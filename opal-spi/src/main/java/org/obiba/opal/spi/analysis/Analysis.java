@@ -1,11 +1,10 @@
 package org.obiba.opal.spi.analysis;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.json.JSONObject;
-import org.obiba.magma.Variable;
 
 import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**

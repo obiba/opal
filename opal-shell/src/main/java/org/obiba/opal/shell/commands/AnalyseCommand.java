@@ -93,10 +93,15 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
-        RAnalysis.Builder builder = RAnalysis.create(analyseOptions.getName(), analyseOptions.getPlugin(), analyseOptions.getTemplate())
-          .session(sessionHandler.getSession())
-          .symbol(RUtils.getSymbol(tibbleName))
-          .parameters(analyseOptions.getParams());
+        RAnalysis.Builder builder =
+          RAnalysis.create(
+            analyseOptions.getId(),
+            analyseOptions.getName(),
+            analyseOptions.getPlugin(),
+            analyseOptions.getTemplate()
+          ).session(sessionHandler.getSession())
+           .symbol(RUtils.getSymbol(tibbleName))
+           .parameters(analyseOptions.getParams());
 
         if (!analyseOptions.getVariables().isEmpty()) {
           builder.variables(StreamSupport.stream(targetValueTable.getVariables().spliterator(), false)
@@ -106,7 +111,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         RAnalysis analysis = builder.build();
 
-        analysisService.save(new OpalAnalysis(datasource.getName(), table.getName(), analysis));
+        analysisService.save(OpalAnalysis.Builder.create(datasource.getName(), table.getName(), analysis).build());
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
         log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());

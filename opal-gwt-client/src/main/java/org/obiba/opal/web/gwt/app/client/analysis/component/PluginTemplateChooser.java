@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PluginTypeChooser extends Chooser {
+public class PluginTemplateChooser extends Chooser {
 
   private Map<String, GroupItem> groupItemMap = new HashMap<String, GroupItem>();
   private String currentGroup;
   private int itemCount = 0;
 
   @UiConstructor
-  public PluginTypeChooser(boolean isMultipleSelect) {
+  public PluginTemplateChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
     initWidget();
   }
@@ -36,11 +36,11 @@ public class PluginTypeChooser extends Chooser {
     }
   }
 
-  public SelectedData getSelectedData() {
+  public SelectionData getSelectedData() {
     int index = super.getSelectedIndex();
     for (GroupItem groupItem : groupItemMap.values()) {
       if (groupItem.indices.contains(index)) {
-        return new SelectedData(groupItem.plugin, groupItem.templates.get(index));
+        return new SelectionData(groupItem.plugin, groupItem.templates.get(index));
       }
     }
 
@@ -54,7 +54,7 @@ public class PluginTypeChooser extends Chooser {
   }
 
   /**
-   * Set the selected value under the corresponding group
+   * Set the selected value under the corresponding plugin group
    *
    * @param pluginName
    * @param templateName
@@ -70,7 +70,6 @@ public class PluginTypeChooser extends Chooser {
     for (GroupItem groupItem : groupItemMap.values()) {
       if (groupItem.indices.contains(templateIndex)) {
         setSelectedIndex(templateIndex);
-//        setSelectedValue(groupItem.templates.get(templateIndex).getTitle());
       }
     }
   }
@@ -79,11 +78,11 @@ public class PluginTypeChooser extends Chooser {
     setPlaceholderText("Put something...");
   }
 
-  public class SelectedData {
+  public class SelectionData {
     private final PluginPackageDto plugin;
     private final AnalysisPluginTemplateDto template;
 
-    public SelectedData(PluginPackageDto plugin, AnalysisPluginTemplateDto template) {
+    public SelectionData(PluginPackageDto plugin, AnalysisPluginTemplateDto template) {
       this.plugin = plugin;
       this.template = template;
     }

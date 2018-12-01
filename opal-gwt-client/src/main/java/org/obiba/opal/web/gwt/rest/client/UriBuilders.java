@@ -574,6 +574,13 @@ public enum UriBuilders {
 
   },
 
+  PROJECT_ANALYSE_COMMAND {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_analyse");
+    }
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {

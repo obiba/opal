@@ -28,6 +28,16 @@ public class Markdown extends JavaScriptObject {
   }-*/;
 
   /**
+   * Turns markdown to html.
+   *
+   * @param markdown markdown text
+   * @return
+   */
+  public static native String parseNoStyle(String markdown) /*-{
+      return '<div>' + $wnd.marked(markdown) + '</div>';
+  }-*/;
+
+  /**
    * Non directly instantiable.
    */
   protected Markdown() {}

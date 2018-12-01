@@ -1,21 +1,22 @@
-package org.obiba.opal.web.gwt.app.client.analysis.service;
+package org.obiba.opal.web.gwt.app.client.analysis.support;
 
-import com.google.inject.Singleton;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.opal.AnalysisPluginPackageDto;
 import org.obiba.opal.web.model.client.opal.AnalysisPluginTemplateDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Singleton
-public class PluginService {
+public class AnalysisPluginsRepository {
 
-  private List<PluginPackageDto> plugins = new ArrayList<PluginPackageDto>();
+  private final List<PluginPackageDto> plugins;
 
-  public void travers(PluginVisitor visitor) {
+  public AnalysisPluginsRepository(List<PluginPackageDto> plugins) {
+    this.plugins = plugins;
+  }
+
+  public void visitPlugins(PluginTemplateVisitor visitor) {
     for (PluginPackageDto plugin : plugins) {
       AnalysisPluginPackageDto analysisPlugin =
         plugin.getExtension(AnalysisPluginPackageDto.PluginPackageDtoExtensions.analysis).cast();
@@ -25,7 +26,7 @@ public class PluginService {
     }
   }
 
-  public OpalAnalysisPluginData getAnalysisPluginData(OpalAnalysisDto analysisDto) {
+  public AnalysisPluginData findAnalysisPluginData(OpalAnalysisDto analysisDto) {
     if (analysisDto == null) return null;
 
     for (PluginPackageDto plugin : plugins) {
@@ -35,7 +36,7 @@ public class PluginService {
 
         for (AnalysisPluginTemplateDto template : JsArrays.toList(analysisPlugin.getAnalysisTemplatesArray())) {
           if (template.getName().equals(analysisDto.getTemplateName())) {
-            return new OpalAnalysisPluginData(plugin, template);
+            return new AnalysisPluginData(plugin, template);
           }
         }
 
@@ -45,7 +46,4 @@ public class PluginService {
     return null;
   }
 
-  public void setPlugins(List<PluginPackageDto> value) {
-    if (value != null) plugins = value;
-  }
 }
