@@ -36,6 +36,8 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   private TableDto originalTable;
 
+  private JsArray<OpalAnalysisDto> originalAnalysisJsArray;
+
   private final ModalProvider<AnalysisEditModalPresenter> AnalysisEditModalPresenterProvider;
 
   private Runnable deleteAnalysisConfirmation;
@@ -84,11 +86,33 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
     modal.initialize(originalTable, null, plugins);
   }
 
+  @Override
+  public void onUpdateAnalysesFilter(String filterText) {
+    if (originalAnalysisJsArray != null && originalAnalysisJsArray.length() > 0) {
+      JsArray<OpalAnalysisDto> array = JsArrays.<OpalAnalysisDto>create();
+
+      if (filterText == null || filterText.length() == 0) {
+        array = originalAnalysisJsArray;
+      } else {
+        for (int i = 0; i < originalAnalysisJsArray.length(); i++) {
+          OpalAnalysisDto analysisDto = originalAnalysisJsArray.get(i);
+
+          if (analysisDto.getName().toLowerCase().contains(filterText.toLowerCase())) {
+            array.push(analysisDto);
+          }
+        }
+      }
+
+      getView().renderRows(array);
+    }
+  }
+
   public void setTable(final TableDto table) {
     getView().clearTable();
 
     if (originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       originalTable = table;
+      originalAnalysisJsArray = null;
     }
 
     if (originalTable != null) {
@@ -101,7 +125,8 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             @Override
             public void onResource(Response response, OpalAnalysesDto resource) {
               if (resource != null) {
-                getView().renderRows(resource.getAnalysesArray());
+                originalAnalysisJsArray = resource.getAnalysesArray();
+                getView().renderRows(originalAnalysisJsArray);
               }
 
               getView().afterRenderRows();
