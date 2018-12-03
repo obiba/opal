@@ -139,11 +139,12 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private String validateArray(Object value) {
-    if(required && (value == null || (value instanceof HashSet && ((HashSet) value).size() == 0))) {
+    HashSet hashSet = value instanceof HashSet ? (HashSet) value : new HashSet();
+    if(required && (value == null || hashSet.size() == 0)) {
       return "required";
     }
 
-    return JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
+    return JsonSchemaGWT.valueForArraySchemaIsValid(hashSet, schema);
   }
 
   public JSONObject getSchema() {

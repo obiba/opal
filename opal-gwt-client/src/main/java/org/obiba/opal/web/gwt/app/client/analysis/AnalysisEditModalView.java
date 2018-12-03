@@ -3,7 +3,9 @@ package org.obiba.opal.web.gwt.app.client.analysis;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,6 +21,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.obiba.opal.web.gwt.app.client.analysis.component.PluginTemplateChooser;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -167,6 +172,28 @@ public class AnalysisEditModalView extends ModalPopupViewWithUiHandlers<Analysis
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  @Override
+  public boolean validateSchemaForm() {
+    Map<HasType<ControlGroupType>, String> errors = new HashMap<>();
+
+    for(Widget widget : formPanel) {
+      if (widget instanceof SchemaUiContainer) {
+        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
+        String validationError = widgetAsSchemaUiContainer.validate();
+
+        if (validationError.length() > 0) {
+          errors.put(widgetAsSchemaUiContainer, widgetAsSchemaUiContainer.getTitle() + ": " + validationError);
+        }
+      }
+    }
+
+    for (Entry<HasType<ControlGroupType>, String> entry: errors.entrySet()) {
+      modal.addAlert(entry.getValue(), AlertType.ERROR, entry.getKey());
+    }
+
+    return errors.size() == 0;
   }
 
   @Override
