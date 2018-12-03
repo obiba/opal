@@ -128,26 +128,10 @@ public class AnalysisEditModalPresenter extends ModalPresenterWidget<AnalysisEdi
       };
     }
 
-    private boolean validateSchemaForm() {
-      boolean isValid = true;
-      Iterator<Widget> iterator = getView().getSchemaForm().iterator();
-
-      while(isValid && iterator.hasNext()) {
-        Widget widget = iterator.next();
-
-        if (widget instanceof SchemaUiContainer) {
-          SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-          isValid = isValid && widgetAsSchemaUiContainer.isValid();
-        }
-      }
-
-      return isValid;
-    }
-
-
     @Override
     public boolean validate() {
-      return super.validate() && validateSchemaForm();
+      boolean validSchemaForm = getView().validateSchemaForm();
+      return super.validate() && validSchemaForm;
     }
 
     @Override
@@ -183,6 +167,8 @@ public class AnalysisEditModalPresenter extends ModalPresenterWidget<AnalysisEdi
     JSONObject getSchemaFormModel();
 
     void showError(@Nullable FormField formField, String message);
+
+    boolean validateSchemaForm();
 
     void clearErrors();
 

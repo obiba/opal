@@ -28,6 +28,10 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     return key;
   }
 
+  public String getFormKey() {
+    return key.endsWith("[]") ? key : key + "[]";
+  }
+
   public String getType() {
     return type;
   }
@@ -41,15 +45,17 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     FlowPanel panel = new FlowPanel();
     panel.add(inputsPanel);
 
-    onAddInput();
-    panel.add((addedInput()));
+    addInput("");
+    panel.add((addPlusButton()));
 
     initWidget(panel);
   }
 
   @Override
   public void setValue(Set<String> ts) {
-
+    for (String val : ts) {
+      addInput(val);
+    }
   }
 
   @Override
@@ -57,13 +63,14 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     Set<String> values = new HashSet<>();
 
     for (TextBox input : inputs) {
-      values.add(input.getValue());
+      String inputValue = input.getValue();
+      if (inputValue != null && inputValue.trim().length() > 0) values.add(inputValue);
     }
 
     return values;
   }
 
-  private FlowPanel addedInput() {
+  private FlowPanel addPlusButton() {
     FlowPanel panel = new FlowPanel();
 
     Button button = new Button();
@@ -76,7 +83,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     button.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        onAddInput();
+        addInput("");
       }
     });
 
@@ -85,10 +92,11 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     return panel;
   }
 
-  private void onAddInput() {
+  private void addInput(String initValue) {
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.getElement().addClassName("input-append");
     TextBox textBox = new TextBox();
+    textBox.setName(getFormKey());
 
     textBox.addAttachHandler(new Handler() {
       @Override
