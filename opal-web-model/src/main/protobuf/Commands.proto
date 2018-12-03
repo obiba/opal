@@ -106,6 +106,7 @@ message AnalyseCommandOptionsDto {
     required string template = 4;
     required string params = 5;
     optional string variables = 6;
+    optional string id = 7;
   }
 
   required string project = 1;

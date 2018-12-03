@@ -692,7 +692,9 @@ public interface Translations extends Constants {
       "BannedUserMins", "Too many login failures. Please try again in {0}mins.",
       "BannedUserMin", "Too many login failures. Please try again in {0}min.",
       "BannedUserSecs", "Too many login failures. Please try again in {0}secs.",
-      "RServerRuntimeError", "An R operation failed. Please contact technical support."
+      "RServerRuntimeError", "An R operation failed. Please contact technical support.",
+      "PluginTypeIsRequired", "Plugin type is required",
+      "AnalysisTask", "Analysis task has been launched.  You can follow its progress in the task list."
   })
   Map<String, String> userMessageMap();
 
@@ -1474,7 +1476,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Analysis")
   String analysis();
 
-
   @Description("Analysis Name label")
   @DefaultStringValue("Name")
   String analysisNameLabel();
@@ -1482,6 +1483,14 @@ public interface Translations extends Constants {
   @Description("Analysis Type label")
   @DefaultStringValue("Type")
   String analysisTypeLabel();
+
+  @Description("Analysis Add Modal title")
+  @DefaultStringValue("Add Analysis")
+  String analysisAddModalTitle();
+
+  @Description("Analysis Edit Modal title")
+  @DefaultStringValue("Edit Analysis")
+  String analysisEditModalTitle();
 
   @Description("Filter Analyses placeholder")
   @DefaultStringValue("Filter Analyses...")

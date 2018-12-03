@@ -1,10 +1,12 @@
 package org.obiba.opal.spi.analysis;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 import org.springframework.util.Assert;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -26,14 +28,16 @@ public abstract class AbstractAnalysis implements Analysis {
 
   private List<String> variables;
 
-  public AbstractAnalysis(@NotNull String name, @NotNull String pluginName,
-      @NotNull String templateName) {
+  public AbstractAnalysis(@Nullable String id,
+                          @NotNull String name,
+                          @NotNull String pluginName,
+                          @NotNull String templateName) {
 
     Assert.notNull(name, "name cannot be null");
     Assert.notNull(templateName , "templateName cannot be null");
     Assert.notNull(templateName , "pluginName cannot be null");
 
-    this.id = IdGenetatorFactory.createDateIdGenerator().generate();
+    this.id = Strings.isNullOrEmpty(id) ? IdGenetatorFactory.createDateIdGenerator().generate() : id;
     this.name = name;
     this.pluginName = pluginName;
     this.templateName = templateName;

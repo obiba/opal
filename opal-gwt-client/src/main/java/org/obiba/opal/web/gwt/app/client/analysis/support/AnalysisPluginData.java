@@ -1,13 +1,13 @@
-package org.obiba.opal.web.gwt.app.client.analysis.service;
+package org.obiba.opal.web.gwt.app.client.analysis.support;
 
 import org.obiba.opal.web.model.client.opal.AnalysisPluginTemplateDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 
-public class OpalAnalysisPluginData {
+public class AnalysisPluginData {
   private PluginPackageDto pluginDto;
   private AnalysisPluginTemplateDto templateDto;
 
-  OpalAnalysisPluginData(PluginPackageDto pluginDto, AnalysisPluginTemplateDto templateDto) {
+  AnalysisPluginData(PluginPackageDto pluginDto, AnalysisPluginTemplateDto templateDto) {
     this.pluginDto = pluginDto;
     this.templateDto = templateDto;
   }

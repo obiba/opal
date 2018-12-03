@@ -78,7 +78,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
     table.addColumn(new TextColumn<OpalAnalysisDto>() {
       @Override
       public String getValue(OpalAnalysisDto object) {
-        return object.getTemplateName();
+          return object.getTemplateName();
       }
     }, translations.analysisTypeLabel());
 
