@@ -8,6 +8,7 @@ import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 import org.springframework.util.Assert;
 
 import javax.annotation.Nullable;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   private String name;
   private String templateName;
   private String pluginName;
-  private JSONObject parameters;
+  private String parametersString;
   private List<String> variables;
 
   private String datasource;
@@ -60,9 +61,20 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
     return templateName;
   }
 
+  /**
+   * OrientDB does not serialize nicely a JSONArray, it adds a field 'myArrayList' that breaks the analysis process.
+   * Saving as string resolves the issue.
+   *
+   * @return
+   */
+  public String getParametersAsString() {
+    return parametersString;
+  }
+
   @Override
+  @Transient
   public JSONObject getParameters() {
-    return parameters;
+    return new JSONObject(parametersString);
   }
 
   @Override
@@ -142,7 +154,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
     }
 
     public Builder parameters(JSONObject value) {
-      analysis.parameters = value;
+      analysis.parametersString = value == null ? "{}" : value.toString();
       return this;
     }
 
