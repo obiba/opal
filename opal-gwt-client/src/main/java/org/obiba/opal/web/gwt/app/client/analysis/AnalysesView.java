@@ -6,6 +6,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -121,6 +122,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
 
   @Override
   public void beforeRenderRows() {
+    filter.setText("");
     table.showLoadingIndicator(dataProvider);
   }
 
@@ -153,5 +155,10 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   @UiHandler("newButton")
   public void onNewButton(ClickEvent event) {
     getUiHandlers().createAnalysis();
+  }
+
+  @UiHandler("filter")
+  public void filterKeyUp(KeyUpEvent event) {
+    getUiHandlers().onUpdateAnalysesFilter(filter.getText());
   }
 }

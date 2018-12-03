@@ -4,4 +4,5 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface AnalysesUiHandlers extends UiHandlers {
   void createAnalysis();
+  void onUpdateAnalysesFilter(String filterText);
 }
