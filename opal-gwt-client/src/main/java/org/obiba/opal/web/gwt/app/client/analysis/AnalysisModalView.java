@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.analysis.component.AnalysisPanel;
+import org.obiba.opal.web.gwt.app.client.analysis.component.ResultsPanel;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.analysis.support.PluginTemplateVisitor;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -27,10 +28,13 @@ import java.util.Map;
 public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModalUiHandlers>
   implements AnalysisModalPresenter.Display {
 
-  private AnalysisPanel analysisPanel;
-
   interface Binder extends UiBinder<Widget, AnalysisModalView> {
+
   }
+
+  private final AnalysisPanel analysisPanel;
+
+  private final ResultsPanel resultsPanel;
 
   private OpalAnalysisDto analysis;
 
@@ -48,17 +52,24 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
 
   @UiField
   SimplePanel analysisContainer;
+
+  @UiField
+  SimplePanel resultsContainer;
+
   @UiField
   Button runButton;
+
   @UiField
   Button cancelButton;
+
 
   @Inject
   public AnalysisModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
-    this.analysisPanel = new AnalysisPanel(eventBus);
+    analysisPanel = new AnalysisPanel(eventBus);
+    resultsPanel = new ResultsPanel(getEventBus());
   }
 
   @Override
@@ -75,7 +86,7 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
     if (createMode) {
       initializeForCreate();
     } else {
-      initializeForView(analysisPluginData);
+      initializeForView(tableDto, analysisPluginData);
     }
   }
 
@@ -85,14 +96,25 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
     analysisOnlyContainer.setVisible(true);
   }
 
-  private void initializeForView(AnalysisPluginData analysisPluginData) {
-    analysisContainer.add(analysisPanel);
+  private void initializeForView(TableDto tableDto, AnalysisPluginData analysisPluginData) {
+    int analysisResultsCount = analysis.getAnalysisResultsCount();
+
+    if (analysisResultsCount == 0) {
+      analysisOnlyContainer.add(analysisPanel);
+      analysisOnlyContainer.setVisible(true);
+    } else {
+      resultsPanel.initialize(tableDto, analysis.getAnalysisResultsArray());
+      analysisContainer.add(analysisPanel);
+      resultsContainer.add(resultsPanel);
+      tabPanel.setVisible(true);
+    }
+
     modal.setTitle(
       analysis.getName()
         + " - " + analysisPluginData.getPluginDto().getTitle()
         + " / " + analysisPluginData.getTemplateDto().getTitle()
     );
-    tabPanel.setVisible(true);
+
     runButton.setVisible(false);
     cancelButton.setText(translations.closeLabel());
   }

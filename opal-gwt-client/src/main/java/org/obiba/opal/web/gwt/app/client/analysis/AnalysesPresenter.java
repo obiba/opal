@@ -119,7 +119,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
       getView().beforeRenderRows();
 
       ResourceRequestBuilderFactory.<OpalAnalysesDto>newBuilder()
-          .forResource(UriBuilders.PROJECT_ANALYSES_TABLE.create()
+          .forResource(UriBuilders.PROJECT_TABLE_ANALYSES.create()
             .build(originalTable.getDatasourceName(), originalTable.getName()))
           .withCallback(new ResourceCallback<OpalAnalysesDto>() {
             @Override
@@ -163,8 +163,19 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             break;
 
           case Display.VIEW_ANALYSIS:
-            AnalysisModalPresenter modal = AnalysisModalPresenterProvider.get();
-            modal.initialize(originalTable, analysis, plugins);
+            ResourceRequestBuilderFactory.<OpalAnalysisDto>newBuilder()
+              .forResource(UriBuilders.PROJECT_TABLE_ANALYSIS.create()
+                .build(originalTable.getDatasourceName(), originalTable.getName(), analysis.getId()))
+              .withCallback(new ResourceCallback<OpalAnalysisDto>() {
+                @Override
+                public void onResource(Response response, OpalAnalysisDto resource) {
+                  if (resource != null) {
+                    AnalysisModalPresenterProvider.get().initialize(originalTable, resource, plugins);
+                  }
+                }
+              })
+              .get().send();
+
             break;
 
           case Display.DELETE_ANALYSIS: {

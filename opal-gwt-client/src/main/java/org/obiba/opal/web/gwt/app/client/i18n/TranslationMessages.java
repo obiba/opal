@@ -224,6 +224,11 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "=0", "No analysis", "one", "1 analysis" })
   String analysisCount(@PluralCount int count);
 
+  @Description("Analysis Result count label")
+  @DefaultMessage("{0} results")
+  @AlternateMessage({ "=0", "No result", "one", "1 result" })
+  String analysisResultCount(@PluralCount int count);
+
   @Description("Entities count label")
   @DefaultMessage("{0} entities")
   @AlternateMessage({ "=0", "No entities", "one", "1 entity" })
