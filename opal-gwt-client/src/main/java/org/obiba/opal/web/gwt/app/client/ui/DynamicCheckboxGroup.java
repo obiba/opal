@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.gwt.user.client.ui.HasEnabled;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,14 +13,17 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 
-public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<String>> {
+public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<String>>, HasEnabled {
 
   private Set<String> value = new HashSet<>();
   private final String key;
 
   private final List<CheckBox> checkBoxes;
 
+  private boolean enabled;
+
   public DynamicCheckboxGroup(String key, List<String> items) {
+    this.enabled = true;
     this.key = key;
     checkBoxes = new ArrayList<>();
 
@@ -88,5 +92,19 @@ public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<St
 
   public void removeItem(String item) {
     value.remove(item);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+
+    for (CheckBox button : checkBoxes) {
+      button.setEnabled(enabled);
+    }
   }
 }

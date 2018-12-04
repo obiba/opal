@@ -1,9 +1,14 @@
 package org.obiba.opal.web.gwt.app.client.support.jsonschema;
 
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
@@ -106,6 +111,36 @@ public abstract class JsonSchemaGWT {
     }
   }
 
+  public static Map<HasType<ControlGroupType>, String> validate(final Panel containerPanel) {
+    Map<HasType<ControlGroupType>, String> errors = new HashMap<>();
+
+    for(Widget widget : containerPanel) {
+      if (widget instanceof SchemaUiContainer) {
+        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
+        String validationError = widgetAsSchemaUiContainer.validate();
+
+        if (validationError.length() > 0) {
+          errors.put(widgetAsSchemaUiContainer, widgetAsSchemaUiContainer.getTitle() + ": " + validationError);
+        }
+      }
+    }
+
+    return errors;
+  }
+
+  public static JSONObject getModel(final Panel containerPanel) {
+    JSONObject jsonObject = new JSONObject();
+
+    for(Widget widget : containerPanel) {
+      if(widget instanceof SchemaUiContainer) {
+        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
+        jsonObject.put(widgetAsSchemaUiContainer.getKey(), widgetAsSchemaUiContainer.getJSONValue());
+      }
+    }
+
+    return jsonObject;
+  }
+
   public static String valueForStringSchemaIsValid(String value, JSONObject schema) {
     String error = "";
 
@@ -174,7 +209,7 @@ public abstract class JsonSchemaGWT {
     return error;
   }
 
-  private static void addToPanel(JSONObject schema, String key, JSONObject initialValue, boolean wholeSchemaIsReadOnly, List<String> required, Panel containerPanel,  EventBus eventBus) {
+  private static void addToPanel(final JSONObject schema, String key, final JSONObject initialValue, boolean wholeSchemaIsReadOnly, List<String> required, Panel containerPanel,  EventBus eventBus) {
     schema.put("readOnly", JSONBoolean.getInstance(wholeSchemaIsReadOnly));
     SchemaUiContainer uiContainer = new SchemaUiContainer(schema, key,required.indexOf(key) > -1, eventBus);
 

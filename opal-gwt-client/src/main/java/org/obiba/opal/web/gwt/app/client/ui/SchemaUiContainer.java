@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,7 @@ import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.TakesValue;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.ControlGroup {
+public class SchemaUiContainer extends ControlGroup {
 
   private final EventBus eventBus;
 
@@ -212,7 +213,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
       JSONValue readOnly = schema.get("readOnly");
       if (readOnly != null && readOnly.isBoolean() != null && readOnly.isBoolean().booleanValue()) {
-        widget.getElement().setAttribute("readonly", "true");
+        ((HasEnabled) widget).setEnabled(false);
       }
 
       add(widget);
@@ -228,7 +229,6 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   private Widget buildInputWidget() {
     JSONValue aDefault = schema.get("default");
 
-    // for now 3 cases: number, integer and string
     switch(type) {
       case "number": {
         return createWidgetForNumber(aDefault);
