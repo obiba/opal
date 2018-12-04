@@ -74,7 +74,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   @Override
   @Transient
   public JSONObject getParameters() {
-    return new JSONObject(parametersString);
+    return new JSONObject(getParametersAsString());
   }
 
   @Override

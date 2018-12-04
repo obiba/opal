@@ -7,6 +7,6 @@ public class AnalysisModule extends AbstractOpalModule {
   @Override
   protected void configure() {
     bindPresenterWidget(AnalysesPresenter.class, AnalysesPresenter.Display.class, AnalysesView.class);
-    bindPresenterWidget(AnalysisEditModalPresenter.class, AnalysisEditModalPresenter.Display.class, AnalysisEditModalView.class);
+    bindPresenterWidget(AnalysisModalPresenter.class, AnalysisModalPresenter.Display.class, AnalysisModalView.class);
   }
 }

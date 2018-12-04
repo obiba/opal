@@ -93,7 +93,7 @@ public class SchemaUiContainer extends ControlGroup {
         TakesValue editableWidget = (TakesValue) widget;
 
         if ("string".equals(type)) {
-          editableWidget.setValue(value.isString().toString());
+          editableWidget.setValue(ensureStringValue(value));
         } else if ("integer".equals(type) || "number".equals(type)) {
           Double aDouble = value.isNumber().doubleValue();
           editableWidget.setValue("number".equals(type) ? aDouble : aDouble.intValue());
@@ -103,7 +103,7 @@ public class SchemaUiContainer extends ControlGroup {
           if (array != null) {
             int size = array.size();
             for (int i = 0; i < size; i++) {
-              set.add(array.get(i).toString());
+              set.add(ensureStringValue(array.get(i)));
             }
           }
 
@@ -113,6 +113,10 @@ public class SchemaUiContainer extends ControlGroup {
         found = true;
       }
     }
+  }
+
+  private String ensureStringValue(JSONValue value) {
+    return value != null && value.isString() != null ? value.isString().stringValue() : "";
   }
 
   public boolean isValid() {

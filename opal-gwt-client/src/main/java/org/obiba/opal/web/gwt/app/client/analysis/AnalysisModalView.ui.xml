@@ -1,0 +1,30 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:o='urn:import:org.obiba.opal.web.gwt.app.client.ui'
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
+
+    <g:SimplePanel ui:field="analysisOnlyContainer" visible="false"/>
+
+    <b:TabPanel tabPosition="above" ui:field="tabPanel" visible="false" >
+      <b:Tab heading="Analysis" active="true">
+        <g:SimplePanel ui:field="analysisContainer"/>
+      </b:Tab>
+      <b:Tab heading="Results">
+        <g:SimplePanel ui:field="resultsContainer"/>
+      </b:Tab>
+    </b:TabPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="runButton" type="PRIMARY">
+        <ui:msg description="Analysis Edit Model run label">Run</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>
