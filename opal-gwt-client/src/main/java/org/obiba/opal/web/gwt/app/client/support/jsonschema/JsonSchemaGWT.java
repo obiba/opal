@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.support.jsonschema;
 
+import com.google.gwt.json.client.JSONBoolean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,9 +68,14 @@ public abstract class JsonSchemaGWT {
     return result;
   }
 
-  public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel, EventBus eventBus) {
+  public static void buildUiIntoPanel(final JSONObject jsonSchema, final JSONObject initialValues, Panel containerPanel, EventBus eventBus) {
     String rootSchemaType = getType(jsonSchema);
     List<String> required = getRequired(jsonSchema);
+
+    JSONObject valueObject = initialValues != null ? initialValues : new JSONObject();
+
+    JSONValue readOnly = jsonSchema.get("readOnly");
+    boolean wholeSchemaIsReadOnly = (readOnly != null && readOnly.isBoolean() != null) && readOnly.isBoolean().booleanValue();
 
     if ("object".equals(rootSchemaType)) {
       JSONObject properties = getProperties(jsonSchema);
@@ -78,7 +84,7 @@ public abstract class JsonSchemaGWT {
       for(String key : keys) {
         JSONObject schema = getSchema(properties, key);
         if(schema != null) {
-          containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
+          addToPanel(schema, key, valueObject, wholeSchemaIsReadOnly, required, containerPanel, eventBus);
         }
       }
     } else {
@@ -92,7 +98,8 @@ public abstract class JsonSchemaGWT {
             JSONObject schema = schemaValue.isObject();
             JSONValue keyValue = schema.get("key");
             String key = keyValue != null && keyValue.isString() != null ? keyValue.isString().stringValue() : "key" + i;
-            containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
+
+            addToPanel(schema, key, valueObject, wholeSchemaIsReadOnly, required, containerPanel, eventBus);
           }
         }
       }
@@ -165,5 +172,13 @@ public abstract class JsonSchemaGWT {
     }
 
     return error;
+  }
+
+  private static void addToPanel(JSONObject schema, String key, JSONObject initialValue, boolean wholeSchemaIsReadOnly, List<String> required, Panel containerPanel,  EventBus eventBus) {
+    schema.put("readOnly", JSONBoolean.getInstance(wholeSchemaIsReadOnly));
+    SchemaUiContainer uiContainer = new SchemaUiContainer(schema, key,required.indexOf(key) > -1, eventBus);
+
+    uiContainer.setJSONValue(initialValue.get(key));
+    containerPanel.add(uiContainer);
   }
 }

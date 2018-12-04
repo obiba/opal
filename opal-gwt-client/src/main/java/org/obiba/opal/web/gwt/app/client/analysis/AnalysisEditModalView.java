@@ -235,7 +235,13 @@ public class AnalysisEditModalView extends ModalPopupViewWithUiHandlers<Analysis
 
     formPanel.clear();
     JSONObject jsonObject = (JSONObject)JSONParser.parseStrict(template.getSchemaForm());
-    JsonSchemaGWT.buildUiIntoPanel(jsonObject, formPanel, getEventBus());
+    JSONObject jsonObjectValues = null;
+
+    if (analysis != null) {
+      jsonObjectValues = (JSONObject)JSONParser.parseLenient(analysis.getParameters());
+    }
+
+    JsonSchemaGWT.buildUiIntoPanel(jsonObject, jsonObjectValues, formPanel, getEventBus());
   }
 
 
