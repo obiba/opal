@@ -19,7 +19,6 @@ public class PluginTemplateChooser extends Chooser {
   @UiConstructor
   public PluginTemplateChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
-    initWidget();
   }
 
   public void addPluginAndTemplates(PluginPackageDto plugin, List<AnalysisPluginTemplateDto> templates) {
@@ -66,17 +65,6 @@ public class PluginTemplateChooser extends Chooser {
     }
   }
 
-  public void setSelectedTemplateIndex(int templateIndex) {
-    for (GroupItem groupItem : groupItemMap.values()) {
-      if (groupItem.indices.contains(templateIndex)) {
-        setSelectedIndex(templateIndex);
-      }
-    }
-  }
-
-  private void initWidget() {
-    setPlaceholderText("Put something...");
-  }
 
   public class SelectionData {
     private final PluginPackageDto plugin;

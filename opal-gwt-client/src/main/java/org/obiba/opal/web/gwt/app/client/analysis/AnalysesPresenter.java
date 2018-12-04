@@ -38,7 +38,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   private JsArray<OpalAnalysisDto> originalAnalysisJsArray;
 
-  private final ModalProvider<AnalysisEditModalPresenter> AnalysisEditModalPresenterProvider;
+  private final ModalProvider<AnalysisModalPresenter> AnalysisModalPresenterProvider;
 
   private Runnable deleteAnalysisConfirmation;
 
@@ -49,10 +49,10 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   @Inject
   public AnalysesPresenter(EventBus eventBus, Display view,
                            TranslationMessages translationMessages,
-                           ModalProvider<AnalysisEditModalPresenter> analysisEditModalPresenter) {
+                           ModalProvider<AnalysisModalPresenter> AnalysisModalPresenter) {
     super(eventBus, view);
     this.translationMessages = translationMessages;
-      AnalysisEditModalPresenterProvider = analysisEditModalPresenter.setContainer(this);
+      AnalysisModalPresenterProvider = AnalysisModalPresenter.setContainer(this);
       getView().setUiHandlers(this);
   }
 
@@ -82,7 +82,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   @Override
   public void createAnalysis() {
-    AnalysisEditModalPresenter modal = AnalysisEditModalPresenterProvider.get();
+    AnalysisModalPresenter modal = AnalysisModalPresenterProvider.get();
     modal.initialize(originalTable, null, plugins);
   }
 
@@ -163,7 +163,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             break;
 
           case Display.VIEW_ANALYSIS:
-            AnalysisEditModalPresenter modal = AnalysisEditModalPresenterProvider.get();
+            AnalysisModalPresenter modal = AnalysisModalPresenterProvider.get();
             modal.initialize(originalTable, analysis, plugins);
             break;
 

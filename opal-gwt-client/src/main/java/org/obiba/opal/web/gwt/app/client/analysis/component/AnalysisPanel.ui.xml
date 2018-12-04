@@ -1,5 +1,4 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:o='urn:import:org.obiba.opal.web.gwt.app.client.ui'
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
@@ -7,8 +6,7 @@
              ui:generateLocales='default'
              xmlns:component="urn:import:org.obiba.opal.web.gwt.app.client.analysis.component">
 
-  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
-
+  <g:FlowPanel>
     <b:ControlGroup ui:field="analyseGroup">
       <b:ControlLabel>
         <ui:msg description="Analysis Edit Model analyse name">Name</ui:msg>
@@ -46,16 +44,6 @@
     <!-- Plugin SchemaForm -->
     <g:FlowPanel ui:field="formPanel">
     </g:FlowPanel>
+  </g:FlowPanel>
 
-
-    <b:ModalFooter>
-      <b:Button ui:field="runButton" type="PRIMARY">
-        <ui:msg description="Analysis Edit Model run label">Run</ui:msg>
-      </b:Button>
-      <b:Button ui:field="cancelButton">
-        <ui:msg description="Cancel button label">Cancel</ui:msg>
-      </b:Button>
-    </b:ModalFooter>
-
-  </o:Modal>
 </ui:UiBinder>
