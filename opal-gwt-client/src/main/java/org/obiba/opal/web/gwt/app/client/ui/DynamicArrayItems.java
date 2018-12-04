@@ -10,19 +10,25 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DynamicArrayItems extends Composite implements TakesValue<Set<String>> {
+public class DynamicArrayItems extends Composite implements TakesValue<Set<String>>, HasEnabled {
 
   private final String key;
   private final String type;
 
   private List<TextBox> inputs;
   private FlowPanel inputsPanel;
+
+  private Button plusButton;
+
+  private boolean enabled;
 
   public String getKey() {
     return key;
@@ -37,6 +43,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
   }
 
   public DynamicArrayItems(String key, String type) {
+    this.enabled = true;
     this.key = key;
     this.type = type;
     inputs = new ArrayList<>();
@@ -86,6 +93,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
       }
     });
 
+    plusButton = button;
     panel.add(button);
 
     return panel;
@@ -108,6 +116,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
       }
     });
 
+    textBox.setEnabled(enabled);
     inputPanel.add(textBox);
 
     Button removeButton = new Button();
@@ -123,8 +132,29 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
       }
     });
 
+    removeButton.setEnabled(enabled);
     inputPanel.add(removeButton);
     inputs.add(textBox);
     inputsPanel.add(inputPanel);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+
+    plusButton.setEnabled(enabled);
+
+    for (Widget inputPanel : inputsPanel) {
+      if (inputPanel instanceof FlowPanel) {
+        for (Widget widget: (FlowPanel) inputPanel) {
+          if (widget instanceof HasEnabled) ((HasEnabled) widget).setEnabled(enabled);
+        }
+      }
+    }
   }
 }

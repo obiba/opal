@@ -86,31 +86,12 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
   @Override
   public JSONObject getCurrentValues() {
-    JSONObject jsonObject = new JSONObject();
-
-    for(Widget widget : containerPanel) {
-      if(widget instanceof SchemaUiContainer) {
-        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-        jsonObject.put(widgetAsSchemaUiContainer.getKey(), widgetAsSchemaUiContainer.getJSONValue());
-      }
-    }
-
-    return jsonObject;
+    return JsonSchemaGWT.getModel(containerPanel);
   }
 
   @Override
   public Map<HasType<ControlGroupType>, String> getErrors() {
-    Map<HasType<ControlGroupType>, String> errors = new HashMap<>();
-
-    for(Widget widget : containerPanel) {
-      if (widget instanceof SchemaUiContainer) {
-        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-        String validationError = widgetAsSchemaUiContainer.validate();
-        if (validationError.length() > 0) errors.put(widgetAsSchemaUiContainer, widgetAsSchemaUiContainer.getTitle() + ": " + validationError);
-      }
-    }
-
-    return errors;
+    return JsonSchemaGWT.validate(containerPanel);
   }
 
   public ModalUiHandlers getUiHandlers() {

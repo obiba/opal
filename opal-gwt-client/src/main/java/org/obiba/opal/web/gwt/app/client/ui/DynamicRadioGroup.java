@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.gwt.user.client.ui.HasEnabled;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +11,14 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 
-public class DynamicRadioGroup extends Composite implements TakesValue<String> {
+public class DynamicRadioGroup extends Composite implements TakesValue<String>, HasEnabled {
 
   private String value;
   private final String key;
 
   private final List<RadioButton> radios;
+
+  private boolean enabled;
 
   @Override
   public void setValue(String value) {
@@ -36,6 +39,7 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
   }
 
   public DynamicRadioGroup(String key, List<String> items) {
+    this.enabled = true;
     this.key = key;
     radios = new ArrayList<>();
 
@@ -71,5 +75,19 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
     }
 
     initWidget(panel);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+
+    for (RadioButton button : radios) {
+      button.setEnabled(enabled);
+    }
   }
 }
