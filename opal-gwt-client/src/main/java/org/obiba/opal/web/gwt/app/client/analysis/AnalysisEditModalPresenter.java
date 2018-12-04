@@ -4,28 +4,29 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.analysis.event.RunAnalysisRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginsRepository;
 import org.obiba.opal.web.gwt.app.client.analysis.support.PluginTemplateVisitor;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
-import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 public class AnalysisEditModalPresenter extends ModalPresenterWidget<AnalysisEditModalPresenter.Display>
   implements AnalysisEditModalUiHandlers {

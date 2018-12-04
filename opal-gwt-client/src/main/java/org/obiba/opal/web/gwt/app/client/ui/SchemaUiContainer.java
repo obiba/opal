@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.Set;
 import javax.validation.constraints.NotNull;
 
 import com.google.gwt.user.client.ui.*;
@@ -77,6 +78,39 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
       return jsonArray;
     } else {
       return new JSONString(value.toString());
+    }
+  }
+
+  public void setJSONValue(JSONValue value) {
+    Iterator<Widget> iterator = getChildren().iterator();
+    boolean found = false;
+
+    while(value != null && (!found || iterator.hasNext())) {
+      Widget widget = iterator.next();
+
+      if(widget instanceof TakesValue) {
+        TakesValue editableWidget = (TakesValue) widget;
+
+        if ("string".equals(type)) {
+          editableWidget.setValue(value.isString().toString());
+        } else if ("integer".equals(type) || "number".equals(type)) {
+          Double aDouble = value.isNumber().doubleValue();
+          editableWidget.setValue("number".equals(type) ? aDouble : aDouble.intValue());
+        } else if ("array".equals(type)) {
+          Set<String> set = new HashSet<>();
+          JSONArray array = value.isArray();
+          if (array != null) {
+            int size = array.size();
+            for (int i = 0; i < size; i++) {
+              set.add(array.get(i).toString());
+            }
+          }
+
+          editableWidget.setValue(set);
+        }
+
+        found = true;
+      }
     }
   }
 

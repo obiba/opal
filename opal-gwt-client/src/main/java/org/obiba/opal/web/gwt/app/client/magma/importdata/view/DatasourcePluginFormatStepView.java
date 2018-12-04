@@ -61,7 +61,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
             containerPanel.clear();
 
             JSONObject jsonSchema = new JSONObject(resource);
-            JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel, eventBus);
+            JsonSchemaGWT.buildUiIntoPanel(jsonSchema, null, containerPanel, eventBus);
           }
         })
         .get().send();
