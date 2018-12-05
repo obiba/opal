@@ -162,20 +162,15 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             runAnalysis(analysis);
             break;
 
-          case Display.VIEW_ANALYSIS:
-            ResourceRequestBuilderFactory.<OpalAnalysisDto>newBuilder()
-              .forResource(UriBuilders.PROJECT_TABLE_ANALYSIS.create()
-                .build(originalTable.getDatasourceName(), originalTable.getName(), analysis.getId()))
-              .withCallback(new ResourceCallback<OpalAnalysisDto>() {
-                @Override
-                public void onResource(Response response, OpalAnalysisDto resource) {
-                  if (resource != null) {
-                    AnalysisModalPresenterProvider.get().initialize(originalTable, resource, plugins);
-                  }
-                }
-              })
-              .get().send();
+          case Display.DUPLICATE_ANALYSIS:
+            OpalAnalysisDto duplicate = OpalAnalysisDto.parse(OpalAnalysisDto.stringify(analysis));
+            duplicate.setId(null);
+            duplicate.setName(null);
+            AnalysisModalPresenterProvider.get().initialize(originalTable, duplicate, plugins);
+            break;
 
+          case Display.VIEW_ANALYSIS:
+            viewAnalysis(analysis);
             break;
 
           case Display.DELETE_ANALYSIS: {
@@ -194,6 +189,21 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         runAnalysis(event.getAnalysisDto());
       }
     });
+  }
+
+  private void viewAnalysis(OpalAnalysisDto analysis) {
+    ResourceRequestBuilderFactory.<OpalAnalysisDto>newBuilder()
+      .forResource(UriBuilders.PROJECT_TABLE_ANALYSIS.create()
+        .build(originalTable.getDatasourceName(), originalTable.getName(), analysis.getId()))
+      .withCallback(new ResourceCallback<OpalAnalysisDto>() {
+        @Override
+        public void onResource(Response response, OpalAnalysisDto resource) {
+          if (resource != null) {
+            AnalysisModalPresenterProvider.get().initialize(originalTable, resource, plugins);
+          }
+        }
+      })
+      .get().send();
   }
 
 

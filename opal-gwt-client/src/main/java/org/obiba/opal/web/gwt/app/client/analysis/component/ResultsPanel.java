@@ -6,15 +6,13 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -44,9 +42,6 @@ public class ResultsPanel extends Composite {
   private ActionsColumn<OpalAnalysisResultDto> actionColumn;
 
   @UiField
-  Label status;
-
-  @UiField
   Label start;
 
   @UiField
@@ -64,6 +59,12 @@ public class ResultsPanel extends Composite {
   @UiField
   TextBoxClearable filter;
 
+  @UiField
+  CollapsiblePanel historyPanel;
+
+  @UiField
+  InlineHTML status;
+
   public ResultsPanel(EventBus eventBus) {
     initWidget(uiBinder.createAndBindUi(this));
     this.eventBus = eventBus;
@@ -75,17 +76,22 @@ public class ResultsPanel extends Composite {
     history = JsArrays.toList(results, 1, lastIndex++);
 
     initializeLastResult();
-    initializeHistory();
+
+    if (history.size() > 0) initializeHistory();
   }
 
   private void initializeLastResult() {
-    status.setText(lastResult.getStatus().getName());
+    String value = AnalysisStatusColumn.formatForRender(lastResult);
+    String cellValue = AnalysisStatusColumn.StatusImageCell.renderAsString(value);
+
+    status.setHTML(cellValue);
     start.setText(lastResult.getStartDate());
     end.setText(lastResult.getEndDate());
     message.setText(lastResult.getMessage());
   }
 
   private void initializeHistory() {
+    historyPanel.setVisible(true);
     addTableColumns();
     initFilter();
     beforeRenderRows();
@@ -96,12 +102,7 @@ public class ResultsPanel extends Composite {
     actionColumn = actionColumn();
 
     // Status Column
-    historyTable.addColumn(new TextColumn<OpalAnalysisResultDto>() {
-      @Override
-      public String getValue(OpalAnalysisResultDto object) {
-        return object.getStatus().getName();
-      }
-    }, translations.analysisResultStatusLabel());
+    historyTable.addColumn(new AnalysisStatusColumn(), translations.analysisResultStatusLabel());
 
     // Date Column
     historyTable.addColumn(new TextColumn<OpalAnalysisResultDto>() {

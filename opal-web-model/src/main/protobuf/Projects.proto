@@ -81,7 +81,7 @@ message AnalysisResultItemDto {
 enum AnalysisStatusDto {
   IN_PROGRESS = 1;
   PASSED = 2;
-  FAILURE = 3;
+  FAILED = 3;
   ERROR = 4;
   IGNORED = 5;
 }
