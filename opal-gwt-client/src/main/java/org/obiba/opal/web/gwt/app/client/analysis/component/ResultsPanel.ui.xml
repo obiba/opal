@@ -1,0 +1,59 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
+
+  <g:FlowPanel>
+    <o:PropertiesTable keyStyleNames="span2">
+      <o:PropertyPanel>
+        <g:Label>
+          <ui:msg description="Analysis Results Status label">Status</ui:msg>
+        </g:Label>
+        <g:Label ui:field="status"/>
+      </o:PropertyPanel>
+
+      <o:PropertyPanel>
+        <g:Label>
+          <ui:msg description="Analysis Results Startlabel">Start</ui:msg>
+        </g:Label>
+        <g:Label ui:field="start"/>
+      </o:PropertyPanel>
+
+      <o:PropertyPanel>
+        <g:Label>
+          <ui:msg description="Analysis Results End label">End</ui:msg>
+        </g:Label>
+        <g:Label ui:field="end"/>
+      </o:PropertyPanel>
+
+      <o:PropertyPanel>
+        <g:Label>
+          <ui:msg description="Analysis Results Status Message label">Message</ui:msg>
+        </g:Label>
+        <g:Label ui:field="message"/>
+      </o:PropertyPanel>
+
+      <o:PropertyPanel>
+        <g:Label>
+          <ui:msg description="Analysis Results Status Report label">Report</ui:msg>
+        </g:Label>
+        <g:Label ui:field="report"/>
+      </o:PropertyPanel>
+
+    </o:PropertiesTable>
+
+    <o:CollapsiblePanel ui:field="advancedOptions" addStyleNames="grid">
+
+      <g:FlowPanel>
+        <b:Controls addStyleNames="small-top-margin pull-right">
+          <b:InputAddOn prependIcon="FILTER">
+            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+          </b:InputAddOn>
+        </b:Controls>
+      </g:FlowPanel>
+
+      <o:Table ui:field="historyTable"></o:Table>
+    </o:CollapsiblePanel>
+
+  </g:FlowPanel>
+</ui:UiBinder>

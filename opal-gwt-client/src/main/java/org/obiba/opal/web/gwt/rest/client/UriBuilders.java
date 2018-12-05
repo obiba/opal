@@ -566,12 +566,19 @@ public enum UriBuilders {
     }
   },
 
-  PROJECT_ANALYSES_TABLE {
+  PROJECT_TABLE_ANALYSES {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("project", "{}", "table", "{}", "analyses");
     }
 
+  },
+
+  PROJECT_TABLE_ANALYSIS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}");
+    }
   },
 
   PROJECT_ANALYSE_COMMAND {
