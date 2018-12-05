@@ -1,9 +1,10 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import java.util.List;
+import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.analysis.event.RunAnalysisRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginsRepository;
@@ -14,9 +15,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
-
-import javax.inject.Inject;
-import java.util.List;
 
 public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPresenter.Display>
   implements AnalysisModalUiHandlers  {
@@ -36,9 +34,7 @@ public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPr
 
 
   @Override
-  protected void onBind() {
-    GWT.log("AnalysisModalPresenter.onBind()");
-  }
+  protected void onBind() { }
 
   public void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, List<PluginPackageDto> plugins) {
     table = tableDto;

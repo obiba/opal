@@ -3,30 +3,49 @@ package org.obiba.opal.web.gwt.app.client.analysis.component;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead.UpdaterCallback;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.analysis.support.PluginTemplateVisitor;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
-import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
-import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle.VariableSuggestion;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.AnalysisPluginTemplateDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
-
-import java.util.*;
 
 public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
@@ -50,7 +69,9 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
   private PluginTemplateChooser.SelectionData currentSelection;
 
-  private boolean enabled = true;
+  private boolean enabled;
+
+  private final VariableSuggestOracle oracle;
 
   @UiField
   TextBox analyseName;
@@ -70,12 +91,20 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
   @UiField
   FlowPanel formPanel;
 
-  @UiField
-  TextBox variables;
+  @UiField(provided = true)
+  SuggestListBox variables;
 
   public AnalysisPanel(EventBus eventBus) {
-    initWidget(uiBinder.createAndBindUi(this));
     this.eventBus = eventBus;
+    enabled = true;
+
+    oracle = new VariableSuggestOracle(eventBus);
+    oracle.setLimit(10);
+
+    variables = new SuggestListBox(oracle);
+
+    initSuggestBox();
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   public void initialize(OpalAnalysisDto analysisDto, TableDto tableDto, AnalysisPluginData data, boolean enabled) {
@@ -84,6 +113,9 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     analysis = analysisDto;
     validationHandler = new PanelValidationHandler();
     setEnabled(enabled);
+
+    oracle.setDatasource(table.getDatasourceName());
+    oracle.setTable(table.getName());
 
     if (analysis == null) return;
 
@@ -99,6 +131,15 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
     pluginTemplateChooser.setSelectedTemplate(pluginName, templateName);
     updateSchemaForm(pluginTemplateChooser.getSelectedData());
+
+    JsArrayString variablesArray = analysisDto.getVariablesArray();
+    if (variablesArray != null && variablesArray.length() > 0) {
+      for(int i = 0; i< variablesArray.length(); i++) {
+        variables.addItem(variablesArray.get(i));
+      }
+
+      variables.getTextBox().setVisible(enabled);
+    }
   }
 
   public void ensureAnalysis() {
@@ -109,6 +150,13 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     analysis.setName(analyseName.getText());
     analysis.setPluginName(getPluginName());
     analysis.setTemplateName(getTemplateName());
+
+    Set<String> set = new HashSet<>(variables.getSelectedItemsTexts());
+
+    for (String variable: set) {
+      analysis.addVariables(variable);
+    }
+
     analysis.setParameters(getSchemaFormModel().toString());
     analysis.setDatasource(table.getDatasourceName());
     analysis.setTable(table.getName());
@@ -140,7 +188,28 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     this.enabled = enabled;
     analyseName.setEnabled(enabled);
     pluginTemplateChooser.setEnabled(enabled);
-    variables.setEnabled(enabled);
+    variables.setReadOnly(!enabled);
+    variables.getTextBox().setEnabled(enabled);
+  }
+
+  private void initSuggestBox() {
+    variables.setUpdaterCallback(new UpdaterCallback() {
+      @Override
+      public String onSelection(Suggestion selectedSuggestion) {
+        variables.addItem(((VariableSuggestion) selectedSuggestion).getVariable());
+        return "";
+      }
+    });
+
+    variables.getTextBox().addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if(event.getNativeEvent().getKeyCode() == 188) {
+          variables.addItem(variables.getTextBox().getText().replace(",", "").trim());
+          variables.getTextBox().setText("");
+        }
+      }
+    });
   }
 
   private HasText getName() {
@@ -156,16 +225,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
   }
 
   private JSONObject getSchemaFormModel() {
-    JSONObject jsonObject = new JSONObject();
-
-    for(Widget widget : formPanel) {
-      if(widget instanceof SchemaUiContainer) {
-        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-        jsonObject.put(widgetAsSchemaUiContainer.getKey(), widgetAsSchemaUiContainer.getJSONValue());
-      }
-    }
-
-    return jsonObject;
+    return JsonSchemaGWT.getModel(formPanel);
   }
 
   private void updateSchemaForm(PluginTemplateChooser.SelectionData data) {

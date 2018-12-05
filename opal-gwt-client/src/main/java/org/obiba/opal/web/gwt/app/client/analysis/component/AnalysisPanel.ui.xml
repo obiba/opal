@@ -1,10 +1,11 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b='urn:import:com.github.gwtbootstrap.client.ui'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:o='urn:import:org.obiba.opal.web.gwt.app.client.ui'
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys='com.google.gwt.i18n.server.keygen.MD5KeyGenerator'
              ui:generateLocales='default'
-             xmlns:component="urn:import:org.obiba.opal.web.gwt.app.client.analysis.component">
+             xmlns:component='urn:import:org.obiba.opal.web.gwt.app.client.analysis.component'>
 
   <g:FlowPanel>
     <b:ControlGroup ui:field="analyseGroup">
@@ -32,7 +33,7 @@
         <ui:msg description="Analysis Edit Model variables label">Variables</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <b:TextBox ui:field="variables"/>
+        <o:SuggestListBox ui:field="variables"/>
         <b:HelpBlock>
           <ui:msg description="Analysis Edit Model variables help label">
             The variable names (comma separated) to which to the analysis applies. If not specified all the table variables will be analysable.
