@@ -19,6 +19,9 @@ public class AnalyseCommandOptionsFactory {
     analyse.setParams(analysisDto.getParameters());
     analyse.setId(analysisDto.getId());
 
+    if (analysisDto.getVariablesCount() > 0)
+      analyse.setVariables(analysisDto.getVariablesArray().join());
+
     JsArray<AnalyseCommandOptionsDto.AnalyseDto> analyses = JsArrays.create();
     analyses.push(analyse);
     command.setAnalysesArray(analyses);

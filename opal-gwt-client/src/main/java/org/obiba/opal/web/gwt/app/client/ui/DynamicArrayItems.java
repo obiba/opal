@@ -102,6 +102,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
   private void addInput(String initValue) {
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.getElement().addClassName("input-append");
+    inputPanel.getElement().setAttribute("style", "display: block;");
     TextBox textBox = new TextBox();
 
     textBox.setValue(initValue);
