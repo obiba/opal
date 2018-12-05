@@ -9,7 +9,7 @@
         <g:Label>
           <ui:msg description="Analysis Results Status label">Status</ui:msg>
         </g:Label>
-        <g:Label ui:field="status"/>
+        <g:InlineHTML ui:field="status"/>
       </o:PropertyPanel>
 
       <o:PropertyPanel>
@@ -42,7 +42,7 @@
 
     </o:PropertiesTable>
 
-    <o:CollapsiblePanel ui:field="advancedOptions" addStyleNames="grid">
+    <o:CollapsiblePanel ui:field="historyPanel" addStyleNames="grid" visible="false">
 
       <g:FlowPanel>
         <b:Controls addStyleNames="small-top-margin pull-right">

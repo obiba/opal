@@ -199,7 +199,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
       log.error("Failed to parse analysis result {}", e);
     }
 
-    return new ParsedAnalysisResult(AnalysisStatus.FAILURE, "");
+    return new ParsedAnalysisResult(AnalysisStatus.FAILED, "");
   }
 
   private AnalysisTemplate getTemplate(String name) throws NoSuchAnalysisTemplateException {

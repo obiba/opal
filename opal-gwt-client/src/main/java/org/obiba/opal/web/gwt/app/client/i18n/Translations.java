@@ -1497,6 +1497,16 @@ public interface Translations extends Constants {
   @DefaultStringValue("Date")
   String analysisResultDateLabel();
 
+  @Description("Analysis Status map")
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
+    "IN_PROGRESS", "In Progress", //
+    "PASSED", "Passed", //
+    "FAILED", "Failed", //
+    "ERROR", "Error", //
+    "IGNORED", "Ignored", //
+  })
+  Map<String, String> analysisStatusMap();
+
   @Description("Filter Analyses placeholder")
   @DefaultStringValue("Filter Analyses...")
   String filterAnalysePlaceholder();

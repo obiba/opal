@@ -80,7 +80,7 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
   @Override
   public void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, AnalysisPluginData analysisPluginData) {
     analysis = analysisDto;
-    boolean createMode = analysis == null;
+    boolean createMode = analysis == null || !analysis.hasId();
     analysisPanel.initialize(analysisDto, tableDto, analysisPluginData, createMode);
 
     if (createMode) {
