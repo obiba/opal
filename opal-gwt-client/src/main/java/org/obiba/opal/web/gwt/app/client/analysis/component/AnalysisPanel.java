@@ -133,10 +133,12 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     updateSchemaForm(pluginTemplateChooser.getSelectedData());
 
     JsArrayString variablesArray = analysisDto.getVariablesArray();
-    if (variablesArray != null) {
+    if (variablesArray != null && variablesArray.length() > 0) {
       for(int i = 0; i< variablesArray.length(); i++) {
         variables.addItem(variablesArray.get(i));
       }
+
+      variables.getTextBox().setVisible(enabled);
     }
   }
 
@@ -186,6 +188,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     this.enabled = enabled;
     analyseName.setEnabled(enabled);
     pluginTemplateChooser.setEnabled(enabled);
+    variables.setReadOnly(!enabled);
     variables.getTextBox().setEnabled(enabled);
   }
 

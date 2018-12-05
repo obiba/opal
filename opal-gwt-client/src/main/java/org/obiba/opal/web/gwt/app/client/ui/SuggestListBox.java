@@ -51,6 +51,8 @@ public class SuggestListBox extends FocusPanel {
 
   private Typeahead.UpdaterCallback updaterCallback;
 
+  private boolean readOnly;
+
   public SuggestListBox(SuggestOracle oracle) {
     this.oracle = oracle;
     addStyleName("obiba-SuggestListBox");
@@ -113,6 +115,11 @@ public class SuggestListBox extends FocusPanel {
       }
     };
     aheadBox.setUpdaterCallback(this.updaterCallback);
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
+    closeables.setReadOnly(readOnly);
   }
 
   public List<String> getSelectedItemsTexts() {

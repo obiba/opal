@@ -32,8 +32,14 @@ public class CloseableList extends UList {
 
   private ItemValidator itemValidator;
 
+  private boolean readOnly;
+
   public CloseableList() {
     addStyleName("closeables");
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
   }
 
   public boolean addItem(String text) {
@@ -64,6 +70,8 @@ public class CloseableList extends UList {
         removeItem(item);
       }
     });
+
+    close.setVisible(!readOnly);
     item.add(close);
 
     clearLastItemFocus();
