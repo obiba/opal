@@ -581,6 +581,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_TABLE_ANALYSIS_RESULT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}", "result", "{}");
+    }
+  },
+
+  PROJECT_TABLE_ANALYSIS_RESULT_EXPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}", "result", "{}", "_export");
+    }
+  },
+
   PROJECT_ANALYSE_COMMAND {
     @Override
     public UriBuilder create() {

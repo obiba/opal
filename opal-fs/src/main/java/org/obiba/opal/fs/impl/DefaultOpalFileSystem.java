@@ -14,6 +14,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -46,6 +51,22 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
 
   @NotNull
   private final String nativeRootURL;
+
+  public static void deleteDirectoriesAndFilesInPath(Path aPath) throws IOException {
+    Files.walkFileTree(aPath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+        Files.delete(path);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path path, IOException e) throws IOException {
+        Files.delete(path);
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
 
   public DefaultOpalFileSystem(String fsRoot) {
     Assert.hasText(fsRoot, "You must specify a root directory for the Opal File System.");

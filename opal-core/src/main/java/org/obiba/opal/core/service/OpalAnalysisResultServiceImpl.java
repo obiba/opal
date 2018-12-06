@@ -1,17 +1,24 @@
 package org.obiba.opal.core.service;
 
-import com.sun.istack.Nullable;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
+import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
+import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
+import org.obiba.opal.spi.analysis.Analysis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService {
+
+  private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisResultServiceImpl.class);
 
   private final OrientDbService orientDbService;
 
@@ -64,6 +71,8 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   @Override
   public void delete(OpalAnalysisResult analysisResult) throws NoSuchAnalysisResultException {
     orientDbService.delete(analysisResult);
+
+    deleteAnalysisResultFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysisResult.getAnalysisId(), "results", analysisResult.getId()));
   }
 
   @Override
@@ -76,5 +85,13 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   @PreDestroy
   public void stop() {
 
+  }
+
+  private void deleteAnalysisResultFiles(Path analysisResultDir) {
+    try {
+      DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(analysisResultDir);
+    } catch (IOException e) {
+      logger.warn("Unable to delete analysis files at \"{}\"", analysisResultDir.toString());
+    }
   }
 }

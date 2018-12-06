@@ -37,7 +37,10 @@
         <g:Label>
           <ui:msg description="Analysis Results Status Report label">Report</ui:msg>
         </g:Label>
-        <g:Label ui:field="report"/>
+
+        <g:Anchor ui:field="report">
+          <ui:msg description="Analysis Results Status Report label">Report</ui:msg>
+        </g:Anchor>
       </o:PropertyPanel>
 
     </o:PropertiesTable>
