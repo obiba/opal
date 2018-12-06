@@ -5,13 +5,16 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import java.util.ArrayList;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -152,7 +155,7 @@ public class ResultsPanel extends Composite {
 
                   if (history.size() > 0) {
                     historyPanel.setVisible(true);
-                    initFilter();
+                    filter.setText("");
                     renderRows();
                   }
                 }
@@ -220,6 +223,26 @@ public class ResultsPanel extends Composite {
 
   private void renderRows() {
     dataProvider.setList(history);
+    dataProvider.refresh();
+  }
+
+  @UiHandler("filter")
+  public void filterKeyUp(KeyUpEvent event) {
+    String filterText = filter.getText();
+
+    List<OpalAnalysisResultDto> filtered = new ArrayList<>();
+
+    if (filterText != null && filterText.trim().length() > 0) {
+      for(OpalAnalysisResultDto result : history) {
+        if (result.getEndDate().toLowerCase().contains(filterText.trim().toLowerCase())) {
+          filtered.add(result);
+        }
+      }
+    } else {
+      filtered = history;
+    }
+
+    dataProvider.setList(filtered);
     dataProvider.refresh();
   }
 }
