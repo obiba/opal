@@ -110,8 +110,6 @@ public class TableAnalysisResource {
   @GET
   @Path("/analysis/{analysisId}/result/{rid}/_export")
   public Response exportAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
-    analysisResultService.delete(analysisResultService.getAnalysisResult(analysisId, rid));
-
     StreamingOutput outputStream =
         stream -> analysisExportService.exportProjectAnalysisResult(analysisId, rid, new BufferedOutputStream(stream));
 
