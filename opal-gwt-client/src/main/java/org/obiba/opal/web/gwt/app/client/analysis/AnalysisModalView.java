@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.analysis.support.PluginTemplateVisitor;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 
@@ -39,7 +40,6 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
   private OpalAnalysisDto analysis;
 
   private final Translations translations;
-
 
   @UiField
   Modal modal;
@@ -64,12 +64,12 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
 
 
   @Inject
-  public AnalysisModalView(EventBus eventBus, Binder binder, Translations translations) {
+  public AnalysisModalView(EventBus eventBus, Binder binder, Translations translations, RequestUrlBuilder urlBuilder) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
     analysisPanel = new AnalysisPanel(eventBus);
-    resultsPanel = new ResultsPanel(getEventBus());
+    resultsPanel = new ResultsPanel(getEventBus(), urlBuilder);
   }
 
   @Override

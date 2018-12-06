@@ -1,6 +1,7 @@
 package org.obiba.opal.web.analysis;
 
 import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.NoSuchAnalysisException;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
@@ -99,6 +100,24 @@ public class TableAnalysisResource {
     return Dtos.asDto(analysisResultService.getAnalysisResult(analysisId, rid)).build();
   }
 
+  @DELETE
+  @Path("/analysis/{analysisId}/result/{rid}")
+  public OpalAnalysisResultsDto deleteAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
+    analysisResultService.delete(analysisResultService.getAnalysisResult(analysisId, rid));
+    return getAnalysisResults(analysisId, false);
+  }
+
+  @GET
+  @Path("/analysis/{analysisId}/result/{rid}/_export")
+  public Response exportAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
+    analysisResultService.delete(analysisResultService.getAnalysisResult(analysisId, rid));
+
+    StreamingOutput outputStream =
+        stream -> analysisExportService.exportProjectAnalysisResult(analysisId, rid, new BufferedOutputStream(stream));
+
+    return analysisZipDownloadResponse(outputStream);
+  }
+
   @GET
   @Path("/analyses/_export")
   @Produces("application/zip")
@@ -110,10 +129,7 @@ public class TableAnalysisResource {
         new BufferedOutputStream(stream),
         !all);
 
-    String fileName = String.format("%s-%s-analsis.zip", datasourceName, tableName);
-    String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
-    return Response.ok(outputStream, mimeType)
-      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+    return analysisZipDownloadResponse(outputStream);
   }
 
   @GET
@@ -126,10 +142,14 @@ public class TableAnalysisResource {
     StreamingOutput outputStream =
       stream -> analysisExportService.exportProjectAnalysis(analysisId, new BufferedOutputStream(stream), !all);
 
-    String fileName = String.format("%s-%s-analsis.zip", datasourceName, tableName);
+    return analysisZipDownloadResponse(outputStream);
+  }
+
+  private Response analysisZipDownloadResponse(StreamingOutput outputStream) {
+    String fileName = String.format("%s-%s-analysis.zip", datasourceName, tableName);
     String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
     return Response.ok(outputStream, mimeType)
-      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
   }
 
   private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException {

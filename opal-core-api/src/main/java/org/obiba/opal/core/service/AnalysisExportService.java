@@ -45,4 +45,14 @@ public interface AnalysisExportService {
   void exportProjectAnalysis(@NotNull String analysisId,
                              @NotNull OutputStream outputStream,
                              boolean lastResult) throws IOException;
+
+  /**
+   * Exports a specific result
+   *
+   * @param analysisId
+   * @param resultId
+   * @param outputStream
+   * @throws IOException
+   */
+  void exportProjectAnalysisResult(@NotNull String analysisId, @NotNull String resultId, @NotNull OutputStream outputStream) throws IOException;
 }

@@ -3,31 +3,49 @@ package org.obiba.opal.web.gwt.app.client.analysis.component;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultDto;
 
 import java.util.List;
+import org.obiba.opal.web.model.client.opal.OpalAnalysisResultsDto;
 
 public class ResultsPanel extends Composite {
   interface Binder extends UiBinder<Widget, ResultsPanel>  {}
 
   private final EventBus eventBus;
 
+  private final RequestUrlBuilder urlBuilder;
+
   private static final ResultsPanel.Binder uiBinder = GWT.create(ResultsPanel.Binder.class);
+
+  private static final String DELETE_RESULT = "Delete";
+
+  private static final String DOWNLOAD_RESULT = "Download";
+
+  private static final String DOWNLOAD_LAST_RESULT = "Report";
 
   private OpalAnalysisResultDto lastResult;
 
@@ -41,6 +59,8 @@ public class ResultsPanel extends Composite {
 
   private ActionsColumn<OpalAnalysisResultDto> actionColumn;
 
+  private TableDto tableDto;
+
   @UiField
   Label start;
 
@@ -51,7 +71,7 @@ public class ResultsPanel extends Composite {
   Label message;
 
   @UiField
-  Label report;
+  Anchor report;
 
   @UiField
   Table<OpalAnalysisResultDto> historyTable;
@@ -65,19 +85,33 @@ public class ResultsPanel extends Composite {
   @UiField
   InlineHTML status;
 
-  public ResultsPanel(EventBus eventBus) {
+  public ResultsPanel(EventBus eventBus, RequestUrlBuilder urlBuilder) {
     initWidget(uiBinder.createAndBindUi(this));
     this.eventBus = eventBus;
+    this.urlBuilder = urlBuilder;
   }
 
   public void initialize(TableDto tableDto, JsArray<OpalAnalysisResultDto> results) {
-    int lastIndex = results.length() - 1;
+    int lastIndex = setHistoryResults(results);
     lastResult = results.get(lastIndex);
-    history = JsArrays.toList(results, 1, lastIndex++);
-
     initializeLastResult();
 
     if (history.size() > 0) initializeHistory();
+    this.tableDto = tableDto;
+
+    report.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        downloadResult(lastResult.getAnalysisId(), lastResult.getId());
+      }
+    });
+  }
+
+  private int setHistoryResults(JsArray<OpalAnalysisResultDto> results) {
+    int lastIndex = results.length() - 1;
+    history = JsArrays.toList(results, 1, lastIndex + 1);
+
+    return lastIndex;
   }
 
   private void initializeLastResult() {
@@ -101,6 +135,32 @@ public class ResultsPanel extends Composite {
   private void addTableColumns() {
     actionColumn = actionColumn();
 
+    actionColumn.setActionHandler(new ActionHandler<OpalAnalysisResultDto>() {
+      @Override
+      public void doAction(OpalAnalysisResultDto analysisResult, String actionName) {
+        if (DOWNLOAD_RESULT.equals(actionName)) {
+          downloadResult(analysisResult.getAnalysisId(), analysisResult.getId());
+
+        } else if (DELETE_RESULT.equals(actionName)) {
+          ResourceRequestBuilderFactory.<OpalAnalysisResultsDto>newBuilder().forResource(
+              UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT.create().build(tableDto.getDatasourceName(), tableDto.getName(), analysisResult.getAnalysisId(), analysisResult.getId()))
+              .withCallback(new ResourceCallback<OpalAnalysisResultsDto>() {
+                @Override
+                public void onResource(Response response, OpalAnalysisResultsDto resource) {
+                  historyPanel.setVisible(false);
+                  setHistoryResults(resource.getAnalysisResultsArray());
+
+                  if (history.size() > 0) {
+                    historyPanel.setVisible(true);
+                    initFilter();
+                    renderRows();
+                  }
+                }
+              }).delete().send();
+        }
+      }
+    });
+
     // Status Column
     historyTable.addColumn(new AnalysisStatusColumn(), translations.analysisResultStatusLabel());
 
@@ -123,12 +183,20 @@ public class ResultsPanel extends Composite {
     dataProvider.addDataDisplay(historyTable);
   }
 
+  private void downloadResult(String analysisId, String resultId) {
+    FileDownloadRequestEvent fileDownloadRequestEvent = new FileDownloadRequestEvent(
+        UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_EXPORT.create()
+            .build(tableDto.getDatasourceName(), tableDto.getName(),
+                analysisId, resultId));
+
+    eventBus.fireEvent(fileDownloadRequestEvent);
+  }
 
   private ActionsColumn<OpalAnalysisResultDto> actionColumn() {
     return new ActionsColumn<OpalAnalysisResultDto>(new ActionsProvider<OpalAnalysisResultDto>() {
       @Override
       public String[] allActions() {
-        return new String[] {"Download", "Delete"};
+        return new String[] {DOWNLOAD_RESULT, DELETE_RESULT};
       }
 
       @Override

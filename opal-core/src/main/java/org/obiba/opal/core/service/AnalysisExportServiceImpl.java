@@ -72,6 +72,27 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(analysisId)));
   }
 
+  @Override
+  public void exportProjectAnalysisResult(String analysisId, String resultId,
+      OutputStream outputStream) throws IOException {
+
+    Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
+    Assert.isTrue(!Strings.isNullOrEmpty(resultId), "Result ID cannot be empty or null.");
+
+    Assert.notNull(outputStream, "outputStream cannot be null.");
+
+    OpalAnalysisResult analysisResult = opalAnalysisResultService.getAnalysisResult(analysisId, resultId);
+
+    try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+      zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", analysisId, "analysis.json").toString()));
+      zipOutputStream.write(new JSONObject(opalAnalysisService.getAnalysis(analysisId)).toString().getBytes());
+      zipOutputStream.closeEntry();
+
+      createZip(zipOutputStream, analysisId, analysisResult);
+    }
+
+  }
+
   private void createZip(@NotNull OutputStream outputStream, boolean lastResult, List<OpalAnalysis> analyses) throws IOException {
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
@@ -83,17 +104,21 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
         zipOutputStream.closeEntry();
 
         for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(id, lastResult)) {
-          String resultId = result.getId();
-          String resultPath = Paths.get("analyses", id, "results", resultId).toString();
-
-          zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
-          zipOutputStream.write(new JSONObject(result).toString().getBytes());
-          zipOutputStream.closeEntry();
-
-          writeResultDataFiles(zipOutputStream, resultPath);
+          createZip(zipOutputStream, id, result);
         }
       }
     }
+  }
+
+  private void createZip(@NotNull ZipOutputStream zipOutputStream, @NotNull String analysisId, @NotNull OpalAnalysisResult result) throws IOException {
+    String resultId = result.getId();
+    String resultPath = Paths.get("analyses", analysisId, "results", resultId).toString();
+
+    zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
+    zipOutputStream.write(new JSONObject(result).toString().getBytes());
+    zipOutputStream.closeEntry();
+
+    writeResultDataFiles(zipOutputStream, resultPath);
   }
 
   private void writeResultDataFiles(ZipOutputStream out, String resultPath) throws IOException {
