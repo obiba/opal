@@ -227,9 +227,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   ButtonGroup tableAddVariableGroup;
+  @UiField
+  Tab analysesTab;
 
   @UiField
   SimplePanel analysesPanel;
+
+  @UiField
+  NavLink downloadAnalyses;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
@@ -508,6 +513,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onDownloadView();
   }
 
+  @UiHandler("downloadAnalyses")
+  void onDownloadAnalyses(ClickEvent event) {
+    getUiHandlers().onDownloadAnalyses();
+  }
+
   @UiHandler("searchVariables")
   void onSearchVariables(ClickEvent event) {
     getUiHandlers().onSearchVariables();
@@ -669,6 +679,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
+  public HasAuthorization getAnalysesDownloadAuthorizer() {
+    return new WidgetAuthorizer(downloadAnalyses);
+  }
+
+  @Override
   public HasAuthorization getValuesAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, VALUES_TAB_INDEX);
   }
@@ -700,6 +715,22 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
+  }
+
+  @Override
+  public HasAuthorization getAnalysesAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ANALYSES_TAB_INDEX);
+  }
+
+  @Override
+  public void enableAnalyses(boolean enable) {
+    if (enable) {
+      analysesTab.asWidget().getElement().removeAttribute("style");
+    } else {
+      analysesTab.asWidget().getElement().setAttribute("style", "display:none");
+    }
+
+    downloadAnalyses.setVisible(enable);
   }
 
   @Override

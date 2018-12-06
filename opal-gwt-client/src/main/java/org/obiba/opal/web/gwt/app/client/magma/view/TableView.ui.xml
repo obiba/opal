@@ -32,6 +32,9 @@
         <b:NavLink ui:field="downloadView">
           <ui:msg description="Download view label">Download view</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="downloadAnalyses">
+          <ui:msg description="Download view label">Download analyses</ui:msg>
+        </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup>
         <b:Button icon="DOWNLOAD_ALT" ui:field="exportData">

@@ -71,4 +71,6 @@ public interface TableUiHandlers extends UiHandlers {
   void onDeleteCustomAttribute(List<VariableDto> selectedItems);
 
   void onVariablesFilterUpdate(String filter);
+
+  void onDownloadAnalyses();
 }

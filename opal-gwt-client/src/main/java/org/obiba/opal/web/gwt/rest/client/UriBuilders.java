@@ -574,6 +574,14 @@ public enum UriBuilders {
 
   },
 
+  PROJECT_TABLE_DOWNLOAD_ANALYSES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analyses", "_export");
+    }
+
+  },
+
   PROJECT_TABLE_ANALYSIS {
     @Override
     public UriBuilder create() {
