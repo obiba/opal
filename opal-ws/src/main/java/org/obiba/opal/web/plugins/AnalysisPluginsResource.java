@@ -12,6 +12,7 @@ import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.model.Plugins.AnalysisPluginPackageDto;
 import org.obiba.opal.web.model.Plugins.PluginPackageDto;
 import org.obiba.opal.web.model.Plugins.PluginPackageDto.Builder;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,7 @@ public class AnalysisPluginsResource {
   }
 
   @GET
+  @NoAuthorization
   public Plugins.PluginPackagesDto list() {
     List<PluginPackageDto> packageDtos = pluginsService.getInstalledPlugins().stream()
         .filter(pluginPackage -> AnalysisService.SERVICE_TYPE.equals(pluginPackage.getType()) || RAnalysisService.SERVICE_TYPE.equals(pluginPackage.getType()))

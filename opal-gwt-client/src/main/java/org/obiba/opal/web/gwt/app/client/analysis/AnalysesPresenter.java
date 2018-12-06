@@ -24,7 +24,10 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.*;
+import org.obiba.opal.web.model.client.opal.AnalyseCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.OpalAnalysesDto;
+import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -56,6 +59,10 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
       getView().setUiHandlers(this);
   }
 
+  public void setPlugins(List<PluginPackageDto> plugins) {
+    this.plugins = plugins;
+  }
+
   public interface Display extends View, HasUiHandlers<AnalysesUiHandlers> {
 
     String RUN_ANALYSIS = "Run";
@@ -77,7 +84,6 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   protected void onBind() {
     super.onBind();
     initializeEventListeners();
-    getAnalysisPlugins();
   }
 
   @Override
@@ -220,20 +226,6 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         }
       })
       .send();
-  }
-
-  private void getAnalysisPlugins() {
-    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder()
-      .forResource(UriBuilders.PLUGINS_ANALYSIS.create().build())
-      .withCallback(new ResourceCallback<PluginPackagesDto>() {
-        @Override
-        public void onResource(Response response, PluginPackagesDto resource) {
-          if (resource != null) {
-            plugins = JsArrays.toList(resource.getPackagesArray());
-          }
-        }
-      })
-      .get().send();
   }
 
   private class DeleteAnalysisRunnable implements Runnable {

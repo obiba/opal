@@ -14,6 +14,7 @@ import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -28,6 +29,7 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.analysis.AnalysesPresenter;
+import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginsResource;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -64,6 +66,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -110,7 +113,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ValuesTablePresenter valuesTablePresenter;
 
-  private final AnalysesPresenter analysesPresenter;
+  private AnalysesPresenter analysesPresenter;
 
   private final ModalProvider<IndexPresenter> indexPresenter;
 
@@ -148,7 +151,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
                         ValuesTablePresenter valuesTablePresenter,
-                        AnalysesPresenter analysesPresenter,
+                        Provider<AnalysesPresenter> analysesPresenterProvider,
                         Provider<ContingencyTablePresenter> crossVariableProvider,
                         Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
                         ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
@@ -166,7 +169,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
-    this.analysesPresenter = analysesPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.translations = translations;
     this.translationMessages = translationMessages;
@@ -184,6 +186,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.attributeModalProvider = attributeModalProvider.setContainer(this);
     this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
     this.opalSystemCache = opalSystemCache;
+
+    AnalysisPluginsResource.getInstance().getAnalysisPlugins(new AnalysisPluginsHandler(analysesPresenterProvider));
     getView().setUiHandlers(this);
   }
 
@@ -301,6 +305,25 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       // Drop table
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
           .authorize(getView().getRemoveAuthorizer()).send();
+    }
+
+    if (analysesPresenter != null) {
+      String url =
+        UriBuilders.PROJECT_TABLE_DOWNLOAD_ANALYSES.create().build(table.getDatasourceName(), table.getName());
+
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(url)
+        .authorize(getView().getAnalysesDownloadAuthorizer())
+        .get()
+        .send();
+
+      url = UriBuilders.PROJECT_TABLE_ANALYSES.create().build(table.getDatasourceName(), table.getName());
+
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(url) //
+        .authorize(new CompositeAuthorizer(getView().getAnalysesAuthorizer(), new AnalysesUpdate())) //
+        .get()
+        .send();
     }
 
     // values
@@ -472,9 +495,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onShowAnalyses() {
-    setInSlot(Slots.Analyses, null);
     analysesPresenter.setTable(table);
-    setInSlot(Slots.Analyses, analysesPresenter);
   }
 
   @Override
@@ -514,6 +535,16 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     String downloadUrl = UriBuilders.DATASOURCE_VIEW.create().build(table.getDatasourceName(), table.getName()) +
         "/xml";
     fireEvent(new FileDownloadRequestEvent(downloadUrl));
+  }
+
+  @Override
+  public void onDownloadAnalyses() {
+    fireEvent(new FileDownloadRequestEvent(
+      UriBuilders.PROJECT_TABLE_DOWNLOAD_ANALYSES
+        .create()
+        .query("all", "true")
+        .build(table.getDatasourceName(), table.getName())
+    ));
   }
 
   @Override
@@ -802,6 +833,26 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
+  private class AnalysisPluginsHandler implements AnalysisPluginsResource.Handler {
+
+    private final Provider<AnalysesPresenter> analysesPresenterProvider;
+
+    AnalysisPluginsHandler(Provider<AnalysesPresenter> provider) {
+      this.analysesPresenterProvider = provider;
+    }
+
+    @Override
+    public void handle(List<PluginPackageDto> plugins) {
+      if (plugins.isEmpty()) {
+        getView().enableAnalyses(false);
+      } else {
+        analysesPresenter = analysesPresenterProvider.get();
+        analysesPresenter.setPlugins(plugins);
+        setInSlot(Slots.Analyses, analysesPresenter);
+      }
+    }
+  }
+
   private class DeleteVariableConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
@@ -916,6 +967,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     HasAuthorization getViewDownloadAuthorizer();
 
+    HasAuthorization getAnalysesDownloadAuthorizer();
+
     HasAuthorization getExportDataAuthorizer();
 
     HasAuthorization getRemoveAuthorizer();
@@ -929,6 +982,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     HasAuthorization getTableIndexEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getAnalysesAuthorizer();
+
+    void enableAnalyses(boolean enable);
 
     boolean isValuesTabSelected();
 
@@ -1078,6 +1135,26 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           table.getName());
 
       setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
+    }
+  }
+
+  /**
+   * Update analyses on authorization.
+   */
+  private final class AnalysesUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+      getView().enableAnalyses(false);
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      getView().enableAnalyses(true);
     }
   }
 
