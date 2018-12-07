@@ -1,22 +1,16 @@
 package org.obiba.opal.core.domain;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.json.JSONObject;
-import org.obiba.opal.spi.analysis.Analysis;
-import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
-import org.springframework.util.Assert;
-
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import org.json.JSONObject;
+import org.obiba.opal.spi.analysis.Analysis;
+import org.springframework.util.Assert;
 
 public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUniqueProperties {
 
-  private static final String DEFAULT_ID = "empty";
-
-  private String id;
   private String name;
   private String templateName;
   private String pluginName;
@@ -25,10 +19,6 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
 
   private String datasource;
   private String table;
-
-  public OpalAnalysis() {
-    this.id = DEFAULT_ID;
-  }
 
   public String getDatasource() {
     return datasource;
@@ -41,7 +31,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   @NotNull
   @Override
   public String getId() {
-    return id;
+    return name;
   }
 
   @NotNull
@@ -84,12 +74,12 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
 
   @Override
   public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
+    return Lists.newArrayList("name", "datasource", "table");
   }
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
+    return Lists.newArrayList(name, datasource, table);
   }
 
   public static class Builder {
@@ -113,7 +103,6 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
       }
 
       return create(null)
-        .id(analysis.getId())
         .name(analysis.getName())
         .datasource(datasource)
         .table(table)
@@ -121,11 +110,6 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
         .templateName(analysis.getTemplateName())
         .parameters(analysis.getParameters())
         .variables(analysis.getVariables());
-    }
-
-    Builder id(String value) {
-      analysis.id = Strings.isNullOrEmpty(value) ? IdGenetatorFactory.createDateIdGenerator().generate() : value;
-      return this;
     }
 
     public Builder name(String value) {

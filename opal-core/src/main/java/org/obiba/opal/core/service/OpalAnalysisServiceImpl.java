@@ -35,22 +35,12 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public OpalAnalysis getAnalysis(String id) throws NoSuchAnalysisException {
+  public OpalAnalysis getAnalysis(String datasource, String table, String name) {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("id = ?")
+      .whereClauses("datasource = ?", "table = ?", "name = ?")
       .build();
-
-    return orientDbService.uniqueResult(OpalAnalysis.class, query, id);
-  }
-
-  @Override
-  public OpalAnalysis getAnalysisByDatasourceAndTableAndId(String datasource, String table, String id) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "id = ?")
-      .build();
-    return orientDbService.uniqueResult(OpalAnalysis.class, query, datasource, table, id);
+    return orientDbService.uniqueResult(OpalAnalysis.class, query, datasource, table, name);
   }
 
   @Override
@@ -80,8 +70,12 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public void save(OpalAnalysis analysis) {
-    orientDbService.save(analysis, analysis);
+  public void save(OpalAnalysis analysis) throws AnalysisAlreadyExistsException {
+    OpalAnalysis existingAnalysis = getAnalysis(analysis.getDatasource(), analysis.getTable(), analysis.getName());
+    if (existingAnalysis == null)
+      orientDbService.save(analysis, analysis);
+    else
+      throw new AnalysisAlreadyExistsException(analysis.getName());
   }
 
   @Override

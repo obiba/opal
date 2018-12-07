@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import java.util.List;
 import org.obiba.opal.web.gwt.app.client.analysis.component.AnalysisPanel;
 import org.obiba.opal.web.gwt.app.client.analysis.component.ResultsPanel;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
@@ -78,10 +79,13 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
   }
 
   @Override
-  public void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, AnalysisPluginData analysisPluginData) {
+  public void initialize(TableDto tableDto,
+                         OpalAnalysisDto analysisDto,
+                         List<String> existingNames,
+                         AnalysisPluginData analysisPluginData) {
     analysis = analysisDto;
     boolean createMode = analysis == null || !analysis.hasId();
-    analysisPanel.initialize(analysisDto, tableDto, analysisPluginData, createMode);
+    analysisPanel.initialize(analysisDto, tableDto, existingNames, analysisPluginData, createMode);
 
     if (createMode) {
       initializeForCreate();

@@ -10,6 +10,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import java.util.ArrayList;
 import org.obiba.opal.web.gwt.app.client.analysis.event.RunAnalysisRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalyseCommandOptionsFactory;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -89,7 +90,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   @Override
   public void createAnalysis() {
     AnalysisModalPresenter modal = AnalysisModalPresenterProvider.get();
-    modal.initialize(originalTable, null, plugins);
+    modal.initialize(originalTable, null, existingAnalysisNames(), plugins);
   }
 
   @Override
@@ -172,7 +173,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             OpalAnalysisDto duplicate = OpalAnalysisDto.parse(OpalAnalysisDto.stringify(analysis));
             duplicate.setId(null);
             duplicate.setName(null);
-            AnalysisModalPresenterProvider.get().initialize(originalTable, duplicate, plugins);
+            AnalysisModalPresenterProvider.get().initialize(originalTable, duplicate, existingAnalysisNames(), plugins);
             break;
 
           case Display.VIEW_ANALYSIS:
@@ -205,7 +206,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         @Override
         public void onResource(Response response, OpalAnalysisDto resource) {
           if (resource != null) {
-            AnalysisModalPresenterProvider.get().initialize(originalTable, resource, plugins);
+            AnalysisModalPresenterProvider.get().initialize(originalTable, resource, new ArrayList<String>(), plugins);
           }
         }
       })
@@ -226,6 +227,16 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         }
       })
       .send();
+  }
+
+  private List<String> existingAnalysisNames() {
+    List<String> currentNames = new ArrayList<String>();
+
+    for(int i = 0; i < originalAnalysisJsArray.length(); i++) {
+      currentNames.add(originalAnalysisJsArray.get(i).getName());
+    }
+
+    return currentNames;
   }
 
   private class DeleteAnalysisRunnable implements Runnable {

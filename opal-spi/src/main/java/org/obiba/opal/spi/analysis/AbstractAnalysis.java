@@ -1,22 +1,16 @@
 package org.obiba.opal.spi.analysis;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.json.JSONObject;
-import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
-import org.springframework.util.Assert;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.List;
+import javax.validation.constraints.NotNull;
+import org.json.JSONObject;
+import org.springframework.util.Assert;
 
 /**
  * Convenient class for implementing data processing engine specific analysis.
  *
  */
 public abstract class AbstractAnalysis implements Analysis {
-
-  private String id;
 
   private final String name;
 
@@ -28,16 +22,13 @@ public abstract class AbstractAnalysis implements Analysis {
 
   private List<String> variables;
 
-  public AbstractAnalysis(@Nullable String id,
-                          @NotNull String name,
+  public AbstractAnalysis(@NotNull String name,
                           @NotNull String pluginName,
                           @NotNull String templateName) {
 
     Assert.notNull(name, "name cannot be null");
-    Assert.notNull(templateName , "templateName cannot be null");
-    Assert.notNull(templateName , "pluginName cannot be null");
-
-    this.id = Strings.isNullOrEmpty(id) ? IdGenetatorFactory.createDateIdGenerator().generate() : id;
+    Assert.notNull(templateName, "templateName cannot be null");
+    Assert.notNull(templateName, "pluginName cannot be null");
     this.name = name;
     this.pluginName = pluginName;
     this.templateName = templateName;
@@ -46,7 +37,7 @@ public abstract class AbstractAnalysis implements Analysis {
   @NotNull
   @Override
   public String getId() {
-    return id;
+    return name;
   }
 
   @NotNull

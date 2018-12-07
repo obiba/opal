@@ -4,9 +4,7 @@ import org.obiba.opal.core.domain.OpalAnalysis;
 
 public interface OpalAnalysisService extends SystemService {
 
-  OpalAnalysis getAnalysis(String id) throws NoSuchAnalysisException;
-
-  OpalAnalysis getAnalysisByDatasourceAndTableAndId(String datasource, String table, String id);
+  OpalAnalysis getAnalysis(String datasource, String table, String name);
 
   Iterable<OpalAnalysis> getAnalyses();
 
@@ -14,7 +12,7 @@ public interface OpalAnalysisService extends SystemService {
 
   Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table);
 
-  void save(OpalAnalysis analysis);
+  void save(OpalAnalysis analysis) throws AnalysisAlreadyExistsException;
 
   void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException;
 }

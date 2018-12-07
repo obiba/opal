@@ -525,6 +525,7 @@ public interface Translations extends Constants {
       "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable.",//
       "CannotFindDatabase", "Cannot find database named {0}.",//
       "NameIsRequired", "A name is required.",//
+      "NameIsUnique", "A name must be unique.",//
       "EntityTypeIsRequired", "An entity type is required.",//
       "IdentifiersAreRequired", "Some identifiers are required.",//
       "SystemIdentifiersAreRequired", "Some system identifiers are required.",//

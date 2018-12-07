@@ -62,18 +62,21 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   }
 
   @Override
-  public void exportProjectAnalysis(@NotNull String analysisId,
+  public void exportProjectAnalysis(@NotNull String projectName,
+                                    @NotNull String tableName,
+                                    @NotNull String analysisId,
                                     @NotNull OutputStream outputStream,
                                     boolean lastResult) throws IOException {
 
     Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
     Assert.notNull(outputStream, "outputStream cannot be null.");
 
-    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(analysisId)));
+    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(projectName, tableName, analysisId)));
   }
 
   @Override
-  public void exportProjectAnalysisResult(String analysisId, String resultId,
+  public void exportProjectAnalysisResult(@NotNull String projectName,
+      @NotNull String tableName, String analysisId, String resultId,
       OutputStream outputStream) throws IOException {
 
     Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
@@ -85,7 +88,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
 
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
       zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", analysisId, "analysis.json").toString()));
-      zipOutputStream.write(new JSONObject(opalAnalysisService.getAnalysis(analysisId)).toString().getBytes());
+      zipOutputStream.write(new JSONObject(opalAnalysisService.getAnalysis(projectName, tableName, analysisId)).toString().getBytes());
       zipOutputStream.closeEntry();
 
       createZip(zipOutputStream, analysisId, analysisResult);

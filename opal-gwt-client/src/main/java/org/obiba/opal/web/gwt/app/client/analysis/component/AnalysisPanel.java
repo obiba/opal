@@ -107,11 +107,11 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public void initialize(OpalAnalysisDto analysisDto, TableDto tableDto, AnalysisPluginData data, boolean enabled) {
+  public void initialize(OpalAnalysisDto analysisDto, TableDto tableDto, List<String> existingNames, AnalysisPluginData data, boolean enabled) {
     table = tableDto;
     currentSelection = null;
     analysis = analysisDto;
-    validationHandler = new PanelValidationHandler();
+    validationHandler = new PanelValidationHandler(existingNames);
     setEnabled(enabled);
 
     oracle.setDatasource(table.getDatasourceName());
@@ -134,7 +134,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
     JsArrayString variablesArray = analysisDto.getVariablesArray();
     if (variablesArray != null && variablesArray.length() > 0) {
-      for(int i = 0; i< variablesArray.length(); i++) {
+      for(int i = 0; i < variablesArray.length(); i++) {
         variables.addItem(variablesArray.get(i));
       }
 
@@ -269,17 +269,32 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
   private class PanelValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
+    private List<String> existingNames;
     Map<HasType<ControlGroupType>, String> errors = new HashMap<HasType<ControlGroupType>, String>();
+
+    public PanelValidationHandler(List<String> existingNames) {
+      this.existingNames = existingNames;
+    }
 
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getName(), "NameIsRequired", FormField.NAME.name()));
+        validators.add(new ConditionValidator(nameIsUnique(), "NameIsUnique", FormField.NAME.name()));
         validators.add(new ConditionValidator(validateType(), "PluginTypeIsRequired", FormField.TYPE.name()));
       }
 
       return validators;
+    }
+
+    private HasValue<Boolean> nameIsUnique() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return existingNames.indexOf(getName().getText()) == -1;
+        }
+      };
     }
 
     private HasValue<Boolean> validateType() {

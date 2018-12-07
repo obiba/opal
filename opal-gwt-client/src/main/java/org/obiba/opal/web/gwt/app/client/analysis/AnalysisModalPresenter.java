@@ -36,7 +36,11 @@ public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPr
   @Override
   protected void onBind() { }
 
-  public void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, List<PluginPackageDto> plugins) {
+  public void initialize(TableDto tableDto,
+                         OpalAnalysisDto analysisDto,
+                         List<String> existingNames,
+                         List<PluginPackageDto> plugins) {
+
     table = tableDto;
     analysis = analysisDto;
     AnalysisPluginsRepository pluginsRepository = new AnalysisPluginsRepository(plugins);
@@ -50,7 +54,7 @@ public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPr
       );
     } else {
       pluginsRepository.visitPlugins(getView().getTemplateVisitor());
-      getView().initialize(tableDto, analysisDto, analysisPluginData);
+      getView().initialize(tableDto, analysisDto, existingNames, analysisPluginData);
     }
   }
 
@@ -69,7 +73,7 @@ public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPr
 
     void hideDialog();
 
-    void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, AnalysisPluginData analysisPluginData);
+    void initialize(TableDto tableDto, OpalAnalysisDto analysisDto, List<String> existingNames, AnalysisPluginData analysisPluginData);
 
     PluginTemplateVisitor getTemplateVisitor();
 

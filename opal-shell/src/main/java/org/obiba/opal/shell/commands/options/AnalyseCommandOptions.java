@@ -16,7 +16,6 @@ public interface AnalyseCommandOptions extends HelpOption {
   List<AnalyseOptions> getAnalyses();
 
   interface AnalyseOptions {
-    String getId();
     String getTable();
     String getVariables();
     String getName();

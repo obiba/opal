@@ -25,7 +25,6 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.*;
 import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
-import org.obiba.opal.web.model.Commands.AnalyseCommandOptionsDto.AnalyseDto;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
