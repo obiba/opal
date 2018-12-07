@@ -8,11 +8,11 @@
     <g:SimplePanel ui:field="analysisOnlyContainer" visible="false"/>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel" visible="false" >
-      <b:Tab heading="Analysis" active="true">
-        <g:SimplePanel ui:field="analysisContainer"/>
-      </b:Tab>
-      <b:Tab heading="Results">
+      <b:Tab heading="Results"  active="true">
         <g:SimplePanel ui:field="resultsContainer"/>
+      </b:Tab>
+      <b:Tab heading="Analysis">
+        <g:SimplePanel ui:field="analysisContainer"/>
       </b:Tab>
     </b:TabPanel>
 
