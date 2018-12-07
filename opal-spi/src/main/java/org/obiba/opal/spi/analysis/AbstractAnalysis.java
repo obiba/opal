@@ -36,12 +36,6 @@ public abstract class AbstractAnalysis implements Analysis {
 
   @NotNull
   @Override
-  public String getId() {
-    return name;
-  }
-
-  @NotNull
-  @Override
   public String getName() {
     return name;
   }

@@ -100,7 +100,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
       for (OpalAnalysis analyse : analyses) {
-        String id = analyse.getId();
+        String id = analyse.getName();
 
         zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", id, "analysis.json").toString()));
         zipOutputStream.write(new JSONObject(analyse).toString().getBytes());

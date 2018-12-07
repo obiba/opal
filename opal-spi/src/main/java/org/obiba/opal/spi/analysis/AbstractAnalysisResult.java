@@ -28,7 +28,7 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
 
   protected AbstractAnalysisResult(T analysis) {
     this.id = IdGeneratorFactory.createDateIdGenerator().generate();
-    this.analysisId = analysis.getId();
+    this.analysisId = analysis.getName();
   }
 
   @Override

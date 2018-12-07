@@ -84,7 +84,7 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
                          List<String> existingNames,
                          AnalysisPluginData analysisPluginData) {
     analysis = analysisDto;
-    boolean createMode = analysis == null || !analysis.hasId();
+    boolean createMode = analysis == null || !analysis.hasName();
     analysisPanel.initialize(analysisDto, tableDto, existingNames, analysisPluginData, createMode);
 
     if (createMode) {

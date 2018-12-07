@@ -15,15 +15,7 @@ public interface Analysis {
   Path ANALYSES_HOME = Paths.get(System.getProperty("OPAL_HOME"), "data", "analyses");
 
   /**
-   * Unique analysis request identifier.
-   *
-   * @return
-   */
-  @NotNull
-  String getId();
-
-  /**
-   * Analysis name.
+   * Unique analysis request identifier, Analysis name.
    *
    * @return
    */

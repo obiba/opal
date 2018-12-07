@@ -30,12 +30,6 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
 
   @NotNull
   @Override
-  public String getId() {
-    return name;
-  }
-
-  @NotNull
-  @Override
   public String getName() {
     return name;
   }

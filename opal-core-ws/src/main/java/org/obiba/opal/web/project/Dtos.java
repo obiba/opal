@@ -116,7 +116,6 @@ public class Dtos {
   public static OpalAnalysisDto.Builder asDto(OpalAnalysis analysis) {
     Builder builder = OpalAnalysisDto.newBuilder();
 
-    builder.setId(analysis.getId());
     builder.setName(analysis.getName());
 
     builder.setDatasource(analysis.getDatasource());

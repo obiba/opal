@@ -88,10 +88,10 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
         .build();
 
     StreamSupport
-        .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getId()).spliterator(), false)
+        .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getName()).spliterator(), false)
         .forEach(orientDbService::delete);
 
-    deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getId()));
+    deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getName()));
   }
 
   @Override

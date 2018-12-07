@@ -171,7 +171,6 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
           case Display.DUPLICATE_ANALYSIS:
             OpalAnalysisDto duplicate = OpalAnalysisDto.parse(OpalAnalysisDto.stringify(analysis));
-            duplicate.setId(null);
             duplicate.setName(null);
             AnalysisModalPresenterProvider.get().initialize(originalTable, duplicate, existingAnalysisNames(), plugins);
             break;
@@ -201,7 +200,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   private void viewAnalysis(OpalAnalysisDto analysis) {
     ResourceRequestBuilderFactory.<OpalAnalysisDto>newBuilder()
       .forResource(UriBuilders.PROJECT_TABLE_ANALYSIS.create()
-        .build(originalTable.getDatasourceName(), originalTable.getName(), analysis.getId()))
+        .build(originalTable.getDatasourceName(), originalTable.getName(), analysis.getName()))
       .withCallback(new ResourceCallback<OpalAnalysisDto>() {
         @Override
         public void onResource(Response response, OpalAnalysisDto resource) {
@@ -251,7 +250,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
     public void run() {
       ResourceRequestBuilderFactory.newBuilder()
           .forResource(UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}")
-              .build(originalTable.getDatasourceName(), originalTable.getName(), toDelete.getId()))
+              .build(originalTable.getDatasourceName(), originalTable.getName(), toDelete.getName()))
           .withCallback(SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
