@@ -1,7 +1,6 @@
 package org.obiba.opal.web.analysis;
 
 import org.obiba.opal.core.domain.OpalAnalysis;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.NoSuchAnalysisException;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
@@ -111,7 +110,7 @@ public class TableAnalysisResource {
   @Path("/analysis/{analysisId}/result/{rid}/_export")
   public Response exportAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
     StreamingOutput outputStream =
-        stream -> analysisExportService.exportProjectAnalysisResult(analysisId, rid, new BufferedOutputStream(stream));
+        stream -> analysisExportService.exportProjectAnalysisResult(datasourceName, tableName, analysisId, rid, new BufferedOutputStream(stream));
 
     return analysisZipDownloadResponse(outputStream);
   }
@@ -138,7 +137,7 @@ public class TableAnalysisResource {
     getAnalysis(analysisId);
 
     StreamingOutput outputStream =
-      stream -> analysisExportService.exportProjectAnalysis(analysisId, new BufferedOutputStream(stream), !all);
+      stream -> analysisExportService.exportProjectAnalysis(datasourceName, tableName, analysisId, new BufferedOutputStream(stream), !all);
 
     return analysisZipDownloadResponse(outputStream);
   }
@@ -152,7 +151,7 @@ public class TableAnalysisResource {
 
   private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException {
     return Optional.ofNullable(
-      analysisService.getAnalysisByDatasourceAndTableAndId(datasourceName, tableName, analysisId)
+      analysisService.getAnalysis(datasourceName, tableName, analysisId)
     ).orElseThrow(() -> new NoSuchAnalysisException(analysisId));
   }
   

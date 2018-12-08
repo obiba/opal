@@ -1,11 +1,10 @@
 package org.obiba.opal.spi.analysis;
 
-import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
+import org.obiba.opal.spi.analysis.support.generator.IdGeneratorFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Convenient class for implementing data processing engine specific results.
@@ -28,8 +27,8 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   private List<AnalysisResult<T>> resultItems;
 
   protected AbstractAnalysisResult(T analysis) {
-    this.id = IdGenetatorFactory.createDateIdGenerator().generate();
-    this.analysisId = analysis.getId();
+    this.id = IdGeneratorFactory.createDateIdGenerator().generate();
+    this.analysisId = analysis.getName();
   }
 
   @Override

@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public final class IdGenetatorFactory {
+public final class IdGeneratorFactory {
 
   public static IdGenerator createDateIdGenerator() {
     return () -> new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "-" + new Random().nextInt();

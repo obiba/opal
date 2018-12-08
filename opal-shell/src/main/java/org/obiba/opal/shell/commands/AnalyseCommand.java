@@ -82,7 +82,12 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         RAnalysisService rAnalysisService = (RAnalysisService) opalRuntime.getServicePlugin(pluginName);
         rAnalysisService.setOpalFileSystemPathResolver(new OpalPathResolver());
 
-        ValueTable targetValueTable = valueTableResolver.resolve(table, analyseOptions.getVariables());
+        // if analysis already exists use the one from database
+        OpalAnalysis existingAnalysis = analysisService.getAnalysis(options.getProject(), analyseOptions.getTable(), analyseOptions.getName());
+
+        String variables = existingAnalysis == null ? analyseOptions.getVariables() :  String.join(",", existingAnalysis.getVariables());
+
+        ValueTable targetValueTable = valueTableResolver.resolve(table, variables);
         String tibbleName = targetValueTable.getName();
 
         if (!loadedTables.contains(tibbleName)) {
@@ -93,25 +98,20 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
-        RAnalysis.Builder builder =
-          RAnalysis.create(
-            analyseOptions.getId(),
-            analyseOptions.getName(),
-            analyseOptions.getPlugin(),
-            analyseOptions.getTemplate()
-          ).session(sessionHandler.getSession())
-           .symbol(RUtils.getSymbol(tibbleName))
-           .parameters(analyseOptions.getParams());
+        RAnalysis.Builder builder = existingAnalysis == null ?
+            fromOptions(analyseOptions) : fromExistingOpalAnalysis(existingAnalysis);
 
-        if (!analyseOptions.getVariables().isEmpty()) {
+        if (!variables.isEmpty()) {
           builder.variables(StreamSupport.stream(targetValueTable.getVariables().spliterator(), false)
-            .map(Variable::getName)
-            .collect(Collectors.toList()));
+              .map(Variable::getName)
+              .collect(Collectors.toList()));
         }
 
-        RAnalysis analysis = builder.build();
+        RAnalysis analysis = builder.session(sessionHandler.getSession()).symbol(RUtils.getSymbol(tibbleName)).build();
 
-        analysisService.save(OpalAnalysis.Builder.create(datasource.getName(), table.getName(), analysis).build());
+        if (existingAnalysis == null)
+          analysisService.save(OpalAnalysis.Builder.create(datasource.getName(), table.getName(), analysis).build());
+
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
         log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());
@@ -128,6 +128,20 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     }
 
     return 0;
+  }
+
+  private RAnalysis.Builder fromOptions(AnalyseCommandOptions.AnalyseOptions analyseOptions) {
+    return RAnalysis.create(
+        analyseOptions.getName(),
+        analyseOptions.getPlugin(),
+        analyseOptions.getTemplate()).parameters(analyseOptions.getParams());
+  }
+
+  private RAnalysis.Builder fromExistingOpalAnalysis(OpalAnalysis existingAnalysis) {
+    return RAnalysis.create(
+        existingAnalysis.getName(),
+        existingAnalysis.getPluginName(),
+        existingAnalysis.getTemplateName()).parameters(existingAnalysis.getParameters());
   }
 
   private class AnalysisValueTableResolver {
