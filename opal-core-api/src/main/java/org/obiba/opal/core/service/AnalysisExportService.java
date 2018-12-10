@@ -42,7 +42,9 @@ public interface AnalysisExportService {
    * @param lastResult
    * @throws IOException
    */
-  void exportProjectAnalysis(@NotNull String analysisId,
+  void exportProjectAnalysis(@NotNull String projectName,
+                             @NotNull String tableName,
+                             @NotNull String analysisId,
                              @NotNull OutputStream outputStream,
                              boolean lastResult) throws IOException;
 
@@ -54,5 +56,9 @@ public interface AnalysisExportService {
    * @param outputStream
    * @throws IOException
    */
-  void exportProjectAnalysisResult(@NotNull String analysisId, @NotNull String resultId, @NotNull OutputStream outputStream) throws IOException;
+  void exportProjectAnalysisResult(@NotNull String projectName,
+                                   @NotNull String tableName,
+                                   @NotNull String analysisId,
+                                   @NotNull String resultId,
+                                   @NotNull OutputStream outputStream) throws IOException;
 }

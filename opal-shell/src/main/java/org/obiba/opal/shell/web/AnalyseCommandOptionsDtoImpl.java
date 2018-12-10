@@ -40,11 +40,6 @@ public class AnalyseCommandOptionsDtoImpl implements AnalyseCommandOptions {
     }
 
     @Override
-    public String getId() {
-      return dto.getId();
-    }
-
-    @Override
     public String getTable() {
       return dto.getTable();
     }

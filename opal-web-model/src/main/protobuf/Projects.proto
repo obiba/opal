@@ -36,21 +36,20 @@ message ProjectSummaryDto {
 }
 
 message OpalAnalysisDto {
-  required string id = 1;
-  required string name = 2;
+  required string name = 1;
 
-  required string datasource = 3;
-  required string table = 4;
+  required string datasource = 2;
+  required string table = 3;
 
-  required string pluginName = 5;
-  required string templateName = 6;
-  required string parameters = 7;
-  repeated string variables = 8;
+  required string pluginName = 4;
+  required string templateName = 5;
+  required string parameters = 6;
+  repeated string variables = 7;
 
-  optional string created = 9;
-  optional string updated = 10;
+  optional string created = 8;
+  optional string updated = 9;
 
-  repeated OpalAnalysisResultDto analysisResults = 11;
+  repeated OpalAnalysisResultDto analysisResults = 10;
 }
 
 message OpalAnalysesDto {

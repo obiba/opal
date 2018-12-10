@@ -17,7 +17,6 @@ public class AnalyseCommandOptionsFactory {
     analyse.setTemplate(analysisDto.getTemplateName());
     analyse.setTable(analysisDto.getTable());
     analyse.setParams(analysisDto.getParameters());
-    analyse.setId(analysisDto.getId());
 
     if (analysisDto.getVariablesCount() > 0)
       analyse.setVariables(analysisDto.getVariablesArray().join());
