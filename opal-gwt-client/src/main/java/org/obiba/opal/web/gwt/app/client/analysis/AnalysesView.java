@@ -18,6 +18,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import javax.inject.Inject;
+import org.obiba.opal.web.gwt.app.client.analysis.component.AnalysisStatusColumn;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -85,6 +86,8 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
       }
     }, translations.analysisTypeLabel());
 
+    table.addColumn(new AnalysisStatusColumn.ForOpalAnalysisDto(), translations.analysisStatusLabel());
+
     table.addColumn(new TextColumn<OpalAnalysisDto>() {
       @Override
       public String getValue(OpalAnalysisDto object) {
@@ -93,7 +96,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
     }, translations.dateLabel());
 
     table.addColumn(analysesActionColumn, translations.actionsLabel());
-    table.setColumnWidth(table.getColumn(3), 175, com.google.gwt.dom.client.Style.Unit.PX);
+    table.setColumnWidth(table.getColumn(4), 175, com.google.gwt.dom.client.Style.Unit.PX);
 
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translationMessages.analysisCount(0)));

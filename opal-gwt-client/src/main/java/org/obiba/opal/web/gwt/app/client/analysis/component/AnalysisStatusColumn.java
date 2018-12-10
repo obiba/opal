@@ -8,20 +8,43 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.Column;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.AnalysisStatusDto;
+import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultDto;
 
 
-public class AnalysisStatusColumn extends Column<OpalAnalysisResultDto, String> {
+public class AnalysisStatusColumn {
+
+  public static class ForOpalAnalysisDto extends Column<OpalAnalysisDto, String> {
+
+    public ForOpalAnalysisDto() {
+      super(new StatusImageCell());
+    }
+
+    @Override
+    public String getValue(OpalAnalysisDto dto) {
+      return formatForRender(dto.getLastStatus().getName());
+    }
+  }
+
+  public static class ForOpalAnalysisResultDto extends Column<OpalAnalysisResultDto, String> {
+
+    public ForOpalAnalysisResultDto() {
+      super(new StatusImageCell());
+    }
+
+    @Override
+    public String getValue(OpalAnalysisResultDto dto) {
+      return formatForRender(dto);
+    }
+  }
 
   private static final Translations translations = GWT.create(Translations.class);
 
-
-  AnalysisStatusColumn() {
-    super(new StatusImageCell());
+  static String formatForRender(OpalAnalysisResultDto dto) {
+    return formatForRender(dto.getStatus().getName());
   }
 
-  static String formatForRender(OpalAnalysisResultDto dto) {
-    String status = dto.getStatus().getName();
+  static String formatForRender(String status) {
     String color = StatusImageCell.BULLET_ORANGE;
 
     if (AnalysisStatusDto.IN_PROGRESS.getName().equals(status)) {
@@ -35,11 +58,6 @@ public class AnalysisStatusColumn extends Column<OpalAnalysisResultDto, String> 
     }
 
     return translations.analysisStatusMap().get(status) + ":" + color;
-  }
-
-  @Override
-  public String getValue(OpalAnalysisResultDto dto) {
-    return formatForRender(dto);
   }
 
   static class StatusImageCell extends AbstractCell<String> {

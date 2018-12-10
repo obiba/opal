@@ -1490,9 +1490,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Analysis")
   String analysisAddModalTitle();
 
-  @Description("Analysis Result Status Column label")
+  @Description("Analysis Status Column label")
   @DefaultStringValue("Status")
-  String analysisResultStatusLabel();
+  String analysisStatusLabel();
 
   @Description("Analysis Result Date Column label")
   @DefaultStringValue("Date")
