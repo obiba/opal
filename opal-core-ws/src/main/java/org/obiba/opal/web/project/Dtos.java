@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.collect.Sets;
+import java.time.Instant;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.OpalAnalysis;
@@ -124,8 +125,8 @@ public class Dtos {
     builder.setPluginName(analysis.getPluginName());
     builder.setTemplateName(analysis.getTemplateName());
     builder.setParameters(analysis.getParameters().toString());
-    builder.setCreated(analysis.getCreated().toString());
-    builder.setUpdated(analysis.getUpdated().toString());
+    builder.setCreated(Instant.ofEpochMilli(analysis.getCreated().getTime()).toString());
+    builder.setUpdated(Instant.ofEpochMilli(analysis.getUpdated().getTime()).toString());
     builder.addAllVariables(analysis.getVariables());
 
     return builder;
@@ -137,8 +138,8 @@ public class Dtos {
     builder.setId(analysisResult.getId());
     builder.setAnalysisId(analysisResult.getAnalysisId());
 
-    builder.setStartDate(analysisResult.getStartDate().toString());
-    builder.setEndDate(analysisResult.getEndDate().toString());
+    builder.setStartDate(Instant.ofEpochMilli(analysisResult.getStartDate().getTime()).toString()); //
+    builder.setEndDate(Instant.ofEpochMilli(analysisResult.getEndDate().getTime()).toString()); //
 
     if (analysisResult.hasResultItems()) {
       analysisResult.getResultItems().forEach(item -> builder.addResultItems(asDto((AnalysisResultItem) item)));
