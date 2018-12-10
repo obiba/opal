@@ -9,7 +9,9 @@
  */
 package org.obiba.opal.spi.r;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REngineException;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Handles a R connection and provides some utility methods to handle operations on it.
@@ -30,6 +33,8 @@ public abstract class AbstractROperation implements ROperation {
   private static int DEFAULT_BUFFER_SIZE = 81920;
 
   RConnection connection;
+
+  private List<String> repositories = Lists.newArrayList("https://cloud.r-project.org", "https://cran.obiba.org");
 
   /**
    * Check if connection is still operational.
@@ -103,7 +108,7 @@ public abstract class AbstractROperation implements ROperation {
 
     REXP evaled;
     try {
-      log.debug("evaluating {}", script);
+      log.debug("evaluating: {}", script);
       String cmd = script;
       if(serialize) {
         cmd = "serialize({" + script + "}, NULL)";
@@ -191,8 +196,9 @@ public abstract class AbstractROperation implements ROperation {
    * @return
    */
   protected REXP ensurePackage(String packageName) {
-    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('https://cran.rstudio.com/', 'https://cran.obiba.org'), dependencies=TRUE) }",
-        packageName, packageName);
+    String repos = Joiner.on("','").join(getRepositories());
+    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('%s'), dependencies=TRUE) }",
+        packageName, packageName, repos);
     return eval(cmd, false);
   }
 
@@ -235,4 +241,22 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected abstract void doWithConnection();
 
+  /**
+   * Set the CRAN repositories for installing packages.
+   *
+   * @param repositories
+   */
+  protected void setRepositories(List<String> repositories) {
+    if (repositories != null && !repositories.isEmpty())
+      this.repositories = repositories;
+  }
+
+  /**
+   * Get the CRAN repositories for installing packages.
+   *
+   * @return
+   */
+  protected List<String> getRepositories() {
+    return repositories;
+  }
 }
