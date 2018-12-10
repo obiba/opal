@@ -1,5 +1,6 @@
 package org.obiba.opal.core.domain;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -74,6 +75,17 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   @Override
   public List<Object> getUniqueValues() {
     return Lists.newArrayList(name, datasource, table);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("name", name)
+        .add("datasource", datasource)
+        .add("table", table)
+        .add("parameters", parametersString)
+        .add("variables", variables)
+        .toString();
   }
 
   public static class Builder {

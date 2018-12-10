@@ -26,6 +26,8 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 
 public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> implements AnalysesPresenter.Display {
@@ -86,7 +88,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
     table.addColumn(new TextColumn<OpalAnalysisDto>() {
       @Override
       public String getValue(OpalAnalysisDto object) {
-        return object.getUpdated();
+        return Moment.create(object.getUpdated()).format(FormatType.MONTH_NAME_TIME_SHORT);
       }
     }, translations.dateLabel());
 

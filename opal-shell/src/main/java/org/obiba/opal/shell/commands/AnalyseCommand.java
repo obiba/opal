@@ -85,7 +85,12 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         // if analysis already exists use the one from database
         OpalAnalysis existingAnalysis = analysisService.getAnalysis(options.getProject(), analyseOptions.getTable(), analyseOptions.getName());
 
-        String variables = existingAnalysis == null ? analyseOptions.getVariables() :  String.join(",", existingAnalysis.getVariables());
+        String variables = analyseOptions.getVariables();
+
+        if (existingAnalysis  != null) {
+          variables = String.join(",", existingAnalysis.getVariables());
+          log.warn("Analysis {} already exists, using existing one instead of provided options with params \"{}\"", existingAnalysis.toString(), analyseOptions.getParams().toString());
+        }
 
         ValueTable targetValueTable = valueTableResolver.resolve(table, variables);
         String tibbleName = targetValueTable.getName();
