@@ -231,8 +231,10 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   private List<String> existingAnalysisNames() {
     List<String> currentNames = new ArrayList<String>();
 
-    for(int i = 0; i < originalAnalysisJsArray.length(); i++) {
-      currentNames.add(originalAnalysisJsArray.get(i).getName());
+    if (originalAnalysisJsArray != null) {
+      for (int i = 0; i < originalAnalysisJsArray.length(); i++) {
+        currentNames.add(originalAnalysisJsArray.get(i).getName());
+      }
     }
 
     return currentNames;
