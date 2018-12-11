@@ -32,12 +32,14 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.AnalysisResultItemDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultDto;
 
 import java.util.List;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultsDto;
 
 public class ResultsPanel extends Composite {
+
   interface Binder extends UiBinder<Widget, ResultsPanel>  {}
 
   private final EventBus eventBus;
@@ -54,7 +56,11 @@ public class ResultsPanel extends Composite {
 
   private List<OpalAnalysisResultDto> history;
 
-  private ListDataProvider<OpalAnalysisResultDto> dataProvider = new ListDataProvider<>();
+  private List<AnalysisResultItemDto> details;
+
+  private ListDataProvider<AnalysisResultItemDto> detailsDataProvider = new ListDataProvider<>();
+
+  private ListDataProvider<OpalAnalysisResultDto> historyDataProvider = new ListDataProvider<>();
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -88,6 +94,12 @@ public class ResultsPanel extends Composite {
   @UiField
   InlineHTML status;
 
+  @UiField
+  CollapsiblePanel detailsPanel;
+
+  @UiField
+  Table detailsTable;
+
   public ResultsPanel(EventBus eventBus, RequestUrlBuilder urlBuilder) {
     initWidget(uiBinder.createAndBindUi(this));
     this.eventBus = eventBus;
@@ -95,11 +107,15 @@ public class ResultsPanel extends Composite {
   }
 
   public void initialize(TableDto tableDto, JsArray<OpalAnalysisResultDto> results) {
-    int lastIndex = setHistoryResults(results);
-    lastResult = results.get(lastIndex);
+    // Results are in descending order
+    history = JsArrays.toList(results, 1, results.length());
+    lastResult = results.get(0);
+    details = JsArrays.toList(lastResult.getResultItemsArray());
     initializeLastResult();
 
+    if (details.size() > 0) initializeDetails();
     if (history.size() > 0) initializeHistory();
+
     this.tableDto = tableDto;
 
     report.addClickHandler(new ClickHandler() {
@@ -110,11 +126,14 @@ public class ResultsPanel extends Composite {
     });
   }
 
-  private int setHistoryResults(JsArray<OpalAnalysisResultDto> results) {
-    int lastIndex = results.length() - 1;
-    history = JsArrays.toList(results, 1, lastIndex + 1);
-
-    return lastIndex;
+  private void updateHistory(JsArray<OpalAnalysisResultDto> results) {
+    // Results are in descending order
+    history = JsArrays.toList(results, 1, results.length());
+    if (history.size() > 0) {
+      historyPanel.setVisible(true);
+      filter.setText("");
+      renderHistoryRows();
+    }
   }
 
   private void initializeLastResult() {
@@ -127,15 +146,39 @@ public class ResultsPanel extends Composite {
     message.setText(lastResult.getMessage());
   }
 
-  private void initializeHistory() {
-    historyPanel.setVisible(true);
-    addTableColumns();
-    initFilter();
-    beforeRenderRows();
-    renderRows();
+  private void initializeDetails() {
+    detailsPanel.setVisible(true);
+    detailsPanel.setOpen(true);
+    addDetailsTableColumns();
+    beforeDetailsRenderRows();
+    renderDetailsRows();
   }
 
-  private void addTableColumns() {
+  private void initializeHistory() {
+    historyPanel.setVisible(true);
+    historyPanel.setText(translations.analysisResultHistoryLabel());
+    addHistoryTableColumns();
+    initFilter();
+    beforeHistoryRenderRows();
+    renderHistoryRows();
+  }
+
+  private void addDetailsTableColumns() {
+    // Status Column
+    detailsTable.addColumn(new AnalysisStatusColumn.ForOpalAnalysisResultDto(), translations.analysisStatusLabel());
+    detailsTable.addColumn(new TextColumn<AnalysisResultItemDto>() {
+      @Override
+      public String getValue(AnalysisResultItemDto itemDto) {
+        return itemDto.getMessage();
+      }
+    }, translations.analysisMessageLabel());
+
+    detailsTable.setColumnWidth(detailsTable.getColumn(0), 25, Style.Unit.PCT);
+    detailsTable.setPageSize(historyTable.DEFAULT_PAGESIZE);
+    detailsDataProvider.addDataDisplay(detailsTable);
+  }
+
+  private void addHistoryTableColumns() {
     actionColumn = actionColumn();
 
     actionColumn.setActionHandler(new ActionHandler<OpalAnalysisResultDto>() {
@@ -151,13 +194,9 @@ public class ResultsPanel extends Composite {
                 @Override
                 public void onResource(Response response, OpalAnalysisResultsDto resource) {
                   historyPanel.setVisible(false);
-                  setHistoryResults(resource.getAnalysisResultsArray());
+                  updateHistory(resource.getAnalysisResultsArray());
 
-                  if (history.size() > 0) {
-                    historyPanel.setVisible(true);
-                    filter.setText("");
-                    renderRows();
-                  }
+
                 }
               }).delete().send();
         }
@@ -183,7 +222,7 @@ public class ResultsPanel extends Composite {
     historyTable.setPageSize(historyTable.DEFAULT_PAGESIZE);
     historyTable.setEmptyTableWidget(new InlineLabel(translationMessages.analysisResultCount(0)));
 
-    dataProvider.addDataDisplay(historyTable);
+    historyDataProvider.addDataDisplay(historyTable);
   }
 
   private void downloadResult(String analysisId, String resultId) {
@@ -216,14 +255,23 @@ public class ResultsPanel extends Composite {
     filter.getClear().setTitle(translations.clearFilter());
   }
 
-  private void beforeRenderRows() {
-    filter.setText("");
-    historyTable.showLoadingIndicator(dataProvider);
+  private void beforeDetailsRenderRows() {
+    detailsTable.showLoadingIndicator(detailsDataProvider);
   }
 
-  private void renderRows() {
-    dataProvider.setList(history);
-    dataProvider.refresh();
+  private void beforeHistoryRenderRows() {
+    filter.setText("");
+    historyTable.showLoadingIndicator(historyDataProvider);
+  }
+
+  private void renderDetailsRows() {
+    detailsDataProvider.setList(details);
+    detailsDataProvider.refresh();
+  }
+
+  private void renderHistoryRows() {
+    historyDataProvider.setList(history);
+    historyDataProvider.refresh();
   }
 
   @UiHandler("filter")
@@ -242,7 +290,7 @@ public class ResultsPanel extends Composite {
       filtered = history;
     }
 
-    dataProvider.setList(filtered);
-    dataProvider.refresh();
+    historyDataProvider.setList(filtered);
+    historyDataProvider.refresh();
   }
 }

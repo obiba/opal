@@ -1,9 +1,13 @@
 package org.obiba.opal.spi.r.analysis;
 
 import org.obiba.opal.spi.analysis.AbstractAnalysisResult;
+import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RAnalysisResult extends AbstractAnalysisResult<RAnalysis> {
 
@@ -73,12 +77,38 @@ public class RAnalysisResult extends AbstractAnalysisResult<RAnalysis> {
       return this;
     }
 
+    public Builder items(List<AnalysisResultItem> items) {
+      result.addResultItems(items);
+      return this;
+    }
+
     public RAnalysisResult build() {
       return result;
     }
 
     public String getResultId() {
       return resultId;
+    }
+  }
+
+  static class RAnalysisResultItem implements AnalysisResultItem {
+
+    private final String message;
+    private final AnalysisStatus status;
+
+    RAnalysisResultItem(AnalysisStatus status, String message) {
+      this.status = status;
+      this.message = message;
+    }
+
+    @Override
+    public AnalysisStatus getStatus() {
+      return status;
+    }
+
+    @Override
+    public String getMessage() {
+      return message;
     }
   }
 }

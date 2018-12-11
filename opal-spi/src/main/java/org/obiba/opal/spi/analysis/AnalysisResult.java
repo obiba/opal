@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Result of the analysis: status and report.
  */
-public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
+public interface AnalysisResult<T extends Analysis, I extends AnalysisResultItem> extends AnalysisResultItem {
 
   /**
    * Analysis result identifier.
@@ -50,7 +50,7 @@ public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
    *
    * @return
    */
-  @Nullable List<AnalysisResultItem> getResultItems();
+  @Nullable List<I> getResultItems();
 
   /**
    * Get ellapsed time.

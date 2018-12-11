@@ -2,6 +2,8 @@ package org.obiba.opal.spi.r.analysis;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.*;
 import org.obiba.opal.spi.r.FileReadROperation;
@@ -11,7 +13,6 @@ import org.obiba.opal.spi.r.RScriptROperation;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -57,9 +59,8 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
         analysisResultBuilder.message("No analysis to run.");
       } else {
         prepare(analysis.getSession(), template);
-        ParsedAnalysisResult parsedResult = parseResult(run(analysis));
-        analysisResultBuilder.message(parsedResult.getMessage());
-        analysisResultBuilder.status(parsedResult.getStatus());
+        REXP rexp = run(analysis);
+        createAnalysisResult(analysisResultBuilder, parseResult(rexp));
 
         Path fileName = template.getReportPath().getFileName();
         Path reportPath = generateReportPath(analysis, analysisResultBuilder.getResultId(), fileName);
@@ -70,6 +71,27 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
 
       return analysisResultBuilder.build();
     }).collect(Collectors.toList());
+  }
+
+  private void createAnalysisResult(RAnalysisResult.Builder analysisResultBuilder, JSONObject parsedResult) {
+    analysisResultBuilder.message(parsedResult.optString("message", ""));
+    analysisResultBuilder.status(
+      AnalysisStatus.valueOf(parsedResult.optString("status", "ERROR").toUpperCase())
+    );
+
+    JSONArray items = parsedResult.getJSONArray("items");
+    List<AnalysisResultItem> resultItems = Lists.newArrayList();
+
+    for (int i = 0, length = items.length(); i < length; i++) {
+      JSONObject itemJson = items.getJSONObject(i);
+      resultItems.add(
+        new RAnalysisResult.RAnalysisResultItem(
+          AnalysisStatus.valueOf(itemJson.optString("status", "ERROR").toUpperCase()),
+          itemJson.optString("message", "")
+        )
+      );
+    }
+    analysisResultBuilder.items(resultItems);
   }
 
 
@@ -188,18 +210,14 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
 
   protected abstract REXP run(RAnalysis analysis);
 
-  protected ParsedAnalysisResult parseResult(REXP rexp) {
+  JSONObject parseResult(REXP rexp) {
     try {
-      RList rList = rexp.asList();
-      return new ParsedAnalysisResult(
-        AnalysisStatus.valueOf(((REXPString) rList.get("status")).asString()),
-        ((REXPString) rList.get("message")).asString()
-      );
-    } catch (REXPMismatchException e) {
+      return new JSONObject(rexp.asString());
+    } catch (REXPMismatchException | JSONException e) {
       log.error("Failed to parse analysis result {}", e);
     }
 
-    return new ParsedAnalysisResult(AnalysisStatus.FAILED, "");
+    return new JSONObject().put("status", AnalysisStatus.ERROR.toString());
   }
 
   private AnalysisTemplate getTemplate(String name) throws NoSuchAnalysisTemplateException {
@@ -207,21 +225,4 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
       .orElseThrow(() -> new NoSuchAnalysisTemplateException(name));
   }
 
-  protected static class ParsedAnalysisResult {
-    private String message;
-    private final AnalysisStatus status;
-
-    public ParsedAnalysisResult(AnalysisStatus status, String message) {
-      this.message = message;
-      this.status = status;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public AnalysisStatus getStatus() {
-      return status;
-    }
-  }
 }
