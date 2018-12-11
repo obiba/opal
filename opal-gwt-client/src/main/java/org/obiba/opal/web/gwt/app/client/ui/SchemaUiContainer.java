@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.google.common.collect.Lists;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -86,7 +87,7 @@ public class SchemaUiContainer extends ControlGroup {
     Iterator<Widget> iterator = getChildren().iterator();
     boolean found = false;
 
-    while(value != null && (!found || iterator.hasNext())) {
+    while(value != null && (!found && iterator.hasNext())) {
       Widget widget = iterator.next();
 
       if(widget instanceof TakesValue) {
@@ -111,6 +112,16 @@ public class SchemaUiContainer extends ControlGroup {
         }
 
         found = true;
+      } else if (widget instanceof ListBox) {
+        ListBox editableWidget = (ListBox) widget;
+        String stringValue = ensureStringValue(value);
+
+        List<String> enumItems = JsonSchemaGWT.getEnum(schema);
+        if (enumItems.size() > 0) {
+          int selectedIndex = enumItems.indexOf(stringValue);
+          if (selectedIndex != -1) editableWidget.setSelectedIndex(selectedIndex);
+          editableWidget.setValue(selectedIndex, stringValue);
+        }
       }
     }
   }
@@ -322,7 +333,7 @@ public class SchemaUiContainer extends ControlGroup {
     }
 
     if(hasEnum) {
-      return createWidgetForStringWithEnum(enumItems);
+      return createWidgetForStringWithEnum(enumItems, aDefault);
     }
 
     TextBox input = format.equals("password") ? new PasswordTextBox() : new TextBox();
@@ -341,7 +352,7 @@ public class SchemaUiContainer extends ControlGroup {
     }
   }
 
-  private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {
+  private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems, final JSONValue aDefault) {
     if(format.equals("radio")) {
       return new DynamicRadioGroup(key, enumItems);
     }
@@ -349,8 +360,14 @@ public class SchemaUiContainer extends ControlGroup {
     ListBox listBox = new ListBox();
     listBox.setName(key);
 
-    for(String item : enumItems) {
-      listBox.addItem(item);
+    int selectedIndex = aDefault != null && aDefault.isString() != null ? enumItems.indexOf(aDefault.isString().stringValue()) : -1;
+
+    for (int i = 0; i < enumItems.size(); i++) {
+      listBox.insertItem(enumItems.get(i), i);
+    }
+
+    if (selectedIndex != -1) {
+      listBox.setSelectedIndex(selectedIndex);
     }
 
     return listBox;

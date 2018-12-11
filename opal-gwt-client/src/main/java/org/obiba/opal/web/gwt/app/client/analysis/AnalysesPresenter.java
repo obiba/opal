@@ -119,7 +119,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
     if (originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       originalTable = table;
-      originalAnalysisJsArray = null;
+      originalAnalysisJsArray = JsArrays.<OpalAnalysisDto>create();
     }
 
     if (originalTable != null) {
@@ -132,7 +132,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             @Override
             public void onResource(Response response, OpalAnalysesDto resource) {
               if (resource != null) {
-                originalAnalysisJsArray = resource.getAnalysesArray();
+                originalAnalysisJsArray = resource.getAnalysesArray() != null ? resource.getAnalysesArray() : JsArrays.<OpalAnalysisDto>create();
                 getView().renderRows(originalAnalysisJsArray);
               }
 
