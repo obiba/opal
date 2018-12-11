@@ -116,6 +116,8 @@ public class SchemaUiContainer extends ControlGroup {
         if (valueIndex > -1) {
           ((OpalListBox) widget).setSelectedIndex(valueIndex);
         }
+
+        found = true;
       }
     }
   }

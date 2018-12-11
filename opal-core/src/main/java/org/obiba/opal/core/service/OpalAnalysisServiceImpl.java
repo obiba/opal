@@ -91,7 +91,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
         .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getName()).spliterator(), false)
         .forEach(orientDbService::delete);
 
-    deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getName()));
+    deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));
   }
 
   @Override

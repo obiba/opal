@@ -15,13 +15,28 @@ public interface Analysis {
   Path ANALYSES_HOME = Paths.get(System.getProperty("OPAL_HOME"), "data", "analyses");
 
   /**
+   * Datasource used by analysis.
+   *
+   * @return
+   */
+  @NotNull
+  String getDatasource();
+
+  /**
+   * Table used by analysis.
+   *
+    * @return
+   */
+  @NotNull
+  String getTable();
+
+  /**
    * Unique analysis request identifier, Analysis name.
    *
    * @return
    */
   @NotNull
   String getName();
-
 
   /**
    * The name of the plugin used to create this analysis.

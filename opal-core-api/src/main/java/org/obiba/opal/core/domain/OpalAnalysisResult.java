@@ -14,6 +14,9 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
 
   private static final String DEFAULT_ID = "empty";
 
+  private String datasource;
+  private String table;
+
   private String analysisId;
   private String id;
   private Date startDate;
@@ -26,7 +29,7 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
     this.id = DEFAULT_ID;
   }
 
-  public OpalAnalysisResult(@NotNull AnalysisResult<T> analysisResult) {
+  public OpalAnalysisResult(@NotNull AnalysisResult<T> analysisResult, String datasource, String table) {
     id = analysisResult.getId();
     analysisId = analysisResult.getAnalysisId();
     startDate = analysisResult.getStartDate();
@@ -34,6 +37,17 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
     resultItems = analysisResult.getResultItems();
     status = analysisResult.getStatus();
     message = analysisResult.getMessage();
+
+    this.datasource = datasource;
+    this.table = table;
+  }
+
+  public String getDatasource() {
+    return datasource;
+  }
+
+  public String getTable() {
+    return table;
   }
 
   @Override

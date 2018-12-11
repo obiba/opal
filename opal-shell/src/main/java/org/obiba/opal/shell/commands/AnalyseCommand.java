@@ -104,7 +104,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
         RAnalysis.Builder builder = existingAnalysis == null ?
-            fromOptions(analyseOptions) : fromExistingOpalAnalysis(existingAnalysis);
+            fromOptions(options.getProject(), analyseOptions) : fromExistingOpalAnalysis(existingAnalysis);
 
         if (!variables.isEmpty()) {
           builder.variables(StreamSupport.stream(targetValueTable.getVariables().spliterator(), false)
@@ -127,7 +127,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
           result.getMessage(),
           result.getReportPath());
 
-        analysisResultService.save(new OpalAnalysisResult(result));
+        analysisResultService.save(new OpalAnalysisResult(result, options.getProject(), analyseOptions.getTable()));
       });
 
     }
@@ -135,8 +135,10 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     return 0;
   }
 
-  private RAnalysis.Builder fromOptions(AnalyseCommandOptions.AnalyseOptions analyseOptions) {
+  private RAnalysis.Builder fromOptions(String project, AnalyseCommandOptions.AnalyseOptions analyseOptions) {
     return RAnalysis.create(
+        project,
+        analyseOptions.getTable(),
         analyseOptions.getName(),
         analyseOptions.getPlugin(),
         analyseOptions.getTemplate()).parameters(analyseOptions.getParams());
@@ -144,6 +146,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   private RAnalysis.Builder fromExistingOpalAnalysis(OpalAnalysis existingAnalysis) {
     return RAnalysis.create(
+        existingAnalysis.getDatasource(),
+        existingAnalysis.getTable(),
         existingAnalysis.getName(),
         existingAnalysis.getPluginName(),
         existingAnalysis.getTemplateName()).parameters(existingAnalysis.getParameters());
