@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -46,9 +48,7 @@ public class ResultsPanel extends Composite {
 
   private static final String DELETE_RESULT = "Delete";
 
-  private static final String DOWNLOAD_RESULT = "Download";
-
-  private static final String DOWNLOAD_LAST_RESULT = "Report";
+  private static final String DOWNLOAD_RESULT = "Report";
 
   private OpalAnalysisResultDto lastResult;
 
@@ -122,8 +122,8 @@ public class ResultsPanel extends Composite {
     String cellValue = AnalysisStatusColumn.StatusImageCell.renderAsString(value);
 
     status.setHTML(cellValue);
-    start.setText(lastResult.getStartDate());
-    end.setText(lastResult.getEndDate());
+    start.setText(Moment.create(lastResult.getStartDate()).format(FormatType.MONTH_NAME_DAY_TIME_SHORT));
+    end.setText(Moment.create(lastResult.getEndDate()).format(FormatType.MONTH_NAME_DAY_TIME_SHORT));
     message.setText(lastResult.getMessage());
   }
 
@@ -165,13 +165,13 @@ public class ResultsPanel extends Composite {
     });
 
     // Status Column
-    historyTable.addColumn(new AnalysisStatusColumn(), translations.analysisResultStatusLabel());
+    historyTable.addColumn(new AnalysisStatusColumn.ForOpalAnalysisResultDto(), translations.analysisStatusLabel());
 
     // Date Column
     historyTable.addColumn(new TextColumn<OpalAnalysisResultDto>() {
       @Override
       public String getValue(OpalAnalysisResultDto object) {
-        return object.getEndDate();
+        return Moment.create(object.getEndDate()).format(FormatType.MONTH_NAME_DAY_TIME_SHORT);
       }
     }, translations.analysisResultDateLabel());
 

@@ -50,6 +50,8 @@ message OpalAnalysisDto {
   optional string updated = 9;
 
   repeated OpalAnalysisResultDto analysisResults = 10;
+
+  optional AnalysisStatusDto lastStatus = 11;
 }
 
 message OpalAnalysesDto {

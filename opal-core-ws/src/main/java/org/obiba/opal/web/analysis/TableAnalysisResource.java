@@ -1,11 +1,16 @@
 package org.obiba.opal.web.analysis;
 
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.NoSuchAnalysisException;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
+import org.obiba.opal.spi.analysis.AnalysisStatus;
 import org.obiba.opal.web.model.Projects;
+import org.obiba.opal.web.model.Projects.AnalysisStatusDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
 import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
@@ -53,7 +58,7 @@ public class TableAnalysisResource {
       .addAllAnalyses(
         StreamSupport
           .stream(analysisService.getAnalysesByDatasourceAndTable(datasourceName, tableName).spliterator(), false)
-          .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList()))
+          .map(analysis -> Dtos.asDto(analysis).setLastStatus(getLastResultsStatus(analysis.getName())).build()).collect(Collectors.toList()))
         .build();
   }
 
@@ -153,6 +158,18 @@ public class TableAnalysisResource {
     return Optional.ofNullable(
       analysisService.getAnalysis(datasourceName, tableName, analysisId)
     ).orElseThrow(() -> new NoSuchAnalysisException(analysisId));
+  }
+
+  private AnalysisStatusDto getLastResultsStatus(String analysisName) {
+    Iterable<OpalAnalysisResult> analysisResults = analysisResultService
+        .getAnalysisResults(analysisName, true);
+
+    if (analysisResults != null) {
+      ArrayList<OpalAnalysisResult> list = Lists.newArrayList(analysisResults);
+      return AnalysisStatusDto.valueOf((list.size() == 1 ? list.get(0).getStatus() : AnalysisStatus.IGNORED).name());
+    }
+
+    return AnalysisStatusDto.valueOf(AnalysisStatus.IGNORED.name());
   }
   
   void setDatasourceName(String value) {
