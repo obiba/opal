@@ -54,9 +54,9 @@ public class SchemaUiContainer extends ControlGroup {
     while(!found || iterator.hasNext()) {
       Widget widget = iterator.next();
 
-      if(widget instanceof TakesValue || widget instanceof ListBox) {
+      if(widget instanceof TakesValue || widget instanceof OpalListBox) {
         found = true;
-        value = widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((ListBox) widget).getSelectedValue();
+        value = widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((OpalListBox) widget).getSelectedValue();
       }
     }
 
@@ -86,7 +86,7 @@ public class SchemaUiContainer extends ControlGroup {
     Iterator<Widget> iterator = getChildren().iterator();
     boolean found = false;
 
-    while(value != null && (!found || iterator.hasNext())) {
+    while(value != null && (!found && iterator.hasNext())) {
       Widget widget = iterator.next();
 
       if(widget instanceof TakesValue) {
@@ -111,6 +111,11 @@ public class SchemaUiContainer extends ControlGroup {
         }
 
         found = true;
+      } else if (widget instanceof OpalListBox) {
+        int valueIndex = ((OpalListBox) widget).getValueIndex(ensureStringValue(value));
+        if (valueIndex > -1) {
+          ((OpalListBox) widget).setSelectedIndex(valueIndex);
+        }
       }
     }
   }
@@ -346,7 +351,7 @@ public class SchemaUiContainer extends ControlGroup {
       return new DynamicRadioGroup(key, enumItems);
     }
 
-    ListBox listBox = new ListBox();
+    OpalListBox listBox = new OpalListBox();
     listBox.setName(key);
 
     for(String item : enumItems) {
