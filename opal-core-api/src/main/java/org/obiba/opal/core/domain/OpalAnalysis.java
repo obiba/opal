@@ -21,10 +21,12 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   private String datasource;
   private String table;
 
+  @Override
   public String getDatasource() {
     return datasource;
   }
 
+  @Override
   public String getTable() {
     return table;
   }

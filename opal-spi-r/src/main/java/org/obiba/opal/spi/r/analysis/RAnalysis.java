@@ -16,8 +16,8 @@ public class RAnalysis extends AbstractAnalysis {
 
   private String symbol;
 
-  private RAnalysis(String name, String pluginName, String templateName) {
-    super(name, pluginName, templateName);
+  private RAnalysis(String datasource, String table, String name, String pluginName, String templateName) {
+    super(datasource, table, name, pluginName, templateName);
   }
 
   /**
@@ -38,16 +38,16 @@ public class RAnalysis extends AbstractAnalysis {
     return symbol;
   }
 
-  public static Builder create( String name, String pluginName, String templateName) {
-    return new Builder(name, pluginName, templateName);
+  public static Builder create(String datasource, String table, String name, String pluginName, String templateName) {
+    return new Builder(datasource, table, name, pluginName, templateName);
   }
 
   public static class Builder {
 
     private final RAnalysis analysis;
 
-    private Builder(String name, String pluginName, String templateName) {
-      this.analysis = new RAnalysis(name, pluginName, templateName);
+    private Builder(String datasource, String table, String name, String pluginName, String templateName) {
+      this.analysis = new RAnalysis(datasource, table, name, pluginName, templateName);
     }
 
     public Builder session(ROperationTemplate session) {

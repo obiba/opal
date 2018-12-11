@@ -72,7 +72,7 @@ public class TableAnalysisResource {
 
     builder.addAllAnalysisResults(
       StreamSupport
-        .stream(analysisResultService.getAnalysisResults(analysisId, lastResult).spliterator(), false)
+        .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisId, lastResult).spliterator(), false)
         .map(analysisResult -> Dtos.asDto(analysisResult).build())
         .collect(Collectors.toList()));
 
@@ -93,7 +93,7 @@ public class TableAnalysisResource {
     return OpalAnalysisResultsDto.newBuilder()
         .addAllAnalysisResults(
           StreamSupport
-            .stream(analysisResultService.getAnalysisResults(analysisId, lastResult).spliterator(), false)
+            .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisId, lastResult).spliterator(), false)
             .map(analysisResult -> Dtos.asDto(analysisResult).build()).collect(Collectors.toList()))
         .build();
   }
@@ -162,14 +162,14 @@ public class TableAnalysisResource {
 
   private AnalysisStatusDto getLastResultsStatus(String analysisName) {
     Iterable<OpalAnalysisResult> analysisResults = analysisResultService
-        .getAnalysisResults(analysisName, true);
+        .getAnalysisResults(datasourceName, tableName, analysisName, true);
 
     if (analysisResults != null) {
       ArrayList<OpalAnalysisResult> list = Lists.newArrayList(analysisResults);
-      return AnalysisStatusDto.valueOf((list.size() == 1 ? list.get(0).getStatus() : AnalysisStatus.IGNORED).name());
+      return AnalysisStatusDto.valueOf((list.size() == 1 ? list.get(0).getStatus() : AnalysisStatus.ERROR).name());
     }
 
-    return AnalysisStatusDto.valueOf(AnalysisStatus.IGNORED.name());
+    return AnalysisStatusDto.valueOf(AnalysisStatus.ERROR.name());
   }
   
   void setDatasourceName(String value) {

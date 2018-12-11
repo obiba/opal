@@ -2,9 +2,6 @@ package org.obiba.opal.core.service;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
-import com.sun.istack.Nullable;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 
 public interface OpalAnalysisResultService extends SystemService {
@@ -13,7 +10,7 @@ public interface OpalAnalysisResultService extends SystemService {
 
   Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult);
 
-  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String analysisId, boolean lastResult) throws NoSuchAnalysisException;
+  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String datasource, @NotNull String table, @NotNull String analysisId, boolean lastResult) throws NoSuchAnalysisException;
 
   void save(@NotNull OpalAnalysisResult analysisResult) throws ConstraintViolationException;
 
