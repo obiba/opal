@@ -1,5 +1,6 @@
 package org.obiba.opal.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -58,6 +59,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
     return parametersString;
   }
 
+  @JsonIgnore
   @Override
   @Transient
   public JSONObject getParameters() {
