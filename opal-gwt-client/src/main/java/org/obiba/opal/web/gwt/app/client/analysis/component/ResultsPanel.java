@@ -227,7 +227,7 @@ public class ResultsPanel extends Composite {
 
   private void downloadResult(String analysisId, String resultId) {
     FileDownloadRequestEvent fileDownloadRequestEvent = new FileDownloadRequestEvent(
-        UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_EXPORT.create()
+        UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_REPORT.create()
             .build(tableDto.getDatasourceName(), tableDto.getName(),
                 analysisId, resultId));
 

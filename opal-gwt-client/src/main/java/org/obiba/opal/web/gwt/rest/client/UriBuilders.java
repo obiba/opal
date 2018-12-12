@@ -603,6 +603,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_TABLE_ANALYSIS_RESULT_REPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}", "result", "{}", "_report");
+    }
+  },
+
   PROJECT_ANALYSE_COMMAND {
     @Override
     public UriBuilder create() {

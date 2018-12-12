@@ -3,6 +3,9 @@ package org.obiba.opal.core.service;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.sun.istack.NotNull;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
@@ -99,6 +102,33 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
 
   }
 
+  @Override
+  public void exportProjectAnalysisResultReport(@NotNull String projectName,
+                                                @NotNull String tableName,
+                                                @NotNull String analysisId,
+                                                @NotNull String resultId,
+                                                @NotNull OutputStream outputStream) throws IOException {
+    Path resultsPath = getResultsPath(projectName, tableName, analysisId, resultId);
+
+      List<Path> tentativeReports = getTentativeReports(resultsPath);
+
+      if (tentativeReports.size() == 0) {
+        throw new FileNotFoundException("No Report Files in \"" + resultsPath.toString() + "\"");
+      } else if (tentativeReports.size() == 1) {
+        Path path = tentativeReports.get(0);
+        writeFileToBuffer(outputStream, path);
+      } else {
+        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+
+        for (Path path : tentativeReports) {
+          zipOutputStream.putNextEntry(new ZipEntry(path.getFileName().toString()));
+          writeFileToBuffer(zipOutputStream, path);
+          zipOutputStream.closeEntry();
+        }
+      }
+
+  }
+
   private void createZip(@NotNull OutputStream outputStream, boolean lastResult, List<OpalAnalysis> analyses) throws IOException {
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
@@ -147,12 +177,41 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     }
   }
 
-  private void writeFileToBuffer(ZipOutputStream out, Path filePath) throws IOException {
+  private void writeFileToBuffer(OutputStream out, Path filePath) throws IOException {
     FileInputStream fileInputStream = new FileInputStream(new File(filePath.toString()));
     int len;
     byte[] buffer = new byte[1024];
     while ((len = fileInputStream.read(buffer)) > 0) {
       out.write(buffer, 0, len);
+    }
+  }
+
+  private static List<Path> getTentativeReports(Path resultDirectoryPath) {
+    try (Stream<Path> pathStream = Files.walk(resultDirectoryPath)) {
+      return pathStream
+          .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().toLowerCase().endsWith(".html") || path.getFileName().toString().toLowerCase().endsWith(".pdf"))
+          .collect(Collectors.toList());
+    } catch (IOException e) {
+      return new ArrayList<>();
+    }
+  }
+
+  public static Path getResultsPath(String projectName, String tableName, String analysisId, String resultId) {
+    return Paths
+        .get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), projectName, tableName, analysisId, "results", resultId);
+  }
+
+  public static String getResultReportExtension(String projectName, String tableName, String analysisId, String resultId) {
+    Path resultsPath = getResultsPath(projectName, tableName, analysisId, resultId);
+
+    List<Path> tentativeReports = getTentativeReports(resultsPath);
+
+    if (tentativeReports.size() == 1) {
+      return tentativeReports.get(0).getFileName().toString().endsWith(".html") ? ".html" : ".pdf";
+    } else if (tentativeReports.size() > 1) {
+      return ".zip";
+    } else {
+      return null;
     }
   }
 
