@@ -1,12 +1,12 @@
 package org.obiba.opal.core.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.sun.istack.NotNull;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-import org.json.JSONObject;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.spi.analysis.Analysis;
@@ -93,10 +93,15 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     OpalAnalysisResult analysisResult = opalAnalysisResultService.getAnalysisResult(analysisId, resultId);
 
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-      zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", projectName, tableName, analysisId, "analysis.json").toString()));
-      zipOutputStream.write(new JSONObject(opalAnalysisService.getAnalysis(projectName, tableName, analysisId)).toString().getBytes());
-      zipOutputStream.closeEntry();
+      zipOutputStream.putNextEntry(
+        new ZipEntry(Paths.get("analyses", projectName, tableName, analysisId, "analysis.json").toString())
+      );
 
+      zipOutputStream.write(
+        new ObjectMapper().writeValueAsBytes(opalAnalysisService.getAnalysis(projectName, tableName, analysisId))
+      );
+
+      zipOutputStream.closeEntry();
       createZip(zipOutputStream, analysisId, analysisResult);
     }
 
@@ -117,6 +122,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
       } else if (tentativeReports.size() == 1) {
         Path path = tentativeReports.get(0);
         writeFileToBuffer(outputStream, path);
+        outputStream.close();
       } else {
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
 
@@ -136,7 +142,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
         String id = analyse.getName();
 
         zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", analyse.getDatasource(), analyse.getTable(), id, "analysis.json").toString()));
-        zipOutputStream.write(new JSONObject(analyse).toString().getBytes());
+        zipOutputStream.write(new ObjectMapper().writeValueAsBytes(analyse));
         zipOutputStream.closeEntry();
 
         for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(analyse.getDatasource(), analyse.getTable(), id, lastResult)) {
@@ -151,7 +157,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     String resultPath = Paths.get("analyses", result.getDatasource(), result.getTable(), analysisId, "results", resultId).toString();
 
     zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
-    zipOutputStream.write(new JSONObject(result).toString().getBytes());
+    zipOutputStream.write(new ObjectMapper().writeValueAsBytes(result));
     zipOutputStream.closeEntry();
 
     writeResultDataFiles(zipOutputStream, resultPath);
