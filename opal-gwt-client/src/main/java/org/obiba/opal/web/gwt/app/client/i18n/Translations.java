@@ -1494,9 +1494,17 @@ public interface Translations extends Constants {
   @DefaultStringValue("Status")
   String analysisStatusLabel();
 
+  @Description("Analysis Message Column label")
+  @DefaultStringValue("Message")
+  String analysisMessageLabel();
+
   @Description("Analysis Result Date Column label")
   @DefaultStringValue("Date")
   String analysisResultDateLabel();
+
+  @Description("Analysis Result History label")
+  @DefaultStringValue("History")
+  String analysisResultHistoryLabel();
 
   @Description("Analysis Status map")
   @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //

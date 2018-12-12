@@ -40,10 +40,11 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult) {
     SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName());
+      .table(OpalAnalysisResult.class.getSimpleName())
+      .order("desc");
 
     if (lastResult) {
-      builder.order("desc").limit(1);
+      builder.limit(1);
     }
 
     return orientDbService.list(OpalAnalysisResult.class, builder.build());
@@ -54,10 +55,11 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
       throws NoSuchAnalysisException {
     SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "analysisId = ?");
+      .whereClauses("datasource = ?", "table = ?", "analysisId = ?")
+      .order("desc");
 
     if (lastResult) {
-      builder.order("desc").limit(1);
+      builder.limit(1);
     }
 
     return orientDbService.list(OpalAnalysisResult.class, builder.build(), datasource, table, analysisId);

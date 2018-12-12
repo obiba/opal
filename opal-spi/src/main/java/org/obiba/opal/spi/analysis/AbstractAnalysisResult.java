@@ -24,7 +24,7 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
 
   private Date endDate;
 
-  private List<AnalysisResult<T>> resultItems;
+  private List<AnalysisResultItem> resultItems;
 
   protected AbstractAnalysisResult(T analysis) {
     this.id = IdGeneratorFactory.createDateIdGenerator().generate();
@@ -84,15 +84,15 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   }
 
   @Override
-  public List<AnalysisResult<T>> getResultItems() {
+  public List<AnalysisResultItem> getResultItems() {
     return resultItems == null ? resultItems = new ArrayList<>() : resultItems;
   }
 
-  protected void addResultItems(List<AnalysisResult<T>> results) {
+  protected void addResultItems(List<AnalysisResultItem> results) {
     getResultItems().addAll(results);
   }
 
-  protected void addResultItem(AnalysisResult<T> result) {
+  protected void addResultItem(AnalysisResultItem result) {
     getResultItems().add(result);
   }
 }

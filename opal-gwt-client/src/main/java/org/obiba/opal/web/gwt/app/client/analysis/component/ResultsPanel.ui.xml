@@ -45,6 +45,10 @@
 
     </o:PropertiesTable>
 
+    <o:CollapsiblePanel ui:field="detailsPanel" addStyleNames="grid" heading="DETAILS" visible="false">
+      <o:Table ui:field="detailsTable"></o:Table>
+    </o:CollapsiblePanel>
+
     <o:CollapsiblePanel ui:field="historyPanel" addStyleNames="grid" visible="false">
 
       <g:FlowPanel>

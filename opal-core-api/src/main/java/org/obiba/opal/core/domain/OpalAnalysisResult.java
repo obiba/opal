@@ -3,14 +3,18 @@ package org.obiba.opal.core.domain;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
+import org.obiba.opal.web.model.Opal;
 
-public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped implements AnalysisResult<T>, HasUniqueProperties {
+public class OpalAnalysisResult<T extends Analysis>
+  extends AbstractTimestamped
+  implements AnalysisResult<T, OpalAnalysisResultItem>, HasUniqueProperties {
 
   private static final String DEFAULT_ID = "empty";
 
@@ -21,7 +25,7 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
   private String id;
   private Date startDate;
   private Date endDate;
-  private List<AnalysisResultItem> resultItems;
+  private List<OpalAnalysisResultItem> resultItems;
   private AnalysisStatus status;
   private String message;
 
@@ -29,7 +33,7 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
     this.id = DEFAULT_ID;
   }
 
-  public OpalAnalysisResult(@NotNull AnalysisResult<T> analysisResult, String datasource, String table) {
+  public OpalAnalysisResult(@NotNull AnalysisResult<T, OpalAnalysisResultItem> analysisResult, String datasource, String table) {
     id = analysisResult.getId();
     analysisId = analysisResult.getAnalysisId();
     startDate = analysisResult.getStartDate();
@@ -77,7 +81,7 @@ public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped 
 
   @Nullable
   @Override
-  public List<AnalysisResultItem> getResultItems() {
+  public List<OpalAnalysisResultItem> getResultItems() {
     return resultItems;
   }
 
