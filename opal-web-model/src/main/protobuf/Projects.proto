@@ -51,7 +51,7 @@ message OpalAnalysisDto {
 
   repeated OpalAnalysisResultDto analysisResults = 10;
 
-  optional AnalysisStatusDto lastStatus = 11;
+  optional OpalAnalysisResultDto lastResult = 11;
 }
 
 message OpalAnalysesDto {

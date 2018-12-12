@@ -1,19 +1,10 @@
 package org.obiba.opal.web.analysis;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.obiba.opal.core.service.AnalysisExportService;
-import org.obiba.opal.core.service.AnalysisExportServiceImpl;
-import org.obiba.opal.core.service.NoSuchAnalysisException;
-import org.obiba.opal.core.service.OpalAnalysisResultService;
-import org.obiba.opal.core.service.OpalAnalysisService;
-import org.obiba.opal.spi.analysis.AnalysisStatus;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.web.model.Projects;
-import org.obiba.opal.web.model.Projects.AnalysisStatusDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
 import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
@@ -29,6 +20,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.BufferedOutputStream;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -61,7 +53,12 @@ public class TableAnalysisResource {
       .addAllAnalyses(
         StreamSupport
           .stream(analysisService.getAnalysesByDatasourceAndTable(datasourceName, tableName).spliterator(), false)
-          .map(analysis -> Dtos.asDto(analysis).setLastStatus(getLastResultsStatus(analysis.getName())).build()).collect(Collectors.toList()))
+          .map(analysis -> {
+            Builder builder = Dtos.asDto(analysis);
+            OpalAnalysisResultDto lastResult = getLastResult(analysis.getName());
+            if (lastResult != null) builder.setLastResult(lastResult);
+            return builder.build();
+          }).collect(Collectors.toList()))
         .build();
   }
 
@@ -181,16 +178,17 @@ public class TableAnalysisResource {
     ).orElseThrow(() -> new NoSuchAnalysisException(analysisId));
   }
 
-  private AnalysisStatusDto getLastResultsStatus(String analysisName) {
+  private OpalAnalysisResultDto getLastResult(String analysisName) {
     Iterable<OpalAnalysisResult> analysisResults = analysisResultService
         .getAnalysisResults(datasourceName, tableName, analysisName, true);
 
-    if (analysisResults != null) {
-      ArrayList<OpalAnalysisResult> list = Lists.newArrayList(analysisResults);
-      return AnalysisStatusDto.valueOf((list.size() == 1 ? list.get(0).getStatus() : AnalysisStatus.ERROR).name());
+    ArrayList<OpalAnalysisResult> list = Lists.newArrayList(analysisResults);
+
+    if (list.size() > 0) {
+      return Dtos.asDto(list.get(0)).build();
     }
 
-    return AnalysisStatusDto.valueOf(AnalysisStatus.ERROR.name());
+    return null;
   }
   
   void setDatasourceName(String value) {

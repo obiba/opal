@@ -1,17 +1,8 @@
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.stream.StreamSupport;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
-import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.slf4j.Logger;
@@ -21,6 +12,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.StreamSupport;
 
 @Component
 public class OpalAnalysisServiceImpl implements OpalAnalysisService {
@@ -53,6 +48,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysis.class.getSimpleName())
       .whereClauses("datasource = ?")
+      .order("desc")
       .build();
 
     return orientDbService.list(OpalAnalysis.class, query, datasource);
@@ -64,6 +60,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysis.class.getSimpleName())
       .whereClauses("datasource = ?", "table = ?")
+      .order("desc")
       .build();
 
     return orientDbService.list(OpalAnalysis.class, query, datasource, table);
