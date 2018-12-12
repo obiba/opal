@@ -61,4 +61,20 @@ public interface AnalysisExportService {
                                    @NotNull String analysisId,
                                    @NotNull String resultId,
                                    @NotNull OutputStream outputStream) throws IOException;
+
+  /**
+   * Export a specific result's report file(s)
+   *
+   * @param projectName
+   * @param tableName
+   * @param analysisId
+   * @param resultId
+   * @param outputStream
+   * @throws IOException
+   */
+  void exportProjectAnalysisResultReport(@NotNull String projectName,
+                                           @NotNull String tableName,
+                                           @NotNull String analysisId,
+                                           @NotNull String resultId,
+                                           @NotNull OutputStream outputStream) throws IOException;
 }

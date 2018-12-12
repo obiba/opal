@@ -1,10 +1,13 @@
 package org.obiba.opal.web.analysis;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.AnalysisExportService;
+import org.obiba.opal.core.service.AnalysisExportServiceImpl;
 import org.obiba.opal.core.service.NoSuchAnalysisException;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
@@ -145,6 +148,24 @@ public class TableAnalysisResource {
       stream -> analysisExportService.exportProjectAnalysis(datasourceName, tableName, analysisId, new BufferedOutputStream(stream), !all);
 
     return analysisZipDownloadResponse(outputStream);
+  }
+
+  @GET
+  @Path("/analysis/{analysisId}/result/{resultId}/_report")
+  @Produces("application/octet-stream")
+  public Response exportReport(@PathParam("analysisId") String analysisId, @PathParam("resultId") String resultId) {
+    StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysisResultReport(datasourceName, tableName, analysisId, resultId, new BufferedOutputStream(stream));
+
+    String resultReportExtension = AnalysisExportServiceImpl.getResultReportExtension(datasourceName, tableName, analysisId, resultId);
+
+    if (resultReportExtension != null) {
+      String mimeType = new MimetypesFileTypeMap().getContentType(resultReportExtension);
+
+      return Response.ok(outputStream, mimeType)
+          .header("Content-Disposition", "attachment; filename=\"report" + resultReportExtension + "\"").build();
+    }
+
+    return null;
   }
 
   private Response analysisZipDownloadResponse(StreamingOutput outputStream) {
