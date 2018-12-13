@@ -159,7 +159,7 @@ public class TableAnalysisResource {
       String mimeType = new MimetypesFileTypeMap().getContentType(resultReportExtension);
 
       return Response.ok(outputStream, mimeType)
-          .header("Content-Disposition", "attachment; filename=\"report" + resultReportExtension + "\"").build();
+          .header("Content-Disposition", "inline; filename=\"report" + resultReportExtension + "\"").build();
     }
 
     return null;

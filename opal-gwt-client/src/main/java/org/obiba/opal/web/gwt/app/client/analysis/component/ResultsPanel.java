@@ -11,11 +11,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.web.bindery.event.shared.EventBus;
 import java.util.ArrayList;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -226,12 +226,10 @@ public class ResultsPanel extends Composite {
   }
 
   private void downloadResult(String analysisId, String resultId) {
-    FileDownloadRequestEvent fileDownloadRequestEvent = new FileDownloadRequestEvent(
-        UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_REPORT.create()
-            .build(tableDto.getDatasourceName(), tableDto.getName(),
-                analysisId, resultId));
+    String href = urlBuilder.buildAbsoluteUrl(UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_REPORT.create()
+      .build(tableDto.getDatasourceName(), tableDto.getName(), analysisId, resultId));
 
-    eventBus.fireEvent(fileDownloadRequestEvent);
+    Window.open(href, "_blank", "");
   }
 
   private ActionsColumn<OpalAnalysisResultDto> actionColumn() {
