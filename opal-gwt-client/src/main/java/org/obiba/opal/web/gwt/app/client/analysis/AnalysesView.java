@@ -64,7 +64,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   @UiField
   Button newButton;
 
-  private ListDataProvider<OpalAnalysisDto> dataProvider = new ListDataProvider<>();
+  private ListDataProvider<OpalAnalysisDto> dataProvider = new ListDataProvider<OpalAnalysisDto>();
 
   private ActionsColumn<OpalAnalysisDto> analysesActionColumn;
 
@@ -119,6 +119,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
     tableColumnSortHandler.setComparator(table.getColumn(NAME_COLUMN_INDEX), nameColumn);
     tableColumnSortHandler.setComparator(table.getColumn(TYPE_COLUMN_INDEX), typeColumn);
     table.getColumnSortList().push(table.getColumn(NAME_COLUMN_INDEX));
+    table.getColumnSortList().push(table.getColumn(TYPE_COLUMN_INDEX));
     table.getColumnSortList().push(table.getColumn(UPDATED_COLUMN_INDEX));
     table.addColumnSortHandler(tableColumnSortHandler);
   }

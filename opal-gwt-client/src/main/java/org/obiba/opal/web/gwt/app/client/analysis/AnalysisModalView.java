@@ -70,7 +70,7 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
     analysisPanel = new AnalysisPanel(eventBus);
-    resultsPanel = new ResultsPanel(getEventBus(), urlBuilder);
+    resultsPanel = new ResultsPanel(urlBuilder);
   }
 
   @Override
