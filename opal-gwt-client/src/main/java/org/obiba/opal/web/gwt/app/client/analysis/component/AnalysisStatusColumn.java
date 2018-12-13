@@ -22,7 +22,9 @@ public class AnalysisStatusColumn {
 
     @Override
     public String getValue(OpalAnalysisDto dto) {
-      return formatForRender(dto.getLastStatus().getName());
+      return dto.hasLastResult()
+        ? formatForRender(dto.getLastResult().getStatus().getName())
+        : formatForRender(AnalysisStatusDto.ERROR.getName());
     }
   }
 

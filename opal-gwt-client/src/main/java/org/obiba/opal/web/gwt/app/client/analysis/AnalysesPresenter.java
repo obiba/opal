@@ -62,6 +62,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   public void setPlugins(List<PluginPackageDto> plugins) {
     this.plugins = plugins;
+    getView().setPlugins(plugins);
   }
 
   public interface Display extends View, HasUiHandlers<AnalysesUiHandlers> {
@@ -71,6 +72,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
     String DUPLICATE_ANALYSIS = "Duplicate";
     String DELETE_ANALYSIS = "Delete";
 
+    void setPlugins(List<PluginPackageDto> plugins);
     void beforeRenderRows();
     void renderRows(JsArray<OpalAnalysisDto> analyses);
     void afterRenderRows();

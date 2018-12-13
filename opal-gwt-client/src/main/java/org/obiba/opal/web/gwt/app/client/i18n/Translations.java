@@ -1494,6 +1494,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Status")
   String analysisStatusLabel();
 
+  @Description("Analysis Total Column label")
+  @DefaultStringValue("Total")
+  String analysisTotalLabel();
+
   @Description("Analysis Message Column label")
   @DefaultStringValue("Message")
   String analysisMessageLabel();
