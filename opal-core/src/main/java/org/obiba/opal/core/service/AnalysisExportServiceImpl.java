@@ -124,13 +124,15 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
         writeFileToBuffer(outputStream, path);
         outputStream.close();
       } else {
-        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
-        for (Path path : tentativeReports) {
-          zipOutputStream.putNextEntry(new ZipEntry(path.getFileName().toString()));
-          writeFileToBuffer(zipOutputStream, path);
-          zipOutputStream.closeEntry();
+          for (Path path : tentativeReports) {
+            zipOutputStream.putNextEntry(new ZipEntry(path.getFileName().toString()));
+            writeFileToBuffer(zipOutputStream, path);
+            zipOutputStream.closeEntry();
+          }
         }
+
       }
 
   }
