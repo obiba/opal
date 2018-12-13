@@ -50,15 +50,6 @@
     </o:CollapsiblePanel>
 
     <o:CollapsiblePanel ui:field="historyPanel" addStyleNames="grid" visible="false">
-
-      <g:FlowPanel>
-        <b:Controls addStyleNames="small-top-margin pull-right">
-          <b:InputAddOn prependIcon="FILTER">
-            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-          </b:InputAddOn>
-        </b:Controls>
-      </g:FlowPanel>
-
       <o:Table ui:field="historyTable"></o:Table>
     </o:CollapsiblePanel>
 

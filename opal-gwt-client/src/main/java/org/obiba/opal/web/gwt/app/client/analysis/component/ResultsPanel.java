@@ -5,23 +5,19 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.web.bindery.event.shared.EventBus;
-import java.util.ArrayList;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -34,15 +30,16 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.AnalysisResultItemDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultDto;
-
-import java.util.List;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisResultsDto;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class ResultsPanel extends Composite {
 
-  interface Binder extends UiBinder<Widget, ResultsPanel>  {}
+  private static final int ENDED_COLUMN_INDEX = 1;
 
-  private final EventBus eventBus;
+  interface Binder extends UiBinder<Widget, ResultsPanel>  {}
 
   private final RequestUrlBuilder urlBuilder;
 
@@ -54,13 +51,15 @@ public class ResultsPanel extends Composite {
 
   private OpalAnalysisResultDto lastResult;
 
-  private List<OpalAnalysisResultDto> history;
+  private JsArray<OpalAnalysisResultDto> history;
 
   private List<AnalysisResultItemDto> details;
 
-  private ListDataProvider<AnalysisResultItemDto> detailsDataProvider = new ListDataProvider<>();
+  private ListDataProvider<AnalysisResultItemDto> detailsDataProvider = new ListDataProvider<AnalysisResultItemDto>();
 
-  private ListDataProvider<OpalAnalysisResultDto> historyDataProvider = new ListDataProvider<>();
+  private ListDataProvider<OpalAnalysisResultDto> historyDataProvider = new ListDataProvider<OpalAnalysisResultDto>();
+
+  private ColumnSortEvent.ListHandler<OpalAnalysisResultDto> tableColumnSortHandler;
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -86,9 +85,6 @@ public class ResultsPanel extends Composite {
   Table<OpalAnalysisResultDto> historyTable;
 
   @UiField
-  TextBoxClearable filter;
-
-  @UiField
   CollapsiblePanel historyPanel;
 
   @UiField
@@ -100,21 +96,20 @@ public class ResultsPanel extends Composite {
   @UiField
   Table detailsTable;
 
-  public ResultsPanel(EventBus eventBus, RequestUrlBuilder urlBuilder) {
+  public ResultsPanel(RequestUrlBuilder urlBuilder) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.eventBus = eventBus;
     this.urlBuilder = urlBuilder;
   }
 
   public void initialize(TableDto tableDto, JsArray<OpalAnalysisResultDto> results) {
     // Results are in descending order
-    history = JsArrays.toList(results, 1, results.length());
-    lastResult = results.get(0);
+    lastResult = results.shift();
+    history = results;
     details = JsArrays.toList(lastResult.getResultItemsArray());
     initializeLastResult();
 
     if (details.size() > 0) initializeDetails();
-    if (history.size() > 0) initializeHistory();
+    if (history.length() > 0) initializeHistory();
 
     this.tableDto = tableDto;
 
@@ -128,10 +123,10 @@ public class ResultsPanel extends Composite {
 
   private void updateHistory(JsArray<OpalAnalysisResultDto> results) {
     // Results are in descending order
-    history = JsArrays.toList(results, 1, results.length());
-    if (history.size() > 0) {
+    lastResult = results.shift();
+    history = results;
+    if (history.length() > 0) {
       historyPanel.setVisible(true);
-      filter.setText("");
       renderHistoryRows();
     }
   }
@@ -158,7 +153,6 @@ public class ResultsPanel extends Composite {
     historyPanel.setVisible(true);
     historyPanel.setText(translations.analysisResultHistoryLabel());
     addHistoryTableColumns();
-    initFilter();
     beforeHistoryRenderRows();
     renderHistoryRows();
   }
@@ -207,22 +201,25 @@ public class ResultsPanel extends Composite {
     historyTable.addColumn(new AnalysisStatusColumn.ForOpalAnalysisResultDto(), translations.analysisStatusLabel());
 
     // Date Column
-    historyTable.addColumn(new TextColumn<OpalAnalysisResultDto>() {
-      @Override
-      public String getValue(OpalAnalysisResultDto object) {
-        return Moment.create(object.getEndDate()).format(FormatType.MONTH_NAME_DAY_TIME_SHORT);
-      }
-    }, translations.analysisResultDateLabel());
+    EndedColumn endedColumn = new EndedColumn();
+    historyTable.addColumn(endedColumn, translations.analysisResultDateLabel());
 
     // Action Column
     historyTable.addColumn(actionColumn, translations.actionsLabel());
-
     historyTable.setColumnWidth(historyTable.getColumn(0), 25, Style.Unit.PCT);
-
     historyTable.setPageSize(historyTable.DEFAULT_PAGESIZE);
     historyTable.setEmptyTableWidget(new InlineLabel(translationMessages.analysisResultCount(0)));
 
     historyDataProvider.addDataDisplay(historyTable);
+    initializeSortableColumns(endedColumn);
+  }
+
+  private void initializeSortableColumns(EndedColumn endedColumn) {
+    tableColumnSortHandler = new ColumnSortEvent.ListHandler<OpalAnalysisResultDto>(historyDataProvider.getList());
+    historyTable.getHeader(ENDED_COLUMN_INDEX).setHeaderStyleNames("sortable-header-column");
+    tableColumnSortHandler.setComparator(endedColumn, endedColumn);
+    historyTable.getColumnSortList().push(endedColumn);
+    historyTable.addColumnSortHandler(tableColumnSortHandler);
   }
 
   private void downloadResult(String analysisId, String resultId) {
@@ -246,19 +243,11 @@ public class ResultsPanel extends Composite {
     });
   }
 
-  private void initFilter() {
-    filter.setText("");
-    filter.getTextBox().setPlaceholder(translations.filterAnalysePlaceholder());
-    filter.getTextBox().addStyleName("input-xlarge");
-    filter.getClear().setTitle(translations.clearFilter());
-  }
-
   private void beforeDetailsRenderRows() {
     detailsTable.showLoadingIndicator(detailsDataProvider);
   }
 
   private void beforeHistoryRenderRows() {
-    filter.setText("");
     historyTable.showLoadingIndicator(historyDataProvider);
   }
 
@@ -268,27 +257,28 @@ public class ResultsPanel extends Composite {
   }
 
   private void renderHistoryRows() {
-    historyDataProvider.setList(history);
+    historyDataProvider.setList(JsArrays.toList(history));
     historyDataProvider.refresh();
+    tableColumnSortHandler.setList(historyDataProvider.getList());
+    ColumnSortEvent.fire(historyTable, historyTable.getColumnSortList());
   }
 
-  @UiHandler("filter")
-  public void filterKeyUp(KeyUpEvent event) {
-    String filterText = filter.getText();
 
-    List<OpalAnalysisResultDto> filtered = new ArrayList<>();
+  private class EndedColumn extends TextColumn<OpalAnalysisResultDto> implements Comparator<OpalAnalysisResultDto>  {
 
-    if (filterText != null && filterText.trim().length() > 0) {
-      for(OpalAnalysisResultDto result : history) {
-        if (result.getEndDate().toLowerCase().contains(filterText.trim().toLowerCase())) {
-          filtered.add(result);
-        }
-      }
-    } else {
-      filtered = history;
+    EndedColumn() {
+      setDefaultSortAscending(false);
+      setSortable(true);
     }
 
-    historyDataProvider.setList(filtered);
-    historyDataProvider.refresh();
+    @Override
+    public String getValue(OpalAnalysisResultDto object) {
+      return Moment.create(object.getEndDate()).format(FormatType.MONTH_NAME_TIME_SHORT);
+    }
+
+    @Override
+    public int compare(OpalAnalysisResultDto o1, OpalAnalysisResultDto o2) {
+      return (int)(Moment.create(o1.getEndDate()).valueOf() - Moment.create(o2.getEndDate()).valueOf());
+    }
   }
 }
