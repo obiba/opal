@@ -29,6 +29,7 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.analysis.AnalysesPresenter;
+import org.obiba.opal.web.gwt.app.client.analysis.event.AnalyseVariablesRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginsResource;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -580,6 +581,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     String tableRef = MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).build();
     tableVariables.put(tableRef, variables);
     fireEvent(new CartAddVariablesEvent(table.getEntityType(), tableVariables));
+  }
+
+  @Override
+  public void onAnalyseVariables(List<VariableDto> variables) {
+    if (variables.isEmpty()) return;
+    fireEvent(new AnalyseVariablesRequestEvent(variables));
   }
 
   @Override

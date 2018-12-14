@@ -145,6 +145,11 @@
                 <ui:msg description="Add variables to cart label">Add to cart</ui:msg>
               </b2:IconAnchor>
 
+              <b2:IconAnchor ui:field="analyseVariables" icon="SIGNAL"
+                             addStyleNames="inline small-indent">
+                <ui:msg description="Analyse variables label">Analyse</ui:msg>
+              </b2:IconAnchor>
+
               <b:Dropdown icon="TAG" ui:field="applyAttributeButton"
                   addStyleNames="inline small-indent">
                 <b:NavLink ui:field="applyTaxonomy">

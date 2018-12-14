@@ -46,7 +46,7 @@ public class AnalysisModalPresenter extends ModalPresenterWidget<AnalysisModalPr
     AnalysisPluginsRepository pluginsRepository = new AnalysisPluginsRepository(plugins);
     AnalysisPluginData analysisPluginData = pluginsRepository.findAnalysisPluginData(analysis);
 
-    if (analysis != null && analysisPluginData == null) {
+    if (analysis != null && analysis.hasName() && analysisPluginData == null) {
       getView().showError(
         TranslationsUtils.replaceArguments(
           translations.userMessageMap().get("InvalidAnalysisPluginData"),

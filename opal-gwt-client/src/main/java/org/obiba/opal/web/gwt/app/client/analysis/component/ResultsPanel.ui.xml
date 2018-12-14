@@ -39,7 +39,7 @@
         </g:Label>
 
         <g:Anchor ui:field="report">
-          <ui:msg>Download</ui:msg>
+          <ui:msg description="Analysis Results Status Show label">Show</ui:msg>
         </g:Anchor>
       </o:PropertyPanel>
 
