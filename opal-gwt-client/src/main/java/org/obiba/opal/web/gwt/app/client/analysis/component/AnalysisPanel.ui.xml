@@ -14,6 +14,11 @@
       </b:ControlLabel>
       <b:Controls>
         <b:TextBox ui:field="analyseName"/>
+        <b:HelpBlock>
+          <ui:msg description="Analysis Edit Model analyse name help label">
+            A name should avoid characters such as <code># % &amp; { } \ &lt; &gt; * ? / $ ! ' " : @</code>
+          </ui:msg>
+        </b:HelpBlock>
       </b:Controls>
     </b:ControlGroup>
 
