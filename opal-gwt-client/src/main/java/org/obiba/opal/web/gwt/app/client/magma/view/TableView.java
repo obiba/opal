@@ -236,6 +236,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   NavLink downloadAnalyses;
 
+  @UiField
+  IconAnchor analyseVariables;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -578,6 +581,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onAddVariablesToCart(checkColumn.getSelectedItems());
   }
 
+  @UiHandler("analyseVariables")
+  void onAnalyseVariables(ClickEvent event) {
+    tabPanel.selectTab(ANALYSES_TAB_INDEX);
+    getUiHandlers().onShowAnalyses();
+    getUiHandlers().onAnalyseVariables(checkColumn.getSelectedItems());
+  }
 
   @UiHandler("deleteVariables")
   void onDeleteVariables(ClickEvent event) {
@@ -730,6 +739,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       analysesTab.asWidget().getElement().setAttribute("style", "display:none");
     }
 
+    analyseVariables.setVisible(enable);
     downloadAnalyses.setVisible(enable);
   }
 

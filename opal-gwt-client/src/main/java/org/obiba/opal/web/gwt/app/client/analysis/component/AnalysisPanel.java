@@ -107,7 +107,10 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public void initialize(OpalAnalysisDto analysisDto, TableDto tableDto, List<String> existingNames, AnalysisPluginData data, boolean enabled) {
+  public void initialize(OpalAnalysisDto analysisDto,
+                         TableDto tableDto, List<String> existingNames,
+                         AnalysisPluginData data,
+                         boolean enabled) {
     table = tableDto;
     currentSelection = null;
     analysis = analysisDto;
@@ -121,19 +124,13 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
     analyseName.setText(analysis.getName());
 
-    String pluginName = data != null && data.hasPluginDto()
-      ? analysis.getPluginName()
-      : null;
-
-    String templateName = data != null && data.hasTemplateDto()
-      ? data.getTemplateDto().getName()
-      : null;
-
-    pluginTemplateChooser.setSelectedTemplate(pluginName, templateName);
-    updateSchemaForm(pluginTemplateChooser.getSelectedData());
+    if (data != null && data.hasPluginDto() && data.hasTemplateDto()) {
+      pluginTemplateChooser.setSelectedTemplate(data.getPluginDto().getName(), data.getTemplateDto().getName());
+      updateSchemaForm(pluginTemplateChooser.getSelectedData());
+    }
 
     JsArrayString variablesArray = analysisDto.getVariablesArray();
-    if (variablesArray != null && variablesArray.length() > 0) {
+    if (variablesArray != null) {
       for(int i = 0; i < variablesArray.length(); i++) {
         variables.addItem(variablesArray.get(i));
       }
@@ -238,7 +235,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     jsonObject.put("readOnly", JSONBoolean.getInstance(!enabled));
     JSONObject jsonObjectValues = null;
 
-    if (analysis != null) {
+    if (analysis != null && analysis.hasParameters()) {
       jsonObjectValues = (JSONObject)JSONParser.parseLenient(analysis.getParameters());
     }
 

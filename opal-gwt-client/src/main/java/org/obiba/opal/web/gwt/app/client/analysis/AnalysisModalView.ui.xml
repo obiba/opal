@@ -11,7 +11,7 @@
       <b:Tab heading="Results"  active="true">
         <g:SimplePanel ui:field="resultsContainer"/>
       </b:Tab>
-      <b:Tab heading="Analysis">
+      <b:Tab heading="Parameters">
         <g:SimplePanel ui:field="analysisContainer"/>
       </b:Tab>
     </b:TabPanel>

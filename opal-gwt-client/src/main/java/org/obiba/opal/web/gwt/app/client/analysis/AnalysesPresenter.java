@@ -1,6 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -10,7 +12,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import java.util.ArrayList;
+import org.obiba.opal.web.gwt.app.client.analysis.event.AnalyseVariablesRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.event.RunAnalysisRequestEvent;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalyseCommandOptionsFactory;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -25,12 +27,14 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.AnalyseCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysesDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.gwt.http.client.Response.SC_CREATED;
@@ -151,6 +155,28 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
       public void onClick(ClickEvent event) {
         setTable(originalTable);
       }
+    });
+
+    addRegisteredHandler(AnalyseVariablesRequestEvent.getType(),
+      new AnalyseVariablesRequestEvent.AnalyseVariablesRequestHandler() {
+
+      @Override
+      public void onAnalyseVariablesRequest(AnalyseVariablesRequestEvent event) {
+        List<VariableDto> variables = event.getVariables();
+        if (variables.isEmpty()) return;
+
+        JsArrayString variableNames= JavaScriptObject.createArray().cast();
+        for (VariableDto variable : variables) {
+          variableNames.push(variable.getName());
+        }
+
+        OpalAnalysisDto opalAnalysisDto = OpalAnalysisDto.create();
+        opalAnalysisDto.setVariablesArray(variableNames);
+        opalAnalysisDto.setDatasource(originalTable.getDatasourceName());
+        opalAnalysisDto.setTable(originalTable.getName());
+        AnalysisModalPresenterProvider.get().initialize(originalTable, opalAnalysisDto, existingAnalysisNames(), plugins);
+      }
+
     });
 
     addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
