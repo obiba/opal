@@ -526,6 +526,7 @@ public interface Translations extends Constants {
       "CannotFindDatabase", "Cannot find database named {0}.",//
       "NameIsRequired", "A name is required.",//
       "NameIsUnique", "A name must be unique.",//
+      "NameIsValidFileName", "A name should avoid characters such as \"#\", \"%\", \"&\", \"{\", \"}\", \"\\\", \"<\", \">\", \"*\", \"?\", \"/\", \"$\", \"!\", \"'\", \"\"\", \":\", \"@\"",
       "EntityTypeIsRequired", "An entity type is required.",//
       "IdentifiersAreRequired", "Some identifiers are required.",//
       "SystemIdentifiersAreRequired", "Some system identifiers are required.",//
