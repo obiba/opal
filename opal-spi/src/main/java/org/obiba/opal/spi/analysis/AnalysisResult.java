@@ -21,7 +21,7 @@ public interface AnalysisResult<T extends Analysis, I extends AnalysisResultItem
    *
    * @return
    */
-  String getAnalysisId();
+  String getAnalysisName();
 
   /**
    * Date at which the analysis was started.

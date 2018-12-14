@@ -2,14 +2,14 @@ package org.obiba.opal.core.service;
 
 public class NoSuchAnalysisException extends RuntimeException {
 
-  private String analysisId;
+  private String analysisName;
 
-  public String getAnalysisId() {
-    return analysisId;
+  public String getAnalysisName() {
+    return analysisName;
   }
 
-  public NoSuchAnalysisException(String analysisId) {
-    super("No Analysis with id \"" + analysisId +"\"");
-    this.analysisId = analysisId;
+  public NoSuchAnalysisException(String analysisName) {
+    super("No Analysis with name \"" + analysisName +"\"");
+    this.analysisName = analysisName;
   }
 }

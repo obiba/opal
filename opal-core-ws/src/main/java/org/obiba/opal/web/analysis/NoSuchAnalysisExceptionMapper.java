@@ -32,7 +32,7 @@ public class NoSuchAnalysisExceptionMapper extends ErrorDtoExceptionMapper<NoSuc
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchAnalysisException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchAnalysis")
-      .addArguments(exception.getAnalysisId())
+      .addArguments(exception.getAnalysisName())
       .build();
   }
 

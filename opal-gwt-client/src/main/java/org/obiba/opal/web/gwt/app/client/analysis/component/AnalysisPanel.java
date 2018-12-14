@@ -8,45 +8,30 @@ import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.analysis.support.AnalysisPluginData;
 import org.obiba.opal.web.gwt.app.client.analysis.support.PluginTemplateVisitor;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle.VariableSuggestion;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.AnalysisPluginTemplateDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+
+import java.util.*;
 
 public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
@@ -194,18 +179,13 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     variables.setUpdaterCallback(new UpdaterCallback() {
       @Override
       public String onSelection(Suggestion selectedSuggestion) {
-        variables.addItem(((VariableSuggestion) selectedSuggestion).getVariable());
-        return "";
-      }
-    });
-
-    variables.getTextBox().addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        if(event.getNativeEvent().getKeyCode() == 188) {
-          variables.addItem(variables.getTextBox().getText().replace(",", "").trim());
-          variables.getTextBox().setText("");
+        String variable = ((VariableSuggestion) selectedSuggestion).getVariable();
+        if (!variables.getSelectedItemsTexts().contains(variable)) {
+          variables.addItem(variable);
         }
+        variables.getTextBox().setText("");
+        variables.getTextBox().setFocus(true);
+        return "";
       }
     });
   }

@@ -116,7 +116,7 @@ public class ResultsPanel extends Composite {
     report.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        downloadResult(lastResult.getAnalysisId(), lastResult.getId());
+        downloadResult(lastResult.getAnalysisName(), lastResult.getId());
       }
     });
   }
@@ -179,11 +179,11 @@ public class ResultsPanel extends Composite {
       @Override
       public void doAction(OpalAnalysisResultDto analysisResult, String actionName) {
         if (DOWNLOAD_RESULT.equals(actionName)) {
-          downloadResult(analysisResult.getAnalysisId(), analysisResult.getId());
+          downloadResult(analysisResult.getAnalysisName(), analysisResult.getId());
 
         } else if (DELETE_RESULT.equals(actionName)) {
           ResourceRequestBuilderFactory.<OpalAnalysisResultsDto>newBuilder().forResource(
-              UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT.create().build(tableDto.getDatasourceName(), tableDto.getName(), analysisResult.getAnalysisId(), analysisResult.getId()))
+              UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT.create().build(tableDto.getDatasourceName(), tableDto.getName(), analysisResult.getAnalysisName(), analysisResult.getId()))
               .withCallback(new ResourceCallback<OpalAnalysisResultsDto>() {
                 @Override
                 public void onResource(Response response, OpalAnalysisResultsDto resource) {
@@ -222,9 +222,9 @@ public class ResultsPanel extends Composite {
     historyTable.addColumnSortHandler(tableColumnSortHandler);
   }
 
-  private void downloadResult(String analysisId, String resultId) {
+  private void downloadResult(String analysisName, String resultId) {
     String href = urlBuilder.buildAbsoluteUrl(UriBuilders.PROJECT_TABLE_ANALYSIS_RESULT_REPORT.create()
-      .build(tableDto.getDatasourceName(), tableDto.getName(), analysisId, resultId));
+      .build(tableDto.getDatasourceName(), tableDto.getName(), analysisName, resultId));
 
     Window.open(href, "_blank", "");
   }

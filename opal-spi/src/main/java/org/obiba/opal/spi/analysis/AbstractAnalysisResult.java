@@ -14,7 +14,7 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
 
   private String id;
 
-  private final String analysisId;
+  private final String analysisName;
 
   private AnalysisStatus status;
 
@@ -28,7 +28,7 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
 
   protected AbstractAnalysisResult(T analysis) {
     this.id = IdGeneratorFactory.createDateIdGenerator().generate();
-    this.analysisId = analysis.getName();
+    this.analysisName = analysis.getName();
   }
 
   @Override
@@ -37,8 +37,8 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   }
 
   @Override
-  public String getAnalysisId() {
-    return analysisId;
+  public String getAnalysisName() {
+    return analysisName;
   }
 
   protected void setStatus(AnalysisStatus status) {

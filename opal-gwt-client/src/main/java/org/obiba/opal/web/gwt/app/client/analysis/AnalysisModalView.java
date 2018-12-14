@@ -6,9 +6,12 @@ import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,7 +31,11 @@ import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 import java.util.Map;
 
 public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModalUiHandlers>
-  implements AnalysisModalPresenter.Display {
+  implements AnalysisModalPresenter.Display, ResizeHandler {
+
+  private static final Float WIDTH_SIZE_PERCENTAGE = 0.4F;
+
+  private static final int MINIMUM_WIDTH = 450;
 
   interface Binder extends UiBinder<Widget, AnalysisModalView> {
 
@@ -71,6 +78,14 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
     this.translations = translations;
     analysisPanel = new AnalysisPanel(eventBus);
     resultsPanel = new ResultsPanel(urlBuilder);
+    Window.addResizeHandler(this);
+    onResize(null);
+  }
+
+  @Override
+  public void onResize(ResizeEvent event) {
+    int width = Double.valueOf(Window.getClientWidth() * WIDTH_SIZE_PERCENTAGE).intValue();
+    asModal().setWidth(Math.max(MINIMUM_WIDTH, width));
   }
 
   @Override

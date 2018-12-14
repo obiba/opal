@@ -69,10 +69,11 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   @Override
   public void save(OpalAnalysis analysis) throws AnalysisAlreadyExistsException {
     OpalAnalysis existingAnalysis = getAnalysis(analysis.getDatasource(), analysis.getTable(), analysis.getName());
-    if (existingAnalysis == null)
+    if (existingAnalysis == null) {
       orientDbService.save(analysis, analysis);
-    else
+    } else {
       throw new AnalysisAlreadyExistsException(analysis.getName());
+    }
   }
 
   @Override
@@ -81,7 +82,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
     String query = SimpleOrientDbQueryBuilder.newInstance()
         .table(OpalAnalysisResult.class.getSimpleName())
-        .whereClauses("analysisId = ? ")
+        .whereClauses("analysisName = ? ")
         .build();
 
     StreamSupport
