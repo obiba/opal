@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -269,8 +270,29 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     private List<String> existingNames;
     Map<HasType<ControlGroupType>, String> errors = new HashMap<HasType<ControlGroupType>, String>();
 
+    List<String> charactersToAvoid;
+
     public PanelValidationHandler(List<String> existingNames) {
       this.existingNames = existingNames;
+
+      charactersToAvoid = new ArrayList<String>();
+      charactersToAvoid.add("#");
+      charactersToAvoid.add("%");
+      charactersToAvoid.add("&");
+      charactersToAvoid.add("{");
+      charactersToAvoid.add("}");
+      charactersToAvoid.add("\\");
+      charactersToAvoid.add("<");
+      charactersToAvoid.add(">");
+      charactersToAvoid.add("*");
+      charactersToAvoid.add("?");
+      charactersToAvoid.add("/");
+      charactersToAvoid.add("$");
+      charactersToAvoid.add("!");
+      charactersToAvoid.add("'");
+      charactersToAvoid.add("\"");
+      charactersToAvoid.add(":");
+      charactersToAvoid.add("@");
     }
 
     @Override
@@ -279,6 +301,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getName(), "NameIsRequired", FormField.NAME.name()));
         validators.add(new ConditionValidator(nameIsUnique(), "NameIsUnique", FormField.NAME.name()));
+        validators.add(new ConditionValidator(nameIsValidFileName(), "NameIsValidFileName", FormField.NAME.name()));
         validators.add(new ConditionValidator(validateType(), "PluginTypeIsRequired", FormField.TYPE.name()));
       }
 
@@ -301,6 +324,22 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
           String pluginName = getPluginName();
           String templateName = getTemplateName();
           return !(pluginName.isEmpty() && templateName.isEmpty());
+        }
+      };
+    }
+
+    private HasValue<Boolean> nameIsValidFileName() {
+
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          boolean isOk = true;
+
+          for (String character: charactersToAvoid) {
+            isOk = isOk && !getName().getText().contains(character);
+          }
+
+          return isOk;
         }
       };
     }
