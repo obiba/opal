@@ -28,13 +28,13 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   }
 
   @Override
-  public OpalAnalysisResult getAnalysisResult(String analysisId, String resultId) {
+  public OpalAnalysisResult getAnalysisResult(String analysisName, String resultId) {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("analysisId = ?", "id = ?")
+      .whereClauses("analysisName = ?", "id = ?")
       .build();
 
-    return orientDbService.uniqueResult(OpalAnalysisResult.class, query, analysisId, resultId);
+    return orientDbService.uniqueResult(OpalAnalysisResult.class, query, analysisName, resultId);
   }
 
   @Override
@@ -51,18 +51,18 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   }
 
   @Override
-  public Iterable<OpalAnalysisResult> getAnalysisResults(String datasource, String table, String analysisId, boolean lastResult)
+  public Iterable<OpalAnalysisResult> getAnalysisResults(String datasource, String table, String analysisName, boolean lastResult)
       throws NoSuchAnalysisException {
     SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "analysisId = ?")
+      .whereClauses("datasource = ?", "table = ?", "analysisName = ?")
       .order("desc");
 
     if (lastResult) {
       builder.limit(1);
     }
 
-    return orientDbService.list(OpalAnalysisResult.class, builder.build(), datasource, table, analysisId);
+    return orientDbService.list(OpalAnalysisResult.class, builder.build(), datasource, table, analysisName);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   public void delete(OpalAnalysisResult analysisResult) throws NoSuchAnalysisResultException {
     orientDbService.delete(analysisResult);
 
-    deleteAnalysisResultFiles(Paths.get(Analysis.ANALYSES_HOME.toString(),analysisResult.getDatasource(), analysisResult.getTable(), analysisResult.getAnalysisId(), "results", analysisResult.getId()));
+    deleteAnalysisResultFiles(Paths.get(Analysis.ANALYSES_HOME.toString(),analysisResult.getDatasource(), analysisResult.getTable(), analysisResult.getAnalysisName(), "results", analysisResult.getId()));
   }
 
   @Override

@@ -60,7 +60,7 @@ message OpalAnalysesDto {
 
 message OpalAnalysisResultDto {
   required string id = 1;
-  required string analysisId = 2;
+  required string analysisName = 2;
 
   optional string startDate = 3;
   optional string endDate = 4;

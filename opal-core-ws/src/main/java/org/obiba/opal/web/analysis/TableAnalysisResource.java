@@ -63,16 +63,16 @@ public class TableAnalysisResource {
   }
 
   @GET
-  @Path("/analysis/{analysisId}")
-  public OpalAnalysisDto getAnalysis(@PathParam("analysisId") String analysisId,
+  @Path("/analysis/{analysisName}")
+  public OpalAnalysisDto getAnalysis(@PathParam("analysisName") String analysisName,
                                      @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
 
-    getAnalysis(analysisId);
-    Builder builder = Dtos.asDto(getAnalysis(analysisId));
+    getAnalysis(analysisName);
+    Builder builder = Dtos.asDto(getAnalysis(analysisName));
 
     builder.addAllAnalysisResults(
       StreamSupport
-        .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisId, lastResult).spliterator(), false)
+        .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisName, lastResult).spliterator(), false)
         .map(analysisResult -> Dtos.asDto(analysisResult).build())
         .collect(Collectors.toList()));
 
@@ -80,42 +80,42 @@ public class TableAnalysisResource {
   }
 
   @DELETE
-  @Path("/analysis/{analysisId}")
-  public Response deleteAnalysis(@PathParam("analysisId") String analysisId, @QueryParam("cascade") @DefaultValue("true") boolean cascade) {
-    analysisService.delete(getAnalysis(analysisId), cascade);
+  @Path("/analysis/{analysisName}")
+  public Response deleteAnalysis(@PathParam("analysisName") String analysisName, @QueryParam("cascade") @DefaultValue("true") boolean cascade) {
+    analysisService.delete(getAnalysis(analysisName), cascade);
     return Response.ok().build();
   }
 
   @GET
-  @Path("/analysis/{analysisId}/results")
-  public OpalAnalysisResultsDto getAnalysisResults(@PathParam("analysisId") String analysisId,
+  @Path("/analysis/{analysisName}/results")
+  public OpalAnalysisResultsDto getAnalysisResults(@PathParam("analysisName") String analysisName,
                                                    @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
     return OpalAnalysisResultsDto.newBuilder()
         .addAllAnalysisResults(
           StreamSupport
-            .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisId, lastResult).spliterator(), false)
+            .stream(analysisResultService.getAnalysisResults(datasourceName, tableName, analysisName, lastResult).spliterator(), false)
             .map(analysisResult -> Dtos.asDto(analysisResult).build()).collect(Collectors.toList()))
         .build();
   }
 
   @GET
-  @Path("/analysis/{analysisId}/result/{rid}")
-  public OpalAnalysisResultDto getAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
-    return Dtos.asDto(analysisResultService.getAnalysisResult(analysisId, rid)).build();
+  @Path("/analysis/{analysisName}/result/{rid}")
+  public OpalAnalysisResultDto getAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
+    return Dtos.asDto(analysisResultService.getAnalysisResult(analysisName, rid)).build();
   }
 
   @DELETE
-  @Path("/analysis/{analysisId}/result/{rid}")
-  public OpalAnalysisResultsDto deleteAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
-    analysisResultService.delete(analysisResultService.getAnalysisResult(analysisId, rid));
-    return getAnalysisResults(analysisId, false);
+  @Path("/analysis/{analysisName}/result/{rid}")
+  public OpalAnalysisResultsDto deleteAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
+    analysisResultService.delete(analysisResultService.getAnalysisResult(analysisName, rid));
+    return getAnalysisResults(analysisName, false);
   }
 
   @GET
-  @Path("/analysis/{analysisId}/result/{rid}/_export")
-  public Response exportAnalysisResult(@PathParam("analysisId") String analysisId, @PathParam("rid") String rid) {
+  @Path("/analysis/{analysisName}/result/{rid}/_export")
+  public Response exportAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
     StreamingOutput outputStream =
-        stream -> analysisExportService.exportProjectAnalysisResult(datasourceName, tableName, analysisId, rid, new BufferedOutputStream(stream));
+        stream -> analysisExportService.exportProjectAnalysisResult(datasourceName, tableName, analysisName, rid, new BufferedOutputStream(stream));
 
     return analysisZipDownloadResponse(outputStream);
   }
@@ -135,25 +135,25 @@ public class TableAnalysisResource {
   }
 
   @GET
-  @Path("/analysis/{analysisId}/_export")
+  @Path("/analysis/{analysisName}/_export")
   @Produces("application/zip")
-  public Response exportTableAnalysis(@PathParam("analysisId") String analysisId,
+  public Response exportTableAnalysis(@PathParam("analysisName") String analysisName,
                                       @QueryParam("all") @DefaultValue("false") boolean all) {
-    getAnalysis(analysisId);
+    getAnalysis(analysisName);
 
     StreamingOutput outputStream =
-      stream -> analysisExportService.exportProjectAnalysis(datasourceName, tableName, analysisId, new BufferedOutputStream(stream), !all);
+      stream -> analysisExportService.exportProjectAnalysis(datasourceName, tableName, analysisName, new BufferedOutputStream(stream), !all);
 
     return analysisZipDownloadResponse(outputStream);
   }
 
   @GET
-  @Path("/analysis/{analysisId}/result/{resultId}/_report")
+  @Path("/analysis/{analysisName}/result/{resultId}/_report")
   @Produces("application/octet-stream")
-  public Response exportReport(@PathParam("analysisId") String analysisId, @PathParam("resultId") String resultId) {
-    StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysisResultReport(datasourceName, tableName, analysisId, resultId, new BufferedOutputStream(stream));
+  public Response exportReport(@PathParam("analysisName") String analysisName, @PathParam("resultId") String resultId) {
+    StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysisResultReport(datasourceName, tableName, analysisName, resultId, new BufferedOutputStream(stream));
 
-    String resultReportExtension = AnalysisExportServiceImpl.getResultReportExtension(datasourceName, tableName, analysisId, resultId);
+    String resultReportExtension = AnalysisExportServiceImpl.getResultReportExtension(datasourceName, tableName, analysisName, resultId);
 
     if (resultReportExtension != null) {
       String mimeType = new MimetypesFileTypeMap().getContentType(resultReportExtension);
@@ -172,10 +172,10 @@ public class TableAnalysisResource {
         .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
   }
 
-  private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException {
+  private OpalAnalysis getAnalysis(String analysisName) throws NoSuchAnalysisException {
     return Optional.ofNullable(
-      analysisService.getAnalysis(datasourceName, tableName, analysisId)
-    ).orElseThrow(() -> new NoSuchAnalysisException(analysisId));
+      analysisService.getAnalysis(datasourceName, tableName, analysisName)
+    ).orElseThrow(() -> new NoSuchAnalysisException(analysisName));
   }
 
   private OpalAnalysisResultDto getLastResult(String analysisName) {

@@ -68,41 +68,41 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   @Override
   public void exportProjectAnalysis(@NotNull String projectName,
                                     @NotNull String tableName,
-                                    @NotNull String analysisId,
+                                    @NotNull String analysisName,
                                     @NotNull OutputStream outputStream,
                                     boolean lastResult) throws IOException {
 
-    Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
+    Assert.isTrue(!Strings.isNullOrEmpty(analysisName), "Analysis ID cannot be empty or null.");
     Assert.notNull(outputStream, "outputStream cannot be null.");
 
-    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(projectName, tableName, analysisId)));
+    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(projectName, tableName, analysisName)));
   }
 
   @Override
   public void exportProjectAnalysisResult(@NotNull String projectName,
                                           @NotNull String tableName,
-                                          @NotNull String analysisId,
+                                          @NotNull String analysisName,
                                           @NotNull String resultId,
                                           @NotNull OutputStream outputStream) throws IOException {
 
-    Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
+    Assert.isTrue(!Strings.isNullOrEmpty(analysisName), "Analysis ID cannot be empty or null.");
     Assert.isTrue(!Strings.isNullOrEmpty(resultId), "Result ID cannot be empty or null.");
 
     Assert.notNull(outputStream, "outputStream cannot be null.");
 
-    OpalAnalysisResult analysisResult = opalAnalysisResultService.getAnalysisResult(analysisId, resultId);
+    OpalAnalysisResult analysisResult = opalAnalysisResultService.getAnalysisResult(analysisName, resultId);
 
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
       zipOutputStream.putNextEntry(
-        new ZipEntry(Paths.get("analyses", projectName, tableName, analysisId, "analysis.json").toString())
+        new ZipEntry(Paths.get("analyses", projectName, tableName, analysisName, "analysis.json").toString())
       );
 
       zipOutputStream.write(
-        new ObjectMapper().writeValueAsBytes(opalAnalysisService.getAnalysis(projectName, tableName, analysisId))
+        new ObjectMapper().writeValueAsBytes(opalAnalysisService.getAnalysis(projectName, tableName, analysisName))
       );
 
       zipOutputStream.closeEntry();
-      createZip(zipOutputStream, analysisId, analysisResult);
+      createZip(zipOutputStream, analysisName, analysisResult);
     }
 
   }
@@ -110,10 +110,10 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   @Override
   public void exportProjectAnalysisResultReport(@NotNull String projectName,
                                                 @NotNull String tableName,
-                                                @NotNull String analysisId,
+                                                @NotNull String analysisName,
                                                 @NotNull String resultId,
                                                 @NotNull OutputStream outputStream) throws IOException {
-    Path resultsPath = getResultsPath(projectName, tableName, analysisId, resultId);
+    Path resultsPath = getResultsPath(projectName, tableName, analysisName, resultId);
 
       List<Path> tentativeReports = getTentativeReports(resultsPath);
 
@@ -154,9 +154,9 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     }
   }
 
-  private void createZip(@NotNull ZipOutputStream zipOutputStream, @NotNull String analysisId, @NotNull OpalAnalysisResult result) throws IOException {
+  private void createZip(@NotNull ZipOutputStream zipOutputStream, @NotNull String analysisName, @NotNull OpalAnalysisResult result) throws IOException {
     String resultId = result.getId();
-    String resultPath = Paths.get("analyses", result.getDatasource(), result.getTable(), analysisId, "results", resultId).toString();
+    String resultPath = Paths.get("analyses", result.getDatasource(), result.getTable(), analysisName, "results", resultId).toString();
 
     zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
     zipOutputStream.write(new ObjectMapper().writeValueAsBytes(result));
@@ -204,13 +204,13 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     }
   }
 
-  public static Path getResultsPath(String projectName, String tableName, String analysisId, String resultId) {
+  public static Path getResultsPath(String projectName, String tableName, String analysisName, String resultId) {
     return Paths
-        .get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), projectName, tableName, analysisId, "results", resultId);
+        .get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), projectName, tableName, analysisName, "results", resultId);
   }
 
-  public static String getResultReportExtension(String projectName, String tableName, String analysisId, String resultId) {
-    Path resultsPath = getResultsPath(projectName, tableName, analysisId, resultId);
+  public static String getResultReportExtension(String projectName, String tableName, String analysisName, String resultId) {
+    Path resultsPath = getResultsPath(projectName, tableName, analysisName, resultId);
 
     List<Path> tentativeReports = getTentativeReports(resultsPath);
 

@@ -6,11 +6,11 @@ import org.obiba.opal.core.domain.OpalAnalysisResult;
 
 public interface OpalAnalysisResultService extends SystemService {
 
-  OpalAnalysisResult getAnalysisResult(String analysisId, String resultId);
+  OpalAnalysisResult getAnalysisResult(String analysisName, String resultId);
 
   Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult);
 
-  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String datasource, @NotNull String table, @NotNull String analysisId, boolean lastResult) throws NoSuchAnalysisException;
+  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String datasource, @NotNull String table, @NotNull String analysisName, boolean lastResult) throws NoSuchAnalysisException;
 
   void save(@NotNull OpalAnalysisResult analysisResult) throws ConstraintViolationException;
 

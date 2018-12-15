@@ -37,28 +37,28 @@ public interface AnalysisExportService {
   /**
    * Exports a specific analysis.
    *
-   * @param analysisId
+   * @param analysisName
    * @param outputStream
    * @param lastResult
    * @throws IOException
    */
   void exportProjectAnalysis(@NotNull String projectName,
                              @NotNull String tableName,
-                             @NotNull String analysisId,
+                             @NotNull String analysisName,
                              @NotNull OutputStream outputStream,
                              boolean lastResult) throws IOException;
 
   /**
    * Exports a specific result
    *
-   * @param analysisId
+   * @param analysisName
    * @param resultId
    * @param outputStream
    * @throws IOException
    */
   void exportProjectAnalysisResult(@NotNull String projectName,
                                    @NotNull String tableName,
-                                   @NotNull String analysisId,
+                                   @NotNull String analysisName,
                                    @NotNull String resultId,
                                    @NotNull OutputStream outputStream) throws IOException;
 
@@ -67,14 +67,14 @@ public interface AnalysisExportService {
    *
    * @param projectName
    * @param tableName
-   * @param analysisId
+   * @param analysisName
    * @param resultId
    * @param outputStream
    * @throws IOException
    */
   void exportProjectAnalysisResultReport(@NotNull String projectName,
                                            @NotNull String tableName,
-                                           @NotNull String analysisId,
+                                           @NotNull String analysisName,
                                            @NotNull String resultId,
                                            @NotNull OutputStream outputStream) throws IOException;
 }

@@ -36,6 +36,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -46,6 +48,8 @@ import java.util.stream.StreamSupport;
 public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(AnalyseCommand.class);
+
+  private static final String INVALID_NAME_CHARACTERS = "#%&{}\\\\<>*?/$!'\\:@";
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -77,6 +81,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     try (RSessionHandlerImpl sessionHandler = new RSessionHandlerImpl()) {
 
       analyses.forEach(analyseOptions -> {
+        ensureValidName(analyseOptions.getName());
+
         ValueTable table = datasource.getValueTable(analyseOptions.getTable());
         String pluginName = analyseOptions.getPlugin();
         RAnalysisService rAnalysisService = (RAnalysisService) opalRuntime.getServicePlugin(pluginName);
@@ -185,6 +191,14 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
       return variableNames;
     }
 
+  }
+
+  private void ensureValidName(String analysisName) {
+    Pattern pattern = Pattern.compile(String.format("[%s]", INVALID_NAME_CHARACTERS));
+    Matcher matcher = pattern.matcher(analysisName);
+    if (matcher.find()) {
+      throw new IllegalArgumentException("Analysis name cannot contain these characters: " + INVALID_NAME_CHARACTERS);
+    }
   }
 
   private class ValueTableToTibbleWriter {

@@ -10,7 +10,7 @@
     <b:HelpBlock>Analyses can help at improving the data quality by detecting inconsistencies etc</b:HelpBlock>
 
     <g:FlowPanel addStyleNames="pull-left">
-      <b:Button icon="PLUS" addStyleNames="small-top-margin" ui:field="newButton">
+      <b:Button type="INFO" icon="PLUS" addStyleNames="small-top-margin" ui:field="newButton">
         <ui:msg description="Add new analysis">New Analysis</ui:msg>
       </b:Button>
 

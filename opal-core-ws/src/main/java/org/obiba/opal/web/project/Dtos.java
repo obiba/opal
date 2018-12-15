@@ -136,7 +136,7 @@ public class Dtos {
     OpalAnalysisResultDto.Builder builder = OpalAnalysisResultDto.newBuilder();
 
     builder.setId(analysisResult.getId());
-    builder.setAnalysisId(analysisResult.getAnalysisId());
+    builder.setAnalysisName(analysisResult.getAnalysisName());
 
     builder.setStartDate(Instant.ofEpochMilli(analysisResult.getStartDate().getTime()).toString()); //
     builder.setEndDate(Instant.ofEpochMilli(analysisResult.getEndDate().getTime()).toString()); //

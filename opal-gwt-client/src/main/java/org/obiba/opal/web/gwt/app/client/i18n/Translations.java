@@ -526,7 +526,7 @@ public interface Translations extends Constants {
       "CannotFindDatabase", "Cannot find database named {0}.",//
       "NameIsRequired", "A name is required.",//
       "NameIsUnique", "A name must be unique.",//
-      "NameIsValidFileName", "A name should avoid characters such as <code># % &amp; { } \\ &lt; &gt; * ? / $ ! ' \" : @</code>",
+      "NameIsValidFileName", "Name cannot contain the following characters: <code># % &amp; { } \\ &lt; &gt; * ? / $ ! ' \" : @</code>",
       "EntityTypeIsRequired", "An entity type is required.",//
       "IdentifiersAreRequired", "Some identifiers are required.",//
       "SystemIdentifiersAreRequired", "Some system identifiers are required.",//
@@ -697,7 +697,8 @@ public interface Translations extends Constants {
       "RServerRuntimeError", "An R operation failed. Please contact technical support.",
       "PluginTypeIsRequired", "Plugin type is required",
       "AnalysisTask", "Analysis task has been launched.  You can follow its progress in the task list.",
-      "InvalidAnalysisPluginData", "Analysis {0} has invalid plugin data, Please contact technical support."
+      "InvalidAnalysisPluginData", "Analysis {0} has invalid plugin data, Please contact technical support.",
+      "NoSuchAnalysis", "No such analysis '{0}."
   })
   Map<String, String> userMessageMap();
 
