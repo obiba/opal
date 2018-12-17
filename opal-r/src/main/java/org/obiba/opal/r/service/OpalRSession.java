@@ -345,6 +345,7 @@ public class OpalRSession implements RASyncOperationTemplate {
     Subject owner = SessionDetachedSubject.asSessionDetachedSubject(SecurityUtils.getSubject());
     consumer = transactionalThreadFactory.newThread(owner.associateWith(rCommandsConsumer));
     consumer.setName("R Operations Consumer " + rCommandsConsumer);
+    consumer.setPriority(Thread.NORM_PRIORITY);
     consumer.start();
   }
 

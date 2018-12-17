@@ -24,6 +24,7 @@ public class TransactionalThread extends Thread {
     super("transactional-thread-" + runnable.getClass().getName());
     this.transactionTemplate = transactionTemplate;
     this.runnable = runnable;
+    setPriority(MIN_PRIORITY);
   }
 
   @Override

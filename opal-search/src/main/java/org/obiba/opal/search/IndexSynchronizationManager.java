@@ -21,7 +21,6 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.spi.search.IndexManager;
 import org.obiba.opal.spi.search.IndexSynchronization;
 import org.obiba.opal.spi.search.ValueTableIndex;
-import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
 import java.util.Calendar;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

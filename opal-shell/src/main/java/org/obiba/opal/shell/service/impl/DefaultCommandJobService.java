@@ -215,6 +215,7 @@ public class DefaultCommandJobService implements CommandJobService {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
         log.info("Starting task {}", ((FutureCommandJob) r).commandJob.getId());
+        t.setPriority(Thread.MIN_PRIORITY);
         getStartedJobs().add((FutureCommandJob) r);
       }
 
