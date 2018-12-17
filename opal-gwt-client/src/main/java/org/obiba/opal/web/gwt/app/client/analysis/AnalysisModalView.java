@@ -37,9 +37,7 @@ public class AnalysisModalView extends ModalPopupViewWithUiHandlers<AnalysisModa
 
   private static final int MINIMUM_WIDTH = 450;
 
-  interface Binder extends UiBinder<Widget, AnalysisModalView> {
-
-  }
+  interface Binder extends UiBinder<Widget, AnalysisModalView> { }
 
   private final AnalysisPanel analysisPanel;
 
