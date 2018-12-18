@@ -67,7 +67,7 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
       args.append(String.format(", row.names=%s", getTmpVectorName(getSymbol(), "row.names")));
 
     log.info("data.frame arguments: {}", args);
-    magmaAssignROperation.doEval(String.format("base::assign('%s', data.frame(%s, stringsAsFactors=FALSE))", getSymbol(), args));
+    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', data.frame(%s, stringsAsFactors=FALSE)))", getSymbol(), args));
   }
 
 }

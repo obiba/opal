@@ -32,7 +32,7 @@ public class DataAssignROperation extends AbstractROperation {
     if(symbol == null) return;
     // write the byte array and unserialize it
     assign(symbol, new REXPRaw(content));
-    eval(String.format("base::assign('%s', value=unserialize(%s))", symbol, symbol), false);
+    eval(String.format("is.null(base::assign('%s', value=unserialize(%s)))", symbol, symbol), false);
   }
 
   @Override

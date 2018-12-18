@@ -54,7 +54,7 @@ public final class ROperations {
 
       @Override
       protected void doWithConnection() {
-        String format = env == null ? "base::assign('%s', value={%s})" : "base::assign('%s', value={%s}, envir=%s)";
+        String format = env == null ? "is.null(base::assign('%s', value={%s}))" : "is.null(base::assign('%s', value={%s}, envir=%s))";
         eval(String.format(format, name, script, env));
         if(lock) {
           eval(String.format("base::lockBinding('%s', %s)", name, env));
