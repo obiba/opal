@@ -4,6 +4,7 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.TakesValue;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class DynamicArrayTuples extends Composite implements TakesValue<JSONArray>, HasEnabled {
 
@@ -30,7 +32,12 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   private Map<FlowPanel, List<SchemaUiContainer>> itemsContainers;
 
+  private Button addMoreButton;
+
+  private boolean enabled;
+
   public DynamicArrayTuples(String key, JSONArray items, EventBus eventBus) {
+    this.enabled = true;
     this.key = key;
     this.items = items;
     this.eventBus = eventBus;
@@ -46,7 +53,8 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     FlowPanel root = new FlowPanel();
     root.add(headerContainer);
     root.add(bodyContainer);
-    createAddMoreButton(root);
+
+    addMoreButton = createAddMoreButton(root);
 
     initWidget(root);
   }
@@ -65,17 +73,25 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   @Override
   public void setValue(JSONArray value) {
+    if (value != null) {
+      int size = value.size();
 
+      for (int i = 0; i < size; i++) {
+        JSONValue jsonValue = value.get(i);
+        if (jsonValue.isObject() != null) {
+          body(jsonValue.isObject());
+        }
+      }
+    }
   }
 
   @Override
   public JSONArray getValue() {
     JSONArray array = new JSONArray();
-
     Collection<List<SchemaUiContainer>> values = getItemsContainers().values();
 
     int i = 0;
-    for (List<SchemaUiContainer> value: values) {
+    for (List<SchemaUiContainer> value : values) {
       JSONObject jsonObject = new JSONObject();
 
       for (SchemaUiContainer schemaUiContainer : value) {
@@ -90,12 +106,29 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   @Override
   public boolean isEnabled() {
-    return false;
+    return enabled;
   }
 
   @Override
   public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
 
+    addMoreButton.setVisible(enabled);
+    addMoreButton.setVisible(enabled);
+
+    Set<FlowPanel> flowPanels = getItemsContainers().keySet();
+
+    for (FlowPanel flowPanel : flowPanels) {
+      for (Widget widget: flowPanel) {
+        if (widget instanceof ControlGroup) {
+          ControlGroup controlGroup = (ControlGroup) widget;
+          for (Widget control : controlGroup) {
+            if (control instanceof HasEnabled) ((HasEnabled) control).setEnabled(enabled);
+            if (control instanceof Button) control.setVisible(enabled);
+          }
+        }
+      }
+    }
   }
 
   private String getSchemaKey(JSONObject schema) {
@@ -107,7 +140,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     return schemaKey.isString() != null ? schemaKey.isString().stringValue() : null;
   }
 
-  private void createAddMoreButton(FlowPanel root) {
+  private Button createAddMoreButton(FlowPanel root) {
     ControlGroup controlGroup = new ControlGroup();
 
     Button button = new Button("<i style='font-weight: 900;'>&plus;</i>");
@@ -116,15 +149,17 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     button.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        body();
+        body(null);
       }
     });
 
     controlGroup.add(button);
     root.add(controlGroup);
+
+    return button;
   }
 
-  private void body() {
+  private void body(JSONObject initialValue) {
     int size = items.size();
     FlowPanel bodyItem = new FlowPanel();
     bodyItem.getElement().setAttribute("style", "display: grid; grid-template-columns: repeat(" + (size < 1 ? 1 : size) + ", 1fr) 50px;");
@@ -134,9 +169,15 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
       JSONValue jsonValue = items.get(i);
       JSONObject schema = jsonValue.isObject();
 
+      schema.put("readOnly", JSONBoolean.getInstance(!enabled));
+
       String schemaKeyString = getSchemaKey(schema);
 
       SchemaUiContainer uiContainer = new SchemaUiContainer(schema, schemaKeyString, false, eventBus);
+
+      if (initialValue != null && initialValue.containsKey(schemaKeyString)) {
+        uiContainer.setJSONValue(initialValue.get(schemaKeyString));
+      }
 
       bodyItem.add(uiContainer);
       widgetList.add(uiContainer);
@@ -145,16 +186,23 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     ControlGroup controlGroup = new ControlGroup();
     Button button = new Button("<i class='icon-trash'></i>");
     button.getElement().addClassName("btn btn-danger");
+
+    button.setVisible(enabled);
+
     button.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         Button source = (Button) event.getSource();
         Widget parent = source.getParent().getParent();
 
-        getItemsContainers().remove(parent);
-        parent.removeFromParent();
+        if (parent instanceof FlowPanel) {
+          getItemsContainers().remove(parent);
+          parent.removeFromParent();
+        }
       }
     });
+
+    button.setEnabled(enabled);
 
     controlGroup.add(button);
     bodyItem.add(controlGroup);
@@ -176,6 +224,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
       ControlGroup controlPanel = new ControlGroup();
       Label label = new Label();
+      label.getElement().setAttribute("style", "font-weight: bold;");
       label.setText(schemaKeyString);
 
       controlPanel.add(label);

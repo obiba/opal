@@ -101,7 +101,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
 
   private void addInput(String initValue) {
     FlowPanel inputPanel = new FlowPanel();
-    inputPanel.getElement().addClassName("input-append");
+    if (enabled) inputPanel.getElement().addClassName("input-append");
     inputPanel.getElement().setAttribute("style", "display: block;");
     TextBox textBox = new TextBox();
 
@@ -121,6 +121,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     inputPanel.add(textBox);
 
     Button removeButton = new Button();
+    removeButton.setVisible(enabled);
     removeButton.setHTML("&times;");
     removeButton.getElement().addClassName("btn");
 
@@ -149,11 +150,15 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     this.enabled = enabled;
 
     plusButton.setEnabled(enabled);
+    plusButton.setVisible(enabled);
 
     for (Widget inputPanel : inputsPanel) {
       if (inputPanel instanceof FlowPanel) {
+        if (!enabled) inputPanel.getElement().removeClassName("input-append");
+
         for (Widget widget: (FlowPanel) inputPanel) {
           if (widget instanceof HasEnabled) ((HasEnabled) widget).setEnabled(enabled);
+          if (widget instanceof Button) widget.setVisible(enabled);
         }
       }
     }
