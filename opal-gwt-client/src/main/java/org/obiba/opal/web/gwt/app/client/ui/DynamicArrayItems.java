@@ -79,11 +79,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
   private FlowPanel addPlusButton() {
     FlowPanel panel = new FlowPanel();
 
-    Button button = new Button();
-    SpanElement spanElement = SpanElement.as(DOM.createSpan());
-    spanElement.setInnerHTML("&plus;");
-    spanElement.setAttribute("style", "font-weight: 900;");
-    button.getElement().appendChild(spanElement);
+    Button button = new Button("<i class='icon-plus'></i>");
     button.addStyleName("btn btn-info");
 
     button.addClickHandler(new ClickHandler() {
@@ -101,7 +97,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
 
   private void addInput(String initValue) {
     FlowPanel inputPanel = new FlowPanel();
-    inputPanel.getElement().addClassName("input-append");
+    if (enabled) inputPanel.getElement().addClassName("input-append");
     inputPanel.getElement().setAttribute("style", "display: block;");
     TextBox textBox = new TextBox();
 
@@ -120,8 +116,8 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     textBox.setEnabled(enabled);
     inputPanel.add(textBox);
 
-    Button removeButton = new Button();
-    removeButton.setHTML("&times;");
+    Button removeButton = new Button("<i class='icon-remove'></i>");
+    removeButton.setVisible(enabled);
     removeButton.getElement().addClassName("btn");
 
     removeButton.addClickHandler(new ClickHandler() {
@@ -149,11 +145,15 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     this.enabled = enabled;
 
     plusButton.setEnabled(enabled);
+    plusButton.setVisible(enabled);
 
     for (Widget inputPanel : inputsPanel) {
       if (inputPanel instanceof FlowPanel) {
+        if (!enabled) inputPanel.getElement().removeClassName("input-append");
+
         for (Widget widget: (FlowPanel) inputPanel) {
           if (widget instanceof HasEnabled) ((HasEnabled) widget).setEnabled(enabled);
+          if (widget instanceof Button) widget.setVisible(enabled);
         }
       }
     }
