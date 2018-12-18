@@ -195,12 +195,20 @@ public class SchemaUiContainer extends ControlGroup {
   }
 
   private String validateArray(Object value) {
-    HashSet hashSet = value instanceof HashSet ? (HashSet) value : new HashSet();
-    if(required && (value == null || hashSet.size() == 0)) {
+    int size = 0;
+    if (schema.get("items").isArray() == null) {
+      size = (value instanceof HashSet ? (HashSet) value : new HashSet()).size();
+    } else {
+      size = (value instanceof JSONArray ? (JSONArray) value : new JSONArray()).size();
+    }
+
+    if(required && (value == null || size == 0)) {
       return "required";
     }
 
-    return JsonSchemaGWT.valueForArraySchemaIsValid(hashSet, schema);
+    return JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value
+        : value instanceof JSONArray ? JsonSchemaGWT.jsonArrayOfObjectsToList((JSONArray) value)
+            : new HashSet(), schema);
   }
 
   public JSONObject getSchema() {
