@@ -143,7 +143,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
   private Button createAddMoreButton(FlowPanel root) {
     ControlGroup controlGroup = new ControlGroup();
 
-    Button button = new Button("<i style='font-weight: 900;'>&plus;</i>");
+    Button button = new Button("<i class='icon-plus'></i>");
     button.addStyleName("btn btn-info");
 
     button.addClickHandler(new ClickHandler() {
@@ -184,8 +184,8 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     }
 
     ControlGroup controlGroup = new ControlGroup();
-    Button button = new Button("<i class='icon-trash'></i>");
-    button.getElement().addClassName("btn btn-danger");
+    Button button = new Button("<i class='icon-remove'></i>");
+    button.getElement().addClassName("btn");
 
     button.setVisible(enabled);
 

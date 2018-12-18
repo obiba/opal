@@ -79,11 +79,7 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
   private FlowPanel addPlusButton() {
     FlowPanel panel = new FlowPanel();
 
-    Button button = new Button();
-    SpanElement spanElement = SpanElement.as(DOM.createSpan());
-    spanElement.setInnerHTML("&plus;");
-    spanElement.setAttribute("style", "font-weight: 900;");
-    button.getElement().appendChild(spanElement);
+    Button button = new Button("<i class='icon-plus'></i>");
     button.addStyleName("btn btn-info");
 
     button.addClickHandler(new ClickHandler() {
@@ -120,9 +116,8 @@ public class DynamicArrayItems extends Composite implements TakesValue<Set<Strin
     textBox.setEnabled(enabled);
     inputPanel.add(textBox);
 
-    Button removeButton = new Button();
+    Button removeButton = new Button("<i class='icon-remove'></i>");
     removeButton.setVisible(enabled);
-    removeButton.setHTML("&times;");
     removeButton.getElement().addClassName("btn");
 
     removeButton.addClickHandler(new ClickHandler() {
