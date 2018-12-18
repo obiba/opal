@@ -68,6 +68,11 @@ public class SchemaUiContainer extends ControlGroup {
 
     if(value == null) return null;
     if(type.equals("array")) {
+
+      if (schema.get("items").isArray() != null) {
+        return (JSONArray) getValue();
+      }
+
       HashSet set = (HashSet) value;
       JSONArray jsonArray = new JSONArray();
 
@@ -98,16 +103,21 @@ public class SchemaUiContainer extends ControlGroup {
           Double aDouble = value.isNumber().doubleValue();
           editableWidget.setValue("number".equals(type) ? aDouble : aDouble.intValue());
         } else if ("array".equals(type)) {
-          Set<String> set = new HashSet<>();
-          JSONArray array = value.isArray();
-          if (array != null) {
-            int size = array.size();
-            for (int i = 0; i < size; i++) {
-              set.add(ensureStringValue(array.get(i)));
+          if (schema.get("items").isArray() != null) {
+            editableWidget.setValue(value.isArray());
+          } else {
+            Set<String> set = new HashSet<>();
+            JSONArray array = value.isArray();
+            if (array != null) {
+              int size = array.size();
+              for (int i = 0; i < size; i++) {
+                set.add(ensureStringValue(array.get(i)));
+              }
             }
+
+            editableWidget.setValue(set);
           }
 
-          editableWidget.setValue(set);
         }
 
         found = true;
@@ -185,12 +195,20 @@ public class SchemaUiContainer extends ControlGroup {
   }
 
   private String validateArray(Object value) {
-    HashSet hashSet = value instanceof HashSet ? (HashSet) value : new HashSet();
-    if(required && (value == null || hashSet.size() == 0)) {
+    int size = 0;
+    if (schema.get("items").isArray() == null) {
+      size = (value instanceof HashSet ? (HashSet) value : new HashSet()).size();
+    } else {
+      size = (value instanceof JSONArray ? (JSONArray) value : new JSONArray()).size();
+    }
+
+    if(required && (value == null || size == 0)) {
       return "required";
     }
 
-    return JsonSchemaGWT.valueForArraySchemaIsValid(hashSet, schema);
+    return JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value
+        : value instanceof JSONArray ? JsonSchemaGWT.jsonArrayOfObjectsToList((JSONArray) value)
+            : new HashSet(), schema);
   }
 
   public JSONObject getSchema() {
@@ -306,7 +324,7 @@ public class SchemaUiContainer extends ControlGroup {
     List<String> enumItems = JsonSchemaGWT.getEnum(schema);
     boolean hasEnum = enumItems.size() > 0;
 
-    if(format.equals("file")) {
+    if(format.equals("file") && eventBus != null) {
       return new FileSelection(eventBus);
     }
 
@@ -365,18 +383,26 @@ public class SchemaUiContainer extends ControlGroup {
 
   private Widget createWidgetForArray() {
     JSONValue itemsSchema = schema.get("items");
-    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null
-        ? itemsSchema.isObject()
-        : new JSONObject();
 
-    List<String> enumItems = JsonSchemaGWT.getEnum(items);
+    if (itemsSchema != null) {
+      if (itemsSchema.isArray() != null) {
+        // tuple
+        return new DynamicArrayTuples(key, itemsSchema.isArray(), eventBus);
+      } else {
+        JSONObject items = itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
 
-    if (enumItems.size() == 0) {
-      JsonSchemaGWT.getType(items);
-      return new DynamicArrayItems(key, type);
+        List<String> enumItems = JsonSchemaGWT.getEnum(items);
+
+        if (enumItems.size() == 0) {
+          String type = JsonSchemaGWT.getType(items);
+          return new DynamicArrayItems(key, type);
+        }
+
+        return new DynamicCheckboxGroup(key, enumItems);
+      }
     }
 
-    return new DynamicCheckboxGroup(key, enumItems);
+    return new DynamicArrayItems(key, "string");
   }
 
   private void setStringSchemaValidations(Widget widget) {
