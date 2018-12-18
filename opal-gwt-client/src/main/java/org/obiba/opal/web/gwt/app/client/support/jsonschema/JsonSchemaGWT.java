@@ -209,6 +209,19 @@ public abstract class JsonSchemaGWT {
     return error;
   }
 
+  public static List<JSONObject> jsonArrayOfObjectsToList(JSONArray array) {
+    List<JSONObject> objects = new ArrayList<JSONObject>();
+
+    for (int i = 0; i < array.size(); i++) {
+      JSONValue jsonValue = array.get(i);
+
+      if (jsonValue.isObject() != null)
+        objects.add(jsonValue.isObject());
+    }
+
+    return objects;
+  }
+
   private static void addToPanel(final JSONObject schema, String key, final JSONObject initialValue, boolean wholeSchemaIsReadOnly, List<String> required, Panel containerPanel,  EventBus eventBus) {
     schema.put("readOnly", JSONBoolean.getInstance(wholeSchemaIsReadOnly));
     SchemaUiContainer uiContainer = new SchemaUiContainer(schema, key,required.indexOf(key) > -1, eventBus);
