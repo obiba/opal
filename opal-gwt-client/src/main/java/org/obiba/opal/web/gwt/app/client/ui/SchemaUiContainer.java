@@ -386,8 +386,7 @@ public class SchemaUiContainer extends ControlGroup {
 
     if (itemsSchema != null) {
       if (itemsSchema.isArray() != null) {
-        // tuple
-        return new DynamicArrayTuples(key, itemsSchema.isArray(), eventBus);
+        return new DynamicArrayTuples(key, itemsSchema.isArray(), required, eventBus);
       } else {
         JSONObject items = itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
 
