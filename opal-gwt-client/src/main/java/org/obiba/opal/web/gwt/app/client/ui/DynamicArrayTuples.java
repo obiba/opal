@@ -26,6 +26,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   private final String key;
   private final JSONArray items;
+  private final boolean required;
   private final EventBus eventBus;
 
   private FlowPanel bodyContainer;
@@ -36,10 +37,11 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   private boolean enabled;
 
-  public DynamicArrayTuples(String key, JSONArray items, EventBus eventBus) {
+  public DynamicArrayTuples(String key, JSONArray items, boolean required, EventBus eventBus) {
     this.enabled = true;
     this.key = key;
     this.items = items;
+    this.required = required;
     this.eventBus = eventBus;
 
     itemsContainers = new HashMap<FlowPanel, List<SchemaUiContainer>>();
@@ -94,11 +96,17 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     for (List<SchemaUiContainer> value : values) {
       JSONObject jsonObject = new JSONObject();
 
+      boolean empty = false;
+
       for (SchemaUiContainer schemaUiContainer : value) {
         jsonObject.put(schemaUiContainer.getKey(), schemaUiContainer.getJSONValue());
+
+        String validate = schemaUiContainer.validate();
+        empty = empty || "required".equals(validate);
       }
 
-      array.set(i++, jsonObject);
+      if (!empty)
+        array.set(i++, jsonObject);
     }
 
     return array;
@@ -129,6 +137,10 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
         }
       }
     }
+  }
+
+  public boolean isRequired() {
+    return required;
   }
 
   private String getSchemaKey(JSONObject schema) {
@@ -173,7 +185,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
       String schemaKeyString = getSchemaKey(schema);
 
-      SchemaUiContainer uiContainer = new SchemaUiContainer(schema, schemaKeyString, false, eventBus);
+      SchemaUiContainer uiContainer = new SchemaUiContainer(schema, schemaKeyString, required, eventBus);
 
       if (initialValue != null && initialValue.containsKey(schemaKeyString)) {
         uiContainer.setJSONValue(initialValue.get(schemaKeyString));
