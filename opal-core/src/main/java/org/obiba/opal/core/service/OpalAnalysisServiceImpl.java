@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.ValueTableUpdateListener;
@@ -21,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.stream.StreamSupport;
 
 @Component
-public class OpalAnalysisServiceImpl implements OpalAnalysisService, ValueTableUpdateListener {
+public class OpalAnalysisServiceImpl implements OpalAnalysisService, DatasourceUpdateListener, ValueTableUpdateListener {
 
   private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisServiceImpl.class);
 
@@ -140,11 +142,36 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService, ValueTableU
 
   @Override
   public void onDelete(ValueTable vt) {
-    deleteAnalyses(vt.getDatasource().getName(), vt.getName());
+    String datasourceName = vt.getDatasource().getName();
+    String valueTableName = vt.getName();
+    deleteAnalyses(datasourceName, valueTableName);
+
+    try {
+      DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(
+        Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName, valueTableName)
+      );
+    } catch (IOException e) {
+      logger.error("Failed to remove value table analyses: {}", e);
+    }
   }
 
   @Override
   public void onDelete(ValueTable vt, Variable v) {
-    
+
+  }
+
+  @Override
+  public void onDelete(Datasource datasource) {
+    String datasourceName = datasource.getName();
+    deleteAnalyses(datasourceName);
+
+    try {
+      DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(
+        Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName)
+      );
+    } catch (IOException e) {
+      logger.error("Failed to remove value project analyses: {}", e);
+    }
+
   }
 }
