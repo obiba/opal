@@ -1,5 +1,8 @@
 package org.obiba.opal.core.service;
 
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
@@ -18,7 +21,7 @@ import java.nio.file.Paths;
 import java.util.stream.StreamSupport;
 
 @Component
-public class OpalAnalysisServiceImpl implements OpalAnalysisService {
+public class OpalAnalysisServiceImpl implements OpalAnalysisService, ValueTableUpdateListener {
 
   private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisServiceImpl.class);
 
@@ -77,7 +80,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException {
+  public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
     orientDbService.delete(analysis);
 
     String query = SimpleOrientDbQueryBuilder.newInstance()
@@ -90,6 +93,16 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
         .forEach(orientDbService::delete);
 
     deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));
+  }
+
+  @Override
+  public void deleteAnalyses(String datasource) {
+    getAnalysesByDatasource(datasource).forEach(this::delete);
+  }
+
+  @Override
+  public void deleteAnalyses(String datasource, String table) {
+    getAnalysesByDatasourceAndTable(datasource, table).forEach(this::delete);
   }
 
   @Override
@@ -108,5 +121,30 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
     } catch (IOException e) {
       logger.warn("Unable to delete analysis files at \"{}\"", analysisDir.toString());
     }
+  }
+
+  @Override
+  public void onUpdate(ValueTable vt, Iterable<Variable> vs) {
+
+  }
+
+  @Override
+  public void onRename(ValueTable vt, String newName) {
+
+  }
+
+  @Override
+  public void onRename(ValueTable vt, Variable v, String newName) {
+
+  }
+
+  @Override
+  public void onDelete(ValueTable vt) {
+    deleteAnalyses(vt.getDatasource().getName(), vt.getName());
+  }
+
+  @Override
+  public void onDelete(ValueTable vt, Variable v) {
+    
   }
 }
