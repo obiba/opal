@@ -70,6 +70,9 @@ public class ProjectResource {
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private OpalAnalysisService opalAnalysisService;
+
   @GET
   @Transactional(readOnly = true)
   public Projects.ProjectDto get(@Context Request request) {
@@ -115,6 +118,8 @@ public class ProjectResource {
       vcfSamplesMappingService.deleteProjectSampleMappings(name + ".%");
       subjectProfileService.deleteBookmarks("/project/" + project.getName());
       subjectProfileService.deleteBookmarks("/datasource/" + project.getName());
+
+      opalAnalysisService.deleteAnalyses(project.getName());
     } catch(Exception e) {
       // silently ignore project not found and other errors
     }

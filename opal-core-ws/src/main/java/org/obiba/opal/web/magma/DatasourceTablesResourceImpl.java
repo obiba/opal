@@ -43,6 +43,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.security.OpalPermissions;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Magma;
@@ -81,6 +82,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   @Autowired
   private SubjectProfileService subjectProfileService;
+
+  @Autowired
+  private OpalAnalysisService opalAnalysisService;
 
   @Override
   public void setDatasource(Datasource datasource) {
@@ -206,6 +210,8 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
           }
         }
         subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
+
+        opalAnalysisService.deleteAnalyses(datasource.getName(), table);
       }
     }
 

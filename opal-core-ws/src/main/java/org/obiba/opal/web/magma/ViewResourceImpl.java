@@ -23,6 +23,7 @@ import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -51,6 +52,8 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   private SubjectProfileService subjectProfileService;
 
+  private OpalAnalysisService opalAnalysisService;
+
   @Autowired
   public void setViewDtos(ViewDtos viewDtos) {
     this.viewDtos = viewDtos;
@@ -64,6 +67,11 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Autowired
   public void setSubjectProfileService(SubjectProfileService subjectProfileService) {
     this.subjectProfileService = subjectProfileService;
+  }
+
+  @Autowired
+  public void setOpalAnalysisService(OpalAnalysisService opalAnalysisService) {
+    this.opalAnalysisService = opalAnalysisService;
   }
 
   @Override
@@ -110,6 +118,9 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
       }
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
+
+      if (opalAnalysisService != null)
+        opalAnalysisService.deleteAnalyses(getDatasource().getName(), getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore
     }

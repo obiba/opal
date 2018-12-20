@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -39,6 +40,9 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private OpalAnalysisService opalAnalysisService;
+
   @Override
   @DELETE
   public Response drop() {
@@ -51,6 +55,8 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
         }
       }
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
+
+      opalAnalysisService.deleteAnalyses(getDatasource().getName(), getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore
     }

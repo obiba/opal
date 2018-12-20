@@ -77,7 +77,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException {
+  public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
     orientDbService.delete(analysis);
 
     String query = SimpleOrientDbQueryBuilder.newInstance()
@@ -90,6 +90,16 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
         .forEach(orientDbService::delete);
 
     deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));
+  }
+
+  @Override
+  public void deleteAnalyses(String datasource) {
+    getAnalysesByDatasource(datasource).forEach(this::delete);
+  }
+
+  @Override
+  public void deleteAnalyses(String datasource, String table) {
+    getAnalysesByDatasourceAndTable(datasource, table).forEach(this::delete);
   }
 
   @Override
