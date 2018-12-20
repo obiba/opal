@@ -14,5 +14,9 @@ public interface OpalAnalysisService extends SystemService {
 
   void save(OpalAnalysis analysis) throws AnalysisAlreadyExistsException;
 
-  void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException;
+  void delete(OpalAnalysis analysis) throws NoSuchAnalysisException;
+
+  void deleteAnalyses(String datasource);
+
+  void deleteAnalyses(String datasource, String table);
 }

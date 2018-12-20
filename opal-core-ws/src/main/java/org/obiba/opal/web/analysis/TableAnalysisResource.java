@@ -81,8 +81,8 @@ public class TableAnalysisResource {
 
   @DELETE
   @Path("/analysis/{analysisName}")
-  public Response deleteAnalysis(@PathParam("analysisName") String analysisName, @QueryParam("cascade") @DefaultValue("true") boolean cascade) {
-    analysisService.delete(getAnalysis(analysisName), cascade);
+  public Response deleteAnalysis(@PathParam("analysisName") String analysisName) {
+    analysisService.delete(getAnalysis(analysisName));
     return Response.ok().build();
   }
 
