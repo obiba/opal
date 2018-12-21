@@ -35,6 +35,8 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   private Button addMoreButton;
 
+  private List<ControlGroup> headerControlGroups;
+
   private boolean enabled;
 
   public DynamicArrayTuples(String key, JSONArray items, boolean required, EventBus eventBus) {
@@ -45,10 +47,12 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     this.eventBus = eventBus;
 
     itemsContainers = new HashMap<FlowPanel, List<SchemaUiContainer>>();
+    headerControlGroups = new ArrayList<ControlGroup>();
 
     FlowPanel headerContainer = new FlowPanel();
     headerContainer.getElement().setAttribute("style", "display: grid; grid-template-columns: repeat(" + (items.size() < 1 ? 1 : items.size()) + ", 1fr) 50px;");
     header(headerContainer);
+    headerVisibility(false);
 
     bodyContainer = new FlowPanel();
 
@@ -162,6 +166,7 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
       @Override
       public void onClick(ClickEvent event) {
         body(null);
+        headerVisibility(!getItemsContainers().isEmpty());
       }
     });
 
@@ -211,6 +216,8 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
           getItemsContainers().remove(parent);
           parent.removeFromParent();
         }
+
+        headerVisibility(!getItemsContainers().isEmpty());
       }
     });
 
@@ -242,8 +249,15 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
       controlPanel.add(label);
 
       container.add(controlPanel);
+      headerControlGroups.add(controlPanel);
     }
 
     container.add(new FlowPanel());
+  }
+
+  private void headerVisibility(boolean visible) {
+    for (ControlGroup header : headerControlGroups) {
+      header.setVisible(visible);
+    }
   }
 }
