@@ -161,7 +161,6 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
 
   @Override
   public void accept(PluginPackageDto plugin, List<AnalysisPluginTemplateDto> templates) {
-    pluginTemplateChooser.clear();
     pluginTemplateChooser.addPluginAndTemplates(plugin, templates);
     pluginTemplateChooser.update();
     pluginTemplateChooser.setSelectedIndex(-1);
