@@ -29,6 +29,7 @@
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
     <bouncycastle.version>1.46</bouncycastle.version>
+    <buji.version>4.0.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
     <commons-codec.version>1.10</commons-codec.version>
     <commons-collections.version>3.2.2</commons-collections.version>
@@ -79,6 +80,7 @@
     <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
     <json.version>20140107</json.version>
+    <json-smart.version>2.3</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.12</junit.version>
@@ -95,11 +97,14 @@
     <mongodb-driver.version>3.9.1</mongodb-driver.version>
     <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
     <newrelic.version>3.20.0</newrelic.version>
+    <nimbus-jose-jwt.version>5.4</nimbus-jose-jwt.version>
+    <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
     <obiba-commons.version>1.12-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
+    <pac4j.version>3.4.0</pac4j.version>
     <postgresql.version>42.2.5</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
@@ -719,6 +724,59 @@
         <version>${postgresql.version}</version>
       </dependency>
 
+      <!-- pac4j dependencies -->
+      <dependency>
+        <groupId>io.buji</groupId>
+        <artifactId>buji-pac4j</artifactId>
+        <version>${buji.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.pac4j</groupId>
+        <artifactId>pac4j-core</artifactId>
+        <version>${pac4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.pac4j</groupId>
+        <artifactId>pac4j-oidc</artifactId>
+        <version>${pac4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>lang-tag</artifactId>
+        <version>1.4.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>oauth2-oidc-sdk</artifactId>
+        <version>${oauth-oidc-sdk.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.github.stephenc.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>${nimbus-jose-jwt.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.github.stephenc.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>net.minidev</groupId>
+        <artifactId>json-smart</artifactId>
+        <version>${json-smart.version}</version>
+        <scope>runtime</scope>
+      </dependency>
 
       <!-- Logging framework -->
       <dependency>
