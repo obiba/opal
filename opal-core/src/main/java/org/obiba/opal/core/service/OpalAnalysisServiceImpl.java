@@ -151,7 +151,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService, DatasourceU
         Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName, valueTableName)
       );
     } catch (IOException e) {
-      logger.error("Failed to remove value table analyses: {}", e);
+      logger.warn(e.getMessage());
     }
   }
 
@@ -170,7 +170,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService, DatasourceU
         Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName)
       );
     } catch (IOException e) {
-      logger.error("Failed to remove value project analyses: {}", e);
+      logger.warn(e.getMessage());
     }
 
   }
