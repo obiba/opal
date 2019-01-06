@@ -65,7 +65,7 @@
     <hsqldb.version>2.3.3</hsqldb.version>
     <httpclient.version>4.5</httpclient.version>
     <jackson.version>2.8.11</jackson.version>
-    <jackson-patched.version>2.8.11.2</jackson-patched.version>
+    <jackson-patched.version>2.8.11.3</jackson-patched.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
