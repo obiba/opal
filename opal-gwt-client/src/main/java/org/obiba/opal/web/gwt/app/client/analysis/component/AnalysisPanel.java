@@ -98,7 +98,6 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
                          AnalysisPluginData data,
                          boolean enabled) {
     table = tableDto;
-    currentSelection = null;
     analysis = analysisDto;
     validationHandler = new PanelValidationHandler(existingNames);
     setEnabled(enabled);
@@ -114,6 +113,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
       pluginTemplateChooser.setSelectedTemplate(data.getPluginDto().getName(), data.getTemplateDto().getName());
       updateSchemaForm(pluginTemplateChooser.getSelectedData());
     }
+    currentSelection = pluginTemplateChooser.getSelectedData();
 
     JsArrayString variablesArray = analysisDto.getVariablesArray();
     if (variablesArray != null) {
@@ -163,7 +163,8 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
   public void accept(PluginPackageDto plugin, List<AnalysisPluginTemplateDto> templates) {
     pluginTemplateChooser.addPluginAndTemplates(plugin, templates);
     pluginTemplateChooser.update();
-    pluginTemplateChooser.setSelectedIndex(-1);
+    pluginTemplateChooser.setSelectedIndex(0);
+    updateSchemaForm(pluginTemplateChooser.getSelectedData());
   }
 
   private void setEnabled(boolean enabled) {

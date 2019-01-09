@@ -38,7 +38,7 @@
           <ui:msg description="Analysis Results Status Report label">Report</ui:msg>
         </g:Label>
 
-        <g:Anchor ui:field="report">
+        <g:Anchor ui:field="report" addStyleNames="btn btn-info">
           <ui:msg description="Analysis Results Status Show label">Show</ui:msg>
         </g:Anchor>
       </o:PropertyPanel>
