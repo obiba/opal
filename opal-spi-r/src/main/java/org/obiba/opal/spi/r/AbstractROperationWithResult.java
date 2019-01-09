@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.spi.r;
 
+import org.json.JSONObject;
+import org.obiba.opal.spi.r.analysis.RAnalysis;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPRaw;
+import org.springframework.util.Assert;
 
 import java.util.NoSuchElementException;
 
@@ -67,6 +70,17 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
 
   protected void setResult(REXP result) {
     this.result = result;
+  }
+
+  protected String getMetadata(RAnalysis analysis) {
+    Assert.notNull(analysis, "analysis cannot be null");
+
+    JSONObject metadata = new JSONObject();
+    metadata.put("datasource", analysis.getDatasource());
+    metadata.put("table", analysis.getTable());
+    metadata.put("variableCount", analysis.getVariables().size());
+    metadata.put("name", analysis.getName());
+    return metadata.toString();
   }
 
 }
