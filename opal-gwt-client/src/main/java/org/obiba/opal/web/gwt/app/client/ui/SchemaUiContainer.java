@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
@@ -20,6 +22,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.TakesValue;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
 
 public class SchemaUiContainer extends ControlGroup {
 
@@ -250,7 +253,9 @@ public class SchemaUiContainer extends ControlGroup {
       JSONValue description = schema.get("description");
       if(description != null && description.isString() != null) {
         String descriptionStringValue = description.isString().stringValue();
-        add(new HelpBlock(SimpleHtmlSanitizer.sanitizeHtml(descriptionStringValue).asString()));
+        HelpBlock helpBlock = new HelpBlock();
+        helpBlock.setHTML(Markdown.parseNoStyle(descriptionStringValue));
+        add(helpBlock);
       }
     }
   }

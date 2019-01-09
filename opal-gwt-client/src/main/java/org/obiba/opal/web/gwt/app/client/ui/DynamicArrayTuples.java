@@ -156,6 +156,14 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     return schemaKey.isString() != null ? schemaKey.isString().stringValue() : null;
   }
 
+  private boolean hasTitle(JSONObject schema) {
+    if (schema == null) {
+      return false;
+    }
+
+    return schema.containsKey("title");
+  }
+
   private Button createAddMoreButton(FlowPanel root) {
     ControlGroup controlGroup = new ControlGroup();
 
@@ -239,14 +247,15 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
       JSONObject schema = jsonValue.isObject();
 
-      String schemaKeyString = getSchemaKey(schema);
-
       ControlGroup controlPanel = new ControlGroup();
-      Label label = new Label();
-      label.getElement().setAttribute("style", "font-weight: bold;");
-      label.setText(schemaKeyString);
 
-      controlPanel.add(label);
+      if (!hasTitle(schema)) {
+        String schemaKeyString = getSchemaKey(schema);
+        Label label = new Label();
+        label.getElement().setAttribute("style", "font-weight: bold;");
+        label.setText(schemaKeyString);
+        controlPanel.add(label);
+      }
 
       container.add(controlPanel);
       headerControlGroups.add(controlPanel);
