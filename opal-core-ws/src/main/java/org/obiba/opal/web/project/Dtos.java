@@ -66,6 +66,17 @@ public class Dtos {
     return builder.build();
   }
 
+  public static Projects.ProjectDto asDtoDigest(Project project) {
+    Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder()
+        .setName(project.getName())
+        .setTitle(project.getTitle());
+    if(project.hasDescription()) builder.setDescription(project.getDescription());
+    if(project.hasTags()) builder.addAllTags(project.getTags());
+    builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
+    
+    return builder.build();
+  }
+
   public static Project fromDto(ProjectDto projectDto) {
     return Project.Builder.create() //
         .name(projectDto.getName()) //
