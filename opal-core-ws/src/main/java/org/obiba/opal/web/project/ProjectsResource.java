@@ -12,9 +12,7 @@ package org.obiba.opal.web.project;
 import java.net.URI;
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -43,11 +41,13 @@ public class ProjectsResource {
   @GET
   @Transactional(readOnly = true)
   @NoAuthorization
-  public List<Projects.ProjectDto> getProjects() {
+  public List<Projects.ProjectDto> getProjects(@QueryParam("digest") @DefaultValue("false") boolean digest) {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for(Project project : projectService.getProjects()) {
       try {
-        projects.add(Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
+        projects.add(
+          digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService.getProjectDirectoryPath(project))
+        );
       } catch(NoSuchDatasourceException e) {
         // ignore
       }

@@ -112,7 +112,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   private void refresh() {
     getView().beforeRenderProjects();
     ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder() //
-        .forResource("/projects") //
+        .forResource(UriBuilders.PROJECTS.create().query("digest", "true").build()) //
         .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
           @Override
           public void onResource(Response response, JsArray<ProjectDto> resource) {
