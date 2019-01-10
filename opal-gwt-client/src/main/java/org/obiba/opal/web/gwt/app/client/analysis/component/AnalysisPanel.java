@@ -133,6 +133,7 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     analysis.setName(analyseName.getText());
     analysis.setPluginName(getPluginName());
     analysis.setTemplateName(getTemplateName());
+    analysis.clearVariablesArray();
 
     Set<String> set = new HashSet<>(variables.getSelectedItemsTexts());
 
