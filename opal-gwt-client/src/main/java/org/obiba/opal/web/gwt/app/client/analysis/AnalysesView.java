@@ -263,7 +263,8 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   private class UpdatedColumn extends SortableColumn implements Comparator<OpalAnalysisDto> {
     @Override
     public String getValue(OpalAnalysisDto object) {
-      return Moment.create(object.getUpdated()).format(FormatType.MONTH_NAME_TIME_SHORT);
+      String date = object.hasLastResult() ? object.getLastResult().getStartDate() : object.getUpdated();
+      return Moment.create(date).format(FormatType.MONTH_NAME_TIME_SHORT);
     }
 
     @Override
