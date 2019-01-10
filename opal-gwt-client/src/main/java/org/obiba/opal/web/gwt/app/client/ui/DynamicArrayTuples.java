@@ -12,7 +12,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasEnabled;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import java.util.ArrayList;
@@ -35,8 +34,6 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
 
   private Button addMoreButton;
 
-  private List<ControlGroup> headerControlGroups;
-
   private boolean enabled;
 
   public DynamicArrayTuples(String key, JSONArray items, boolean required, EventBus eventBus) {
@@ -47,17 +44,10 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     this.eventBus = eventBus;
 
     itemsContainers = new HashMap<FlowPanel, List<SchemaUiContainer>>();
-    headerControlGroups = new ArrayList<ControlGroup>();
-
-    FlowPanel headerContainer = new FlowPanel();
-    headerContainer.getElement().setAttribute("style", "display: grid; grid-template-columns: repeat(" + (items.size() < 1 ? 1 : items.size()) + ", 1fr) 50px;");
-    header(headerContainer);
-    headerVisibility(false);
 
     bodyContainer = new FlowPanel();
 
     FlowPanel root = new FlowPanel();
-    root.add(headerContainer);
     root.add(bodyContainer);
 
     addMoreButton = createAddMoreButton(root);
@@ -174,7 +164,6 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
       @Override
       public void onClick(ClickEvent event) {
         body(null);
-        headerVisibility(!getItemsContainers().isEmpty());
       }
     });
 
@@ -224,8 +213,6 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
           getItemsContainers().remove(parent);
           parent.removeFromParent();
         }
-
-        headerVisibility(!getItemsContainers().isEmpty());
       }
     });
 
@@ -237,36 +224,5 @@ public class DynamicArrayTuples extends Composite implements TakesValue<JSONArra
     bodyContainer.add(bodyItem);
 
     itemsContainers.put(bodyItem, widgetList);
-  }
-
-  private void header(FlowPanel container) {
-    int size = items.size();
-
-    for (int i = 0; i < size; i++) {
-      JSONValue jsonValue = items.get(i);
-
-      JSONObject schema = jsonValue.isObject();
-
-      ControlGroup controlPanel = new ControlGroup();
-
-      if (!hasTitle(schema)) {
-        String schemaKeyString = getSchemaKey(schema);
-        Label label = new Label();
-        label.getElement().setAttribute("style", "font-weight: bold;");
-        label.setText(schemaKeyString);
-        controlPanel.add(label);
-      }
-
-      container.add(controlPanel);
-      headerControlGroups.add(controlPanel);
-    }
-
-    container.add(new FlowPanel());
-  }
-
-  private void headerVisibility(boolean visible) {
-    for (ControlGroup header : headerControlGroups) {
-      header.setVisible(visible);
-    }
   }
 }
