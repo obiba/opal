@@ -9,23 +9,13 @@
  */
 package org.obiba.opal.core.service;
 
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -42,10 +32,16 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
+
 import static com.google.common.base.Strings.nullToEmpty;
 
 @Component
-public class ProjectsServiceImpl implements ProjectService {
+public class ProjectsServiceImpl implements ProjectService, ValueTableUpdateListener {
 
   private static final String PROJECTS_DIR = "projects";
 
@@ -249,5 +245,32 @@ public class ProjectsServiceImpl implements ProjectService {
     if(folder.getChildren().length == 0) {
       folder.delete();
     }
+  }
+
+  // Keep track of each ValueTable change and save Project to update last updated date.
+
+  public void onUpdate(ValueTable valueTable, Iterable<Variable> vs) {
+    updateProjectOnValueTableUpdate(valueTable);
+  }
+
+  public void onRename(ValueTable valueTable, String s) {
+    updateProjectOnValueTableUpdate(valueTable);
+  }
+
+  public void onRename(ValueTable valueTable, Variable variable, String s) {
+    updateProjectOnValueTableUpdate(valueTable);
+  }
+
+  public void onDelete(ValueTable valueTable) {
+    updateProjectOnValueTableUpdate(valueTable);
+  }
+
+  public void onDelete(ValueTable valueTable, Variable variable) {
+    updateProjectOnValueTableUpdate(valueTable);
+  }
+
+  private void updateProjectOnValueTableUpdate(ValueTable valueTable) {
+    Project project = getProject(valueTable.getDatasource().getName());
+    save(project);
   }
 }

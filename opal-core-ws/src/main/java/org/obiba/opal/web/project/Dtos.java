@@ -72,7 +72,7 @@ public class Dtos {
         .setTitle(project.getTitle());
     if(project.hasDescription()) builder.setDescription(project.getDescription());
     if(project.hasTags()) builder.addAllTags(project.getTags());
-    builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
+    builder.setTimestamps(asTimestampsDto(project));
     
     return builder.build();
   }
