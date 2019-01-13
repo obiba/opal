@@ -27,7 +27,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private static final int MIN_POOL_SIZE = 3;
 
-  private static final int MAX_POOL_SIZE = 30;
+  private static final int MAX_POOL_SIZE = 100;
 
   private static final int MAX_IDLE = 10;
 
@@ -38,6 +38,8 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   protected String username;
 
   protected String password;
+
+  protected int maxPoolSize = MAX_POOL_SIZE;
 
   protected boolean managed;
 
@@ -68,7 +70,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     dataSource.setUsername(username);
     dataSource.setPassword(password);
     dataSource.setInitialSize(MIN_POOL_SIZE);
-    dataSource.setMaxActive(MAX_POOL_SIZE);
+    dataSource.setMaxActive(maxPoolSize);
     dataSource.setMaxIdle(MAX_IDLE);
     dataSource.setTestOnBorrow(true);
     dataSource.setTestWhileIdle(false);
@@ -130,6 +132,10 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public void setMaxPoolSize(Integer maxPoolSize) {
+    if (maxPoolSize != null) this.maxPoolSize = maxPoolSize;
   }
 
   public void setConnectionProperties(String connectionProperties) {

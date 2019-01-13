@@ -38,8 +38,10 @@ import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasour
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.transaction.jta.JtaTransactionManager;
@@ -396,6 +398,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Configuration
+  @PropertySource("classpath:/META-INF/defaults.properties")
   public static class Config extends AbstractOrientDbTestConfig {
 
     @Bean

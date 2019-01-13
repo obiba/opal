@@ -300,6 +300,7 @@ datasource-plugins:
 
 analysis-plugins:
 	$(call install-plugin,opal-analysis-validate)
+	$(call install-plugin,opal-analysis-car)
 
 plugin:
 	$(call install-plugin,${p})
