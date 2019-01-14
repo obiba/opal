@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
+import org.obiba.opal.web.gwt.app.client.support.PluginPackageHelper;
+import org.obiba.opal.web.gwt.app.client.support.PluginPackageHelper.PluginPackageResourceCallback;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -221,25 +223,10 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
     formatChooser.addItemToGroup(translations.sqlLabel(), ImportFormat.JDBC.name());
 
+    pluginPackageDtoJsArray = JsArrays.create();
     ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
         .forResource(UriBuilders.DS_PLUGINS.create().query("usage", "import").build()) //
-        .withCallback(new ResourceCallback<PluginPackagesDto>() {
-          @Override
-          public void onResource(Response response, PluginPackagesDto resource) {
-            pluginPackageDtoJsArray = JsArrays.toSafeArray(resource.getPackagesArray());
-            for (PluginPackageDto plugin : JsArrays.toIterable(pluginPackageDtoJsArray)) {
-              DatasourcePluginPackageDto dsPlugin = plugin.getExtension(DatasourcePluginPackageDto.PluginPackageDtoExtensions.datasource).cast();
-              if ("FILE".equals(dsPlugin.getGroup())) {
-                formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 0);
-              }
-              if ("SERVER".equals(dsPlugin.getGroup())) {
-                formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 1);
-              }
-            }
-            if (pluginPackageDtoJsArray.length()>0)
-              formatChooser.update();
-          }
-        })
+        .withCallback(new PluginPackageResourceCallback(pluginPackageDtoJsArray, formatChooser))
         .get().send();
   }
 
@@ -275,17 +262,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
 
   @Override
   public PluginPackageDto getPluginPackage(String name) {
-    boolean found = false;
-    int index = 0;
-
-    if (pluginPackageDtoJsArray != null) {
-      while (!found && index < pluginPackageDtoJsArray.length()) {
-        found = pluginPackageDtoJsArray.get(index).getName().equals(name);
-        if (!found) index++;
-      }
-    }
-
-    return found ? pluginPackageDtoJsArray.get(index) : null;
+    return PluginPackageHelper.findPluginPackage(name, pluginPackageDtoJsArray);
   }
 
   @Override

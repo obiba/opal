@@ -35,7 +35,16 @@ public class FileSelection extends Composite implements TakesValue<String> {
   private TextBox file;
   private Button browseButton;
 
-  public FileSelection(EventBus eventBus) {
+  private final FileSelectorPresenter.FileSelectionType format;
+
+  public FileSelection(EventBus eventBus, String format) {
+
+    if (format == null || "file".equals(format)) {
+      this.format = FileSelectorPresenter.FileSelectionType.FILE;
+    } else {
+      this.format = FileSelectorPresenter.FileSelectionType.FOLDER;
+    }
+
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     builder.appendHtmlConstant("<div></div>");
     HTMLPanel panel = new HTMLPanel(builder.toSafeHtml());
@@ -58,7 +67,7 @@ public class FileSelection extends Composite implements TakesValue<String> {
     browseButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new FileSelectionRequestEvent(FileSelection.this, FileSelectorPresenter.FileSelectionType.FILE));
+        eventBus.fireEvent(new FileSelectionRequestEvent(FileSelection.this, format));
       }
     });
 
