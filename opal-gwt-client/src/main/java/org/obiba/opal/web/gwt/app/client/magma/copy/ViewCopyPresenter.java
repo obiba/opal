@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -26,7 +27,9 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewCopyPresenter extends ModalPresenterWidget<ViewCopyPresenter.Display> implements CopyUiHandlers {
@@ -62,8 +65,13 @@ public class ViewCopyPresenter extends ModalPresenterWidget<ViewCopyPresenter.Di
   }
 
   @Override
-  public void onReveal() {
+  protected void onBind() {
     initDatasources();
+  }
+
+  @Override
+  public void onReveal() {
+
   }
 
   @Override
@@ -91,12 +99,16 @@ public class ViewCopyPresenter extends ModalPresenterWidget<ViewCopyPresenter.Di
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCES.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder()
+        .forResource(UriBuilders.PROJECTS.create().query("digest", "true").build()).get()
+        .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
           @Override
-          public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            getView().setDatasources(JsArrays.toList(resource));
+          public void onResource(Response response, JsArray<ProjectDto> resource) {
+            List<String> datasourceNames = Lists.newArrayList();
+            for (ProjectDto project : JsArrays.toIterable(resource)) {
+              datasourceNames.add(project.getName());
+            }
+            getView().setDatasources(datasourceNames);
           }
         }).send();
   }
@@ -127,7 +139,7 @@ public class ViewCopyPresenter extends ModalPresenterWidget<ViewCopyPresenter.Di
     /**
      * Set a collection of datasources retrieved from Opal.
      */
-    void setDatasources(List<DatasourceDto> datasources);
+    void setDatasources(List<String> datasourceNames);
 
     void setView(TableDto view);
 

@@ -69,6 +69,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   @Override
+  protected void onBind() {
+    refreshDatasources();
+  }
+
+  @Override
   public void saveVariable() {
     getView().clearErrors();
 
@@ -168,7 +173,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     this.variableTableReferences = Maps.newHashMap();
     this.variables = variables;
 
-    refreshDatasources();
+    //refreshDatasources();
 
     // Prepare the array of variableDto
     List<VariableDto> derivedVariables = Lists.newArrayList();
@@ -198,7 +203,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       // build a unique list of table references
       String tableRef = parser.getTableReference();
       if (!tableReferences.contains(tableRef)) tableReferences.add(tableRef);
-      if (tableReferences.size() == 1) refreshDatasources();
+      //if (tableReferences.size() == 1) refreshDatasources();
       // build a unique list of derived variables
       // when several original variables have the same name, the unique derived + repeatable variable is added
       ResourceRequestBuilderFactory.<VariableDto>newBuilder() //

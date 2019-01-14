@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -37,6 +38,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Display> implements CopyUiHandlers {
 
@@ -72,7 +74,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   }
 
   @Override
-  public void onReveal() {
+  public void onBind() {
     initDatasources();
   }
 
@@ -133,22 +135,22 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCES.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder()
+        .forResource(UriBuilders.PROJECTS.create().query("digest", "true").build()).get()
+        .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
           @Override
-          public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            List<DatasourceDto> datasources = new ArrayList<>();
+          public void onResource(Response response, JsArray<ProjectDto> resource) {
+            List<String> datasourceNames = Lists.newArrayList();
 
-            for(DatasourceDto datasource : JsArrays.toList(resource)) {
+            for(ProjectDto project : JsArrays.toList(resource)) {
               // Allow to copy in itself if only one table is selected
-              if(copyTables.size() == 1 || !datasource.getName().equals(datasourceName)) {
-                datasources.add(datasource);
+              if(copyTables.size() == 1 || !project.getName().equals(datasourceName)) {
+                datasourceNames.add(project.getName());
               }
             }
 
-            if(!datasources.isEmpty()) {
-              getView().setDatasources(datasources);
+            if(!datasourceNames.isEmpty()) {
+              getView().setDatasources(datasourceNames);
             } else {
               getView().showError(null, translations.userMessageMap().get("NoDataToCopy"));
             }
@@ -209,7 +211,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     /**
      * Set a collection of datasources retrieved from Opal.
      */
-    void setDatasources(List<DatasourceDto> datasources);
+    void setDatasources(List<String> datasourceNames);
 
     void setValuesQuery(String query);
 

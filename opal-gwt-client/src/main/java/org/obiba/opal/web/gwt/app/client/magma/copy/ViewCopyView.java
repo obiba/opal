@@ -68,12 +68,10 @@ public class ViewCopyView extends ModalPopupViewWithUiHandlers<CopyUiHandlers>
   }
 
   @Override
-  public void setDatasources(List<DatasourceDto> datasources) {
+  public void setDatasources(List<String> datasourceNames) {
     this.datasources.clear();
-    for(DatasourceDto datasource : datasources) {
-      if(!"null".equals(datasource.getType())) {
-        this.datasources.addItem(datasource.getName());
-      }
+    for(String datasource : datasourceNames) {
+      this.datasources.addItem(datasource);
     }
   }
 
