@@ -9,15 +9,29 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.user.client.ui.FlowPanel;
 import java.util.Date;
 
+import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.support.PluginPackageHelper;
+import org.obiba.opal.web.gwt.app.client.support.PluginPackageHelper.PluginPackageResourceCallback;
+import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
@@ -38,6 +52,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import org.obiba.opal.web.model.client.opal.DatasourcePluginPackageDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -87,11 +104,22 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   @UiField
   CodeBlock queryLabel;
 
+  @UiField
+  FlowPanel pluginsFormatContainer;
+
+  @UiField
+  FlowPanel serverFormatContainer;
+
   private FileSelectionPresenter.Display fileSelection;
+
+  private JsArray<PluginPackageDto> pluginPackageDtoJsArray;
+
+  private final EventBus eventBus;
 
   @Inject
   public DataExportView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.eventBus = eventBus;
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.exportData());
@@ -107,15 +135,51 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     dataFormat.addItemToGroup(translations.rStataLabel(), ImportConfig.ImportFormat.RSTATA.name());
     dataFormat.addGroup(translations.remoteServerBasedDatasources());
     dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
+
+    pluginPackageDtoJsArray = JsArrays.create();
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
+        .forResource(UriBuilders.DS_PLUGINS.create().query("usage", "export").build()) //
+        .withCallback(new PluginPackageResourceCallback(pluginPackageDtoJsArray, dataFormat))
+        .get().send();
+
     dataFormat.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent event) {
         boolean fileBased = isFileBasedDataFormat();
-        destinationFolder.setVisible(fileBased);
-        destinationDatabase.setVisible(!fileBased);
+        boolean fromPluginSource = isFromPluginSource();
+
+        pluginsFormatContainer.clear();
+
+        destinationFolder.setVisible(!fromPluginSource && fileBased);
+        destinationDatabase.setVisible(!fromPluginSource && !fileBased);
+        pluginsFormatContainer.setVisible(fromPluginSource);
+
+        if (fromPluginSource) {
+          pluginsFormatContainer.setVisible(true);
+
+          PluginPackageDto pluginPackage = PluginPackageHelper.findPluginPackage(dataFormat.getSelectedValue(), pluginPackageDtoJsArray);
+
+          if (pluginPackage != null) {
+            ResourceRequestBuilderFactory.<JavaScriptObject>newBuilder()
+                .forResource(UriBuilders.DS_PLUGIN_FORM.create().query("usage", "export").build(pluginPackage.getName()))
+                .withCallback(new ResourceCallback<JavaScriptObject>() {
+
+                  @Override
+                  public void onResource(Response response, JavaScriptObject resource) {
+                    pluginsFormatContainer.clear();
+
+                    JSONObject jsonSchema = new JSONObject(resource);
+                    JsonSchemaGWT.buildUiIntoPanel(jsonSchema, null, pluginsFormatContainer, eventBus);
+                  }
+                })
+                .get().send();
+          }
+        }
+
       }
     });
     destinationDatabase.setVisible(false);
+    pluginsFormatContainer.setVisible(false);
   }
 
   @UiHandler("cancelButton")
@@ -125,8 +189,21 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @UiHandler("submitButton")
   public void onSubmit(ClickEvent event) {
-    getUiHandlers().onSubmit(getDataFormat(), isFileBasedDataFormat() ? getOutFile() : getSelectedDatabase(),
-        getSelectedIdentifiersMapping());
+    if (isFromPluginSource()) {
+      Map<HasType<ControlGroupType>, String> validateErrors = JsonSchemaGWT.validate(pluginsFormatContainer);
+
+      if (validateErrors.entrySet().size() > 0) {
+        for (Map.Entry<HasType<ControlGroupType>, String> entry: validateErrors.entrySet()) {
+          modal.addAlert(entry.getValue(), AlertType.ERROR, entry.getKey());
+        }
+      } else {
+        JSONObject model = JsonSchemaGWT.getModel(pluginsFormatContainer);
+        getUiHandlers().onSubmit(getDataFormat(), model.toString(), getSelectedIdentifiersMapping());
+      }
+    } else {
+      getUiHandlers().onSubmit(getDataFormat(), isFileBasedDataFormat() ? getOutFile() : getSelectedDatabase(),
+          getSelectedIdentifiersMapping());
+    }
   }
 
   private String getSelectedIdentifiersMapping() {
@@ -188,7 +265,11 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   }
 
   private boolean isFileBasedDataFormat() {
-    return ImportConfig.ImportFormat.valueOf(dataFormat.getSelectedValue()) != ImportConfig.ImportFormat.JDBC;
+    return !isFromPluginSource() && ImportConfig.ImportFormat.valueOf(dataFormat.getSelectedValue()) != ImportConfig.ImportFormat.JDBC;
+  }
+
+  private boolean isFromPluginSource() {
+    return PluginPackageHelper.findPluginPackage(dataFormat.getSelectedValue(), pluginPackageDtoJsArray) != null;
   }
 
   private String getOutFile() {

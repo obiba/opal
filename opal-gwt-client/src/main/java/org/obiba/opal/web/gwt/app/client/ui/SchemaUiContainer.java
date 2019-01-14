@@ -329,8 +329,8 @@ public class SchemaUiContainer extends ControlGroup {
     List<String> enumItems = JsonSchemaGWT.getEnum(schema);
     boolean hasEnum = enumItems.size() > 0;
 
-    if(format.equals("file") && eventBus != null) {
-      return new FileSelection(eventBus);
+    if(("file".equals(format) || "folder".equals(format)) && eventBus != null) {
+      return new FileSelection(eventBus, format);
     }
 
     if (format.equals("textarea")) {

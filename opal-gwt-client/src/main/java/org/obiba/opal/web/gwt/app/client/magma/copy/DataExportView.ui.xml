@@ -33,65 +33,69 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <!--Destination Folder-->
-    <b:ControlGroup ui:field="destinationFolder">
-      <b:ControlLabel>
-        <ui:msg description="Destination Folder field">Destination Folder</ui:msg>
-        <o:RequiredIcon/>
-      </b:ControlLabel>
-      <b:Controls>
-        <g:SimplePanel ui:field="filePanel"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Destination Folder help">Data will be exported in the selected folder, with a timestamp in the name. Exporting in SAS, SPSS or Stata requires a functional R server with the <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
-          <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
-        </ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+    <g:FlowPanel ui:field="pluginsFormatContainer"></g:FlowPanel>
 
-    <!--Destination Database-->
-    <b:ControlGroup ui:field="destinationDatabase">
-      <b:ControlLabel>
-        <ui:msg description="Destination Database field">Destination Database</ui:msg>
-        <o:RequiredIcon/>
-      </b:ControlLabel>
-      <b:Controls>
-        <o:Chooser ui:field="database"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Destination Database help">Data will be exported in the selected SQL database.
-        </ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+    <g:FlowPanel ui:field="serverFormatContainer">
+      <!--Destination Folder-->
+      <b:ControlGroup ui:field="destinationFolder">
+        <b:ControlLabel>
+          <ui:msg description="Destination Folder field">Destination Folder</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <g:SimplePanel ui:field="filePanel"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Destination Folder help">Data will be exported in the selected folder, with a timestamp in the name. Exporting in SAS, SPSS or Stata requires a functional R server with the <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+            <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-    <!--Query-->
-    <b:ControlGroup ui:field="queryPanel" visible="false">
-      <b:ControlLabel>
-        <ui:msg description="Values Filter field">Values Filter</ui:msg>
-      </b:ControlLabel>
-      <b:CheckBox ui:field="applyQuery" value="true">
-        <ui:msg description="Apply Query label">apply query</ui:msg>:
-      </b:CheckBox>
-      <b:CodeBlock ui:field="queryLabel"/>
-      <b:HelpBlock>
-        <ui:msg description="Export Query help">Only export entities which values match this query.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+      <!--Destination Database-->
+      <b:ControlGroup ui:field="destinationDatabase">
+        <b:ControlLabel>
+          <ui:msg description="Destination Database field">Destination Database</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:Chooser ui:field="database"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Destination Database help">Data will be exported in the selected SQL database.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-    <!--Identifiers-->
-    <b:ControlGroup ui:field="identifiersPanel" visible="false">
-      <b:ControlLabel>
-        <ui:msg description="Identifiers Mapping field">Identifiers Mapping</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <o:Chooser ui:field="identifiers" addStyleNames="small-indent"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Export Identifiers Mapping help">Select a mapping of identifiers to be used when exporting
-          data.
-        </ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+      <!--Query-->
+      <b:ControlGroup ui:field="queryPanel" visible="false">
+        <b:ControlLabel>
+          <ui:msg description="Values Filter field">Values Filter</ui:msg>
+        </b:ControlLabel>
+        <b:CheckBox ui:field="applyQuery" value="true">
+          <ui:msg description="Apply Query label">apply query</ui:msg>:
+        </b:CheckBox>
+        <b:CodeBlock ui:field="queryLabel"/>
+        <b:HelpBlock>
+          <ui:msg description="Export Query help">Only export entities which values match this query.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <!--Identifiers-->
+      <b:ControlGroup ui:field="identifiersPanel" visible="false">
+        <b:ControlLabel>
+          <ui:msg description="Identifiers Mapping field">Identifiers Mapping</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:Chooser ui:field="identifiers" addStyleNames="small-indent"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Export Identifiers Mapping help">Select a mapping of identifiers to be used when exporting
+            data.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+    </g:FlowPanel>
 
     <b:ModalFooter>
       <b:Button ui:field="submitButton" type="PRIMARY">
