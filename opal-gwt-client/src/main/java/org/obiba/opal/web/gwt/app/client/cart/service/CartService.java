@@ -42,7 +42,7 @@ public class CartService {
 
   public CartService() {
     stockStore = Storage.getLocalStorageIfSupported();
-    GWT.log("Local storage is supported: " + (stockStore != null));
+    GWT.log("Local storage is supported: " + isStoreSupported());
   }
 
   public void addVariableItems(Map<String, List<ItemResultDto>> tableVariableItems) {

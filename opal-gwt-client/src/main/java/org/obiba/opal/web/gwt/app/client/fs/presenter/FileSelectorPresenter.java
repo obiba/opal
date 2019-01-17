@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -56,6 +57,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   private final TranslationMessages translationMessages;
 
+  private final FileService fileService;
+
   private Object fileSelectionSource;
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
@@ -66,7 +69,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   public FileSelectorPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider, RequestCredentials credentials,
-      Translations translations, TranslationMessages translationMessages) {
+      Translations translations, TranslationMessages translationMessages, FileService fileService) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
@@ -75,7 +78,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     this.credentials = credentials;
     this.translations = translations;
     this.translationMessages = translationMessages;
-
+    this.fileService = fileService;
     getView().setUiHandlers(this);
   }
 
@@ -147,7 +150,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     // Adjust display based on file selection type.
     setDisplaysFiles(displaysFiles());
 
-    folderDetailsPresenter.setCurrentFolder(FileDtos.user(credentials.getUsername()));
+    FileDto lastFolder = fileService.getLastFolderDto();
+    folderDetailsPresenter.setCurrentFolder(lastFolder == null ? FileDtos.user(credentials.getUsername()) : lastFolder);
   }
 
   public void setFileSelectionSource(Object fileSelectionSource) {
@@ -190,7 +194,13 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   @Nullable
   public FileSelection getSelection() {
     FileDto selectedFile = getSelectedFile();
-    if(selectedFile == null) return null;
+    if(selectedFile == null) {
+      if (fileSelectionType == FileSelectionType.FOLDER) {
+        selectedFile = getCurrentFolder();
+        return new FileSelection(selectedFile.getPath(), fileSelectionType);
+      }
+      return null;
+    }
 
     if(fileSelectionType == FileSelectionType.FILE_OR_FOLDER) {
       return new FileSelection(selectedFile.getPath(), fileSelectionType);

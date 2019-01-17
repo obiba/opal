@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -41,9 +42,12 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
    */
   private FileDto currentFolder;
 
+  private final FileService fileService;
+
   @Inject
-  public FolderDetailsPresenter(Display display, EventBus eventBus) {
+  public FolderDetailsPresenter(Display display, EventBus eventBus, FileService fileService) {
     super(eventBus, display);
+    this.fileService = fileService;
     getView().setUiHandlers(this);
   }
 
@@ -126,10 +130,11 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
   public void setCurrentFolder(FileDto currentFolder) {
     this.currentFolder = currentFolder;
+    fileService.setLastFolder(currentFolder.getPath());
   }
 
   private void updateTable(FileDto file) {
-    currentFolder = file;
+    setCurrentFolder(file);
     if(!isVisible()) return;
     getAndUpdateTable(file);
   }
@@ -140,7 +145,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
         .withCallback(new ResourceCallback<FileDto>() {
           @Override
           public void onResource(Response response, FileDto resource) {
-            currentFolder = resource;
+            setCurrentFolder(resource);
             getView().renderRows(resource);
             fireEvent(new FolderUpdatedEvent(currentFolder));
           }
