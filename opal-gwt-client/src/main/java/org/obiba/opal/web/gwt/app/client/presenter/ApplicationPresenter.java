@@ -43,6 +43,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -104,6 +105,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final CartService cartService;
 
+  private final FileService fileService;
+
   private int activeModals = 0;
 
   @Inject
@@ -113,7 +116,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter,
       ModalProvider<FileSelectorPresenter> fileSelectorProvider,
       ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider, RequestUrlBuilder urlBuilder,
-      PlaceManager placeManager, CartService cartService) {
+      PlaceManager placeManager, CartService cartService, FileService fileService) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
@@ -123,6 +126,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     this.urlBuilder = urlBuilder;
     this.placeManager = placeManager;
     this.cartService = cartService;
+    this.fileService = fileService;
     getView().setUiHandlers(this);
     getView().setCartCounts(cartService.getVariablesCount());
   }
@@ -411,6 +415,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   public void onQuit() {
     cartService.clear();
+    fileService.clear();
     fireEvent(new SessionEndedEvent());
   }
 
