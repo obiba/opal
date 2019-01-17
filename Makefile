@@ -297,6 +297,7 @@ datasource-plugins:
 	$(call install-plugin,opal-datasource-redcap)
 	$(call install-plugin,opal-datasource-googlesheets4)
 	$(call install-plugin,opal-datasource-readr)
+	$(call install-plugin,opal-datasource-readxl)
 
 analysis-plugins:
 	$(call install-plugin,opal-analysis-validate)
