@@ -762,6 +762,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       ValueTableWriter wrapped = super.createWriter(tableName, entityType);
       return new RSymbolValueTableWriter(this, wrapped, tableName, rSymbolWriter, sessionHandler, txTemplate, getEntityIdMap().getOrDefault(entityType, entityIdName));
     }
+
+    @Override
+    public void dispose() {
+      rSymbolWriter.dispose();
+    }
   }
 
   private class CopyProgressListener implements DatasourceCopierProgressListener {

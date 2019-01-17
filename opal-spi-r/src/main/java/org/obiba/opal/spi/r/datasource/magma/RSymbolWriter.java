@@ -1,11 +1,12 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
+import org.obiba.magma.Disposable;
 import org.obiba.magma.ValueTable;
 
 /**
  * An interface to prepare table push to R, referred by a symbol and to call for symbol persistence.
  */
-public interface RSymbolWriter {
+public interface RSymbolWriter extends Disposable {
 
 
   /**

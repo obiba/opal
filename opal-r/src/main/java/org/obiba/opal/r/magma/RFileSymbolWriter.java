@@ -39,6 +39,11 @@ public class RFileSymbolWriter implements RSymbolWriter {
     rSessionHandler.getSession().execute(new FileReadROperation(destination.getName(), destination));
   }
 
+  @Override
+  public void dispose() {
+    // no-op
+  }
+
   private File getOutputFile(ValueTable table) {
     if (outputFiles.size() == 1)
       return outputFiles.get(0);
