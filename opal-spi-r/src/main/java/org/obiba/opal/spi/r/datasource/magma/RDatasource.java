@@ -11,6 +11,8 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasource;
@@ -21,6 +23,7 @@ import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,7 +39,7 @@ public class RDatasource extends AbstractDatasource {
 
   private List<File> outputFiles;
 
-  private final String symbol;
+  private final Map<String, String> tableSymbolNames = Maps.newHashMap();
 
   private final String entityType;
 
@@ -54,9 +57,14 @@ public class RDatasource extends AbstractDatasource {
    * @param idColumnName
    */
   public RDatasource(@NotNull String name, RSessionHandler rSessionHandler, String symbol, String entityType, String idColumnName) {
+    this(name, rSessionHandler, Lists.newArrayList(symbol), entityType, idColumnName);
+  }
+
+  public RDatasource(@NotNull String name, RSessionHandler rSessionHandler, List<String> symbols, String entityType, String idColumnName) {
     super(name, "r");
     this.rSessionHandler = rSessionHandler;
-    this.symbol = symbol;
+    if (symbols != null && !symbols.isEmpty())
+      symbols.forEach(symbol -> tableSymbolNames.put(symbol.replaceAll(" ", "_"), symbol));
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumnName = idColumnName;
   }
@@ -78,12 +86,12 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    return Strings.isNullOrEmpty(symbol) ? Sets.newHashSet() : Sets.newHashSet(symbol.replaceAll(" ", "_"));
+    return tableSymbolNames.isEmpty() ? Sets.newHashSet() : tableSymbolNames.keySet();
   }
 
   @Override
   protected ValueTable initialiseValueTable(String tableName) {
-    return new RValueTable(this, tableName, symbol, entityType, idColumnName);
+    return new RValueTable(this, tableName, tableSymbolNames.get(tableName), entityType, idColumnName);
   }
 
   @Override
@@ -99,6 +107,5 @@ public class RDatasource extends AbstractDatasource {
   public String getLocale() {
     return Strings.isNullOrEmpty(locale) ? "en" : locale;
   }
-
 
 }
