@@ -171,8 +171,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     if (dto.hasVcfStoreService()) {
       getParticipantTables();
       initializeParticipantIdentifierMappingList();
-      refresh();
       authorize();
+      refresh();
     }
   }
 
