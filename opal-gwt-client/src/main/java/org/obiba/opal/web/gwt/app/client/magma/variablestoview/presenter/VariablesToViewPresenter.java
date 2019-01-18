@@ -78,6 +78,10 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     getView().clearErrors();
 
     VariableCopyValidationHandler variableCopyValidationHandler = new VariableCopyValidationHandler();
+
+    variableCopyValidationHandler.getValidators().add(new RequiredTextValidator(getView().getViewName(), "NameIsRequired", FormField.NAME.name()));
+    variableCopyValidationHandler.getValidators().add(new RegExValidator(getView().getViewName(), "^[a-zA-Z0-9_-]*$", "NameHasInvalidCharacters", FormField.NAME.name()));
+
     if (variableCopyValidationHandler.validate()) {
       createOrUpdateViewWithVariables();
     }
