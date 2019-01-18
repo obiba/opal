@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -32,6 +33,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
@@ -105,6 +107,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @Autowired
+  private EventBus eventBus;
 
   private Map<String, String> entityIdMap;
 
@@ -785,6 +790,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         String node = "/datasource/" + options.getDestination() + "/table/" + table;
         subjectAclService.addSubjectPermission("opal", node, SubjectAcl.SubjectType.USER.subjectFor(getOwner()), Opal.AclAction.TABLE_ALL.name());
         tablesWithPermission.add(table);
+      }
+      if (percentComplete == 100) {
+        eventBus.post(new ValueTableAddedEvent(options.getDestination(), table));
       }
     }
   }

@@ -9,25 +9,20 @@
  */
 package org.obiba.opal.shell.commands;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelectInfo;
-import org.apache.commons.vfs2.FileSelector;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.apache.shiro.SecurityUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
+import org.apache.commons.vfs2.*;
+import org.obiba.crypt.KeyProviderException;
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.crypt.KeyProviderException;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -37,16 +32,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-import static org.obiba.opal.shell.commands.CommandResultCode.CRITICAL_ERROR;
-import static org.obiba.opal.shell.commands.CommandResultCode.NON_CRITICAL_ERROR;
-import static org.obiba.opal.shell.commands.CommandResultCode.SUCCESS;
+import static org.obiba.opal.shell.commands.CommandResultCode.*;
 
 @SuppressWarnings("ClassTooDeepInInheritanceTree")
 @CommandUsage(description = "Imports one or more Onyx data files into a datasource.",
@@ -64,6 +57,9 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @Autowired
   private SubjectAclService subjectAclService;
+
+  @Autowired
+  private EventBus eventBus;
 
   @Override
   public int execute() {
@@ -332,6 +328,9 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
         String node = "/datasource/" + options.getDestination() + "/table/" + table;
         subjectAclService.addSubjectPermission("opal", node, SubjectAcl.SubjectType.USER.subjectFor(getOwner()), Opal.AclAction.TABLE_ALL.name());
         tablesWithPermission.add(table);
+      }
+      if (percentComplete == 100) {
+        eventBus.post(new ValueTableAddedEvent(options.getDestination(), table));
       }
     }
   }

@@ -13,4 +13,8 @@ public class ValueTableEvent {
   public ValueTable getValueTable() {
     return valueTable;
   }
+
+  public boolean hasValueTable() {
+    return valueTable != null;
+  }
 }
