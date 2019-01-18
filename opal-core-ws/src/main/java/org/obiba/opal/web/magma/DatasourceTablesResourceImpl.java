@@ -9,39 +9,20 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-
+import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.search.service.OpalSearchService;
@@ -50,7 +31,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
@@ -61,7 +41,19 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -74,22 +66,18 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private ViewManager viewManager;
 
-  private Set<ValueTableUpdateListener> tableListeners;
-
   @Autowired
   protected OpalSearchService opalSearchService;
 
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private EventBus eventBus;
+
   @Override
   public void setDatasource(Datasource datasource) {
     this.datasource = datasource;
-  }
-
-  @Autowired
-  public void setTableListeners(Set<ValueTableUpdateListener> tableListeners) {
-    this.tableListeners = tableListeners;
   }
 
   @Autowired
@@ -200,11 +188,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
         } else {
           datasource.dropTable(table);
         }
-        if(tableListeners != null && !tableListeners.isEmpty()) {
-          for(ValueTableUpdateListener listener : tableListeners) {
-            listener.onDelete(toDrop);
-          }
-        }
+        eventBus.post(new ValueTableDeletedEvent(toDrop));
         subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
       }
     }

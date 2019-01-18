@@ -21,7 +21,7 @@ import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.web.model.Magma;
@@ -83,9 +83,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     if (getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
 
-    for (ValueTableUpdateListener listener : getTableListeners()) {
-      listener.onRename(getValueTable(), table.getName());
-    }
+    getEventBus().post(new ValueTableRenamedEvent(getValueTable(), table.getName()));
     getDatasource().renameTable(valueTable.getName(), table.getName());
 
     return Response.ok().build();

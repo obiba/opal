@@ -9,20 +9,19 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collection;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.core.Response;
-
+import com.google.common.eventbus.EventBus;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.core.Response;
 
 /**
  * A table resource that supports DELETE (drop)
@@ -33,11 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class DroppableTableResourceImpl extends TableResourceImpl implements DroppableTableResource {
 
   @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Collection<ValueTableUpdateListener> tableListeners;
+  private SubjectProfileService subjectProfileService;
 
   @Autowired
-  private SubjectProfileService subjectProfileService;
+  private EventBus eventBus;
 
   @Override
   @DELETE
@@ -45,11 +43,7 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
     try {
       ValueTable table = getValueTable();
       getDatasource().dropTable(table.getName());
-      if (tableListeners != null && !tableListeners.isEmpty()) {
-        for (ValueTableUpdateListener listener : tableListeners) {
-          listener.onDelete(table);
-        }
-      }
+      eventBus.post(new ValueTableDeletedEvent(table));
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore

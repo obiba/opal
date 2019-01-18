@@ -9,15 +9,21 @@
  */
 package org.obiba.opal.core.service;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.obiba.magma.*;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
+import org.obiba.opal.core.event.ValueTableEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -36,12 +42,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 @Component
-public class ProjectsServiceImpl implements ProjectService, ValueTableUpdateListener {
+public class ProjectsServiceImpl implements ProjectService {
 
   private static final String PROJECTS_DIR = "projects";
 
@@ -66,8 +71,8 @@ public class ProjectsServiceImpl implements ProjectService, ValueTableUpdateList
   private TransactionTemplate transactionTemplate;
 
   @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Set<ValueTableUpdateListener> tableListeners;
+  private EventBus eventBus;
+
 
   @Override
   @PostConstruct
@@ -117,12 +122,8 @@ public class ProjectsServiceImpl implements ProjectService, ValueTableUpdateList
     Datasource datasource = project.getDatasource();
 
     // call tables listeners
-    if(tableListeners != null && !tableListeners.isEmpty()) {
-      for(ValueTableUpdateListener listener : tableListeners) {
-        for(ValueTable valueTable : datasource.getValueTables()) {
-          listener.onDelete(valueTable);
-        }
-      }
+    for(ValueTable valueTable : datasource.getValueTables()) {
+      eventBus.post(new ValueTableDeletedEvent(valueTable));
     }
 
     // disconnect datasource
@@ -249,28 +250,9 @@ public class ProjectsServiceImpl implements ProjectService, ValueTableUpdateList
 
   // Keep track of each ValueTable change and save Project to update last updated date.
 
-  public void onUpdate(ValueTable valueTable, Iterable<Variable> vs) {
-    updateProjectOnValueTableUpdate(valueTable);
-  }
-
-  public void onRename(ValueTable valueTable, String s) {
-    updateProjectOnValueTableUpdate(valueTable);
-  }
-
-  public void onRename(ValueTable valueTable, Variable variable, String s) {
-    updateProjectOnValueTableUpdate(valueTable);
-  }
-
-  public void onDelete(ValueTable valueTable) {
-    updateProjectOnValueTableUpdate(valueTable);
-  }
-
-  public void onDelete(ValueTable valueTable, Variable variable) {
-    updateProjectOnValueTableUpdate(valueTable);
-  }
-
-  private void updateProjectOnValueTableUpdate(ValueTable valueTable) {
-    Project project = getProject(valueTable.getDatasource().getName());
+  @Subscribe
+  public void onValueTable(ValueTableEvent event) {
+    Project project = getProject(event.getValueTable().getDatasource().getName());
     save(project);
   }
 }

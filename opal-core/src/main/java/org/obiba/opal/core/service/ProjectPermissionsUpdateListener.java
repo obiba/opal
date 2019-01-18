@@ -10,20 +10,19 @@
 
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.eventbus.Subscribe;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
+import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
+
 @Component
-public class ProjectPermissionsUpdateListener implements DatasourceUpdateListener, ValueTableUpdateListener {
+public class ProjectPermissionsUpdateListener {
 
   private final SubjectAclService subjectAclService;
 
@@ -32,22 +31,24 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
     this.subjectAclService = subjectAclService;
   }
 
-  @Override
-  public void onDelete(@Nonnull Datasource datasource) {
+  @Subscribe
+  public void onDatasourceDeleted(@Nonnull DatasourceDeletedEvent event) {
     // remove all permissions related to the project and the datasource
+    Datasource datasource = event.getDatasource();
     subjectAclService.deleteNodePermissions("/datasource/" + datasource.getName());
     subjectAclService.deleteNodePermissions("/project/" + datasource.getName());
     subjectAclService.deleteNodePermissions("/files/projects/" + datasource.getName());
   }
 
-  @Override
-  public void onRename(@NotNull ValueTable vt, String newName) {
+  @Subscribe
+  public void onValueTableRenamed(ValueTableRenamedEvent event) {
+    ValueTable vt = event.getValueTable();
     Iterable<SubjectAclService.Permissions> perms = subjectAclService
         .getNodeHierarchyPermissions("opal", getNode(vt), null);
     onDelete(vt);
     String prefix = vt.isView() ? "/view/" : "/table/";
     String originalStr = prefix + vt.getName();
-    String newStr = prefix + newName;
+    String newStr = prefix + event.getNewName();
     for(SubjectAclService.Permissions perm : perms) {
       subjectAclService
           .addSubjectPermissions(perm.getDomain(), perm.getNode().replace(originalStr, newStr), perm.getSubject(),
@@ -55,20 +56,17 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
     }
   }
 
-  @Override
-  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
-    // ignore
-  }
-
-  @Override
-  public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
+  @Subscribe
+  public void onVariableRenamed(VariableRenamedEvent event) {
+    ValueTable vt = event.getValueTable();
+    Variable v = event.getVariable();
     Iterable<SubjectAclService.Permissions> perms = subjectAclService
         .getNodeHierarchyPermissions("opal", getNode(vt, v), null);
     // remove all permissions related to the variable
     subjectAclService.deleteNodePermissions(getNode(vt, v));
     String prefix = "/variable/";
     String originalStr = prefix + v.getName();
-    String newStr = prefix + newName;
+    String newStr = prefix + event.getNewName();
     for(SubjectAclService.Permissions perm : perms) {
       subjectAclService
           .addSubjectPermissions(perm.getDomain(), perm.getNode().replace(originalStr, newStr), perm.getSubject(),
@@ -76,18 +74,22 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
     }
   }
 
-  @Override
-  public void onDelete(@Nonnull ValueTable vt) {
+  @Subscribe
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    onDelete(event.getValueTable());
+  }
+
+  private void onDelete(ValueTable vt) {
     // remove all permissions related to the table
     subjectAclService.deleteNodePermissions(getNode(vt));
   }
 
-  @Override
-  public void onDelete(@NotNull ValueTable vt, Variable v) {
-    Iterable<SubjectAclService.Permissions> perms = subjectAclService
-        .getNodeHierarchyPermissions("opal", getNode(vt, v), null);
+  @Subscribe
+  public void onVariableDeleted(VariableDeletedEvent event) {
+    ValueTable vt = event.getValueTable();Iterable<SubjectAclService.Permissions> perms = subjectAclService
+        .getNodeHierarchyPermissions("opal", getNode(vt, event.getVariable()), null);
     // remove all permissions related to the variable
-    subjectAclService.deleteNodePermissions(getNode(vt, v));
+    subjectAclService.deleteNodePermissions(getNode(vt, event.getVariable()));
   }
 
   private String getNode(ValueTable vt) {

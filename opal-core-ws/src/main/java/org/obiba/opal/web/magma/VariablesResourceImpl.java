@@ -20,8 +20,9 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.event.VariableDeletedEvent;
+import org.obiba.opal.core.event.VariablesUpdatedEvent;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
@@ -32,7 +33,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -174,9 +174,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
         variableWriter.writeVariable(variable);
       }
     }
-    for (ValueTableUpdateListener listener : getTableListeners()) {
-      listener.onUpdate(getValueTable(), variables);
-    }
+    getEventBus().post(new VariablesUpdatedEvent(getValueTable(), variables));
   }
 
   @Override
@@ -189,9 +187,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       for (String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
-        for (ValueTableUpdateListener listener : getTableListeners()) {
-          listener.onDelete(getValueTable(), v);
-        }
+        getEventBus().post(new VariableDeletedEvent(getValueTable(), v));
         variableWriter.removeVariable(v);
       }
       return Response.ok().build();

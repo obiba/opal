@@ -12,30 +12,28 @@ package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
+import com.google.common.eventbus.Subscribe;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
+import org.obiba.opal.core.event.ValueTableRenamedEvent;
+import org.obiba.opal.core.event.VariableDeletedEvent;
+import org.obiba.opal.core.event.VariableRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, ValueTableUpdateListener {
+public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
   @Autowired
   private OrientDbService orientDbService;
@@ -152,10 +150,18 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     );
   }
 
-  @Override
-  public void onRename(@NotNull ValueTable vt, String newName) {
-    getMatchingMappingTables(vt).ifPresent(list -> {
-      String newTableReference = String.format("%s.%s", vt.getDatasource().getName(), newName);
+  @Subscribe
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    ValueTable vt = event.getValueTable();
+    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) {
+      deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
+    }
+  }
+
+  @Subscribe
+  public void onValueTableRenamed(ValueTableRenamedEvent event) {
+    getMatchingMappingTables(event.getValueTable()).ifPresent(list -> {
+      String newTableReference = String.format("%s.%s", event.getValueTable().getDatasource().getName(), event.getNewName());
       list.forEach(s -> {
         VCFSamplesMapping n = VCFSamplesMapping.newBuilder(s).tableName(newTableReference).build();
         orientDbService.save(n, n);
@@ -163,21 +169,16 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     });
   }
 
-  @Override
-  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
-    // ignore
-  }
-
-  @Override
-  public void onRename(@NotNull ValueTable vt, Variable variable, String newName) {
-    getMatchingMappingTables(vt).ifPresent(list -> {
-      String variableName = variable.getName();
+  @Subscribe
+  public void onVariableRenamed(VariableRenamedEvent event) {
+    getMatchingMappingTables(event.getValueTable()).ifPresent(list -> {
+      String variableName = event.getVariable().getName();
       list.forEach(s -> {
         VCFSamplesMapping.Builder b = VCFSamplesMapping.newBuilder(s);
         if (s.getParticipantIdVariable().equals(variableName)) {
-          b.participantIdVariable(newName);
+          b.participantIdVariable(event.getNewName());
         } else if (s.getSampleRoleVariable().equals(variableName)) {
-          b.sampleRoleVariable(newName);
+          b.sampleRoleVariable(event.getNewName());
         }
 
         VCFSamplesMapping n = b.build();
@@ -186,17 +187,11 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     });
   }
 
-  @Override
-  public void onDelete(@NotNull ValueTable vt) {
-    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) {
-      deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
-    }
-  }
-
-  @Override
-  public void onDelete(@NotNull ValueTable vt, Variable v) {
+  @Subscribe
+  public void onVariableDeleted(VariableDeletedEvent event) {
+    ValueTable vt = event.getValueTable();
     getMatchingMappingTables(vt).ifPresent(list -> {
-      String variableName = v.getName();
+      String variableName = event.getVariable().getName();
       list.forEach(s -> {
         if (s.getParticipantIdVariable().equals(variableName) || s.getSampleRoleVariable().equals(variableName)) {
           delete(s.getProjectName());

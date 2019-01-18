@@ -9,20 +9,16 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collection;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
+import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -35,6 +31,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -44,10 +42,6 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   private ViewManager viewManager;
 
   private ViewDtos viewDtos;
-
-  @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Collection<ValueTableUpdateListener> tableListeners;
 
   private SubjectProfileService subjectProfileService;
 
@@ -79,11 +73,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
     ValueTable table = getValueTable();
     if(!viewDto.getName().equals(table.getName())) {
-      if(tableListeners != null && !tableListeners.isEmpty()) {
-        for(ValueTableUpdateListener listener : tableListeners) {
-          listener.onRename(table, viewDto.getName());
-        }
-      }
+      getEventBus().post(new ValueTableRenamedEvent(table, viewDto.getName()));
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     }
@@ -103,11 +93,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Override
   public Response removeView() {
     try {
-      if(tableListeners != null && !tableListeners.isEmpty()) {
-        for(ValueTableUpdateListener listener : tableListeners) {
-          listener.onDelete(getValueTable());
-        }
-      }
+      getEventBus().post(new ValueTableDeletedEvent(getValueTable()));
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {
