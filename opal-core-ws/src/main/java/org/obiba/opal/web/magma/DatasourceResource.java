@@ -19,6 +19,7 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
+import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -173,6 +174,7 @@ public class DatasourceResource {
     View view = viewDtos.fromDto(viewDto);
     viewManager.addView(getDatasource().getName(), view, comment, null);
     scheduleViewIndexation(view);
+    getEventBus().post(new ValueTableAddedEvent(getDatasource().getValueTable(viewDto.getName())));
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());

@@ -22,6 +22,7 @@ import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -171,6 +172,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
     writeVariablesToTable(table);
+    getEventBus().post(new ValueTableAddedEvent(datasource.getValueTable(table.getName())));
     URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable")
         .build(datasource.getName(), table.getName());
     return Response.created(tableUri)//
@@ -188,7 +190,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
         } else {
           datasource.dropTable(table);
         }
-        eventBus.post(new ValueTableDeletedEvent(toDrop));
+        getEventBus().post(new ValueTableDeletedEvent(toDrop));
         subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
       }
     }
@@ -218,5 +220,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     return opalSearchService.isRunning() && opalSearchService.isEnabled()
         && opalSearchService.getValuesIndexManager().hasIndex(table)
         && opalSearchService.getValuesIndexManager().getIndex(table).isUpToDate();
+  }
+
+  private EventBus getEventBus() {
+    return eventBus == null ? eventBus = new EventBus() : eventBus;
   }
 }

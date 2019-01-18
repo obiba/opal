@@ -291,12 +291,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Datasource datasourceMock = createMock(Datasource.class);
     ValueTableWriter valueTableWriterMock = createMock(ValueTableWriter.class);
     VariableWriter variableWriterMock = createMock(VariableWriter.class);
+    ValueTable valueTableMock = createMock(ValueTable.class);
 
     datasourceMock.initialise();
     expect(datasourceMock.createWriter("table", "entityType")).andReturn(valueTableWriterMock);
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
     expect(datasourceMock.getName()).andReturn("testDatasource").atLeastOnce();
     expect(datasourceMock.hasValueTable("table")).andReturn(false);
+    expect(datasourceMock.getValueTable("table")).andReturn(valueTableMock);
     datasourceMock.dispose();
     expectLastCall().atLeastOnce();
     variableWriterMock.writeVariable(isA(Variable.class));
