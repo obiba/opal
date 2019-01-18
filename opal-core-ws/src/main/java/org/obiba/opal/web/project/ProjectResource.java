@@ -9,17 +9,20 @@
  */
 package org.obiba.opal.web.project;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.*;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
@@ -38,7 +41,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
-import java.util.Set;
 
 @Component
 @Scope("request")
@@ -52,8 +54,7 @@ public class ProjectResource {
   private ProjectService projectService;
 
   @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Set<DatasourceUpdateListener> datasourceUpdateListeners;
+  private EventBus eventBus;
 
   @Autowired
   private ProjectsKeyStoreService projectsKeyStoreService;
@@ -104,9 +105,7 @@ public class ProjectResource {
       Datasource ds = project.hasDatasource() ? project.getDatasource() : null;
       projectService.delete(name, archive);
       if (ds != null) {
-        for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
-          listener.onDelete(ds);
-        }
+        eventBus.post(new DatasourceDeletedEvent(ds));
       }
       if (project.hasVCFStoreService() && opalRuntime.hasServicePlugin(project.getVCFStoreService())) {
         ServicePlugin servicePlugin = opalRuntime.getServicePlugin(project.getVCFStoreService());

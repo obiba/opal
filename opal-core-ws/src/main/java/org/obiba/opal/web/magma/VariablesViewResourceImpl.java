@@ -17,7 +17,8 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.event.VariableDeletedEvent;
+import org.obiba.opal.core.event.VariablesUpdatedEvent;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -92,9 +93,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
       }
       viewManager.addView(getDatasource().getName(), view, comment, operationContext);
     }
-    for (ValueTableUpdateListener listener : getTableListeners()) {
-      listener.onUpdate(getValueTable(), variables);
-    }
+    getEventBus().post(new VariablesUpdatedEvent(getValueTable(), variables));
   }
 
   @Override
@@ -108,9 +107,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
         Variable variable = variableSource.getVariable();
         String name = variable.getName();
         if (variables.contains(name)) {
-          for (ValueTableUpdateListener listener : getTableListeners()) {
-            listener.onDelete(getValueTable(), variable);
-          }
+          getEventBus().post(new VariableDeletedEvent(getValueTable(), variable));
           operationContext.deleteVariable(view, variable);
           names.add(name);
           variableWriter.removeVariable(variable);

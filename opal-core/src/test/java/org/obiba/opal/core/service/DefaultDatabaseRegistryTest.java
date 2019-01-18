@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.google.common.eventbus.EventBus;
 import org.easymock.EasyMock;
 import org.hibernate.SessionFactory;
 import org.junit.After;
@@ -434,6 +435,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     @Bean
     public IdentifiersTableService identifiersTableService() {
       return EasyMock.createMock(IdentifiersTableService.class);
+    }
+
+    @Bean
+    public EventBus eventBus() {
+      return new EventBus();
     }
 
   }

@@ -1,12 +1,11 @@
 package org.obiba.opal.core.service;
 
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceUpdateListener;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
+import org.obiba.opal.core.event.DatasourceDeletedEvent;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
+import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
@@ -23,7 +22,7 @@ import java.nio.file.Paths;
 import java.util.stream.StreamSupport;
 
 @Component
-public class OpalAnalysisServiceImpl implements OpalAnalysisService, DatasourceUpdateListener, ValueTableUpdateListener {
+public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisServiceImpl.class);
 
@@ -125,44 +124,29 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService, DatasourceU
     }
   }
 
-  @Override
-  public void onUpdate(ValueTable vt, Iterable<Variable> vs) {
-
-  }
-
-  @Override
-  public void onRename(ValueTable vt, String newName) {
-
-  }
-
-  @Override
-  public void onRename(ValueTable vt, Variable v, String newName) {
-
-  }
-
-  @Override
-  public void onDelete(ValueTable vt) {
-    String datasourceName = vt.getDatasource().getName();
-    String valueTableName = vt.getName();
+  @Subscribe
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    String datasourceName = event.getValueTable().getDatasource().getName();
+    String valueTableName = event.getValueTable().getName();
     deleteAnalyses(datasourceName, valueTableName);
 
     try {
       DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(
-        Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName, valueTableName)
+          Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName, valueTableName)
       );
     } catch (IOException e) {
       logger.warn(e.getMessage());
     }
   }
 
-  @Override
-  public void onDelete(ValueTable vt, Variable v) {
-
+  @Subscribe
+  public void onValueTableRenamed(ValueTableRenamedEvent event) {
+    // TODO
   }
 
-  @Override
-  public void onDelete(Datasource datasource) {
-    String datasourceName = datasource.getName();
+  @Subscribe
+  public void onDatasourceDeleted(DatasourceDeletedEvent event) {
+    String datasourceName = event.getDatasource().getName();
     deleteAnalyses(datasourceName);
 
     try {

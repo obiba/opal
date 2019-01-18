@@ -10,14 +10,15 @@
 package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -64,11 +65,12 @@ public class DatasourceResource {
 
   private IndexManagerConfigurationService indexManagerConfigService;
 
-  private Set<DatasourceUpdateListener> datasourceUpdateListeners;
-
   private ViewDtos viewDtos;
 
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private EventBus eventBus;
 
   public void setName(String name) {
     this.name = name;
@@ -82,11 +84,6 @@ public class DatasourceResource {
   @Autowired
   public void setServerService(OpalGeneralConfigService serverService) {
     this.serverService = serverService;
-  }
-
-  @Autowired
-  public void setDatasourceUpdateListeners(Set<DatasourceUpdateListener> datasourceUpdateListeners) {
-    this.datasourceUpdateListeners = datasourceUpdateListeners;
   }
 
   @Autowired
@@ -123,11 +120,7 @@ public class DatasourceResource {
           .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound")).build();
     }
 
-    if(datasourceUpdateListeners != null) {
-      for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
-        listener.onDelete(ds);
-      }
-    }
+    getEventBus().post(new DatasourceDeletedEvent(ds));
 
     return Response.ok().build();
   }
@@ -246,4 +239,9 @@ public class DatasourceResource {
     // Get locales from server config
     return Sets.newHashSet(serverService.getConfig().getLocales());
   }
+
+  private EventBus getEventBus() {
+    return eventBus == null ? eventBus = new EventBus() : eventBus;
+  }
+
 }

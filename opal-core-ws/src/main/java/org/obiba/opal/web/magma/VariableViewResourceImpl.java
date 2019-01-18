@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import com.google.common.collect.Lists;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -16,7 +17,9 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
-import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.event.VariableDeletedEvent;
+import org.obiba.opal.core.event.VariableRenamedEvent;
+import org.obiba.opal.core.event.VariablesUpdatedEvent;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +70,7 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
       for (VariableValueSource v : view.getListClause().getVariableValueSources()) {
         Variable variable = v.getVariable();
         if (variable.getName().equals(getName())) {
-          for (ValueTableUpdateListener listener : getTableListeners()) {
-            listener.onDelete(getValueTable(), variable);
-          }
+          getEventBus().post(new VariableDeletedEvent(getValueTable(), variable));
           variableWriter.removeVariable(variable);
           VariableOperationContext operationContext = new VariableOperationContext();
           operationContext.deleteVariable(view, variable);
@@ -126,14 +127,16 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
       operationContext.addVariable(view, updatedVariable);
       variableWriter.writeVariable(updatedVariable);
       viewManager.addView(getDatasource().getName(), view, comment, operationContext);
+
+      // inform about update
+      List<Variable> variables = Lists.newArrayList(updatedVariable);
+      getEventBus().post(new VariablesUpdatedEvent(getValueTable(), variables));
     }
     return Response.ok().build();
   }
 
   private void renameVariable(Variable variable, String newName, ValueTable table, ValueTableWriter.VariableWriter variableWriter) {
-    for (ValueTableUpdateListener listener : getTableListeners()) {
-      listener.onRename(table, variable, newName);
-    }
+    getEventBus().post(new VariableRenamedEvent(table, variable, newName));
     variableWriter.removeVariable(variable);
   }
 

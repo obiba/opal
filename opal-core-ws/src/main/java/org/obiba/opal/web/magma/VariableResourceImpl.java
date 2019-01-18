@@ -10,9 +10,12 @@
 package org.obiba.opal.web.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
+import org.obiba.opal.core.event.VariableDeletedEvent;
+import org.obiba.opal.core.event.VariablesUpdatedEvent;
 import org.obiba.opal.web.magma.math.*;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -67,9 +70,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
     // The variable must exist
     Variable v = getValueTable().getVariable(name);
-    for (ValueTableUpdateListener listener : getTableListeners()) {
-      listener.onDelete(getValueTable(), v);
-    }
+    getEventBus().post(new VariableDeletedEvent(getValueTable(), v));
 
     try (ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
@@ -191,6 +192,10 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
          ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       variableWriter.writeVariable(updatedVariable);
+
+      // inform about update
+      List<Variable> variables = Lists.newArrayList(updatedVariable);
+      getEventBus().post(new VariablesUpdatedEvent(getValueTable(), variables));
       return Response.ok().build();
     }
   }

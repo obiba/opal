@@ -9,19 +9,17 @@
  */
 package org.obiba.opal.search;
 
+import com.google.common.eventbus.Subscribe;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
-import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.event.ValueTableDeletedEvent;
+import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
-
 @Component
-public class IndexManagerConfigurationService implements ValueTableUpdateListener {
+public class IndexManagerConfigurationService {
 
   private final ExtensionConfigurationSupplier<IndexManagerConfiguration> configSupplier;
 
@@ -67,28 +65,14 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
     configSupplier.addExtension(config);
   }
 
-  @Override
-  public void onRename(@NotNull ValueTable vt, String newName) {
-    onDelete(vt);
+  @Subscribe
+  public void onValueTableRenamed(ValueTableRenamedEvent event) {
+    remove(event.getValueTable());
   }
 
-  @Override
-  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
-    // does not affect scheduling
+  @Subscribe
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    remove(event.getValueTable());
   }
 
-  @Override
-  public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
-    // does not affect scheduling
-  }
-
-  @Override
-  public void onDelete(@NotNull ValueTable vt) {
-    remove(vt);
-  }
-
-  @Override
-  public void onDelete(@NotNull ValueTable vt, Variable v) {
-    // does not affect scheduling
-  }
 }

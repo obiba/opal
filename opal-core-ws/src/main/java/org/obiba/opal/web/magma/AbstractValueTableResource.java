@@ -12,13 +12,13 @@ package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
-import com.google.common.collect.Sets;
-import org.obiba.opal.core.ValueTableUpdateListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -34,7 +34,7 @@ abstract class AbstractValueTableResource {
   ApplicationContext applicationContext;
 
   @Autowired
-  private Collection<ValueTableUpdateListener> tableListeners;
+  private EventBus eventBus;
 
   @Autowired
   void setApplicationContext(ApplicationContext applicationContext) {
@@ -49,8 +49,8 @@ abstract class AbstractValueTableResource {
     this.valueTable = valueTable;
   }
 
-  public Collection<ValueTableUpdateListener> getTableListeners() {
-    return tableListeners == null ? Lists.newArrayList() : tableListeners;
+  public EventBus getEventBus() {
+    return eventBus == null ? eventBus = new EventBus() : eventBus;
   }
 
   public ValueTable getValueTable() {

@@ -10,10 +10,10 @@
 package org.obiba.opal.search.service;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.ValueTableUpdateListener;
-import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
@@ -21,8 +21,8 @@ import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
-import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.search.*;
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.ThreadFactory;
 
 @Component
-public class OpalSearchService implements Service, ValueTableUpdateListener {
+public class OpalSearchService implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalSearchService.class);
 
@@ -244,34 +244,39 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     return opalRuntime.hasServicePlugins(SearchService.class);
   }
 
-  @Override
-  public void onRename(@NotNull ValueTable vt, String newName) {
-    onDelete(vt);
+  @Subscribe
+  public void onValueTableRenamed(ValueTableRenamedEvent event) {
+    remove(event.getValueTable());
   }
 
-  @Override
-  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
+  @Subscribe
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    remove(event.getValueTable());
+  }
+
+  @Subscribe
+  public void onVariableRenamed(VariableRenamedEvent event) {
+    remove(event.getValueTable());
+  }
+
+  @Subscribe
+  public void onVariableDeleted(VariableDeletedEvent event) {
+    remove(event.getValueTable());
+  }
+
+  @Subscribe
+  public void onVariablesUpdated(VariablesUpdatedEvent event) {
     // to ensure variable search is correct
-    getVariablesIndexManager().getIndex(vt).delete();
+    getVariablesIndexManager().getIndex(event.getValueTable()).delete();
     // synchronize variable index
-    synchroManager.synchronizeIndex(getVariablesIndexManager(), vt);
+    synchroManager.synchronizeIndex(getVariablesIndexManager(), event.getValueTable());
   }
 
-  @Override
-  public void onRename(ValueTable vt, Variable v, String newName) {
-    onDelete(vt);
-  }
-
-  @Override
-  public void onDelete(@NotNull ValueTable vt) {
+  private void remove(@NotNull ValueTable vt) {
     if (!isRunning()) return;
     // Delete index
     getValuesIndexManager().getIndex(vt).delete();
     getVariablesIndexManager().getIndex(vt).delete();
   }
 
-  @Override
-  public void onDelete(@NotNull ValueTable vt, Variable v) {
-    onDelete(vt);
-  }
 }

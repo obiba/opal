@@ -10,7 +10,40 @@
 
 package org.obiba.opal.core.service;
 
-import java.sql.SQLException;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.cache.*;
+import com.google.common.collect.*;
+import com.google.common.eventbus.Subscribe;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
+import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.SocketFactoryProvider;
+import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
+import org.obiba.magma.support.EntitiesPredicate;
+import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbSettings;
+import org.obiba.opal.core.domain.database.SqlSettings;
+import org.obiba.opal.core.event.DatasourceDeletedEvent;
+import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
+import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
+import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.database.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -19,57 +52,11 @@ import javax.sql.DataSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-
-import org.apache.commons.dbcp.BasicDataSource;
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.obiba.magma.*;
-import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
-import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
-import org.obiba.magma.support.EntitiesPredicate;
-import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbSettings;
-import org.obiba.opal.core.domain.database.SqlSettings;
-import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
-import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
-import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasourceException;
-import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
-import org.obiba.opal.core.service.database.DatabaseRegistry;
-import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
-import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
-import org.obiba.opal.core.service.database.NoSuchDatabaseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.jta.JtaTransactionManager;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
+import java.sql.SQLException;
 
 @Component
 @SuppressWarnings("OverlyCoupledClass")
-public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpdateListener {
+public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
 
@@ -84,9 +71,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
-
-  @Autowired
-  private JtaTransactionManager jtaTransactionManager;
 
   @Autowired
   private SocketFactoryProvider socketFactoryProvider;
@@ -353,12 +337,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }
 
-  @Override
-  public void onDelete(@NotNull Datasource datasource) {
+  @Subscribe
+  public void onDatasourceDeleted(DatasourceDeletedEvent event) {
     //Remove from registrations
     ImmutableList<String> keys = ImmutableList.copyOf(registrations.keySet());
     for(String key : keys) {
-      registrations.remove(key, datasource.getName());
+      registrations.remove(key, event.getDatasource().getName());
     }
   }
 
