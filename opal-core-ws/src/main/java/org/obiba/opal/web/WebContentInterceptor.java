@@ -27,10 +27,14 @@ public class WebContentInterceptor implements RequestCyclePostProcess {
 
     @Override
     public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
-        MultivaluedMap<String, String> map = response.getStringHeaders();
-        //making sure IE doesn't cache: https://support.microsoft.com/en-us/kb/234067
-        map.put("Expires", Collections.singletonList("-1"));
-        map.put("Cache-Control", Collections.singletonList("no-cache"));
-        map.put("Pragma", Collections.singletonList("no-cache"));
+        try {
+            MultivaluedMap<String, Object> map = response.getHeaders();
+            //making sure IE doesn't cache: https://support.microsoft.com/en-us/kb/234067
+            map.put("Expires", Collections.singletonList("-1"));
+            map.put("Cache-Control", Collections.singletonList("no-cache"));
+            map.put("Pragma", Collections.singletonList("no-cache"));
+        } catch (Exception e) {
+            // ignored
+        }
     }
 }
