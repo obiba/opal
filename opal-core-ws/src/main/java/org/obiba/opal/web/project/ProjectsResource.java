@@ -17,10 +17,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -43,12 +45,13 @@ public class ProjectsResource {
   @NoAuthorization
   public List<Projects.ProjectDto> getProjects(@QueryParam("digest") @DefaultValue("false") boolean digest) {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
-    for(Project project : projectService.getProjects()) {
+    for (Project project : projectService.getProjects()) {
       try {
-        projects.add(
-          digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService.getProjectDirectoryPath(project))
-        );
-      } catch(NoSuchDatasourceException e) {
+        if (MagmaEngine.get().hasDatasource(project.getName())) {
+          projects.add(
+              digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
+        }
+      } catch (NoSuchDatasourceException e) {
         // ignore
       }
     }
@@ -59,8 +62,8 @@ public class ProjectsResource {
   public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
     Project project = Dtos.fromDto(projectFactoryDto);
     // verify project does not exists
-    if(projectService.hasProject(project.getName())) throw new IllegalArgumentException("Project already exists");
-    
+    if (projectService.hasProject(project.getName())) throw new IllegalArgumentException("Project already exists");
+
     projectService.save(project);
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
     return Response.created(projectUri)
