@@ -125,6 +125,7 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
   private void setDefaultCharset() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .accept("text/plain")
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override

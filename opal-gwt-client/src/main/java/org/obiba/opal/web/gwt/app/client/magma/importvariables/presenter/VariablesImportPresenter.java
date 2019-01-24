@@ -190,6 +190,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private void setDefaultCharset() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .accept("text/plain")
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override

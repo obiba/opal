@@ -117,6 +117,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
   public void getDefaultCharset() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .accept("text/plain")
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override

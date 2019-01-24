@@ -339,6 +339,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private void refreshApplicationName() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_NAME.create().build()) //
+        .accept("text/plain")
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override

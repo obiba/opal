@@ -146,6 +146,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   private void refreshApplicationName() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_NAME.create().build()) //
+        .accept("text/plain")
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override
