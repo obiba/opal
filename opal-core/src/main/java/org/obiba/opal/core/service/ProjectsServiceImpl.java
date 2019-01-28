@@ -254,13 +254,22 @@ public class ProjectsServiceImpl implements ProjectService {
   @Subscribe
   public void onValueTable(ValueTableEvent event) {
     if (event instanceof ValueTableAddedEvent) return;
-    Project project = getProject(event.getValueTable().getDatasource().getName());
-    save(project);
+    try {
+      Project project = getProject(event.getValueTable().getDatasource().getName());
+      save(project);
+    } catch(Exception e) {
+      log.warn(e.getMessage());
+    }
   }
 
   @Subscribe
   public void onValueTableAdded(ValueTableAddedEvent event) {
+    try {
     Project project = getProject(event.getDatasourceName());
     save(project);
+
+    } catch(Exception e) {
+      log.warn(e.getMessage());
+    }
   }
 }
