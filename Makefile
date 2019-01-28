@@ -1,7 +1,7 @@
 ##
 ## Makefile for Opal developers
 ##
-version=2.13-SNAPSHOT
+version=2.14-SNAPSHOT
 #magma_version=1.19-SNAPSHOT
 #version=2.12-SNAPSHOT
 magma_version=1.18-SNAPSHOT
