@@ -88,6 +88,7 @@ public class OpalJettyServer {
   }
 
   private void init() throws IOException, URISyntaxException {
+    // LOGJAM
     System.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
     jettyServer = new Server();
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
