@@ -136,7 +136,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
         identifiersTable.getName(), builder.build(), identifiersTable.getEntityType());
 
     // Don't copy null values otherwise, we'll delete existing mappings
-    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().dontCopyMetadata().withLoggingListener().build()
         .copy(sourceIdentifiersTable, identifiersTableService.getDatasource());
   }
 
@@ -151,7 +151,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
     }
 
     // Don't copy null values otherwise, we'll delete existing mappings
-    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().dontCopyMetadata().withLoggingListener().build()
         .copy(sourceIdentifiersTable, identifiersTableService.getDatasource());
   }
 }
