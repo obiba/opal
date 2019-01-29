@@ -5,6 +5,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DateType;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPString;
 
@@ -19,12 +20,12 @@ public class DateVectorType extends VectorType {
 
   @Override
   protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-    int ints[] = new int[values.size()];
+    double doubles[] = new double[values.size()];
     int i = 0;
     for (Value value : values) {
       // do not support categories in this type
       if (value.isNull()) {
-        ints[i++] = REXPInteger.NA;
+        doubles[i++] = REXPInteger.NA;
       } else {
         Object val = value.getValue();
         Date date;
@@ -34,10 +35,10 @@ public class DateVectorType extends VectorType {
           date = (Date) val;
         }
         double d = ((double)date.getTime()) / (24 * 3600 * 1000);
-        ints[i++] = Long.valueOf(Math.round(d)).intValue();
+        doubles[i++] = d;
       }
     }
-    return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
+    return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null, withLabelled));
   }
 
   @Override
