@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreateUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -72,16 +74,16 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   }
 
   private void initWidgets() {
-    allPkg.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+    allPkg.addClickHandler(new ClickHandler() {
       @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        name.setEnabled(!event.getValue());
+      public void onClick(ClickEvent event) {
+        name.setEnabled(!allPkg.getValue());
       }
     });
-    namedPkg.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+    namedPkg.addClickHandler(new ClickHandler() {
       @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        name.setEnabled(event.getValue());
+      public void onClick(ClickEvent event) {
+        name.setEnabled(namedPkg.getValue());
       }
     });
     allPkg.setValue(true, true);

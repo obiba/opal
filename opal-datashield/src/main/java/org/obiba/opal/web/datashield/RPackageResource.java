@@ -74,27 +74,41 @@ public abstract class RPackageResource {
   }
 
   protected RScriptROperation removePackage(String name) {
+    checkAlphanumeric(name);
     String cmd = "remove.packages('" + name + "')";
     return execute(cmd);
-  }
-
-  protected RScriptROperation installPackage(String name) {
-    RScriptROperation rval = execute(getInstallPackagesCommand(name));
-    restartRServer();
-    return rval;
   }
 
   protected RScriptROperation installDatashieldPackage(String name, String ref) {
     String cmd;
     if(Strings.isNullOrEmpty(ref)) {
+      checkAlphanumeric(name);
       cmd = getInstallPackagesCommand(name);
     } else {
       execute(getInstallDevtoolsPackageCommand());
-      cmd = getInstallGitHubCommand(name, "datashield", ref);
+      if (name.contains("/")) {
+        String[] parts = name.split("/");
+        checkAlphanumeric(parts[0]);
+        checkAlphanumeric(parts[1]);
+        cmd = getInstallGitHubCommand(parts[1], parts[0], ref);
+      } else {
+        checkAlphanumeric(name);
+        cmd = getInstallGitHubCommand(name, "datashield", ref);
+      }
     }
     RScriptROperation rval = execute(cmd);
     restartRServer();
     return rval;
+  }
+
+  /**
+   * Simple security check: the provided name (package name or Github user/organization name) must be alphanumeric.
+   *
+   * @param name
+   */
+  private void checkAlphanumeric(String name) {
+    if (!name.matches("[a-zA-Z0-9]+"))
+      throw new IllegalArgumentException("Not a valid name: " + name);
   }
 
   private void restartRServer() {
@@ -120,7 +134,7 @@ public abstract class RPackageResource {
   }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
-    return String.format("devtools::install_github('%s/%s', ref='%s')", username, name, ref);
+    return String.format("devtools::install_github('%s/%s', ref='%s', dependencies=TRUE)", username, name, ref);
   }
 
   protected RScriptROperation execute(String rscript) {
