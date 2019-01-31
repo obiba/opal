@@ -24,7 +24,7 @@ public class DateTimeVectorType extends VectorType {
     for (Value value : values) {
       // do not support categories in this type
       if (value.isNull()) {
-        doubles[i++] = REXPInteger.NA;
+        doubles[i++] = REXPDouble.NA;
       } else {
         Date d = (Date) value.getValue();
         double t = ((double)d.getTime()) / 1000;

@@ -25,7 +25,7 @@ public class DateVectorType extends VectorType {
     for (Value value : values) {
       // do not support categories in this type
       if (value.isNull()) {
-        doubles[i++] = REXPInteger.NA;
+        doubles[i++] = REXPDouble.NA;
       } else {
         Object val = value.getValue();
         Date date;
