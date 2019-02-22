@@ -409,6 +409,7 @@ public interface Translations extends Constants {
       "SpssFileRequired", "A SPSS file is required.", //
       "RSPSSFileRequired", "A SPSS file is required.", //
       "RSASFileRequired", "A SAS file is required.", //
+      "RXPTFileRequired", "A SAS Transport file is required.", //
       "RStataFileRequired", "A Stata file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and sav.",//
@@ -818,6 +819,14 @@ public interface Translations extends Constants {
   @Description("RSAS help")
   @DefaultStringValue("Data in SAS format are packaged in a file with suffix .sas7bdat. If there is a file in the parent folder with same base name and suffix .sas7bcat, it will be automatically used as the catalog file.")
   String rSASHelp();
+
+  @Description("RXPT label")
+  @DefaultStringValue("XPT (R)")
+  String rXPTLabel();
+
+  @Description("RSAS help")
+  @DefaultStringValue("Data in SAS Transport format are packaged in a file with suffix .xpt.")
+  String rXPTHelp();
 
   @Description("RStata label")
   @DefaultStringValue("Stata (R)")

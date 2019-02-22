@@ -104,6 +104,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   FlowPanel helpRSASHaven;
 
   @UiField
+  FlowPanel helpRXPTHaven;
+
+  @UiField
   FlowPanel helpRSPSSHaven;
 
   @UiField
@@ -218,6 +221,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
     formatChooser.addItemToGroup(translations.rSPSSLabel(), ImportFormat.RSPSS.name());
     formatChooser.addItemToGroup(translations.rSASLabel(), ImportFormat.RSAS.name());
+    formatChooser.addItemToGroup(translations.rXPTLabel(), ImportFormat.RXPT.name());
     formatChooser.addItemToGroup(translations.rStataLabel(), ImportFormat.RSTATA.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
@@ -425,6 +429,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
           break;
         case RSAS:
           helpRSASHaven.setVisible(true);
+          break;
+        case RXPT:
+          helpRXPTHaven.setVisible(true);
           break;
         case RSPSS:
           helpRSPSSHaven.setVisible(true);

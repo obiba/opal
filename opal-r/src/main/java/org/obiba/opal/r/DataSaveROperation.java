@@ -26,6 +26,8 @@ public class DataSaveROperation extends AbstractROperation {
 
     SAS("haven::write_sas","sas7bdat"),
 
+    XPT("haven::write_xpt","xpt"),
+
     DTA("haven::write_dta","dta"),
 
     SAV("haven::write_sav","sav"),

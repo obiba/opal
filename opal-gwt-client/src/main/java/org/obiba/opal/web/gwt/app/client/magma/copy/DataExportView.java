@@ -132,6 +132,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     dataFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
     dataFormat.addItemToGroup(translations.rSPSSLabel(), ImportConfig.ImportFormat.RSPSS.name());
     dataFormat.addItemToGroup(translations.rSASLabel(), ImportConfig.ImportFormat.RSAS.name());
+    dataFormat.addItemToGroup(translations.rXPTLabel(), ImportConfig.ImportFormat.RXPT.name());
     dataFormat.addItemToGroup(translations.rStataLabel(), ImportConfig.ImportFormat.RSTATA.name());
     dataFormat.addGroup(translations.remoteServerBasedDatasources());
     dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
@@ -288,6 +289,9 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
       return fileSelection.getFile() + suffix + ".sav";
     } else if(ImportConfig.ImportFormat.RSAS.name().equals(getDataFormat())) {
       return fileSelection.getFile() + suffix + ".sas7bdat";
+    } else if(ImportConfig.ImportFormat.RXPT.name().equals(getDataFormat())) {
+      suffix = suffix.replaceAll("-", "_");
+      return fileSelection.getFile() + suffix + ".xpt";
     } else if(ImportConfig.ImportFormat.RSTATA.name().equals(getDataFormat())) {
       return fileSelection.getFile() + suffix + ".dta";
     }

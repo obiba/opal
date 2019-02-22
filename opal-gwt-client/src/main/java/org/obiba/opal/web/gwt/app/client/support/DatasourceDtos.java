@@ -57,6 +57,7 @@ public class DatasourceDtos {
         return createRestDatasourceFactoryDto(importConfig);
       case RSPSS:
       case RSAS:
+      case RXPT:
       case RSTATA:
         return createRHavenDatasourceFactoryDto(importConfig);
       case FROM_PLUGIN:
