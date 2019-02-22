@@ -24,6 +24,8 @@ public class DataReadROperation extends AbstractROperation {
 
     SAS("haven::read_sas","sas7bdat"),
 
+    XPT("haven::read_xpt","xpt"),
+
     DTA("haven::read_dta","dta"),
 
     SPSS("haven::read_spss","sav", "zsav", "por") {

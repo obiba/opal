@@ -151,6 +151,8 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
           switch(importFormat) {
             case RSAS:
               return "RSASFileRequired";
+            case RXPT:
+              return "RXPTFileRequired";
             case RSPSS:
               return "RSPSSFileRequired";
             case RSTATA:
@@ -178,6 +180,8 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
             return path.endsWith(".sav");
           if (ImportFormat.RSAS.equals(importFormat))
             return path.endsWith(".sas7bdat");
+          if (ImportFormat.RXPT.equals(importFormat))
+            return path.endsWith(".xpt");
           return path.endsWith(".dta");
         }
       };
