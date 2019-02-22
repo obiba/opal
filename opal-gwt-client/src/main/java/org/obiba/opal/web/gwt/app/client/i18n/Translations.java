@@ -821,7 +821,7 @@ public interface Translations extends Constants {
   String rSASHelp();
 
   @Description("RXPT label")
-  @DefaultStringValue("XPT (R)")
+  @DefaultStringValue("SAS Transport (R)")
   String rXPTLabel();
 
   @Description("RSAS help")
