@@ -11,6 +11,7 @@ package org.obiba.opal.spi.r;
 
 import org.rosuda.REngine.REXPRaw;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -24,7 +25,7 @@ public class DataAssignROperation extends AbstractROperation {
 
   public DataAssignROperation(String symbol, String base64Content) {
     this.symbol = symbol;
-    this.content = Base64.getDecoder().decode(base64Content);
+    this.content = Base64.getDecoder().decode(base64Content.replaceAll("\\n", "").replaceAll("\\r", ""));
   }
 
   @Override
