@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield.support;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 
@@ -16,7 +17,7 @@ import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
  *
  */
 public abstract class AbstractDataShieldMethodConverter implements DataShieldMethodConverter {
-  protected DataShieldMethodDto.Builder getDataShieldMethodDtoBuilder(DataShieldMethod method) {
+  protected DataShieldMethodDto.Builder getDataShieldMethodDtoBuilder(DSMethod method) {
     return DataShieldMethodDto.newBuilder().setName(method.getName());
   }
 }

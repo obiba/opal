@@ -16,11 +16,12 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import org.obiba.datashield.core.DSOption;
 import org.springframework.util.StringUtils;
 
 public class DataShieldROptionsScriptBuilder {
 
-  private Iterable<Map.Entry<String, String>> rOptions;
+  private Iterable<DSOption> rOptions;
 
   private DataShieldROptionsScriptBuilder() {}
 
@@ -28,7 +29,7 @@ public class DataShieldROptionsScriptBuilder {
     return new DataShieldROptionsScriptBuilder();
   }
 
-  public DataShieldROptionsScriptBuilder setROptions(Iterable<Map.Entry<String, String>> options) {
+  public DataShieldROptionsScriptBuilder setROptions(Iterable<DSOption> options) {
     rOptions = options;
     return this;
   }
@@ -37,8 +38,8 @@ public class DataShieldROptionsScriptBuilder {
     if (!rOptions.iterator().hasNext()) return "";
 
     Collection<String> options = new ArrayList<>();
-    for(Map.Entry<String, String> entry : rOptions) {
-      options.add(entry.getKey() + "=" + formatValue(entry.getValue()));
+    for(DSOption entry : rOptions) {
+      options.add(entry.getName() + "=" + formatValue(entry.getValue()));
     }
 
     return String.format("options(%s)", StringUtils.collectionToCommaDelimitedString(options));

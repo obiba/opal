@@ -10,16 +10,17 @@
 
 package org.obiba.opal.datashield.expr.web.support;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.obiba.datashield.core.impl.DefaultDSOption;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class DataShiledROptionsBuilderTest {
+public class DataShieldROptionsBuilderTest {
 
 
   @Test
@@ -77,9 +78,8 @@ public class DataShiledROptionsBuilderTest {
 
   @Test
   public void test_emptyOptions() {
-    Map<String, String> options = new HashMap<>();
     DataShieldROptionsScriptBuilder builder = DataShieldROptionsScriptBuilder.newBuilder()
-        .setROptions(options.entrySet());
+        .setROptions(Lists.newArrayList());
     assertThat(builder.build()).isEqualTo("");
   }
 
@@ -94,9 +94,9 @@ public class DataShiledROptionsBuilderTest {
 
   private void testOption(String value, String expectedValue) {
     String expected = String.format("options(var=%s)", expectedValue);
-    Map<String, String> options = new HashMap<>(); options.put("var", value);
     DataShieldROptionsScriptBuilder builder = DataShieldROptionsScriptBuilder.newBuilder()
-        .setROptions(options.entrySet());
+        .setROptions(Collections.singletonList(new DefaultDSOption("var", value) {
+        }));
     assertThat(builder.build()).isEqualTo(expected);
   }
 

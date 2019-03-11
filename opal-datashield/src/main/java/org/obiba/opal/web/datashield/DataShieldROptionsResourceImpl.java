@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
+import org.obiba.datashield.core.DSOption;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.web.model.DataShield;
@@ -42,8 +43,8 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
     DatashieldConfiguration config = configurationSupplier.get();
 
-    for(Map.Entry<String, String> entry : config.getOptions()) {
-      options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getKey())//
+    for(DSOption entry : config.getOptions()) {
+      options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getName())//
           .setValue(entry.getValue()).build());
     }
 

@@ -9,20 +9,20 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.datashield.core.NoSuchDSMethodException;
+import org.springframework.stereotype.Component;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
-import org.springframework.stereotype.Component;
-
 @Component
 @Provider
-public class NoSuchDataShieldMethodExceptionMapper implements ExceptionMapper<NoSuchDataShieldMethodException> {
+public class NoSuchDSMethodExceptionMapper implements ExceptionMapper<NoSuchDSMethodException> {
 
   @Override
-  public Response toResponse(NoSuchDataShieldMethodException exception) {
+  public Response toResponse(NoSuchDSMethodException exception) {
     return Response.status(Status.NOT_FOUND).build();
   }
 

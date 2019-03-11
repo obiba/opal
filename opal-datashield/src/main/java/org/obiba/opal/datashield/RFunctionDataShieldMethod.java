@@ -9,27 +9,12 @@
  */
 package org.obiba.opal.datashield;
 
-import javax.annotation.Nullable;
-
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.impl.PackagedFunctionDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
-public class RFunctionDataShieldMethod implements DataShieldMethod {
-
-  private String name;
-
-  private String function;
-
-  /**
-   * R package that defined this method.
-   */
-  private String rPackage;
-
-  /**
-   * Version of the R package.
-   */
-  private String version;
+public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implements DataShieldMethod {
 
   public RFunctionDataShieldMethod() {
   }
@@ -39,42 +24,12 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
   }
 
   public RFunctionDataShieldMethod(String name, String function, String rPackage, String version) {
-    this.name = name;
-    this.function = function;
-    this.rPackage = rPackage;
-    this.version = version;
+    super(name, function, rPackage, version);
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  public String getFunction() {
-    return function;
-  }
-
-  public boolean hasRPackage() {
-    return rPackage != null;
-  }
-
-  @Nullable
-  public String getRPackage() {
-    return rPackage;
-  }
-
-  @Nullable
-  public String getVersion() {
-    return version;
-  }
-
-  @Override
-  public ROperation assign(Environment env) {
+  public ROperation assign(DSMethodType env) {
     return ROperations.noOp();
   }
 
-  @Override
-  public String invoke(Environment env) {
-    return getFunction();
-  }
 }

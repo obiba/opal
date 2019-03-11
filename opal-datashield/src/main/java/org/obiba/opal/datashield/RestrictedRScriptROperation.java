@@ -9,21 +9,22 @@
  */
 package org.obiba.opal.datashield;
 
-import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
-import org.obiba.opal.datashield.expr.ParseException;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.r.expr.DSRScriptValidator;
+import org.obiba.datashield.r.expr.ParseException;
 
 /**
  * Parses a restricted R script, executes it and stores the result.
  */
 public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROperation {
 
-  public RestrictedRScriptROperation(String script, DataShieldEnvironment environment,
-      DataShieldScriptValidator validator) throws ParseException {
+  public RestrictedRScriptROperation(String script, DSEnvironment environment,
+      DSRScriptValidator validator) throws ParseException {
     super(script, environment, validator);
   }
 
-  public RestrictedRScriptROperation(String script, DataShieldEnvironment environment) throws ParseException {
-    this(script, environment, new DataShieldScriptValidator());
+  public RestrictedRScriptROperation(String script, DSEnvironment environment) throws ParseException {
+    this(script, environment, new DSRScriptValidator());
   }
 
   @Override

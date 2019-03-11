@@ -9,102 +9,22 @@
  */
 package org.obiba.opal.datashield;
 
-import java.util.List;
-
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
+import com.google.common.collect.ImmutableList;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.impl.DefaultDSEnvironment;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.util.stream.Collectors;
 
-public class DataShieldEnvironment {
-
-  private Environment environment;
-
-  private List<DataShieldMethod> methods;
+public class DataShieldEnvironment extends DefaultDSEnvironment {
 
   // XStream ctor
   public DataShieldEnvironment() {
-
   }
 
-  public DataShieldEnvironment(Environment environment, List<DataShieldMethod> methods) {
-    Preconditions.checkArgument(environment != null);
-    Preconditions.checkArgument(methods != null);
-    this.environment = environment;
-    this.methods = Lists.newArrayList(methods);
-  }
-
-  public Environment getEnvironment() {
-    return environment;
-  }
-
-  /**
-   * Get the registered methods.
-   *
-   * @return
-   */
-  public List<DataShieldMethod> getMethods() {
-    return ImmutableList.copyOf(methods);
-  }
-
-  /**
-   * Add or replace the provide method.
-   *
-   * @param method
-   */
-  public void addMethod(DataShieldMethod method) {
-    for(DataShieldMethod m : getMethods()) {
-      if(m.getName().equals(method.getName())) {
-        methods.remove(m);
-        break;
-      }
-    }
-    methods.add(method);
-  }
-
-  /**
-   * Remove the method with the given name.
-   *
-   * @param name
-   * @throws NoSuchDataShieldMethodException
-   */
-  public void removeMethod(String name) {
-    methods.remove(getMethod(name));
-  }
-
-  /**
-   * Check if there is a method with the given name.
-   *
-   * @param name
-   * @return
-   */
-  public boolean hasMethod(String name) {
-    for(DataShieldMethod method : methods) {
-      if(method.getName().equals(name)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Get the method with from its name.
-   *
-   * @param name
-   * @return
-   * @throws NoSuchDataShieldMethodException
-   */
-  public DataShieldMethod getMethod(String name) {
-    for(DataShieldMethod method : methods) {
-      if(method.getName().equals(name)) {
-        return method;
-      }
-    }
-    throw new NoSuchDataShieldMethodException(name);
+  public DataShieldEnvironment(DSMethodType type) {
+    super(type);
   }
 
   /**
@@ -117,14 +37,15 @@ public class DataShieldEnvironment {
    */
   public Iterable<ROperation> prepareOps() {
     return ImmutableList.<ROperation>builder()//
-        .add(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null))//
-        .add(ROperations.assign(environment.symbol(), "base::new.env()"))//
-        .addAll(Iterables.transform(getMethods(), input -> input.assign(environment)))//
+        .add(ROperations.eval(String.format("base::rm(%s)", getMethodType().symbol()), null))
+        .add(ROperations.assign(getMethodType().symbol(), "base::new.env()"))
+        .addAll(getMethods().stream().map(input -> ((DataShieldMethod) input).assign(getMethodType())).collect(Collectors.toList()))//
             // Protect the contents of the environment
-        .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null))//
+        .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", getMethodType().symbol()), null))//
             // Protect the contents of the environment
         .add(
-            ROperations.eval(String.format("base::lockBinding('%s', base::environment())", environment.symbol()), null))
+            ROperations.eval(String.format("base::lockBinding('%s', base::environment())", getMethodType().symbol()), null))
         .build();
   }
+
 }

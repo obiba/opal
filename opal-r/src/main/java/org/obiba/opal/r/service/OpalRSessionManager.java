@@ -12,12 +12,13 @@ package org.obiba.opal.r.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -40,7 +41,7 @@ import java.util.*;
  * R session created or a R session explicitly set.
  */
 @Component
-public class OpalRSessionManager implements ServiceListener<OpalRService> {
+public class OpalRSessionManager {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
@@ -70,17 +71,15 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   @Autowired
   public void setOpalRService(OpalRService opalRService) {
     this.opalRService = opalRService;
-    opalRService.addListener(this);
   }
 
-  @Override
-  public void onServiceStart(OpalRService service) {
-
-  }
-
-  @Override
-  public void onServiceStop(OpalRService service) {
-    stop();
+  @Subscribe
+  public void onRServiceStopped(RServiceStoppedEvent event) {
+    try {
+      stop();
+    } catch(Exception e) {
+      log.warn("Error while stopping R session manager", e);
+    }
   }
 
   /**

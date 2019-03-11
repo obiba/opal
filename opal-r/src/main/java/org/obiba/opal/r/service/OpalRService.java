@@ -9,12 +9,12 @@
  */
 package org.obiba.opal.r.service;
 
-import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.core.runtime.HasServiceListener;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.core.runtime.ServiceListener;
+import org.obiba.opal.r.service.event.RServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.RRuntimeException;
@@ -22,18 +22,17 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 /**
  * Gets connection to the R server.
  */
 @Component
-public class OpalRService implements Service, ROperationTemplate, HasServiceListener<OpalRService> {
+public class OpalRService implements Service, ROperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
@@ -57,24 +56,8 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   @Value("${org.obiba.opal.Rserve.encoding}")
   private String encoding;
 
-  private final List<ServiceListener<OpalRService>> listeners = Lists.newArrayList();
-
-  @Override
-  public void addListener(ServiceListener<OpalRService> listener) {
-    listeners.add(listener);
-  }
-
-  private void notifyListenersOnStart() {
-    for(ServiceListener<OpalRService> listener : listeners) {
-      listener.onServiceStart(this);
-    }
-  }
-
-  private void notifyListenersOnStop() {
-    for(ServiceListener<OpalRService> listener : listeners) {
-      listener.onServiceStop(this);
-    }
-  }
+  @Autowired
+  private EventBus eventBus;
 
   /**
    * Creates a new connection to R server.
@@ -135,7 +118,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     } catch(RestClientException e) {
       log.warn("Error when starting R server: " + e.getMessage());
     }
-    notifyListenersOnStart();
+    eventBus.post(new RServiceStartedEvent());
   }
 
   @Override
@@ -146,7 +129,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     } catch(RestClientException e) {
       log.warn("Error when stopping R server: " + e.getMessage());
     }
-    notifyListenersOnStop();
+    eventBus.post(new RServiceStoppedEvent());
   }
 
   @Override

@@ -15,10 +15,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
@@ -65,7 +65,7 @@ public class DataShieldResource {
   @Path("/env/{name}")
   public DataShieldEnvironmentResource getEnvironment(@PathParam("name") String env) {
     DataShieldEnvironmentResource resource = applicationContext.getBean(DataShieldEnvironmentResource.class);
-    resource.setEnvironment(Environment.valueOf(env.toUpperCase()));
+    resource.setMethodType(DSMethodType.valueOf(env.toUpperCase()));
     return resource;
   }
 

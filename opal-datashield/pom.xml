@@ -43,6 +43,14 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-ws</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.datashield</groupId>
+      <artifactId>ds4j-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.datashield</groupId>
+      <artifactId>ds4j-r</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -54,21 +62,6 @@
           <failOnError>false</failOnError>
           <excludeFilterFile>src/main/findbugs/exclude.xml</excludeFilterFile>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>jjtree-javacc</id>
-            <goals>
-              <goal>jjtree-javacc</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

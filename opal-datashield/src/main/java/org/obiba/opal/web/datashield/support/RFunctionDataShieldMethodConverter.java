@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield.support;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.RFunctionDataShieldMethod;
 import org.obiba.opal.web.model.DataShield;
@@ -35,17 +36,17 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
   }
 
   @Override
-  public boolean accept(DataShieldMethod method) {
+  public boolean accept(DSMethod method) {
     return method instanceof RFunctionDataShieldMethod;
   }
 
   @Override
-  public DataShieldMethodDto asDto(DataShieldMethod method) {
+  public DataShieldMethodDto asDto(DSMethod method) {
     RFunctionDataShieldMethod rFunctionMethod = (RFunctionDataShieldMethod) method;
     RFunctionDataShieldMethodDto.Builder builder = DataShield.RFunctionDataShieldMethodDto.newBuilder()
         .setFunc(rFunctionMethod.getFunction());
-    if(rFunctionMethod.hasRPackage()) {
-      builder.setRPackage(rFunctionMethod.getRPackage());
+    if(rFunctionMethod.hasPackage()) {
+      builder.setRPackage(rFunctionMethod.getPackage());
       builder.setVersion(rFunctionMethod.getVersion());
     }
     return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RFunctionDataShieldMethodDto.method, builder.build()).build();

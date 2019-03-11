@@ -9,18 +9,15 @@
  */
 package org.obiba.opal.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
+import org.obiba.datashield.core.DSMethod;
+import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.spi.r.ROperation;
 
 /**
  * Interface to be implemented by methods that can be executed through datashield
  */
-public interface DataShieldMethod {
+public interface DataShieldMethod extends DSMethod {
 
-  String getName();
-
-  ROperation assign(Environment env);
-
-  String invoke(Environment env);
+  ROperation assign(DSMethodType env);
 
 }

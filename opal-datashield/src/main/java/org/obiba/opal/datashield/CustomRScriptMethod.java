@@ -9,42 +9,24 @@
  */
 package org.obiba.opal.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.impl.ScriptDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
-public class CustomRScriptMethod implements DataShieldMethod {
-
-  private String name;
-
-  private String script;
+public class CustomRScriptMethod extends ScriptDSMethod implements DataShieldMethod {
 
   public CustomRScriptMethod() {
 
   }
 
   public CustomRScriptMethod(String name, String script) {
-    this.name = name;
-    this.script = script;
+    super(name, script);
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  public String getScript() {
-    return script;
-  }
-
-  @Override
-  public ROperation assign(Environment env) {
+  public ROperation assign(DSMethodType env) {
     return ROperations.assign(getName(), getScript(), env.symbol(), true);
-  }
-
-  @Override
-  public String invoke(Environment env) {
-    return env.symbol() + "$" + getName();
   }
 
 }
