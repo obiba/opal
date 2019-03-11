@@ -48,10 +48,11 @@ public class EventBusConfiguration {
           log.info("Register bean {} ({}) containing method {} to EventBus", beanName, bean.getClass().getName(), method.getName());
           // register it with the event bus
           Object targetBean = AopProxyUtils.getSingletonTarget(bean);
-          if (targetBean != null) {
-            eventBus.register(targetBean);
-            return bean; // we only need to register once
+          if (targetBean == null) {
+            targetBean = bean;
           }
+          eventBus.register(targetBean);
+          return bean; // we only need to register once
         }
       }
       return bean;
