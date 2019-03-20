@@ -47,13 +47,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
-    switch(configSupplier.get().getLevel()) {
-      case RESTRICTED:
-        return putRestrictedRScript(uri, script, async);
-      case UNRESTRICTED:
-        return super.putRScript(uri, script, async);
-    }
-    throw new IllegalStateException("Unknown script interpretation level: " + configSupplier.get().getLevel());
+    return putRestrictedRScript(uri, script, async);
   }
 
   @Override

@@ -9,32 +9,22 @@
  */
 package org.obiba.opal.web.datashield;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.core.DeprecatedOperationException;
-import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.RSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
 @Component
 @Transactional
 @Path("/datashield")
 public class DataShieldResource {
-
-  @Autowired
-  private DatashieldConfigurationSupplier configurationSupplier;
 
   @Autowired
   private OpalRSessionManager opalRSessionManager;
@@ -68,28 +58,5 @@ public class DataShieldResource {
     resource.setMethodType(DSMethodType.valueOf(env.toUpperCase()));
     return resource;
   }
-
-  @GET
-  @Path("/cfg")
-  public Response getConfig() {
-    DataShieldConfigDto.Level level = DataShieldConfigDto.Level.valueOf(configurationSupplier.get().getLevel().name());
-    return Response.ok(DataShieldConfigDto.newBuilder().setLevel(level).build()).build();
-  }
-
-  @PUT
-  @Path("/cfg")
-  public Response setConfig(DataShieldConfigDto config) {
-    final DatashieldConfiguration.Level level = DatashieldConfiguration.Level.valueOf(config.getLevel().name());
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        config.setLevel(level);
-      }
-    });
-    return getConfig();
-  }
-
-
 
 }

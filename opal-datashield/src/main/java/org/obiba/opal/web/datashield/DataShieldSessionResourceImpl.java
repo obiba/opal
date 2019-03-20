@@ -18,7 +18,6 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.spi.r.ROperationWithResult;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,19 +54,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   @Override
   public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
     try {
-      ROperationWithResult operation;
-      switch(configurationSupplier.get().getLevel()) {
-        case RESTRICTED:
-          operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
-              DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
-          break;
-        case UNRESTRICTED:
-          operation = new RScriptROperation(body);
-          break;
-        default:
-          throw new IllegalStateException(
-              "Unknown script interpretation level: " + configurationSupplier.get().getLevel());
-      }
+      ROperationWithResult operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
+          DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
       if (async) {
         String id = getOpalRSession().executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();

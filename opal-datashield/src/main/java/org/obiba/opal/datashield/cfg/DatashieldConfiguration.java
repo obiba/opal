@@ -24,15 +24,8 @@ public class DatashieldConfiguration extends DefaultDSConfiguration implements O
     RESTRICTED, UNRESTRICTED
   }
 
+  @Deprecated
   private Level level;
-
-  public Level getLevel() {
-    return level == null ? Level.RESTRICTED : level;
-  }
-
-  public void setLevel(Level level) {
-    this.level = level;
-  }
 
   public void addOptions(Iterable<DataShield.DataShieldROptionDto> optionsList) {
     for (DataShield.DataShieldROptionDto option : optionsList) {
