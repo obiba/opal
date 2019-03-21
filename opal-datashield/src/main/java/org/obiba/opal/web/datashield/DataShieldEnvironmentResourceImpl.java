@@ -95,7 +95,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
       @Override
       public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addMethod(methodConverterRegistry.parse(dto));
+        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
       }
     });
     DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), methodType);
@@ -120,7 +120,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
       @Override
       public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addMethod(methodConverterRegistry.parse(dto));
+        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
       }
     });
 

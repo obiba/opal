@@ -75,7 +75,7 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
               if(env.hasMethod(method.getName())) {
                 env.removeMethod(method.getName());
               }
-              env.addMethod(methodConverterRegistry.parse(method));
+              env.addOrUpdate(methodConverterRegistry.parse(method));
             }
           }
         });
