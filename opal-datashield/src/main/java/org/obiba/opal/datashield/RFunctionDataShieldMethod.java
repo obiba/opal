@@ -16,6 +16,9 @@ import org.obiba.opal.spi.r.ROperations;
 
 public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implements DataShieldMethod {
 
+  @Deprecated
+  private String rPackage;
+
   public RFunctionDataShieldMethod() {
   }
 
@@ -25,6 +28,15 @@ public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implemen
 
   public RFunctionDataShieldMethod(String name, String function, String rPackage, String version) {
     super(name, function, rPackage, version);
+  }
+  
+  @Override
+  public String getPackage() {
+    if (rPackage != null) {
+      setPackage(rPackage);
+      rPackage = null;
+    }
+    return super.getPackage();
   }
 
   @Override

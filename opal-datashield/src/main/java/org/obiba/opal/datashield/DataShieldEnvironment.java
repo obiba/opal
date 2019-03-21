@@ -19,12 +19,29 @@ import java.util.stream.Collectors;
 
 public class DataShieldEnvironment extends DefaultDSEnvironment {
 
+  @Deprecated
+  private DSMethodType environment;
+
   // XStream ctor
   public DataShieldEnvironment() {
   }
 
   public DataShieldEnvironment(DSMethodType type) {
     super(type);
+  }
+
+  public void setEnvironment(DSMethodType environment) {
+    setMethodType(environment.name());
+  }
+
+
+  @Override
+  public DSMethodType getMethodType() {
+    if (environment != null) {
+      setMethodType(environment.name());
+      environment = null;
+    }
+    return super.getMethodType();
   }
 
   /**

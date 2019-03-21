@@ -20,12 +20,16 @@ import java.io.Serializable;
 
 public class DatashieldConfiguration extends DefaultDSConfiguration implements OpalConfigurationExtension, Serializable {
 
-  public enum Level {
-    RESTRICTED, UNRESTRICTED
-  }
-
   @Deprecated
-  private Level level;
+  private String level;
+
+  @Override
+  public synchronized DSEnvironment getEnvironment(DSMethodType type) {
+    if (level != null) {
+      level = null;
+    }
+    return super.getEnvironment(type);
+  }
 
   public void addOptions(Iterable<DataShield.DataShieldROptionDto> optionsList) {
     for (DataShield.DataShieldROptionDto option : optionsList) {
