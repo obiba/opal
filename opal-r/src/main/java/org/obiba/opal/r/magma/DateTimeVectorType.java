@@ -10,6 +10,7 @@ import org.rosuda.REngine.REXPString;
 
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class DateTimeVectorType extends VectorType {
 
@@ -40,7 +41,7 @@ public class DateTimeVectorType extends VectorType {
     contents.add(new REXPString(new String[] {"POSIXct", "POSIXt"}));
     if (!names.contains("tzone")) {
       names.add("tzone");
-      contents.add(new REXPString("UTC"));
+      contents.add(new REXPString(TimeZone.getDefault().getID()));
     }
   }
 }
