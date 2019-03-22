@@ -12,6 +12,7 @@ projects=$(CURDIR)/..
 opal_project=$(CURDIR)
 magma_project=${projects}/magma
 commons_project=${projects}/obiba-commons
+ds4j_project=${projects}/datashield4j
 opal_home=${opal_project}/opal_home
 jennite_project=${projects}/jennite
 obiba_home=${projects}/obiba-home
@@ -190,6 +191,16 @@ commons-all:
 	cp obiba-shiro/target/obiba-shiro-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
 	cp obiba-shiro-web/target/obiba-shiro-web-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
 	cp obiba-shiro-crowd/target/obiba-shiro-crowd-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib
+
+#
+# Compile and install all DataSHIELD4J sub-projects
+#
+ds4j-all:
+	cd ${ds4j_project} && \
+	${mvn_exec} clean install && \
+	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep ds4j | xargs rm && \
+	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc` ${opal_project}/opal-server/target/opal-server-${version}/lib
+
 
 #
 # Compile and install jennite

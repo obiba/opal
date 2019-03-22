@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield.support;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 
@@ -21,24 +22,24 @@ public interface DataShieldMethodConverter {
    * @param dto
    * @return
    */
-  public boolean canParse(DataShieldMethodDto dto);
+  boolean canParse(DataShieldMethodDto dto);
 
   /**
    * @param dto
    * @return
    */
-  public DataShieldMethod parse(DataShieldMethodDto dto);
+  DataShieldMethod parse(DataShieldMethodDto dto);
 
   /**
    * @param method
    * @return
    */
-  public boolean accept(DataShieldMethod method);
+  boolean accept(DSMethod method);
 
   /**
    * @param method
    * @return
    */
-  public DataShieldMethodDto asDto(DataShieldMethod method);
+  DataShieldMethodDto asDto(DSMethod method);
 
 }

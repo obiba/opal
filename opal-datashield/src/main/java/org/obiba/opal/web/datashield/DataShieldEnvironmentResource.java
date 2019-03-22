@@ -22,12 +22,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
+import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.web.model.DataShield;
 
 public interface DataShieldEnvironmentResource {
 
-  void setEnvironment(DatashieldConfiguration.Environment environment);
+  void setMethodType(DSMethodType methodType);
 
   @GET
   @Path("/methods")

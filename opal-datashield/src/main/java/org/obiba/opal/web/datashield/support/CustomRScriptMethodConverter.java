@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield.support;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.CustomRScriptMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield;
@@ -33,12 +34,12 @@ public class CustomRScriptMethodConverter extends AbstractDataShieldMethodConver
   }
 
   @Override
-  public boolean accept(DataShieldMethod method) {
+  public boolean accept(DSMethod method) {
     return method instanceof CustomRScriptMethod;
   }
 
   @Override
-  public DataShieldMethodDto asDto(DataShieldMethod method) {
+  public DataShieldMethodDto asDto(DSMethod method) {
     CustomRScriptMethod rScriptMethod = (CustomRScriptMethod) method;
     DataShield.RScriptDataShieldMethodDto methodDto = DataShield.RScriptDataShieldMethodDto.newBuilder()
         .setScript(rScriptMethod.getScript()).build();

@@ -9,19 +9,12 @@
  */
 package org.obiba.opal.web.datashield;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.collect.Lists;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.core.DSMethod;
+import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
-import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
@@ -32,22 +25,28 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentResource {
 
-  private DatashieldConfiguration.Environment environment;
+  private DSMethodType methodType;
 
   private DatashieldConfigurationSupplier configurationSupplier;
 
   private DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @Override
-  public void setEnvironment(DatashieldConfiguration.Environment environment) {
-    this.environment = environment;
+  public void setMethodType(DSMethodType methodType) {
+    this.methodType = methodType;
   }
 
   @Autowired
@@ -63,7 +62,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   @Override
   public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
     List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
-    for(DataShieldMethod method : listMethods()) {
+    for(DSMethod method : listMethods()) {
       dtos.add(methodConverterRegistry.asDto(method));
     }
     sortByName(dtos);
@@ -76,14 +75,14 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
       @Override
       public void doWithConfig(DatashieldConfiguration config) {
-        for(DataShieldMethod method : getEnvironment(config).getMethods()) {
+        for(DSMethod method : getEnvironment(config).getMethods()) {
           getEnvironment(config).removeMethod(method.getName());
         }
       }
 
     });
 
-    DataShieldLog.adminLog("deleted all methods from environment {}.", environment);
+    DataShieldLog.adminLog("deleted all methods from type {}.", methodType);
     return Response.ok().build();
   }
 
@@ -96,10 +95,10 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
       @Override
       public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addMethod(methodConverterRegistry.parse(dto));
+        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
       }
     });
-    DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), environment);
+    DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), methodType);
     UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
         .path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
     return Response.created(ub.build(dto.getName())).build();
@@ -121,11 +120,11 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
       @Override
       public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addMethod(methodConverterRegistry.parse(dto));
+        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
       }
     });
 
-    DataShieldLog.adminLog("modified method '{}' in environment {}.", name, environment);
+    DataShieldLog.adminLog("modified method '{}' in type {}.", name, methodType);
 
     return Response.ok().build();
   }
@@ -140,11 +139,11 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
         getEnvironment(config).removeMethod(name);
       }
     });
-    DataShieldLog.adminLog("deleted method '{}' from environment {}.", name, environment);
+    DataShieldLog.adminLog("deleted method '{}' from type {}.", name, methodType);
     return Response.ok().build();
   }
 
-  private Iterable<DataShieldMethod> listMethods() {
+  private Iterable<DSMethod> listMethods() {
     return getEnvironment().getMethods();
   }
 
@@ -164,12 +163,12 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     });
   }
 
-  private DataShieldEnvironment getEnvironment() {
+  private DSEnvironment getEnvironment() {
     return getEnvironment(getDatashieldConfiguration());
   }
 
-  private DataShieldEnvironment getEnvironment(DatashieldConfiguration config) {
-    return config.getEnvironment(environment);
+  private DSEnvironment getEnvironment(DatashieldConfiguration config) {
+    return config.getEnvironment(methodType);
   }
 
 }

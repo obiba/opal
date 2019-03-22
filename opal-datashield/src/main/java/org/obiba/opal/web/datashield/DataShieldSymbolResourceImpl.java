@@ -10,10 +10,11 @@
 package org.obiba.opal.web.datashield;
 
 import com.google.common.base.Supplier;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +47,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
-    switch(configSupplier.get().getLevel()) {
-      case RESTRICTED:
-        return putRestrictedRScript(uri, script, async);
-      case UNRESTRICTED:
-        return super.putRScript(uri, script, async);
-    }
-    throw new IllegalStateException("Unknown script interpretation level: " + configSupplier.get().getLevel());
+    return putRestrictedRScript(uri, script, async);
   }
 
   @Override
@@ -75,7 +70,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
     try {
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-          configSupplier.get().getAssignEnvironment());
+          configSupplier.get().getEnvironment(DSMethodType.ASSIGN));
       if(async) {
         String id = getRSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();

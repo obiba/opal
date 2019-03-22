@@ -10,13 +10,12 @@
 
 package org.obiba.opal.web.datashield.support;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.NoSuchDSMethodException;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
-import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.web.datashield.RPackageResource;
@@ -27,7 +26,8 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
 
 @Component
 public class DataShieldPackageMethodImpl extends RPackageResource {
@@ -65,17 +65,17 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
 
           @Override
           public void doWithConfig(DatashieldConfiguration config) {
-            addMethods(configurationSupplier.get().getAggregateEnvironment(), methods.getAggregateList());
-            addMethods(configurationSupplier.get().getAssignEnvironment(), methods.getAssignList());
+            addMethods(configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE), methods.getAggregateList());
+            addMethods(configurationSupplier.get().getEnvironment(DSMethodType.ASSIGN), methods.getAssignList());
             config.addOptions(roptions);
           }
 
-          private void addMethods(DataShieldEnvironment env, Iterable<DataShield.DataShieldMethodDto> envMethods) {
+          private void addMethods(DSEnvironment env, Iterable<DataShield.DataShieldMethodDto> envMethods) {
             for(DataShield.DataShieldMethodDto method : envMethods) {
               if(env.hasMethod(method.getName())) {
                 env.removeMethod(method.getName());
               }
-              env.addMethod(methodConverterRegistry.parse(method));
+              env.addOrUpdate(methodConverterRegistry.parse(method));
             }
           }
         });
@@ -93,16 +93,10 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
 
       try {
         configurationSupplier
-            .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-              @Override
-              public void doWithConfig(DatashieldConfiguration config) {
-                config.getEnvironment(DatashieldConfiguration.Environment.AGGREGATE).removeMethod(methodName);
-              }
-            });
+            .modify(config -> config.getEnvironment(DSMethodType.AGGREGATE).removeMethod(methodName));
         DataShieldLog.adminLog("deleted method '{}' from environment {}.", methodName,
-            DatashieldConfiguration.Environment.AGGREGATE);
-      } catch(NoSuchDataShieldMethodException nothing) {
+            DSMethodType.AGGREGATE);
+      } catch(NoSuchDSMethodException nothing) {
         // nothing, the method may have been deleted manually
       }
     }
@@ -113,16 +107,10 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
 
       try {
         configurationSupplier
-            .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-              @Override
-              public void doWithConfig(DatashieldConfiguration config) {
-                config.getEnvironment(DatashieldConfiguration.Environment.ASSIGN).removeMethod(methodName);
-              }
-            });
+            .modify(config -> config.getEnvironment(DSMethodType.ASSIGN).removeMethod(methodName));
         DataShieldLog.adminLog("deleted method '{}' from environment {}.", methodName,
-            DatashieldConfiguration.Environment.ASSIGN);
-      } catch(NoSuchDataShieldMethodException nothing) {
+            DSMethodType.ASSIGN);
+      } catch(NoSuchDSMethodException nothing) {
         // nothing, the method may have been deleted manually
       }
     }

@@ -9,18 +9,13 @@
  */
 package org.obiba.opal.datashield;
 
-import java.io.StringReader;
-
-import org.obiba.opal.datashield.expr.DataShieldGrammar;
-import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
-import org.obiba.opal.datashield.expr.InvalidScriptException;
-import org.obiba.opal.datashield.expr.ParseException;
-import org.obiba.opal.datashield.expr.RScriptGenerator;
-import org.obiba.opal.datashield.expr.SimpleNode;
+import com.google.common.base.Preconditions;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.r.expr.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.ROperation;
 
-import com.google.common.base.Preconditions;
+import java.io.StringReader;
 
 public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult {
 
@@ -28,11 +23,11 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   private final SimpleNode scriptAst;
 
-  private final DataShieldEnvironment environment;
+  private final DSEnvironment environment;
 
   @SuppressWarnings("ConstantConditions")
-  public AbstractRestrictedRScriptROperation(String script, DataShieldEnvironment environment,
-      DataShieldScriptValidator validator) throws ParseException, InvalidScriptException {
+  public AbstractRestrictedRScriptROperation(String script, DSEnvironment environment,
+      DSRScriptValidator validator) throws ParseException, InvalidScriptException {
     Preconditions.checkArgument(script != null, "script cannot be null");
     Preconditions.checkArgument(environment != null, "environment cannot be null");
     Preconditions.checkArgument(validator != null, "validator cannot be null");
@@ -52,13 +47,10 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   @Override
   protected void doWithConnection() {
-    Iterable<ROperation> ops = environment.prepareOps();
+    Iterable<ROperation> ops = ((DataShieldEnvironment)environment).prepareOps();
     for(ROperation op : ops) {
       op.doWithConnection(getConnection());
     }
-  }
-
-  protected void prepare() {
   }
 
   protected String restricted() {

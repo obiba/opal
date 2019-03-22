@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.datashield;
 
-import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
-import org.obiba.opal.datashield.expr.ParseException;
-
 import com.google.common.base.Preconditions;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.r.expr.DSRScriptValidator;
+import org.obiba.datashield.r.expr.ParseException;
 
 /**
  * Parses a restricted R script, executes it and assigns the result to a symbol.
@@ -21,16 +21,16 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
 
   private final String symbol;
 
-  public RestrictedAssignmentROperation(String symbol, String script, DataShieldEnvironment environment,
-      DataShieldScriptValidator validator) throws ParseException {
+  public RestrictedAssignmentROperation(String symbol, String script, DSEnvironment environment,
+                                        DSRScriptValidator validator) throws ParseException {
     super(script, environment, validator);
     Preconditions.checkArgument(symbol != null, "symbol cannot be null");
     this.symbol = symbol;
   }
 
-  public RestrictedAssignmentROperation(String symbol, String script, DataShieldEnvironment environment)
+  public RestrictedAssignmentROperation(String symbol, String script, DSEnvironment environment)
       throws ParseException {
-    this(symbol, script, environment, new DataShieldScriptValidator());
+    this(symbol, script, environment, new DSRScriptValidator());
   }
 
   @Override

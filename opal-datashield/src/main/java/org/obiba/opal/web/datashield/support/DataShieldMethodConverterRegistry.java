@@ -11,6 +11,7 @@ package org.obiba.opal.web.datashield.support;
 
 import java.util.Set;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class DataShieldMethodConverterRegistry {
     throw new NoSuchDataShieldMethodConverterException(dto);
   }
 
-  public DataShieldMethodDto asDto(DataShieldMethod method) {
+  public DataShieldMethodDto asDto(DSMethod method) {
     for(DataShieldMethodConverter converter : converters) {
       if(converter.accept(method)) {
         return converter.asDto(method);

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield.support;
 
+import org.obiba.datashield.core.DSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 
@@ -19,7 +20,7 @@ public class NoSuchDataShieldMethodConverterException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public NoSuchDataShieldMethodConverterException(DataShieldMethod method) {
+  public NoSuchDataShieldMethodConverterException(DSMethod method) {
     super("No such converter for DataShield method with class: " + method.getClass().getSimpleName());
   }
 

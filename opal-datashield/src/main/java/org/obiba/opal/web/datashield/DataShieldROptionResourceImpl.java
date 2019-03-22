@@ -39,13 +39,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   @Override
   public Response deleteDataShieldROption(final @QueryParam("name") String name) {
     configurationSupplier
-        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-          @Override
-          public void doWithConfig(DatashieldConfiguration config) {
-            config.removeOption(name);
-          }
-        });
+        .modify(config -> config.removeOption(name));
 
     return Response.ok().build();
   }
@@ -53,13 +47,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   @Override
   public Response addOrUpdateDataShieldROption(final DataShield.DataShieldROptionDto dto) {
     configurationSupplier
-        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-          @Override
-          public void doWithConfig(DatashieldConfiguration config) {
-            config.addOrUpdateOption(dto.getName(), dto.getValue());
-          }
-        });
+        .modify(config -> config.addOrUpdateOption(dto.getName(), dto.getValue()));
 
     return Response.ok().build();
   }
@@ -70,7 +58,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
     if (config.hasOption(name)) {
       DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)
-          .setValue(config.getOption(name)).build();
+          .setValue(config.getOption(name).getValue()).build();
 
       return Response.ok().entity(dto).build();
     }

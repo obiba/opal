@@ -9,21 +9,15 @@
  */
 package org.obiba.opal.web.datashield;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.r.expr.DSRScriptValidator;
+import org.obiba.datashield.r.expr.FirstNodeInvokesFunctionValidator;
+import org.obiba.datashield.r.expr.NoBinaryOpsValidator;
+import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
-import org.obiba.opal.datashield.expr.FirstNodeInvokesFunctionValidator;
-import org.obiba.opal.datashield.expr.NoBinaryOpsValidator;
-import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.spi.r.ROperationWithResult;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +27,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 @Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -54,19 +54,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   @Override
   public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
     try {
-      ROperationWithResult operation;
-      switch(configurationSupplier.get().getLevel()) {
-        case RESTRICTED:
-          operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getAggregateEnvironment(),
-              DataShieldScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
-          break;
-        case UNRESTRICTED:
-          operation = new RScriptROperation(body);
-          break;
-        default:
-          throw new IllegalStateException(
-              "Unknown script interpretation level: " + configurationSupplier.get().getLevel());
-      }
+      ROperationWithResult operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
+          DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
       if (async) {
         String id = getOpalRSession().executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
