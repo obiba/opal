@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 
 @Component
@@ -19,32 +18,35 @@ public class SystemLogService {
 
   private static final Logger log = LoggerFactory.getLogger(SystemLogService.class);
 
-  private static final String LOGS_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "logs";
+  private File logsDir;
 
-  private static final String OPAL_LOG = "opal.log";
+  private static final String OPAL_LOG_FILE = "opal.log";
 
-  private static final String DATASHIELD_LOG = "datashield.log";
+  private static final String DATASHIELD_LOG_FILE = "datashield.log";
 
-  private static final String REST_LOG = "rest.log";
+  private static final String REST_LOG_FILE = "rest.log";
 
   private TailBroadcaster opalLogBroadcaster;
 
   @PostConstruct
   public void initialize() {
+    logsDir = new File(System.getenv().get("OPAL_LOG"));
+    if (!logsDir.exists())
+      logsDir = new File(System.getenv().get("OPAL_HOME") + File.separatorChar + "logs");
     this.opalLogBroadcaster = new TailBroadcaster();
     Tailer.create(getOpalLogFile(), opalLogBroadcaster);
   }
 
   public File getOpalLogFile() {
-    return new File(LOGS_DIR, OPAL_LOG);
+    return new File(logsDir, OPAL_LOG_FILE);
   }
 
   public File getDatashieldLogFile() {
-    return new File(LOGS_DIR, DATASHIELD_LOG);
+    return new File(logsDir, DATASHIELD_LOG_FILE);
   }
 
   public File getRestLogFile() {
-    return new File(LOGS_DIR, REST_LOG);
+    return new File(logsDir, REST_LOG_FILE);
   }
 
   public void subscribeOpalLog(TailerListener tailer) {
