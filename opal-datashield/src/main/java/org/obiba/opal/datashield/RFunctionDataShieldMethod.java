@@ -29,14 +29,35 @@ public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implemen
   public RFunctionDataShieldMethod(String name, String function, String rPackage, String version) {
     super(name, function, rPackage, version);
   }
-  
+
+  @Override
+  public boolean hasPackage() {
+    upgrade();
+    return super.hasPackage();
+  }
+
+  @Override
+  public void setPackage(String pack) {
+    upgrade();
+    super.setPackage(pack);
+  }
+
   @Override
   public String getPackage() {
-    if (rPackage != null) {
-      setPackage(rPackage);
-      rPackage = null;
-    }
+    upgrade();
     return super.getPackage();
+  }
+
+  @Override
+  public void setVersion(String version) {
+    upgrade();
+    super.setVersion(version);
+  }
+
+  @Override
+  public String getVersion() {
+    upgrade();
+    return super.getVersion();
   }
 
   @Override
@@ -44,4 +65,13 @@ public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implemen
     return ROperations.noOp();
   }
 
+  /**
+   * Upgrade DataSHIELD configuration on the fly.
+   */
+  private void upgrade() {
+    if (rPackage != null) {
+      super.setPackage(rPackage);
+      rPackage = null;
+    }
+  }
 }
