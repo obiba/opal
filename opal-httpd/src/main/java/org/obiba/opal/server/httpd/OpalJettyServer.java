@@ -11,9 +11,7 @@ package org.obiba.opal.server.httpd;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import io.buji.pac4j.filter.SecurityFilter;
 import org.apache.shiro.web.env.EnvironmentLoader;
-import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -22,6 +20,7 @@ import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.GzipFilter;
@@ -32,6 +31,7 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.pac4j.Pac4jConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -48,7 +48,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Properties;
 
@@ -123,7 +122,7 @@ public class OpalJettyServer {
     handlers.addHandler(createDistFileHandler("/webapp"));
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    handlers.addHandler(createServletHandler());
+    handlers.addHandler(createServletHandler(properties));
 
     jettyServer.setHandler(handlers);
   }
@@ -196,14 +195,14 @@ public class OpalJettyServer {
     return jettySsl;
   }
 
-  private Handler createServletHandler() {
+  private Handler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath("/");
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
     initEventListeners();
     initNotAllowedMethods();
-    initFilters();
+    initFilters(properties);
 
     servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
@@ -225,9 +224,9 @@ public class OpalJettyServer {
     //servletContextHandler.addEventListener(new OpalEnvironmentLoaderListener());
   }
 
-  private void initFilters() {
+  private void initFilters(Properties properties) {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
-    initPac4jFilter();
+    initPac4jFilter(properties);
     FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
     authenticationFilterHolder.setName("authenticationFilter");
     authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
@@ -236,9 +235,11 @@ public class OpalJettyServer {
     servletContextHandler.addFilter(GzipFilter.class, "/*", EnumSet.of(REQUEST));
   }
 
-  private void initPac4jFilter() {
-    servletContextHandler.addFilter(OpalSecurityFilter.Wrapper.class, "/ws/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-    servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, "/callback", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+  private void initPac4jFilter(Properties properties) {
+    if (Pac4jConfigurer.init(properties)) {
+      servletContextHandler.addFilter(OpalSecurityFilter.Wrapper.class, "/login/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+      servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, Pac4jConfigurer.getCallbackPath() + "/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+    }
   }
 
   private void initNotAllowedMethods() {

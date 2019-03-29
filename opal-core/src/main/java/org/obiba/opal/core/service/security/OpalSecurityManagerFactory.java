@@ -9,14 +9,9 @@
  */
 package org.obiba.opal.core.service.security;
 
-import java.util.Collection;
-import java.util.Set;
-
-import javax.annotation.PreDestroy;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import net.sf.ehcache.CacheManager;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -38,10 +33,9 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
-import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.util.LifecycleUtils;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.obiba.shiro.realm.ObibaRealm;
 import org.springframework.beans.factory.FactoryBean;
@@ -49,8 +43,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
+import javax.annotation.PreDestroy;
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.Set;
 
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
@@ -130,6 +126,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     @Override
     @SuppressWarnings("ChainOfInstanceofChecks")
     protected SecurityManager createDefaultInstance() {
+      //DefaultWebSecurityManager dsm = new DefaultWebSecurityManager();
       DefaultSecurityManager dsm = (DefaultSecurityManager) super.createDefaultInstance();
 
       initializeCacheManager(dsm);
@@ -187,6 +184,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
         oRealm.setServiceKey(serviceKey);
         builder.add(oRealm);
       }
+
+
       super.applyRealmsToSecurityManager(builder.build(), securityManager);
     }
 
@@ -208,9 +207,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
     sessionManager.setSessionListeners(sessionListeners);
     sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
-    SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
-    sessionValidationScheduler.enableSessionValidation();
-    sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
     sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
+    sessionManager.setSessionValidationSchedulerEnabled(true);
   }
 }

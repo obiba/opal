@@ -102,6 +102,15 @@ public class Dtos {
     return builder.build();
   }
 
+  public static Opal.AuthClientDto asDto(String name, String redirectUrl) {
+    Opal.AuthClientDto.Builder builder = Opal.AuthClientDto.newBuilder();
+    builder.setName(name);
+    if (redirectUrl != null) {
+      builder.setRedirectUrl(redirectUrl);
+    }
+    return builder.build();
+  }
+
   private static String toUri(String... fragments) {
     StringBuilder sb = new StringBuilder();
     for(String fragment : fragments) {
