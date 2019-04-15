@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -74,9 +75,11 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   protected void doRemoveTmpVectors(String... names) {
     // remove temporary vectors
+    List<String> vectorNames = Lists.newArrayList();
     for (String name : names) {
-      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(), name) + ")");
+      vectorNames.add(getTmpVectorName(getSymbol(), name));
     }
+    magmaAssignROperation.doEval("base::rm(list=c('" + Joiner.on("','").join(vectorNames) + "'))");
     magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
         withIdColumn() ? getIdColumnName() : "row.names") + ")");
     if (withUpdatedColumn()) {
@@ -86,7 +89,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   protected String getTmpVectorName(String symbol, String name) {
-    return ("opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
+    return (".opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
         .replace("'", ".").replace("[", ".").replace("]", ".").replace("{", ".").replace("}", ".").replace("(", ".").replace(")", ".");
   }
 

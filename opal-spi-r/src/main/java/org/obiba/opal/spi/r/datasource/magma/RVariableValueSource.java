@@ -112,7 +112,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     else if (isDateTime()) type = DateTimeType.get();
     else if (isBoolean()) type = BooleanType.get();
     else if (isBinary()) type = BinaryType.get();
-    log.info("Tibble '{}' has column '{}' of class {} mapped to {}", valueTable.getSymbol(), colName, colClass, type.getName());
+    log.debug("Tibble '{}' has column '{}' of class {} mapped to {}", valueTable.getSymbol(), colName, colClass, type.getName());
     return type;
   }
 
@@ -171,7 +171,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
           else
             attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(strValue).build());
         } else {
-          log.info("Attribute value is a {}", value.getClass().getName());
+          log.debug("Attribute value is a {}", value.getClass().getName());
         }
       }
 

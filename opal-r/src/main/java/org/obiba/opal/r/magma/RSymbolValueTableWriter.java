@@ -11,28 +11,35 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.VariableEntity;
+import com.google.common.collect.Lists;
+import org.obiba.magma.*;
 import org.obiba.magma.support.StaticDatasource;
-import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.spi.r.BindRowsAssignROperation;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
 import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Writes a tibble in a R session, save it as a file and get this file back in the opal file system.
  */
 public class RSymbolValueTableWriter implements ValueTableWriter {
 
+  private static final Logger log = LoggerFactory.getLogger(RSymbolValueTableWriter.class);
+
+  private static final int MAX_DATA_POINTS = 100000;
+
   private final String tableName;
 
-  private final StaticDatasource datasource;
+  private final ValueTableWriter wrappedValueTableWriter;
 
-  private final ValueTableWriter valueTableWriter;
+  private final StaticDatasource datasource;
 
   private final RSymbolWriter symbolWriter;
 
@@ -42,10 +49,12 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private final String idColumnName;
 
-  public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrapped, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName) {
+  private int bufferedTableCount = 0;
+
+  public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrappedValueTableWriter, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName) {
     this.tableName = tableName;
     this.datasource = datasource;
-    this.valueTableWriter = wrapped;
+    this.wrappedValueTableWriter = wrappedValueTableWriter;
     this.rSessionHandler = rSessionHandler;
     this.txTemplate = txTemplate;
     this.idColumnName = Strings.isNullOrEmpty(idColumnName) ? RDatasource.DEFAULT_ID_COLUMN_NAME : idColumnName;
@@ -54,24 +63,67 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   @Override
   public VariableWriter writeVariables() {
-    return valueTableWriter.writeVariables();
+    return wrappedValueTableWriter.writeVariables();
   }
 
   @Override
   public ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
-    return valueTableWriter.writeValueSet(entity);
+    if (datasource.hasValueTable(tableName)) {
+      StaticValueTable table = (StaticValueTable)datasource.getValueTable(tableName);
+      int entityCount = table.getVariableEntityCount();
+      int variableCount = table.getVariableCount();
+      int dataPointsCount = entityCount * variableCount;
+      if (dataPointsCount>MAX_DATA_POINTS) {
+        log.debug("Buffered data points: {}", dataPointsCount);
+        flushValueTable();
+      }
+    }
+    return wrappedValueTableWriter.writeValueSet(entity);
   }
 
   @Override
   public void close() {
-    valueTableWriter.close();
-    // get in-memory table and persist it in R
-    ValueTable valueTable = datasource.getValueTable(tableName);
-    if (valueTable.getValueSetCount()>0) {
-      // push table to a R tibble
-      rSessionHandler.getSession().execute(new MagmaAssignROperation(symbolWriter.getSymbol(valueTable), valueTable, txTemplate, idColumnName));
-      symbolWriter.write(valueTable);
+    boolean hasValueSets = flushValueTable()>0;
+    wrappedValueTableWriter.close();
+
+    StaticValueTable table = (StaticValueTable)datasource.getValueTable(tableName);
+    if (hasValueSets) {
+      String symbol = symbolWriter.getSymbol(table);
+      List<String> symbols = Lists.newArrayList();
+      for (int i = 0; i < bufferedTableCount; i++) {
+        symbols.add(asValueTableSymbol(symbol, i));
+      }
+      if (symbols.size() > 0) {
+        rSessionHandler.getSession().execute(new BindRowsAssignROperation(symbol, symbols, true));
+      }
+
+      symbolWriter.write(table);
+      table.removeAllValues();
     }
+  }
+
+  /**
+   * Assign StaticValueTable as a R Tibble.
+   */
+  private int flushValueTable() {
+    // get in-memory table and persist it in R
+    StaticValueTable valueTable = (StaticValueTable)datasource.getValueTable(tableName);
+    int valueSetCount = valueTable.getValueSetCount();
+    if (valueSetCount>0) {
+      // push table to a R tibble
+      String tableSymbol = asValueTableSymbol(symbolWriter.getSymbol(valueTable), bufferedTableCount);
+      log.debug("Assigning table: {} to {}", tableName, tableSymbol);
+      rSessionHandler.getSession().execute(new MagmaAssignROperation(tableSymbol, valueTable, txTemplate, idColumnName));
+
+      log.debug("Truncating table: {}", tableName);
+      valueTable.removeAllValues();
+      bufferedTableCount++;
+    }
+    return valueSetCount;
+  }
+
+  private String asValueTableSymbol(String symbol, int id) {
+    return "." + symbol + "__" + id;
   }
 
 }
