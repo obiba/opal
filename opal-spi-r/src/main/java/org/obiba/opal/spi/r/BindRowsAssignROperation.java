@@ -25,6 +25,10 @@ public class BindRowsAssignROperation extends AbstractROperation {
   // remove symbols after being bound
   private final boolean remove;
 
+  public BindRowsAssignROperation(String symbol, List<String> symbols) {
+    this(symbol, symbols, true);
+  }
+
   public BindRowsAssignROperation(String symbol, List<String> symbols, boolean remove) {
     this.symbol = symbol;
     this.symbols = symbols;

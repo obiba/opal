@@ -94,7 +94,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
         symbols.add(asValueTableSymbol(symbol, i));
       }
       if (symbols.size() > 0) {
-        rSessionHandler.getSession().execute(new BindRowsAssignROperation(symbol, symbols, true));
+        rSessionHandler.getSession().execute(new BindRowsAssignROperation(symbol, symbols));
       }
 
       symbolWriter.write(table);
