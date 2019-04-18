@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.BooleanType;
+import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.PolygonType;
 import org.rosuda.REngine.*;
@@ -93,6 +94,9 @@ public class VectorType {
       if (withMissings || !variable.isMissingValue(value)) {
         String str = value.toString();
         code = codes.get(str);
+        if (code == null && value.getValueType().equals(DecimalType.get()) && str!= null && str.endsWith(".0")) {
+          code = codes.get(str.substring(0, str.length() - 2));
+        }
       }
       ints[i] = code != null ? code : REXPInteger.NA;
       i++;

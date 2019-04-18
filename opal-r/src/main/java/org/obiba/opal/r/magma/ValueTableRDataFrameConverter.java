@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.magma;
 
+import org.obiba.magma.ValueTable;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
@@ -27,26 +28,22 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
   }
 
   @Override
-  public void doAssign(String symbol, String path) {
-    if (magmaAssignROperation.hasValueTable()) setValueTable(magmaAssignROperation.getValueTable());
-    else resolvePath(path);
-    if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
-    magmaAssignROperation.setEntities(getValueTable());
-    RList list = getVariableVectors();
+  protected void doAssignTable(ValueTable table, String symbol) {
+    RList list = getVariableVectors(table);
     if (!withIdColumn() && hasMultilines()) {
       throw new IllegalArgumentException("Id column name is missing (there are multiple rows per entity).");
     }
-    REXP ids = getIdsVector(withMissings());
+    REXP ids = getIdsVector(table, withMissings());
 
     String[] names = list.keys();
     if (names == null || names.length == 0) return;
 
-    doAssignTmpVectors(ids, names, list);
-    doAssignDataFrame(names);
+    doAssignTmpVectors(table, ids, names, list);
+    doAssignDataFrame(symbol, names);
     doRemoveTmpVectors(names);
   }
 
-  private void doAssignDataFrame(String... names) {
+  private void doAssignDataFrame(String symbol, String... names) {
     // create the data.frame from the vectors
     StringBuilder args = new StringBuilder();
     if (withIdColumn()) {
@@ -67,7 +64,7 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
       args.append(String.format(", row.names=%s", getTmpVectorName(getSymbol(), "row.names")));
 
     log.trace("data.frame arguments: {}", args);
-    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', data.frame(%s, stringsAsFactors=FALSE)))", getSymbol(), args));
+    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', data.frame(%s, stringsAsFactors=FALSE)))", symbol, args));
   }
 
 }

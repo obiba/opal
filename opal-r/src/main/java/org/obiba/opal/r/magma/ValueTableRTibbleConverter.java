@@ -10,12 +10,18 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.support.SplitValueTablesFactory;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Build a R tibble from a table: list of vectors of variables.
@@ -29,29 +35,25 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
   }
 
   @Override
-  public void doAssign(String symbol, String path) {
-    if (magmaAssignROperation.hasValueTable()) setValueTable(magmaAssignROperation.getValueTable());
-    else resolvePath(path);
-    if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
-    magmaAssignROperation.setEntities(getValueTable());
-    RList list = getVariableVectors();
-    REXP ids = getIdsVector(true);
+  protected void doAssignTable(ValueTable table, String symbol) {
+    RList list = getVariableVectors(table);
+    REXP ids = getIdsVector(table, true);
 
     String[] names = list.keys();
     if (names == null || names.length == 0) return;
 
-    doAssignTmpVectors(ids, names, list);
-    doAssignTibble(names);
+    doAssignTmpVectors(table, ids, names, list);
+    doAssignTibble(symbol, names);
     doRemoveTmpVectors(names);
   }
 
-  private void doAssignTibble(String... names) {
+  private void doAssignTibble(String symbol, String... names) {
     // create the tibble from the vectors
     StringBuilder args = new StringBuilder();
     args.append(String.format("'%s'=%s", getIdColumnName(),
           getTmpVectorName(getSymbol(), getIdColumnName())));
 
-    if (magmaAssignROperation.withUpdatedColumn()) {
+    if (withUpdatedColumn()) {
       if (args.length() > 0) args.append(", ");
       args.append(String.format("'%s'=%s", getUpdatedColumnName(),
           getTmpVectorName(getSymbol(), getUpdatedColumnName())));
@@ -63,7 +65,7 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
     log.trace("tibble arguments: {}", args);
     magmaAssignROperation.doEnsurePackage("tibble");
     magmaAssignROperation.doEval("library(tibble)");
-    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', tibble(%s)))", getSymbol(), args));
+    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', tibble(%s)))", symbol, args));
   }
 
   @Override

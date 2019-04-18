@@ -41,7 +41,6 @@ public class BindRowsAssignROperation extends AbstractROperation {
     if (symbols.size()>1) {
       ensurePackage("dplyr");
       eval(String.format("is.null(base::assign('%s', value=dplyr::bind_rows(%s)))", symbol, getArguments()), false);
-      // TODO reinstate data dico in resulting tibble
       eval(String.format("for (n in names(`%s`)) attributes(`%s`[[n]]) <- attributes(`%s`[[n]])", symbol, symbol, symbols.get(0)), false);
       if (remove) {
         eval(String.format("is.null(base::rm(list=c('%s')))", Joiner.on("','").join(symbols)), false);
