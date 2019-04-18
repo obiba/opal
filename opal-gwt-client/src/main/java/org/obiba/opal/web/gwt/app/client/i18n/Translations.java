@@ -812,6 +812,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Data in SPSS format are packaged in a file with suffix .sav.")
   String rSPSSHelp();
 
+  @Description("RZSPSS label")
+  @DefaultStringValue("SPSS Compressed (R)")
+  String rZSPSSLabel();
+
+  @Description("RSPSS help")
+  @DefaultStringValue("Data in SPSS compressed format are packaged in a file with suffix .zsav.")
+  String rZSPSSHelp();
+
   @Description("RSAS label")
   @DefaultStringValue("SAS (R)")
   String rSASLabel();

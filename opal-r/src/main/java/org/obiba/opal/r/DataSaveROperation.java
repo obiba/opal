@@ -30,7 +30,15 @@ public class DataSaveROperation extends AbstractROperation {
 
     DTA("haven::write_dta","dta"),
 
-    SAV("haven::write_sav","sav"),
+    SAV("haven::write_sav","sav","zsav") {
+      @Override
+      public String getCommand(String symbol, String path) {
+        if (path.endsWith(".sav"))
+          return String.format("%s(`%s`, path='%s', compress=FALSE)", command, symbol, path);
+        else
+          return String.format("%s(`%s`, path='%s', compress=TRUE)", command, symbol, path);
+      }
+    },
 
     CSV("utils::write.table","csv","tsv") {
       @Override

@@ -177,7 +177,7 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
         public Boolean getValue() {
           String path = selectedFile.toLowerCase();
           if (ImportFormat.RSPSS.equals(importFormat))
-            return path.endsWith(".sav");
+            return path.endsWith(".sav") || path.endsWith(".zsav");
           if (ImportFormat.RSAS.equals(importFormat))
             return path.endsWith(".sas7bdat");
           if (ImportFormat.RXPT.equals(importFormat))

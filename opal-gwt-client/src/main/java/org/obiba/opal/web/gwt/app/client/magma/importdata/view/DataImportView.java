@@ -409,6 +409,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateHelpPanelsVisibility() {
+    hideHelpPanels();
     PluginPackageDto foundPluginPackage = getPluginPackage(formatChooser.getSelectedValue());
     if (foundPluginPackage != null) {
       helpOpalDatasourcePluginPanel.setVisible(true);

@@ -66,7 +66,7 @@
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRSPSSHaven" visible="false">
             <b:HelpBlock>
-              <ui:msg description="RHaven information">This format expects the file to be a valid SPSS file
+              <ui:msg description="RHaven information">This format expects the file to be a valid SPSS file, optionally compressed,
                 containing the variables and the data. This import procedure requires a functional R server with the
                 <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
                 <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.

@@ -56,6 +56,7 @@ public class DatasourceDtos {
       case REST:
         return createRestDatasourceFactoryDto(importConfig);
       case RSPSS:
+      case RZSPSS:
       case RSAS:
       case RXPT:
       case RSTATA:

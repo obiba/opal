@@ -95,6 +95,9 @@ public class RHavenStepView extends ViewImpl implements RHavenStepPresenter.Disp
       case RSPSS:
         selectFileHelp.setText(translations.rSPSSHelp());
         break;
+      case RZSPSS:
+        selectFileHelp.setText(translations.rZSPSSHelp());
+        break;
       case RSTATA:
         selectFileHelp.setText(translations.rStataHelp());
         break;
