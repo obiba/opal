@@ -11,6 +11,7 @@
 package org.obiba.opal.core.tools;
 
 import org.junit.Test;
+import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -55,4 +56,10 @@ public class LuhnValidatorTest {
   public void test_validate_zeros() {
     assertThat(LuhnValidator.validate("0000000000000")).isFalse();
   }
+
+  @Test
+  public void test_generated() {
+    assertThat(LuhnValidator.validate(LuhnValidator.generate())).isTrue();
+  }
+
 }
