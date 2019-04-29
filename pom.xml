@@ -41,7 +41,6 @@
     <commons-lang.version>3.1</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-vfs.version>2.0</commons-vfs.version>
-    <crowd.version>2.9.0-OD-074</crowd.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>1.0-SNAPSHOT</ds4j.version>
     <easymock.version>3.4</easymock.version>
@@ -96,7 +95,7 @@
     <mongodb-driver.version>3.9.1</mongodb-driver.version>
     <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
     <newrelic.version>3.20.0</newrelic.version>
-    <obiba-commons.version>1.11.2</obiba-commons.version>
+    <obiba-commons.version>1.12-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
@@ -119,7 +118,6 @@
     <sshd.version>0.8.0</sshd.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
-    <xfire.version>1.2.6</xfire.version>
     <xmlunit.version>1.6</xmlunit.version>
     <xstream.version>1.4.8</xstream.version>
 
@@ -325,11 +323,6 @@
       <dependency>
         <groupId>org.obiba.commons</groupId>
         <artifactId>obiba-shiro-web</artifactId>
-        <version>${obiba-commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.commons</groupId>
-        <artifactId>obiba-shiro-crowd</artifactId>
         <version>${obiba-commons.version}</version>
       </dependency>
       <dependency>
@@ -922,52 +915,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-
-      <dependency>
-        <groupId>com.atlassian.crowd</groupId>
-        <artifactId>crowd-integration-client</artifactId>
-        <version>${crowd.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.xfire</groupId>
-        <artifactId>xfire-aegis</artifactId>
-        <version>${xfire.version}</version>
-      </dependency>
-
+      
       <!-- RESTEasy dependencies -->
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
@@ -1846,17 +1794,6 @@
       </releases>
       <snapshots>
         <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>atlassian</id>
-      <name>Atlassian Maven Public</name>
-      <url>https://maven.atlassian.com/content/repositories/atlassian-public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>

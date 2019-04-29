@@ -103,19 +103,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.obiba.commons</groupId>
-      <artifactId>obiba-shiro-crowd</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.atlassian.crowd</groupId>
-      <artifactId>crowd-integration-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.xfire</groupId>
-      <artifactId>xfire-aegis</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
