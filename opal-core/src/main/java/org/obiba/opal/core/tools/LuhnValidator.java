@@ -61,8 +61,18 @@ public class LuhnValidator {
    * @return
    */
   public static String generate() {
+    return generate(15);
+  }
+
+  /**
+   * Generate an identifier that is Luhn valid.
+   *
+   * @param size
+   * @return
+   */
+  public static String generate(int size) {
     IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
-    pId.setKeySize(15);
+    pId.setKeySize(size);
     pId.setAllowStartWithZero(false);
     pId.setPrefix("");
     String gen = null;

@@ -1084,6 +1084,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();
 
+  @Description("Identifiers are Luhn valid")
+  @DefaultStringValue("Luhn Valid")
+  String getLuhnValid();
+
+  @Description("Luhn Valid help")
+  @DefaultStringValue("Generate Luhn validated identifiers")
+  String getLuhnValidHelp();
+
   @Description("Cancel label")
   @DefaultStringValue("Cancel")
   String cancelLabel();

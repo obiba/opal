@@ -47,6 +47,13 @@
         </b:ControlGroup>
 
         <b:ControlGroup>
+          <b:CheckBox ui:field="luhnValid"><ui:msg description="Identifiers are Luhn valid">Luhn Valid</ui:msg></b:CheckBox>
+          <b:HelpBlock ui:field="luhnValidHelp">
+            <ui:msg description="Luhn valid help label">Luhn Help</ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
           <b:ControlLabel for="prefix">
             <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
           </b:ControlLabel>

@@ -44,9 +44,11 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.Disposables;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.identifiers.IdentifiersMaps;
+import org.obiba.opal.core.identifiers.LuhnValidIdentifierGeneratorImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -196,14 +198,27 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @POST
   @Path("/_generate")
   public Response importIdentifiers(@QueryParam("type") String entityType, @QueryParam("size") Integer size,
-      @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+      @QueryParam("zeros") Boolean zeros, @QueryParam("luhn") Boolean luhn, @QueryParam("prefix") String prefix) {
     ensureEntityType(entityType);
     try {
-      IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
-      if(size != null) pId.setKeySize(size);
-      if(zeros != null) pId.setAllowStartWithZero(zeros);
-      if(prefix != null) pId.setPrefix(prefix);
-      int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
+      IdentifierGenerator ig;
+
+      if (luhn) {
+        LuhnValidIdentifierGeneratorImpl luhnId = new LuhnValidIdentifierGeneratorImpl();
+        if(size != null) luhnId.setKeySize(size);
+        if(prefix != null) luhnId.setPrefix(prefix);
+
+        ig = luhnId;
+      } else {
+        IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
+        if(size != null) pId.setKeySize(size);
+        if(zeros != null) pId.setAllowStartWithZero(zeros);
+        if(prefix != null) pId.setPrefix(prefix);
+
+        ig = pId;
+      }
+
+      int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), ig);
       return Response.ok().entity(Integer.toString(count)).build();
     } catch(MagmaRuntimeException ex) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

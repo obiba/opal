@@ -90,6 +90,12 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   @UiField
   Button cancelButton;
 
+  @UiField
+  CheckBox luhnValid;
+
+  @UiField
+  HelpBlock luhnValidHelp;
+
   //
   // Constructors
   //
@@ -137,7 +143,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
 
   @UiHandler("generateButton")
   public void onGenerateButtonClicked(ClickEvent event) {
-    getUiHandlers().generateIdentifiers(getSize(), getAllowZeros(), getPrefix());
+    getUiHandlers().generateIdentifiers(getSize(), getAllowZeros(), getLuhnValid(), getPrefix());
   }
 
   @UiHandler("cancelButton")
@@ -155,6 +161,10 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
 
   private boolean getAllowZeros() {
     return allowZeros.getValue();
+  }
+
+  private boolean getLuhnValid() {
+    return luhnValid.getValue();
   }
 
   //
@@ -179,6 +189,15 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     allowZeros.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
+        if (getLuhnValid()) luhnValid.setValue(false);
+        sampleIdentifier.setText(generateSampleIdentifier());
+      }
+    });
+
+    luhnValid.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        allowZeros.setValue(false);
         sampleIdentifier.setText(generateSampleIdentifier());
       }
     });
@@ -189,6 +208,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     generateButton.setEnabled(valid);
     prefix.setEnabled(valid);
     allowZeros.setEnabled(valid);
+    luhnValid.setEnabled(valid);
     sampleIdentifier.setText(valid ? generateSampleIdentifier() : "");
   }
 
@@ -199,6 +219,8 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
 
   private void initializeTexts() {
     dialog.setTitle(translations.generateIdentifiers());
+    luhnValid.setText(translations.getLuhnValid());
+    luhnValidHelp.setText(translations.getLuhnValidHelp());
     updateDescriptionText();
     List<String> args = new ArrayList<String>();
     args.clear();
@@ -224,6 +246,8 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
 
     if(allowZeros.getValue()) {
       sample = "0" + replicateString('9', count - 1);
+    } else if (luhnValid.getValue()) {
+      sample = "" + replicateString('9', count - 1) + generateLuhnCheckDigit(Long.parseLong(sample));
     }
 
     if(!prefix.getText().isEmpty()) {
@@ -237,6 +261,29 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     char[] chars = new char[count];
     Arrays.fill(chars, c);
     return new String(chars);
+  }
+
+  private static int generateLuhnCheckDigit(long input) {
+    String str = Long.toString(input);
+    int[] ints = new int[str.length()];
+    for (int i = 0; i < str.length(); i++) {
+      ints[i] = Integer.parseInt(str.substring(i, i + 1));
+    }
+    for (int i = ints.length - 2; i >= 0; i = i - 2) {
+      int j = ints[i];
+      j = j * 2;
+      if (j > 9) {
+        j = j % 10 + 1;
+      }
+      ints[i] = j;
+    }
+    int sum = 0;
+    for (int i = 0; i < ints.length; i++) {
+      sum += ints[i];
+    }
+    if (sum % 10 == 0) {
+      return 0;
+    } else return 10 - (sum % 10);
   }
 
 }
