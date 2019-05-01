@@ -145,7 +145,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean hasCategories() {
-    return "labelled".equals(colClass) || "haven_labelled".equals(colClass) || "labelled_spss".equals(colClass) || "factor".equals(colClass);
+    return "labelled".equals(colClass) || "haven_labelled".equals(colClass) || "labelled_spss".equals(colClass) || "haven_labelled_spss".equals(colClass) || "factor".equals(colClass);
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -205,7 +205,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private List<Category> extractCategories(REXP attr) {
     if ("labelled".equals(colClass) || "haven_labelled".equals(colClass))
       return extractCategoriesFromLabels(extractAttribute(attr, "labels"), null, null);
-    else if ("labelled_spss".equals(colClass)) {
+    else if ("labelled_spss".equals(colClass) || "haven_labelled_spss".equals(colClass)) {
       REXP naValues = extractAttribute(attr, "na_values");
       REXP naRange = extractAttribute(attr, "na_range");
       return extractCategoriesFromLabels(extractAttribute(attr, "labels"), naValues, naRange);
