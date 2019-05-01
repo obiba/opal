@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -44,11 +43,9 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.Disposables;
-import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.identifiers.IdentifiersMaps;
-import org.obiba.opal.core.identifiers.LuhnValidIdentifierGeneratorImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -62,7 +59,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -201,24 +197,13 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
       @QueryParam("zeros") Boolean zeros, @QueryParam("luhn") Boolean luhn, @QueryParam("prefix") String prefix) {
     ensureEntityType(entityType);
     try {
-      IdentifierGenerator ig;
+      IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
+      if(size != null) pId.setKeySize(size);
+      if(zeros != null) pId.setAllowStartWithZero(zeros);
+      if(prefix != null) pId.setPrefix(prefix);
+      if(luhn != null) pId.setWithLuhnCheckDigit(luhn);
 
-      if (luhn) {
-        LuhnValidIdentifierGeneratorImpl luhnId = new LuhnValidIdentifierGeneratorImpl();
-        if(size != null) luhnId.setKeySize(size);
-        if(prefix != null) luhnId.setPrefix(prefix);
-
-        ig = luhnId;
-      } else {
-        IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
-        if(size != null) pId.setKeySize(size);
-        if(zeros != null) pId.setAllowStartWithZero(zeros);
-        if(prefix != null) pId.setPrefix(prefix);
-
-        ig = pId;
-      }
-
-      int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), ig);
+      int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
       return Response.ok().entity(Integer.toString(count)).build();
     } catch(MagmaRuntimeException ex) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
