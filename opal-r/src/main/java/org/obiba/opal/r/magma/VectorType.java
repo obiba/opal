@@ -203,7 +203,7 @@ public class VectorType {
       }
       if (!missingCats.isEmpty()) {
         names.add("class");
-        contents.add(new REXPString(new String[] { "labelled_spss", "labelled" }));
+        contents.add(new REXPString(new String[] { "labelled_spss", "labelled", "haven_labelled" }));
         REXP naRange = getCategoriesMissingRange(variable, missingCats);
         if (naRange != null) {
           names.add("na_range");
@@ -219,7 +219,7 @@ public class VectorType {
         }
       } else {
         names.add("class");
-        contents.add(new REXPString("labelled"));
+        contents.add(new REXPString(new String[] {"labelled", "haven_labelled"}));
       }
       names.add("labels");
       contents.add(getCategoriesRAttributes(variable));
