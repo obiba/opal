@@ -194,14 +194,14 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @POST
   @Path("/_generate")
   public Response importIdentifiers(@QueryParam("type") String entityType, @QueryParam("size") Integer size,
-      @QueryParam("zeros") Boolean zeros, @QueryParam("luhn") Boolean luhn, @QueryParam("prefix") String prefix) {
+      @QueryParam("zeros") Boolean zeros, @QueryParam("checksum") Boolean checksum, @QueryParam("prefix") String prefix) {
     ensureEntityType(entityType);
     try {
       IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
       if(size != null) pId.setKeySize(size);
       if(zeros != null) pId.setAllowStartWithZero(zeros);
       if(prefix != null) pId.setPrefix(prefix);
-      if(luhn != null) pId.setWithLuhnCheckDigit(luhn);
+      if(checksum != null) pId.setWithCheckDigit(checksum);
 
       int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
       return Response.ok().entity(Integer.toString(count)).build();

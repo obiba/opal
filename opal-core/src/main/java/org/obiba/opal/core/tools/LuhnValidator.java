@@ -65,7 +65,7 @@ public class LuhnValidator {
     pId.setKeySize(15);
     pId.setAllowStartWithZero(false);
     pId.setPrefix("");
-    pId.setWithLuhnCheckDigit(true);
+    pId.setWithCheckDigit(true);
     return pId.generateIdentifier();
   }
 }

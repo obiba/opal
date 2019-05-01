@@ -1084,13 +1084,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();
 
-  @Description("Identifiers are Luhn valid")
-  @DefaultStringValue("Luhn Valid")
-  String getLuhnValid();
+  @Description("Identifiers are generated with a checksum digit")
+  @DefaultStringValue("With Checksum Digit")
+  String geValidWithChecksum();
 
-  @Description("Luhn Valid help")
-  @DefaultStringValue("Generate Luhn validated identifiers")
-  String getLuhnValidHelp();
+  @Description("Checksum help")
+  @DefaultStringValue("Generate checksum validated identifiers")
+  String geValidWithChecksumHelp();
 
   @Description("Cancel label")
   @DefaultStringValue("Cancel")

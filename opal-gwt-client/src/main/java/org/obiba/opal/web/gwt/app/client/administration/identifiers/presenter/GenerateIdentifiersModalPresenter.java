@@ -73,7 +73,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
   }
 
   @Override
-  public void generateIdentifiers(Number size, boolean allowZeros, boolean luhnValid, String prefix) {
+  public void generateIdentifiers(Number size, boolean allowZeros, boolean withChecksum, String prefix) {
     getView().setBusy(true);
 
     ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -103,7 +103,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
     };
 
     UriBuilder ub = UriBuilder.create().segment("identifiers", "mapping", "{}", "_generate")
-        .query("type", table.getEntityType(), "size", String.valueOf(size), "zeros", String.valueOf(allowZeros), "luhn", String.valueOf(luhnValid),
+        .query("type", table.getEntityType(), "size", String.valueOf(size), "zeros", String.valueOf(allowZeros), "checksum", String.valueOf(withChecksum),
             "prefix", prefix);
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build(variable.getName())).post()//
         .withCallback(callbackHandler,

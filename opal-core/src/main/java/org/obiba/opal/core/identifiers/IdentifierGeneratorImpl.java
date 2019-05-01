@@ -33,7 +33,7 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
   @Value("${org.obiba.opal.identifiers.prefix}")
   private String prefix;
 
-  private boolean withLuhnCheckDigit = false;
+  private boolean withCheckDigit = false;
 
   public void setKeySize(int keySize) {
     this.keySize = keySize;
@@ -55,18 +55,18 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
     return prefix != null ? prefix.length() : 0;
   }
 
-  public boolean isWithLuhnCheckDigit() {
-    return withLuhnCheckDigit;
+  public boolean isWithCheckDigit() {
+    return withCheckDigit;
   }
 
-  public void setWithLuhnCheckDigit(boolean withLuhnCheckDigit) {
-    allowStartWithZero = !withLuhnCheckDigit;
-    this.withLuhnCheckDigit = withLuhnCheckDigit;
+  public void setWithCheckDigit(boolean withCheckDigit) {
+    allowStartWithZero = !withCheckDigit;
+    this.withCheckDigit = withCheckDigit;
   }
 
   @Override
   public String generateIdentifier() {
-    return withLuhnCheckDigit ? generateLuhnValidRandomIdentifier() : generateRandomIdentifier();
+    return withCheckDigit ? generateLuhnValidRandomIdentifier() : generateRandomIdentifier();
   }
 
   private String generateRandomIdentifier() {

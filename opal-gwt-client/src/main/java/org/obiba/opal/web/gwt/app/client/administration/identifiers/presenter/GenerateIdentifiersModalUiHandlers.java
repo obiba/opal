@@ -14,5 +14,5 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface GenerateIdentifiersModalUiHandlers extends ModalUiHandlers {
 
-  void generateIdentifiers(Number size, boolean allowZeros, boolean luhnValid, String prefix);
+  void generateIdentifiers(Number size, boolean allowZeros, boolean withChecksum, String prefix);
 }

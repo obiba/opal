@@ -47,9 +47,9 @@
         </b:ControlGroup>
 
         <b:ControlGroup>
-          <b:CheckBox ui:field="luhnValid"><ui:msg description="Identifiers are Luhn valid">Luhn Valid</ui:msg></b:CheckBox>
-          <b:HelpBlock ui:field="luhnValidHelp">
-            <ui:msg description="Luhn valid help label">Luhn Help</ui:msg>
+          <b:CheckBox ui:field="withChecksum"><ui:msg description="Identifiers are generated with a checksum digit">With Checksum Digit</ui:msg></b:CheckBox>
+          <b:HelpBlock ui:field="withChecksumHelp">
+            <ui:msg description="Checksum help">Checksum help</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 
