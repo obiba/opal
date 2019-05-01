@@ -1089,7 +1089,7 @@ public interface Translations extends Constants {
   String geValidWithChecksum();
 
   @Description("Checksum help")
-  @DefaultStringValue("Generate checksum validated identifiers")
+  @DefaultStringValue("Generate identifiers with its Luhn checksum.")
   String geValidWithChecksumHelp();
 
   @Description("Cancel label")
