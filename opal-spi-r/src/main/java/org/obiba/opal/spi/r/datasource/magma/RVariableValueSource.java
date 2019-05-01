@@ -77,7 +77,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   @Override
   public Value getValue(ValueSet valueSet) {
-    Map<Integer, List<String>> columnValues = ((RValueSet) valueSet).getValuesByPosition();
+    Map<Integer, List<Object>> columnValues = ((RValueSet) valueSet).getValuesByPosition();
     if (!columnValues.containsKey(position))
       return variable.isRepeatable() ? getValueType().nullSequence() : getValueType().nullValue();
     return getValue(columnValues.get(position));
@@ -145,7 +145,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean hasCategories() {
-    return "labelled".equals(colClass) || "labelled_spss".equals(colClass) || "factor".equals(colClass);
+    return "labelled".equals(colClass) || "haven_labelled".equals(colClass) || "labelled_spss".equals(colClass) || "factor".equals(colClass);
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -203,7 +203,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private List<Category> extractCategories(REXP attr) {
-    if ("labelled".equals(colClass))
+    if ("labelled".equals(colClass) || "haven_labelled".equals(colClass))
       return extractCategoriesFromLabels(extractAttribute(attr, "labels"), null, null);
     else if ("labelled_spss".equals(colClass)) {
       REXP naValues = extractAttribute(attr, "na_values");
@@ -296,7 +296,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     }
   }
 
-  private Value getValue(List<String> strValues) {
+  private Value getValue(List<Object> strValues) {
     if (strValues == null || strValues.size() == 0)
       return variable.isRepeatable() ? getValueType().nullSequence() : getValueType().nullValue();
     return variable.isRepeatable() ?
@@ -304,24 +304,33 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         getSingleValue(strValues.get(0));
   }
 
-  private Value getSingleValue(String strValue) {
+  private Value getSingleValue(Object objValue) {
     if (isDate())
-      return getDateFromEpoch(strValue);
+      return getDateFromEpoch(objValue);
     else if (isDateTime())
-      return getDateTimeFromEpoch(strValue);
-    return "NaN".equals(strValue) ? getValueType().nullValue() : getValueType().valueOf(strValue);
+      return getDateTimeFromEpoch(objValue);
+    else if (isNumeric())
+      return getNumeric(objValue);
+    return getValueType().valueOf(objValue);
+  }
+
+  private Value getNumeric(Object objValue) {
+    if (objValue == null ||
+    (objValue instanceof Double && ((Double) objValue).isNaN())) return getValueType().nullValue();
+    return getValueType().valueOf(objValue);
   }
 
   /**
    * R dates are serialized as a number of days since epoch (1970-01-01).
    *
-   * @param strValue
+   * @param objValue
    * @return
    */
-  private Value getDateFromEpoch(String strValue) {
-    if ("NaN".equals(strValue)) return getValueType().nullValue();
+  private Value getDateFromEpoch(Object objValue) {
+    if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      Double dbl = Double.parseDouble(strValue);
+      Double dbl = (Double)objValue;
+      if (dbl.isNaN()) return getValueType().nullValue();
       Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
       return getValueType().valueOf(value);
     } catch (Exception e) {
@@ -329,10 +338,11 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     }
   }
 
-  private Value getDateTimeFromEpoch(String strValue) {
-    if ("NaN".equals(strValue)) return getValueType().nullValue();
+  private Value getDateTimeFromEpoch(Object objValue) {
+    if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      Double dbl = Double.parseDouble(strValue);
+      Double dbl = (Double)objValue;
+      if (dbl.isNaN()) return getValueType().nullValue();
       Date value = new Date(dbl.longValue() * 1000);
       return getValueType().valueOf(value);
     } catch (Exception e) {
