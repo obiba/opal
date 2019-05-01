@@ -33,6 +33,8 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
   @Value("${org.obiba.opal.identifiers.prefix}")
   private String prefix;
 
+  private boolean withCheckDigit = false;
+
   public void setKeySize(int keySize) {
     this.keySize = keySize;
   }
@@ -53,8 +55,21 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
     return prefix != null ? prefix.length() : 0;
   }
 
+  public boolean isWithCheckDigit() {
+    return withCheckDigit;
+  }
+
+  public void setWithCheckDigit(boolean withCheckDigit) {
+    allowStartWithZero = !withCheckDigit;
+    this.withCheckDigit = withCheckDigit;
+  }
+
   @Override
   public String generateIdentifier() {
+    return withCheckDigit ? generateLuhnValidRandomIdentifier() : generateRandomIdentifier();
+  }
+
+  private String generateRandomIdentifier() {
     if(keySize < 1) {
       throw new IllegalStateException("keySize must be at least 1: " + keySize);
     }
@@ -74,6 +89,55 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
     }
 
     return sb.toString();
+  }
+
+  private String generateLuhnValidRandomIdentifier() {
+    if(keySize < 2) {
+      throw new IllegalStateException("keySize must be at least 2: " + keySize);
+    }
+
+    StringBuilder sb = new StringBuilder(keySize + getPrefixLength());
+
+    sb.append(generator.nextInt(9) + 1); // First digit shouldn't be 0
+
+    for(int i = 1; i < keySize - 1; i++) {
+      sb.append(generator.nextInt(10));
+    }
+
+    sb.append(generateCheckDigitAlt(Long.parseLong(sb.toString())));
+
+    sb.insert(0, prefix);
+
+    return sb.toString();
+  }
+
+  /**
+   * Generate Luhn check digit.
+   *
+   * @param input
+   * @return
+   */
+  private int generateCheckDigitAlt(long input) {
+    String[] sLong = Long.toString(input).split("");
+    int length = sLong.length;
+    int sumDigits = 0;
+
+    for(int i = length - 1; i > -1; i--) {
+      Integer digit = Integer.valueOf(sLong[i]);
+      if (length % 2 == 0 && i % 2 != 0) {
+        int doubled = digit * 2;
+        if (doubled > 9) {
+          String[] doubledDigits = Integer.toString(doubled).split("");
+          sumDigits = sumDigits + Integer.valueOf(doubledDigits[0]) + Integer.valueOf(doubledDigits[1]);
+        } else {
+          sumDigits += doubled;
+        }
+      } else {
+        sumDigits += digit;
+      }
+    }
+
+    return (9 * sumDigits) % 10;
   }
 
 }

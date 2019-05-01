@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -60,7 +59,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -196,13 +194,15 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @POST
   @Path("/_generate")
   public Response importIdentifiers(@QueryParam("type") String entityType, @QueryParam("size") Integer size,
-      @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+      @QueryParam("zeros") Boolean zeros, @QueryParam("checksum") Boolean checksum, @QueryParam("prefix") String prefix) {
     ensureEntityType(entityType);
     try {
       IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
       if(size != null) pId.setKeySize(size);
       if(zeros != null) pId.setAllowStartWithZero(zeros);
       if(prefix != null) pId.setPrefix(prefix);
+      if(checksum != null) pId.setWithCheckDigit(checksum);
+
       int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
       return Response.ok().entity(Integer.toString(count)).build();
     } catch(MagmaRuntimeException ex) {

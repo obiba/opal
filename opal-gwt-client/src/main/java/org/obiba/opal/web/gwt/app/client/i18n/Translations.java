@@ -1084,6 +1084,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();
 
+  @Description("Identifiers are generated with a checksum digit")
+  @DefaultStringValue("With Checksum Digit")
+  String geValidWithChecksum();
+
+  @Description("Checksum help")
+  @DefaultStringValue("Generate identifiers with its Luhn checksum.")
+  String geValidWithChecksumHelp();
+
   @Description("Cancel label")
   @DefaultStringValue("Cancel")
   String cancelLabel();

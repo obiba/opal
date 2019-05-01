@@ -11,7 +11,6 @@
 package org.obiba.opal.core.tools;
 
 import org.junit.Test;
-import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

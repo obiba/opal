@@ -47,6 +47,13 @@
         </b:ControlGroup>
 
         <b:ControlGroup>
+          <b:CheckBox ui:field="withChecksum"><ui:msg description="Identifiers are generated with a checksum digit">With Checksum Digit</ui:msg></b:CheckBox>
+          <b:HelpBlock ui:field="withChecksumHelp">
+            <ui:msg description="Checksum help">Checksum help</ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
           <b:ControlLabel for="prefix">
             <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
           </b:ControlLabel>
