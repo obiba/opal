@@ -7,6 +7,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.support.SplitValueTablesFactory;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
@@ -20,6 +21,7 @@ import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.AnalyseCommandOptions;
 import org.obiba.opal.spi.analysis.AnalysisService;
+import org.obiba.opal.spi.r.BindRowsAssignROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.analysis.RAnalysis;
@@ -43,8 +45,8 @@ import java.util.stream.StreamSupport;
 
 
 @CommandUsage(
-  description = "Applies analysis on a table or a set of variables.",
-  syntax = "Syntax: analyse [--project PROJECT] [--analyses ANALYSE-JSON-LIST]")
+    description = "Applies analysis on a table or a set of variables.",
+    syntax = "Syntax: analyse [--project PROJECT] [--analyses ANALYSE-JSON-LIST]")
 public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(AnalyseCommand.class);
@@ -93,7 +95,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         String variables = analyseOptions.getVariables();
 
-        if (existingAnalysis  != null) {
+        if (existingAnalysis != null) {
           variables = String.join(",", existingAnalysis.getVariables());
           log.warn("Analysis {} already exists, using existing one instead of provided options with params \"{}\"", existingAnalysis.toString(), analyseOptions.getParams().toString());
         }
@@ -127,11 +129,11 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());
         log.debug("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
-          result.getStartDate(),
-          result.getEndDate(),
-          result.getStatus(),
-          result.getMessage(),
-          result.getReportPath());
+            result.getStartDate(),
+            result.getEndDate(),
+            result.getStatus(),
+            result.getMessage(),
+            result.getReportPath());
 
         analysisResultService.save(new OpalAnalysisResult(result, options.getProject(), analyseOptions.getTable()));
       });
@@ -171,9 +173,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     private ValueTable createView(ValueTable table, List<String> variableNames) {
       String viewName = table.getName() + "View";
       ValueTable view = View.Builder
-        .newView(viewName, table)
-        .select(variable -> variableNames.contains(variable.getName()))
-        .build();
+          .newView(viewName, table)
+          .select(variable -> variableNames.contains(variable.getName()))
+          .build();
 
       if (view.getVariableCount() == 0) {
         throw new RuntimeException(String.format("Invalid variable names provided: %s", variableNames.toString()));
@@ -205,9 +207,28 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
     void write(@NotNull ValueTable valueTable, RSessionHandler rSessionHandler) {
       if (valueTable.getValueSetCount() > 0) {
-        rSessionHandler
-          .getSession()
-          .execute(new MagmaAssignROperation(RUtils.getSymbol(valueTable.getName()), valueTable, txTemplate, "id"));
+
+        List<ValueTable> splitValueTables = SplitValueTablesFactory.split(valueTable);
+        String finalSymbol = RUtils.getSymbol(valueTable.getName());
+
+        if (splitValueTables.size() > 1) {
+          List<String> tmpSymbols = Lists.newArrayList();
+          for (int i = 0; i < splitValueTables.size(); i++) {
+            ValueTable splitValueTable = splitValueTables.get(i);
+            String tmpSymbol = "." + finalSymbol + "__" + i;
+            tmpSymbols.add(tmpSymbol);
+            rSessionHandler
+                .getSession()
+                .execute(new MagmaAssignROperation(tmpSymbol, splitValueTable, txTemplate, "id"));
+          }
+          rSessionHandler
+              .getSession()
+              .execute(new BindRowsAssignROperation(finalSymbol, tmpSymbols));
+        } else {
+          rSessionHandler
+              .getSession()
+              .execute(new MagmaAssignROperation(finalSymbol, valueTable, txTemplate, "id"));
+        }
       }
     }
 

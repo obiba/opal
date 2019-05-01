@@ -10,16 +10,13 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSortedSet;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.rosuda.REngine.REXP;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.util.SortedSet;
 
 /**
  * Assign Magma values (from a table or a variable) to a R symbol.
@@ -55,8 +52,6 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final String updatedColumnName;
 
   private final RClass rClass;
-
-  private SortedSet<VariableEntity> entities;
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate, String idColumnName) {
     if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
@@ -128,15 +123,6 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   TransactionTemplate getTransactionTemplate() {
     return transactionTemplate;
-  }
-
-  SortedSet<VariableEntity> getEntities() {
-    if (entities == null) throw new IllegalStateException("call setEntities() first");
-    return entities;
-  }
-
-  void setEntities(ValueTable table) {
-    this.entities = ImmutableSortedSet.copyOf(table.getVariableEntities());
   }
 
   String getSymbol() {

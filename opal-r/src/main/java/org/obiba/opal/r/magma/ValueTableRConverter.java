@@ -5,19 +5,22 @@
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.SplitValueTablesFactory;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
@@ -44,8 +47,6 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableRConverter.class);
 
-  private ValueTable table;
-
   private final Map<String, Integer> lineCounts = Maps.newConcurrentMap();
 
   ValueTableRConverter(MagmaAssignROperation magmaAssignROperation) {
@@ -56,7 +57,58 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     return !lineCounts.isEmpty();
   }
 
-  protected void doAssignTmpVectors(REXP ids, String[] names, RList list) {
+  @Override
+  public void doAssign(String symbol, String path) {
+    ValueTable table;
+    if (magmaAssignROperation.hasValueTable()) table = magmaAssignROperation.getValueTable();
+    else table = resolvePath(path);
+    if (table == null) throw new IllegalStateException("Table must not be null");
+
+    // if only table path was provided, it might be necessary to assign table by chunks
+    doAssignTable(table, !magmaAssignROperation.hasValueTable());
+  }
+
+  /**
+   * Make the table assignment, split it to assign it by chunks if necessary.
+   *
+   * @param table
+   * @param split
+   */
+  protected void doAssignTable(ValueTable table, boolean split) {
+    if (split) {
+      List<ValueTable> splitTables = SplitValueTablesFactory.split(table);
+      if (splitTables.size()>1) {
+        List<String> splitSymbols = Lists.newArrayList();
+        int i = 1;
+        for (ValueTable splitTable : splitTables) {
+          String splitSymbol = "." + getSymbol() + "__" + i;
+          doAssignTable(splitTable, splitSymbol);
+          splitSymbols.add(splitSymbol);
+          i++;
+        }
+        String args = Joiner.on("`,`").join(splitSymbols);
+        magmaAssignROperation.doEnsurePackage("dplyr");
+        magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', dplyr::bind_rows(`%s`)))", getSymbol(), args));
+        magmaAssignROperation.doEval(String.format("for (n in names(`%s`)) attributes(`%s`[[n]]) <- attributes(`%s`[[n]])", getSymbol(), getSymbol(), splitSymbols.get(0)));
+        args = Joiner.on("','").join(splitSymbols);
+        magmaAssignROperation.doEval(String.format("base::rm(list='%s')", args));
+      } else {
+        doAssignTable(table, getSymbol());
+      }
+    } else {
+      doAssignTable(table, getSymbol());
+    }
+  }
+
+  /**
+   * Converter specific table assignment.
+   *
+   * @param table
+   * @param symbol
+   */
+  protected abstract void doAssignTable(ValueTable table, String symbol);
+
+  protected void doAssignTmpVectors(ValueTable table, REXP ids, String[] names, RList list) {
     // one temporary vector per variable
     for (String name : names) {
       magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), name), list.at(name));
@@ -64,7 +116,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     // one temporary vector for the timestamp
     if (withUpdatedColumn()) {
       magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), getUpdatedColumnName()),
-          getUpdatedVector(withMissings()));
+          getUpdatedVector(table, withMissings()));
     }
     // one temporary vector for the ids
     magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(),
@@ -74,9 +126,11 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   protected void doRemoveTmpVectors(String... names) {
     // remove temporary vectors
+    List<String> vectorNames = Lists.newArrayList();
     for (String name : names) {
-      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(), name) + ")");
+      vectorNames.add(getTmpVectorName(getSymbol(), name));
     }
+    magmaAssignROperation.doEval("base::rm(list=c('" + Joiner.on("','").join(vectorNames) + "'))");
     magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
         withIdColumn() ? getIdColumnName() : "row.names") + ")");
     if (withUpdatedColumn()) {
@@ -86,7 +140,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   protected String getTmpVectorName(String symbol, String name) {
-    return ("opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
+    return (".opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
         .replace("'", ".").replace("[", ".").replace("]", ".").replace("{", ".").replace("}", ".").replace("(", ".").replace(")", ".");
   }
 
@@ -97,7 +151,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected boolean withIdColumn() {
     return magmaAssignROperation.withIdColumn();
   }
-  
+
   protected String getIdColumnName() {
     return magmaAssignROperation.getIdColumnName();
   }
@@ -109,13 +163,9 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected String getUpdatedColumnName() {
     return magmaAssignROperation.getUpdatedColumnName();
   }
-  
-  protected SortedSet<VariableEntity> getEntities() {
-    return magmaAssignROperation.getEntities();
-  }
 
-  protected List<VariableEntity> getEntitiesAsList() {
-    return ImmutableList.copyOf(magmaAssignROperation.getEntities());
+  protected SortedSet<VariableEntity> getEntities(ValueTable table) {
+    return ImmutableSortedSet.copyOf(table.getVariableEntities());
   }
 
   /**
@@ -132,7 +182,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
    *
    * @return
    */
-  protected boolean  withFactors() {
+  protected boolean withFactors() {
     return true;
   }
 
@@ -145,27 +195,28 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     return false;
   }
 
-  protected REXP getIdsVector(boolean withMissings) {
-    return getUnaryVector(new VariableEntityValueSource(getIdColumnName()), withMissings);
+  protected REXP getIdsVector(ValueTable table, boolean withMissings) {
+    return getUnaryVector(table, new VariableEntityValueSource(table, getIdColumnName()), withMissings);
   }
 
-  protected REXP getUpdatedVector(boolean withMissings) {
-    return getUnaryVector(new ValueSetUpdatedValueSource(getUpdatedColumnName()), withMissings);
+  protected REXP getUpdatedVector(ValueTable table, boolean withMissings) {
+    return getUnaryVector(table, new ValueSetUpdatedValueSource(table, getUpdatedColumnName()), withMissings);
   }
 
-  private REXP getUnaryVector(VariableValueSource vvs, boolean withMissings) {
+  private REXP getUnaryVector(ValueTable table, VariableValueSource vvs, boolean withMissings) {
+    SortedSet<VariableEntity> entities = getEntities(table);
     if (lineCounts.isEmpty())
-      return getVector(vvs, getEntities(), withMissings);
+      return getVector(vvs, entities, withMissings);
     else {
       List<Value> values = Lists.newArrayList();
-      List<Value> vValues = ImmutableList.copyOf(vvs.asVectorSource().getValues(getEntities()));
-      List<String> ids = getEntitiesAsList().stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
+      List<Value> vValues = ImmutableList.copyOf(vvs.asVectorSource().getValues(entities));
+      List<String> ids = entities.stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
 
-      for (int i=0; i<ids.size(); i++) {
+      for (int i = 0; i < ids.size(); i++) {
         Value val = vValues.get(i);
         String id = ids.get(i);
         if (lineCounts.containsKey(id)) {
-          for (int j=0; j<lineCounts.get(id); j++) {
+          for (int j = 0; j < lineCounts.get(id); j++) {
             values.add(val);
           }
         } else {
@@ -173,20 +224,12 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         }
       }
 
-      return getVector(vvs.getVariable(), values, getEntities(), withMissings, false, false);
+      return getVector(vvs.getVariable(), values, entities, withMissings, false, false);
     }
   }
 
-  protected RList getVariableVectors() {
-    return getVariableVectorsByRows();
-  }
-
-  protected void setValueTable(ValueTable table) {
-    this.table = table;
-  }
-
-  protected ValueTable getValueTable() {
-    return table;
+  protected RList getVariableVectors(ValueTable table) {
+    return getVariableVectorsByRows(table);
   }
 
   /**
@@ -195,11 +238,11 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
    *
    * @return
    */
-  protected RList getVariableVectorsByRows() {
+  protected RList getVariableVectorsByRows(ValueTable table) {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
-    SortedSet<VariableEntity> entities = getEntities();
-    Iterable<Variable> variables = filterVariables();
+    SortedSet<VariableEntity> entities = getEntities(table);
+    Iterable<Variable> variables = filterVariables(table);
     Map<String, Map<String, Value>> variableValues = Maps.newConcurrentMap();
     variables.forEach(variable -> variableValues.put(variable.getName(), Maps.newConcurrentMap()));
 
@@ -235,12 +278,12 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         if (lineCounts.containsKey(e.getIdentifier())) {
           if (value.isSequence()) {
             values.addAll(value.asSequence().getValues());
-            for (int i = value.asSequence().getSize(); i<lineCounts.get(e.getIdentifier()); i++) {
+            for (int i = value.asSequence().getSize(); i < lineCounts.get(e.getIdentifier()); i++) {
               values.add(value.getValueType().nullValue());
             }
           } else {
             // repeat the non sequence value over the multiple lines
-            for (int i=0; i<lineCounts.get(e.getIdentifier()); i++) {
+            for (int i = 0; i < lineCounts.get(e.getIdentifier()); i++) {
               values.add(value);
             }
           }
@@ -261,10 +304,10 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
    *
    * @return
    */
-  private Iterable<Variable> filterVariables() {
+  private Iterable<Variable> filterVariables(ValueTable table) {
     List<Variable> filteredVariables;
     List<Variable> allVariables = StreamSupport.stream(table.getVariables().spliterator(), false)
-      .filter(v -> !BinaryType.get().equals(v.getValueType())).collect(Collectors.toList());
+        .filter(v -> !BinaryType.get().equals(v.getValueType())).collect(Collectors.toList());
 
     if (Strings.isNullOrEmpty(magmaAssignROperation.getVariableFilter())) {
       filteredVariables = allVariables;
@@ -277,7 +320,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     return filteredVariables;
   }
 
-  protected void resolvePath(String path) {
+  protected ValueTable resolvePath(String path) {
     MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(path);
 
     if (resolver.getDatasourceName() == null) {
@@ -285,7 +328,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     }
     Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
 
-    table = applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()));
+    return applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()));
   }
 
   /**
@@ -295,7 +338,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
     private final Variable variable;
 
-    VariableEntityValueSource(String name) {
+    VariableEntityValueSource(ValueTable table, String name) {
       this.variable = Variable.Builder.newVariable(Strings.isNullOrEmpty(name) ? "opal_id" : name, TextType.get(), table.getEntityType()).build();
     }
 
@@ -340,9 +383,12 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   private class ValueSetUpdatedValueSource extends AbstractVariableValueSource implements VariableValueSource {
 
+    private final ValueTable table;
+
     private final Variable variable;
 
-    ValueSetUpdatedValueSource(String name) {
+    ValueSetUpdatedValueSource(ValueTable table, String name) {
+      this.table = table;
       this.variable = Variable.Builder.newVariable(name, DateTimeType.get(), table.getEntityType()).build();
     }
 

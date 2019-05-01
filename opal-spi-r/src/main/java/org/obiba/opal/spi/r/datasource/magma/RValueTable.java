@@ -32,6 +32,8 @@ public class RValueTable extends AbstractValueTable {
 
   private static final Logger log = LoggerFactory.getLogger(RValueTable.class);
 
+  private static final int MAX_DATA_POINTS = 10000;
+
   private final String symbol;
 
   private int idPosition;
@@ -109,6 +111,10 @@ public class RValueTable extends AbstractValueTable {
       // ignore
       log.error("Variable init failure for tibble {}", getSymbol(), e);
     }
+    int optimizedBatchSize = MAX_DATA_POINTS / getVariableCount();
+    log.debug("Optimized batch size: {}", optimizedBatchSize);
+    if (optimizedBatchSize > getVariableEntityBatchSize())
+      setVariableEntityBatchSize(optimizedBatchSize);
   }
 
   REXP execute(String script) {

@@ -20,6 +20,7 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
 
 import javax.validation.constraints.NotNull;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +31,14 @@ class RValueSet extends ValueSetBean {
 
   private final RValueSetFetcher fetcher;
 
-  private Map<Integer, List<String>> columnValues;
+  private Map<Integer, List<Object>> columnValues;
 
   RValueSet(@NotNull RValueTable table, @NotNull VariableEntity entity) {
     super(table, entity);
     this.fetcher = new RValueSetFetcher(table);
   }
 
-  public Map<Integer, List<String>> getValuesByPosition() {
+  public Map<Integer, List<Object>> getValuesByPosition() {
     if (columnValues == null) {
       parseREXP(fetcher.getREXP(getVariableEntity()));
     }
@@ -65,20 +66,20 @@ class RValueSet extends ValueSetBean {
           }
           row++;
         }
-        for (int col = 0; col<vectors.size(); col++) {
+        for (int col = 0; col < vectors.size(); col++) {
           if (getIdPosition() == col + 1) continue;
           int position = col + 1;
           columnValues.put(position, Lists.newArrayList());
           REXP vector = (REXP) vectors.get(col);
           boolean[] nas = vector.isNA();
-          String[] strValues = vector.asStrings();
+          Object[] objectValues = asObjects(vector);
           // #3303 force NA representation
-          for (int i=0; i<nas.length; i++) {
-            if (nas[i]) strValues[i] = null;
+          for (int i = 0; i < nas.length; i++) {
+            if (nas[i]) objectValues[i] = null;
           }
-          for (int r = 0; r < strValues.length; r++) {
+          for (int r = 0; r < objectValues.length; r++) {
             if (rowIdx.contains(r)) {
-              columnValues.get(position).add(strValues[r]);
+              columnValues.get(position).add(objectValues[r]);
             }
           }
         }
@@ -86,6 +87,16 @@ class RValueSet extends ValueSetBean {
         // ignore
       }
     }
+  }
+
+  private Object[] asObjects(REXP vector) throws REXPMismatchException {
+    Object payload = vector.asNativeJavaObject();
+    int arrlength = Array.getLength(payload);
+    Object[] outputArray = new Object[arrlength];
+    for (int i = 0; i < arrlength; ++i) {
+      outputArray[i] = Array.get(payload, i);
+    }
+    return outputArray;
   }
 
   private RVariableEntity getRVariableEntity() {
