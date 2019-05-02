@@ -84,7 +84,6 @@ public class DefaultParticipantIdentifierImplTest {
     assertThat(LuhnValidator.validate(participantIdentifier.generateIdentifier())).isTrue();
     participantIdentifier.setKeySize(12);
     participantIdentifier.setWithCheckDigit(true);
-    // TODO make sure it works for size != 15
-    //assertThat(LuhnValidator.validate(participantIdentifier.generateIdentifier())).isTrue();
+    assertThat(LuhnValidator.validate(participantIdentifier.generateIdentifier())).isTrue();
   }
 }
