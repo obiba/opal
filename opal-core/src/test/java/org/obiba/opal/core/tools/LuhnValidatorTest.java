@@ -56,9 +56,4 @@ public class LuhnValidatorTest {
     assertThat(LuhnValidator.validate("0000000000000")).isFalse();
   }
 
-  @Test
-  public void test_generated() {
-    assertThat(LuhnValidator.validate(LuhnValidator.generate())).isTrue();
-  }
-
 }

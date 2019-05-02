@@ -17,6 +17,7 @@ import java.util.Set;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.core.tools.LuhnValidator;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -74,5 +75,16 @@ public class DefaultParticipantIdentifierImplTest {
       assertThat(c.getValue() >= 9500 && c.getValue() <= 10500).isTrue()
           .overridingErrorMessage("The distribution of [" + c.getKey() + "] has the value [" + c.getValue() + "].");
     }
+  }
+
+  @Test
+  public void testLuhnValidIdentifierGeneration() {
+    participantIdentifier.setKeySize(15);
+    participantIdentifier.setWithCheckDigit(true);
+    assertThat(LuhnValidator.validate(participantIdentifier.generateIdentifier())).isTrue();
+    participantIdentifier.setKeySize(12);
+    participantIdentifier.setWithCheckDigit(true);
+    // TODO make sure it works for size != 15
+    //assertThat(LuhnValidator.validate(participantIdentifier.generateIdentifier())).isTrue();
   }
 }

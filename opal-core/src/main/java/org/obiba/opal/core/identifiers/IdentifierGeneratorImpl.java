@@ -12,6 +12,7 @@ package org.obiba.opal.core.identifiers;
 import java.security.SecureRandom;
 import java.util.Random;
 
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -106,7 +107,8 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
 
     sb.append(generateCheckDigitAlt(Long.parseLong(sb.toString())));
 
-    sb.insert(0, prefix);
+    if (!Strings.isNullOrEmpty(prefix))
+      sb.insert(0, prefix);
 
     return sb.toString();
   }

@@ -55,17 +55,4 @@ public class LuhnValidator {
     }
   }
 
-  /**
-   * Generate an identifier that is Luhn valid.
-   *
-   * @return
-   */
-  public static String generate() {
-    IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
-    pId.setKeySize(15);
-    pId.setAllowStartWithZero(false);
-    pId.setPrefix("");
-    pId.setWithCheckDigit(true);
-    return pId.generateIdentifier();
-  }
 }
