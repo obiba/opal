@@ -809,7 +809,7 @@ public interface Translations extends Constants {
   String rSPSSLabel();
 
   @Description("RSPSS help")
-  @DefaultStringValue("Data in SPSS format are packaged in a file with suffix .sav.")
+  @DefaultStringValue("Data in SPSS format are packaged in a file with suffix .sav or .zsav (when compressed).")
   String rSPSSHelp();
 
   @Description("RZSPSS label")
