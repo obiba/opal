@@ -12,7 +12,6 @@ package org.obiba.opal.core.identifiers;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +60,6 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
   }
 
   public void setWithCheckDigit(boolean withCheckDigit) {
-    allowStartWithZero = !withCheckDigit;
     this.withCheckDigit = withCheckDigit;
   }
 
@@ -105,10 +103,9 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
       sb.append(generator.nextInt(10));
     }
 
-    sb.append(generateCheckDigitAlt(Long.parseLong(sb.toString())));
+    sb.append(generateCheckDigit(Long.parseLong(sb.toString())));
 
-    if (!Strings.isNullOrEmpty(prefix))
-      sb.insert(0, prefix);
+    if (getPrefixLength() > 0) sb.insert(0, prefix);
 
     return sb.toString();
   }
@@ -119,24 +116,17 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
    * @param input
    * @return
    */
-  private int generateCheckDigitAlt(long input) {
+  private int generateCheckDigit(long input) {
     String[] sLong = Long.toString(input).split("");
     int length = sLong.length;
+    boolean lengthIsPair = length % 2 == 0;
     int sumDigits = 0;
 
     for(int i = length - 1; i > -1; i--) {
-      Integer digit = Integer.valueOf(sLong[i]);
-      if (length % 2 == 0 && i % 2 != 0) {
-        int doubled = digit * 2;
-        if (doubled > 9) {
-          String[] doubledDigits = Integer.toString(doubled).split("");
-          sumDigits = sumDigits + Integer.valueOf(doubledDigits[0]) + Integer.valueOf(doubledDigits[1]);
-        } else {
-          sumDigits += doubled;
-        }
-      } else {
-        sumDigits += digit;
-      }
+      int digit = Integer.valueOf(sLong[i]);
+      if ((lengthIsPair && i % 2 != 0) || (!lengthIsPair && i % 2 == 0)) digit *= 2;
+      if (digit > 9) digit -= 9;
+      sumDigits += digit;
     }
 
     return (9 * sumDigits) % 10;
