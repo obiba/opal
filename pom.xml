@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
     <bouncycastle.version>1.46</bouncycastle.version>
-    <buji.version>4.0.0</buji.version>
+    <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
     <commons-codec.version>1.10</commons-codec.version>
     <commons-collections.version>3.2.2</commons-collections.version>
@@ -88,7 +88,7 @@
     <logback.version>1.1.3</logback.version>
     <logstash-logback.version>4.5.1</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>1.18.5</magma.version>
+    <magma.version>1.19-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>2.2.5</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
