@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
@@ -188,6 +189,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
       Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(
           new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
+      validators.add(
+          new RegExValidator(getView().getName(), "^[\\w_-]*$", "NameHasInvalidCharactersNoSpace", Display.FormField.NAME.name()));
 
       return validators;
     }

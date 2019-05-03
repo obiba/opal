@@ -22,6 +22,7 @@ import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
@@ -157,6 +158,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   public Taxonomy importInputStreamTaxonomy(@NotNull InputStream input, @Nullable String name, boolean override) {
     TaxonomyYaml yaml = new TaxonomyYaml();
     Taxonomy taxonomy = yaml.load(input);
+    taxonomySanitizeName(taxonomy);
     String taxonomyName = Strings.isNullOrEmpty(name) ? taxonomy.getName() : name;
     if(override || !hasTaxonomy(taxonomyName)) {
       saveTaxonomy(taxonomy);
@@ -312,6 +314,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
         if (matcher.find()) {
           TaxonomyYaml yaml = new TaxonomyYaml();
           Taxonomy taxonomy = yaml.load(zipIn);
+          taxonomySanitizeName(taxonomy);
           if(override || !hasTaxonomy(taxonomy.getName())) {
             saveTaxonomy(taxonomy);
             result.add(taxonomy);
@@ -329,6 +332,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
     try (InputStream input = new URL(uri).openStream()){
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
+      taxonomySanitizeName(taxonomy);
       if(override || !hasTaxonomy(taxonomy.getName())) {
         saveTaxonomy(taxonomy);
         return taxonomy;
@@ -337,6 +341,28 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
       throw new TaxonomyImportException(e);
     }
     return null;
+  }
+
+  private void taxonomySanitizeName(Taxonomy taxonomy){
+    taxonomy.setName(sanitizeName(taxonomy.getName()));
+    if(taxonomy.hasVocabularies()){
+      taxonomy.getVocabularies().forEach(vocabulary -> vocabularySanitizeName(vocabulary));
+    }
+  }
+
+  private void vocabularySanitizeName(Vocabulary vocabulary){
+    vocabulary.setName(sanitizeName(vocabulary.getName()));
+    if(vocabulary.hasTerms()){
+      vocabulary.getTerms().forEach(term -> termSanitizeName(term));
+    }
+  }
+
+  private void termSanitizeName(Term term){
+    term.setName(sanitizeName(term.getName()));
+  }
+
+  private String sanitizeName(String name){
+    return  name.replaceAll("[^\\w_-]", "_");
   }
 
   private FileObject resolveFileInFileSystem(String path) throws FileSystemException {
