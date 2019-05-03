@@ -33,6 +33,7 @@ public final class IdentifierGeneratorImpl implements IdentifierGenerator {
   @Value("${org.obiba.opal.identifiers.prefix}")
   private String prefix;
 
+  @Value("${org.obiba.opal.identifiers.checksum}")
   private boolean withCheckDigit = false;
 
   public void setKeySize(int keySize) {
