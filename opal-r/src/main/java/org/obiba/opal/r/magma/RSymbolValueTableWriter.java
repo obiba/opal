@@ -12,7 +12,8 @@ package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.magma.*;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.spi.r.BindRowsAssignROperation;
@@ -51,6 +52,12 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private int bufferedTableCount = 0;
 
+  private int optimizedDataPoints = 0;
+
+  private final long freeMemoryInit;
+
+  private final long totalMemoryInit;
+
   public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrappedValueTableWriter, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName) {
     this.tableName = tableName;
     this.datasource = datasource;
@@ -59,6 +66,9 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
     this.txTemplate = txTemplate;
     this.idColumnName = Strings.isNullOrEmpty(idColumnName) ? RDatasource.DEFAULT_ID_COLUMN_NAME : idColumnName;
     this.symbolWriter = symbolWriter;
+    System.gc();
+    freeMemoryInit = Runtime.getRuntime().freeMemory();
+    totalMemoryInit = Runtime.getRuntime().totalMemory();
   }
 
   @Override
@@ -69,11 +79,21 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
   @Override
   public ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
     if (datasource.hasValueTable(tableName)) {
-      StaticValueTable table = (StaticValueTable)datasource.getValueTable(tableName);
+      StaticValueTable table = (StaticValueTable) datasource.getValueTable(tableName);
       int entityCount = table.getVariableEntityCount();
       int variableCount = table.getVariableCount();
       int dataPointsCount = entityCount * variableCount;
-      if (dataPointsCount>MAX_DATA_POINTS) {
+      if (optimizedDataPoints == 0) {
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        long deltaMemory = totalMemory - totalMemoryInit;
+        long freeMemoryTotal = freeMemoryInit + (deltaMemory > 0 ? deltaMemory : 0);
+        if (freeMemory < freeMemoryTotal * 0.3) {
+          optimizedDataPoints = dataPointsCount;
+          log.trace("FREE MEMORY: {} / {} (~{})", freeMemory, freeMemoryInit, deltaMemory);
+          log.info("Using {}% of the initial free memory, for {} data points", 100 * (freeMemoryTotal - freeMemory) / freeMemoryTotal, optimizedDataPoints);
+        }
+      } else if (dataPointsCount > optimizedDataPoints) {
         log.debug("Buffered data points: {}", dataPointsCount);
         flushValueTable();
       }
@@ -83,10 +103,10 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   @Override
   public void close() {
-    boolean hasValueSets = flushValueTable()>0;
+    boolean hasValueSets = flushValueTable() > 0;
     wrappedValueTableWriter.close();
 
-    StaticValueTable table = (StaticValueTable)datasource.getValueTable(tableName);
+    StaticValueTable table = (StaticValueTable) datasource.getValueTable(tableName);
     if (hasValueSets) {
       String symbol = symbolWriter.getSymbol(table);
       List<String> symbols = Lists.newArrayList();
@@ -105,11 +125,11 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
   /**
    * Assign StaticValueTable as a R Tibble.
    */
-  private int flushValueTable() {
+  private synchronized int flushValueTable() {
     // get in-memory table and persist it in R
-    StaticValueTable valueTable = (StaticValueTable)datasource.getValueTable(tableName);
+    StaticValueTable valueTable = (StaticValueTable) datasource.getValueTable(tableName);
     int valueSetCount = valueTable.getValueSetCount();
-    if (valueSetCount>0) {
+    if (valueSetCount > 0) {
       // push table to a R tibble
       String tableSymbol = asValueTableSymbol(symbolWriter.getSymbol(valueTable), bufferedTableCount);
       log.debug("Assigning table: {} to {}", tableName, tableSymbol);
