@@ -46,6 +46,13 @@
         </b:Column>
       </b:Row>
     </g:FlowPanel>
+    <g:FlowPanel addStyleNames="container">
+      <b:Row addStyleNames="top-margin">
+        <b:Column size="4" offset="4">
+          <g:VerticalPanel ui:field="authClientsPanel"/>
+        </b:Column>
+      </b:Row>
+    </g:FlowPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

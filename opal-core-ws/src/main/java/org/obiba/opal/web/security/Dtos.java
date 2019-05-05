@@ -12,6 +12,7 @@ package org.obiba.opal.web.security;
 
 import java.text.SimpleDateFormat;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -102,10 +103,13 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Opal.AuthClientDto asDto(String name, String redirectUrl) {
+  public static Opal.AuthClientDto asDto(String name, String label, String redirectUrl) {
     Opal.AuthClientDto.Builder builder = Opal.AuthClientDto.newBuilder();
     builder.setName(name);
-    if (redirectUrl != null) {
+    if (!Strings.isNullOrEmpty(label)) {
+      builder.setLabel(label);
+    }
+    if (!Strings.isNullOrEmpty(redirectUrl)) {
       builder.setRedirectUrl(redirectUrl);
     }
     return builder.build();

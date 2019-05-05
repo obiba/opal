@@ -401,5 +401,6 @@ message VcsCommitInfoDto {
 
 message AuthClientDto {
   required string name = 1;
-  optional string redirectUrl = 2;
+  optional string label = 2;
+  optional string redirectUrl = 3;
 }

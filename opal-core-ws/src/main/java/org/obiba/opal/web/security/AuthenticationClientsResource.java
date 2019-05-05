@@ -6,6 +6,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.client.IndirectClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,10 +29,15 @@ public class AuthenticationClientsResource {
     List<Opal.AuthClientDto> result = Lists.newArrayList();
     Clients clients = pac4jConfigurer.getConfig().getClients();
     for (Client client : clients.getClients()) {
+      String label = null;
       if (client instanceof OidcClient) {
-
+        label = ((OidcClient) client).getConfiguration().getCustomParam(Pac4jConfigurer.LABEL_KEY);
       }
-      result.add(Dtos.asDto(client.getName(), ((OidcClient)client).getCallbackUrl()));
+      String redirectUrl = null;
+      if (client instanceof IndirectClient) {
+        redirectUrl = ((IndirectClient)client).getCallbackUrl();
+      }
+      result.add(Dtos.asDto(client.getName(), label, redirectUrl));
     }
 
     return result;

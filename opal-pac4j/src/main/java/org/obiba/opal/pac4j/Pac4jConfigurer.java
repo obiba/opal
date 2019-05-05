@@ -18,6 +18,8 @@ import java.util.Properties;
 @Component
 public class Pac4jConfigurer {
 
+  public static final String LABEL_KEY = "label";
+
   private static String callbackUrl;
 
   private static String callbackPath;
@@ -70,19 +72,22 @@ public class Pac4jConfigurer {
 
   public Config getConfig() {
     if (config == null) {
-      KeycloakOidcConfiguration kcConfig = new KeycloakOidcConfiguration();
-      kcConfig.setClientId("opal");
-      kcConfig.setSecret("1aa43945-7166-4292-8f46-c4b836054676");
-      kcConfig.setBaseUri("http://localhost:8888/auth");
-      kcConfig.setRealm("obiba");
       KeycloakOidcClient kcClient = new KeycloakOidcClient();
       kcClient.setName("kc-test");
       kcClient.setCallbackUrlResolver(new PathParameterCallbackUrlResolver());
+      KeycloakOidcConfiguration kcConfig = new KeycloakOidcConfiguration();
+      kcConfig.setClientId("opal");
+      kcConfig.setSecret("1aa43945-7166-4292-8f46-c4b836054676");
+      kcConfig.setBaseUri("http://localhost:8899/auth");
+      kcConfig.setRealm("obiba");
+      kcConfig.addCustomParam(LABEL_KEY, "Keycloack Test");
       kcClient.setConfiguration(kcConfig);
-
+      kcConfig.setWithState(true);
+      
       config = new Config();
       config.setClients(new Clients(getCallbackUrl(), kcClient));
       config.setSessionStore(ShiroSessionStore.INSTANCE);
+
     }
 
     return config;
