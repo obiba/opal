@@ -34,7 +34,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private static final Logger log = LoggerFactory.getLogger(RSymbolValueTableWriter.class);
 
-  private static final int MAX_DATA_POINTS = 100000;
+  private static final double MEMORY_RATIO = 0.5;
 
   private final String tableName;
 
@@ -66,6 +66,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
     this.txTemplate = txTemplate;
     this.idColumnName = Strings.isNullOrEmpty(idColumnName) ? RDatasource.DEFAULT_ID_COLUMN_NAME : idColumnName;
     this.symbolWriter = symbolWriter;
+    // clean memory and get initial state
     System.gc();
     freeMemoryInit = Runtime.getRuntime().freeMemory();
     totalMemoryInit = Runtime.getRuntime().totalMemory();
@@ -86,12 +87,12 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
       if (optimizedDataPoints == 0) {
         long freeMemory = Runtime.getRuntime().freeMemory();
         long totalMemory = Runtime.getRuntime().totalMemory();
-        long deltaMemory = totalMemory - totalMemoryInit;
-        long freeMemoryTotal = freeMemoryInit + (deltaMemory > 0 ? deltaMemory : 0);
-        if (freeMemory < freeMemoryTotal * 0.3) {
+        long deltaTotalMemory = totalMemory - totalMemoryInit;
+        long freeMemoryTotal = freeMemoryInit + (deltaTotalMemory > 0 ? deltaTotalMemory : 0);
+        if (freeMemory < freeMemoryTotal * MEMORY_RATIO) {
           optimizedDataPoints = dataPointsCount;
-          log.trace("FREE MEMORY: {} / {} (~{})", freeMemory, freeMemoryInit, deltaMemory);
-          log.info("Using {}% of the initial free memory, for {} data points", 100 * (freeMemoryTotal - freeMemory) / freeMemoryTotal, optimizedDataPoints);
+          log.trace("FREE MEMORY: {} / {} (~{})", freeMemory, freeMemoryInit, deltaTotalMemory);
+          log.debug("Using {}% of the initial free memory, for {} data points", 100 * (freeMemoryTotal - freeMemory) / freeMemoryTotal, optimizedDataPoints);
         }
       } else if (dataPointsCount > optimizedDataPoints) {
         log.debug("Buffered data points: {}", dataPointsCount);
