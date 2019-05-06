@@ -73,6 +73,9 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   Image loginProgress;
 
   @UiField
+  Panel authPanel;
+
+  @UiField
   VerticalPanel authClientsPanel;
 
   private final Translations translations;
@@ -176,7 +179,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
         title = key; //fallback
       }
       Anchor anchor = new Anchor(title, false, "../login/" + key);
-      anchor.addStyleName("btn btn-info");
+      anchor.addStyleName("btn btn-inverse");
       widgets.add(anchor);
     }
 
@@ -186,7 +189,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
       }
     }
     authClientsPanel.setBorderWidth(0);
-    authClientsPanel.setVisible(widgets.size() > 0);
+    authPanel.setVisible(widgets.size() > 0);
   }
 
   private void clearPassword() {

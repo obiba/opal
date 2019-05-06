@@ -13,12 +13,14 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import com.google.common.collect.Lists;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
@@ -174,6 +176,9 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     }
 
     private Collection<Permission> doGetGroupPermissions(Subject group) {
+      if ("admin".equals(group.getPrincipal())) {
+        return Lists.newArrayList(new AllPermission());
+      }
       return ImmutableList
           .copyOf(Iterables.transform(loadSubjectPermissions(group), new Function<String, Permission>() {
 

@@ -11,7 +11,7 @@ package org.obiba.opal.server.httpd;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import org.apache.shiro.web.env.EnvironmentLoader;
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -20,7 +20,6 @@ import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.GzipFilter;
@@ -68,8 +67,8 @@ public class OpalJettyServer {
 
   private static final String MAX_FORM_CONTENT_SIZE = "200000";
 
-  private static String[] GZIP_MIME_TYPES = { "text/css", "text/html", "text/plain", "text/csv",
-      "application/xml", "application/json", "application/x-protobuf+json", "application/javascript" };
+  private static String[] GZIP_MIME_TYPES = {"text/css", "text/html", "text/plain", "text/csv",
+      "application/xml", "application/json", "application/x-protobuf+json", "application/javascript"};
 
   private Server jettyServer;
 
@@ -129,7 +128,7 @@ public class OpalJettyServer {
 
   private Properties loadProperties() throws IOException {
     // ${OPAL_HOME}/conf/opal-config.properties
-    try(FileInputStream inputStream = new FileInputStream(
+    try (FileInputStream inputStream = new FileInputStream(
         new File(System.getProperty("OPAL_HOME") + "/conf/opal-config.properties"))) {
       Properties properties = new Properties(PropertiesLoaderUtils.loadAllProperties("META-INF/defaults.properties"));
       properties.load(inputStream);
@@ -138,15 +137,15 @@ public class OpalJettyServer {
   }
 
   private void configureHttpConnector(@Nullable Integer httpPort, HttpConfiguration httpConfig) {
-    if(httpPort == null || httpPort <= 0) return;
+    if (httpPort == null || httpPort <= 0) return;
     ServerConnector httpConnector = new ServerConnector(jettyServer, new HttpConnectionFactory(httpConfig));
     httpConnector.setPort(httpPort);
     jettyServer.addConnector(httpConnector);
   }
 
   private void configureSslConnector(@Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
-      String includedCipherSuites) {
-    if(httpsPort == null || httpsPort <= 0) return;
+                                     String includedCipherSuites) {
+    if (httpsPort == null || httpsPort <= 0) return;
     httpConfig.setSecureScheme("https");
     httpConfig.setSecurePort(httpsPort);
     httpConfig.addCustomizer(new SecureRequestCustomizer());
@@ -182,14 +181,14 @@ public class OpalJettyServer {
     jettySsl.setNeedClientAuth(false);
     jettySsl.setRenegotiationAllowed(false);
 
-    if(!Strings.isNullOrEmpty(excludedProtocols)) {
+    if (!Strings.isNullOrEmpty(excludedProtocols)) {
       String[] protocols = excludedProtocols.split("\\s*,\\s*");
-      if(protocols.length > 0) jettySsl.addExcludeProtocols(protocols);
+      if (protocols.length > 0) jettySsl.addExcludeProtocols(protocols);
     }
 
-    if(!Strings.isNullOrEmpty(includedCipherSuites)) {
+    if (!Strings.isNullOrEmpty(includedCipherSuites)) {
       String[] ciphers = includedCipherSuites.split("\\s*,\\s*");
-      if(ciphers.length > 0) jettySsl.setIncludeCipherSuites(ciphers);
+      if (ciphers.length > 0) jettySsl.setIncludeCipherSuites(ciphers);
     }
 
     return jettySsl;
@@ -221,7 +220,7 @@ public class OpalJettyServer {
     servletContextHandler.addEventListener(new ResteasyBootstrap());
     servletContextHandler.addEventListener(new Spring4ContextLoaderListener());
     servletContextHandler.addEventListener(new RequestContextListener());
-    //servletContextHandler.addEventListener(new OpalEnvironmentLoaderListener());
+    servletContextHandler.addEventListener(new EnvironmentLoaderListener());
   }
 
   private void initFilters(Properties properties) {
@@ -280,7 +279,7 @@ public class OpalJettyServer {
 
   private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
     File file = new File(filePath);
-    if(!file.exists() && !file.mkdirs()) {
+    if (!file.exists() && !file.mkdirs()) {
       throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
     }
     return createFileHandler("file://" + filePath);
@@ -288,7 +287,7 @@ public class OpalJettyServer {
 
   /**
    * Make sure there are no symbolic links in the Opal distribution folder path.
-   * 
+   *
    * @return
    * @throws IOException
    */
@@ -303,7 +302,7 @@ public class OpalJettyServer {
 
     @Override
     protected void customizeContext(ServletContext servletContext,
-        ConfigurableWebApplicationContext configurableWebApplicationContext) {
+                                    ConfigurableWebApplicationContext configurableWebApplicationContext) {
       super.customizeContext(servletContext, configurableWebApplicationContext);
       springContextLoaderSupport.customizeContext(servletContext, configurableWebApplicationContext);
     }
