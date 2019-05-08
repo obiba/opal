@@ -2,11 +2,17 @@ package org.obiba.opal.pac4j;
 
 import com.google.common.base.Strings;
 import io.buji.pac4j.context.ShiroSessionStore;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
+import org.apache.shiro.web.subject.WebSubject;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.oidc.client.KeycloakOidcClient;
 import org.pac4j.oidc.config.KeycloakOidcConfiguration;
+import org.pac4j.oidc.credentials.extractor.OidcExtractor;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
@@ -37,8 +43,8 @@ public class Pac4jConfigurer {
 
     if (!Strings.isNullOrEmpty(path)) {
       String opalPublicUrl = properties.getProperty("org.obiba.opal.public.url", "http://localhost:8080");
-      callbackUrl = opalPublicUrl + path;
-      callbackPath = path;
+      callbackUrl = opalPublicUrl + "/auth" + path;
+      callbackPath = "/auth" + path;
     }
 
     return isEnabled();
@@ -82,7 +88,7 @@ public class Pac4jConfigurer {
       kcConfig.setRealm("obiba");
       kcConfig.addCustomParam(LABEL_KEY, "Keycloack Test");
       kcClient.setConfiguration(kcConfig);
-      kcConfig.setWithState(true);
+      kcClient.setCredentialsExtractor(new OidcExtractor(kcConfig, kcClient));
       
       config = new Config();
       config.setClients(new Clients(getCallbackUrl(), kcClient));
@@ -92,4 +98,5 @@ public class Pac4jConfigurer {
 
     return config;
   }
+
 }

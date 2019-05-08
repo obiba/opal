@@ -178,7 +178,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
       if (title == null) {
         title = key; //fallback
       }
-      Anchor anchor = new Anchor(title, false, "../login/" + key);
+      Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
       anchor.addStyleName("btn btn-inverse");
       widgets.add(anchor);
     }

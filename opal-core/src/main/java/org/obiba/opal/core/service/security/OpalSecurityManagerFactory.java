@@ -11,6 +11,8 @@ package org.obiba.opal.core.service.security;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import io.buji.pac4j.realm.Pac4jRealm;
+import io.buji.pac4j.subject.Pac4jSubjectFactory;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
@@ -33,10 +35,13 @@ import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
+import org.obiba.opal.pac4j.Pac4jConfigurer;
 import org.obiba.shiro.realm.ObibaRealm;
+import org.pac4j.core.context.Pac4jConstants;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -76,6 +81,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   private SessionsSecurityManager securityManager;
 
   @Autowired
+  @Lazy
   public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners, RolePermissionResolver rolePermissionResolver, CacheManager cacheManager) {
     this.realms = realms;
     this.sessionListeners = sessionListeners;
@@ -120,6 +126,9 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
       oRealm.setServiceKey(serviceKey);
       shiroRealms.add(oRealm);
     }
+    if (Pac4jConfigurer.isEnabled()) {
+      shiroRealms.add(new Pac4jRealm());
+    }
     DefaultWebSecurityManager dsm = new DefaultWebSecurityManager(shiroRealms);
     initializeCacheManager(dsm);
     initializeSessionManager(dsm);
@@ -140,13 +149,15 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   private void initializeSessionManager(DefaultWebSecurityManager dsm) {
     DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
     sessionManager.setSessionListeners(sessionListeners);
-    sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
+    //sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
     sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
     sessionManager.setSessionValidationSchedulerEnabled(true);
     dsm.setSessionManager(sessionManager);
   }
 
   private void initializeSubjectDAO(DefaultSecurityManager dsm) {
+    if (Pac4jConfigurer.isEnabled())
+      dsm.setSubjectFactory(new Pac4jSubjectFactory());
     if (dsm.getSubjectDAO() instanceof DefaultSubjectDAO) {
       ((DefaultSubjectDAO) dsm.getSubjectDAO()).setSessionStorageEvaluator(new OpalSessionStorageEvaluator());
     }

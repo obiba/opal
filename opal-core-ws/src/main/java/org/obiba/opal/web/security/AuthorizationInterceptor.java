@@ -72,7 +72,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       // Allow header will be added on postProcess
       return Response.ok().build();
     }
-    if(!isWebServicePublic(method) && !isWebServiceWithoutAuthorization(method) &&
+    if(!isWebServicePublic(method) && !isWebServiceWithoutAuthorization(method) && isUserAuthenticated() &&
         !getSubject().isPermitted("rest:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
       return Response.status(Status.FORBIDDEN).build();
     }
@@ -143,7 +143,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   private void addPermissionUris(Iterable<URI> resourceUris) {
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
-      if(!getSubject().isPermitted("rest:" + resource + ":*")) {
+      if(isUserAuthenticated() && !getSubject().isPermitted("rest:" + resource + ":*")) {
         subjectAclService
             .addSubjectPermission("rest", resource, SubjectType.USER.subjectFor(getPrincipal()),
                 "*:GET/*");
@@ -164,6 +164,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
       @Override
       public boolean apply(String from) {
+        if (!isUserAuthenticated()) return false;
         String perm = "rest:" + uri + ":" + from;
         boolean permitted = getSubject().isPermitted(perm);
         log.debug("isPermitted({}, {})=={}", getSubject().getPrincipal(), perm, permitted);
