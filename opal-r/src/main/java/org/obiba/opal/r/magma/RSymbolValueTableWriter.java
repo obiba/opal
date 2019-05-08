@@ -81,18 +81,21 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
   public ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
     if (datasource.hasValueTable(tableName)) {
       StaticValueTable table = (StaticValueTable) datasource.getValueTable(tableName);
-      int entityCount = table.getVariableEntityCount();
-      int variableCount = table.getVariableCount();
-      int dataPointsCount = entityCount * variableCount;
 
       if (optimizedDataPoints <= 0) {
         long bufferMemory = getApplicationUsedMemory() - usedMemoryInit;
         optimizedDataPoints = memorySizeProvider.getOptimizedDataPointsCount(table, bufferMemory);
       }
 
-      if (optimizedDataPoints > 0 && dataPointsCount > optimizedDataPoints) {
-        log.debug("Buffered data points: {}", dataPointsCount);
-        flushValueTable();
+      if (optimizedDataPoints > 0) {
+        int entityCount = table.getVariableEntityCount();
+        int variableCount = table.getVariableCount();
+        int dataPointsCount = entityCount * variableCount;
+
+        if (dataPointsCount > optimizedDataPoints) {
+          log.debug("Buffered data points: {}", dataPointsCount);
+          flushValueTable();
+        }
       }
     }
     return wrappedValueTableWriter.writeValueSet(entity);
