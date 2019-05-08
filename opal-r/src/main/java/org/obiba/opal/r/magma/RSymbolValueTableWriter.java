@@ -56,6 +56,8 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private final long usedMemoryInit;
 
+  private final long maxFreeMemoryInit;
+
   private final RCopyBufferSizeProvider memorySizeProvider;
 
   public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrappedValueTableWriter, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName, RCopyBufferSizeProvider memorySizeProvider) {
@@ -69,6 +71,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
     // clean memory and get initial state
     System.gc();
     this.usedMemoryInit = getApplicationUsedMemory();
+    this.maxFreeMemoryInit = Runtime.getRuntime().maxMemory() - usedMemoryInit;
     this.memorySizeProvider = memorySizeProvider == null ? new RCopyBufferStaticSizeProvider() : memorySizeProvider;
   }
 
@@ -84,7 +87,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
       if (optimizedDataPoints <= 0) {
         long bufferMemory = getApplicationUsedMemory() - usedMemoryInit;
-        optimizedDataPoints = memorySizeProvider.getOptimizedDataPointsCount(table, bufferMemory);
+        optimizedDataPoints = memorySizeProvider.getOptimizedDataPointsCount(table, maxFreeMemoryInit, bufferMemory);
       }
 
       if (optimizedDataPoints > 0) {

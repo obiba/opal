@@ -25,19 +25,13 @@ public class RCopyBufferStaticSizeProvider implements RCopyBufferSizeProvider {
   }
 
   @Override
-  public int getOptimizedDataPointsCount(ValueTable table, long bufferMemory) {
-    long maxMemory = Runtime.getRuntime().maxMemory();
-    long freeMemory = Runtime.getRuntime().freeMemory();
-    long totalMemory = Runtime.getRuntime().totalMemory();
-
-    long maxFreeMemory = freeMemory + (maxMemory - totalMemory);
-
-    if (bufferMemory > maxFreeMemory * memoryRatio) {
+  public int getOptimizedDataPointsCount(ValueTable table, long availableMemory,  long bufferMemory) {
+    if (bufferMemory > availableMemory * memoryRatio) {
       int entityCount = table.getVariableEntityCount();
       int variableCount = table.getVariableCount();
       int dataPointsCount = entityCount * variableCount;
 
-      log.info("Using {}% of the available memory at copy init, for {} data points", 100 * bufferMemory / maxFreeMemory, dataPointsCount);
+      log.info("Using {}% of the available memory at copy init, for {} data points", 100 * bufferMemory / availableMemory, dataPointsCount);
       return dataPointsCount;
     }
 

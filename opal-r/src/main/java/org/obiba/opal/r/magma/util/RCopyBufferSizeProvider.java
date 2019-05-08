@@ -4,6 +4,6 @@ import org.obiba.magma.ValueTable;
 
 public interface RCopyBufferSizeProvider {
 
-  int getOptimizedDataPointsCount(ValueTable table, long bufferMemory);
+  int getOptimizedDataPointsCount(ValueTable table, long availableMemory, long bufferMemory);
 
 }
