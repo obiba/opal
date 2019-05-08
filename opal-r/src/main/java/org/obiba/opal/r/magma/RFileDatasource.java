@@ -12,6 +12,7 @@ package org.obiba.opal.r.magma;
 
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.StaticDatasource;
+import org.obiba.opal.r.magma.util.RCopyBufferSizeProvider;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -36,14 +37,17 @@ public class RFileDatasource extends StaticDatasource {
   // default ID column name
   private final String idColumnName;
 
+  private final RCopyBufferSizeProvider memoryRatioProvider;
 
-  public RFileDatasource(String name, RSessionHandler sessionHandler, List<File> outputFiles, TransactionTemplate txTemplate,  String idColumnName, Map<String, String> idColumnNames) {
+
+  public RFileDatasource(String name, RSessionHandler sessionHandler, List<File> outputFiles, TransactionTemplate txTemplate,  String idColumnName, Map<String, String> idColumnNames, RCopyBufferSizeProvider memoryRatioProvider) {
     super(name);
     this.sessionHandler = sessionHandler;
     this.outputFiles = outputFiles;
     this.txTemplate = txTemplate;
     this.idColumnName = idColumnName;
     this.idColumnNames = idColumnNames;
+    this.memoryRatioProvider = memoryRatioProvider;
   }
 
   @Override
@@ -51,7 +55,7 @@ public class RFileDatasource extends StaticDatasource {
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
     ValueTableWriter staticValueTableWriter = super.createWriter(tableName, entityType);
     return new RSymbolValueTableWriter(this, staticValueTableWriter, tableName, new RFileSymbolWriter(sessionHandler, outputFiles),
-        sessionHandler, txTemplate, getIdColumnName(entityType));
+        sessionHandler, txTemplate, getIdColumnName(entityType), memoryRatioProvider);
   }
 
   private String getIdColumnName(String entityType) {

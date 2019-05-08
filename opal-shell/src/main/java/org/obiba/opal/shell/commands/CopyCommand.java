@@ -41,6 +41,7 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.magma.RFileDatasource;
 import org.obiba.opal.r.magma.RSymbolValueTableWriter;
+import org.obiba.opal.r.magma.util.RCopyBufferStaticSizeProvider;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
@@ -118,6 +119,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Value("${org.obiba.magma.entityIdName}")
   private String entityIdName;
+
+  @Value("${org.obiba.magma.r.copyBufferMemoryRatio}")
+  private Double memoryRatio;
 
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
@@ -743,7 +747,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           });
         }
         getValueTables().size();
-        return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap());
+        return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap(), new RCopyBufferStaticSizeProvider(memoryRatio));
       }
       return null;
     }
@@ -765,7 +769,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Override
     public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
       ValueTableWriter wrapped = super.createWriter(tableName, entityType);
-      return new RSymbolValueTableWriter(this, wrapped, tableName, rSymbolWriter, sessionHandler, txTemplate, getEntityIdMap().getOrDefault(entityType, entityIdName));
+      return new RSymbolValueTableWriter(this, wrapped, tableName, rSymbolWriter, sessionHandler, txTemplate, getEntityIdMap().getOrDefault(entityType, entityIdName), new RCopyBufferStaticSizeProvider(memoryRatio));
     }
 
     @Override

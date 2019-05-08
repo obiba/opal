@@ -16,6 +16,8 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.r.magma.util.RCopyBufferSizeProvider;
+import org.obiba.opal.r.magma.util.RCopyBufferStaticSizeProvider;
 import org.obiba.opal.spi.r.BindRowsAssignROperation;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
@@ -33,8 +35,6 @@ import java.util.List;
 public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private static final Logger log = LoggerFactory.getLogger(RSymbolValueTableWriter.class);
-
-  private static final double MEMORY_RATIO = 0.5;
 
   private final String tableName;
 
@@ -54,11 +54,11 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private int optimizedDataPoints = 0;
 
-  private final long freeMemoryInit;
+  private final long usedMemoryInit;
 
-  private final long totalMemoryInit;
+  private final RCopyBufferSizeProvider memorySizeProvider;
 
-  public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrappedValueTableWriter, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName) {
+  public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrappedValueTableWriter, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName, RCopyBufferSizeProvider memorySizeProvider) {
     this.tableName = tableName;
     this.datasource = datasource;
     this.wrappedValueTableWriter = wrappedValueTableWriter;
@@ -68,8 +68,8 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
     this.symbolWriter = symbolWriter;
     // clean memory and get initial state
     System.gc();
-    freeMemoryInit = Runtime.getRuntime().freeMemory();
-    totalMemoryInit = Runtime.getRuntime().totalMemory();
+    this.usedMemoryInit = getApplicationUsedMemory();
+    this.memorySizeProvider = memorySizeProvider == null ? new RCopyBufferStaticSizeProvider() : memorySizeProvider;
   }
 
   @Override
@@ -84,22 +84,22 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
       int entityCount = table.getVariableEntityCount();
       int variableCount = table.getVariableCount();
       int dataPointsCount = entityCount * variableCount;
-      if (optimizedDataPoints == 0) {
-        long freeMemory = Runtime.getRuntime().freeMemory();
-        long totalMemory = Runtime.getRuntime().totalMemory();
-        long deltaTotalMemory = totalMemory - totalMemoryInit;
-        long freeMemoryTotal = freeMemoryInit + (deltaTotalMemory > 0 ? deltaTotalMemory : 0);
-        if (freeMemory < freeMemoryTotal * MEMORY_RATIO) {
-          optimizedDataPoints = dataPointsCount;
-          log.trace("FREE MEMORY: {} / {} (~{})", freeMemory, freeMemoryInit, deltaTotalMemory);
-          log.debug("Using {}% of the initial free memory, for {} data points", 100 * (freeMemoryTotal - freeMemory) / freeMemoryTotal, optimizedDataPoints);
-        }
-      } else if (dataPointsCount > optimizedDataPoints) {
+
+      if (optimizedDataPoints <= 0) {
+        long bufferMemory = getApplicationUsedMemory() - usedMemoryInit;
+        optimizedDataPoints = memorySizeProvider.getOptimizedDataPointsCount(table, bufferMemory);
+      }
+
+      if (optimizedDataPoints > 0 && dataPointsCount > optimizedDataPoints) {
         log.debug("Buffered data points: {}", dataPointsCount);
         flushValueTable();
       }
     }
     return wrappedValueTableWriter.writeValueSet(entity);
+  }
+
+  private long getApplicationUsedMemory() {
+    return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
   }
 
   @Override
