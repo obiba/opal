@@ -21,9 +21,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
@@ -83,6 +85,14 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   @UiField
   ControlGroup vcfStoreServiceGroup;
 
+  @UiField
+  ControlGroup exportFolderGroup;
+
+  @UiField
+  SimplePanel exportFolderPanel;
+
+  private FileSelectionPresenter.Display folderSelection;
+
   private final Translations translations;
 
   @Inject
@@ -96,6 +106,14 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
 
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
+  }
+
+  @Override
+  public void setFileWidgetDisplay(FileSelectionPresenter.Display display) {
+    exportFolderPanel.setWidget(display.asWidget());
+    folderSelection = display;
+    folderSelection.setEnabled(true);
+    folderSelection.setFieldWidth("20em");
   }
 
   @Override
@@ -184,6 +202,16 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
         }
       }
     };
+  }
+
+  @Override
+  public HasText getExportFolder() {
+    return folderSelection.getFileText();
+  }
+
+  @Override
+  public void setExportFolder(String exportFolder) {
+    if (!Strings.isNullOrEmpty(exportFolder)) folderSelection.setFile(exportFolder);
   }
 
   @Override

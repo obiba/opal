@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.JsArray;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -30,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresent
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;

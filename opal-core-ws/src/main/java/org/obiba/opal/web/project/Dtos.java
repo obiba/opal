@@ -51,6 +51,7 @@ public class Dtos {
     if(project.hasTags()) builder.addAllTags(project.getTags());
     if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
     if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
+    if(project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
     Datasource datasource = project.getDatasource();
     Magma.DatasourceDto.Builder dsDtoBuilder;
     try {
@@ -84,6 +85,7 @@ public class Dtos {
         .description(projectDto.getDescription()) //
         .database(projectDto.getDatabase()) //
         .vcfStoreService(projectDto.getVcfStoreService()) //
+        .exportFolder(projectDto.getExportFolder()) //
         .archived(projectDto.getArchived()) //
         .tags(projectDto.getTagsList()) //
         .build();
@@ -96,6 +98,7 @@ public class Dtos {
         .description(projectFactoryDto.getDescription()) //
         .database(projectFactoryDto.getDatabase()) //
         .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
+        .exportFolder(projectFactoryDto.getExportFolder()) //
         .tags(projectFactoryDto.getTagsList()) //
         .build();
   }
