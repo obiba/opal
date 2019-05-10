@@ -39,7 +39,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
-import org.obiba.opal.web.model.client.opal.AuthClientDto;
+import org.obiba.opal.web.model.client.opal.AuthProviderDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,16 +168,13 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   }
 
   @Override
-  public void renderAuthClients(JsArray<AuthClientDto> clients) {
+  public void renderAuthProviders(JsArray<AuthProviderDto> providers) {
     List<Widget> widgets = Lists.newArrayList();
-    for (int i=0;i<clients.length(); i++) {
-      AuthClientDto client = clients.get(i);
+    for (int i=0;i<providers.length(); i++) {
+      AuthProviderDto provider = providers.get(i);
 
-      String key = client.getName();
-      String title = "Sign in with " + (client.hasLabel() ? client.getLabel() : client.getName());
-      if (title == null) {
-        title = key; //fallback
-      }
+      String key = provider.getName();
+      String title = translations.signInWith() + " " + (provider.hasLabel() ? provider.getLabel() : provider.getName());
       Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
       anchor.addStyleName("btn btn-inverse");
       widgets.add(anchor);

@@ -132,12 +132,6 @@
       <groupId>org.mozilla</groupId>
       <artifactId>rhino</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-pac4j</artifactId>
-      <version>2.14-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
 
   <build>

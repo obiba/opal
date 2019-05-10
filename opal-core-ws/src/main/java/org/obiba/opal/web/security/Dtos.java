@@ -103,14 +103,14 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Opal.AuthClientDto asDto(String name, String label, String redirectUrl) {
-    Opal.AuthClientDto.Builder builder = Opal.AuthClientDto.newBuilder();
+  public static Opal.AuthProviderDto asDto(String name, String label, String providerUrl) {
+    Opal.AuthProviderDto.Builder builder = Opal.AuthProviderDto.newBuilder();
     builder.setName(name);
     if (!Strings.isNullOrEmpty(label)) {
       builder.setLabel(label);
     }
-    if (!Strings.isNullOrEmpty(redirectUrl)) {
-      builder.setRedirectUrl(redirectUrl);
+    if (!Strings.isNullOrEmpty(providerUrl)) {
+      builder.setProviderUrl(providerUrl);
     }
     return builder.build();
   }

@@ -11,9 +11,6 @@ package org.obiba.opal.server.httpd;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import org.apache.shiro.web.env.EnvironmentLoader;
-import org.apache.shiro.web.env.EnvironmentLoaderListener;
-import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -32,7 +29,6 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.pac4j.Pac4jConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -197,7 +193,7 @@ public class OpalJettyServer {
   }
 
   private Handler createServletHandler(Properties properties) {
-    servletContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
+    servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS|ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath("/");
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
@@ -208,8 +204,6 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
-   // servletContextHandler.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM, "org.obiba.opal.core.service.security.OpalIniEnvironment");
-    //servletContextHandler.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM, System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
 
     GzipHandler gzipHandler = new GzipHandler();
     gzipHandler.setHandler(servletContextHandler);
@@ -228,8 +222,8 @@ public class OpalJettyServer {
   private void initFilters(Properties properties) {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
 
-    initPac4jFilter(properties);
-
+    initOIDCFilter(properties);
+    
     FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
     authenticationFilterHolder.setName("authenticationFilter");
     authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
@@ -238,12 +232,9 @@ public class OpalJettyServer {
     servletContextHandler.addFilter(GzipFilter.class, "/*", EnumSet.of(REQUEST));
   }
 
-  private void initPac4jFilter(Properties properties) {
-    if (Pac4jConfigurer.init(properties)) {
-      servletContextHandler.addFilter(ShiroFilter.class, "/auth/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-      servletContextHandler.addFilter(OpalSecurityFilter.Wrapper.class, "/auth/login/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-      servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, Pac4jConfigurer.getCallbackPath() + "/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-    }
+  private void initOIDCFilter(Properties properties) {
+      servletContextHandler.addFilter(OpalLoginFilter.Wrapper.class, "/auth/login/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+      servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, "/auth/callback/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
   }
 
   private void initNotAllowedMethods() {

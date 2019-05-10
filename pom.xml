@@ -85,6 +85,7 @@
     <jta.version>1.1</jta.version>
     <junit.version>4.12</junit.version>
     <liquibase.version>3.6.2</liquibase.version>
+    <lang-tag.version>1.4.4</lang-tag.version>
     <logback.version>1.1.3</logback.version>
     <logstash-logback.version>4.5.1</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
@@ -104,7 +105,6 @@
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
-    <pac4j.version>3.4.0</pac4j.version>
     <postgresql.version>42.2.5</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
@@ -154,7 +154,6 @@
   </properties>
 
   <modules>
-    <module>opal-pac4j</module>
     <module>opal-core-api</module>
     <module>opal-core</module>
     <module>opal-core-ws</module>
@@ -180,11 +179,6 @@
     <dependencies>
 
       <!-- Opal dependencies -->
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-pac4j</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-core-api</artifactId>
@@ -324,6 +318,11 @@
       <dependency>
         <groupId>org.obiba.commons</groupId>
         <artifactId>obiba-security</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-oidc</artifactId>
         <version>${obiba-commons.version}</version>
       </dependency>
       <dependency>
@@ -730,26 +729,11 @@
         <version>${postgresql.version}</version>
       </dependency>
 
-      <!-- pac4j dependencies -->
-      <dependency>
-        <groupId>io.buji</groupId>
-        <artifactId>buji-pac4j</artifactId>
-        <version>${buji.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.pac4j</groupId>
-        <artifactId>pac4j-core</artifactId>
-        <version>${pac4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.pac4j</groupId>
-        <artifactId>pac4j-oidc</artifactId>
-        <version>${pac4j.version}</version>
-      </dependency>
+      <!-- oidc dependencies -->
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>lang-tag</artifactId>
-        <version>1.4.4</version>
+        <version>${lang-tag.version}</version>
       </dependency>
       <dependency>
         <groupId>com.nimbusds</groupId>

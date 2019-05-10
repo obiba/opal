@@ -45,6 +45,10 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-oidc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-git</artifactId>
     </dependency>
     <dependency>
@@ -58,10 +62,6 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-fs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-pac4j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -210,15 +210,6 @@
     </dependency>
 
     <dependency>
-      <groupId>io.buji</groupId>
-      <artifactId>buji-pac4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.pac4j</groupId>
-      <artifactId>pac4j-core</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
@@ -301,14 +292,6 @@
     <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-spi-r</artifactId>
-    </dependency>
-      <dependency>
-          <groupId>org.pac4j</groupId>
-          <artifactId>pac4j-oidc</artifactId>
-      </dependency>
-    <dependency>
-      <groupId>org.pac4j</groupId>
-      <artifactId>pac4j-oidc</artifactId>
     </dependency>
 
   </dependencies>

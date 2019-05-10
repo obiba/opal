@@ -399,8 +399,8 @@ message VcsCommitInfoDto {
   optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
 }
 
-message AuthClientDto {
+message AuthProviderDto {
   required string name = 1;
   optional string label = 2;
-  optional string redirectUrl = 3;
+  optional string providerUrl = 3;
 }

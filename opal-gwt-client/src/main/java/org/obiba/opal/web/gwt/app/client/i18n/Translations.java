@@ -2738,4 +2738,8 @@ public interface Translations extends Constants {
       "name:desc", "Name (desc)" })
   Map<String, String> sortOrderMap();
 
+  @Description("Sign in with")
+  @DefaultStringValue("Sign in with")
+  String signInWith();
+
 }

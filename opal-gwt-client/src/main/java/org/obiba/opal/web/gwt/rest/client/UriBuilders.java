@@ -785,10 +785,10 @@ public enum UriBuilders {
 
   },
 
-  AUTH_CLIENTS {
+  AUTH_PROVIDERS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("authclients");
+      return UriBuilder.create().segment("auth", "providers");
     }
   },
 

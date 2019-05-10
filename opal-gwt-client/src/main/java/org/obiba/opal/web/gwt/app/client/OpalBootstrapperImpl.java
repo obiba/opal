@@ -147,16 +147,18 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       public void onSessionEnded(SessionEndedEvent event) {
         if(requestCredentials.hasCredentials()) {
           ResourceRequestBuilderFactory.newBuilder().forResource(
-              UriBuilder.create().segment("auth", "session", requestCredentials.extractOpalCredentials()).build())//
+              UriBuilder.create().segment("auth", "session", "_current").build())//
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
                   // do nothing
+                  requestCredentials.invalidate();
+                  if (response.getStatusCode()<300) {
+                    Window.Location.replace("/");
+                  }
                 }
               }) //
               .delete().send();
-          requestCredentials.invalidate();
-          Window.Location.replace("/");
         }
       }
     });
