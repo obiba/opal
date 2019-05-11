@@ -92,6 +92,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   @DELETE
   @Path("/session/_current")
+  @NoAuthorization
   public Response deleteCurrentSession() {
     // Delete the Shiro session
     try {

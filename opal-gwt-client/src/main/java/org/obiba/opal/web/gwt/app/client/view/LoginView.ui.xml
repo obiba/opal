@@ -42,6 +42,12 @@
               <ui:msg description="Sign in button label">Sign In</ui:msg>
             </b:Button>
             <b:Image ui:field="loginProgress" addStyleNames="xsmall-indent inline-block" url="image/login-progress.gif" visible="false"/>
+            <g:FlowPanel ui:field="authPanel" visible="false">
+              <g:HTMLPanel>
+                <hr></hr>
+              </g:HTMLPanel>
+              <g:VerticalPanel ui:field="authClientsPanel"/>
+            </g:FlowPanel>
           </b:Well>
         </b:Column>
       </b:Row>

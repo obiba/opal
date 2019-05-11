@@ -398,3 +398,9 @@ message VcsCommitInfoDto {
   optional bool isHead = 7 [default = false]; // head of the commit tree
   optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
 }
+
+message AuthProviderDto {
+  required string name = 1;
+  optional string label = 2;
+  optional string providerUrl = 3;
+}

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.view;
 
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
@@ -34,13 +37,12 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import org.obiba.opal.web.model.client.opal.AuthProviderDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
@@ -69,6 +71,12 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @UiField
   Image loginProgress;
+
+  @UiField
+  Panel authPanel;
+
+  @UiField
+  VerticalPanel authClientsPanel;
 
   private final Translations translations;
 
@@ -157,6 +165,28 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     login.setEnabled(!value);
     loginProgress.setVisible(value);
     RootPanel.get().getBodyElement().getStyle().setCursor(value ? Style.Cursor.WAIT : Style.Cursor.DEFAULT);
+  }
+
+  @Override
+  public void renderAuthProviders(JsArray<AuthProviderDto> providers) {
+    List<Widget> widgets = Lists.newArrayList();
+    for (int i=0;i<providers.length(); i++) {
+      AuthProviderDto provider = providers.get(i);
+
+      String key = provider.getName();
+      String title = translations.signInWith() + " " + (provider.hasLabel() ? provider.getLabel() : provider.getName());
+      Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
+      anchor.addStyleName("btn btn-inverse");
+      widgets.add(anchor);
+    }
+
+    if (widgets.size() > 0) {
+      for (Widget w: widgets) {
+        authClientsPanel.add(w);
+      }
+    }
+    authClientsPanel.setBorderWidth(0);
+    authPanel.setVisible(widgets.size() > 0);
   }
 
   private void clearPassword() {

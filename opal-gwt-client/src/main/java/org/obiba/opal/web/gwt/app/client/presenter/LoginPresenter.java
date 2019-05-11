@@ -10,30 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.datetime.client.Moment;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.HasKeyUpHandlers;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
@@ -46,9 +26,17 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
+import org.obiba.opal.web.model.client.opal.AuthProviderDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import java.util.Date;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
@@ -75,12 +63,15 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     void setApplicationName(String text);
 
     void setBusy(boolean value);
+
+    void renderAuthProviders(JsArray<AuthProviderDto> providers);
   }
 
   @ProxyStandard
   @NameToken(Places.LOGIN)
   @NoGatekeeper
-  public interface Proxy extends ProxyPlace<LoginPresenter> {}
+  public interface Proxy extends ProxyPlace<LoginPresenter> {
+  }
 
   private final RequestCredentials credentials;
 
@@ -92,7 +83,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
-      ResourceAuthorizationCache authorizationCache, Translations translations) {
+                        ResourceAuthorizationCache authorizationCache, Translations translations) {
     super(eventBus, display, proxy, RevealType.Root);
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
@@ -110,7 +101,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     getView().getUserNameTextBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           createSecurityResource();
         }
       }
@@ -118,7 +109,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     getView().getPasswordTextBox().addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           createSecurityResource();
         }
       }
@@ -141,6 +132,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   @Override
   protected void onReveal() {
     refreshApplicationName();
+    refreshAuthProviders();
   }
 
   private void refreshApplicationName() {
@@ -154,6 +146,19 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
             getView().setApplicationName(response.getText());
           }
         }, Response.SC_OK).send();
+  }
+
+  private void refreshAuthProviders() {
+    // Fetch all auth providers
+    ResourceRequestBuilderFactory.<JsArray<AuthProviderDto>>newBuilder() //
+        .forResource(UriBuilders.AUTH_PROVIDERS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<AuthProviderDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<AuthProviderDto> resource) {
+            JsArray<AuthProviderDto> providers = JsArrays.toSafeArray(resource);
+            getView().renderAuthProviders(providers);
+          }
+        }).get().send();
   }
 
   private void createSecurityResource() {
@@ -194,7 +199,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
               int remainingBanTime = Integer.parseInt(args.get(1));
               String arg = remainingBanTime + "";
               status = "BannedUserSecs";
-              if (remainingBanTime>60) {
+              if (remainingBanTime > 60) {
                 arg = (remainingBanTime / 60) + "";
                 status = "BannedUserMin" + ("1".equals(arg) ? "" : "s");
               }
@@ -217,7 +222,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
           @Override
           public void onResponseCode(Request request, Response response) {
             // When a 201 happens, we should have credentials, but we'll test anyway.
-            if(credentials.hasCredentials()) {
+            if (credentials.hasCredentials()) {
               getView().clear();
               credentials.setUsername(username);
               fireEvent(new SessionCreatedEvent(response.getHeader("Location")));

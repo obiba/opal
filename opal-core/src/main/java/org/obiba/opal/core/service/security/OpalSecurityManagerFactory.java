@@ -9,18 +9,12 @@
  */
 package org.obiba.opal.core.service.security;
 
-import java.util.Collection;
-import java.util.Set;
-
-import javax.annotation.PreDestroy;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import net.sf.ehcache.CacheManager;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
@@ -29,47 +23,43 @@ import org.apache.shiro.authz.permission.PermissionResolverAware;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
-import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.util.LifecycleUtils;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.obiba.oidc.OIDCConfiguration;
+import org.obiba.oidc.OIDCConfigurationProvider;
+import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.obiba.shiro.realm.ObibaRealm;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
+import javax.annotation.PreDestroy;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Set;
 
 @Component
-public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
-
-  public static final String INI_REALM = "opal-ini-realm";
+public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager> {
 
   private static final long SESSION_VALIDATION_INTERVAL = 300000l; // 5 minutes
 
-  @Autowired
-  private Set<Realm> realms;
+  private final Set<Realm> realms;
 
-  @Autowired
-  private Set<SessionListener> sessionListeners;
+  private final Set<SessionListener> sessionListeners;
 
-  @Autowired
-  private Set<AuthenticationListener> authenticationListeners;
+  private final Set<AuthenticationListener> authenticationListeners;
 
-  @Autowired
-  private RolePermissionResolver rolePermissionResolver;
+  private final RolePermissionResolver rolePermissionResolver;
 
   @NotNull
   @Value("${org.obiba.realm.url}")
@@ -83,16 +73,28 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
   @Value("${org.obiba.realm.service.key}")
   private String serviceKey;
 
-  @Autowired
-  private CacheManager cacheManager;
+  private final CacheManager cacheManager;
 
   private final PermissionResolver permissionResolver = new OpalPermissionResolver();
 
-  private SecurityManager securityManager;
+  private final OIDCConfigurationProvider oidcConfigurationProvider;
+
+  private SessionsSecurityManager securityManager;
+
+  @Autowired
+  @Lazy
+  public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners, RolePermissionResolver rolePermissionResolver, CacheManager cacheManager, OIDCConfigurationProvider oidcConfigurationProvider) {
+    this.realms = realms;
+    this.sessionListeners = sessionListeners;
+    this.authenticationListeners = authenticationListeners;
+    this.rolePermissionResolver = rolePermissionResolver;
+    this.cacheManager = cacheManager;
+    this.oidcConfigurationProvider = oidcConfigurationProvider;
+  }
 
   @Override
-  public SecurityManager getObject() throws Exception {
-    if(securityManager == null) {
+  public SessionsSecurityManager getObject() {
+    if (securityManager == null) {
       securityManager = doCreateSecurityManager();
       SecurityUtils.setSecurityManager(securityManager);
     }
@@ -117,100 +119,65 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     securityManager = null;
   }
 
-  private SecurityManager doCreateSecurityManager() {
-    return new CustomIniSecurityManagerFactory(System.getProperty("OPAL_HOME") + "/conf/shiro.ini").createInstance();
+  private SessionsSecurityManager doCreateSecurityManager() {
+    List<Realm> shiroRealms = Lists.newArrayList(realms);
+    if (!Strings.isNullOrEmpty(obibaRealmUrl)) {
+      ObibaRealm oRealm = new ObibaRealm();
+      oRealm.setBaseUrl(obibaRealmUrl);
+      oRealm.setServiceName(serviceName);
+      oRealm.setServiceKey(serviceKey);
+      shiroRealms.add(oRealm);
+    }
+    for (OIDCConfiguration configuration : oidcConfigurationProvider.getConfigurations()) {
+      OIDCRealm realm = new OIDCRealm(configuration);
+      shiroRealms.add(realm);
+    }
+    DefaultWebSecurityManager dsm = new DefaultWebSecurityManager(shiroRealms);
+    initializeCacheManager(dsm);
+    initializeSessionManager(dsm);
+    initializeSubjectDAO(dsm);
+    initializeAuthorizer(dsm);
+    initializeAuthenticator(dsm);
+    return dsm;
   }
 
-  private class CustomIniSecurityManagerFactory extends IniSecurityManagerFactory {
-
-    private CustomIniSecurityManagerFactory(String resourcePath) {
-      super(resourcePath);
-    }
-
-    @Override
-    @SuppressWarnings("ChainOfInstanceofChecks")
-    protected SecurityManager createDefaultInstance() {
-      DefaultSecurityManager dsm = (DefaultSecurityManager) super.createDefaultInstance();
-
-      initializeCacheManager(dsm);
-      initializeSessionManager(dsm);
-      initializeSubjectDAO(dsm);
-      initializeAuthorizer(dsm);
-      initializeAuthenticator(dsm);
-
-      return dsm;
-    }
-
-    private void initializeCacheManager(DefaultSecurityManager dsm) {
-      if(dsm.getCacheManager() == null) {
-        EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager(cacheManager);
-        dsm.setCacheManager(ehCacheManager);
-      }
-    }
-
-    private void initializeSessionManager(DefaultSecurityManager dsm) {
-      if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-        setDefaultSessionManager(dsm);
-      }
-    }
-
-    private void initializeSubjectDAO(DefaultSecurityManager dsm) {
-      if(dsm.getSubjectDAO() instanceof DefaultSubjectDAO) {
-        ((DefaultSubjectDAO) dsm.getSubjectDAO()).setSessionStorageEvaluator(new OpalSessionStorageEvaluator());
-      }
-    }
-
-    private void initializeAuthorizer(DefaultSecurityManager dsm) {
-      if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
-        ((RolePermissionResolverAware) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
-        ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(permissionResolver);
-      }
-    }
-
-    private void initializeAuthenticator(DefaultSecurityManager dsm) {
-      ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
-
-      if(dsm.getAuthenticator() instanceof ModularRealmAuthenticator) {
-        ((ModularRealmAuthenticator) dsm.getAuthenticator()).setAuthenticationStrategy(new FirstSuccessfulStrategy());
-      }
-    }
-
-    @Override
-    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, @SuppressWarnings(
-        "ParameterHidesMemberVariable") SecurityManager securityManager) {
-      ImmutableList.Builder<Realm> builder = ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms);
-      if(!Strings.isNullOrEmpty(obibaRealmUrl)) {
-        ObibaRealm oRealm = new ObibaRealm();
-        oRealm.setBaseUrl(obibaRealmUrl);
-        oRealm.setServiceName(serviceName);
-        oRealm.setServiceKey(serviceKey);
-        builder.add(oRealm);
-      }
-      super.applyRealmsToSecurityManager(builder.build(), securityManager);
-    }
-
-    @Override
-    protected Realm createRealm(Ini ini) {
-      // Set the resolvers first, because IniRealm is initialized before the resolvers are
-      // applied by the ModularRealmAuthorizer
-      IniRealm realm = new IniRealm();
-      realm.setName(INI_REALM);
-      realm.setRolePermissionResolver(rolePermissionResolver);
-      realm.setPermissionResolver(permissionResolver);
-      realm.setResourcePath(System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
-      realm.setCredentialsMatcher(new PasswordMatcher());
-      return realm;
+  private void initializeCacheManager(DefaultSecurityManager dsm) {
+    if (dsm.getCacheManager() == null) {
+      EhCacheManager ehCacheManager = new EhCacheManager();
+      ehCacheManager.setCacheManager(cacheManager);
+      dsm.setCacheManager(ehCacheManager);
     }
   }
 
-  private void setDefaultSessionManager(DefaultSecurityManager dsm) {
-    DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
+  private void initializeSessionManager(DefaultWebSecurityManager dsm) {
+    DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
     sessionManager.setSessionListeners(sessionListeners);
     sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
-    SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
-    sessionValidationScheduler.enableSessionValidation();
-    sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
     sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
+    sessionManager.setSessionValidationSchedulerEnabled(true);
+    dsm.setSessionManager(sessionManager);
+    //dsm.setSessionManager(new ServletContainerSessionManager());
   }
+
+  private void initializeSubjectDAO(DefaultSecurityManager dsm) {
+    if (dsm.getSubjectDAO() instanceof DefaultSubjectDAO) {
+      ((DefaultSubjectDAO) dsm.getSubjectDAO()).setSessionStorageEvaluator(new OpalSessionStorageEvaluator());
+    }
+  }
+
+  private void initializeAuthorizer(DefaultSecurityManager dsm) {
+    if (dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
+      ((RolePermissionResolverAware) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
+      ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(permissionResolver);
+    }
+  }
+
+  private void initializeAuthenticator(DefaultSecurityManager dsm) {
+    ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
+
+    if (dsm.getAuthenticator() instanceof ModularRealmAuthenticator) {
+      ((ModularRealmAuthenticator) dsm.getAuthenticator()).setAuthenticationStrategy(new FirstSuccessfulStrategy());
+    }
+  }
+
 }

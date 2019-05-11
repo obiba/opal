@@ -45,6 +45,10 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-oidc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-git</artifactId>
     </dependency>
     <dependency>
@@ -204,6 +208,7 @@
       <groupId>eu.flatwhite.shiro</groupId>
       <artifactId>shiro-extras</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>

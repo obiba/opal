@@ -168,8 +168,8 @@ magma:
 magma-all:
 	cd ${magma_project} && \
 	${mvn_exec} clean install && \
-	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep magma | grep -v health-canada | grep -v geonames | xargs rm && \
-	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc | grep -v jacoco` ${opal_project}/opal-server/target/opal-server-${version}/lib
+	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep magma | xargs rm && \
+	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc | grep -v jacoco | grep -v magma-filter | grep -v magma-beans | grep -v magma-data-generator | grep -v magma-spring | grep -v magma-test | grep -v magma-integration` ${opal_project}/opal-server/target/opal-server-${version}/lib
 
 #
 # Compile and install a Commons sub-project
@@ -185,11 +185,8 @@ commons:
 commons-all:
 	cd ${commons_project} && \
 	${mvn_exec} clean install && \
-	cp obiba-core/target/obiba-core-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
-	cp obiba-git/target/obiba-git-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
-	cp obiba-shiro/target/obiba-shiro-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
-	cp obiba-shiro-web/target/obiba-shiro-web-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib && \
-	cp obiba-shiro-crowd/target/obiba-shiro-crowd-${commons_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib
+	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep obiba- | xargs rm && \
+	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc` ${opal_project}/opal-server/target/opal-server-${version}/lib
 
 #
 # Compile and install all DataSHIELD4J sub-projects
