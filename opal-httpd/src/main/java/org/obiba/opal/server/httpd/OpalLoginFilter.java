@@ -10,10 +10,8 @@
 package org.obiba.opal.server.httpd;
 
 import org.obiba.oidc.OIDCConfigurationProvider;
-import org.obiba.oidc.OIDCStateManager;
+import org.obiba.oidc.OIDCSessionManager;
 import org.obiba.oidc.web.filter.OIDCLoginFilter;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,7 @@ public class OpalLoginFilter extends OIDCLoginFilter {
   private OIDCConfigurationProvider oidcConfigurationProvider;
 
   @Autowired
-  private OIDCStateManager oidcStateManager;
+  private OIDCSessionManager oidcSessionManager;
 
   @Value("${org.obiba.opal.public.url}")
   private String opalPublicUrl;
@@ -36,7 +34,7 @@ public class OpalLoginFilter extends OIDCLoginFilter {
   @PostConstruct
   public void init() {
     setOIDCConfigurationProvider(oidcConfigurationProvider);
-    setOIDCStateManager(oidcStateManager);
+    setOIDCSessionManager(oidcSessionManager);
     String callbackUrl = opalPublicUrl + (opalPublicUrl.endsWith("/") ? "" : "/") + "auth/callback/";
     setCallbackURL(callbackUrl);
   }

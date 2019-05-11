@@ -15,7 +15,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.oidc.OIDCCredentials;
-import org.obiba.oidc.OIDCStateManager;
+import org.obiba.oidc.OIDCSessionManager;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.oidc.web.filter.OIDCCallbackFilter;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
@@ -39,7 +39,7 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
   private OIDCConfigurationProvider oidcConfigurationProvider;
 
   @Autowired
-  private OIDCStateManager oidcStateManager;
+  private OIDCSessionManager oidcSessionManager;
 
   @Autowired
   private AuthenticationExecutor authenticationExecutor;
@@ -50,7 +50,7 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
   @PostConstruct
   public void init() {
     setOIDCConfigurationProvider(oidcConfigurationProvider);
-    setOIDCStateManager(oidcStateManager);
+    setOIDCSessionManager(oidcSessionManager);
     setDefaultRedirectURL(opalPublicUrl);
     String callbackUrl = opalPublicUrl + (opalPublicUrl.endsWith("/") ? "" : "/") + "auth/callback/";
     setCallbackURL(callbackUrl);
