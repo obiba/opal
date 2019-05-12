@@ -15,6 +15,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.oidc.OIDCCredentials;
+import org.obiba.oidc.OIDCSession;
 import org.obiba.oidc.OIDCSessionManager;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.oidc.web.filter.OIDCCallbackFilter;
@@ -57,15 +58,16 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
   }
 
   @Override
-  protected void onAuthenticationSuccess(OIDCCredentials credentials, HttpServletResponse response) {
+  protected void onAuthenticationSuccess(OIDCSession session, OIDCCredentials credentials, HttpServletResponse response) {
     Subject subject = authenticationExecutor.login(new OIDCAuthenticationToken(credentials));
     if (subject != null) {
-      Session session = subject.getSession();
-      log.trace("Binding subject {} session {} to executing thread {}", subject.getPrincipal(), session.getId(), Thread.currentThread().getId());
+      Session subjectSession = subject.getSession();
+      log.trace("Binding subject {} session {} to executing thread {}", subject.getPrincipal(), subjectSession.getId(), Thread.currentThread().getId());
       ThreadContext.bind(subject);
-      session.touch();
-      int timeout = (int) (session.getTimeout() / 1000);
-      Cookie cookie = new Cookie("opalsid", session.getId().toString());
+      subjectSession.touch();
+      int timeout = (int) (subjectSession.getTimeout() / 1000);
+      Cookie cookie = new Cookie("opalsid", subjectSession.getId().toString());
+      cookie.setMaxAge(timeout);
       cookie.setPath("/");
       response.addCookie(cookie);
       log.debug("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
