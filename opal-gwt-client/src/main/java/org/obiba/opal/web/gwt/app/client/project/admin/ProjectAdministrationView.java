@@ -91,6 +91,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Label vcfServiceName;
 
+  @UiField
+  Label exportFolder;
+
   private ProjectDto project;
 
   @Inject
@@ -107,6 +110,8 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     description.setText(project.getDescription());
     tags.setText("");
     if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
+    if (project.getExportFolder() != null) exportFolder.setText(project.getExportFolder());
+
     noDatabasePanel.setVisible(!project.hasDatabase());
     databasePanel.setVisible(project.hasDatabase());
     if(project.hasDatabase()) {

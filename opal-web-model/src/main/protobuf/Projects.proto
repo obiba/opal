@@ -16,6 +16,7 @@ message ProjectDto {
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
   optional string vcfStoreService = 11;
+  optional string exportFolder = 12;
 }
 
 message ProjectFactoryDto {
@@ -25,6 +26,7 @@ message ProjectFactoryDto {
   optional string database = 4;
   repeated string tags = 5;
   optional string vcfStoreService = 6;
+  optional string exportFolder = 7;
 }
 
 message ProjectSummaryDto {

@@ -49,6 +49,12 @@
           </o:PropertyPanel>
           <o:PropertyPanel>
             <g:Label>
+              <ui:msg description="Project Export Folder label">Export Folder</ui:msg>
+            </g:Label>
+            <g:Label ui:field="exportFolder"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
               <ui:msg description="Tags label">Tags</ui:msg>
             </g:Label>
             <g:Label ui:field="tags"/>

@@ -10,8 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import java.util.Arrays;
-
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -19,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
@@ -156,6 +155,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
 
+  private final DataExportFolderService dataExportFolderService;
+
   private BookmarkIconPresenter bookmarkIconPresenter;
 
   @Inject
@@ -166,7 +167,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
       Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider,
-      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider) {
+      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider,
+      DataExportFolderService dataExportFolderService) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -178,6 +180,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
     this.projectResourcePermissionsProvider = projectResourcePermissionsProvider;
     this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
+    this.dataExportFolderService = dataExportFolderService;
   }
 
   @Override
@@ -231,6 +234,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           @Override
           public void onResource(Response response, ProjectDto resource) {
             project = resource;
+            dataExportFolderService.setProjectExportFolder(project.getExportFolder());
+
             getView().setProject(project);
             authorize();
 

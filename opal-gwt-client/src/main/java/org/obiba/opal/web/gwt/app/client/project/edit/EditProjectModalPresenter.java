@@ -13,10 +13,14 @@ package org.obiba.opal.web.gwt.app.client.project.edit;
 import java.util.*;
 
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 
 import com.google.common.collect.Lists;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
@@ -64,11 +68,21 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
   private ValidationHandler validationHandler;
 
+  private final FileSelectionPresenter fileSelectionPresenter;
+
+  private final DataExportFolderService dataExportFolderService;
+
   private final Translations translations;
 
   @Inject
-  public EditProjectModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public EditProjectModalPresenter(EventBus eventBus,
+                                   Display display,
+                                   Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
+                                   DataExportFolderService dataExportFolderService,
+                                   Translations translations) {
     super(eventBus, display);
+    this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
+    this.dataExportFolderService = dataExportFolderService;
     this.translations = translations;
     getView().setUiHandlers(this);
   }
@@ -85,6 +99,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
               getView().setProject(project);
               getView().getDatabase().setText(project.getDatabase());
               getView().getVcfStoreService().setText(project.getVcfStoreService());
+              getView().setExportFolder(project.getExportFolder());
             }
           }).get().send();
     }
@@ -94,6 +109,11 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
   protected void onBind() {
     super.onBind();
     validationHandler = new ProjectValidationHandler();
+
+    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FOLDER);
+    fileSelectionPresenter.bind();
+    getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
+
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(UriBuilders.DATABASES_FOR_STORAGE.create().build()) //
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
@@ -103,6 +123,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
             if(project != null) {
               getView().getDatabase().setText(project.getDatabase());
               getView().getVcfStoreService().setText(project.getVcfStoreService());
+              getView().setExportFolder(project.getExportFolder());
             }
           }
         }).get().send();
@@ -134,6 +155,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     } else {
       update();
     }
+
+    dataExportFolderService.setProjectExportFolder(project.getExportFolder());
   }
 
   private void create() {
@@ -178,6 +201,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     }
     dto.setDatabase(getView().getDatabase().getText());
     dto.setVcfStoreService(getView().getVcfStoreService().getText());
+    dto.setExportFolder(getView().getExportFolder().getText());
     if(project != null) dto.setArchived(project.getArchived());
     return dto;
   }
@@ -221,6 +245,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     dto.setDescription(getView().getDescription().getText());
     dto.setDatabase(getView().getDatabase().getText());
     dto.setVcfStoreService(getView().getVcfStoreService().getText());
+    dto.setExportFolder(getView().getExportFolder().getText());
     String tags = getView().getTags().getText();
     if(!Strings.isNullOrEmpty(tags)) {
       JsArrayString tagsArray = JavaScriptObject.createArray().cast();
@@ -301,6 +326,10 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
     HasText getVcfStoreService();
 
+    HasText getExportFolder();
+
+    void setExportFolder(String exportFolder);
+
     void showError(@Nullable FormField formField, String message);
 
     void hideDialog();
@@ -312,5 +341,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     void setBusy(boolean busy);
 
     void setAvailableVcfStoreServices(List<PluginPackageDto> availableVcfStoreServices);
+
+    void setFileWidgetDisplay(FileSelectionPresenter.Display display);
   }
 }
