@@ -20,4 +20,6 @@ public interface ProjectAdministrationUiHandlers extends UiHandlers {
 
   void onArchive();
 
+  void onRefresh();
+
 }

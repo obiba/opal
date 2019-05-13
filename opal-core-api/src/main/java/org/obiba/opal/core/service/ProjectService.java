@@ -35,7 +35,7 @@ public interface ProjectService extends SystemService {
   /**
    * Get project directory, create it if it does not exist.
    *
-   * @param name
+   * @param project
    * @return
    * @throws NoSuchIdentifiersMappingException
    * @throws FileSystemException

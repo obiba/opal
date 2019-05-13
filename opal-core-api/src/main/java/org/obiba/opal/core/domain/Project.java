@@ -53,8 +53,7 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   private String exportFolder;
 
-  public Project() {
-  }
+  public Project() { }
 
   public Project(@NotNull String name) {
     this.name = name;

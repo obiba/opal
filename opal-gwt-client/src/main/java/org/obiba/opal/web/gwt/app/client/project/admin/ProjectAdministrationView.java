@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -191,6 +192,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiHandler("archiveProject")
   void onArchiveProject(ClickEvent event) {
     getUiHandlers().onArchive();
+  }
+
+  @UiHandler("refreshProject")
+  public void onRefreshProject(ClickEvent event) {
+    getUiHandlers().onRefresh();
   }
 
 }

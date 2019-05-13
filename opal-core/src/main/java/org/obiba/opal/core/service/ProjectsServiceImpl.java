@@ -209,14 +209,7 @@ public class ProjectsServiceImpl implements ProjectService {
     }
   }
 
-  /**
-   * Create DatasourceFactory and add it to MagmaEngine
-   *
-   * @param project
-   * @return
-   */
-  @NotNull
-  private DatasourceFactory registerDatasource(@NotNull final Project project) {
+  public static DatasourceFactory registerDatasource(final Project project, final TransactionTemplate transactionTemplate, final DatabaseRegistry databaseRegistry) {
     return transactionTemplate.execute(new TransactionCallback<DatasourceFactory>() {
       @Override
       public DatasourceFactory doInTransaction(TransactionStatus status) {
@@ -232,6 +225,17 @@ public class ProjectsServiceImpl implements ProjectService {
         return dataSourceFactory;
       }
     });
+  }
+
+  /**
+   * Create DatasourceFactory and add it to MagmaEngine
+   *
+   * @param project
+   * @return
+   */
+  @NotNull
+  private DatasourceFactory registerDatasource(@NotNull final Project project) {
+    return registerDatasource(project, transactionTemplate, databaseRegistry);
   }
 
   private void deleteFolder(FileObject folder) throws FileSystemException {

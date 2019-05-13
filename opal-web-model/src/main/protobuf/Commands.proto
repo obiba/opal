@@ -111,3 +111,7 @@ message AnalyseCommandOptionsDto {
   required string project = 1;
   repeated AnalyseDto analyses = 2;
 }
+
+message RefreshCommandOptionsDto {
+  required string project = 1;
+}
