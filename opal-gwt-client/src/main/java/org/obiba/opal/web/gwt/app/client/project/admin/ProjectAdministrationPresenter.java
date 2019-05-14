@@ -44,6 +44,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -70,6 +71,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final Provider<ProjectKeyStorePresenter> projectDataExchangeProvider;
 
+  private final Provider<ProjectIdentifiersMappingsPresenter> identifiersMappingsPresenterProvider;
+
   private ProjectDto project;
 
   private Runnable removeConfirmation;
@@ -80,16 +83,19 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
-      ModalProvider<EditProjectModalPresenter> editProjectModalProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      Provider<ProjectKeyStorePresenter> projectDataExchangeProvider, TranslationMessages translationMessages) {
+                                        ModalProvider<EditProjectModalPresenter> editProjectModalProvider,
+                                        Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                        Provider<ProjectKeyStorePresenter> projectDataExchangeProvider,
+                                        Provider<ProjectIdentifiersMappingsPresenter> identifiersMappingsPresenterProvider,
+                                        TranslationMessages translationMessages) {
     super(eventBus, view);
-    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
+    this.translationMessages = translationMessages;
     this.placeManager = placeManager;
     this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectDataExchangeProvider = projectDataExchangeProvider;
+    this.identifiersMappingsPresenterProvider = identifiersMappingsPresenterProvider;
   }
 
   @Override
@@ -151,27 +157,27 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(project.getLink()) //
-        .authorize(getView().getEditAuthorizer()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(project.getLink())
+        .authorize(new CompositeAuthorizer(getView().getEditAuthorizer(), new ProjectIdentifiersMappingsSlotAuthorizer())) 
         .put().send();
 
     // set permissions
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilders.PROJECT_PERMISSIONS_PROJECT.create().build(project.getName())) //
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsSlotAuthorizer())) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_PROJECT.create().build(project.getName()))
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsSlotAuthorizer()))
         .post().send();
 
     // set keystore
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName())) //
-        .authorize(new CompositeAuthorizer(getView().getKeyStoreAuthorizer(), new KeyStoreSlotAuthorizer())) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))
+        .authorize(new CompositeAuthorizer(getView().getKeyStoreAuthorizer(), new KeyStoreSlotAuthorizer()))
         .post().send();
 
     // delete project
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(project.getLink()) //
-        .authorize(getView().getDeleteAuthorizer()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(project.getLink())
+        .authorize(getView().getDeleteAuthorizer())
         .delete().send();
   }
 
@@ -270,9 +276,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
       };
 
       UriBuilder uri = UriBuilders.PROJECT.create().query("archive", Boolean.toString(archive));
-      ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(uri.build(projectDto.getName())) //
-          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(uri.build(projectDto.getName()))
+          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)
           .delete().send();
     }
   }
@@ -324,10 +330,33 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     }
   }
 
+  /**
+   * Update Project on authorization.
+   */
+  private final class ProjectIdentifiersMappingsSlotAuthorizer implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      clearSlot(Display.Places.MAPPINGS);
+    }
+
+    @Override
+    public void authorized() {
+      ProjectIdentifiersMappingsPresenter identifiersMappingsPresenter = identifiersMappingsPresenterProvider.get();
+
+      identifiersMappingsPresenter.setProject(project);
+      setInSlot(Display.Places.MAPPINGS, identifiersMappingsPresenter);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<ProjectAdministrationUiHandlers> {
 
     enum Places {
-      PERMISSIONS, KEYSTORE
+      MAPPINGS, PERMISSIONS, KEYSTORE
     }
 
     void setProject(ProjectDto project);
@@ -337,6 +366,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     void toggleVcfServicePluginPanel(boolean show);
 
     HasAuthorization getEditAuthorizer();
+
+    HasAuthorization getIdentifiersMappingsAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
 

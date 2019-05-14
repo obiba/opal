@@ -10,12 +10,15 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.collect.Sets;
+
 import java.time.Instant;
+
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.domain.ProjectIdentifiersMapping;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
 
@@ -38,20 +42,29 @@ public class Dtos {
 
   private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
-  private Dtos() {}
+  private Dtos() {
+  }
 
   public static ProjectDto asDto(Project project, @NotNull String directory) {
     ProjectDto.Builder builder = ProjectDto.newBuilder() //
-        .setName(project.getName()) //
-        .setTitle(project.getTitle()) //
-        .setDirectory(directory) //
-        .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
-        .setArchived(project.isArchived());
-    if(project.hasDescription()) builder.setDescription(project.getDescription());
-    if(project.hasTags()) builder.addAllTags(project.getTags());
-    if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
-    if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
-    if(project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
+      .setName(project.getName()) //
+      .setTitle(project.getTitle()) //
+      .setDirectory(directory) //
+      .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
+      .setArchived(project.isArchived());
+    if (project.hasDescription()) builder.setDescription(project.getDescription());
+    if (project.hasTags()) builder.addAllTags(project.getTags());
+    if (project.hasDatabase()) builder.setDatabase(project.getDatabase());
+    if (project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
+    if (project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
+    if (project.hasIdentifiersMappings()) {
+      builder.addAllIdMappings(
+        project.getIdentifiersMappings().stream()
+        .map(mapping -> asDto(mapping))
+        .collect(Collectors.toList())
+      );
+    }
+
     Datasource datasource = project.getDatasource();
     Magma.DatasourceDto.Builder dsDtoBuilder;
     try {
@@ -69,38 +82,52 @@ public class Dtos {
 
   public static Projects.ProjectDto asDtoDigest(Project project) {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder()
-        .setName(project.getName())
-        .setTitle(project.getTitle());
-    if(project.hasDescription()) builder.setDescription(project.getDescription());
-    if(project.hasTags()) builder.addAllTags(project.getTags());
+      .setName(project.getName())
+      .setTitle(project.getTitle());
+    if (project.hasDescription()) builder.setDescription(project.getDescription());
+    if (project.hasTags()) builder.addAllTags(project.getTags());
     builder.setTimestamps(asTimestampsDto(project));
-    
+
     return builder.build();
   }
 
   public static Project fromDto(ProjectDto projectDto) {
-    return Project.Builder.create() //
-        .name(projectDto.getName()) //
-        .title(projectDto.getTitle()) //
-        .description(projectDto.getDescription()) //
-        .database(projectDto.getDatabase()) //
-        .vcfStoreService(projectDto.getVcfStoreService()) //
-        .exportFolder(projectDto.getExportFolder()) //
-        .archived(projectDto.getArchived()) //
-        .tags(projectDto.getTagsList()) //
-        .build();
+    Project.Builder builder = Project.Builder.create() //
+      .name(projectDto.getName()) //
+      .title(projectDto.getTitle()) //
+      .description(projectDto.getDescription()) //
+      .database(projectDto.getDatabase()) //
+      .vcfStoreService(projectDto.getVcfStoreService()) //
+      .exportFolder(projectDto.getExportFolder()) //
+      .archived(projectDto.getArchived()) //
+      .tags(projectDto.getTagsList());
+
+    if (projectDto.getIdMappingsCount() > 0) {
+      projectDto.getIdMappingsList()
+        .forEach(dto ->
+          builder.idMapping(
+            ProjectIdentifiersMapping.newBuilder()
+              .entityType(dto.getEntityType())
+              .name(dto.getName())
+              .mapping(dto.getMapping())
+              .build()
+          )
+        );
+    }
+
+    return builder.build();
   }
 
   public static Project fromDto(Projects.ProjectFactoryDto projectFactoryDto) {
     return Project.Builder.create() //
-        .name(projectFactoryDto.getName()) //
-        .title(projectFactoryDto.getTitle()) //
-        .description(projectFactoryDto.getDescription()) //
-        .database(projectFactoryDto.getDatabase()) //
-        .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
-        .exportFolder(projectFactoryDto.getExportFolder()) //
-        .tags(projectFactoryDto.getTagsList()) //
-        .build();
+      .name(projectFactoryDto.getName()) //
+      .title(projectFactoryDto.getTitle()) //
+      .description(projectFactoryDto.getDescription()) //
+      .database(projectFactoryDto.getDatabase()) //
+      .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
+      .exportFolder(projectFactoryDto.getExportFolder()) //
+      .tags(projectFactoryDto.getTagsList()) //
+      .build();
   }
 
   @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -112,10 +139,10 @@ public class Dtos {
     int tableCount = 0;
     int variablesCount = 0;
     Set<String> ids = Sets.newHashSet();
-    for(ValueTable table : project.getDatasource().getValueTables()) {
+    for (ValueTable table : project.getDatasource().getValueTables()) {
       tableCount++;
       variablesCount = variablesCount + table.getVariableCount();
-      for(VariableEntity entity : table.getVariableEntities()) {
+      for (VariableEntity entity : table.getVariableEntities()) {
         ids.add(entity.getType() + ":" + entity.getIdentifier());
       }
     }
@@ -168,6 +195,14 @@ public class Dtos {
     return builder;
   }
 
+  private static ProjectDto.IdentifiersMappingDto asDto(ProjectIdentifiersMapping mapping) {
+    return ProjectDto.IdentifiersMappingDto.newBuilder()
+      .setEntityType(mapping.getEntityType())
+      .setName(mapping.getName())
+      .setMapping(mapping.getMapping())
+      .build();
+  }
+
   private static AnalysisResultItemDto asDto(AnalysisResultItem item) {
     AnalysisResultItemDto.Builder builder = AnalysisResultItemDto.newBuilder();
 
@@ -195,9 +230,9 @@ public class Dtos {
     Timestamps ts = timestamped.getTimestamps();
     Magma.TimestampsDto.Builder builder = Magma.TimestampsDto.newBuilder();
     Value created = ts.getCreated();
-    if(!created.isNull()) builder.setCreated(created.toString());
+    if (!created.isNull()) builder.setCreated(created.toString());
     Value lastUpdate = ts.getLastUpdate();
-    if(!lastUpdate.isNull()) builder.setLastUpdate(lastUpdate.toString());
+    if (!lastUpdate.isNull()) builder.setLastUpdate(lastUpdate.toString());
     return builder.build();
   }
 }

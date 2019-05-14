@@ -21,6 +21,10 @@ import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPrese
 import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesView;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectImportVcfFileModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectImportVcfFileModalView;
+import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsModalView;
+import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsView;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
@@ -54,5 +58,10 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectExportVcfFileModalView.class);
     bindPresenterWidget(ProjectGenotypeEditMappingTableModalPresenter.class,
         ProjectGenotypeEditMappingTableModalPresenter.Display.class, ProjectGenotypeEditMappingTableModalView.class);
+    bindPresenterWidget(ProjectIdentifiersMappingsPresenter.class, ProjectIdentifiersMappingsPresenter.Display.class,
+      ProjectIdentifiersMappingsView.class);
+    bindPresenterWidget(ProjectIdentifiersMappingsModalPresenter.class, ProjectIdentifiersMappingsModalPresenter.Display.class,
+      ProjectIdentifiersMappingsModalView.class);
+
   }
 }

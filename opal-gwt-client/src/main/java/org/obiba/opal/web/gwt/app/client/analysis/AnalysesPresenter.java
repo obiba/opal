@@ -46,7 +46,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   private JsArray<OpalAnalysisDto> originalAnalysisJsArray;
 
-  private final ModalProvider<AnalysisModalPresenter> AnalysisModalPresenterProvider;
+  private final ModalProvider<AnalysisModalPresenter> analysisModalPresenterProvider;
 
   private Runnable deleteAnalysisConfirmation;
 
@@ -60,8 +60,8 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
                            ModalProvider<AnalysisModalPresenter> AnalysisModalPresenter) {
     super(eventBus, view);
     this.translationMessages = translationMessages;
-      AnalysisModalPresenterProvider = AnalysisModalPresenter.setContainer(this);
-      getView().setUiHandlers(this);
+    analysisModalPresenterProvider = AnalysisModalPresenter.setContainer(this);
+    getView().setUiHandlers(this);
   }
 
   public void setPlugins(List<PluginPackageDto> plugins) {
@@ -95,7 +95,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   @Override
   public void createAnalysis() {
-    AnalysisModalPresenter modal = AnalysisModalPresenterProvider.get();
+    AnalysisModalPresenter modal = analysisModalPresenterProvider.get();
     modal.initialize(originalTable, null, existingAnalysisNames(), plugins);
   }
 
@@ -174,7 +174,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         opalAnalysisDto.setVariablesArray(variableNames);
         opalAnalysisDto.setDatasource(originalTable.getDatasourceName());
         opalAnalysisDto.setTable(originalTable.getName());
-        AnalysisModalPresenterProvider.get().initialize(originalTable, opalAnalysisDto, existingAnalysisNames(), plugins);
+        analysisModalPresenterProvider.get().initialize(originalTable, opalAnalysisDto, existingAnalysisNames(), plugins);
       }
 
     });
@@ -200,7 +200,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
           case Display.DUPLICATE_ANALYSIS:
             OpalAnalysisDto duplicate = OpalAnalysisDto.parse(OpalAnalysisDto.stringify(analysis));
             duplicate.setName(null);
-            AnalysisModalPresenterProvider.get().initialize(originalTable, duplicate, existingAnalysisNames(), plugins);
+            analysisModalPresenterProvider.get().initialize(originalTable, duplicate, existingAnalysisNames(), plugins);
             break;
 
           case Display.VIEW_ANALYSIS:
@@ -233,7 +233,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         @Override
         public void onResource(Response response, OpalAnalysisDto resource) {
           if (resource != null) {
-            AnalysisModalPresenterProvider.get().initialize(originalTable, resource, new ArrayList<String>(), plugins);
+            analysisModalPresenterProvider.get().initialize(originalTable, resource, new ArrayList<String>(), plugins);
           }
         }
       })

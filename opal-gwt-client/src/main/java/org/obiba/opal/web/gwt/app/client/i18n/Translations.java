@@ -328,6 +328,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("An identifiers mapping already exists with this name.")
   String identifiersMappingNameAlreadyExists();
 
+  @Description("Identifiers mappings Empty label")
+  @DefaultStringValue("No identifiers mappings.")
+  String noIdentifiersMappings();
+
+  @Description("Identifiers mappingsMappings Column label")
+  @DefaultStringValue("Identifiers Mapping")
+  String identifiersMappings();
+
   @Description("Category name already exists label")
   @DefaultStringValue("The specified category name already exists.")
   String categoryNameAlreadyExists();

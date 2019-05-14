@@ -5,6 +5,12 @@ package Projects;
 option java_package = "org.obiba.opal.web.model";
 
 message ProjectDto {
+  message IdentifiersMappingDto {
+    required string entityType = 1;
+    required string name = 2;
+    required string mapping = 3;
+  }
+
   required string name = 1;
   required string title = 2;
   optional string description = 3;
@@ -17,6 +23,7 @@ message ProjectDto {
   optional Magma.TimestampsDto timestamps = 10;
   optional string vcfStoreService = 11;
   optional string exportFolder = 12;
+  repeated IdentifiersMappingDto idMappings = 13;
 }
 
 message ProjectFactoryDto {
