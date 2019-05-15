@@ -48,6 +48,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
         List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "*:GET/*", args),//
             toRest("/project/{0}/commands/_export", "POST:GET", args),//
             toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+            toRest("/project/{0}/commands/_refresh", "POST:GET", args),//
             toRest("/project/{0}/report-templates", "GET:GET", args),//
             toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
@@ -101,6 +102,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/commands/_analyse", "POST:GET", args),//
             toRest("/project/{0}/commands/_export", "POST:GET", args),//
             toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+            toRest("/project/{0}/commands/_refresh", "POST:GET", args),//
             toRest("/project/{0}/report-templates", "GET:GET", args),//
             toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//

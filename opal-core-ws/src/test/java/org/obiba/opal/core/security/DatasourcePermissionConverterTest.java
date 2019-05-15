@@ -43,6 +43,7 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/commands/_analyse:POST:GET", //
         "rest:/project/patate/commands/_export:POST:GET", //
         "rest:/project/patate/commands/_copy:POST:GET", //
+        "rest:/project/patate/commands/_refresh:POST:GET", //
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
@@ -66,6 +67,7 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/commands/_import:POST:GET", //
         "rest:/project/patate/commands/_export:POST:GET", //
         "rest:/project/patate/commands/_copy:POST:GET", //
+        "rest:/project/patate/commands/_refresh:POST:GET", //
         "rest:/files/projects/patate:GET:GET/*", //
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");
