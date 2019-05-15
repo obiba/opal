@@ -137,13 +137,20 @@
       <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>
 
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="Refresh Project label">Refresh Project</ui:msg>
+      </b:Heading>
+      <b:Form>
+        <b:Button type="INFO" ui:field="refreshProject">Refresh</b:Button>
+        <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
+      </b:Form>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="deletePanel">
       <b:Heading size="4">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
       </b:Heading>
-      <b:Form>
-        <b:Button type="INFO" ui:field="refreshProject">Refresh Project</b:Button>
-      </b:Form>
       <b:Paragraph>
         <ui:msg description="Archive Project text">Archiving a project makes its data inaccessible. Project tables,
           views, files, reports and keystore will remain untouched. These data will be reinstated when a project with

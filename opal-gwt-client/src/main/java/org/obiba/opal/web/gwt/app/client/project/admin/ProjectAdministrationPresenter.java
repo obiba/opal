@@ -116,6 +116,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     this.project = project;
     getView().setProject(project);
     authorize();
+    initProjectState();
 
     Map<String, String> params = Maps.newHashMap();
     params.put("type", VCF_STORE_SERVICE_TYPE);
@@ -135,6 +136,18 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
           showVcfServiceNamePanel(hasPlugin);
         }
       }).get().send();
+  }
+
+  private void initProjectState() {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(project.getName()))
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            String responseText = response.getText();
+            getView().toggleRefreshButton(!"BUSY".equals(responseText));
+          }
+        }).get().send();
   }
 
   private void authorize() {
@@ -203,9 +216,11 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
                       ? "Forbidden"
                       : "ProjectMomentarilyNotRefreshable" : response.getText();
                   fireEvent(NotificationEvent.newBuilder().error(errorMessage).args(project.getName()).build());
+                } else {
+                  initProjectState();
                 }
               }
-            }, SC_CREATED, SC_FORBIDDEN, SC_NOT_FOUND, SC_CONFLICT, SC_INTERNAL_SERVER_ERROR) //
+            }, SC_CREATED, SC_FORBIDDEN, SC_NOT_FOUND, SC_CONFLICT, SC_INTERNAL_SERVER_ERROR)
             .post().send();
       }
     };
@@ -328,6 +343,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     HasAuthorization getKeyStoreAuthorizer();
 
     HasAuthorization getDeleteAuthorizer();
+
+    void toggleRefreshButton(boolean toggleOn);
   }
 
 }

@@ -11,7 +11,7 @@ package org.obiba.opal.web.shell;
 
 import com.google.common.collect.Lists;
 import java.util.Arrays;
-import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -238,6 +238,29 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     return launchCommand(refreshCommand);
   }
 
+  @GET
+  @Path("/state")
+  public Response getState() {
+    List<CommandJob> jobs = commandJobService.getHistory().stream()
+        .filter(job -> job.hasProject() && job.getProject()
+            .equals(name)).collect(Collectors.toList());
+
+    boolean isRefreshing = checkCommandIsBlocked(jobs, name, false);
+    boolean isBusy = checkCommandIsBlocked(jobs, name, true);
+
+    ResponseBuilder responseBuilder = Response.ok();
+
+    if (isBusy) {
+      responseBuilder.entity(State.BUSY.name());
+    } else if (isRefreshing) {
+      responseBuilder.entity(State.REFRESHING.name());
+    } else {
+      responseBuilder.entity(State.READY.name());
+    }
+
+    return responseBuilder.build();
+  }
+
   @Override
   protected CommandJob newCommandJob(String jobName, Command<?> command) {
     CommandJob job = super.newCommandJob(jobName, command);
@@ -245,7 +268,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     return job;
   }
 
-  public static boolean checkCommandIsBlocked(CommandJobService commandJobService, String projectName, boolean refreshingProject) {
+  private boolean checkCommandIsBlocked(CommandJobService commandJobService, String projectName, boolean refreshingProject) {
     return checkCommandIsBlocked(
         commandJobService.getHistory().stream()
             .filter(job -> job.hasProject() && job.getProject().equals(projectName))
@@ -255,12 +278,12 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     );
   }
 
-  public static boolean checkCommandIsBlocked(List<CommandJob> jobs, String projectName, boolean refreshingProject) {
+  private boolean checkCommandIsBlocked(List<CommandJob> jobs, String projectName, boolean refreshingProject) {
     boolean isBlocked;
     if (refreshingProject) {
       isBlocked = jobs.stream()
           .filter(job -> projectName.equals(job.getProject()))
-          .filter(job -> READ_WRITE_COMMAND_NAMES.indexOf(job.getName()) > -1)
+          .filter(job -> READ_WRITE_COMMAND_NAMES.indexOf(job.getName()) > -1 || REFRESH_COMMAND_NAME.equals(job.getName()))
           .anyMatch(job -> BLOCKING_STATUSES.indexOf(job.getStatus()) > -1);
     } else {
       isBlocked = jobs.stream()
@@ -324,5 +347,11 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     return Response.created(
         UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId))
         .build();
+  }
+
+  public enum State {
+    BUSY, // project has read, write and refresh commands that are pending or being processed
+    READY,
+    REFRESHING // project only has one refresh command being processed (only one should be present at a time)
   }
 }

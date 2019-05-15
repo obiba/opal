@@ -95,6 +95,12 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Label exportFolder;
 
+  @UiField
+  Button refreshProject;
+
+  @UiField
+  Label refreshProjectBusy;
+
   private ProjectDto project;
 
   @Inject
@@ -109,6 +115,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     name.setText(project.getName());
     title.setText(project.getTitle());
     description.setText(project.getDescription());
+    refreshProjectBusy.getElement().addClassName("help-block");
     tags.setText("");
     if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
     if (project.getExportFolder() != null) exportFolder.setText(project.getExportFolder());
@@ -166,6 +173,12 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public HasAuthorization getDeleteAuthorizer() {
     return new WidgetAuthorizer(deletePanel);
+  }
+
+  @Override
+  public void toggleRefreshButton(boolean toggleOn) {
+    refreshProject.setEnabled(toggleOn);
+    refreshProjectBusy.setVisible(!toggleOn);
   }
 
   @UiHandler("editProperties")
