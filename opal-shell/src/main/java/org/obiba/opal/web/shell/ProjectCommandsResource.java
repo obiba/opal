@@ -91,8 +91,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_import")
   public Response importData(Commands.ImportCommandOptionsDto options) {
-    boolean isBlocked = checkCommandIsBlocked(commandJobService, name, false);
-    if (isBlocked) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     if(!name.equals(options.getDestination())) {
       throw new InvalidRequestException("DataCanOnlyBeImportedInCurrentDatasource", name);
@@ -126,8 +125,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    boolean isBlocked = checkCommandIsBlocked(commandJobService, name, false);
-    if (isBlocked) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     String commandName = "copy";
 
@@ -150,8 +148,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_export")
   public Response exportData(Commands.ExportCommandOptionsDto options) {
-    boolean isBlocked = checkCommandIsBlocked(commandJobService, name, false);
-    if (isBlocked) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     String commandName = "export";
 
@@ -230,8 +227,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_refresh")
   public Response refreshProject() {
-    boolean isBlocked = checkCommandIsBlocked(commandJobService, name, true);
-    if (isBlocked) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(commandJobService, name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     Command<Object> refreshCommand = commandRegistry.newCommand("refresh");
     refreshCommand.setOptions(new RefreshCommandOptionsDtoImpl(RefreshCommandOptionsDto.newBuilder().setProject(name).build()));
@@ -268,32 +264,30 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     return job;
   }
 
-  private boolean checkCommandIsBlocked(CommandJobService commandJobService, String projectName, boolean refreshingProject) {
+  private boolean checkCommandIsBlocked(CommandJobService commandJobService, String projectName, boolean forProjectRefresh) {
     return checkCommandIsBlocked(
         commandJobService.getHistory().stream()
             .filter(job -> job.hasProject() && job.getProject().equals(projectName))
             .collect(Collectors.toList()),
         projectName,
-        refreshingProject
+        forProjectRefresh
     );
   }
 
-  private boolean checkCommandIsBlocked(List<CommandJob> jobs, String projectName, boolean refreshingProject) {
+  private boolean checkCommandIsBlocked(List<CommandJob> jobs, String projectName, boolean forProjectRefresh) {
     boolean isBlocked;
-    if (refreshingProject) {
+    if (forProjectRefresh) {
       isBlocked = jobs.stream()
-          .filter(job -> projectName.equals(job.getProject()))
-          .filter(job -> READ_WRITE_COMMAND_NAMES.indexOf(job.getName()) > -1 || REFRESH_COMMAND_NAME.equals(job.getName()))
+          .filter(job -> projectName.equals(job.getProject()) && (READ_WRITE_COMMAND_NAMES.indexOf(job.getName()) > -1 || REFRESH_COMMAND_NAME.equals(job.getName())))
           .anyMatch(job -> BLOCKING_STATUSES.indexOf(job.getStatus()) > -1);
     } else {
       isBlocked = jobs.stream()
-          .filter(job -> projectName.equals(job.getProject()))
-          .filter(job -> REFRESH_COMMAND_NAME.equals(job.getName()))
+          .filter(job -> projectName.equals(job.getProject()) && REFRESH_COMMAND_NAME.equals(job.getName()))
           .anyMatch(job -> BLOCKING_STATUSES.indexOf(job.getStatus()) > -1);
     }
 
     if (isBlocked) {
-      log.error("Project [{}]'s {} command call is blocked.", projectName, refreshingProject ? "refresh" : "read/write/copy");
+      log.warn("Project [{}]'s {} command call is blocked.", projectName, forProjectRefresh ? "refresh" : "read/write/copy");
     }
 
     return isBlocked;
