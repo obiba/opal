@@ -163,6 +163,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         dataExportService
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
                 buildDatasourceCopier(destinationDatasource), !options.getNonIncremental(), new CopyProgressListener());
+        Disposables.dispose(destinationDatasource);
         getShell().printf("Successfully copied all tables.\n");
         errorCode = CommandResultCode.SUCCESS;
       } catch(Exception e) {
@@ -174,7 +175,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           if(options.getOutFormat().equalsIgnoreCase("jdbc") && !Strings.isNullOrEmpty(destinationDatasourceName)) {
             databaseRegistry.unregister(options.getOut(), destinationDatasourceName);
           }
-          Disposables.silentlyDispose(destinationDatasource);
         }
       }
     }
