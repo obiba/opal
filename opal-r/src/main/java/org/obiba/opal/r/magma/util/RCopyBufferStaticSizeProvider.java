@@ -31,8 +31,10 @@ public class RCopyBufferStaticSizeProvider implements RCopyBufferSizeProvider {
       int variableCount = table.getVariableCount();
       int dataPointsCount = entityCount * variableCount;
 
-      log.info("Using {}% of the available memory at copy init, for {} data points", 100 * bufferMemory / availableMemory, dataPointsCount);
-      return dataPointsCount;
+      if (dataPointsCount > 0) {
+        log.info("Using {}% of the available memory at copy init, for {} data points", 100 * bufferMemory / availableMemory, dataPointsCount);
+        return dataPointsCount;
+      }
     }
 
     return 0;

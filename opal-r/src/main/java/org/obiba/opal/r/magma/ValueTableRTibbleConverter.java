@@ -5,23 +5,17 @@
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.obiba.opal.r.magma;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.SplitValueTablesFactory;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.RList;
+import org.rosuda.REngine.REXPList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Build a R tibble from a table: list of vectors of variables.
@@ -36,36 +30,16 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
 
   @Override
   protected void doAssignTable(ValueTable table, String symbol) {
-    RList list = getVariableVectors(table);
-    REXP ids = getIdsVector(table, true);
+    REXPList list = getVectorsList(table);
 
-    String[] names = list.keys();
-    if (names == null || names.length == 0) return;
-
-    doAssignTmpVectors(table, ids, names, list);
-    doAssignTibble(symbol, names);
-    doRemoveTmpVectors(names);
+    doAssignTmpVectorsList(list);
+    doAssignTibble(symbol);
+    doRemoveTmpVectorsList();
   }
 
-  private void doAssignTibble(String symbol, String... names) {
-    // create the tibble from the vectors
-    StringBuilder args = new StringBuilder();
-    args.append(String.format("'%s'=%s", getIdColumnName(),
-          getTmpVectorName(getSymbol(), getIdColumnName())));
-
-    if (withUpdatedColumn()) {
-      if (args.length() > 0) args.append(", ");
-      args.append(String.format("'%s'=%s", getUpdatedColumnName(),
-          getTmpVectorName(getSymbol(), getUpdatedColumnName())));
-    }
-    for (String name : names) {
-      if (args.length() > 0) args.append(", ");
-      args.append(String.format("'%s'=%s", name, getTmpVectorName(getSymbol(), name)));
-    }
-    log.trace("tibble arguments: {}", args);
+  private void doAssignTibble(String symbol) {
     magmaAssignROperation.doEnsurePackage("tibble");
-    magmaAssignROperation.doEval("library(tibble)");
-    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', tibble(%s)))", symbol, args));
+    magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', tibble::as_tibble(as.list(%s))))", symbol, VALUETABLE_LIST_SYMBOL));
   }
 
   @Override

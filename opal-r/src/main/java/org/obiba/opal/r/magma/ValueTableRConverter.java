@@ -26,6 +26,7 @@ import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ import java.util.stream.StreamSupport;
 abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableRConverter.class);
+
+  protected static final String VALUETABLE_LIST_SYMBOL = ".valuetablelist";
 
   private final Map<String, Integer> lineCounts = Maps.newConcurrentMap();
 
@@ -77,7 +80,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected void doAssignTable(ValueTable table, boolean split) {
     if (split) {
       List<ValueTable> splitTables = SplitValueTablesFactory.split(table);
-      if (splitTables.size()>1) {
+      if (splitTables.size() > 1) {
         List<String> splitSymbols = Lists.newArrayList();
         int i = 1;
         for (ValueTable splitTable : splitTables) {
@@ -108,40 +111,12 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
    */
   protected abstract void doAssignTable(ValueTable table, String symbol);
 
-  protected void doAssignTmpVectors(ValueTable table, REXP ids, String[] names, RList list) {
-    // one temporary vector per variable
-    for (String name : names) {
-      magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), name), list.at(name));
-    }
-    // one temporary vector for the timestamp
-    if (withUpdatedColumn()) {
-      magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), getUpdatedColumnName()),
-          getUpdatedVector(table, withMissings()));
-    }
-    // one temporary vector for the ids
-    magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(),
-        withIdColumn() ? getIdColumnName() : "row.names"), ids);
+  protected void doAssignTmpVectorsList(REXPList list) {
+    magmaAssignROperation.doAssign(VALUETABLE_LIST_SYMBOL, list);
   }
 
-
-  protected void doRemoveTmpVectors(String... names) {
-    // remove temporary vectors
-    List<String> vectorNames = Lists.newArrayList();
-    for (String name : names) {
-      vectorNames.add(getTmpVectorName(getSymbol(), name));
-    }
-    magmaAssignROperation.doEval("base::rm(list=c('" + Joiner.on("','").join(vectorNames) + "'))");
-    magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
-        withIdColumn() ? getIdColumnName() : "row.names") + ")");
-    if (withUpdatedColumn()) {
-      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
-          getUpdatedColumnName()) + ")");
-    }
-  }
-
-  protected String getTmpVectorName(String symbol, String name) {
-    return (".opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
-        .replace("'", ".").replace("[", ".").replace("]", ".").replace("{", ".").replace("}", ".").replace("(", ".").replace(")", ".");
+  protected void doRemoveTmpVectorsList() {
+    magmaAssignROperation.doEval("base::rm(" + VALUETABLE_LIST_SYMBOL + ")");
   }
 
   protected String getSymbol() {
@@ -228,17 +203,13 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     }
   }
 
-  protected RList getVariableVectors(ValueTable table) {
-    return getVariableVectorsByRows(table);
-  }
-
   /**
    * Parallelize vector extraction per value set as it is safe and optimal to do so for a view (some derive variables
    * can refer to each other in the same value set).
    *
    * @return
    */
-  protected RList getVariableVectorsByRows(ValueTable table) {
+  protected REXPList getVectorsList(ValueTable table) {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
     SortedSet<VariableEntity> entities = getEntities(table);
@@ -296,7 +267,20 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
       names.add(v.getName());
     });
 
-    return new RList(contents, names);
+    // one temporary vector for the timestamp
+    if (withUpdatedColumn()) {
+      names.add(0, getUpdatedColumnName());
+      contents.add(0, getUpdatedVector(table, withMissings()));
+    }
+
+    // one temporary vector for the ids
+    if (withIdColumn()) {
+      REXP ids = getIdsVector(table, withMissings());
+      names.add(0, getIdColumnName());
+      contents.add(0, ids);
+    }
+
+    return new REXPList(new RList(contents, names));
   }
 
   /**

@@ -81,7 +81,7 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
   }
 
   @Override
-  public ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
+  public synchronized ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
     if (datasource.hasValueTable(tableName)) {
       StaticValueTable table = (StaticValueTable) datasource.getValueTable(tableName);
 
