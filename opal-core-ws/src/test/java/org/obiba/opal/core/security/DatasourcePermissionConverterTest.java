@@ -47,6 +47,7 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/analyses:GET:GET",
         "rest:/project/patate/analyses/_export:GET:GET");
@@ -62,6 +63,7 @@ public class DatasourcePermissionConverterTest
         "rest:/identifiers/mappings:GET", //
         "rest:/datasource-plugin:GET:GET/GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/transient-datasources:POST", //
         "rest:/project/patate/commands/_import:POST:GET", //

@@ -140,7 +140,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private void initProjectState() {
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(project.getName()))
+        .forResource(UriBuilders.PROJECT_STATE.create().build(project.getName()))
         .withCallback(SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

@@ -37,6 +37,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/permissions/table/pwel:*:GET/*", //
         "rest:/files/projects/patate:GET:GET/*", //
@@ -54,6 +55,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/permissions/table/pwel:*:GET/*", //
         "rest:/files/projects/patate:GET:GET/*", //
@@ -82,6 +84,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/facets/_search:POST:GET",//
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET");
   }
 
@@ -101,6 +104,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/analyses:GET:GET", //
         "rest:/project/patate/table/pwel/analyses:GET:GET",
@@ -115,6 +119,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/facets/_search:POST:GET", //
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/datasource/patate/table/pwel:PUT:GET", //
         "rest:/datasource/patate/table/pwel/variables:POST:GET/*", //
@@ -133,6 +138,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/facets/_search:POST:GET", //
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET");
   }
 
@@ -148,6 +154,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/facets/_search:POST:GET",//
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST",//
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/datasource/patate/view/pwel/xml:GET:GET");
   }
@@ -168,6 +175,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/analyses:GET:GET",
         "rest:/project/patate/table/pwel/analyses:GET:GET",
@@ -182,6 +190,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/facets/_search:POST:GET", //
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/datasource/patate/view/pwel/xml:GET:GET");
   }

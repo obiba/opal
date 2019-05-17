@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.eventbus.EventBus;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Timestamped;
@@ -158,5 +159,33 @@ public class ProjectResource {
     public Timestamps getTimestamps() {
       return timestamps;
     }
+  }
+
+  @GET
+  @Path("/state")
+  public Response getState(@PathParam("name") String name) {
+    Project project = projectService.getProject(name);
+
+    boolean isRefreshing = !project.hasDatasource();
+    boolean isBusy = isRefreshing;
+
+    ResponseBuilder responseBuilder = Response.ok();
+
+    if (isBusy) {
+      responseBuilder.entity(State.BUSY.name());
+    } else if (isRefreshing) {
+      responseBuilder.entity(State.REFRESHING.name());
+    } else {
+      responseBuilder.entity(State.READY.name());
+    }
+
+    return responseBuilder.build();
+  }
+
+
+  public enum State {
+    BUSY, // project has read, write and refresh commands that are pending or being processed
+    READY,
+    REFRESHING // project's datasource is not ready
   }
 }

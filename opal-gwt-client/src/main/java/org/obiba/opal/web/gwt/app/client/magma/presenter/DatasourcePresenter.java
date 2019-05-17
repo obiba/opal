@@ -329,7 +329,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     private void initProjectCommandsState() {
       ResourceRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(datasource.getName()))
+          .forResource(UriBuilders.PROJECT_STATE.create().build(datasource.getName()))
           .withCallback(SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {

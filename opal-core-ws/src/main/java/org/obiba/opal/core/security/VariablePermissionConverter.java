@@ -43,6 +43,7 @@ public class VariablePermissionConverter extends OpalPermissionConverter {
         return Lists.newArrayList(toRest("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
             toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args));
       }
     };

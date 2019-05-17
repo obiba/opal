@@ -24,6 +24,7 @@ public class VariablePermissionConverterTest
         "rest:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET");
   }
 
