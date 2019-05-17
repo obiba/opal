@@ -121,6 +121,12 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiField
   Panel permissionsPanel;
 
+  @UiField
+  IconAnchor exportSelectionAnchor;
+
+  @UiField
+  IconAnchor copySelectionAnchor;
+
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private final Translations translations;
@@ -313,6 +319,15 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     else addUpdateTables.setText(translations.addUpdateTablesLabel());
 
     checkColumn.clearSelection();
+  }
+
+  @Override
+  public void toggleReadWriteButtons(boolean toggleOn) {
+    importData.setEnabled(toggleOn);
+    exportData.setEnabled(toggleOn);
+    copyData.setEnabled(toggleOn);
+    copySelectionAnchor.setVisible(toggleOn);
+    exportSelectionAnchor.setVisible(toggleOn);
   }
 
   @Override

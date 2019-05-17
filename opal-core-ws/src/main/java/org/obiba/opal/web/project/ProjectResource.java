@@ -47,47 +47,55 @@ import java.util.Arrays;
 @Path("/project/{name}")
 public class ProjectResource {
 
-  @Autowired
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
+
+  private final ProjectService projectService;
+
+  private final EventBus eventBus;
+
+  private final ProjectsKeyStoreService projectsKeyStoreService;
+
+  private final ApplicationContext applicationContext;
+
+  private final VCFSamplesMappingService vcfSamplesMappingService;
+
+  private final SubjectProfileService subjectProfileService;
 
   @Autowired
-  private ProjectService projectService;
-
-  @Autowired
-  private EventBus eventBus;
-
-  @Autowired
-  private ProjectsKeyStoreService projectsKeyStoreService;
-
-  @PathParam("name")
-  private String name;
-
-  @Autowired
-  private ApplicationContext applicationContext;
-
-  @Autowired
-  private VCFSamplesMappingService vcfSamplesMappingService;
-
-  @Autowired
-  private SubjectProfileService subjectProfileService;
+  public ProjectResource(
+      OpalRuntime opalRuntime,
+      ProjectService projectService,
+      EventBus eventBus,
+      ProjectsKeyStoreService projectsKeyStoreService,
+      ApplicationContext applicationContext,
+      VCFSamplesMappingService vcfSamplesMappingService,
+      SubjectProfileService subjectProfileService) {
+    this.opalRuntime = opalRuntime;
+    this.projectService = projectService;
+    this.eventBus = eventBus;
+    this.projectsKeyStoreService = projectsKeyStoreService;
+    this.applicationContext = applicationContext;
+    this.vcfSamplesMappingService = vcfSamplesMappingService;
+    this.subjectProfileService = subjectProfileService;
+  }
 
   @GET
   @Transactional(readOnly = true)
-  public Projects.ProjectDto get(@Context Request request) {
-    Project project = getProject();
+  public Projects.ProjectDto get(@Context Request request, @PathParam("name") String name) {
+    Project project = projectService.getProject(name);
     return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
   }
 
   @GET
   @Path("/summary")
   @Transactional(readOnly = true)
-  public Projects.ProjectSummaryDto getSummary(@Context Request request) {
-    Project project = getProject();
+  public Projects.ProjectSummaryDto getSummary(@Context Request request, @PathParam("name") String name) {
+    Project project = projectService.getProject(name);
     return Dtos.asSummaryDto(project);
   }
 
   @PUT
-  public Response update(Projects.ProjectDto projectDto) {
+  public Response update(Projects.ProjectDto projectDto, @PathParam("name") String name) {
     // will throw a no such project exception
     projectService.getProject(name);
     if(!name.equals(projectDto.getName())) {
@@ -99,9 +107,9 @@ public class ProjectResource {
 
   @DELETE
   @Transactional
-  public Response delete(@QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
+  public Response delete(@PathParam("name") String name, @QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
     try {
-      Project project = getProject();
+      Project project = projectService.getProject(name);
       Datasource ds = project.hasDatasource() ? project.getDatasource() : null;
       projectService.delete(name, archive);
       if (ds != null) {
@@ -121,25 +129,21 @@ public class ProjectResource {
   }
 
   @Path("/keystore")
-  public KeyStoreResource getKeyStoreResource() {
+  public KeyStoreResource getKeyStoreResource(@PathParam("name") String name) {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
-    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(projectService.getProject(name));
     resource.setKeyStore(keyStore);
     return resource;
   }
 
   @Path("/vcf-store")
-  public VCFStoreResource getVCFStoreResource() {
-    Project project = getProject();
+  public VCFStoreResource getVCFStoreResource(@PathParam("name") String name) {
+    Project project = projectService.getProject(name);
     if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) throw new NotFoundException("Project has no VCF store: " + project.getName());
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
-  }
-
-  private Project getProject() {
-    return projectService.getProject(name);
   }
 
   private static class ProjectTimestamps implements Timestamped {

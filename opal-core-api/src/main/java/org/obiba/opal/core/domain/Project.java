@@ -51,8 +51,9 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   private String vcfStoreService;
 
-  public Project() {
-  }
+  private String exportFolder;
+
+  public Project() { }
 
   public Project(@NotNull String name) {
     this.name = name;
@@ -141,6 +142,18 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   public void setVCFStoreService(String vcfStore) {
     this.vcfStoreService = vcfStore;
+  }
+
+  public boolean hasExportFolder() {
+    return !Strings.isNullOrEmpty(exportFolder);
+  }
+
+  public String getExportFolder() {
+    return exportFolder;
+  }
+
+  void setExportFolder(String exportFolder) {
+    this.exportFolder = exportFolder;
   }
 
   @Transient
@@ -267,6 +280,11 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
     public Builder vcfStoreService(String service) {
       project.setVCFStoreService(service);
+      return this;
+    }
+
+    public Builder exportFolder(String value) {
+      project.setExportFolder(value);
       return this;
     }
 

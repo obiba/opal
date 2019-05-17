@@ -49,6 +49,12 @@
           </o:PropertyPanel>
           <o:PropertyPanel>
             <g:Label>
+              <ui:msg description="Project Export Folder label">Export Folder</ui:msg>
+            </g:Label>
+            <g:Label ui:field="exportFolder"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
               <ui:msg description="Tags label">Tags</ui:msg>
             </g:Label>
             <g:Label ui:field="tags"/>
@@ -129,6 +135,16 @@
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="permissions"/>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="Refresh Project label">Refresh Project</ui:msg>
+      </b:Heading>
+      <b:Form>
+        <b:Button type="INFO" ui:field="refreshProject">Refresh</b:Button>
+        <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
+      </b:Form>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="deletePanel">

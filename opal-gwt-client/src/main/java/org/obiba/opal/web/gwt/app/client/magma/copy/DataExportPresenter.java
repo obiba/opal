@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -47,7 +46,7 @@ import com.gwtplatform.mvp.client.PopupView;
 public class DataExportPresenter extends ModalPresenterWidget<DataExportPresenter.Display>
     implements DataExportUiHandlers {
 
-  private final RequestCredentials credentials;
+  private final DataExportFolderService dataExportFolderService;
 
   private Set<TableDto> exportTables = Sets.newHashSet();
 
@@ -62,13 +61,17 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   private String valuesQuery;
 
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus, Translations translations,
-      TranslationMessages translationMessages, FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
+  public DataExportPresenter(Display display,
+                             EventBus eventBus,
+                             Translations translations,
+                             TranslationMessages translationMessages,
+                             FileSelectionPresenter fileSelectionPresenter,
+                             DataExportFolderService dataExportFolderService) {
     super(eventBus, display);
     this.translations = translations;
     this.translationMessages = translationMessages;
     this.fileSelectionPresenter = fileSelectionPresenter;
-    this.credentials = credentials;
+    this.dataExportFolderService = dataExportFolderService;
 
     getView().setUiHandlers(this);
   }
@@ -82,7 +85,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   protected void initDisplayComponents() {
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    fileSelectionPresenter.getView().setFile("/home/" + credentials.getUsername() + "/export");
+    fileSelectionPresenter.getView().setFile(dataExportFolderService.getExportFolder());
     getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
     updateFormatChooser();
   }

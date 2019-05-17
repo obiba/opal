@@ -227,6 +227,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   ButtonGroup tableAddVariableGroup;
+
   @UiField
   Tab analysesTab;
 
@@ -489,6 +490,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setVariableFilter(String variableFilter) {
     filter.setText(variableFilter);
+  }
+
+  @Override
+  public void toggleReadWriteButtons(boolean toggleOn) {
+    copyData.setEnabled(toggleOn);
+    exportData.setEnabled(toggleOn);
   }
 
   @UiHandler("dictionnaryTab")

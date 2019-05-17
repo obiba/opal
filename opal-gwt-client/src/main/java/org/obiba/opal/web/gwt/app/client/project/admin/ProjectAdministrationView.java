@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -91,6 +92,15 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Label vcfServiceName;
 
+  @UiField
+  Label exportFolder;
+
+  @UiField
+  Button refreshProject;
+
+  @UiField
+  Label refreshProjectBusy;
+
   private ProjectDto project;
 
   @Inject
@@ -105,8 +115,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     name.setText(project.getName());
     title.setText(project.getTitle());
     description.setText(project.getDescription());
+    refreshProjectBusy.getElement().addClassName("help-block");
     tags.setText("");
     if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
+    if (project.getExportFolder() != null) exportFolder.setText(project.getExportFolder());
+
     noDatabasePanel.setVisible(!project.hasDatabase());
     databasePanel.setVisible(project.hasDatabase());
     if(project.hasDatabase()) {
@@ -162,6 +175,12 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     return new WidgetAuthorizer(deletePanel);
   }
 
+  @Override
+  public void toggleRefreshButton(boolean toggleOn) {
+    refreshProject.setEnabled(toggleOn);
+    refreshProjectBusy.setVisible(!toggleOn);
+  }
+
   @UiHandler("editProperties")
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEdit();
@@ -186,6 +205,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiHandler("archiveProject")
   void onArchiveProject(ClickEvent event) {
     getUiHandlers().onArchive();
+  }
+
+  @UiHandler("refreshProject")
+  public void onRefreshProject(ClickEvent event) {
+    getUiHandlers().onRefresh();
   }
 
 }

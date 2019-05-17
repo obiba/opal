@@ -397,6 +397,7 @@ public interface Translations extends Constants {
       "InternalError", "An internal error has occurred. Please contact technical support.", //
       "UnhandledException",
       "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
+      "ProjectMomentarilyNotRefreshable", "Project [{0}]'s command call is blocked momentarily.",
       //
       "DatasourceNameDisallowedChars", "Project names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //

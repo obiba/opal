@@ -10,9 +10,27 @@
 
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
+import static com.google.gwt.http.client.Response.SC_CONFLICT;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent.Handler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -27,31 +45,17 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
-import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
-
-import java.util.Map;
-
-import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
-import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdministrationPresenter.Display>
     implements ProjectAdministrationUiHandlers {
@@ -69,6 +73,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   private ProjectDto project;
 
   private Runnable removeConfirmation;
+
+  private Runnable refreshConfirmation;
 
   private final TranslationMessages translationMessages;
 
@@ -95,12 +101,22 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         placeManager.revealPlace(ProjectPlacesHelper.getAdministrationPlace(project.getName()));
       }
     });
+    addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (refreshConfirmation != null && event.getSource().equals(refreshConfirmation) && event.isConfirmed()) {
+          refreshConfirmation.run();
+          refreshConfirmation = null;
+        }
+      }
+    });
   }
 
   public void setProject(ProjectDto project) {
     this.project = project;
     getView().setProject(project);
     authorize();
+    initProjectState();
 
     Map<String, String> params = Maps.newHashMap();
     params.put("type", VCF_STORE_SERVICE_TYPE);
@@ -120,6 +136,18 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
           showVcfServiceNamePanel(hasPlugin);
         }
       }).get().send();
+  }
+
+  private void initProjectState() {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(project.getName()))
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            String responseText = response.getText();
+            getView().toggleRefreshButton(!"BUSY".equals(responseText));
+          }
+        }).get().send();
   }
 
   private void authorize() {
@@ -170,6 +198,34 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     removeConfirmation = new RemoveRunnable(project, true);
     fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.archiveProject(),
         translationMessages.confirmArchiveProject()));
+  }
+
+  @Override
+  public void onRefresh() {
+    refreshConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(project.getName()))
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                if(response.getStatusCode() != SC_CREATED) {
+                  String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                      ? "Forbidden"
+                      : "ProjectMomentarilyNotRefreshable" : response.getText();
+                  fireEvent(NotificationEvent.newBuilder().error(errorMessage).args(project.getName()).build());
+                } else {
+                  initProjectState();
+                }
+              }
+            }, SC_CREATED, SC_FORBIDDEN, SC_NOT_FOUND, SC_CONFLICT, SC_INTERNAL_SERVER_ERROR)
+            .post().send();
+      }
+    };
+
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(refreshConfirmation, translationMessages.refreshProject(), translationMessages.confirmRefreshProject()));
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -287,6 +343,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     HasAuthorization getKeyStoreAuthorizer();
 
     HasAuthorization getDeleteAuthorizer();
+
+    void toggleRefreshButton(boolean toggleOn);
   }
 
 }
