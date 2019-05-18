@@ -107,7 +107,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     Path usageSchemaPath = getUsageSchemaPath(usage).toAbsolutePath();
     String result = "{}";
 
-    log.info("Reading usage jsonSchema at %s", usageSchemaPath);
+    log.debug("Reading usage jsonSchema at %s", usageSchemaPath);
 
     if(hasUsage(usage) && usageSchemaPath.toFile().exists()) {
       String schema = Files.lines(usageSchemaPath).reduce("", String::concat).trim();
@@ -144,7 +144,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
   private void setDefaultValue(String schemaName, String defaultValue, JSONObject jsonObject) {
     if(defaultValue != null && !defaultValue.isEmpty()) {
-      log.info("setting default value \"{}\" for schema \"{}\"", defaultValue, schemaName);
+      log.debug("setting default value \"{}\" for schema \"{}\"", defaultValue, schemaName);
 
       String rootSchemaType = jsonObject.optString("type");
 
