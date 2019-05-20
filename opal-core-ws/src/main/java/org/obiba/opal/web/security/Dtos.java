@@ -10,9 +10,9 @@
 
 package org.obiba.opal.web.security;
 
-import java.text.SimpleDateFormat;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -20,7 +20,8 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.util.StringUtils;
 
-import com.google.common.collect.Sets;
+import java.text.SimpleDateFormat;
+import java.util.Map;
 
 import static org.obiba.opal.web.model.Opal.BookmarkDto.ResourceType;
 
@@ -28,14 +29,15 @@ public class Dtos {
 
   private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-  private Dtos() {}
+  private Dtos() {
+  }
 
   public static SubjectCredentials fromDto(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials.Builder builder = SubjectCredentials.Builder.create() //
         .name(dto.getName()) //
         .enabled(dto.getEnabled()) //
         .groups(Sets.newHashSet(dto.getGroupsList()));
-    switch(dto.getAuthenticationType()) {
+    switch (dto.getAuthenticationType()) {
       case PASSWORD:
         builder.authenticationType(SubjectCredentials.AuthenticationType.PASSWORD);
         break;
@@ -52,7 +54,7 @@ public class Dtos {
         .setName(subjectCredentials.getName()) //
         .setEnabled(subjectCredentials.isEnabled()) //
         .addAllGroups(subjectCredentials.getGroups());
-    switch(subjectCredentials.getAuthenticationType()) {
+    switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
         builder.setAuthenticationType(Opal.SubjectCredentialsDto.AuthenticationType.PASSWORD);
         break;
@@ -87,28 +89,89 @@ public class Dtos {
 
     String[] fragments = StringUtils.tokenizeToStringArray(bookmark.getResource(), "/");
     int nbFragments = fragments.length;
-    if(nbFragments >= 2) {
+    if (nbFragments >= 2) {
       builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1])).setLink(fragments[1]));
       builder.setType(ResourceType.PROJECT);
     }
-    if(nbFragments >= 4) {
+    if (nbFragments >= 4) {
       builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1], fragments[2], fragments[3]))
           .setLink(fragments[3]));
       builder.setType(ResourceType.TABLE);
     }
-    if(nbFragments == 6) {
+    if (nbFragments == 6) {
       builder.addLinks(Opal.LinkDto.newBuilder().setRel(bookmark.getResource()).setLink(fragments[5]));
       builder.setType(ResourceType.VARIABLE);
     }
     return builder.build();
   }
 
-  public static Opal.AuthProviderDto asDto(String name, String label, String providerUrl) {
+  public static Opal.IDProviderDto asDto(OIDCConfiguration configuration) {
+    Opal.IDProviderDto.Builder builder = Opal.IDProviderDto.newBuilder();
+    builder.setName(configuration.getName());
+    builder.setEnabled(false);
+    for (Map.Entry<String, String> entry : configuration.getCustomParams().entrySet()) {
+      if ("label".equals(entry.getKey()))
+        builder.setLabel(entry.getValue());
+      else if ("providerUrl".equals(entry.getKey()))
+        builder.setProviderUrl(entry.getValue());
+      else if ("groups".equals(entry.getKey()))
+        builder.setGroups(entry.getValue());
+      else if ("enabled".equals(entry.getKey())) {
+        try {
+          builder.setEnabled(Boolean.parseBoolean(entry.getValue()));
+        } catch (Exception e) {
+          // ignore
+        }
+      } else
+        builder.addParameters(Opal.ParameterDto.newBuilder().setKey(entry.getKey()).setValue(entry.getValue()));
+    }
+    builder.setClientId(configuration.getClientId());
+    builder.setSecret(configuration.getSecret());
+    builder.setDiscoveryURI(configuration.getDiscoveryURI());
+    builder.setScope(configuration.getScope());
+    builder.setUseNonce(configuration.isUseNonce());
+    builder.setConnectTimeout(configuration.getConnectTimeout());
+    builder.setReadTimeout(configuration.getReadTimeout());
+    return builder.build();
+  }
+
+  public static OIDCConfiguration fromDto(Opal.IDProviderDto dto) {
+    OIDCConfiguration configuration = new OIDCConfiguration(dto.getName());
+    configuration.setClientId(dto.getClientId());
+    configuration.setSecret(dto.getSecret());
+    configuration.setDiscoveryURI(dto.getDiscoveryURI());
+    configuration.setScope(dto.getScope());
+    configuration.setUseNonce(dto.getUseNonce());
+    if (dto.hasConnectTimeout()) {
+      configuration.setConnectTimeout(dto.getConnectTimeout());
+    }
+    if (dto.hasReadTimeout()) {
+      configuration.setReadTimeout(dto.getReadTimeout());
+    }
+    if (dto.hasGroups()) {
+      configuration.getCustomParams().put("groups", dto.getGroups());
+    }
+    if (dto.hasLabel()) {
+      configuration.getCustomParams().put("label", dto.getLabel());
+    }
+    if (dto.hasProviderUrl()) {
+      configuration.getCustomParams().put("providerUrl", dto.getProviderUrl());
+    }
+    configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
+    if (dto.getParametersCount()>0) {
+      dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
+    }
+    return configuration;
+  }
+
+  public static Opal.AuthProviderDto asSummaryDto(OIDCConfiguration configuration) {
     Opal.AuthProviderDto.Builder builder = Opal.AuthProviderDto.newBuilder();
-    builder.setName(name);
+    builder.setName(configuration.getName());
+    String label = configuration.getCustomParam("label");
     if (!Strings.isNullOrEmpty(label)) {
       builder.setLabel(label);
     }
+    String providerUrl = configuration.getCustomParam("providerUrl");
     if (!Strings.isNullOrEmpty(providerUrl)) {
       builder.setProviderUrl(providerUrl);
     }
@@ -117,7 +180,7 @@ public class Dtos {
 
   private static String toUri(String... fragments) {
     StringBuilder sb = new StringBuilder();
-    for(String fragment : fragments) {
+    for (String fragment : fragments) {
       sb.append("/").append(fragment);
     }
     return sb.toString();

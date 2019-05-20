@@ -30,8 +30,12 @@ public class GroupResource {
   @PathParam("name")
   private String name;
 
+  private final SubjectCredentialsService subjectCredentialsService;
+
   @Autowired
-  private SubjectCredentialsService subjectCredentialsService;
+  public GroupResource(SubjectCredentialsService subjectCredentialsService) {
+    this.subjectCredentialsService = subjectCredentialsService;
+  }
 
   @GET
   public Response getGroup() {

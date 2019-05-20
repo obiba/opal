@@ -399,6 +399,22 @@ message VcsCommitInfoDto {
   optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
 }
 
+message IDProviderDto {
+  required string name = 1;
+  optional string label = 2;
+  optional string providerUrl = 3;
+  required string clientId = 4;
+  required string secret = 5;
+  required string discoveryURI = 6;
+  required string scope = 7;
+  required bool useNonce = 8;
+  optional int32 connectTimeout = 9;
+  optional int32 readTimeout = 10;
+  optional string groups = 11;
+  repeated ParameterDto parameters = 12;
+  required bool enabled = 13;
+}
+
 message AuthProviderDto {
   required string name = 1;
   optional string label = 2;
