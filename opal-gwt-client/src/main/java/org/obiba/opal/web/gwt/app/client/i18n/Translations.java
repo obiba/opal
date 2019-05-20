@@ -702,7 +702,11 @@ public interface Translations extends Constants {
       "PluginTypeIsRequired", "Plugin type is required",
       "AnalysisTask", "Analysis task has been launched.  You can follow its progress in the task list.",
       "InvalidAnalysisPluginData", "Analysis {0} has invalid plugin data, Please contact technical support.",
-      "NoSuchAnalysis", "No such analysis '{0}."
+      "NoSuchAnalysis", "No such analysis '{0}.",
+      "IDProviderNameIsRequired", "A name is required",
+      "IDProviderClientIdIsRequired", "Client ID is required",
+      "IDProviderClientSecretIsRequired", "Client secret is required",
+      "IDProviderDiscoveryUriIsRequired", "Discovery URI is required"
   })
   Map<String, String> userMessageMap();
 
@@ -1610,6 +1614,22 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Account Login label")
+  @DefaultStringValue("Account Login")
+  String accountLoginLabel();
+
+  @Description("Provider Login label")
+  @DefaultStringValue("Provider's Login")
+  String providerLoginLabel();
+
+  @Description("Discovery URI label")
+  @DefaultStringValue("Discovery URI")
+  String discoveryURILabel();
+
+  @Description("Parameters label")
+  @DefaultStringValue("Parameters")
+  String parametersLabel();
+
   @Description("Usage label")
   @DefaultStringValue("Usage")
   String usageLabel();
@@ -1932,6 +1952,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Profiles")
   String pageProfilesTitle();
 
+  @Description("Page ID Providers title")
+  @DefaultStringValue("Identity Providers")
+  String pageIDProvidersTitle();
+
   @Description("Page Projects title")
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
@@ -2036,6 +2060,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Users")
   String groupUsersLabel();
 
+  @Description("Enabled label")
+  @DefaultStringValue("Enabled")
+  String enabledLabel();
+
   @Description("Add user with password label")
   @DefaultStringValue("Add user with password")
   String addUserWithPasswordLabel();
@@ -2043,6 +2071,10 @@ public interface Translations extends Constants {
   @Description("Add user with certificate label")
   @DefaultStringValue("Add user with certificate")
   String addUserWithCertificateLabel();
+
+  @Description("Add ID Provider label")
+  @DefaultStringValue("Add ID Provider")
+  String addIDProvider();
 
   @Description("Add Project label")
   @DefaultStringValue("Add Project")
@@ -2424,6 +2456,10 @@ public interface Translations extends Constants {
   @Description("Remove User Profile label")
   @DefaultStringValue("Remove User Profile")
   String removeUserProfile();
+
+  @Description("Remove ID Provider label")
+  @DefaultStringValue("Remove ID Provider")
+  String removeIDProvider();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")

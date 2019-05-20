@@ -48,7 +48,7 @@ public class IDProviderResource {
 
   @PUT
   public Response update(Opal.IDProviderDto dto) {
-    if (name.equals(dto.getName())) return Response.status(Response.Status.BAD_REQUEST).build();
+    if (!name.equals(dto.getName())) return Response.status(Response.Status.BAD_REQUEST).build();
     // ensure it exists
     idProvidersService.getConfiguration(name);
     try {
@@ -61,13 +61,13 @@ public class IDProviderResource {
   }
 
   @PUT
-  @Path("/enable")
+  @Path("/_enable")
   public Response enable() {
     return enableConfiguration(true);
   }
 
   @DELETE
-  @Path("/enable")
+  @Path("/_enable")
   public Response disable() {
     return enableConfiguration(false);
   }

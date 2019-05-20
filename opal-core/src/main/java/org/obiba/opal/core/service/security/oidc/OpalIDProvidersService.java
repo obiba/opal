@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Component
 public class OpalIDProvidersService implements IDProvidersService {
@@ -67,9 +68,9 @@ public class OpalIDProvidersService implements IDProvidersService {
   public void deleteConfiguration(String name) {
     if (Strings.isNullOrEmpty(name)) return;
     if (configurations.containsKey(name)) {
-      configurations.remove(name);
       File confFile = getConfigurationFile(configurations.get(name).getName());
       if (confFile.exists()) confFile.delete();
+      configurations.remove(name);
       removeRealm(name);
     }
   }
@@ -83,7 +84,7 @@ public class OpalIDProvidersService implements IDProvidersService {
 
   @Override
   public Collection<OIDCConfiguration> getConfigurations() {
-    return configurations.values();
+    return configurations.keySet().stream().sorted().map(configurations::get).collect(Collectors.toList());
   }
 
   @Override

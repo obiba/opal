@@ -37,6 +37,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink profilesPlace;
 
   @UiField
+  OpalNavLink idProvidersPlace;
+
+  @UiField
   OpalNavLink identifiersPlace;
 
   @UiField
@@ -89,6 +92,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   @UiField
   FlowPanel profilesAuthorizable;
+
+  @UiField
+  FlowPanel idProvidersAuthorizable;
 
   @UiField
   FlowPanel rAuthorizable;
@@ -177,6 +183,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
+  public HasAuthorization getIDProvidersAuthorizer() {
+    return new WidgetAuthorizer(idProvidersAuthorizable);
+  }
+
+  @Override
   public HasAuthorization getUsersGroupsAuthorizer() {
     return new WidgetAuthorizer(usersGroupsAuthorizable);
   }
@@ -194,6 +205,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setProfilesHistoryToken(String historyToken) {
     profilesPlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void setIDProvidersHistoryToken(String historyToken) {
+    idProvidersPlace.setHistoryToken(historyToken);
   }
 
   @Override

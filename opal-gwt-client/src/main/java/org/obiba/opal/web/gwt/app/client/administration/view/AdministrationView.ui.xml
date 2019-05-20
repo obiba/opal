@@ -58,6 +58,19 @@
                   </g:Label>
                 </g:FlowPanel>
               </g:FlowPanel>
+
+              <g:FlowPanel ui:field="idProvidersAuthorizable">
+                <o:OpalNavLink ui:field="idProvidersPlace" icon="COG">
+                  <ui:msg description="Main Administration ID Providers title">Identity Providers</ui:msg>
+                </o:OpalNavLink>
+                <g:FlowPanel>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Main Administration ID Providers help">
+                      Manage the OpenID Connect providers
+                    </ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
+              </g:FlowPanel>
             </b:NavList>
 
             <b:NavList addStyleNames="xlarge-bottom-margin no-padding-left">

@@ -63,6 +63,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     HasAuthorization getProfilesAuthorizer();
 
+    HasAuthorization getIDProvidersAuthorizer();
+
     HasAuthorization getUsersGroupsAuthorizer();
 
     HasAuthorization getIdentifiersAuthorizer();
@@ -70,6 +72,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     void setUsersGroupsHistoryToken(String historyToken);
 
     void setProfilesHistoryToken(String historyToken);
+
+    void setIDProvidersHistoryToken(String historyToken);
 
     void setIdentifiersMappingsHistoryToken(String historyToken);
 
@@ -122,6 +126,10 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.PROFILES.create().build()).get()
         .authorize(composeAuthorizer(getView().getProfilesAuthorizer())).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.ID_PROVIDERS.create().build()).get()
+        .authorize(composeAuthorizer(getView().getIDProvidersAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SERVICE_R.create().build()).get()
@@ -179,6 +187,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     PlaceRequest adminPlace = createRequest(Places.ADMINISTRATION);
     getView().setUsersGroupsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.USERS));
     getView().setProfilesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.PROFILES));
+    getView().setIDProvidersHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.ID_PROVIDERS));
     getView().setDatabasesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.DATABASES));
     getView().setIndexHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.INDEX));
     getView().setRHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.R));

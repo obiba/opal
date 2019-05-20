@@ -40,6 +40,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Edit user {0}")
   String editUserLabel(String name);
 
+  @Description("Edit ID Provider label")
+  @DefaultMessage("Edit ID Provider {0}")
+  String editIDProviderLabel(String name);
+
   @Description("Clear Jobs List label")
   @DefaultMessage("Clear Jobs List")
   String clearJobsList();
@@ -197,6 +201,10 @@ public interface TranslationMessages extends Messages {
   @Description("Confirm remove user profile label")
   @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its preferences will be lost.")
   String confirmRemoveUserProfile(String name);
+
+  @Description("Confirm remove id provider label")
+  @DefaultMessage("Please confirm that you want to remove the identity provider {0}. None of its users will be able to login anymore.")
+  String confirmRemoveIDProvider(String name);
 
   @Description("Vocabulary count label")
   @DefaultMessage("{0} vocabularies")

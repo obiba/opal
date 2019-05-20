@@ -59,6 +59,18 @@ public abstract class LinkCell<C> extends AbstractCell<C> {
     return "";
   }
 
+  public String getTarget(C value) {
+    return "";
+  }
+
+  public String getLinkClass(C value) {
+    return "";
+  }
+
+  public boolean displayTextWhenNoLink(C value) {
+    return true;
+  }
+
   @Override
   public void render(Context context, C value, SafeHtmlBuilder sb) {
     String link = getLink(value);
@@ -66,11 +78,21 @@ public abstract class LinkCell<C> extends AbstractCell<C> {
     if (iconClass == null) iconClass = "";
     if (!iconClass.isEmpty()) iconClass = "<i class='" + iconClass + "'></i> ";
     if(isEnabled() && !Strings.isNullOrEmpty(link)) {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<a href='" + link + "'>"))
+      String target = getTarget(value);
+      if (!Strings.isNullOrEmpty(target))
+        target = "target='" + target + "'";
+      else
+        target = "";
+      String linkClass = getLinkClass(value);
+      if (!Strings.isNullOrEmpty(linkClass))
+        linkClass = "class='" + linkClass + "'";
+      else
+        linkClass = "";
+      sb.append(SafeHtmlUtils.fromSafeConstant("<a href='" + link + "' " + target + " " + linkClass + ">"))
           .append(SafeHtmlUtils.fromSafeConstant(iconClass))
           .appendHtmlConstant(getText(value))
           .append(SafeHtmlUtils.fromSafeConstant("</a>"));
-    } else {
+    } else if (displayTextWhenNoLink(value)) {
       sb.append(SafeHtmlUtils.fromSafeConstant(getText(value)));
     }
   }
