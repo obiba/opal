@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.view;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.*;
@@ -173,11 +174,22 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     for (int i=0;i<providers.length(); i++) {
       AuthProviderDto provider = providers.get(i);
 
+      FlowPanel panel = new FlowPanel();
+      if (i > 0) {
+        panel.addStyleName("top-margin");
+      }
       String key = provider.getName();
       String title = translations.signInWith() + " " + (provider.hasLabel() ? provider.getLabel() : provider.getName());
       Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
       anchor.addStyleName("btn btn-inverse");
-      widgets.add(anchor);
+      panel.add(anchor);
+      if (!Strings.isNullOrEmpty(provider.getProviderUrl())) {
+        Anchor accountAnchor = new Anchor(translations.userAccountLabel(), false, provider.getProviderUrl());
+        accountAnchor.addStyleName("small-indent");
+        accountAnchor.setTarget("_blank");
+        panel.add(accountAnchor);
+      }
+      widgets.add(panel);
     }
 
     if (widgets.size() > 0) {

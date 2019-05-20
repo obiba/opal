@@ -2779,4 +2779,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Sign in with")
   String signInWith();
 
+  @Description("User account Label")
+  @DefaultStringValue("User account")
+  String userAccountLabel();
+
 }
