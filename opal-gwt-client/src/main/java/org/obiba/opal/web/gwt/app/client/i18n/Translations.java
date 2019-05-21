@@ -703,10 +703,12 @@ public interface Translations extends Constants {
       "AnalysisTask", "Analysis task has been launched.  You can follow its progress in the task list.",
       "InvalidAnalysisPluginData", "Analysis {0} has invalid plugin data, Please contact technical support.",
       "NoSuchAnalysis", "No such analysis '{0}.",
-      "IDProviderNameIsRequired", "A name is required",
-      "IDProviderClientIdIsRequired", "Client ID is required",
-      "IDProviderClientSecretIsRequired", "Client secret is required",
-      "IDProviderDiscoveryUriIsRequired", "Discovery URI is required"
+      "IDProviderNameIsRequired", "A name is required.",
+      "IDProviderClientIdIsRequired", "Client ID is required.",
+      "IDProviderClientSecretIsRequired", "Client secret is required.",
+      "IDProviderDiscoveryUriIsRequired", "Discovery URI is required.",
+      "IDProviderDiscoveryUriIsUri", "Discovery URI must start with https (recommended) or http.",
+      "IDProviderProviderUrlIsUri", "Account login page address must start with https (recommended) or http."
   })
   Map<String, String> userMessageMap();
 

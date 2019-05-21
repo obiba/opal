@@ -22,10 +22,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -140,6 +137,8 @@ public class IDProviderPresenter extends ModalPresenterWidget<IDProviderPresente
       validators.add(new RequiredTextValidator(getView().getClientId(), "IDProviderClientIdIsRequired", Display.FormField.CLIENT_ID.name()));
       validators.add(new RequiredTextValidator(getView().getSecret(), "IDProviderClientSecretIsRequired", Display.FormField.SECRET.name()));
       validators.add(new RequiredTextValidator(getView().getDiscoveryUri(), "IDProviderDiscoveryUriIsRequired", Display.FormField.DISCOVERY_URI.name()));
+      validators.add(new RegExValidator(getView().getDiscoveryUri(), "^http[s]*://","IDProviderDiscoveryUriIsUri", Display.FormField.DISCOVERY_URI.name()));
+      validators.add(new RegExValidator(getView().getProviderUrl(), "(^$)|(^http[s]*://)","IDProviderProviderUrlIsUri", Display.FormField.PROVIDER_URL.name()));
       return validators;
     }
 
@@ -152,7 +151,7 @@ public class IDProviderPresenter extends ModalPresenterWidget<IDProviderPresente
   public interface Display extends PopupView, HasUiHandlers<IDProviderUiHandlers> {
 
     enum FormField {
-      NAME, CLIENT_ID, SECRET, DISCOVERY_URI
+      NAME, CLIENT_ID, SECRET, DISCOVERY_URI, PROVIDER_URL
     }
 
     void hideDialog();
@@ -168,6 +167,8 @@ public class IDProviderPresenter extends ModalPresenterWidget<IDProviderPresente
     HasText getSecret();
 
     HasText getDiscoveryUri();
+
+    HasText getProviderUrl();
 
     void showError(@Nullable FormField formField, String message);
 

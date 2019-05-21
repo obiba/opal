@@ -27,10 +27,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.opal.IDProviderDto;
 
@@ -89,6 +87,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   TextBox scope;
 
   @UiField
+  ControlGroup providerUrlGroup;
+
+  @UiField
   TextBox providerUrl;
 
   @UiField
@@ -96,6 +97,12 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
 
   @UiField
   CheckBox useNonce;
+
+  @UiField
+  NumericTextBox connectTimeout;
+
+  @UiField
+  NumericTextBox readTimeout;
 
   private IDProviderDto provider;
 
@@ -132,6 +139,8 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     label.setValue(provider.getLabel());
     providerUrl.setValue(provider.getProviderUrl());
     groups.setValue(provider.getGroups());
+    connectTimeout.setValue(provider.getConnectTimeout());
+    readTimeout.setValue(provider.getReadTimeout());
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
       name.setEnabled(false);
     } else {
@@ -161,6 +170,11 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   }
 
   @Override
+  public TextBox getProviderUrl() {
+    return providerUrl;
+  }
+
+  @Override
   public void hideDialog() {
     modal.hide();
   }
@@ -180,6 +194,8 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setProviderUrl(providerUrl.getValue());
     provider.setLabel(label.getValue());
     provider.setUseNonce(useNonce.getValue());
+    provider.setConnectTimeout(connectTimeout.hasValue() ? connectTimeout.getNumberValue().intValue() : 0);
+    provider.setReadTimeout(readTimeout.hasValue() ? readTimeout.getNumberValue().intValue() : 0);
     getUiHandlers().save(provider);
   }
 
@@ -204,6 +220,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
           break;
         case DISCOVERY_URI:
           group = discoveryUriGroup;
+          break;
+        case PROVIDER_URL:
+          group = providerUrlGroup;
           break;
       }
     }

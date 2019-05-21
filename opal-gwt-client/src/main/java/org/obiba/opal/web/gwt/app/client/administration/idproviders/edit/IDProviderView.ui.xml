@@ -86,7 +86,7 @@
       </b:Controls>
     </b:ControlGroup>
 
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="providerUrlGroup">
       <b:ControlLabel>
         <ui:msg description="Provider Account Login label">Account Login</ui:msg>
       </b:ControlLabel>
@@ -119,7 +119,7 @@
         <ui:msg description="Provider Scope label">Scope</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <b:TextBox ui:field="scope"/>
+        <b:TextBox ui:field="scope" value="openid"/>
         <b:HelpBlock>
           <ui:msg description="Provider Scope help label">
             List of scope names to be specified to retrieve user information. Usually <code>openid</code> is enough.
@@ -128,11 +128,43 @@
       </b:Controls>
     </b:ControlGroup>
 
-    <b:ControlGroup>
-      <b:CheckBox ui:field="useNonce">
-        <ui:msg description="Provider Nonce label"><a href="https://openid.net/specs/openid-connect-core-1_0.html#IDToken" target="_blank">Use Nonce</a> to validate ID token.</ui:msg>
-      </b:CheckBox>
-    </b:ControlGroup>
+    <o:CollapsiblePanel ui:field="advancedOptions" heading="ADVANCED_OPTIONS">
+
+      <b:ControlGroup>
+        <b:CheckBox ui:field="useNonce" value="true">
+          <ui:msg description="Provider Nonce label"><a href="https://openid.net/specs/openid-connect-core-1_0.html#IDToken" target="_blank">Use Nonce</a> to validate ID token.</ui:msg>
+        </b:CheckBox>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Provider Connect Timeout label">Connect Timeout</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:NumericTextBox ui:field="connectTimeout" min="0" value="500" steps="100" maxConstrained="false"/>
+          <b:HelpBlock>
+            <ui:msg description="Provider Connect Timeout help label">
+              Maximum time to wait before a connection is established, in milliseconds. Zero implies no timeout.
+            </ui:msg>
+          </b:HelpBlock>
+        </b:Controls>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Provider Read Timeout label">Read Timeout</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:NumericTextBox ui:field="readTimeout" min="0" value="500" steps="100" maxConstrained="false"/>
+          <b:HelpBlock>
+            <ui:msg description="Provider Read Timeout help label">
+              Maximum time to wait before a response is received, in milliseconds. Zero implies no timeout.
+            </ui:msg>
+          </b:HelpBlock>
+        </b:Controls>
+      </b:ControlGroup>
+
+    </o:CollapsiblePanel>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
