@@ -10,13 +10,13 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.eventbus.EventBus;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.domain.ProjectsState;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -62,6 +62,8 @@ public class ProjectResource {
 
   private final SubjectProfileService subjectProfileService;
 
+  private final ProjectsState projectsState;
+
   @Autowired
   public ProjectResource(
       OpalRuntime opalRuntime,
@@ -70,7 +72,8 @@ public class ProjectResource {
       ProjectsKeyStoreService projectsKeyStoreService,
       ApplicationContext applicationContext,
       VCFSamplesMappingService vcfSamplesMappingService,
-      SubjectProfileService subjectProfileService) {
+      SubjectProfileService subjectProfileService,
+      ProjectsState projectsState) {
     this.opalRuntime = opalRuntime;
     this.projectService = projectService;
     this.eventBus = eventBus;
@@ -78,6 +81,7 @@ public class ProjectResource {
     this.applicationContext = applicationContext;
     this.vcfSamplesMappingService = vcfSamplesMappingService;
     this.subjectProfileService = subjectProfileService;
+    this.projectsState = projectsState;
   }
 
   @GET
@@ -164,28 +168,6 @@ public class ProjectResource {
   @GET
   @Path("/state")
   public Response getState(@PathParam("name") String name) {
-    Project project = projectService.getProject(name);
-
-    boolean isRefreshing = !project.hasDatasource();
-    boolean isBusy = isRefreshing;
-
-    ResponseBuilder responseBuilder = Response.ok();
-
-    if (isBusy) {
-      responseBuilder.entity(State.BUSY.name());
-    } else if (isRefreshing) {
-      responseBuilder.entity(State.REFRESHING.name());
-    } else {
-      responseBuilder.entity(State.READY.name());
-    }
-
-    return responseBuilder.build();
-  }
-
-
-  public enum State {
-    BUSY, // project has read, write and refresh commands that are pending or being processed
-    READY,
-    REFRESHING // project's datasource is not ready
+    return  Response.ok().entity(projectsState.getProjectState(name)).build();
   }
 }

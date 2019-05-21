@@ -492,12 +492,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     filter.setText(variableFilter);
   }
 
-  @Override
-  public void toggleReadWriteButtons(boolean toggleOn) {
-    copyData.setEnabled(toggleOn);
-    exportData.setEnabled(toggleOn);
-  }
-
   @UiHandler("dictionnaryTab")
   void onDictionnaryTabSelect(ClickEvent event) {
     getUiHandlers().onShowDictionary();

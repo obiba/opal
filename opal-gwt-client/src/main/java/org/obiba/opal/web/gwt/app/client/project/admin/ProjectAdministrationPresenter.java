@@ -104,7 +104,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
-        if (refreshConfirmation != null && event.getSource().equals(refreshConfirmation) && event.isConfirmed()) {
+        if (event.getSource().equals(refreshConfirmation) && event.isConfirmed()) {
           refreshConfirmation.run();
           refreshConfirmation = null;
         }
@@ -145,7 +145,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
           @Override
           public void onResponseCode(Request request, Response response) {
             String responseText = response.getText();
-            getView().toggleRefreshButton(!"BUSY".equals(responseText));
+            getView().toggleRefreshButton("READY".equals(responseText));
           }
         }).get().send();
   }
