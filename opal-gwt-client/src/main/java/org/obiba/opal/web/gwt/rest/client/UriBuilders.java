@@ -687,6 +687,30 @@ public enum UriBuilders {
     }
   },
 
+  ID_PROVIDERS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "idproviders");
+
+    }
+  },
+
+  ID_PROVIDER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "idprovider", "{}");
+
+    }
+  },
+
+  ID_PROVIDER_ENABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "idprovider", "{}", "_enable");
+
+    }
+  },
+
   DATABASES {
     @Override
     public UriBuilder create() {

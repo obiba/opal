@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration;
 
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalView;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationPresenter;
@@ -23,40 +24,16 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.data.DataD
 import org.obiba.opal.web.gwt.app.client.administration.database.list.data.DataDatabasesView;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabaseView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldConfigView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldMethodView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageCreateView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldROptionModalView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldROptionsView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.*;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.view.*;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.CopySystemIdentifiersModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.GenerateIdentifiersModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersMappingModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportIdentifiersMappingModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportSystemIdentifiersModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.CopySystemIdentifiersModalView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.GenerateIdentifiersModalView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersMappingModalView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableModalView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.ImportIdentifiersMappingModalView;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.ImportSystemIdentifiersModalView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.*;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.*;
+import org.obiba.opal.web.gwt.app.client.administration.idproviders.edit.IDProviderPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.idproviders.edit.IDProviderView;
+import org.obiba.opal.web.gwt.app.client.administration.idproviders.list.IDProvidersAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.idproviders.list.IDProvidersAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
@@ -104,8 +81,6 @@ import org.obiba.opal.web.gwt.app.client.administration.users.profile.admin.Subj
 import org.obiba.opal.web.gwt.app.client.administration.users.profile.admin.SubjectProfilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
 
-import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
-
 /**
  *
  */
@@ -122,6 +97,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     configureDatashield();
     configureUserGroups();
     configureProfiles();
+    configureIDProviders();
     configureSystemConfig();
     configureTaxonomies();
     configureIdentifiers();
@@ -171,6 +147,13 @@ public class AdministrationModule extends AbstractPresenterModule {
         SubjectProfilePresenter.Proxy.class);
     bindPresenterWidget(ChangePasswordModalPresenter.class, ChangePasswordModalPresenter.Display.class,
         ChangePasswordModalView.class);
+  }
+
+  private void configureIDProviders() {
+    bindPresenter(IDProvidersAdministrationPresenter.class, IDProvidersAdministrationPresenter.Display.class,
+        IDProvidersAdministrationView.class, IDProvidersAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(IDProviderPresenter.class, IDProviderPresenter.Display.class,
+        IDProviderView.class);
   }
 
   private void configureR() {

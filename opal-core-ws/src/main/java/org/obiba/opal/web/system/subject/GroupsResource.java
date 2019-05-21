@@ -36,8 +36,12 @@ import com.google.common.collect.Lists;
 @Path("/system/groups")
 public class GroupsResource {
 
+  private final SubjectCredentialsService subjectCredentialsService;
+
   @Autowired
-  private SubjectCredentialsService subjectCredentialsService;
+  public GroupsResource(SubjectCredentialsService subjectCredentialsService) {
+    this.subjectCredentialsService = subjectCredentialsService;
+  }
 
   @GET
   public List<Opal.GroupDto> getGroups() {

@@ -49,6 +49,8 @@ public final class Places {
 
   public static final String PROFILES = "!profiles";
 
+  public static final String ID_PROVIDERS = "!idproviders";
+
   public static final String PROFILE = "!profile";
 
   public static final String DATABASES = "!databases";

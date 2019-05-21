@@ -129,8 +129,18 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
       shiroRealms.add(oRealm);
     }
     for (OIDCConfiguration configuration : oidcConfigurationProvider.getConfigurations()) {
-      OIDCRealm realm = new OIDCRealm(configuration);
-      shiroRealms.add(realm);
+      boolean enabled = false;
+      if (configuration.getCustomParams().containsKey("enabled")) {
+        try {
+          enabled = Boolean.parseBoolean(configuration.getCustomParam("enabled"));
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      if (enabled) {
+        OIDCRealm realm = new OIDCRealm(configuration);
+        shiroRealms.add(realm);
+      }
     }
     DefaultWebSecurityManager dsm = new DefaultWebSecurityManager(shiroRealms);
     initializeCacheManager(dsm);
