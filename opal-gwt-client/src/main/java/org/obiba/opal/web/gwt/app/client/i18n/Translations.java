@@ -2177,6 +2177,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Server has been running for {0}.")
   String serverRunningFor();
 
+  @Description("")
+  @DefaultStringValue("The project's datasource is refreshing, Read and Write actions are temporarily unavailable. Try again later.")
+  String projectRefreshingText();
+
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//
       "JAVA_VERSION", "Java Version", //
