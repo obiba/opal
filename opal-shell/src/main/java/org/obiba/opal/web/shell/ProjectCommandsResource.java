@@ -10,7 +10,6 @@
 package org.obiba.opal.web.shell;
 
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -19,15 +18,15 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.security.SecuredDatasource;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.domain.ProjectsState;
+import org.obiba.opal.core.domain.ProjectsState.State;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.*;
-import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
-import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.RefreshCommandOptionsDto;
 import org.obiba.opal.web.support.ConflictingRequestException;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -58,16 +57,15 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectCommandsResource.class);
 
-  private static final List<String> READ_WRITE_COMMAND_NAMES = Arrays.asList("import", "export", "copy");
-  private static final String REFRESH_COMMAND_NAME = "refresh";
-  private static final List<Status> BLOCKING_STATUSES = Arrays.asList(Status.IN_PROGRESS, Status.NOT_STARTED);
-
   @PathParam("name")
   protected String name;
 
   @Autowired
   @Qualifier("web")
   private CommandRegistry commandRegistry;
+
+  @Autowired
+  private ProjectsState projectsState;
 
   @GET
   public List<Commands.CommandStateDto> getCommands() {
@@ -90,7 +88,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_import")
   public Response importData(Commands.ImportCommandOptionsDto options) {
-    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     if(!name.equals(options.getDestination())) {
       throw new InvalidRequestException("DataCanOnlyBeImportedInCurrentDatasource", name);
@@ -124,7 +122,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     String commandName = "copy";
 
@@ -147,7 +145,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_export")
   public Response exportData(Commands.ExportCommandOptionsDto options) {
-    if (checkCommandIsBlocked(commandJobService, name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     String commandName = "export";
 
@@ -226,7 +224,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_refresh")
   public Response refreshProject() {
-    if (checkCommandIsBlocked(commandJobService, name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
 
     Command<Object> refreshCommand = commandRegistry.newCommand("refresh");
     refreshCommand.setOptions(new RefreshCommandOptionsDtoImpl(RefreshCommandOptionsDto.newBuilder().setProject(name).build()));
@@ -240,33 +238,14 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     return job;
   }
 
-  private boolean checkCommandIsBlocked(CommandJobService commandJobService, String projectName, boolean forProjectRefresh) {
-    return checkCommandIsBlocked(
-        commandJobService.getHistory().stream()
-            .filter(job -> job.hasProject() && job.getProject().equals(projectName))
-            .collect(Collectors.toList()),
-        projectName,
-        forProjectRefresh
-    );
-  }
+  private boolean checkCommandIsBlocked(String projectName, boolean forProjectRefresh) {
+    String projectState = projectsState.getProjectState(projectName);
 
-  private boolean checkCommandIsBlocked(List<CommandJob> jobs, String projectName, boolean forProjectRefresh) {
-    boolean isBlocked;
     if (forProjectRefresh) {
-      isBlocked = jobs.stream()
-          .filter(job -> projectName.equals(job.getProject()) && (READ_WRITE_COMMAND_NAMES.indexOf(job.getName()) > -1 || REFRESH_COMMAND_NAME.equals(job.getName())))
-          .anyMatch(job -> BLOCKING_STATUSES.indexOf(job.getStatus()) > -1);
+      return !State.READY.name().equals(projectState);
     } else {
-      isBlocked = jobs.stream()
-          .filter(job -> projectName.equals(job.getProject()) && REFRESH_COMMAND_NAME.equals(job.getName()))
-          .anyMatch(job -> BLOCKING_STATUSES.indexOf(job.getStatus()) > -1);
+      return State.REFRESHING.name().equals(projectState);
     }
-
-    if (isBlocked) {
-      log.warn("Project [{}]'s {} command call is blocked.", projectName, forProjectRefresh ? "refresh" : "read/write/copy");
-    }
-
-    return isBlocked;
   }
 
   private void ensureTableValuesAccess(String table) {
