@@ -297,7 +297,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     private void displayDatasource(DatasourceDto datasourceDto) {
       getView().setDatasource(datasourceDto);
       updateTables();
-      initProjectCommandsState();
       authorize();
     }
 
@@ -325,18 +324,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
               getView().afterRenderRows();
             }
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN).send();
-    }
-
-    private void initProjectCommandsState() {
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(datasource.getName()))
-          .withCallback(SC_OK, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              String responseText = response.getText();
-              getView().toggleReadWriteButtons(!"REFRESHING".equals(responseText));
-            }
-          }).get().send();
     }
 
     private void authorize() {
@@ -506,8 +493,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     void afterRenderRows();
 
     void setDatasource(DatasourceDto dto);
-
-    void toggleReadWriteButtons(boolean toggleOn);
 
     HasAuthorization getAddUpdateTablesAuthorizer();
 

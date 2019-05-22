@@ -21,6 +21,8 @@ import org.obiba.crypt.KeyProviderException;
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.opal.core.domain.ProjectsState;
+import org.obiba.opal.core.domain.ProjectsState.State;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.service.DataImportService;
@@ -61,11 +63,16 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   @Autowired
   private EventBus eventBus;
 
+  @Autowired
+  private ProjectsState projectsState;
+
   @Override
   public int execute() {
     int errorCode;
 
     Stopwatch stopwatch = Stopwatch.createStarted();
+
+    projectsState.updateProjectState(options.getDestination(), State.BUSY);
 
     List<FileObject> filesToImport = getFilesToImport();
     errorCode = executeImports(filesToImport);
@@ -81,6 +88,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       getShell().printf("Import done.\n");
       log.info("Import succeed in {}", stopwatch.stop());
     }
+
+    projectsState.updateProjectState(options.getDestination(), State.READY);
     return errorCode;
   }
 

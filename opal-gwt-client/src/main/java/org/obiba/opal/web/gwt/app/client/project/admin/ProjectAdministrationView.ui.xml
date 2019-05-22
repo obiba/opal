@@ -145,6 +145,12 @@
         <b:Button type="INFO" ui:field="refreshProject">Refresh</b:Button>
         <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
       </b:Form>
+      <b:Paragraph>
+        <ui:msg description="Refresh Project text">Refreshing a project makes its data temporarily inaccessible (no table listing, no import or export)
+          while the connection to the database is being re-initialised.
+          The time taken by this operation depends on the database type and schema.
+        </ui:msg>
+      </b:Paragraph>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="deletePanel">

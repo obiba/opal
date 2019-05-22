@@ -16,6 +16,7 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.domain.ProjectsState;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -61,6 +62,8 @@ public class ProjectResource {
 
   private final SubjectProfileService subjectProfileService;
 
+  private final ProjectsState projectsState;
+
   @Autowired
   public ProjectResource(
       OpalRuntime opalRuntime,
@@ -69,7 +72,8 @@ public class ProjectResource {
       ProjectsKeyStoreService projectsKeyStoreService,
       ApplicationContext applicationContext,
       VCFSamplesMappingService vcfSamplesMappingService,
-      SubjectProfileService subjectProfileService) {
+      SubjectProfileService subjectProfileService,
+      ProjectsState projectsState) {
     this.opalRuntime = opalRuntime;
     this.projectService = projectService;
     this.eventBus = eventBus;
@@ -77,6 +81,7 @@ public class ProjectResource {
     this.applicationContext = applicationContext;
     this.vcfSamplesMappingService = vcfSamplesMappingService;
     this.subjectProfileService = subjectProfileService;
+    this.projectsState = projectsState;
   }
 
   @GET
@@ -158,5 +163,11 @@ public class ProjectResource {
     public Timestamps getTimestamps() {
       return timestamps;
     }
+  }
+
+  @GET
+  @Path("/state")
+  public Response getState(@PathParam("name") String name) {
+    return  Response.ok().entity(projectsState.getProjectState(name)).build();
   }
 }

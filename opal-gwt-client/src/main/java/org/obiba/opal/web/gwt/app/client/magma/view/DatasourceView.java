@@ -322,15 +322,6 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   }
 
   @Override
-  public void toggleReadWriteButtons(boolean toggleOn) {
-    importData.setEnabled(toggleOn);
-    exportData.setEnabled(toggleOn);
-    copyData.setEnabled(toggleOn);
-    copySelectionAnchor.setVisible(toggleOn);
-    exportSelectionAnchor.setVisible(toggleOn);
-  }
-
-  @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
     return new CompositeAuthorizer(new WidgetAuthorizer(addTable), new WidgetAuthorizer(addUpdateTables)) {
       @Override

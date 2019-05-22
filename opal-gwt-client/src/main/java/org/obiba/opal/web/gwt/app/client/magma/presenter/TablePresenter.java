@@ -14,7 +14,6 @@ import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -400,7 +399,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         updateVariables();
         updateTableIndexStatus();
         authorize();
-        initProjectCommandsState();
 
         if (getView().isValuesTabSelected()) {
           valuesTablePresenter.setTable(tableDto);
@@ -421,7 +419,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             getView().setFromTables(null, null);
             getView().setWhereScript(null);
           }
-        }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)//
+        }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)
         .withCallback(new ViewResourceCallback()).send();
   }
 
@@ -441,18 +439,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
               SC_SERVICE_UNAVAILABLE).withCallback(new TableIndexStatusResourceCallback()).send();
     }
-  }
-
-  private void initProjectCommandsState() {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_COMMANDS_STATE.create().build(table.getDatasourceName()))
-        .withCallback(SC_OK, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            String responseText = response.getText();
-            getView().toggleReadWriteButtons(!"REFRESHING".equals(responseText));
-          }
-        }).get().send();
   }
 
   private void updateVariables() {
@@ -1028,8 +1014,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void hideContingencyTable();
 
     void setVariableFilter(String variableFilter);
-
-    void toggleReadWriteButtons(boolean toggleOn);
   }
 
   private class RemoveRunnable implements Runnable {

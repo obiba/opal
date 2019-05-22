@@ -89,10 +89,10 @@ public enum UriBuilders {
     }
   },
 
-  PROJECT_COMMANDS_STATE {
+  PROJECT_STATE {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("project", "{}", "commands", "state");
+      return UriBuilder.create().segment("project", "{}", "state");
     }
   },
 

@@ -31,6 +31,8 @@ import org.obiba.magma.js.support.JavascriptVariableTransformer;
 import org.obiba.magma.support.*;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
+import org.obiba.opal.core.domain.ProjectsState;
+import org.obiba.opal.core.domain.ProjectsState.State;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
@@ -146,11 +148,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     Stopwatch stopwatch = Stopwatch.createStarted();
 
+    final ProjectsState projectsState = applicationContext.getBean(ProjectsState.class);
+    projectsState.updateProjectState(options.getDestination(), State.BUSY);
+
     if(validateOptions()) {
       Datasource destinationDatasource = null;
 
       try {
         destinationDatasource = getDestinationDatasource();
+
         Set<ValueTable> tables = getValueTables();
         for(ValueTable table : tables) {
           if(destinationDatasource.getName().equals(table.getDatasource().getName()) &&
@@ -187,6 +193,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       log.info("Copy succeed in {}", stopwatch.stop());
     }
 
+    projectsState.updateProjectState(options.getDestination(), State.READY);
     return errorCode;
   }
 

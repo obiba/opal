@@ -107,7 +107,21 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   public void onMagmaPathSelection(MagmaPathSelectionEvent event) {
     if(event.getSource() == this) return;
 
-    MagmaPath.Parser parser = event.getParser();
+    final MagmaPath.Parser parser = event.getParser();
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PROJECT_STATE.create().build(parser.getDatasource()))
+      .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if (!"REFRESHING".equals(response.getText())) {
+            doShow(parser);
+          } else {
+            getView().showRefreshingMessage(parser.getDatasource());
+          }
+        }
+      }).get().send();
+  }
+
+  private void doShow(MagmaPath.Parser parser) {
     if(parser.hasVariable()) {
       show(parser.getDatasource(), parser.getTable(), parser.getVariable());
     } else if(parser.hasTable()) {
@@ -165,6 +179,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     void selectTable(String datasource, String table, boolean isView);
 
     void selectVariable(String datasource, String table, String variable);
+
+    void showRefreshingMessage(String datasource);
   }
 
   private class TableDtoResourceCallback implements ResourceCallback<TableDto> {

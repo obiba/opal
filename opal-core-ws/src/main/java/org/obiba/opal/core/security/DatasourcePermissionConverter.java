@@ -68,6 +68,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
             toRest("/identifiers/mappings", "GET"), //
             toRest("/datasource-plugin", "GET:GET/GET"), //
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),//
             toRest("/project/{0}/transient-datasources", "POST", args),//
             toRest("/project/{0}/commands/_import", "POST:GET", args),//
@@ -91,6 +92,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/report-templates", "GET:GET", args),//
             toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/analyses", "GET:GET", args),
             toRest("/project/{0}/analyses/_export", "GET:GET", args));

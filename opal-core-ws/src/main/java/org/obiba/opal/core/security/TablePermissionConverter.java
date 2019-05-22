@@ -52,6 +52,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/report-templates", "GET:GET", args),//
             toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),//
             toRest("/project/{0}/permissions/table/{1}", "*:GET/*", args),//
             toRest("/files/projects/{0}", "GET:GET/*", args), //
@@ -79,6 +80,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/datasource/{0}/table/{1}/facets/_search", "POST:GET", args),//
             toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args),//
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args));
 
         if(isView) perms.add(toRest("/datasource/{0}/view/{1}/xml", "GET:GET", args));
@@ -106,6 +108,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/report-templates", "GET:GET", args),//
             toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/analyses", "GET:GET", args),
             toRest("/project/{0}/table/{1}/analyses", "GET:GET", args),

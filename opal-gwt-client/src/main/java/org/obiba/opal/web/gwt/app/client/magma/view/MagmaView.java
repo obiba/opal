@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
@@ -18,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 import com.github.gwtbootstrap.client.ui.Badge;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavPills;
 import com.github.gwtbootstrap.client.ui.constants.BadgeType;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -131,6 +131,23 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     badge.setType(BadgeType.IMPORTANT);
     badge.setText("V");
     badge.setTitle(translations.variableLabel());
+    setHeading();
+  }
+
+  @Override
+  public void showRefreshingMessage(String datasource) {
+    tabPanel.clear();
+
+    FlowPanel flowPanel = new FlowPanel();
+    flowPanel.getElement().setInnerText(translations.projectRefreshingText());
+    tabPanel.add(flowPanel, getDatasourceLink(datasource));
+
+    tabPanel.setMenuVisible(true);
+
+    badge.setType(BadgeType.INFO);
+    badge.setText("D");
+    badge.setTitle(translations.datasourceLabel());
+
     setHeading();
   }
 
