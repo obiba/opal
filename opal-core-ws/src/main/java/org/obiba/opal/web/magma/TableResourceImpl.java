@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.js.JavascriptVariableBuilder;
@@ -42,7 +39,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.obiba.magma.Attribute.Builder.newAttribute;
@@ -99,14 +96,11 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   }
 
   @Override
-  public Set<VariableEntityDto> getEntities() {
-    Iterable<VariableEntity> entities = filterEntities(null, null);
-    return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
-      @Override
-      public VariableEntityDto apply(VariableEntity from) {
-        return VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).build();
-      }
-    }));
+  public List<VariableEntityDto> getEntities() {
+    List<VariableEntity> entities = filterEntities(null, null);
+    return entities.stream()
+        .map(from -> VariableEntityDto.newBuilder().setIdentifier(from.getIdentifier()).build())
+        .collect(Collectors.toList());
   }
 
   @Override

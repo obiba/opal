@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.StreamSupport;
@@ -119,6 +120,8 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   private void deleteAnalysisFiles(Path analysisDir) {
     try {
       DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(analysisDir);
+    } catch (NoSuchFileException e) {
+      // ignore
     } catch (IOException e) {
       logger.warn("Unable to delete analysis files at \"{}\"", analysisDir.toString());
     }
@@ -134,8 +137,10 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
       DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(
           Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName, valueTableName)
       );
+    } catch (NoSuchFileException e) {
+      // ignore
     } catch (IOException e) {
-      logger.warn(e.getMessage());
+      logger.warn(e.getMessage(), e);
     }
   }
 
@@ -153,8 +158,10 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
       DefaultOpalFileSystem.deleteDirectoriesAndFilesInPath(
         Paths.get(Analysis.ANALYSES_HOME.toAbsolutePath().toString(), datasourceName)
       );
+    } catch (NoSuchFileException e) {
+      // ignore
     } catch (IOException e) {
-      logger.warn(e.getMessage());
+      logger.warn(e.getMessage(), e);
     }
 
   }

@@ -10,8 +10,7 @@
 package org.obiba.opal.core.identifiers;
 
 import java.util.Iterator;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -118,7 +117,7 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
       private final Iterator<Value> privateIdentifiers;
 
       {
-        NavigableSet<VariableEntity> entities = new TreeSet<>(identifiersTable.getVariableEntities());
+        List<VariableEntity> entities = identifiersTable.getVariableEntities();
 
         privateIdentifiers = identifiersTable.hasVariable(idMapping)
             ? identifiersTable.getVariableValueSource(idMapping).asVectorSource().getValues(entities).iterator()

@@ -16,7 +16,6 @@ import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.rosuda.REngine.REXP;
 
 import java.util.List;
-import java.util.SortedSet;
 
 /**
  * Base implementation of Magma vector providers.
@@ -29,12 +28,12 @@ abstract class AbstractMagmaRConverter implements MagmaRConverter {
     this.magmaAssignROperation = magmaAssignROperation;
   }
 
-  REXP getVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
+  REXP getVector(VariableValueSource vvs, List<VariableEntity> entities, boolean withMissings) {
     VectorType vt = VectorTypeRegistry.forValueType(vvs.getValueType());
     return vt.asVector(vvs, entities, withMissings);
   }
 
-  REXP getVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
+  REXP getVector(Variable variable, List<Value> values, List<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
     VectorType vt = VectorTypeRegistry.forValueType(variable.getValueType());
     return vt.asVector(variable, values, entities, withMissings, withFactors, withLabelled);
   }

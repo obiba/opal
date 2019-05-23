@@ -10,9 +10,7 @@
 
 package org.obiba.opal.web.magma;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -103,17 +101,13 @@ abstract class AbstractValueTableResource {
     return variables;
   }
 
-  Iterable<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
-    Iterable<VariableEntity> entities;
-    entities = Sets.newTreeSet(valueTable.getVariableEntities());
-    // Apply offset then limit (in that order)
-    if(offset != null) {
-      entities = Iterables.skip(entities, offset);
-    }
-    if(limit != null && limit >= 0) {
-      entities = Iterables.limit(entities, limit);
-    }
-    return entities;
+  List<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
+    List<VariableEntity> entities = valueTable.getVariableEntities();
+    int from = offset == null ? 0 : offset;
+    from = Math.max(from, 0);
+    int to = (limit != null && limit >= 0) ? from + limit : entities.size();
+    to = Math.min(to, entities.size());
+    return entities.subList(from, to);
   }
 
 }

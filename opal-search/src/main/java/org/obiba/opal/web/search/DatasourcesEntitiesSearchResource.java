@@ -42,7 +42,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -70,7 +69,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
         .setQuery(queryStr);
 
     if (!identifiersTableService.hasIdentifiersTable(entityType)) return builder.build();
-    Set<VariableEntity> entities = identifiersTableService.getIdentifiersTable(entityType).getVariableEntities();
+    List<VariableEntity> entities = identifiersTableService.getIdentifiersTable(entityType).getVariableEntities();
 
     if ("*".equals(queryStr))
       builder.addAllIdentifiers(entities.stream().map(VariableEntity::getIdentifier)

@@ -30,6 +30,14 @@
       overflowToDisk="true"
       diskPersistent="true"/>
 
+  <!--cache name="magma-table-valuesets"
+         maxElementsInMemory="1"
+         eternal="true"
+         timeToLiveSeconds="0"
+         timeToIdleSeconds="0"
+         overflowToDisk="true"
+         diskPersistent="true"/-->
+
   <cache name="opal-datasource-parse-error-log"
          maxElementsInMemory="1"
          timeToLiveSeconds="600"
