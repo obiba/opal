@@ -10,7 +10,6 @@
 
 package org.obiba.opal.r.magma;
 
-import com.google.common.collect.ImmutableSortedSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
@@ -18,11 +17,10 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
 
-import java.util.SortedSet;
+import java.util.List;
 
 /**
  * Build a R vector from a variable: vector of values.
- *
  */
 class VariableRConverter extends AbstractMagmaRConverter {
 
@@ -56,7 +54,7 @@ class VariableRConverter extends AbstractMagmaRConverter {
 
   private REXP asVector(String path, boolean withMissings, String identifiersMapping) {
     resolvePath(path, identifiersMapping);
-    SortedSet<VariableEntity> entities = ImmutableSortedSet.copyOf(table.getVariableEntities());
+    List<VariableEntity> entities = table.getVariableEntities();
     return getVector(variableValueSource, entities, withMissings);
   }
 

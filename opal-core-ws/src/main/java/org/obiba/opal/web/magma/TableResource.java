@@ -56,7 +56,7 @@ public interface TableResource {
    */
   @GET
   @Path("/entities")
-  Set<Magma.VariableEntityDto> getEntities();
+  List<Magma.VariableEntityDto> getEntities();
 
   /**
    * Get the value set from the given entity identifier, for the variables filtered by the optional 'select' script.

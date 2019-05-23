@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -202,7 +204,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   private void constructCacheFromVector(@NotNull ValueTable keyTable, @NotNull VectorSource vs) {
-    SortedSet<VariableEntity> entities = new TreeSet<>(keyTable.getVariableEntities());
+    List<VariableEntity> entities = keyTable.getVariableEntities();
     Iterator<Value> values = vs.getValues(entities).iterator();
     for (VariableEntity opalEntity : entities) {
       Value value = values.next();

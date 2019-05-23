@@ -13,7 +13,6 @@ package org.obiba.opal.r.magma;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
@@ -37,7 +36,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -139,8 +137,8 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     return magmaAssignROperation.getUpdatedColumnName();
   }
 
-  protected SortedSet<VariableEntity> getEntities(ValueTable table) {
-    return ImmutableSortedSet.copyOf(table.getVariableEntities());
+  protected List<VariableEntity> getEntities(ValueTable table) {
+    return table.getVariableEntities();
   }
 
   /**
@@ -179,7 +177,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   private REXP getUnaryVector(ValueTable table, VariableValueSource vvs, boolean withMissings) {
-    SortedSet<VariableEntity> entities = getEntities(table);
+    List<VariableEntity> entities = getEntities(table);
     if (lineCounts.isEmpty())
       return getVector(vvs, entities, withMissings);
     else {
@@ -212,7 +210,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected REXPList getVectorsList(ValueTable table) {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
-    SortedSet<VariableEntity> entities = getEntities(table);
+    List<VariableEntity> entities = getEntities(table);
     Iterable<Variable> variables = filterVariables(table);
     Map<String, Map<String, Value>> variableValues = Maps.newConcurrentMap();
     variables.forEach(variable -> variableValues.put(variable.getName(), Maps.newConcurrentMap()));
@@ -358,7 +356,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         }
 
         @Override
-        public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+        public Iterable<Value> getValues(List<VariableEntity> entities) {
           return entities.stream().map(e -> TextType.get().valueOf(e.getIdentifier())).collect(Collectors.toList());
         }
       };
@@ -408,7 +406,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         }
 
         @Override
-        public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+        public Iterable<Value> getValues(List<VariableEntity> entities) {
           return entities.stream().map(e -> table.getValueSet(e).getTimestamps().getLastUpdate()).collect(Collectors.toList());
         }
       };

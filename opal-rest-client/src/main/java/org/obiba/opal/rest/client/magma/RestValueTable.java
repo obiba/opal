@@ -9,14 +9,8 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Map;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
@@ -36,12 +30,15 @@ import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Search;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class RestValueTable extends AbstractValueTable {
 
@@ -81,7 +78,7 @@ public class RestValueTable extends AbstractValueTable {
   private void initialiseVariables() {
     Iterable<VariableDto> variables = getOpalClient()
         .getResources(VariableDto.class, newReference("variables"), VariableDto.newBuilder());
-    for(final VariableDto dto : variables) {
+    for (final VariableDto dto : variables) {
       addVariableValueSource(new RestVariableValueSource(dto));
     }
     variablesInitialised = true;
@@ -107,7 +104,7 @@ public class RestValueTable extends AbstractValueTable {
 
   @Override
   public ValueSet getValueSet(VariableEntity entity) throws NoSuchValueSetException {
-    if(!hasValueSet(entity)) {
+    if (!hasValueSet(entity)) {
       throw new NoSuchValueSetException(this, entity);
     }
 
@@ -124,14 +121,14 @@ public class RestValueTable extends AbstractValueTable {
     try {
       getOpalClient().delete(newReference("valueSets"));
       refresh();
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   @Override
   public Timestamps getValueSetTimestamps(VariableEntity entity) throws NoSuchValueSetException {
-    if(valueSetsTimestampsSupported && valueSetsTimestamps.isEmpty()) {
+    if (valueSetsTimestampsSupported && valueSetsTimestamps.isEmpty()) {
       initialiseValueSetsTimestamps();
     }
 
@@ -154,12 +151,12 @@ public class RestValueTable extends AbstractValueTable {
       ValueSetsDto vss = getOpalClient()
           .getResource(ValueSetsDto.class, newUri("valueSets", "timestamps").query("limit", "-1").build(),
               ValueSetsDto.newBuilder());
-      if(vss.getValueSetsCount() > 0) {
-        for(ValueSetsDto.ValueSetDto vs : vss.getValueSetsList()) {
+      if (vss.getValueSetsCount() > 0) {
+        for (ValueSetsDto.ValueSetDto vs : vss.getValueSetsList()) {
           valueSetsTimestamps.put(vs.getIdentifier(), new ValueSetTimestamps(vs.getTimestamps()));
         }
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       valueSetsTimestampsSupported = false;
     }
   }
@@ -195,16 +192,11 @@ public class RestValueTable extends AbstractValueTable {
     }
 
     @Override
-    public Set<VariableEntity> getVariableEntities() {
+    public List<VariableEntity> getVariableEntities() {
       ensureEntities();
 
-      return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntityDto, VariableEntity>() {
-
-        @Override
-        public VariableEntity apply(VariableEntityDto from) {
-          return new VariableEntityBean(getEntityType(), from.getIdentifier());
-        }
-      }));
+      return StreamSupport.stream(entities.spliterator(), false)
+          .map(from -> new VariableEntityBean(getEntityType(), from.getIdentifier())).collect(Collectors.toList());
     }
 
     @Override
@@ -234,9 +226,9 @@ public class RestValueTable extends AbstractValueTable {
       loadValueSet();
       ValueSetsDto.ValueSetDto values = valueSet.getValueSets(0);
 
-      for(int i = 0; i < valueSet.getVariablesCount(); i++) {
-        if(variable.getName().equals(valueSet.getVariables(i))) {
-          if(variable.getValueType().equals(BinaryType.get())) {
+      for (int i = 0; i < valueSet.getVariablesCount(); i++) {
+        if (variable.getName().equals(valueSet.getVariables(i))) {
+          if (variable.getValueType().equals(BinaryType.get())) {
             return getBinary(variable, values.getValues(i));
           } else {
             return Dtos.fromDto(values.getValues(i), variable.getValueType(), variable.isRepeatable());
@@ -247,20 +239,14 @@ public class RestValueTable extends AbstractValueTable {
     }
 
     private Value getBinary(Variable variable, ValueSetsDto.ValueDto valueDto) {
-      if(variable.isRepeatable()) return getRepeatableBinary(valueDto);
+      if (variable.isRepeatable()) return getRepeatableBinary(valueDto);
       return getBinaryResource(valueDto);
     }
 
     private Value getRepeatableBinary(ValueSetsDto.ValueDto valueDto) {
-      if(valueDto.getValuesCount() == 0) return BinaryType.get().nullSequence();
-      return BinaryType.get().sequenceOf(ImmutableList
-          .copyOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
-
-            @Override
-            public Value apply(ValueSetsDto.ValueDto input) {
-              return getBinaryResource(input);
-            }
-          })));
+      if (valueDto.getValuesCount() == 0) return BinaryType.get().nullSequence();
+      return BinaryType.get().sequenceOf(valueDto.getValuesList().stream()
+          .map(this::getBinaryResource).collect(Collectors.toList()));
     }
 
     /**
@@ -270,20 +256,21 @@ public class RestValueTable extends AbstractValueTable {
      * @return
      */
     private Value getBinaryResource(ValueSetsDto.ValueDto valueDto) {
-      if(!valueDto.hasLength() || valueDto.getLength() == 0 || !valueDto.hasLink()) return BinaryType.get().nullValue();
+      if (!valueDto.hasLength() || valueDto.getLength() == 0 || !valueDto.hasLink())
+        return BinaryType.get().nullValue();
 
       URI uri = getOpalClient().newUri().link(valueDto.getLink()).build();
 
       InputStream is = null;
       try {
         HttpResponse response = getOpalClient().get(uri);
-        if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+        if (response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
           EntityUtils.consume(response.getEntity());
           throw new RuntimeException(response.getStatusLine().getReasonPhrase());
         }
         is = response.getEntity().getContent();
         return BinaryType.get().valueOf(ByteStreams.toByteArray(is));
-      } catch(IOException e) {
+      } catch (IOException e) {
         throw new RuntimeException(e);
       } finally {
         getOpalClient().closeQuietly(is);
@@ -292,7 +279,7 @@ public class RestValueTable extends AbstractValueTable {
 
     @Override
     public Timestamps getTimestamps() {
-      if(timestamps != null) return timestamps;
+      if (timestamps != null) return timestamps;
       loadTimestamps();
       return timestamps;
     }
@@ -303,14 +290,14 @@ public class RestValueTable extends AbstractValueTable {
             newUri("valueSet", getVariableEntity().getIdentifier(), "timestamps").build(),
             Magma.TimestampsDto.newBuilder());
         timestamps = new ValueSetTimestamps(tsDto);
-      } catch(RuntimeException e) {
+      } catch (RuntimeException e) {
         // legacy with older opals: fallback to table timestamps
         timestamps = RestValueTable.this.getTimestamps();
       }
     }
 
     synchronized ValueSetsDto loadValueSet() {
-      if(valueSet == null) {
+      if (valueSet == null) {
         valueSet = getOpalClient().getResource(ValueSetsDto.class,
             newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "true").build(),
             ValueSetsDto.newBuilder());
@@ -331,7 +318,7 @@ public class RestValueTable extends AbstractValueTable {
     @NotNull
     @Override
     public Value getLastUpdate() {
-      if(tsDto != null && tsDto.hasLastUpdate()) {
+      if (tsDto != null && tsDto.hasLastUpdate()) {
         return DateTimeType.get().valueOf(tsDto.getLastUpdate());
       }
       return getTimestamps().getLastUpdate();
@@ -340,7 +327,7 @@ public class RestValueTable extends AbstractValueTable {
     @NotNull
     @Override
     public Value getCreated() {
-      if(tsDto != null && tsDto.hasCreated()) {
+      if (tsDto != null && tsDto.hasCreated()) {
         return DateTimeType.get().valueOf(tsDto.getCreated());
       }
       return getTimestamps().getCreated();
@@ -349,14 +336,14 @@ public class RestValueTable extends AbstractValueTable {
 
   @Override
   public Timestamps getTimestamps() {
-    if(tableTimestamps == null) {
+    if (tableTimestamps == null) {
       final Magma.TimestampsDto tsDto = tableDto.getTimestamps();
       tableTimestamps = new Timestamps() {
 
         @NotNull
         @Override
         public Value getLastUpdate() {
-          if(tsDto.hasLastUpdate()) {
+          if (tsDto.hasLastUpdate()) {
             return DateTimeType.get().valueOf(tsDto.getLastUpdate());
           }
           return DateTimeType.get().nullValue();
@@ -365,7 +352,7 @@ public class RestValueTable extends AbstractValueTable {
         @NotNull
         @Override
         public Value getCreated() {
-          if(tsDto.hasCreated()) {
+          if (tsDto.hasCreated()) {
             return DateTimeType.get().valueOf(tsDto.getCreated());
           }
           return DateTimeType.get().nullValue();

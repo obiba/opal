@@ -11,8 +11,8 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityProvider;
 import org.rosuda.REngine.REXP;
@@ -20,8 +20,8 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The R entities are provided by the id column in the tibble.
@@ -36,7 +36,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
 
   private String idColumn;
 
-  private Set<VariableEntity> entities;
+  private List<VariableEntity> entities;
 
   private Map<String, RVariableEntity> entitiesMap;
 
@@ -62,15 +62,15 @@ class RVariableEntityProvider implements VariableEntityProvider {
   }
 
   @Override
-  public Set<VariableEntity> getVariableEntities() {
+  public List<VariableEntity> getVariableEntities() {
     if (entities == null || entities.isEmpty()) {
-      entities = Sets.newLinkedHashSet();
+      entities = Lists.newArrayList();
       entitiesMap = Maps.newHashMap();
       initialiseIdColumn();
       REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
       boolean isNumeric = idVector.isNumeric();
       if (idVector instanceof REXPVector) {
-        int length = ((REXPVector)idVector).length();
+        int length = ((REXPVector) idVector).length();
         try {
           if (isNumeric) {
             for (double id : idVector.asDoubles()) {

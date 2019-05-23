@@ -9,26 +9,10 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
-import com.google.common.collect.Sets;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.VectorSource;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import org.obiba.magma.*;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
@@ -38,10 +22,16 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
+import javax.annotation.Nullable;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -59,7 +49,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
   @Override
   public Response getValueSets(UriInfo uriInfo, String select, int offset, int limit, Boolean filterBinary) {
     // filter entities
-    Iterable<VariableEntity> variableEntities = filterEntities(offset, limit);
+    List<VariableEntity> variableEntities = filterEntities(offset, limit);
     ValueSetsDto vs = variableValueSource == null
         ? getValueSetsDto(uriInfo, select, variableEntities, filterBinary)
         : getValueSetsDto(uriInfo, variableEntities, filterBinary);
@@ -89,35 +79,26 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
   public Response getValueSetsTimestamps(int offset, int limit) {
 
     // filter entities
-    Iterable<VariableEntity> variableEntities = filterEntities(offset, limit);
+    List<VariableEntity> variableEntities = filterEntities(offset, limit);
 
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
-    builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {
-      @Override
-      public ValueSetDto apply(VariableEntity fromEntity) {
-        Timestamps timestamps = getValueTable().getValueSetTimestamps(fromEntity);
-        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier())
-            .setTimestamps(Dtos.asDto(timestamps)).build();
-      }
-    }));
+    variableEntities.stream().map(fromEntity -> {
+      Timestamps timestamps = getValueTable().getValueSetTimestamps(fromEntity);
+      return ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier())
+          .setTimestamps(Dtos.asDto(timestamps)).build();
+    }).forEach(builder::addValueSets);
 
     return TimestampedResponses.ok(getValueTable(), builder.build()).build();
   }
 
-  private ValueSetsDto getValueSetsDto(UriInfo uriInfo, String select, Iterable<VariableEntity> variableEntities,
-      boolean filterBinary) {
+  private ValueSetsDto getValueSetsDto(UriInfo uriInfo, String select, List<VariableEntity> variableEntities,
+                                       boolean filterBinary) {
     Iterable<Variable> variables = filterVariables(select, 0, null);
 
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
 
-    builder.addAllVariables(Iterables.transform(variables, new Function<Variable, String>() {
-
-      @Override
-      public String apply(Variable from) {
-        return from.getName();
-      }
-
-    }));
+    builder.addAllVariables(StreamSupport.stream(variables.spliterator(), false)
+        .map(Variable::getName).collect(Collectors.toList()));
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     ValueTable valueTable = getValueTable();
@@ -132,13 +113,13 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
   }
 
   @SuppressWarnings("ConstantConditions")
-  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, Iterable<VariableEntity> variableEntities,
-      final boolean filterBinary) {
+  private ValueSetsDto getValueSetsDto(final UriInfo uriInfo, List<VariableEntity> variableEntities,
+                                       final boolean filterBinary) {
     final Variable variable = variableValueSource.getVariable();
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(variable.getEntityType())
         .addVariables(variable.getName());
 
-    if(variableValueSource.supportVectorSource()) {
+    if (variableValueSource.supportVectorSource()) {
       addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary,
           variableValueSource.asVectorSource(), builder);
     } else {
@@ -151,26 +132,24 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
     return builder.build();
   }
 
-  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, Iterable<VariableEntity> variableEntities,
-      Variable variable, boolean filterBinary, VectorSource vector, ValueSetsDto.Builder builder) {
-    ImmutableSortedSet<VariableEntity> sortedEntities = ImmutableSortedSet.<VariableEntity>naturalOrder()
-        .addAll(variableEntities).build();
-    Iterable<Value> values = vector.getValues(sortedEntities);
+  private void addValueSetDtosFromVectorSource(UriInfo uriInfo, List<VariableEntity> variableEntities,
+                                               Variable variable, boolean filterBinary, VectorSource vector, ValueSetsDto.Builder builder) {
+    Iterable<Value> values = vector.getValues(variableEntities);
 
     Map<VariableEntity, Value> results = new LinkedHashMap<>();
-    Iterator<VariableEntity> entitiesIterator = sortedEntities.iterator();
-    for(Value value : values) {
+    Iterator<VariableEntity> entitiesIterator = variableEntities.iterator();
+    for (Value value : values) {
       VariableEntity entity = entitiesIterator.next();
       results.put(entity, value);
     }
 
-    for(VariableEntity entity : variableEntities) {
+    for (VariableEntity entity : variableEntities) {
       builder.addValueSets(getValueSetDto(uriInfo, entity, variable, filterBinary, results.get(entity)));
     }
   }
 
   private ValueSetDto getValueSetDto(UriInfo uriInfo, VariableEntity fromEntity, Variable variable,
-      boolean filterBinary, Value value) {
+                                     boolean filterBinary, Value value) {
     String link = uriInfo.getPath().replace("valueSets",
         "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + variable.getName() + "/value");
     return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier())

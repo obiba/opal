@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 public class VectorType {
@@ -41,7 +40,7 @@ public class VectorType {
    * @param withMissings if true, values corresponding to missing categories will be pushed to the vector
    * @return
    */
-  public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
+  public REXP asVector(VariableValueSource vvs, List<VariableEntity> entities, boolean withMissings) {
     return asVector(vvs.getVariable(), ImmutableList.copyOf(vvs.asVectorSource().getValues(entities)), entities, withMissings, true, false);
   }
 
@@ -56,7 +55,7 @@ public class VectorType {
    * @param withLabelled
    * @return
    */
-  public REXP asVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
+  public REXP asVector(Variable variable, List<Value> values, List<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
     return asValuesVector(variable, values, withMissings, withFactors, withLabelled);
   }
 
@@ -94,7 +93,7 @@ public class VectorType {
       if (withMissings || !variable.isMissingValue(value)) {
         String str = value.toString();
         code = codes.get(str);
-        if (code == null && value.getValueType().equals(DecimalType.get()) && str!= null && str.endsWith(".0")) {
+        if (code == null && value.getValueType().equals(DecimalType.get()) && str != null && str.endsWith(".0")) {
           code = codes.get(str.substring(0, str.length() - 2));
         }
       }
@@ -203,7 +202,7 @@ public class VectorType {
       }
       if (!missingCats.isEmpty()) {
         names.add("class");
-        contents.add(new REXPString(new String[] { "haven_labelled_spss", "haven_labelled" }));
+        contents.add(new REXPString(new String[]{"haven_labelled_spss", "haven_labelled"}));
         REXP naRange = getCategoriesMissingRange(variable, missingCats);
         if (naRange != null) {
           names.add("na_range");
@@ -211,7 +210,7 @@ public class VectorType {
         }
         // add discrete missing values after na_range as the missingCats may have been modified
         if (!missingCats.isEmpty()) {
-          if (naRange != null && missingCats.size()>1) {
+          if (naRange != null && missingCats.size() > 1) {
             log.warn("Variable {}: SPSS format does not support more than one discrete missing value in addition to a missing values range.", variable.getName());
           }
           names.add("na_values");
@@ -219,7 +218,7 @@ public class VectorType {
         }
       } else {
         names.add("class");
-        contents.add(new REXPString(new String[] {"haven_labelled"}));
+        contents.add(new REXPString(new String[]{"haven_labelled"}));
       }
       names.add("labels");
       contents.add(getCategoriesRAttributes(variable));

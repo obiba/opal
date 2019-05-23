@@ -10,6 +10,7 @@
 package org.obiba.opal.core.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
@@ -176,7 +177,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
       if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
         // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-        Set<VariableEntity> entitiesInKeysTable = identifiersTableService
+        List<VariableEntity> entitiesInKeysTable = identifiersTableService
             .getIdentifiersTable(valueTable.getEntityType()).getVariableEntities();
         nonExistentVariableEntities.removeAll(entitiesInKeysTable);
       }

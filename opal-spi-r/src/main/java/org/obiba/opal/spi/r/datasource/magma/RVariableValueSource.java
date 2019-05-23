@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -71,7 +70,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   @Override
-  public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+  public Iterable<Value> getValues(List<VariableEntity> entities) {
     return null;
   }
 
@@ -217,8 +216,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   /**
    * Extract categories and flag missings appropriatly.
    *
-   * @param labels Category values
-   * @param missings Discrete missings
+   * @param labels        Category values
+   * @param missings      Discrete missings
    * @param missingsRange Range of missings
    * @return
    */
@@ -316,7 +315,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private Value getNumeric(Object objValue) {
     if (objValue == null ||
-    (objValue instanceof Double && ((Double) objValue).isNaN())) return getValueType().nullValue();
+        (objValue instanceof Double && ((Double) objValue).isNaN())) return getValueType().nullValue();
     return getValueType().valueOf(objValue);
   }
 
@@ -329,7 +328,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private Value getDateFromEpoch(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      Double dbl = (Double)objValue;
+      Double dbl = (Double) objValue;
       if (dbl.isNaN()) return getValueType().nullValue();
       Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
       return getValueType().valueOf(value);
@@ -341,7 +340,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private Value getDateTimeFromEpoch(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      Double dbl = (Double)objValue;
+      Double dbl = (Double) objValue;
       if (dbl.isNaN()) return getValueType().nullValue();
       Date value = new Date(dbl.longValue() * 1000);
       return getValueType().valueOf(value);

@@ -9,12 +9,8 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -22,13 +18,13 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
 
-import com.google.common.collect.ImmutableSet;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -47,7 +43,7 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetParticipantCount_WithSingleTable() {
     Set<ValueTable> tables = ImmutableSet.of( //
-    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"))) //
+        createMockTable(ImmutableList.of(createMockEntity("P1"))) //
     );
 
     testGetParticipantCount(tables, 1);
@@ -56,8 +52,8 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetParticipantCount_WithMultipleTablesDoesNotCountTheSameParticipantTwice() {
     Set<ValueTable> tables = ImmutableSet.of( //
-    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"))), //
-    /**/createMockTable(ImmutableSet.of(createMockEntity("P1"), createMockEntity("P2"))) //
+        createMockTable(ImmutableList.of(createMockEntity("P1"))), //
+        createMockTable(ImmutableList.of(createMockEntity("P1"), createMockEntity("P2"))) //
     );
 
     testGetParticipantCount(tables, 2);
@@ -99,13 +95,13 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
     assertThat(response.getEntity()).isEqualTo(String.valueOf(expectedCount));
   }
 
-  private ValueTable createMockTable(Set<VariableEntity> entities) {
+  private ValueTable createMockTable(List<VariableEntity> entities) {
     ValueTable mockTable = createMock(ValueTable.class);
 
     expect(mockTable.isForEntityType("Participant")).andReturn(true).anyTimes();
     expect(mockTable.getVariableEntities()).andReturn(entities).anyTimes();
 
-    for(VariableEntity entity : entities) {
+    for (VariableEntity entity : entities) {
       expect(mockTable.hasValueSet(entity)).andReturn(true).anyTimes();
     }
 
