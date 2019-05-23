@@ -14,17 +14,14 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableEvent;
+import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -53,26 +50,40 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectsServiceImpl.class);
 
-  @Autowired
-  private OpalRuntime opalRuntime;
+  private final OpalRuntime opalRuntime;
+
+  private final OrientDbService orientDbService;
+
+  private final DatabaseRegistry databaseRegistry;
+
+  private final ProjectsKeyStoreService projectsKeyStoreService;
+
+  private final IdentifiersTableService identifiersTableService;
+
+  private final ViewManager viewManager;
+
+  private final TransactionTemplate transactionTemplate;
+
+  private final EventBus eventBus;
 
   @Autowired
-  private OrientDbService orientDbService;
-
-  @Autowired
-  private DatabaseRegistry databaseRegistry;
-
-  @Autowired
-  private ProjectsKeyStoreService projectsKeyStoreService;
-
-  @Autowired
-  private ViewManager viewManager;
-
-  @Autowired
-  private TransactionTemplate transactionTemplate;
-
-  @Autowired
-  private EventBus eventBus;
+  public ProjectsServiceImpl(OpalRuntime opalRuntime,
+                             OrientDbService orientDbService,
+                             DatabaseRegistry databaseRegistry,
+                             ProjectsKeyStoreService projectsKeyStoreService,
+                             IdentifiersTableService identifiersTableService,
+                             ViewManager viewManager,
+                             TransactionTemplate transactionTemplate,
+                             EventBus eventBus) {
+    this.opalRuntime = opalRuntime;
+    this.orientDbService = orientDbService;
+    this.databaseRegistry = databaseRegistry;
+    this.projectsKeyStoreService = projectsKeyStoreService;
+    this.identifiersTableService = identifiersTableService;
+    this.viewManager = viewManager;
+    this.transactionTemplate = transactionTemplate;
+    this.eventBus = eventBus;
+  }
 
 
   @Override
@@ -257,7 +268,6 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Subscribe
   public void onValueTable(ValueTableEvent event) {
-    if (event instanceof ValueTableAddedEvent) return;
     try {
       Project project = getProject(event.getValueTable().getDatasource().getName());
       save(project);
@@ -267,13 +277,42 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Subscribe
-  public void onValueTableAdded(ValueTableAddedEvent event) {
-    try {
-    Project project = getProject(event.getDatasourceName());
-    save(project);
-
-    } catch(Exception e) {
-      log.warn(e.getMessage());
+  public void onValueTableDeleted(ValueTableDeletedEvent event) {
+    if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
+      removeProjectIdentifiersMappingByEntityType(event.getValueTable());
     }
+  }
+
+  @Subscribe
+  public void onVariableDeleted(VariableDeletedEvent event) {
+    if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
+      removeProjectIdentifiersMappingByMapping(event.getVariable());
+    }
+  }
+
+  private void removeProjectIdentifiersMappingByEntityType(ValueTable valueTable) {
+    final String entityType = valueTable.getEntityType();
+    getProjects().
+      forEach(project -> {
+        if (project.hasIdentifiersMappings()) {
+          if (project.getIdentifiersMappings().removeIf(mapping -> mapping.getEntityType().equals(entityType))) {
+            save(project);
+          }
+        }
+      }
+    );
+  }
+
+  private void removeProjectIdentifiersMappingByMapping(Variable variable) {
+    final String mappingName = variable.getName();
+    getProjects().
+      forEach(project -> {
+        if (project.hasIdentifiersMappings()) {
+          if (project.getIdentifiersMappings().removeIf(mapping -> mapping.getMapping().equals(mappingName))) {
+            save(project);
+          }
+        }
+      }
+    );
   }
 }
