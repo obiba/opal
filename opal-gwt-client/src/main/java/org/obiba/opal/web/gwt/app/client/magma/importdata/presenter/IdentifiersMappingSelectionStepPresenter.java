@@ -9,19 +9,20 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class IdentifiersMappingSelectionStepPresenter
     extends PresenterWidget<IdentifiersMappingSelectionStepPresenter.Display> {
@@ -39,11 +40,24 @@ public class IdentifiersMappingSelectionStepPresenter
 
   private void initIdentifiersMappings() {
 
-    ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder().forResource("/identifiers/mappings")
+    ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder().forResource(UriBuilders.IDENTIFIERS_MAPPINGS.create().build())
         .get().withCallback(new ResourceCallback<JsArray<IdentifiersMappingDto>>() {
       @Override
       public void onResource(Response response, JsArray<IdentifiersMappingDto> resource) {
         getView().setIdentifiersMappings(JsArrays.toSafeArray(resource));
+      }
+
+    }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
+  }
+
+  public void initializeDefaultIdentifiersMapping(String project, String entityType) {
+
+    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPING.create().query("entityType", entityType).build(project);
+    ResourceRequestBuilderFactory.<ProjectDto.IdentifiersMappingDto>newBuilder().forResource(uri)
+      .get().withCallback(new ResourceCallback<ProjectDto.IdentifiersMappingDto>() {
+      @Override
+      public void onResource(Response response, ProjectDto.IdentifiersMappingDto mapping) {
+        getView().selectIdentifiersMapping(mapping);
       }
 
     }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
@@ -64,6 +78,8 @@ public class IdentifiersMappingSelectionStepPresenter
   public interface Display extends View {
 
     void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings);
+
+    void selectIdentifiersMapping(ProjectDto.IdentifiersMappingDto mapping);
 
     String getSelectedIdentifiersMapping();
 

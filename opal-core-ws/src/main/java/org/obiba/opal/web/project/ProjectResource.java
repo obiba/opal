@@ -177,6 +177,9 @@ public class ProjectResource {
     @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
 
     Project project = projectService.getProject(name);
+    if (!project.hasIdentifiersMappings()) {
+      return Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance();
+    }
 
     return project.getIdentifiersMappings()
       .stream()

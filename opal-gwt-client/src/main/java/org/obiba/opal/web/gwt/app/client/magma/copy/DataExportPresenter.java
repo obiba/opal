@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
@@ -42,6 +45,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class DataExportPresenter extends ModalPresenterWidget<DataExportPresenter.Display>
     implements DataExportUiHandlers {
@@ -59,6 +63,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   private String datasourceName;
 
   private String valuesQuery;
+
+  private HashMap<String, String> projectIdMappings = Maps.newHashMap();
 
   @Inject
   public DataExportPresenter(Display display,
@@ -134,7 +140,34 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   public void setDatasourceName(String name) {
     datasourceName = name;
+    initProjectIdentifiersMappings();
     getView().setFileBaseName(datasourceName);
+  }
+
+  private void initProjectIdentifiersMappings() {
+    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPINGS.create().build(datasourceName);
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto.IdentifiersMappingDto>>newBuilder() //
+      .forResource(uri) //
+      .withCallback(new ResourceCallback<JsArray<ProjectDto.IdentifiersMappingDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<ProjectDto.IdentifiersMappingDto> mappings) {
+          setProjectIdMappings(JsArrays.toList(mappings));
+          // auto select ID mapping when exporting one table
+          if (exportTables.size() == 1) {
+            TableDto table = exportTables.iterator().next();
+            if (projectIdMappings.containsKey(table.getEntityType())) {
+              getView().selectIdentifiersMapping(projectIdMappings.get(table.getEntityType()));
+            }
+          }
+        }
+      }) //
+      .get().send();
+  }
+
+  private void setProjectIdMappings(List<ProjectDto.IdentifiersMappingDto> mappings) {
+    for (ProjectDto.IdentifiersMappingDto mapping : mappings) {
+      projectIdMappings.put(mapping.getEntityType(), mapping.getMapping());
+    }
   }
 
   private void updateFormatChooser() {
@@ -294,6 +327,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     void setDatabases(JsArray<DatabaseDto> databases);
 
     String getSelectedDatabase();
+
+    void selectIdentifiersMapping(String mapping);
   }
 
 }

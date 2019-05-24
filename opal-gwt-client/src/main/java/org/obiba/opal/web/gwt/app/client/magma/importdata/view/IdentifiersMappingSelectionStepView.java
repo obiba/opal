@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.IdentifiersMappingSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
@@ -27,6 +28,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class IdentifiersMappingSelectionStepView extends ViewImpl implements IdentifiersMappingSelectionStepPresenter.Display {
 
@@ -73,6 +75,16 @@ public class IdentifiersMappingSelectionStepView extends ViewImpl implements Ide
     }
     identifiers.setSelectedIndex(0);
     identifiersPanel.setVisible(mappings.length() > 0);
+  }
+
+  @Override
+  public void selectIdentifiersMapping(ProjectDto.IdentifiersMappingDto mapping) {
+    if (Strings.isNullOrEmpty(mapping.getMapping())) {
+      if (identifiers.getItemCount() > 0) identifiers.setSelectedIndex(0);
+    } else {
+      identifiers.setSelectedValue(mapping.getMapping());
+      idMappingOptions.setVisible(identifiers.getSelectedIndex()>0);
+    }
   }
 
   @Override

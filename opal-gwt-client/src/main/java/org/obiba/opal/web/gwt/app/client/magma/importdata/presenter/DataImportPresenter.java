@@ -473,6 +473,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     public void onStepIn() {
       importConfig = formatStepPresenter.getImportConfig();
       importConfig.setDestinationDatasourceName(destination);
+      identifiersMappingSelectionStepPresenter.initializeDefaultIdentifiersMapping(destination, importConfig.getEntityType());
     }
   }
 
