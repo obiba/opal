@@ -40,6 +40,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_IDENTIFIERS_MAPPINGS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "identifiers-mappings");
+    }
+  },
+
+  PROJECT_IDENTIFIERS_MAPPING {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "identifiers-mapping");
+    }
+  },
+
   PROJECT_REPORT_TEMPLATES {
     @Override
     public UriBuilder create() {

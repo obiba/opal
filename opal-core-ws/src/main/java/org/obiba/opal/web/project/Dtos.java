@@ -195,7 +195,7 @@ public class Dtos {
     return builder;
   }
 
-  private static ProjectDto.IdentifiersMappingDto asDto(ProjectIdentifiersMapping mapping) {
+  public static ProjectDto.IdentifiersMappingDto asDto(ProjectIdentifiersMapping mapping) {
     return ProjectDto.IdentifiersMappingDto.newBuilder()
       .setEntityType(mapping.getEntityType())
       .setName(mapping.getName())

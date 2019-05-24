@@ -49,14 +49,28 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
 
   public void setProject(ProjectDto project) {
     this.project = project;
-    getView().setIdentifiersMappings(JsArrays.toList(this.project.getIdMappingsArray()));
-    initializeMappingTables();
+    initializeIdentifiersMappings();
   }
 
   @Override
   public void addIdMappings() {
     ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
     modal.initialize(mappingTables);
+  }
+
+  private void initializeIdentifiersMappings() {
+    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPINGS.create().build(project.getName());
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto.IdentifiersMappingDto>>newBuilder() //
+      .forResource(uri) //
+      .withCallback(new ResourceCallback<JsArray<ProjectDto.IdentifiersMappingDto>>() {
+
+        @Override
+        public void onResource(Response response, JsArray<ProjectDto.IdentifiersMappingDto> mappings) {
+          getView().setIdentifiersMappings(JsArrays.toList(mappings));
+          initializeMappingTables();
+        }
+      }) //
+      .get().send();
   }
 
   private void initializeMappingTables() {
