@@ -102,12 +102,7 @@ abstract class AbstractValueTableResource {
   }
 
   List<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
-    List<VariableEntity> entities = valueTable.getVariableEntities();
-    int from = offset == null ? 0 : offset;
-    from = Math.max(from, 0);
-    int to = (limit != null && limit >= 0) ? from + limit : entities.size();
-    to = Math.min(to, entities.size());
-    return entities.subList(from, to);
+    return valueTable.getVariableEntities(offset == null ? 0 : offset, limit == null ? -1 : limit);
   }
 
 }
