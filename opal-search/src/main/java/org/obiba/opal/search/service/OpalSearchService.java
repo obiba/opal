@@ -266,6 +266,7 @@ public class OpalSearchService implements Service {
 
   @Subscribe
   public void onVariablesUpdated(VariablesUpdatedEvent event) {
+    if (!isRunning()) return;
     // to ensure variable search is correct
     getVariablesIndexManager().getIndex(event.getValueTable()).delete();
     // synchronize variable index

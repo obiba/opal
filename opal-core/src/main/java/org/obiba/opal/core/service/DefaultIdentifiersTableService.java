@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Strings;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.NoSuchValueTableException;
@@ -50,7 +51,6 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Value("${org.obiba.opal.keys.tableReference}")
   private String tableReference;
 
-  @NotNull
   @Value("${org.obiba.opal.keys.entityType}")
   private String participantEntityType;
 
@@ -118,11 +118,14 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       Initialisables.initialise(datasourceFactory);
       datasource = datasourceFactory.create();
       Initialisables.initialise(datasource);
-      try {
-        getIdentifiersTable(getParticipantEntityType());
-      } catch (NoSuchValueTableException e) {
-        datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
+      if (!Strings.isNullOrEmpty(getParticipantEntityType())) {
+        try {
+          getIdentifiersTable(getParticipantEntityType());
+        } catch (NoSuchValueTableException e) {
+          datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
+        }
       }
+
     }
     return datasource;
   }
