@@ -17,6 +17,10 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+    <b:Paragraph>
+      <ui:msg description="Project Identifiers Mappings text">Identifiers mappings listed below will be automatically used when importing/exporting data matching the correct entity type.
+      </ui:msg>
+    </b:Paragraph>
     <g:FlowPanel>
       <b:Button icon="PLUS" ui:field="addMappingButton" enabled="false">
         <ui:msg description="Project Identifiers Mappings Add label">Add Mapping</ui:msg>

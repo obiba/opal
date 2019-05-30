@@ -279,40 +279,28 @@ public class ProjectsServiceImpl implements ProjectService {
   @Subscribe
   public void onValueTableDeleted(ValueTableDeletedEvent event) {
     if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
-      removeProjectIdentifiersMappingByEntityType(event.getValueTable());
+      removeProjectsIdentifiersMappingByEntityType(event.getValueTable());
     }
   }
 
   @Subscribe
   public void onVariableDeleted(VariableDeletedEvent event) {
     if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
-      removeProjectIdentifiersMappingByMapping(event.getVariable());
+      removeProjectsIdentifiersMappingByMapping(event.getVariable());
     }
   }
 
-  private void removeProjectIdentifiersMappingByEntityType(ValueTable valueTable) {
-    final String entityType = valueTable.getEntityType();
-    getProjects().
-      forEach(project -> {
-        if (project.hasIdentifiersMappings()) {
-          if (project.getIdentifiersMappings().removeIf(mapping -> mapping.getEntityType().equals(entityType))) {
-            save(project);
-          }
-        }
-      }
-    );
+  private void removeProjectsIdentifiersMappingByEntityType(ValueTable valueTable) {
+    getProjects().forEach(project -> {
+      project.removeIdentifiersMappingByEntityType(valueTable.getEntityType());
+      save(project);
+    });
   }
 
-  private void removeProjectIdentifiersMappingByMapping(Variable variable) {
-    final String mappingName = variable.getName();
-    getProjects().
-      forEach(project -> {
-        if (project.hasIdentifiersMappings()) {
-          if (project.getIdentifiersMappings().removeIf(mapping -> mapping.getMapping().equals(mappingName))) {
-            save(project);
-          }
-        }
-      }
-    );
+  private void removeProjectsIdentifiersMappingByMapping(Variable variable) {
+    getProjects().forEach(project -> {
+      project.removeIdentifiersMappingByMapping(variable.getName());
+      save(project);
+    });
   }
 }

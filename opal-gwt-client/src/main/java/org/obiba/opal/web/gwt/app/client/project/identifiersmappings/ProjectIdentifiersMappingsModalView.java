@@ -75,6 +75,11 @@ public class ProjectIdentifiersMappingsModalView extends
   }
 
   @Override
+  public void selectMapping(String variableName) {
+    mappings.setSelectedValue(variableName);
+  }
+
+  @Override
   public void hideDialog() {
     modal.hide();
   }

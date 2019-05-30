@@ -126,7 +126,7 @@
 
     <g:FlowPanel ui:field="idMappingsPanel">
       <b:Heading size="4">
-        <ui:msg description="Permissions label">Identiders Mappings</ui:msg>
+        <ui:msg description="Permissions label">Identifiers Mappings</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="idMappings"/>
     </g:FlowPanel>

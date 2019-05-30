@@ -28,6 +28,8 @@ import java.util.List;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<ProjectIdentifiersMappingsPresenter.Display>
   implements ProjectIdentifiersMappingsUiHandlers {
@@ -55,7 +57,30 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
   @Override
   public void addIdMappings() {
     ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
-    modal.initialize(mappingTables);
+    modal.initialize(mappingTables, null);
+  }
+
+  @Override
+  public void editIdMapping(ProjectDto.IdentifiersMappingDto mapping) {
+    ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
+    modal.initialize(mappingTables, mapping);
+  }
+
+  @Override
+  public void removeIdMapping(ProjectDto.IdentifiersMappingDto mapping) {
+    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPING.create()
+      .query("entityType", mapping.getEntityType())
+      .build(project.getName());
+
+    ResourceRequestBuilderFactory.newBuilder()
+      .forResource(uri)
+      .withCallback(SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          initializeIdentifiersMappings();
+        }
+      })
+      .delete().send();
   }
 
   private void initializeIdentifiersMappings() {
@@ -106,11 +131,11 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
       @Override
       public void doAction(ProjectDto.IdentifiersMappingDto dto, String actionName) {
         switch (actionName) {
-          case Display.ADD_MAPPING:
+          case EDIT_ACTION:
+            editIdMapping(dto);
             break;
-          case Display.EDIT_MAPPING:
-            break;
-          case Display.DELETE_MAPPING:
+          case REMOVE_ACTION:
+            removeIdMapping(dto);
             break;
         }
       }
@@ -170,9 +195,6 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
   }
 
   public interface Display extends View, HasUiHandlers<ProjectIdentifiersMappingsUiHandlers> {
-    String ADD_MAPPING = "addMapping";
-    String EDIT_MAPPING = "editMapping";
-    String DELETE_MAPPING = "deleteMapping";
 
     HasActionHandler<ProjectDto.IdentifiersMappingDto> getActionColumn();
 

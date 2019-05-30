@@ -187,6 +187,18 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return identifiersMappings;
   }
 
+  public void removeIdentifiersMappingByEntityType(String entityType) {
+    if (hasIdentifiersMappings()) {
+      getIdentifiersMappings().removeIf(mapping -> mapping.getEntityType().equals(entityType));
+    }
+  }
+
+  public void removeIdentifiersMappingByMapping(String mappingName) {
+    if (hasIdentifiersMappings()) {
+      getIdentifiersMappings().removeIf(mapping -> mapping.getMapping().equals(mappingName));
+    }
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();

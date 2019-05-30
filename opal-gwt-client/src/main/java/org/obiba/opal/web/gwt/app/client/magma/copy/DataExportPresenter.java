@@ -110,7 +110,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   @Override
   public void onReveal() {
-    initIdentifiersMappings();
+//    initIdentifiersMappings();
   }
 
   @Override
@@ -139,8 +139,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   public void setDatasourceName(String name) {
+    initIdentifiersMappings();
     datasourceName = name;
-    initProjectIdentifiersMappings();
     getView().setFileBaseName(datasourceName);
   }
 
@@ -215,6 +215,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
         // if exporting at least one table of type 'identifiersEntityType', show id mappings selection
         getView().setIdentifiersMappings(getEntityTypeMappings(exportTables, mappings));
+        initProjectIdentifiersMappings();
       }
 
       private JsArray<IdentifiersMappingDto> getEntityTypeMappings(Set<TableDto> tables,

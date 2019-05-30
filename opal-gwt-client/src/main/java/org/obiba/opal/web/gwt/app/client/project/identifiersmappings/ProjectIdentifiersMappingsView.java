@@ -13,6 +13,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.permissions.view.ResourcePermissionsView;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -20,6 +21,9 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.ProjectDto.IdentifiersMappingDto;
 
 import java.util.List;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class ProjectIdentifiersMappingsView extends ViewWithUiHandlers<ProjectIdentifiersMappingsUiHandlers>
   implements ProjectIdentifiersMappingsPresenter.Display {
@@ -85,6 +89,7 @@ public class ProjectIdentifiersMappingsView extends ViewWithUiHandlers<ProjectId
     }, translations.identifiersMappings());
 
     actionColumn = createActionColumn();
+    mappingsTable.addColumn(actionColumn, translations.actionsLabel());
     dataProvider.addDataDisplay(mappingsTable);
   }
 
@@ -92,7 +97,7 @@ public class ProjectIdentifiersMappingsView extends ViewWithUiHandlers<ProjectId
     return new ActionsColumn<IdentifiersMappingDto>(new ActionsProvider<IdentifiersMappingDto>() {
       @Override
       public String[] allActions() {
-        return new String[] {ADD_MAPPING, EDIT_MAPPING, DELETE_MAPPING};
+        return new String[] {EDIT_ACTION, REMOVE_ACTION};
       }
 
       @Override

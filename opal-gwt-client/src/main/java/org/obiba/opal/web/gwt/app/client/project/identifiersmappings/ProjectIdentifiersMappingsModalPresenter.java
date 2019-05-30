@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.project.identifiersmappings;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.web.bindery.event.shared.EventBus;
@@ -32,16 +33,21 @@ public class ProjectIdentifiersMappingsModalPresenter extends ModalPresenterWidg
     this.translations = translations;
   }
 
-  public void initialize(List<TableDto> mappingTables) {
+  public void initialize(List<TableDto> mappingTables, ProjectDto.IdentifiersMappingDto mapping) {
     getView().clearEntityTypes();
     this.mappingTables = mappingTables;
     for (TableDto table : mappingTables) {
       getView().addEntityType(table);
     }
-    getMappings(mappingTables.get(0).getName());
+
+    if (mapping == null) {
+      getMappings(mappingTables.get(0).getName(), null);
+    } else {
+      getMappings(mapping.getEntityType(), mapping.getMapping());
+    }
   }
 
-  private void getMappings(String tableName) {
+  private void getMappings(final String tableName, final String variableName) {
     String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLES.create().build(tableName);
     ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
       .forResource(uri) //
@@ -53,6 +59,10 @@ public class ProjectIdentifiersMappingsModalPresenter extends ModalPresenterWidg
           for (VariableDto variable : variables) {
             getView().addMapping(variable.getName());
           }
+
+          if (!Strings.isNullOrEmpty(variableName)) {
+            getView().selectMapping(variableName);
+          }
         }
       }) //
       .get().send();
@@ -60,7 +70,7 @@ public class ProjectIdentifiersMappingsModalPresenter extends ModalPresenterWidg
 
   @Override
   public void updateMappings(String tableName) {
-    getMappings(tableName);
+    getMappings(tableName, null);
   }
 
   @Override
@@ -81,5 +91,7 @@ public class ProjectIdentifiersMappingsModalPresenter extends ModalPresenterWidg
     void addEntityType(TableDto type);
 
     void addMapping(String name);
+
+    void selectMapping(String variableName);
   }
 }

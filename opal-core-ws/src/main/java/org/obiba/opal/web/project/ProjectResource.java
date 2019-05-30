@@ -17,7 +17,6 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.domain.ProjectIdentifiersMapping;
 import org.obiba.opal.core.domain.ProjectsState;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
@@ -44,10 +43,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -187,6 +184,19 @@ public class ProjectResource {
       .findFirst()
       .map(Dtos::asDto)
       .orElse(Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance());
+  }
+
+  @DELETE
+  @Path("/identifiers-mapping")
+  public Response removeIdentifiersMapping(
+    @PathParam("name") String name,
+    @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
+
+    Project project = projectService.getProject(name);
+    project.removeIdentifiersMappingByEntityType(entityType);
+    projectService.save(project);
+
+    return Response.ok().build();
   }
 
   private static class ProjectTimestamps implements Timestamped {
