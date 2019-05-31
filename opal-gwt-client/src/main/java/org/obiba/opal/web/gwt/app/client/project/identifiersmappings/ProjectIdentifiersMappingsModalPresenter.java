@@ -43,7 +43,7 @@ public class ProjectIdentifiersMappingsModalPresenter extends ModalPresenterWidg
     if (mapping == null) {
       getMappings(mappingTables.get(0).getName(), null);
     } else {
-      getMappings(mapping.getEntityType(), mapping.getMapping());
+      getMappings(mapping.getName(), mapping.getMapping());
     }
   }
 

@@ -3,7 +3,7 @@
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-    <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="300">
+    <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="320">
 
 
         <b:ControlGroup ui:field="entityTypeGroup">
@@ -13,6 +13,9 @@
             <b:Controls>
                 <o:Chooser ui:field="entityTypes"/>
             </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="Identifiers Table entity type help">What the identifiers are about.</ui:msg>
+            </b:HelpBlock>
         </b:ControlGroup>
 
         <b:ControlGroup ui:field="mappingsGroups">
@@ -22,8 +25,10 @@
             <b:Controls>
                 <o:Chooser ui:field="mappings"/>
             </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="Project Identifiers Mappings Modal ID Mappings help">The name of the mapping.</ui:msg>
+            </b:HelpBlock>
         </b:ControlGroup>
-
 
         <b:ModalFooter>
             <b:Button ui:field="saveButton" type="PRIMARY">

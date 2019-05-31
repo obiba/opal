@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -51,16 +52,28 @@ public class IdentifiersMappingSelectionStepPresenter
   }
 
   public void initializeDefaultIdentifiersMapping(String project, String entityType) {
+    if (Strings.isNullOrEmpty(entityType)) {
+      String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPINGS.create().build(project);
+      ResourceRequestBuilderFactory.<JsArray<ProjectDto.IdentifiersMappingDto>>newBuilder().forResource(uri)
+        .get().withCallback(new ResourceCallback<JsArray<ProjectDto.IdentifiersMappingDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<ProjectDto.IdentifiersMappingDto> mappings) {
+          if (mappings.length() > 0) getView().selectIdentifiersMapping(mappings.get(0));
+        }
 
-    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPING.create().query("entityType", entityType).build(project);
-    ResourceRequestBuilderFactory.<ProjectDto.IdentifiersMappingDto>newBuilder().forResource(uri)
-      .get().withCallback(new ResourceCallback<ProjectDto.IdentifiersMappingDto>() {
-      @Override
-      public void onResource(Response response, ProjectDto.IdentifiersMappingDto mapping) {
-        getView().selectIdentifiersMapping(mapping);
-      }
+      }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
+    } else {
 
-    }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
+      String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPING.create().query("entityType", entityType).build(project);
+      ResourceRequestBuilderFactory.<ProjectDto.IdentifiersMappingDto>newBuilder().forResource(uri)
+        .get().withCallback(new ResourceCallback<ProjectDto.IdentifiersMappingDto>() {
+        @Override
+        public void onResource(Response response, ProjectDto.IdentifiersMappingDto mapping) {
+          getView().selectIdentifiersMapping(mapping);
+        }
+
+      }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
+    }
   }
 
   public void updateImportConfig(ImportConfig importConfig) {

@@ -56,14 +56,24 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
 
   @Override
   public void addIdMappings() {
-    ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
-    modal.initialize(mappingTables, null);
+    initializeMappingTables(new IdentifiersTablesResourceSuccessCallback() {
+      @Override
+      public void onSuccess() {
+        ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
+        modal.initialize(mappingTables, null);
+      }
+    });
   }
 
   @Override
-  public void editIdMapping(ProjectDto.IdentifiersMappingDto mapping) {
-    ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
-    modal.initialize(mappingTables, mapping);
+  public void editIdMapping(final ProjectDto.IdentifiersMappingDto mapping) {
+    initializeMappingTables(new IdentifiersTablesResourceSuccessCallback() {
+      @Override
+      public void onSuccess() {
+        ProjectIdentifiersMappingsModalPresenter modal = modalProvider.get();
+        modal.initialize(mappingTables, mapping);
+      }
+    });
   }
 
   @Override
@@ -92,13 +102,13 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
         @Override
         public void onResource(Response response, JsArray<ProjectDto.IdentifiersMappingDto> mappings) {
           getView().setIdentifiersMappings(JsArrays.toList(mappings));
-          initializeMappingTables();
+          initializeMappingTables(null);
         }
       }) //
       .get().send();
   }
 
-  private void initializeMappingTables() {
+  private void initializeMappingTables(final IdentifiersTablesResourceSuccessCallback successCallback) {
     String uri = UriBuilders.IDENTIFIERS_TABLES.create().query("counts", "true").build();
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
       .forResource(uri) //
@@ -107,6 +117,7 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
         @Override
         public void onResource(Response response, JsArray<TableDto> dtos) {
           ensureValidMappingTables(JsArrays.toList(dtos));
+          if (successCallback != null) successCallback.onSuccess();
         }
       }) //
       .get().send();
@@ -192,6 +203,10 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
         }
       }) //
       .put().send();
+  }
+
+  interface IdentifiersTablesResourceSuccessCallback {
+    void onSuccess();
   }
 
   public interface Display extends View, HasUiHandlers<ProjectIdentifiersMappingsUiHandlers> {

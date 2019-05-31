@@ -18,7 +18,7 @@
 
   <g:FlowPanel>
     <b:Paragraph>
-      <ui:msg description="Project Identifiers Mappings text">Identifiers mappings listed below will be automatically used when importing/exporting data matching the correct entity type.
+      <ui:msg description="Project Identifiers Mappings text">Identifiers mappings listed below that match the entity type of the data are automatically selected during an import/export process.
       </ui:msg>
     </b:Paragraph>
     <g:FlowPanel>

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -153,10 +154,14 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
         public void onResource(Response response, JsArray<ProjectDto.IdentifiersMappingDto> mappings) {
           setProjectIdMappings(JsArrays.toList(mappings));
           // auto select ID mapping when exporting one table
-          if (exportTables.size() == 1) {
-            TableDto table = exportTables.iterator().next();
+          boolean found = false;
+          Iterator<TableDto> iterator = exportTables.iterator();
+
+          while (iterator.hasNext() && !found) {
+            TableDto table = iterator.next();
             if (projectIdMappings.containsKey(table.getEntityType())) {
               getView().selectIdentifiersMapping(projectIdMappings.get(table.getEntityType()));
+              found = true;
             }
           }
         }
