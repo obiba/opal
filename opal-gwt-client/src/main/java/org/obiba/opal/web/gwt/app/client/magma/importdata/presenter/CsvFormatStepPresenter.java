@@ -264,7 +264,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return selectedFile.toLowerCase().endsWith(".csv") || selectedFile.toLowerCase().endsWith(".tsv");
+          return selectedFile.toLowerCase().endsWith(".csv") || selectedFile.toLowerCase().endsWith(".tsv") || selectedFile.toLowerCase().endsWith(".zip");
         }
       };
     }
