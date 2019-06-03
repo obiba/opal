@@ -186,19 +186,6 @@ public class ProjectResource {
       .orElse(Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance());
   }
 
-  @DELETE
-  @Path("/identifiers-mapping")
-  public Response removeIdentifiersMapping(
-    @PathParam("name") String name,
-    @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
-
-    Project project = projectService.getProject(name);
-    project.removeIdentifiersMappingByEntityType(entityType);
-    projectService.save(project);
-
-    return Response.ok().build();
-  }
-
   private static class ProjectTimestamps implements Timestamped {
     final UnionTimestamps timestamps;
 

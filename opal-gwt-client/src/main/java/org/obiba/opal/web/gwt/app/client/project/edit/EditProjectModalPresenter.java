@@ -202,6 +202,10 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     dto.setDatabase(getView().getDatabase().getText());
     dto.setVcfStoreService(getView().getVcfStoreService().getText());
     dto.setExportFolder(getView().getExportFolder().getText());
+
+    JsArray<ProjectDto.IdentifiersMappingDto> idMappings = project.getIdMappingsArray();
+    if (idMappings != null) dto.setIdMappingsArray(idMappings);
+
     if(project != null) dto.setArchived(project.getArchived());
     return dto;
   }

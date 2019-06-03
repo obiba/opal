@@ -75,6 +75,11 @@ public class ProjectIdentifiersMappingsModalView extends
   }
 
   @Override
+  public void selectEntityType(String entityType) {
+    entityTypes.setSelectedValue(entityType);
+  }
+
+  @Override
   public void selectMapping(String variableName) {
     mappings.setSelectedValue(variableName);
   }

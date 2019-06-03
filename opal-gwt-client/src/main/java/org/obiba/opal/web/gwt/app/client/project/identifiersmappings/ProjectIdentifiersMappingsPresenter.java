@@ -2,12 +2,14 @@ package org.obiba.opal.web.gwt.app.client.project.identifiersmappings;
 
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.js.JsArrayIterator;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
@@ -78,19 +80,22 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
 
   @Override
   public void removeIdMapping(ProjectDto.IdentifiersMappingDto mapping) {
-    String uri = UriBuilders.PROJECT_IDENTIFIERS_MAPPING.create()
-      .query("entityType", mapping.getEntityType())
-      .build(project.getName());
+    removeMappingFromProject(mapping);
+    update();
+  }
 
-    ResourceRequestBuilderFactory.newBuilder()
-      .forResource(uri)
-      .withCallback(SC_OK, new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          initializeIdentifiersMappings();
-        }
-      })
-      .delete().send();
+  private void removeMappingFromProject(ProjectDto.IdentifiersMappingDto mapping) {
+    JsArray<ProjectDto.IdentifiersMappingDto> idMappings = JsArrays.create();
+    JsArrayIterator iterator = new JsArrayIterator(project.getIdMappingsArray());
+
+    while(iterator.hasNext()) {
+      ProjectDto.IdentifiersMappingDto target = (ProjectDto.IdentifiersMappingDto)iterator.next();
+      if (!target.getEntityType().equals(mapping.getEntityType())) {
+        idMappings.push(target);
+      }
+    }
+
+    project.setIdMappingsArray(idMappings);
   }
 
   private void initializeIdentifiersMappings() {

@@ -110,11 +110,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   @Override
-  public void onReveal() {
-//    initIdentifiersMappings();
-  }
-
-  @Override
   public void cancel() {
     getView().hideDialog();
   }

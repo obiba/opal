@@ -18,6 +18,7 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 import com.google.common.collect.Maps;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -71,7 +72,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final Provider<ProjectKeyStorePresenter> projectDataExchangeProvider;
 
-  private final Provider<ProjectIdentifiersMappingsPresenter> identifiersMappingsPresenterProvider;
+  private final ProjectIdentifiersMappingsPresenter identifiersMappingsPresenter;
 
   private ProjectDto project;
 
@@ -95,7 +96,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectDataExchangeProvider = projectDataExchangeProvider;
-    this.identifiersMappingsPresenterProvider = identifiersMappingsPresenterProvider;
+    this.identifiersMappingsPresenter = identifiersMappingsPresenterProvider.get();
   }
 
   @Override
@@ -346,8 +347,6 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
     @Override
     public void authorized() {
-      ProjectIdentifiersMappingsPresenter identifiersMappingsPresenter = identifiersMappingsPresenterProvider.get();
-
       identifiersMappingsPresenter.setProject(project);
       setInSlot(Display.Places.MAPPINGS, identifiersMappingsPresenter);
     }

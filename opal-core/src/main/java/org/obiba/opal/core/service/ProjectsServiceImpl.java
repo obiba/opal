@@ -189,7 +189,7 @@ public class ProjectsServiceImpl implements ProjectService {
     synchronized (this) {
       orientDbService.save(project, project);
     }
-  }
+}
 
   @NotNull
   @Override
@@ -299,7 +299,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private void removeProjectsIdentifiersMappingByMapping(Variable variable) {
     getProjects().forEach(project -> {
-      project.removeIdentifiersMappingByMapping(variable.getName());
+      project.removeIdentifiersMappingByMapping(variable.getEntityType(), variable.getName());
       save(project);
     });
   }
