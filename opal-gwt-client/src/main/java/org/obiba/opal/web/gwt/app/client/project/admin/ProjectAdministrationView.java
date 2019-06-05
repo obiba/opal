@@ -17,10 +17,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -95,11 +92,19 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Label exportFolder;
 
+
   @UiField
   Button refreshProject;
 
   @UiField
   Label refreshProjectBusy;
+
+
+  @UiField
+  FlowPanel idMappingsPanel;
+
+  @UiField
+  FlowPanel idMappings;
 
   private ProjectDto project;
 
@@ -134,12 +139,19 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == Places.KEYSTORE) {
-      keyStore.clear();
-      if(content != null) keyStore.add(content);
-    } else {
-      permissions.clear();
-      if(content != null) permissions.add(content);
+    switch (Places.valueOf(slot+"")) {
+      case KEYSTORE:
+        keyStore.clear();
+        if(content != null) keyStore.add(content);
+        break;
+      case PERMISSIONS:
+        permissions.clear();
+        if(content != null) permissions.add(content);
+        break;
+      case MAPPINGS:
+        idMappings.clear();
+        if(content != null) idMappings.add(content);
+        break;
     }
   }
 
@@ -158,6 +170,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public HasAuthorization getEditAuthorizer() {
     return new WidgetAuthorizer(editProperties);
+  }
+
+  @Override
+  public HasAuthorization getIdentifiersMappingsAuthorizer() {
+    return new WidgetAuthorizer(idMappingsPanel);
   }
 
   @Override

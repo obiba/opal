@@ -96,6 +96,8 @@ public class Chooser extends ChosenListBox {
 
   public void setSelectedValue(String value) {
     for(int i = 0; i < getItemCount(); i++) {
+      com.google.gwt.core.shared.GWT.log(">>>> ProjectIdentifiersMappingsPresenter::*** " + getValue(i));
+
       if(getValue(i).equals(value)) {
         super.setItemSelected(i, true);
       }

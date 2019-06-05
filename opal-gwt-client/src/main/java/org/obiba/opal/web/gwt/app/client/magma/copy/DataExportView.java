@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
@@ -52,7 +53,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
-import org.obiba.opal.web.model.client.opal.DatasourcePluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 
@@ -241,6 +241,11 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   @Override
   public String getSelectedDatabase() {
     return database.getItemText(database.getSelectedIndex());
+  }
+
+  @Override
+  public void selectIdentifiersMapping(String mapping) {
+    identifiers.setSelectedValue(mapping);
   }
 
   @Override

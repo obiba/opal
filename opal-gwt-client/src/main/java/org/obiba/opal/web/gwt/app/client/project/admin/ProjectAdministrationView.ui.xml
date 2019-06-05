@@ -123,6 +123,14 @@
       </b:Column>
     </b:FluidRow>
 
+
+    <g:FlowPanel ui:field="idMappingsPanel">
+      <b:Heading size="4">
+        <ui:msg description="Permissions label">Identifiers Mappings</ui:msg>
+      </b:Heading>
+      <g:FlowPanel ui:field="idMappings"/>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="keyStorePanel">
       <b:Heading size="4">
         <ui:msg description="Keystore label">Keystore</ui:msg>

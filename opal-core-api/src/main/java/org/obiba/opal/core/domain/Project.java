@@ -12,12 +12,14 @@ package org.obiba.opal.core.domain;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Sets;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
@@ -53,7 +55,10 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   private String exportFolder;
 
-  public Project() { }
+  private Set<ProjectIdentifiersMapping> identifiersMappings;
+
+  public Project() {
+  }
 
   public Project(@NotNull String name) {
     this.name = name;
@@ -174,6 +179,27 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return MagmaEngine.get().hasDatasource(name);
   }
 
+  public boolean hasIdentifiersMappings() {
+    return identifiersMappings != null && identifiersMappings.size() > 0;
+  }
+
+  public Set<ProjectIdentifiersMapping> getIdentifiersMappings() {
+    return identifiersMappings;
+  }
+
+  public void removeIdentifiersMappingByEntityType(String entityType) {
+    if (hasIdentifiersMappings()) {
+      getIdentifiersMappings().removeIf(mapping -> mapping.getEntityType().equals(entityType));
+    }
+  }
+
+  public void removeIdentifiersMappingByMapping(String entityType, String name) {
+    if (hasIdentifiersMappings()) {
+      getIdentifiersMappings()
+        .removeIf(mapping -> mapping.getEntityType().equals(entityType) && mapping.getMapping().equals(name));
+    }
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();
@@ -285,6 +311,15 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
     public Builder exportFolder(String value) {
       project.setExportFolder(value);
+      return this;
+    }
+
+    public Builder idMapping(ProjectIdentifiersMapping value) {
+      if (project.identifiersMappings == null) {
+        project.identifiersMappings = Sets.newHashSet();
+      }
+
+      project.identifiersMappings.add(value);
       return this;
     }
 

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.project;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
@@ -37,11 +38,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("request")
@@ -149,6 +153,37 @@ public class ProjectResource {
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
+  }
+
+  @GET
+  @Path("/identifiers-mappings")
+  public List<Projects.ProjectDto.IdentifiersMappingDto> getIdentifiersMappings(@PathParam("name") String name) {
+    Project project = projectService.getProject(name);
+
+    if (project.hasIdentifiersMappings()) {
+      return project.getIdentifiersMappings().stream().map(Dtos::asDto).collect(Collectors.toList());
+    }
+
+    return Lists.newArrayList();
+  }
+
+  @GET
+  @Path("/identifiers-mapping")
+  public Projects.ProjectDto.IdentifiersMappingDto getIdentifiersMapping(
+    @PathParam("name") String name,
+    @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
+
+    Project project = projectService.getProject(name);
+    if (!project.hasIdentifiersMappings()) {
+      return Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance();
+    }
+
+    return project.getIdentifiersMappings()
+      .stream()
+      .filter(mapping -> mapping.getEntityType().equals(entityType))
+      .findFirst()
+      .map(Dtos::asDto)
+      .orElse(Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance());
   }
 
   private static class ProjectTimestamps implements Timestamped {
