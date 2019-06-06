@@ -147,18 +147,18 @@
 
     <g:FlowPanel>
       <b:Heading size="4">
-        <ui:msg description="Refresh Project label">Refresh Project</ui:msg>
+        <ui:msg description="Project Database label">Database</ui:msg>
       </b:Heading>
-      <b:Form>
-        <b:Button type="INFO" ui:field="refreshProject">Refresh</b:Button>
-        <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
-      </b:Form>
       <b:Paragraph>
-        <ui:msg description="Refresh Project text">Refreshing a project makes its data temporarily inaccessible (no table listing, no import or export)
+        <ui:msg description="Refresh Project text">Refreshing a project database makes its data temporarily inaccessible (no table listing, no import or export)
           while the connection to the database is being re-initialised.
           The time taken by this operation depends on the database type and schema.
         </ui:msg>
       </b:Paragraph>
+      <b:Form>
+        <b:Button type="INFO" icon="REFRESH" ui:field="refreshProject">Refresh</b:Button>
+        <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
+      </b:Form>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="deletePanel">
@@ -173,14 +173,14 @@
         </ui:msg>
       </b:Paragraph>
       <b:Form>
-        <b:Button type="WARNING" ui:field="archiveProject">Archive Project</b:Button>
+        <b:Button type="WARNING" icon="ARCHIVE" ui:field="archiveProject">Archive Project</b:Button>
       </b:Form>
       <b:Paragraph>
         <ui:msg description="Remove Project text">Removing a project destroys all associated data and files. It can be a
           long running task and there is no going back.
         </ui:msg>
       </b:Paragraph>
-      <b:Button type="DANGER" ui:field="deleteProject">Remove Project</b:Button>
+      <b:Button type="DANGER" icon="TRASH" ui:field="deleteProject">Remove Project</b:Button>
     </g:FlowPanel>
 
   </g:FlowPanel>
