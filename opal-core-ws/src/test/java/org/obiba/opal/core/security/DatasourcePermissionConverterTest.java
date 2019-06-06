@@ -24,6 +24,7 @@ public class DatasourcePermissionConverterTest
         "rest:/identifiers/mappings:GET", //
         "rest:/datasource-plugin:GET:GET/GET", //
         "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/transient-datasource:*:GET/*", //
         "rest:/project/patate/report-template:*:GET/*", //
         "rest:/project/patate/command:*:GET/*", //
