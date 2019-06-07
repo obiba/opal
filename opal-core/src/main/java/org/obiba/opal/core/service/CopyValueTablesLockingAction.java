@@ -9,21 +9,10 @@
  */
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ThreadFactory;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceCopierProgressListener;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.VariableEntity;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import org.obiba.magma.*;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -31,18 +20,25 @@ import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ThreadFactory;
 
 /**
  *
  */
 class CopyValueTablesLockingAction extends LockingActionTemplate {
+
+  private static final Logger log = LoggerFactory.getLogger(CopyValueTablesLockingAction.class);
 
   private final Set<ValueTable> sourceTables;
 
@@ -62,8 +58,8 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService,
-      TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, DatasourceCopierProgressListener progressListener) {
+                               TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
+                               boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, DatasourceCopierProgressListener progressListener) {
     this.identifiersTableService = identifiersTableService;
     this.identifierService = identifierService;
     this.txTemplate = txTemplate;
@@ -88,11 +84,11 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   private Set<String> getTablesToLock() {
     Set<String> tablesToLock = new TreeSet<>();
 
-    for(ValueTable valueTable : sourceTables) {
+    for (ValueTable valueTable : sourceTables) {
       tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
-      if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
+      if (identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
         String ref = identifiersTableService.getTableReference(valueTable.getEntityType());
-        if(!tablesToLock.contains(ref)) tablesToLock.add(ref);
+        if (!tablesToLock.contains(ref)) tablesToLock.add(ref);
       }
     }
 
@@ -117,38 +113,27 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
     @Override
     public void execute() throws Exception {
-      for(final ValueTable valueTable : sourceTables) {
-        if(Thread.interrupted()) {
+      for (final ValueTable valueTable : sourceTables) {
+        if (Thread.interrupted()) {
           throw new InterruptedException("Thread interrupted");
         }
 
-        if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
-
-          if(valueTable instanceof IdentifiersMappingView) {
-            importUnitData((IdentifiersMappingView) valueTable);
-          } else {
-            addMissingEntitiesToKeysTable(valueTable);
-            MultithreadedDatasourceCopier.Builder.newCopier() //
-                .withThreads(new ThreadFactory() {
-                  @NotNull
-                  @Override
-                  public Thread newThread(@NotNull Runnable r) {
-                    return new TransactionalThread(r);
-                  }
-                }) //
-                .withProgressListener(progressListener) //
-                .withCopier(newCopierForParticipants()) //
-                .from(valueTable) //
-                .to(destination).build() //
-                .copy();
-          }
-
+        if (valueTable instanceof IdentifiersMappingView && identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
+          importUnitData((IdentifiersMappingView) valueTable);
         } else {
-          DatasourceCopier.Builder.newCopier() //
-              .dontCopyNullValues() //
-              .withProgressListener(progressListener)//
-              .withLoggingListener().build() //
-              .copy(valueTable, destination);
+          MultithreadedDatasourceCopier.Builder.newCopier() //
+              .withThreads(new ThreadFactory() {
+                @NotNull
+                @Override
+                public Thread newThread(@NotNull Runnable r) {
+                  return new TransactionalThread(r);
+                }
+              }) //
+              .withProgressListener(progressListener) //
+              .withCopier(newCopierForParticipants()) //
+              .from(valueTable) //
+              .to(destination).build() //
+              .copy();
         }
       }
     }
@@ -172,28 +157,6 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       }
     }
 
-    private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
-      Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
-
-      if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
-        // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-        List<VariableEntity> entitiesInKeysTable = identifiersTableService
-            .getIdentifiersTable(valueTable.getEntityType()).getVariableEntities();
-        nonExistentVariableEntities.removeAll(entitiesInKeysTable);
-      }
-
-      if(!nonExistentVariableEntities.isEmpty()) {
-        try(ValueTableWriter keysTableWriter = identifiersTableService
-            .createIdentifiersTableWriter(valueTable.getEntityType())) {
-          for(VariableEntity ve : nonExistentVariableEntities) {
-            keysTableWriter.writeValueSet(ve).close();
-          }
-        }
-      }
-
-      return nonExistentVariableEntities;
-    }
-
     private void importUnitData(IdentifiersMappingView identifiersMappingView) throws IOException {
       String idMapping = identifiersMappingView.getIdentifiersMapping();
       ValueTable table = identifiersMappingView.getWrappedValueTable();
@@ -209,7 +172,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
       // prepare for copying participant data
 
-      try(ValueTableWriter keysTableWriter = identifiersTableService
+      try (ValueTableWriter keysTableWriter = identifiersTableService
           .createIdentifiersTableWriter(table.getEntityType())) {
         DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
             keysTableWriter);
@@ -225,7 +188,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
      * executed before the ValueSet is copied to the data datasource otherwise, it will not have an associated entity.
      */
     private DatasourceCopier.DatasourceCopyEventListener createKeysListener(final ValueTable privateView,
-        final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
+                                                                            final PrivateVariableEntityMap entityMap, final ValueTableWriter keysTableWriter) {
       return new DatasourceCopier.DatasourceCopyValueSetEventListener() {
         @Override
         public void onValueSetCopied(ValueTable source, ValueSet valueSet, @SuppressWarnings(

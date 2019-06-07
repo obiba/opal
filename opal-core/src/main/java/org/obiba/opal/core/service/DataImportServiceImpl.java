@@ -38,7 +38,6 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public class DataImportServiceImpl implements DataImportService {
 
-  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DataImportServiceImpl.class);
 
   @Autowired

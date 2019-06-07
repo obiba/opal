@@ -19,6 +19,7 @@ import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableEvent;
 import org.obiba.opal.core.event.VariableDeletedEvent;
@@ -269,8 +270,12 @@ public class ProjectsServiceImpl implements ProjectService {
   @Subscribe
   public void onValueTable(ValueTableEvent event) {
     try {
-      Project project = getProject(event.getValueTable().getDatasource().getName());
+      String datasourceName = event instanceof ValueTableAddedEvent ?
+          ((ValueTableAddedEvent)event).getDatasourceName() : event.getValueTable().getDatasource().getName();
+      Project project = getProject(datasourceName);
       save(project);
+    } catch (NoSuchProjectException e) {
+      // ignore
     } catch(Exception e) {
       log.warn(e.getMessage());
     }
