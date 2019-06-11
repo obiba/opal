@@ -90,12 +90,12 @@ public class RSymbolValueTableWriter implements ValueTableWriter {
         optimizedDataPoints = memorySizeProvider.getOptimizedDataPointsCount(table, maxFreeMemoryInit, bufferMemory);
       }
 
-      if (optimizedDataPoints > 0) {
+      if (table.getVariableEntityBatchSize() <= table.getVariableEntityCount() || optimizedDataPoints > 0) {
         int entityCount = table.getVariableEntityCount();
         int variableCount = table.getVariableCount();
         int dataPointsCount = entityCount * variableCount;
 
-        if (dataPointsCount > optimizedDataPoints) {
+        if (table.getVariableEntityBatchSize() <= table.getVariableEntityCount() || dataPointsCount > optimizedDataPoints) {
           log.debug("Buffered data points: {}", dataPointsCount);
           flushValueTable();
         }

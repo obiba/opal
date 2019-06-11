@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.service.OpalRSession;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -27,6 +28,8 @@ public interface RSymbolResource {
   void setOpalRSession(OpalRSession rSession);
 
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
+
+  void setDataExportService(DataExportService dataExportService);
 
   void setTransactionTemplate(TransactionTemplate transactionTemplate);
 
@@ -68,4 +71,5 @@ public interface RSymbolResource {
 
   @DELETE
   Response rm();
+
 }

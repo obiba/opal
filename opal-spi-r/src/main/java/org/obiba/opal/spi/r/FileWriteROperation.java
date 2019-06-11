@@ -12,7 +12,7 @@ package org.obiba.opal.spi.r;
 import java.io.File;
 
 /**
- * Read a file from R into a local file.
+ * Write a local file into R.
  */
 public class FileWriteROperation extends AbstractROperation {
 

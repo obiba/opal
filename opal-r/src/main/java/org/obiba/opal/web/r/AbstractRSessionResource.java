@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.obiba.magma.type.DateTimeType;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -47,6 +48,9 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private DataExportService dataExportService;
 
   @Autowired
   private TransactionTemplate txTemplate;
@@ -201,6 +205,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     resource.setName(name);
     resource.setOpalRSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
+    resource.setDataExportService(dataExportService);
     resource.setTransactionTemplate(txTemplate);
     return resource;
   }

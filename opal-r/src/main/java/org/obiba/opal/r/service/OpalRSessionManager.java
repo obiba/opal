@@ -32,6 +32,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -269,6 +270,7 @@ public class OpalRSessionManager {
   }
 
   private String getSubjectPrincipal() {
+    if (!SecurityUtils.getSubject().isAuthenticated()) throw new ForbiddenException();
     return SecurityUtils.getSubject().getPrincipal().toString();
   }
 

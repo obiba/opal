@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.spi.r.datasource.magma;
 
-import org.obiba.magma.MagmaRuntimeException;
-
 /**
  * Magma to R related runtime errors.
  */
@@ -18,7 +16,7 @@ public class MagmaRRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public MagmaRRuntimeException(String msg, MagmaRuntimeException cause) {
+  public MagmaRRuntimeException(String msg, Exception cause) {
     super(msg, cause);
   }
 

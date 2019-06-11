@@ -41,7 +41,9 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.r.datasource.RExportDatasource;
 import org.obiba.opal.r.magma.RFileDatasource;
+import org.obiba.opal.r.magma.RFileSymbolWriter;
 import org.obiba.opal.r.magma.RSymbolValueTableWriter;
 import org.obiba.opal.r.magma.util.RCopyBufferStaticSizeProvider;
 import org.obiba.opal.r.service.OpalRSession;
@@ -352,9 +354,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         }
       };
       ((RDatasourceService) datasourceService).setRSessionHandler(rSessionHandler);
+      // ugly: no need to request creation of a datasource
       RDatasourceFactory rDatasourceFactory = (RDatasourceFactory) datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters);
-      return new RPluginDatasource(rDatasourceFactory.create(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
-
+      return new RExportDatasource(rDatasourceFactory.create().getName(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
     } else {
       return datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters).create();
     }
@@ -754,7 +756,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           });
         }
         getValueTables().size();
-        return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap(), new RCopyBufferStaticSizeProvider(memoryRatio));
+        RExportDatasource ds = new RExportDatasource(outputFile.getName().getBaseName(), sessionHandler, new RFileSymbolWriter(sessionHandler, outFiles));
+        ds.setEntityIdNames(getEntityIdMap());
+        return ds;
+        //return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap(), new RCopyBufferStaticSizeProvider(memoryRatio));
       }
       return null;
     }

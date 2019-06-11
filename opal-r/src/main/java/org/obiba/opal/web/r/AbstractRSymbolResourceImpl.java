@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.r;
 
+import com.google.common.base.Strings;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
@@ -36,6 +38,9 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @NotNull
   protected IdentifiersTableService identifiersTableService;
 
+  @NotNull
+  protected DataExportService dataExportService;
+
   protected TransactionTemplate transactionTemplate;
 
   @Override
@@ -55,6 +60,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
     this.identifiersTableService = identifiersTableService;
+  }
+
+  @Override
+  public void setDataExportService(DataExportService dataExportService) {
+    this.dataExportService = dataExportService;
   }
 
   @Override
@@ -88,8 +98,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings,
                            String idName, String updatedName, String identifiersMapping,
                            String rClass, boolean async) {
-    return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
-        "tibble".equals(rClass) ? MagmaAssignROperation.RClass.TIBBLE : MagmaAssignROperation.RClass.DATA_FRAME, async);
+    return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, rClass, async);
   }
 
   @Override
@@ -109,12 +118,25 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   Response assignMagmaSymbol(UriInfo uri, String path, String variableFilter, Boolean withMissings,
-                             String idName, String updatedName, String identifiersMapping, MagmaAssignROperation.RClass rClass,
+                             String idName, String updatedName, String identifiersMapping, String rClass,
                              boolean async) {
+    MagmaAssignROperation.RClass rClassToApply;
+    if (path.contains(":"))
+      rClassToApply = MagmaAssignROperation.RClass.VECTOR;
+    else if (Strings.isNullOrEmpty(rClass))
+      rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
+    else if ("data.frame".equals(rClass))
+      rClassToApply = MagmaAssignROperation.RClass.DATA_FRAME;
+    else {
+      try {
+        rClassToApply = MagmaAssignROperation.RClass.valueOf(rClass.toUpperCase());
+      } catch (Exception e) {
+        rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
+      }
+    }
     return assignSymbol(uri,
         new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
-            rClass,identifiersTableService, transactionTemplate),
-        async);
+            rClassToApply, identifiersTableService, dataExportService, transactionTemplate), async);
   }
 
   protected URI getSymbolURI(UriInfo info) {

@@ -14,6 +14,7 @@ import org.obiba.datashield.r.expr.DSRScriptValidator;
 import org.obiba.datashield.r.expr.FirstNodeInvokesFunctionValidator;
 import org.obiba.datashield.r.expr.NoBinaryOpsValidator;
 import org.obiba.datashield.r.expr.ParseException;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
@@ -49,6 +50,9 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   private IdentifiersTableService identifiersTableService;
 
   @Autowired
+  private DataExportService dataExportService;
+
+  @Autowired
   private TransactionTemplate txTemplate;
 
   @Override
@@ -76,6 +80,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     resource.setName(name);
     resource.setOpalRSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
+    resource.setDataExportService(dataExportService);
     resource.setTransactionTemplate(txTemplate);
     return resource;
   }
