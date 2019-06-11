@@ -28,7 +28,10 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
-import org.obiba.magma.support.*;
+import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
 import org.obiba.opal.core.domain.ProjectsState;
@@ -42,10 +45,7 @@ import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.datasource.RExportDatasource;
-import org.obiba.opal.r.magma.RFileDatasource;
 import org.obiba.opal.r.magma.RFileSymbolWriter;
-import org.obiba.opal.r.magma.RSymbolValueTableWriter;
-import org.obiba.opal.r.magma.util.RCopyBufferStaticSizeProvider;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
@@ -55,7 +55,6 @@ import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.datasource.RDatasourceFactory;
 import org.obiba.opal.spi.r.datasource.RDatasourceService;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
-import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,10 +122,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Value("${org.obiba.magma.entityIdName}")
   private String entityIdName;
-
-  @Value("${org.obiba.magma.r.copyBufferMemoryRatio}")
-  private Double memoryRatio;
-
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
@@ -153,17 +148,17 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     final ProjectsState projectsState = applicationContext.getBean(ProjectsState.class);
     projectsState.updateProjectState(options.getDestination(), State.BUSY);
 
-    if(validateOptions()) {
+    if (validateOptions()) {
       Datasource destinationDatasource = null;
 
       try {
         destinationDatasource = getDestinationDatasource();
 
         Set<ValueTable> tables = getValueTables();
-        for(ValueTable table : tables) {
-          if(destinationDatasource.getName().equals(table.getDatasource().getName()) &&
+        for (ValueTable table : tables) {
+          if (destinationDatasource.getName().equals(table.getDatasource().getName()) &&
               destinationDatasource.hasValueTable(table.getName())) {
-            if(tables.size() > 1 || tables.size() == 1 && !options.isName())
+            if (tables.size() > 1 || tables.size() == 1 && !options.isName())
               throw new IllegalArgumentException("Cannot copy a table into itself: " + table.getName());
           }
         }
@@ -174,20 +169,20 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         Disposables.dispose(destinationDatasource);
         getShell().printf("Successfully copied all tables.\n");
         errorCode = CommandResultCode.SUCCESS;
-      } catch(Exception e) {
-        if(!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
+      } catch (Exception e) {
+        if (!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
         //noinspection UseOfSystemOutOrSystemErr
         e.printStackTrace(System.err);
       } finally {
-        if(options.isOut()) {
-          if(options.getOutFormat().equalsIgnoreCase("jdbc") && !Strings.isNullOrEmpty(destinationDatasourceName)) {
+        if (options.isOut()) {
+          if (options.getOutFormat().equalsIgnoreCase("jdbc") && !Strings.isNullOrEmpty(destinationDatasourceName)) {
             databaseRegistry.unregister(options.getOut(), destinationDatasourceName);
           }
         }
       }
     }
 
-    if(errorCode != SUCCESS) {
+    if (errorCode != SUCCESS) {
       getShell().printf("Copy failed.\n");
       log.info("Copy failed in {}", stopwatch.stop());
     } else {
@@ -204,7 +199,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     sb.append("copy");
 
-    if(options != null) {
+    if (options != null) {
       appendOption(sb, "unit", options.isUnit(), options.getUnit());
       appendOption(sb, "source", options.isSource(), options.getSource());
       appendOption(sb, "destination", options.isDestination(), options.getDestination());
@@ -231,7 +226,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       if (!Strings.isNullOrEmpty(entityIdNames))
         Splitter.on(",").split(entityIdNames).forEach(token -> {
           String[] entry = token.trim().split("=");
-          if (entry.length == 2) entityIdMap.put(entry[0].trim(),entry[1].trim());
+          if (entry.length == 2) entityIdMap.put(entry[0].trim(), entry[1].trim());
         });
     }
     return entityIdMap;
@@ -240,14 +235,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private String getTableNames() {
     List<String> names = Lists.newArrayList();
 
-    if(options.isSource()) {
-      for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
+    if (options.isSource()) {
+      for (ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
         names.add(table.getName());
       }
     }
 
-    if(options.getTables() != null) {
-      for(String name : options.getTables()) {
+    if (options.getTables() != null) {
+      for (String name : options.getTables()) {
         names.add(name);
       }
     }
@@ -268,15 +263,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         ? DatasourceCopier.Builder.newCopier().dontCopyValues()
         : dataExportService.newCopier(destinationDatasource);
 
-    if(options.getNoVariables()) {
+    if (options.getNoVariables()) {
       builder.dontCopyMetadata();
     }
 
-    if(options.isMultiplex()) {
+    if (options.isMultiplex()) {
       builder.withMultiplexingStrategy(new JavascriptMultiplexingStrategy(options.getMultiplex()));
     }
 
-    if(options.isTransform()) {
+    if (options.isTransform()) {
       builder.withVariableTransformer(new JavascriptVariableTransformer(options.getTransform()));
     }
 
@@ -287,7 +282,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   private Datasource getDestinationDatasource() throws IOException {
     Datasource destinationDatasource;
-    if(options.isDestination()) {
+    if (options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
       destinationDatasource = createDestinationDatasource();
@@ -298,18 +293,17 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private Datasource createDestinationDatasource() throws IOException {
     Datasource destinationDatasource;
 
-    if(options.getOutFormat().equalsIgnoreCase("jdbc")) {
+    if (options.getOutFormat().equalsIgnoreCase("jdbc")) {
       Database database = databaseRegistry.getDatabase(options.getOut());
       destinationDatasource = databaseRegistry.createDatasourceFactory(DATE_FORMAT.format(new Date()), database).create();
       destinationDatasourceName = destinationDatasource.getName();
     } else if (opalRuntime.hasServicePlugin(options.getOutFormat())) {
       destinationDatasource = createDestinationPluginDatasource();
-    }
-    else {
+    } else {
       destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
     }
 
-    if(destinationDatasource == null) {
+    if (destinationDatasource == null) {
       throw new IllegalArgumentException("Unknown output datasource type");
     }
 
@@ -366,15 +360,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if (valueTables != null) return valueTables;
     Map<String, ValueTable> tablesByName = Maps.newHashMap();
 
-    if(options.isSource()) {
-      for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
+    if (options.isSource()) {
+      for (ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
         tablesByName.put(table.getDatasource().getName() + "." + table.getName(), table);
       }
     }
 
-    if(options.getTables() != null) {
-      for(String name : options.getTables()) {
-        if(!tablesByName.containsKey(name)) {
+    if (options.getTables() != null) {
+      for (String name : options.getTables()) {
+        if (!tablesByName.containsKey(name)) {
           tablesByName.put(name, MagmaEngineTableResolver.valueOf(name).resolveTable());
         }
       }
@@ -388,20 +382,20 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private void applyNameOption(Map<String, ValueTable> tablesByName) {
-    if(tablesByName.size() == 1 && options.isName()) {
+    if (tablesByName.size() == 1 && options.isName()) {
       String originalName = tablesByName.keySet().iterator().next();
-      if(originalName.equals(options.getDestination() + "." + options.getName()))
+      if (originalName.equals(options.getDestination() + "." + options.getName()))
         throw new IllegalArgumentException("Cannot copy a table into itself: " + originalName);
       tablesByName.put(originalName, new RenameValueTable(options.getName(), tablesByName.get(originalName)));
     }
   }
 
   private void applyQueryOption(Map<String, ValueTable> tablesByName) {
-    if(!options.isQuery()) return;
+    if (!options.isQuery()) return;
 
     // make views with query where clause
     Map<String, View> viewsByName = Maps.newHashMap();
-    for(Map.Entry<String, ValueTable> entry : tablesByName.entrySet()) {
+    for (Map.Entry<String, ValueTable> entry : tablesByName.entrySet()) {
       ValueTable table = entry.getValue();
       QueryWhereClause queryWhereClause = applicationContext.getBean("searchQueryWhereClause", QueryWhereClause.class);
       queryWhereClause.setQuery(options.getQuery());
@@ -412,7 +406,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     // replace original tables by corresponding views
-    for(Map.Entry<String, View> entry : viewsByName.entrySet()) {
+    for (Map.Entry<String, View> entry : viewsByName.entrySet()) {
       tablesByName.put(entry.getKey(), entry.getValue());
     }
   }
@@ -431,7 +425,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateSourceOrTables() {
-    if(!options.isSource() && options.getTables() == null) {
+    if (!options.isSource() && options.getTables() == null) {
       getShell().printf("%s\n", "Neither source nor table name(s) are specified.");
       return false;
     }
@@ -439,7 +433,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateSwitches() {
-    if(options.getNoValues() && options.getNoVariables()) {
+    if (options.getNoValues() && options.getNoVariables()) {
       getShell().printf("Must at least copy variables or values.\n");
       return false;
     }
@@ -447,15 +441,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateTables() {
-    if(options.getTables() != null) {
-      for(String tableName : options.getTables()) {
+    if (options.getTables() != null) {
+      for (String tableName : options.getTables()) {
         MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
         try {
           resolver.resolveTable();
-        } catch(NoSuchDatasourceException e) {
+        } catch (NoSuchDatasourceException e) {
           getShell().printf("'%s' refers to an unknown datasource: '%s'.\n", tableName, resolver.getDatasourceName());
           return false;
-        } catch(NoSuchValueTableException e) {
+        } catch (NoSuchValueTableException e) {
           getShell().printf("Table '%s' does not exist in datasource : '%s'.\n", resolver.getTableName(),
               resolver.getDatasourceName());
           return false;
@@ -466,10 +460,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateSource() {
-    if(options.isSource()) {
+    if (options.isSource()) {
       try {
         getDatasourceByName(options.getSource());
-      } catch(NoSuchDatasourceException e) {
+      } catch (NoSuchDatasourceException e) {
         getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
         return false;
       }
@@ -478,18 +472,18 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateDestination() {
-    if(!options.isDestination() && !options.isOut()) {
+    if (!options.isDestination() && !options.isOut()) {
       getShell().printf("Must provide either the 'destination' option or the 'out' option.\n");
       return false;
     }
-    if(options.isDestination() && options.isOut()) {
+    if (options.isDestination() && options.isOut()) {
       getShell().printf("The 'destination' option and the 'out' option are mutually exclusive.\n");
       return false;
     }
-    if(options.isDestination()) {
+    if (options.isDestination()) {
       try {
         getDatasourceByName(options.getDestination());
-      } catch(NoSuchDatasourceException e) {
+      } catch (NoSuchDatasourceException e) {
         getShell().printf("Destination datasource '%s' does not exist.\n", options.getDestination());
         return false;
       }
@@ -507,7 +501,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     try {
       // Get the file specified on the command line.
       return resolveOutputFileAndCreateParentFolders();
-    } catch(FileSystemException e) {
+    } catch (FileSystemException e) {
       log.error("There was an error accessing the output file", e);
       throw new RuntimeException("There was an error accessing the output file", e);
     }
@@ -525,15 +519,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     // Create the parent directory, if it doesn't already exist.
     FileObject directory = outputFile.getParent();
-    if(directory != null) {
+    if (directory != null) {
       directory.createFolder();
     }
 
-    if(Strings.isNullOrEmpty(outputFile.getName().getExtension())) {
+    if (Strings.isNullOrEmpty(outputFile.getName().getExtension())) {
       outputFile.createFolder();
     }
 
-    if("xls".equals(outputFile.getName().getExtension())) {
+    if ("xls".equals(outputFile.getName().getExtension())) {
       getShell()
           .printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows " +
               "which may not be sufficient for writing large tables.\nUse an 'xlsx' extension to use Excel 2007 format " +
@@ -543,7 +537,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private void appendOption(StringBuilder sb, String option, boolean optionSpecified, String value) {
-    if(optionSpecified) {
+    if (optionSpecified) {
       sb.append(" --");
       sb.append(option);
       sb.append(' ');
@@ -552,14 +546,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private void appendFlag(StringBuilder sb, String flag, boolean value) {
-    if(value) {
+    if (value) {
       sb.append(" --");
       sb.append(flag);
     }
   }
 
   private void appendUnparsedList(StringBuilder sb, Iterable<String> unparsedList) {
-    for(String unparsed : unparsedList) {
+    for (String unparsed : unparsedList) {
       sb.append(' ');
       sb.append(unparsed);
     }
@@ -587,7 +581,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Nullable
     public Datasource createDatasource(FileObject outputFile) throws IOException {
       Datasource ds = internalCreateDatasource(outputFile);
-      if(ds == null && next != null) {
+      if (ds == null && next != null) {
         ds = next.createDatasource(outputFile);
       }
       return ds;
@@ -607,13 +601,13 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   abstract class CsvDatasourceFactory extends FileDatasourceFactory {
 
     protected void addCsvValueTable(CsvDatasource ds, ValueTable table, @Nullable File variablesFile,
-        @Nullable File dataFile) {
+                                    @Nullable File dataFile) {
       ds.addValueTable(table.getName(), variablesFile, dataFile, table.getEntityType());
       ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
     }
 
     protected void createFileIfNotExists(File f) throws IOException {
-      if(!f.exists() && !f.createNewFile()) {
+      if (!f.exists() && !f.createNewFile()) {
         throw new IllegalArgumentException("Unable to create the file: " + f);
       }
     }
@@ -625,7 +619,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Nullable
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
-      if(outputFile.getType() == FileType.FOLDER) {
+      if (outputFile.getType() == FileType.FOLDER) {
         return getMultipleFileCsvDatasource(getLocalFile(outputFile));
       }
       return null;
@@ -636,15 +630,15 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
       ds.setEntityIdName(entityIdName);
-      for(ValueTable table : getValueTables()) {
+      for (ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
-        if(tableDir.exists() || tableDir.mkdir()) {
+        if (tableDir.exists() || tableDir.mkdir()) {
           File variablesFile = null;
           File dataFile = null;
-          if(!options.getNoVariables()) {
+          if (!options.getNoVariables()) {
             createFileIfNotExists(variablesFile = new File(tableDir, CsvDatasource.VARIABLES_FILE));
           }
-          if(!options.getNoValues()) {
+          if (!options.getNoValues()) {
             createFileIfNotExists(dataFile = new File(tableDir, CsvDatasource.DATA_FILE));
           }
           addCsvValueTable(ds, table, variablesFile, dataFile);
@@ -660,7 +654,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
-      if("csv".equals(outputFile.getName().getExtension())) {
+      if ("csv".equals(outputFile.getName().getExtension())) {
         return getSingleFileCsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
       return null;
@@ -673,19 +667,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       ds.setEntityIdName(entityIdName);
       // one table only
       Set<ValueTable> tables = getValueTables();
-      if(tables.size() > 1) {
+      if (tables.size() > 1) {
         throw new IllegalArgumentException(
             "Only one table expected when writing to a CSV file. Provide a directory instead for copying several tables.");
       }
 
-      if(!options.getNoVariables() && !options.getNoValues()) {
+      if (!options.getNoVariables() && !options.getNoValues()) {
         throw new IllegalArgumentException(
             "Writing both variables and values in the same CSV file is not supported. Provide a directory instead.");
       }
-      if(!options.getNoVariables()) {
+      if (!options.getNoVariables()) {
         createFileIfNotExists(csvFile);
         addCsvValueTable(ds, tables.iterator().next(), csvFile, null);
-      } else if(!options.getNoValues()) {
+      } else if (!options.getNoValues()) {
         createFileIfNotExists(csvFile);
         addCsvValueTable(ds, tables.iterator().next(), null, csvFile);
       }
@@ -698,7 +692,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   class ExcelDatasourceFactory extends FileDatasourceFactory {
     @Override
     public Datasource internalCreateDatasource(FileObject outputFile) {
-      if(outputFile.getName().getExtension().startsWith("xls")) {
+      if (outputFile.getName().getExtension().startsWith("xls")) {
         return new ExcelDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
       return null;
@@ -708,7 +702,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   class FsDatasourceFactory extends FileDatasourceFactory {
     @Override
     public Datasource internalCreateDatasource(FileObject outputFile) {
-      if(outputFile.getName().getExtension().startsWith("zip")) {
+      if (outputFile.getName().getExtension().startsWith("zip")) {
         return new FsDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
       return null;
@@ -718,7 +712,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   class NullDatasourceFactory extends FileDatasourceFactory {
     @Override
     public Datasource internalCreateDatasource(FileObject outputFile) {
-      if("/dev/null".equals(outputFile.getName().getPath())) {
+      if ("/dev/null".equals(outputFile.getName().getPath())) {
         return new NullDatasource("/dev/null");
       }
       return null;
@@ -759,46 +753,20 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         RExportDatasource ds = new RExportDatasource(outputFile.getName().getBaseName(), sessionHandler, new RFileSymbolWriter(sessionHandler, outFiles));
         ds.setEntityIdNames(getEntityIdMap());
         return ds;
-        //return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap(), new RCopyBufferStaticSizeProvider(memoryRatio));
       }
       return null;
-    }
-  }
-
-  private class RPluginDatasource extends StaticDatasource {
-
-    private final RSessionHandler sessionHandler;
-
-    private final RSymbolWriter rSymbolWriter;
-
-    RPluginDatasource(@NotNull Datasource wrapped, RSessionHandler rSessionHandler, RSymbolWriter rSymbolWriter) {
-      super(wrapped.getName());
-      this.sessionHandler = rSessionHandler;
-      this.rSymbolWriter = rSymbolWriter;
-    }
-
-    @NotNull
-    @Override
-    public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
-      ValueTableWriter wrapped = super.createWriter(tableName, entityType);
-      return new RSymbolValueTableWriter(this, wrapped, tableName, rSymbolWriter, sessionHandler, txTemplate, getEntityIdMap().getOrDefault(entityType, entityIdName), new RCopyBufferStaticSizeProvider(memoryRatio));
-    }
-
-    @Override
-    public void dispose() {
-      rSymbolWriter.dispose();
     }
   }
 
   private class CopyProgressListener implements DatasourceCopierProgressListener {
 
     private int currentPercentComplete = -1;
-    
+
     private List<String> tablesWithPermission = Lists.newArrayList();
 
     @Override
     public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
-      if(percentComplete != currentPercentComplete) {
+      if (percentComplete != currentPercentComplete) {
         getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
         currentPercentComplete = percentComplete;
       }
