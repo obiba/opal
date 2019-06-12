@@ -90,8 +90,6 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/commands/_export", "POST:GET", args),//
             toRest("/project/{0}/commands/_copy", "POST:GET", args),//
             toRest("/project/{0}/commands/_refresh", "POST:GET", args),//
-            toRest("/project/{0}/report-templates", "GET:GET", args),//
-            toRest("/project/{0}/report-templates", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
             toRest("/project/{0}/state", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),
