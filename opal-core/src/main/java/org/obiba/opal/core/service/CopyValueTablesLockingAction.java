@@ -133,7 +133,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
               }
             }) //
             .withProgressListener(progressListener) //
-            .withCopier(newCopierForIdentifiers()) //
+            .withCopier(newCopier()) //
             .from(tableToCopy) //
             .to(destination).build() //
             .copy();
@@ -160,6 +160,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     }
 
     private ValueTable importUnitIdentifiers(ValueTable table) throws IOException {
+      log.info("Preparing identifiers for mapping [{}]", idMapping);
       identifiersTableService.ensureIdentifiersMapping(new IdentifiersMapping(idMapping, table.getEntityType()));
 
       View privateView = identifierService.createPrivateView(idMapping, table,
@@ -170,14 +171,17 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       Initialisables.initialise(identifiersMappingView);
       PrivateVariableEntityMap entityMap = identifiersMappingView.getPrivateVariableEntityMap();
 
-      // prepare for copying participant data
-      try (ValueTableWriter keysTableWriter = identifiersTableService
-          .createIdentifiersTableWriter(table.getEntityType())) {
-        DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
-            keysTableWriter);
-        // Copy participant's non-identifiable variables and data
-        DatasourceCopier datasourceCopier = newCopierForIdentifiers().withListener(keysListener).build();
-        datasourceCopier.copy(identifiersMappingView, destination);
+      if (allowIdentifierGeneration) {
+        log.info("Saving generated identifiers");
+        // prepare for copying identifiers mapping
+        try (ValueTableWriter keysTableWriter = identifiersTableService
+            .createIdentifiersTableWriter(table.getEntityType())) {
+          DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
+              keysTableWriter);
+          // Copy participant's non-identifiable variables and data
+          DatasourceCopier datasourceCopier = newCopier().withListener(keysListener).build();
+          datasourceCopier.copy(identifiersMappingView, destination);
+        }
       }
       return identifiersMappingView;
     }
@@ -203,7 +207,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       };
     }
 
-    private DatasourceCopier.Builder newCopierForIdentifiers() {
+    private DatasourceCopier.Builder newCopier() {
       return DatasourceCopier.Builder.newCopier() //
           .withLoggingListener() //
           .withThroughtputListener();
