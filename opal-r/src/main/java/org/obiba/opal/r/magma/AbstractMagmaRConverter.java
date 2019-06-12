@@ -11,11 +11,17 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
-import org.obiba.magma.*;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.js.views.JavascriptClause;
+import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.support.MagmaEngineReferenceResolver;
+import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
-import org.rosuda.REngine.REXP;
-
-import java.util.List;
+import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 
 /**
  * Base implementation of Magma vector providers.
@@ -28,14 +34,16 @@ abstract class AbstractMagmaRConverter implements MagmaRConverter {
     this.magmaAssignROperation = magmaAssignROperation;
   }
 
-  REXP getVector(VariableValueSource vvs, List<VariableEntity> entities, boolean withMissings) {
-    VectorType vt = VectorTypeRegistry.forValueType(vvs.getValueType());
-    return vt.asVector(vvs, entities, withMissings);
+  protected String getSymbol() {
+    return magmaAssignROperation.getSymbol();
   }
 
-  REXP getVector(Variable variable, List<Value> values, List<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
-    VectorType vt = VectorTypeRegistry.forValueType(variable.getValueType());
-    return vt.asVector(variable, values, entities, withMissings, withFactors, withLabelled);
+  protected boolean withIdColumn() {
+    return magmaAssignROperation.withIdColumn();
+  }
+
+  protected String getIdColumnName() {
+    return magmaAssignROperation.getIdColumnName();
   }
 
   ValueTable applyIdentifiersMapping(ValueTable table) {
@@ -49,5 +57,32 @@ abstract class AbstractMagmaRConverter implements MagmaRConverter {
           magmaAssignROperation.getIdentifiersTableService());
     }
     return table;
+  }
+
+  ValueTable applyVariableFilter(ValueTable table, String varName) {
+    ValueTable filteredTable = table;
+    if (!Strings.isNullOrEmpty(varName)) {
+      View view = new View(table.getName(), table);
+      view.setSelectClause(variable -> variable.getName().equals(varName));
+      Initialisables.initialise(view);
+      filteredTable = view;
+    } else if (magmaAssignROperation.hasVariableFilter()) {
+      View view = new View(table.getName(), table);
+      view.setSelectClause(new JavascriptClause(magmaAssignROperation.getVariableFilter()));
+      Initialisables.initialise(view);
+      filteredTable = view;
+    }
+    return filteredTable;
+  }
+
+  ValueTable resolvePath(String path) {
+    MagmaEngineReferenceResolver resolver = path.contains(":") ?
+        MagmaEngineVariableResolver.valueOf(path) : MagmaEngineTableResolver.valueOf(path);
+
+    if (resolver.getDatasourceName() == null)
+      throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
+    Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
+    ValueTable table = applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()));
+    return applyVariableFilter(table, resolver.getVariableName());
   }
 }

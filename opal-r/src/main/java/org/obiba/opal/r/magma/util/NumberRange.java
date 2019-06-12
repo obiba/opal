@@ -52,6 +52,14 @@ public abstract class NumberRange {
     return !naRange.isEmpty();
   }
 
+  public Number getRangeMin() {
+    return hasRange() ? naRange.get(0) : null;
+  }
+
+  public Number getRangeMax() {
+    return hasRange() ? naRange.get(naRange.size() - 1) : null;
+  }
+
   protected abstract Number makeNumber(String valStr);
 
   @Override

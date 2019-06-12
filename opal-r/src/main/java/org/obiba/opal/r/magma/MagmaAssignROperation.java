@@ -11,9 +11,11 @@ package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
@@ -29,6 +31,9 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   @NotNull
   private final IdentifiersTableService identifiersTableService;
+
+  @NotNull
+  private final DataExportService dataExportService;
 
   @NotNull
   private final TransactionTemplate transactionTemplate;
@@ -54,7 +59,6 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final RClass rClass;
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate, String idColumnName) {
-    if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     this.symbol = symbol;
     this.path = "";
     this.valueTable = valueTable;
@@ -62,6 +66,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.withMissings = true;
     this.identifiersMapping = "";
     this.identifiersTableService = null;
+    this.dataExportService = null;
     this.idColumnName = idColumnName;
     this.updatedColumnName = "";
     this.transactionTemplate = txTemplate;
@@ -70,11 +75,9 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
                                boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping, RClass rClass,
-                               @NotNull IdentifiersTableService identifiersTableService, @NotNull TransactionTemplate transactionTemplate) {
-    if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
-    if (path == null) throw new IllegalArgumentException("path cannot be null");
-    if (!Strings.isNullOrEmpty(identifiersMapping) && identifiersTableService == null)
-      throw new IllegalArgumentException("identifiers table service cannot be null");
+                               @NotNull IdentifiersTableService identifiersTableService,
+                               @NotNull DataExportService dataExportService,
+                               @NotNull TransactionTemplate transactionTemplate) {
     this.symbol = symbol;
     this.path = path;
     this.valueTable = null;
@@ -84,6 +87,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.idColumnName = idColumnName;
     this.updatedColumnName = updatedColumnName;
     this.identifiersTableService = identifiersTableService;
+    this.dataExportService = dataExportService;
     this.transactionTemplate = transactionTemplate;
     this.rClass = path.contains(":") ? RClass.VECTOR : RClass.VECTOR.equals(rClass) ? RClass.DATA_FRAME : rClass;
   }
@@ -93,16 +97,18 @@ public class MagmaAssignROperation extends AbstractROperation {
     MagmaRConverter converter;
     switch (rClass) {
       case VECTOR:
-        converter = new VariableRConverter(this);
-        break;
       case DATA_FRAME:
-        converter = new ValueTableRDataFrameConverter(this);
+        converter = new ValueTableDataFrameRConverter(this);
         break;
       default:
-        converter = new ValueTableRTibbleConverter(this);
+        converter = new ValueTableTibbleRConverter(this);
     }
 
     converter.doAssign(symbol, path);
+  }
+
+  RConnection getRConnection() {
+    return getConnection();
   }
 
   void doAssign(String sym, REXP ct) {
@@ -119,6 +125,10 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   IdentifiersTableService getIdentifiersTableService() {
     return identifiersTableService;
+  }
+
+  DataExportService getDataExportService() {
+    return this.dataExportService;
   }
 
   TransactionTemplate getTransactionTemplate() {
@@ -138,7 +148,8 @@ public class MagmaAssignROperation extends AbstractROperation {
   }
 
   String getIdColumnName() {
-    return idColumnName;
+    // we need one for tibble assignment and will be removed in the case of a data frame
+    return withIdColumn() ? idColumnName : ".id";
   }
 
   boolean withIdColumn() {
@@ -159,6 +170,10 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   String getIdentifiersMapping() {
     return identifiersMapping;
+  }
+
+  boolean hasVariableFilter() {
+    return !Strings.isNullOrEmpty(variableFilter);
   }
 
   String getVariableFilter() {
