@@ -39,13 +39,13 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   private IdentifiersTableService identifiersTableService;
 
   @Autowired
-  private IdentifierGenerator participantIdentifier;
+  private IdentifierGenerator identifierGenerator;
 
   @Override
   public DatasourceFactory parse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     DatasourceFactory factory = internalParse(dto, encryptionStrategy);
     // apply wrappers
-    factory = applyIdentifiersMapping(dto, factory);
+    //factory = applyIdentifiersMapping(dto, factory);
     factory = applyIncremental(dto, factory);
     factory = applyBatch(dto, factory);
 
@@ -63,7 +63,7 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
     }
 
     return new IdentifiersMappingDatasourceFactory(factory, idMapping, identifiersTableService,
-        idConfig.getAllowIdentifierGeneration() ? participantIdentifier : null,
+        idConfig.getAllowIdentifierGeneration() ? identifierGenerator : null,
         idConfig.getIgnoreUnknownIdentifier());
   }
 
