@@ -32,6 +32,7 @@ public interface DataImportService {
    *
    * @param sourceDatasourceName name of the source datasource
    * @param destinationDatasourceName name of the destination datasource
+   * @param idMapping
    * @param allowIdentifierGeneration unknown participant will be created at importation time
    * @param ignoreUnknownIdentifier
    * @param progressListener
@@ -41,7 +42,7 @@ public interface DataImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  void importData(String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration,
+  void importData(String sourceDatasourceName, String destinationDatasourceName, String idMapping, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
@@ -51,6 +52,7 @@ public interface DataImportService {
    *
    * @param sourceTableNames
    * @param destinationDatasourceName
+   * @param idMapping
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
    * @param progressListener
@@ -59,7 +61,7 @@ public interface DataImportService {
    * @throws IOException
    * @throws InterruptedException
    */
-  void importData(List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration,
+  void importData(List<String> sourceTableNames, String destinationDatasourceName, String idMapping, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
@@ -69,12 +71,13 @@ public interface DataImportService {
    *
    * @param sourceValueTables
    * @param destinationDatasourceName
+   * @param idMapping
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
    * @param progressListener
    */
   void importData(Set<ValueTable> sourceValueTables, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+      String idMapping, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
       @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 

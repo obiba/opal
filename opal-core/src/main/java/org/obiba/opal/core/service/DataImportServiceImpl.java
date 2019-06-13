@@ -23,6 +23,7 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,12 @@ public class DataImportServiceImpl implements DataImportService {
   @Autowired
   private IdentifierService identifierService;
 
+  @Autowired
+  private IdentifierGenerator identifierGenerator;
+
   @Override
   public void importData(@NotNull String sourceDatasourceName, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+                         String idMapping, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
       DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
       InterruptedException {
@@ -59,7 +63,7 @@ public class DataImportServiceImpl implements DataImportService {
 
     Datasource sourceDatasource = getDatasourceOrTransientDatasource(sourceDatasourceName);
     try {
-      importData(sourceDatasource.getValueTables(), destinationDatasourceName, allowIdentifierGeneration,
+      importData(sourceDatasource.getValueTables(), destinationDatasourceName, idMapping, allowIdentifierGeneration,
           ignoreUnknownIdentifier, progressListener);
     } finally {
       MagmaEngine.get().removeTransientDatasource(sourceDatasource.getName());
@@ -68,7 +72,7 @@ public class DataImportServiceImpl implements DataImportService {
 
   @Override
   public void importData(@NotNull List<String> sourceTableNames, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+                         String idMapping, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
       DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException {
@@ -83,7 +87,7 @@ public class DataImportServiceImpl implements DataImportService {
     }
     Set<ValueTable> sourceTables = builder.build();
     try {
-      importData(sourceTables, destinationDatasourceName, allowIdentifierGeneration, ignoreUnknownIdentifier,
+      importData(sourceTables, destinationDatasourceName, idMapping, allowIdentifierGeneration, ignoreUnknownIdentifier,
           progressListener);
     } finally {
       for(ValueTable table : sourceTables) {
@@ -94,14 +98,14 @@ public class DataImportServiceImpl implements DataImportService {
 
   @Override
   public void importData(Set<ValueTable> sourceTables, @NotNull String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+      String idMapping, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
       DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NonExistentVariableEntitiesException, IOException,
       InterruptedException {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
 
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-    copyValueTables(sourceTables, destinationDatasource, allowIdentifierGeneration, ignoreUnknownIdentifier,
+    copyValueTables(sourceTables, destinationDatasource, idMapping, allowIdentifierGeneration, ignoreUnknownIdentifier,
         progressListener);
   }
 
@@ -125,12 +129,12 @@ public class DataImportServiceImpl implements DataImportService {
    * @throws InterruptedException
    */
   @SuppressWarnings("ChainOfInstanceofChecks")
-  private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, boolean allowIdentifierGeneration,
+  private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, String idMapping, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier, DatasourceCopierProgressListener progressListener)
       throws IOException, InterruptedException {
     try {
-      new CopyValueTablesLockingAction(identifiersTableService, identifierService, txTemplate, sourceTables,
-          destination, allowIdentifierGeneration, ignoreUnknownIdentifier, progressListener).execute();
+      new CopyValueTablesLockingAction(identifiersTableService, identifierService, identifierGenerator, txTemplate, sourceTables,
+          destination, idMapping, allowIdentifierGeneration, ignoreUnknownIdentifier, progressListener).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof IOException) {
         throw (IOException) ex.getCause();
@@ -141,5 +145,8 @@ public class DataImportServiceImpl implements DataImportService {
       throw new RuntimeException(ex.getCause());
     }
   }
+
+
+
 
 }

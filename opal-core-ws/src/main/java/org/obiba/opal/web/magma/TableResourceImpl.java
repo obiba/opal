@@ -139,7 +139,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
         dataImportService
-            .importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds, null);
+            .importData(ds.getValueTables(), vt.getDatasource().getName(), unitName, generateIds, ignoreUnknownIds, null);
       }
     } catch (NoSuchIdentifiersMappingException ex) {
       return Response.status(BAD_REQUEST)
