@@ -10,10 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.*;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -330,7 +327,7 @@ public class DataShieldPackageAdministrationPresenter
             public void onResource(Response response, DataShieldPackageMethodsDto resource) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if(response.getStatusCode() == Response.SC_OK) {
-                fireEvent(new DataShieldMethodUpdatedEvent());
+                fireEvent(new DataShieldPackageUpdatedEvent(dto));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }

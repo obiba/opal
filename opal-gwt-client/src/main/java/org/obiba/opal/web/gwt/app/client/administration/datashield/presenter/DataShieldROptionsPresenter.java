@@ -10,16 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -28,6 +18,16 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
+
+import java.util.List;
 
 public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROptionsPresenter.Display>
     implements DataShieldROptionsUiHandlers {
@@ -42,7 +42,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Inject
   public DataShieldROptionsPresenter(Display display, EventBus eventBus,
-      ModalProvider<DataShieldROptionModalPresenter> provider) {
+                                     ModalProvider<DataShieldROptionModalPresenter> provider) {
     super(eventBus, display);
     modalProvider = provider.setContainer(this);
     getView().setUiHandlers(this);
@@ -55,6 +55,13 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
+            refresh();
+          }
+        });
+    addHandler(DataShieldPackageUpdatedEvent.getType(),
+        new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
+          @Override
+          public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
             refresh();
           }
         });

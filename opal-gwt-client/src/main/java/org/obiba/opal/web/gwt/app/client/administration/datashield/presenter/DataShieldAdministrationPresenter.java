@@ -24,6 +24,7 @@ import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -84,7 +85,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         }
       }
     });
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
     registerHandler(getView().addMethodHandler(new ClickHandler() {
 
       @Override
@@ -94,15 +95,15 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         presenter.createNewMethod();
       }
     }));
-    registerHandler(getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(),
+    addHandler(DataShieldMethodCreatedEvent.getType(),
         new DataShieldMethodCreatedEvent.DataShieldMethodCreatedHandler() {
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
             updateDataShieldMethods();
           }
-        }));
-    registerHandler(getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(),
+        });
+    addHandler(DataShieldMethodUpdatedEvent.getType(),
         new DataShieldMethodUpdatedEvent.DataShieldMethodUpdatedHandler() {
 
           @Override
@@ -110,14 +111,21 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
             updateDataShieldMethods();
           }
 
-        }));
-    registerHandler(getEventBus().addHandler(DataShieldPackageRemovedEvent.getType(),
+        });
+    addHandler(DataShieldPackageRemovedEvent.getType(),
         new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
             updateDataShieldMethods();
           }
-        }));
+        });
+    addHandler(DataShieldPackageUpdatedEvent.getType(),
+        new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
+          @Override
+          public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
+            updateDataShieldMethods();
+          }
+        });
   }
 
   @Override
