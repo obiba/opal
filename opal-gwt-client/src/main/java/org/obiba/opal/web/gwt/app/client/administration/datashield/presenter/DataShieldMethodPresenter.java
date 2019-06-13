@@ -9,9 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -28,14 +33,8 @@ import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMethodPresenter.Display>
     implements DataShieldMethodUiHandlers {
@@ -62,9 +61,9 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
 
   @Override
   public void save() {
-    if(dialogMode == Mode.CREATE) {
+    if (dialogMode == Mode.CREATE) {
       createMethod();
-    } else if(dialogMode == Mode.UPDATE) {
+    } else if (dialogMode == Mode.UPDATE) {
       updateMethod();
     }
   }
@@ -121,7 +120,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
   private void displayMethod(String name, DataShieldMethodDto dto) {
     getView().setName(name);
     MethodType type;
-    if(dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
+    if (dto.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method) != null) {
       type = MethodType.RSCRIPT;
       getView().setScript(((RScriptDataShieldMethodDto) dto
           .getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript());
@@ -142,13 +141,13 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
   }
 
   private void updateMethod() {
-    if(methodValidationHandler.validate()) {
+    if (methodValidationHandler.validate()) {
       putMethod(getDataShieldMethodDto());
     }
   }
 
   private void createMethod() {
-    if(methodValidationHandler.validate()) {
+    if (methodValidationHandler.validate()) {
       ResourceRequestBuilderFactory.<DataShieldMethodDto>newBuilder().forResource(method(getView().getName().getText()))
           .get()//
           .withCallback(new AlreadyExistMethodCallBack())//
@@ -176,7 +175,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     DataShieldMethodDto dto = DataShieldMethodDto.create();
     dto.setName(getView().getName().getText());
 
-    if(getView().isScript().getValue()) {
+    if (getView().isScript().getValue()) {
       RScriptDataShieldMethodDto method = RScriptDataShieldMethodDto.create();
       method.setScript(getView().getScript().getText());
       dto.setExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method, method);
@@ -203,7 +202,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
+      if (validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getName(), "DataShieldMethodNameIsRequired"));
         validators.add(new ConditionalValidator(getView().isScript(),
@@ -245,9 +244,9 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
+      if (response.getStatusCode() == Response.SC_OK) {
         getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
-      } else if(response.getStatusCode() == Response.SC_CREATED) {
+      } else if (response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
       }
     }

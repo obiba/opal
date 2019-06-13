@@ -10,6 +10,17 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
@@ -23,28 +34,12 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 import java.util.List;
 
@@ -63,7 +58,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus,
-      ModalProvider<DataShieldMethodPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
+                                           ModalProvider<DataShieldMethodPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.datashieldModalProvider = datashieldModalProvider.setContainer(this);
@@ -84,7 +79,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
     getView().getDataShieldMethodActionsColumn().setActionHandler(new ActionHandler<DataShieldMethodDto>() {
       @Override
       public void doAction(DataShieldMethodDto dto, String actionName) {
-        if(actionName != null) {
+        if (actionName != null) {
           doDataShieldMethodActionImpl(dto, actionName);
         }
       }
@@ -95,7 +90,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
       @Override
       public void onClick(ClickEvent event) {
         DataShieldMethodPresenter presenter = datashieldModalProvider.get();
-        if(!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
+        if (!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
         presenter.createNewMethod();
       }
     }));
@@ -186,17 +181,18 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   protected void doDataShieldMethodActionImpl(final DataShieldMethodDto dto, String actionName) {
-    if(actionName.equals(EDIT_ACTION)) {
+    if (actionName.equals(EDIT_ACTION)) {
       authorizeEditMethod(dto, new Authorizer(getEventBus()) {
 
         @Override
         public void authorized() {
           DataShieldMethodPresenter presenter = datashieldModalProvider.get();
+          presenter.setEnvironement(env);
           presenter.updateMethod(dto);
         }
       });
 
-    } else if(actionName.equals(REMOVE_ACTION)) {
+    } else if (actionName.equals(REMOVE_ACTION)) {
       authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
         @Override
         public void authorized() {
@@ -206,7 +202,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
               deleteDataShieldMethod(dto);
             }
           };
-          if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+          if (DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
             getEventBus().fireEvent(ConfirmationRequiredEvent
                 .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAssignMethod(),
                     translationMessages.confirmDeleteDataShieldAssignMethod()));
@@ -228,7 +224,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
       @Override
       public void onResponseCode(Request request, Response response) {
         fireEvent(ConfirmationTerminatedEvent.create());
-        if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
+        if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
           updateDataShieldMethods();
         } else {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error("Failed removing aggregating method.").build());
@@ -271,7 +267,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) &&
+      if (removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) &&
           event.isConfirmed()) {
         removeMethodConfirmation.run();
         removeMethodConfirmation = null;
