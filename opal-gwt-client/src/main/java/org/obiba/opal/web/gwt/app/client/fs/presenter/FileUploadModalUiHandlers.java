@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
+import java.util.List;
+
 public interface FileUploadModalUiHandlers extends ModalUiHandlers {
 
-  void uploadFile(String filename);
+  void uploadFiles(List<String> filenames);
 
   void submit();
 }

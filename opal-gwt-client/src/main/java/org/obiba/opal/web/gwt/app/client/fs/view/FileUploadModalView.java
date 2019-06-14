@@ -9,29 +9,33 @@
  */
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.FileUpload;
+import com.github.gwtbootstrap.client.ui.Form;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.google.common.collect.Lists;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import elemental.html.File;
+import elemental.html.FileList;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.FileUpload;
-import com.github.gwtbootstrap.client.ui.Form;
-import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
+import java.util.List;
 
 public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUploadModalUiHandlers> implements Display {
 
-  interface Binder extends UiBinder<Widget, FileUploadModalView> {}
+  interface Binder extends UiBinder<Widget, FileUploadModalView> {
+  }
 
   @UiField
   Modal dialog;
@@ -62,6 +66,7 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.uploadFileModalTitle());
+    fileToUpload.getElement().setAttribute("multiple", "multiple");
   }
 
   @Override
@@ -83,8 +88,15 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
 
   @UiHandler("uploadButton")
   public void onUploadButton(ClickEvent event) {
-    String filename = fileToUpload.getFilename();
-    getUiHandlers().uploadFile(filename);
+    List<String> filenames = Lists.newArrayList();
+    FileList files = (FileList) fileToUpload.getElement().getPropertyObject("files");
+    if (files.getLength() > 0) {
+      for (int i = 0; i < files.getLength(); i++) {
+        File file = files.item(i);
+        filenames.add(file.getName());
+      }
+    }
+    getUiHandlers().uploadFiles(filenames);
   }
 
   @UiHandler("form")

@@ -20,7 +20,7 @@
     <g:FlowPanel ui:field="inputFieldPanel">
       <b:ControlGroup>
         <b:ControlLabel>
-          <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
+          <ui:msg description="Select the file to upload label">Select or drop the files to be uploaded in directory:</ui:msg>
         </b:ControlLabel>
         <b:Controls>
           <b2:InlineLabel ui:field="remoteFolderName" addStyleNames="help-block"/>
@@ -29,7 +29,7 @@
       <b:ControlGroup>
         <b:Controls>
           <b:Form type="INLINE" encoding="multipart/form-data" method="POST" ui:field="form">
-            <b:FileUpload name="fileToUpload" ui:field="fileToUpload"/>
+            <b:FileUpload name="fileToUpload[]" ui:field="fileToUpload"/>
           </b:Form>
         </b:Controls>
       </b:ControlGroup>

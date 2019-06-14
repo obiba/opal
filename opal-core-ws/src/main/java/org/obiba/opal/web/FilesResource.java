@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -57,9 +58,11 @@ import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.Selectors;
+import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -332,41 +335,45 @@ public class FilesResource {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
 
-    FileItem uploadedFile = getUploadedFile(request);
-    if(uploadedFile == null) {
+    List<FileItem> uploadedFiles = getUploadedFiles(request);
+    if(uploadedFiles.isEmpty()) {
       return Response.status(Status.BAD_REQUEST)
           .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
           .build();
     }
 
-    return doUploadFile(folderPath, folder, uploadedFile, uriInfo);
+    return doUploadFiles(folderPath, folder, uploadedFiles, uriInfo);
   }
 
-  private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile, UriInfo uriInfo)
+  private Response doUploadFiles(String folderPath, FileObject folder, List<FileItem> uploadedFiles, UriInfo uriInfo)
       throws FileSystemException {
-    String fileName = uploadedFile.getName();
-    // #3275 make sure file name is valid
-    if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
-      return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
 
-    // #3275 make sure parent folder of the written file is the provided destination folder
-    FileObject file = folder.resolveFile(fileName);
-    if (!file.getParent().getURL().equals(folder.getURL()))
-      return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
+    for (FileItem uploadedFile : uploadedFiles) {
+      String fileName = uploadedFile.getName();
+      // #3275 make sure file name is valid
+      if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
+        return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
 
-    boolean overwrite = file.exists();
-    writeUploadedFileToFileSystem(uploadedFile, file);
+      // #3275 make sure parent folder of the written file is the provided destination folder
+      FileObject file = folder.resolveFile(fileName);
+      if (!file.getParent().getURL().equals(folder.getURL()))
+        return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
 
-    log.info("The following file was uploaded to Opal file system : {}", file.getURL());
+      boolean overwrite = file.exists();
+      writeUploadedFileToFileSystem(uploadedFile, file);
 
-    if(overwrite) {
-      return Response.ok().build();
+      log.info("The following file was uploaded to Opal file system : {}", file.getURL());
+
+      if (!overwrite) {
+        URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
+        OpalPermissions perms = new OpalPermissions(fileUri, AclAction.FILES_ALL);
+        subjectAclService.addSubjectPermission(perms.getDomain(), perms.getNode(),
+            SubjectAcl.SubjectType.USER.subjectFor(SecurityUtils.getSubject().getPrincipal().toString()),
+            AclAction.FILES_ALL.name());
+      }
     }
-    URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
-    return Response.created(fileUri)//
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
-        .entity("<html><body>OK</body></html>")//
-        .build();
+
+    return Response.ok().build();
   }
 
   @POST
@@ -636,16 +643,16 @@ public class FilesResource {
    * @return
    * @throws FileUploadException
    */
-  FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
+  List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
+    List<FileItem> files = Lists.newArrayList();
     for(FileItem fileItem : upload.parseRequest(request)) {
       if(!fileItem.isFormField()) {
-        return fileItem;
+        files.add(fileItem);
       }
     }
-
-    return null;
+    return files;
   }
 
   private void writeUploadedFileToFileSystem(FileItem uploadedFile, FileObject fileToWriteTo) {

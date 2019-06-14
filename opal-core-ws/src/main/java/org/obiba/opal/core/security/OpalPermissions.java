@@ -10,6 +10,8 @@
 package org.obiba.opal.core.security;
 
 import java.net.URI;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -32,14 +34,8 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   public OpalPermissions(URI uri, Iterable<AclAction> actions) {
     this.uri = uri;
-    perms = Iterables.transform(actions, new Function<AclAction, String>() {
-
-      @Override
-      public String apply(AclAction input) {
-        return input.toString();
-      }
-
-    });
+    perms = StreamSupport.stream(actions.spliterator(), false)
+        .map(Enum::name).collect(Collectors.toList());
   }
 
   @Override

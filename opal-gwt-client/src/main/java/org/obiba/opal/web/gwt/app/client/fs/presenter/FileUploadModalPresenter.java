@@ -9,6 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -21,11 +28,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
+import java.util.List;
 
 public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadModalPresenter.Display>
     implements FileUploadModalUiHandlers {
@@ -42,7 +45,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   @Inject
   public FileUploadModalPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder,
-      Translations translations, TranslationMessages translationMessages) {
+                                  Translations translations, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translations = translations;
     this.urlBuilder = urlBuilder;
@@ -62,23 +65,32 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
   }
 
   @Override
-  public void uploadFile(String fileName) {
+  public void uploadFiles(List<String> fileNames) {
 
     actionRequiringConfirmation = new Runnable() {
       @Override
       public void run() {
-        submitFile();
+        submitFiles();
       }
     };
 
-    if("".equals(fileName)) {
+    if (fileNames.isEmpty()) {
       fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
-    } else if(fileExist(fileName)) {
-      fireEvent(ConfirmationRequiredEvent
-          .createWithMessages(actionRequiringConfirmation, translationMessages.replaceExistingFile(),
-              translationMessages.confirmReplaceExistingFile()));
     } else {
-      submitFile();
+      List<String> existingFileNames = Lists.newArrayList();
+      for (String fileName : fileNames) {
+        if (fileExist(fileName))
+          existingFileNames.add(fileName);
+      }
+
+      if (!existingFileNames.isEmpty()) {
+        String names = Joiner.on(", ").join(existingFileNames);
+        fireEvent(ConfirmationRequiredEvent
+            .createWithMessages(actionRequiringConfirmation, translationMessages.replaceExistingFile(),
+                translationMessages.confirmReplaceExistingFile(names)));
+      } else {
+        submitFiles();
+      }
     }
   }
 
@@ -94,7 +106,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
   }
 
   private void showRemoteFolderName() {
-    if(currentFolder != null) {
+    if (currentFolder != null) {
       getView().setRemoteFolderName(currentFolder.getPath());
     }
   }
@@ -108,7 +120,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+      if (actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;
@@ -117,18 +129,18 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
   }
 
   private boolean fileExist(String fileName) {
-    if(currentFolder == null) return false;
+    if (currentFolder == null) return false;
 
     // OPAL-1075 Chrome prefixes the file name with C:\fakepath\
     int sep = fileName.lastIndexOf("\\");
     String name = fileName;
-    if(sep != -1) {
+    if (sep != -1) {
       name = fileName.substring(sep + 1);
     }
     JsArray<FileDto> filesInCurrentDirectory = currentFolder.getChildrenArray();
-    if(filesInCurrentDirectory != null) {
-      for(int i = 0; i < filesInCurrentDirectory.length(); i++) {
-        if(name.equals(filesInCurrentDirectory.get(i).getName())) {
+    if (filesInCurrentDirectory != null) {
+      for (int i = 0; i < filesInCurrentDirectory.length(); i++) {
+        if (name.equals(filesInCurrentDirectory.get(i).getName())) {
           return true;
         }
       }
@@ -137,7 +149,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
     return false;
   }
 
-  private void submitFile() {
+  private void submitFiles() {
     getView().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
     fireEvent(ConfirmationTerminatedEvent.create());
   }
