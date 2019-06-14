@@ -312,10 +312,10 @@ public interface TranslationMessages extends Messages {
   String confirmRemoveRWorkspace();
 
   @Description(
-      "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file message")
+      "Confirm file replacement")
   @DefaultMessage(
-      "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file")
-  String confirmReplaceExistingFile();
+      "Some file that you are uploading already exist in the file system: {0}.<br/><br/>Please confirm that you want to replace the existing files.")
+  String confirmReplaceExistingFile(String names);
 
   @Description("The file(s) will be removed from the file system. Please confirm message.")
   @DefaultMessage("The file(s) will be removed from the file system. Please confirm.")

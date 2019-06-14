@@ -126,6 +126,8 @@
 
   <!-- GWT Drag-n-Drop -->
   <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
+  
+  <inherits name="elemental.Elemental"/>
 
   <extend-property name='locale' values='fr'/>
   <extend-property name='locale' values='en'/>

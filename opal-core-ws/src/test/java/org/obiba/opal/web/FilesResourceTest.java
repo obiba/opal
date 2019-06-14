@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs2.FileContent;
@@ -278,8 +279,8 @@ public class FilesResourceTest {
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
-        return fileItemMock;
+      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+        return Lists.newArrayList(fileItemMock);
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
@@ -312,8 +313,8 @@ public class FilesResourceTest {
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
-        return null;
+      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+        return Lists.newArrayList();
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
@@ -333,8 +334,8 @@ public class FilesResourceTest {
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
-        return fileItemMock;
+      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+        return Lists.newArrayList(fileItemMock);
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
