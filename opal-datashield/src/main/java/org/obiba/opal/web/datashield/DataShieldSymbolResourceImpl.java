@@ -15,9 +15,11 @@ import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
+import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,9 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   @Autowired
   private Supplier<DatashieldConfiguration> configSupplier;
+
+  @Value("#{new Boolean('${org.obiba.opal.datashield.useTibble}')}")
+  private boolean useTibble;
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
@@ -81,5 +86,21 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
+  }
+
+  /**
+   * Transitional Datashield set up from using data frames to tibbles.
+   *
+   * @param path
+   * @param rClass
+   * @return
+   */
+  @Override
+  protected MagmaAssignROperation.RClass getRClassToApply(String path, String rClass) {
+    MagmaAssignROperation.RClass rClassToApply = super.getRClassToApply(path, rClass);
+    if (useTibble && rClassToApply.equals(MagmaAssignROperation.RClass.DATA_FRAME)) {
+      rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
+    }
+    return rClassToApply;
   }
 }

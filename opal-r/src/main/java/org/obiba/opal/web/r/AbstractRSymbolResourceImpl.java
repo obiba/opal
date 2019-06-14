@@ -120,6 +120,17 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   Response assignMagmaSymbol(UriInfo uri, String path, String variableFilter, Boolean withMissings,
                              String idName, String updatedName, String identifiersMapping, String rClass,
                              boolean async) {
+    MagmaAssignROperation.RClass rClassToApply = getRClassToApply(path, rClass);
+    return assignSymbol(uri,
+        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
+            rClassToApply, identifiersTableService, dataExportService, transactionTemplate), async);
+  }
+
+  protected URI getSymbolURI(UriInfo info) {
+    return info.getRequestUri();
+  }
+
+  protected MagmaAssignROperation.RClass getRClassToApply(String path, String rClass) {
     MagmaAssignROperation.RClass rClassToApply;
     if (path.contains(":"))
       rClassToApply = MagmaAssignROperation.RClass.VECTOR;
@@ -134,13 +145,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
         rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
       }
     }
-    return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
-            rClassToApply, identifiersTableService, dataExportService, transactionTemplate), async);
-  }
-
-  protected URI getSymbolURI(UriInfo info) {
-    return info.getRequestUri();
+    return rClassToApply;
   }
 
 }
