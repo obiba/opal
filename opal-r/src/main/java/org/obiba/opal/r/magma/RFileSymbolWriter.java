@@ -13,6 +13,7 @@ package org.obiba.opal.r.magma;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.r.DataSaveROperation;
 import org.obiba.opal.spi.r.FileReadROperation;
+import org.obiba.opal.spi.r.FolderReadROperation;
 import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
@@ -45,7 +46,7 @@ public class RFileSymbolWriter implements RSymbolWriter {
     // save tibble in file in R
     rSessionHandler.getSession().execute(new DataSaveROperation(getSymbol(table), destination.getName()));
     // read back file from R to opal
-    rSessionHandler.getSession().execute(new FileReadROperation(destination.getName(), destination));
+    rSessionHandler.getSession().execute(new FolderReadROperation(destination.getParentFile()));
   }
 
   @Override
