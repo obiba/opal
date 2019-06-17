@@ -354,9 +354,9 @@ public class RAssignDatasource extends CsvDatasource {
         attributesList.add(String.format("labels = c(%s)",
             Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories()))));
       }
-      if (!attributesList.isEmpty())
-        attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
-            getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
+      attributesList.add(String.format("'opal.value_type' = '%s'", variable.getValueType().getName()));
+      attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
+          getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
     }
 
     private List<String> getLabelledCategories(Variable variable, Collection<Category> categories) {
