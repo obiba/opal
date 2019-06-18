@@ -75,7 +75,7 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
                 overrideView(dto.getName(), view);
               }
             } catch (Exception e) {
-              //
+              fireEvent(NotificationEvent.newBuilder().error("InvalidViewBackupFile").build());
             }
           }
         });
