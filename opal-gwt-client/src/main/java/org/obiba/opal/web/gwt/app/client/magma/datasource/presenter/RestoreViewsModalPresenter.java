@@ -67,13 +67,15 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
           public void handleEvent(Event evt) {
             String view = fileReader.getResult().toString();
 
-            ViewDto dto = ViewDto.parse(view);
-            if (!currentViews.contains(dto.getName())) {
-              createView(view);
-            } else {
-              if (getView().canOverride()) {
+            try {
+              ViewDto dto = ViewDto.parse(view);
+              if (!currentViews.contains(dto.getName())) {
+                createView(view);
+              } else if (currentViews.contains(dto.getName()) && getView().canOverride()) {
                 overrideView(dto.getName(), view);
               }
+            } catch (Exception e) {
+              //
             }
           }
         });
