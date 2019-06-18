@@ -127,6 +127,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiField
   IconAnchor copySelectionAnchor;
 
+  @UiField
+  NavLink restoreViews;
+
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private final Translations translations;
@@ -231,6 +234,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {
     getUiHandlers().onTablesFilterUpdate(filter.getText());
+  }
+
+  @UiHandler("restoreViews")
+  public void restoreViewsClick(ClickEvent event) {
+    getUiHandlers().onRestoreViews();
   }
 
   private void addTableColumns() {

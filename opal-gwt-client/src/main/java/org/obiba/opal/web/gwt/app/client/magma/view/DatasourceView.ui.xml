@@ -67,6 +67,9 @@
             <b:NavLink icon="TH_LARGE" ui:field="addView">
               <ui:msg description="Add view label">Add view...</ui:msg>
             </b:NavLink>
+            <b:NavLink icon="TH_LARGE" ui:field="restoreViews">
+              <ui:msg description="Restore views label">Restore views...</ui:msg>
+            </b:NavLink>
           </b:DropdownButton>
           <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-top-margin small-indent">
             <ui:msg description="Refresh tables list">Refresh</ui:msg>

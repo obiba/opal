@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RestoreViewsModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
@@ -75,6 +76,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
 
+  private final ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private TranslationMessages translationMessages;
@@ -93,6 +96,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<ViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
+      ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
@@ -101,6 +105,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
+    this.restoreViewsModalProvider = restoreViewsModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -231,6 +236,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onSearchVariables() {
     fireEvent(new SearchDatasourceVariablesEvent(datasourceName));
+  }
+
+  @Override
+  public void onRestoreViews() {
+    RestoreViewsModalPresenter presenter = restoreViewsModalProvider.get();
+    presenter.initialize(datasourceName);
   }
 
   @Override

@@ -1,0 +1,44 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+
+  <o:Modal ui:field="modal" resizable="true" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel>
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Input files field">Views</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+
+        <b:Controls>
+          <b:FileUpload name="viewsFiles[]" ui:field="viewsFiles"/>
+        </b:Controls>
+
+        <b:HelpBlock>
+          <ui:msg description="Input files help">Backed up views in JSON format.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:CheckBox ui:field="override" addStyleNames="inline-block">
+          <ui:msg description="Override views field">Override</ui:msg>
+        </b:CheckBox>
+      </b:ControlGroup>
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="submitButton" type="PRIMARY">
+        <ui:msg description="Submit button label">Submit</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
+
+
+</ui:UiBinder>
