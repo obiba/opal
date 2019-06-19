@@ -13,10 +13,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.obiba.oidc.OIDCConfigurationProvider;
-import org.obiba.oidc.OIDCCredentials;
-import org.obiba.oidc.OIDCSession;
-import org.obiba.oidc.OIDCSessionManager;
+import org.obiba.oidc.*;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.oidc.web.filter.OIDCCallbackFilter;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
@@ -28,8 +25,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component("opalCallbackFilter")
 public class OpalCallbackFilter extends OIDCCallbackFilter {
@@ -55,6 +56,15 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
     setDefaultRedirectURL(opalPublicUrl);
     String callbackUrl = opalPublicUrl + (opalPublicUrl.endsWith("/") ? "" : "/") + "auth/callback/";
     setCallbackURL(callbackUrl);
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    try {
+      super.doFilterInternal(request, response, filterChain);
+    } catch (OIDCException e) {
+      response.sendRedirect(opalPublicUrl);
+    }
   }
 
   @Override
