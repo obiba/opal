@@ -28,6 +28,9 @@
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="backupViews">
+          <ui:msg description="Download dictionary label">Backup views</ui:msg>
+        </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup>
         <b:Button icon="UPLOAD_ALT" ui:field="importData">

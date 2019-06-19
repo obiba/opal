@@ -41,4 +41,6 @@ public interface DatasourceUiHandlers extends UiHandlers {
   void onSearchVariables();
 
   void onRestoreViews();
+
+  void onBackupViews();
 }

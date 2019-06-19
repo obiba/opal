@@ -245,6 +245,26 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   @Override
+  public void onBackupViews() {
+    List<TableDto> selectedTables = getView().getSelectedTables();
+
+    if (selectedTables.size() == 0) {
+      selectedTables = getView().getAllTables();
+    }
+
+    UriBuilder uriBuilder = UriBuilders.DATASOURCE_VIEWS.create();
+
+    for (int i = 0; i < selectedTables.size(); i++) {
+      TableDto tableDto = selectedTables.get(i);
+      if (tableDto.hasViewLink()) {
+        uriBuilder.query("views", tableDto.getName());
+      }
+    }
+
+    fireEvent(new FileDownloadRequestEvent(uriBuilder.build(datasourceName)));
+  }
+
+  @Override
   public void onDownloadDictionary() {
     downloadMetadata();
   }
@@ -364,6 +384,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName) + "/excel") //
           .authorize(getView().getExcelDownloadAuthorizer()) //
           .get().send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_VIEWS.create().build(datasourceName)) //
+          .authorize(getView().getBackupButtonAuthorizer()) //
+          .get().send();
+
     }
 
     private void authorizeProject() {
@@ -516,6 +541,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    HasAuthorization getBackupButtonAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
 
