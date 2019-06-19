@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -163,25 +164,15 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       log.info("Preparing identifiers for mapping [{}]", idMapping);
       identifiersTableService.ensureIdentifiersMapping(new IdentifiersMapping(idMapping, table.getEntityType()));
 
-      View privateView = identifierService.createPrivateView(idMapping, table,
-          identifiersTableService.getSelectScript(table.getEntityType(), idMapping));
-
       IdentifiersMappingView identifiersMappingView = new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
           table, identifiersTableService, allowIdentifierGeneration ? identifierGenerator : null, ignoreUnknownIdentifier);
-      Initialisables.initialise(identifiersMappingView);
-      PrivateVariableEntityMap entityMap = identifiersMappingView.getPrivateVariableEntityMap();
 
       if (allowIdentifierGeneration) {
         log.info("Saving generated identifiers");
-        // prepare for copying identifiers mapping
-        try (ValueTableWriter keysTableWriter = identifiersTableService
-            .createIdentifiersTableWriter(table.getEntityType())) {
-          DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
-              keysTableWriter);
-          // Copy participant's non-identifiable variables and data
-          DatasourceCopier datasourceCopier = newCopier().withListener(keysListener).build();
-          datasourceCopier.copy(identifiersMappingView, destination);
-        }
+        PrivateVariableEntityMap entityMap = identifiersMappingView.getPrivateVariableEntityMap();
+        // force entities listing to both generate and persist missing IDs
+        identifiersMappingView.getVariableEntities();
+        Disposables.dispose(entityMap); // finalize the persistence of the IDs
       }
       return identifiersMappingView;
     }

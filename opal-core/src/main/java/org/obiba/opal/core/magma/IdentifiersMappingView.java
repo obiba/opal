@@ -12,6 +12,7 @@ package org.obiba.opal.core.magma;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.type.TextType;
@@ -185,6 +186,12 @@ public class IdentifiersMappingView extends View {
     };
   }
 
+  @Override
+  public void dispose() {
+    super.dispose();
+    Disposables.dispose(mappingFunction);
+  }
+
   //
   // Private classes
   //
@@ -251,7 +258,7 @@ public class IdentifiersMappingView extends View {
 
   }
 
-  private interface UnitIdentifiersMappingFunction extends BijectiveFunction<VariableEntity, VariableEntity> {
+  private interface UnitIdentifiersMappingFunction extends BijectiveFunction<VariableEntity, VariableEntity>, Disposable {
 
     PrivateVariableEntityMap getPrivateVariableEntityMap();
 
@@ -295,6 +302,11 @@ public class IdentifiersMappingView extends View {
     public VariableEntity unapply(VariableEntity from) {
       return entityMap.publicEntity(from);
     }
+
+    @Override
+    public void dispose() {
+      Disposables.dispose(entityMap);
+    }
   }
 
   /**
@@ -336,6 +348,11 @@ public class IdentifiersMappingView extends View {
     @Override
     public VariableEntity unapply(VariableEntity from) {
       return entityMap.privateEntity(from);
+    }
+
+    @Override
+    public void dispose() {
+      Disposables.dispose(entityMap);
     }
   }
 

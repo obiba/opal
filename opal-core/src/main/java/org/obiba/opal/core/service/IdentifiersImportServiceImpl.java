@@ -25,6 +25,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
@@ -118,6 +119,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
                 identifiersTableWriter);
       }
     }
+    Disposables.dispose(entityMap);
   }
 
   @Override

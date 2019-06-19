@@ -11,6 +11,7 @@ package org.obiba.opal.core.magma;
 
 import javax.validation.constraints.NotNull;
 
+import org.obiba.magma.Disposable;
 import org.obiba.magma.VariableEntity;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  * Interface that defines the contract of mapping private VariableEntity to public instances and for creating public
  * identifiers if possible.
  */
-public interface PrivateVariableEntityMap {
+public interface PrivateVariableEntityMap extends Disposable {
 
   VariableEntity publicEntity(@NotNull VariableEntity privateEntity);
 

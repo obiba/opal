@@ -15,6 +15,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
@@ -24,11 +25,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * An Opal implementation of {@code PrivateVariableEntityMap}, on top of a Magma {@code ValueTable}.
@@ -48,6 +49,8 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   @NotNull
   private final BiMap<VariableEntity, VariableEntity> publicToPrivate = Maps.synchronizedBiMap(HashBiMap.create());
+
+  private ValueTableWriter entitiesValueTableWriter;
 
   public OpalPrivateVariableEntityMap(@NotNull ValueTable keysValueTable, @NotNull Variable ownerVariable,
                                       @NotNull IdentifierGenerator participantIdentifier) {
@@ -96,7 +99,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for (int i = 0; i < 100; i++) {
       VariableEntity privateEntity = entityFor(participantIdentifier.generateIdentifier());
       if (!publicToPrivate.inverse().containsKey(privateEntity)) {
-        writeEntities(keysValueTable, publicEntity, privateEntity);
+        writeEntities(getEntitiesValueTableWriter(keysValueTable), publicEntity, privateEntity);
         log.debug("{} <--> ({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
         publicToPrivate.put(entityFor(publicEntity.getIdentifier()), privateEntity);
         return privateEntity;
@@ -139,7 +142,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     vtw.close();
 
     log.info("IDs generation done for {} entities in {}", publicEntities.size(), stopwatch.stop());
-    return publicPrivateEntities.values().stream().collect(Collectors.toList());
+    return new ArrayList<>(publicPrivateEntities.values());
   }
 
   @Override
@@ -148,7 +151,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for (int i = 0; i < 100; i++) {
       VariableEntity publicEntity = entityFor(participantIdentifier.generateIdentifier());
       if (!publicToPrivate.containsKey(publicEntity)) {
-        writeEntities(keysValueTable, publicEntity, privateEntity);
+        writeEntities(getEntitiesValueTableWriter(keysValueTable), publicEntity, privateEntity);
         publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
         return publicEntity;
       }
@@ -158,10 +161,10 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
             privateEntity.getIdentifier() + "]. One hundred attempts made.");
   }
 
-  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity) {
-    ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
-    writeEntities(vtw, publicEntity, privateEntity);
-    vtw.close();
+  private ValueTableWriter getEntitiesValueTableWriter(ValueTable keyTable) {
+    if (entitiesValueTableWriter == null)
+      entitiesValueTableWriter = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
+    return entitiesValueTableWriter;
   }
 
   private void writeEntities(ValueTableWriter vtw, VariableEntity publicEntity, VariableEntity privateEntity) {
@@ -212,6 +215,14 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
         log.debug("{} <--> ({}) cached", opalEntity.getIdentifier(), value);
         publicToPrivate.put(entityFor(opalEntity.getIdentifier()), entityFor(value.toString()));
       }
+    }
+  }
+
+  @Override
+  public void dispose() {
+    if (entitiesValueTableWriter != null) {
+      entitiesValueTableWriter.close();
+      entitiesValueTableWriter = null;
     }
   }
 }
