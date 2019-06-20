@@ -610,7 +610,7 @@ public interface Translations extends Constants {
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
       "ProjectCreationFailed", "The datasource creation has failed: {0}.", //
       "FileNotFound", "File not found: {0}.",//
-      "InvalidViewBackupFile", "A backup file does not contain a valid ViewDto.",
+      "InvalidViewBackupFile", "The backup file does not contain a valid view (JSON format expected).",
       "FileNotAccessible", "File not accessible: {0}.",//
       "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}.", //
       "DatabaseAlreadyExists", "Database named {0} already exists.", //

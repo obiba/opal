@@ -9,6 +9,7 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -24,6 +25,7 @@ import elemental.html.FileReader;
 import java.util.List;
 import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -38,6 +40,8 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
   private String projectName;
 
   private List<String> currentViews;
+
+  private int remainingRestores;
 
   @Inject
   public RestoreViewsModalPresenter(
@@ -56,6 +60,7 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
   @Override
   public void onSubmitFiles(List<File> files) {
     if (files.size() > 0) {
+      remainingRestores = files.size();
 
       for (int i = 0; i < files.size(); i++) {
         File file = files.get(i);
@@ -82,7 +87,6 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
 
         fileReader.readAsText(file);
       }
-
     }
 
     getView().hideDialog();
@@ -134,8 +138,12 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if (response.getStatusCode() != SC_CREATED || response.getStatusCode() != SC_OK) {
+      if (response.getStatusCode() != SC_CREATED && response.getStatusCode() != SC_OK) {
         fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText())).build());
+      }
+      remainingRestores = remainingRestores - 1;
+      if (remainingRestores == 0) {
+        fireEvent(new ViewsRestoreSubmittedEvent());
       }
     }
   }
