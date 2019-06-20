@@ -159,6 +159,8 @@ public class OpalBootstrapperImpl implements Bootstrapper {
                 }
               }) //
               .delete().send();
+        } else {
+          Window.Location.replace("/");
         }
       }
     });
