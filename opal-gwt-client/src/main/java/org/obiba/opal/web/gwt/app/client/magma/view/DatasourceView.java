@@ -127,6 +127,12 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiField
   IconAnchor copySelectionAnchor;
 
+  @UiField
+  NavLink restoreViews;
+
+  @UiField
+  NavLink backupViews;
+
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private final Translations translations;
@@ -231,6 +237,16 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {
     getUiHandlers().onTablesFilterUpdate(filter.getText());
+  }
+
+  @UiHandler("restoreViews")
+  public void restoreViewsClick(ClickEvent event) {
+    getUiHandlers().onRestoreViews();
+  }
+
+  @UiHandler("backupViews")
+  public void backupViewsClick(ClickEvent event) {
+    getUiHandlers().onBackupViews();
   }
 
   private void addTableColumns() {
@@ -363,6 +379,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new WidgetAuthorizer(downloadDictionary);
+  }
+
+  @Override
+  public HasAuthorization getBackupButtonAuthorizer() {
+    return new WidgetAuthorizer(backupViews);
   }
 
   @Override

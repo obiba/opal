@@ -39,4 +39,8 @@ public interface DatasourceUiHandlers extends UiHandlers {
   void onTablesFilterUpdate(String filter);
 
   void onSearchVariables();
+
+  void onRestoreViews();
+
+  void onBackupViews();
 }

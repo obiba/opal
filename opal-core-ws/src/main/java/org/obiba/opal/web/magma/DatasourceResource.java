@@ -11,6 +11,13 @@ package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.googlecode.protobuf.format.JsonFormat;
+import java.io.BufferedOutputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -180,6 +187,32 @@ public class DatasourceResource {
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
     return Response.created(viewUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, action)).build();
+  }
+
+  @GET
+  @Path("/views")
+  public Response backupViews(@QueryParam("views") List<String> viewNames) {
+
+    List<ViewDto> views = getDatasource().getValueTables().stream()
+        .filter(valueTable -> valueTable.isView() && (
+            (viewNames != null && viewNames.contains(valueTable.getName())) || (viewNames == null || viewNames.size() == 0)))
+        .map(valueTable -> viewDtos.asDto(viewManager.getView(valueTable.getDatasource().getName(), valueTable.getName())))
+        .collect(Collectors.toList());
+
+    StreamingOutput outputStream = stream -> {
+      try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(stream))) {
+        for (ViewDto viewDto : views) {
+          zipOutputStream.putNextEntry(new ZipEntry(viewDto.getName() + ".json"));
+          zipOutputStream.write(JsonFormat.printToString(viewDto).getBytes());
+          zipOutputStream.closeEntry();
+        }
+      }
+    };
+
+    return Response
+        .ok(outputStream, MediaType.APPLICATION_OCTET_STREAM)
+        .header("Content-Disposition", "inline; filename=\"backup-" + name + "-" + new Date().getTime() + ".zip\"")
+        .build();
   }
 
   private AclAction getAction(ViewDto viewDto) {

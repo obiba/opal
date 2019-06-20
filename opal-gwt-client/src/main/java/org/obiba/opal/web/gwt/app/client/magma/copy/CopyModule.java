@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RestoreViewsModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.view.RestoreViewsModalView;
 
 /**
  * Bind concrete implementations to interfaces within the export wizard.
@@ -21,5 +23,6 @@ public class CopyModule extends AbstractOpalModule {
     bindPresenterWidget(DataExportPresenter.class, DataExportPresenter.Display.class, DataExportView.class);
     bindPresenterWidget(DataCopyPresenter.class, DataCopyPresenter.Display.class, DataCopyView.class);
     bindPresenterWidget(ViewCopyPresenter.class, ViewCopyPresenter.Display.class, ViewCopyView.class);
+    bindPresenterWidget(RestoreViewsModalPresenter.class, RestoreViewsModalPresenter.Display.class, RestoreViewsModalView.class);
   }
 }

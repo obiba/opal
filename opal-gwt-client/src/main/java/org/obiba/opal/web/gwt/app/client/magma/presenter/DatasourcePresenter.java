@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RestoreViewsModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
@@ -75,6 +76,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
 
+  private final ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private TranslationMessages translationMessages;
@@ -93,6 +96,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<ViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
+      ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
@@ -101,6 +105,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
+    this.restoreViewsModalProvider = restoreViewsModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -234,6 +239,32 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   @Override
+  public void onRestoreViews() {
+    RestoreViewsModalPresenter presenter = restoreViewsModalProvider.get();
+    presenter.initialize(datasourceName);
+  }
+
+  @Override
+  public void onBackupViews() {
+    List<TableDto> selectedTables = getView().getSelectedTables();
+
+    if (selectedTables.size() == 0) {
+      selectedTables = getView().getAllTables();
+    }
+
+    UriBuilder uriBuilder = UriBuilders.DATASOURCE_VIEWS.create();
+
+    for (int i = 0; i < selectedTables.size(); i++) {
+      TableDto tableDto = selectedTables.get(i);
+      if (tableDto.hasViewLink()) {
+        uriBuilder.query("views", tableDto.getName());
+      }
+    }
+
+    fireEvent(new FileDownloadRequestEvent(uriBuilder.build(datasourceName)));
+  }
+
+  @Override
   public void onDownloadDictionary() {
     downloadMetadata();
   }
@@ -353,6 +384,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName) + "/excel") //
           .authorize(getView().getExcelDownloadAuthorizer()) //
           .get().send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_VIEWS.create().build(datasourceName)) //
+          .authorize(getView().getBackupButtonAuthorizer()) //
+          .get().send();
+
     }
 
     private void authorizeProject() {
@@ -505,6 +541,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    HasAuthorization getBackupButtonAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
 
