@@ -24,6 +24,8 @@ import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RestoreViewsModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent.Handler;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
@@ -116,6 +118,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     // Delete tables confirmation handler
     addRegisteredHandler(ConfirmationEvent.getType(), new DeleteConfirmationEventHandler());
+    addRegisteredHandler(ViewsRestoreSubmittedEvent.getType(), new Handler() {
+      @Override
+      public void onViewsRestoreSubmitted(ViewsRestoreSubmittedEvent event) {
+        initDatasource();
+      }
+    });
   }
 
   private void downloadMetadata() {
