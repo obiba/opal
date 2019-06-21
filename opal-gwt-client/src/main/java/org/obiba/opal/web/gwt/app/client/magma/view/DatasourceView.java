@@ -310,6 +310,17 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     exportData.setEnabled(enableItem);
     copyData.setEnabled(enableItem);
     table.hideLoadingIndicator();
+
+    List<TableDto> tables = dataProvider.getList();
+    int viewsCount = 0;
+
+    for (int i = 0; i < tables.size(); i++) {
+      if (tables.get(i).hasViewLink()) {
+        viewsCount++;
+      }
+    }
+
+    backupViews.setVisible(viewsCount > 0);
   }
 
   @Override
