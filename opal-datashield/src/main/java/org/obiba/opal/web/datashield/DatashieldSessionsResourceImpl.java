@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
@@ -35,6 +36,9 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;
 
+  @Autowired
+  private OpalConfigurationService configurationService;
+
   protected void onNewRSession(OpalRSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
     DatashieldConfiguration config = configurationSupplier.get();
@@ -42,6 +46,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
       rSession.execute(
           new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
     }
+    rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", configurationService.getOpalConfiguration().getSeed())));
     DataShieldLog.userLog("created a datashield session {}", rSession.getId());
   }
 }

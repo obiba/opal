@@ -12,6 +12,8 @@ package org.obiba.opal.core.cfg;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.IntBinaryOperator;
+import java.util.function.IntConsumer;
 
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.runtime.Version;
@@ -50,6 +52,11 @@ public class OpalConfiguration {
 
   public String getSecretKey() {
     return secretKey;
+  }
+
+  public int getSeed() {
+    int seed = getSecretKey().chars().sum();
+    return seed;
   }
 
   public void setFileSystemRoot(String fileSystemRoot) {
