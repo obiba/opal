@@ -19,6 +19,7 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
+import java.io.InputStream;
 
 /**
  * Assign Magma values (from a table or a variable) to a R symbol.
@@ -117,6 +118,10 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   REXP doEval(String script) {
     return eval(script, false);
+  }
+
+  void doWriteFile(String fileName, InputStream in) {
+    writeFile(fileName, in);
   }
 
   REXP doEnsurePackage(String packageName) {
