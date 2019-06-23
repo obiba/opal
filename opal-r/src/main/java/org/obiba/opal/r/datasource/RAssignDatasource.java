@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2019 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package org.obiba.opal.r.datasource;
 
 import com.google.common.base.Joiner;
@@ -27,6 +38,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +55,9 @@ public class RAssignDatasource extends CsvDatasource {
 
   private static final String ATTR_FILE_NAME = ".variable-attributes.R";
 
-  private Path workDir;
+  private static final String R_WORK_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "R";
+
+  private File workDir;
 
   private final String symbol;
 
@@ -69,18 +83,15 @@ public class RAssignDatasource extends CsvDatasource {
 
   @Override
   protected void onInitialise() {
-    try {
-      workDir = Files.createTempDirectory(getName() + "-");
-    } catch (IOException e) {
-      throw new MagmaRRuntimeException("Failed at creating R assign work directory", e);
-    }
+    workDir = new File(R_WORK_DIR, getName() + "-" + UUID.randomUUID());
+    workDir.mkdirs();
   }
 
   @Override
   protected void onDispose() {
     if (workDir != null) {
       try {
-        FileUtil.delete(workDir.toFile());
+        FileUtil.delete(workDir);
       } catch (IOException e) {
         log.warn("Failed at removing work directory {}", workDir, e);
       }
@@ -93,7 +104,7 @@ public class RAssignDatasource extends CsvDatasource {
   @NotNull
   @Override
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
-    File parentFolder = new File(workDir.toFile(), tableName);
+    File parentFolder = new File(workDir, tableName);
     parentFolder.mkdirs();
     if (!hasValueTable(tableName)) {
       addValueTable(tableName, new File(parentFolder, DATA_FILE_NAME), entityType);
