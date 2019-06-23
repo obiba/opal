@@ -320,7 +320,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
       }
     }
 
-    backupViews.setVisible(viewsCount > 0);
+    backupViews.setDisabled(viewsCount == 0);
   }
 
   @Override
