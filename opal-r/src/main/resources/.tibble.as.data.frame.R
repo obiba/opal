@@ -1,6 +1,6 @@
 # transform a haven_labelled vector into a factor with appropritae levels (can be more than the observed values)
-.haven_labelled.as.factor <- function(x) {
-    rval <- `x`
+.tibble.as.data.frame <- function(x) {
+    rval <- as.data.frame(`x`)
     for (n in colnames(rval)) {
         if ("haven_labelled" %in% class(rval[[n]])) {
             v <- as.factor(rval[[n]])
