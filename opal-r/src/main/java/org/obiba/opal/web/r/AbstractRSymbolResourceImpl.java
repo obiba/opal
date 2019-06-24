@@ -17,7 +17,6 @@ import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
@@ -40,8 +39,6 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   @NotNull
   protected DataExportService dataExportService;
-
-  protected TransactionTemplate transactionTemplate;
 
   @Override
   public void setName(String name) {
@@ -68,11 +65,6 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
-    this.transactionTemplate = transactionTemplate;
-  }
-
-  @Override
   public String getName() {
     return name;
   }
@@ -96,9 +88,9 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings,
-                           String idName, String updatedName, String identifiersMapping,
+                           String idName, String identifiersMapping,
                            String rClass, boolean async) {
-    return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, rClass, async);
+    return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
   }
 
   @Override
@@ -118,12 +110,12 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   Response assignMagmaSymbol(UriInfo uri, String path, String variableFilter, Boolean withMissings,
-                             String idName, String updatedName, String identifiersMapping, String rClass,
+                             String idName, String identifiersMapping, String rClass,
                              boolean async) {
     MagmaAssignROperation.RClass rClassToApply = getRClassToApply(path, rClass);
     return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
-            rClassToApply, identifiersTableService, dataExportService, transactionTemplate), async);
+        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, identifiersMapping,
+            rClassToApply, identifiersTableService, dataExportService), async);
   }
 
   protected URI getSymbolURI(UriInfo info) {

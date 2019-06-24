@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedMap;
@@ -52,9 +51,6 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   @Autowired
   private DataExportService dataExportService;
 
-  @Autowired
-  private TransactionTemplate txTemplate;
-
   private OpalRSession rSession;
 
   @Override
@@ -69,7 +65,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public Response removeRSession(String saveId) {
-    if(!Strings.isNullOrEmpty(saveId)) {
+    if (!Strings.isNullOrEmpty(saveId)) {
       opalRSessionManager.saveSubjectRSession(rSession.getId(), saveId);
     }
     opalRSessionManager.removeSubjectRSession(rSession.getId());
@@ -78,7 +74,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public Response saveWorkspace(String saveId) {
-    if(!Strings.isNullOrEmpty(saveId)) {
+    if (!Strings.isNullOrEmpty(saveId)) {
       opalRSessionManager.saveSubjectRSession(rSession.getId(), saveId);
     }
     return Response.status(Strings.isNullOrEmpty(saveId) ? Response.Status.BAD_REQUEST : Response.Status.OK).build();
@@ -123,13 +119,13 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   @Override
   public OpalR.RCommandDto getRCommand(String rid, boolean wait) {
     RCommand rCommand = getOpalRSession().getRCommand(rid);
-    if(!rCommand.isFinished() && wait) {
-      while(!getOpalRSession().getRCommand(rid).isFinished()) {
+    if (!rCommand.isFinished() && wait) {
+      while (!getOpalRSession().getRCommand(rid).isFinished()) {
         try {
-          synchronized(rCommand) {
+          synchronized (rCommand) {
             rCommand.wait();
           }
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
           return asDto(rCommand);
         }
       }
@@ -139,7 +135,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public Response removeRCommand(String rid) {
-    if(getOpalRSession().hasRCommand(rid)) {
+    if (getOpalRSession().hasRCommand(rid)) {
       getOpalRSession().removeRCommand(rid);
     }
     return Response.ok().build();
@@ -149,14 +145,14 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   public Response getRCommandResult(String rid, boolean remove, boolean wait) {
     RCommand rCommand = getOpalRSession().getRCommand(rid);
     Response resp = Response.noContent().build();
-    if(!rCommand.isFinished()) {
-      if(wait) {
-        while(!getOpalRSession().getRCommand(rid).isFinished()) {
+    if (!rCommand.isFinished()) {
+      if (wait) {
+        while (!getOpalRSession().getRCommand(rid).isFinished()) {
           try {
-            synchronized(rCommand) {
+            synchronized (rCommand) {
               rCommand.wait();
             }
-          } catch(InterruptedException e) {
+          } catch (InterruptedException e) {
             return resp;
           }
         }
@@ -170,13 +166,13 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   private Response getFinishedRCommandResult(RCommand rCommand, boolean remove) {
     Response resp = Response.noContent().build();
-    if(rCommand.hasResult()) {
+    if (rCommand.hasResult()) {
       ROperationWithResult rop = rCommand.asROperationWithResult();
-      if(rop.hasRawResult()) {
+      if (rop.hasRawResult()) {
         resp = Response.ok().entity(rop.getRawResult().asBytes()).build();
       }
     }
-    if(remove) getOpalRSession().removeRCommand(rCommand.getId());
+    if (remove) getOpalRSession().removeRCommand(rCommand.getId());
     return resp;
   }
 
@@ -186,15 +182,15 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     builder.setCreateDate(DateTimeType.get().valueOf(rCommand.getCreateDate()).toString());
     builder.setStatus(rCommand.getStatus().name());
     builder.setWithResult(rCommand.hasResult());
-    if(rCommand.getStatus() != RCommand.Status.PENDING) {
+    if (rCommand.getStatus() != RCommand.Status.PENDING) {
       builder.setStartDate(DateTimeType.get().valueOf(rCommand.getStartDate()).toString());
     }
-    if(rCommand.getStatus() == RCommand.Status.COMPLETED) {
+    if (rCommand.getStatus() == RCommand.Status.COMPLETED) {
       builder.setEndDate(DateTimeType.get().valueOf(rCommand.getEndDate()).toString());
     }
-    if(rCommand.getStatus() == RCommand.Status.FAILED) {
+    if (rCommand.getStatus() == RCommand.Status.FAILED) {
       builder.setEndDate(DateTimeType.get().valueOf(rCommand.getEndDate()).toString());
-      if(rCommand.hasError()) builder.setError(rCommand.getError());
+      if (rCommand.hasError()) builder.setError(rCommand.getError());
     }
     return builder.build();
   }
@@ -206,7 +202,6 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     resource.setOpalRSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
-    resource.setTransactionTemplate(txTemplate);
     return resource;
   }
 

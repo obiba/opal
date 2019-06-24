@@ -13,7 +13,6 @@ package org.obiba.opal.web.r;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.service.OpalRSession;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -30,8 +29,6 @@ public interface RSymbolResource {
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
 
   void setDataExportService(DataExportService dataExportService);
-
-  void setTransactionTemplate(TransactionTemplate transactionTemplate);
 
   String getName();
 
@@ -53,11 +50,10 @@ public interface RSymbolResource {
    * @param uri
    * @param path
    * @param variableFilter
-   * @param withMissings Include values corresponding to "missing" categories.
-   * @param idName Include the entity ID as a column.
-   * @param updatedName Include the value set last update timestamp as a column.
+   * @param withMissings       Include values corresponding to "missing" categories.
+   * @param idName             Include the entity ID as a column.
    * @param identifiersMapping Identifiers mapping to be used.
-   * @param rClass R data frame class (can be "data.frame" (default) or "tibble").
+   * @param rClass             R data frame class (can be "data.frame" (default) or "tibble").
    * @param async
    * @return
    */
@@ -65,7 +61,7 @@ public interface RSymbolResource {
   @Consumes("application/x-opal")
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
                     @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("id") String idName,
-                    @QueryParam("updated") String updatedName, @QueryParam("identifiers") String identifiersMapping,
+                    @QueryParam("identifiers") String identifiersMapping,
                     @QueryParam("class") @DefaultValue("data.frame") String rClass,
                     @QueryParam("async") @DefaultValue("false") boolean async);
 

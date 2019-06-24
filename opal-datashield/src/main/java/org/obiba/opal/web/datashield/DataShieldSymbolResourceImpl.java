@@ -43,10 +43,10 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
-                           String updatedName, String identifiersMapping, String rClass,
+                           String identifiersMapping, String rClass,
                            boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, variableFilter, withMissings, idName, null, identifiersMapping, rClass, async);
+    return super.putMagma(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
   }
 
   @Override
@@ -76,14 +76,14 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     try {
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
           configSupplier.get().getEnvironment(DSMethodType.ASSIGN));
-      if(async) {
+      if (async) {
         String id = getRSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
       } else {
         getRSession().execute(rop);
         return Response.created(getSymbolURI(uri)).build();
       }
-    } catch(ParseException e) {
+    } catch (ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
   }

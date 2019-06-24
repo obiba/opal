@@ -222,7 +222,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String finalSymbol = RUtils.getSymbol(valueTable.getName());
         rSessionHandler
             .getSession()
-            .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, txTemplate, "id"));
+            .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, "id"));
       }
     }
 

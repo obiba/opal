@@ -17,9 +17,9 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
-import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
-import org.obiba.opal.spi.r.DataAssignROperation;
 import org.obiba.opal.r.DataSaveROperation;
+import org.obiba.opal.spi.r.DataAssignROperation;
+import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,10 +37,10 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
-                           String updatedName, String identifiersMapping, String rClass, boolean async) {
+                           String identifiersMapping, String rClass, boolean async) {
     Response check = checkValueTable(path);
     if (check != null) return check;
-    return super.putMagma(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, rClass, async);
+    return super.putMagma(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
   }
 
   @Override

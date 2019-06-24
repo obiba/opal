@@ -27,7 +27,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
@@ -52,9 +51,6 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   @Autowired
   private DataExportService dataExportService;
 
-  @Autowired
-  private TransactionTemplate txTemplate;
-
   @Override
   public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
     try {
@@ -67,7 +63,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
         getOpalRSession().execute(operation);
         return Response.ok().entity(operation.getRawResult().asBytes()).build();
       }
-    } catch(ParseException e) {
+    } catch (ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
 
@@ -81,7 +77,6 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     resource.setOpalRSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
-    resource.setTransactionTemplate(txTemplate);
     return resource;
   }
 
