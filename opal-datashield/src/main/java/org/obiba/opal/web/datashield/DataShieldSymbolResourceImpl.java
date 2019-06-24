@@ -98,8 +98,9 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   @Override
   protected MagmaAssignROperation.RClass getRClassToApply(String path, String rClass) {
     MagmaAssignROperation.RClass rClassToApply = super.getRClassToApply(path, rClass);
-    if (useTibble && rClassToApply.equals(MagmaAssignROperation.RClass.DATA_FRAME)) {
-      rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
+    if (rClassToApply.equals(MagmaAssignROperation.RClass.TIBBLE)
+        || (useTibble && rClassToApply.equals(MagmaAssignROperation.RClass.DATA_FRAME))) {
+      rClassToApply = MagmaAssignROperation.RClass.TIBBLE_WITH_FACTORS;
     }
     return rClassToApply;
   }
