@@ -59,7 +59,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final RClass rClass;
 
-  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate, String idColumnName) {
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, @NotNull TransactionTemplate txTemplate, String idColumnName) {
     this.symbol = symbol;
     this.path = "";
     this.valueTable = valueTable;
@@ -67,7 +67,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.withMissings = true;
     this.identifiersMapping = "";
     this.identifiersTableService = null;
-    this.dataExportService = null;
+    this.dataExportService = dataExportService;
     this.idColumnName = idColumnName;
     this.updatedColumnName = "";
     this.transactionTemplate = txTemplate;

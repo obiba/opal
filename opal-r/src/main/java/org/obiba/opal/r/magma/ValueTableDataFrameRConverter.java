@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Base implementation of Magma R converters using file dumps to be transferred to R and read back by R.
+ * Convert tibble's labelled vectors to factors, and optionally downgrade to data.frame class. This data structure
+ * is more appropriate for running analysis.
  */
 class ValueTableDataFrameRConverter extends ValueTableTibbleRConverter {
 

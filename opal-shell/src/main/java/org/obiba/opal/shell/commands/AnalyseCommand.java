@@ -17,12 +17,12 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.support.SplitValueTablesFactory;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
@@ -31,7 +31,6 @@ import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.AnalyseCommandOptions;
 import org.obiba.opal.spi.analysis.AnalysisService;
-import org.obiba.opal.spi.r.BindRowsAssignROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.analysis.RAnalysis;
@@ -74,6 +73,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Autowired
   private TransactionTemplate txTemplate;
+
+  @Autowired
+  private DataExportService dataExportService;
 
   @Autowired
   private OpalAnalysisResultService analysisResultService;
@@ -217,28 +219,10 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
     void write(@NotNull ValueTable valueTable, RSessionHandler rSessionHandler) {
       if (valueTable.getValueSetCount() > 0) {
-
-        List<ValueTable> splitValueTables = SplitValueTablesFactory.split(valueTable);
         String finalSymbol = RUtils.getSymbol(valueTable.getName());
-
-        if (splitValueTables.size() > 1) {
-          List<String> tmpSymbols = Lists.newArrayList();
-          for (int i = 0; i < splitValueTables.size(); i++) {
-            ValueTable splitValueTable = splitValueTables.get(i);
-            String tmpSymbol = "." + finalSymbol + "__" + i;
-            tmpSymbols.add(tmpSymbol);
-            rSessionHandler
-                .getSession()
-                .execute(new MagmaAssignROperation(tmpSymbol, splitValueTable, txTemplate, "id"));
-          }
-          rSessionHandler
-              .getSession()
-              .execute(new BindRowsAssignROperation(finalSymbol, tmpSymbols));
-        } else {
-          rSessionHandler
-              .getSession()
-              .execute(new MagmaAssignROperation(finalSymbol, valueTable, txTemplate, "id"));
-        }
+        rSessionHandler
+            .getSession()
+            .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, txTemplate, "id"));
       }
     }
 
