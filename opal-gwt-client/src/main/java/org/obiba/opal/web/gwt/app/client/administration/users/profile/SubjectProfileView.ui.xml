@@ -28,6 +28,10 @@
     <b:Paragraph ui:field="accountText">
     </b:Paragraph>
 
+    <b:Button ui:field="userAccount" target="_blank" icon="USER" type="INFO" addStyleNames="bottom-margin">
+      <ui:msg description="User account label">User Account</ui:msg>
+    </b:Button>
+
     <b:Form ui:field="accountForm">
       <b:ButtonGroup>
         <b:Button type="INFO" icon="PENCIL" ui:field="changePassword">

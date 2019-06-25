@@ -248,6 +248,7 @@ message SubjectProfileDto {
   required string realm = 2;
   required string created = 3;
   required string lastUpdate = 4;
+  optional string accountUrl = 5;
 }
 
 message LinkDto {

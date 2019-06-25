@@ -23,9 +23,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
+import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.IDProvidersService;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
@@ -52,10 +55,21 @@ public class SubjectProfileCurrentResource {
   @Autowired
   private OpalGeneralConfigService opalGeneralConfigService;
 
+  @Autowired
+  private IDProvidersService idProvidersService;
+
   @GET
   @NoAuthorization
   public Response get() {
-    return Response.ok().entity(Dtos.asDto(subjectProfileService.getProfile(getPrincipal()))).build();
+    SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
+    String accountUrl = null;
+    try {
+      OIDCConfiguration config = idProvidersService.getConfiguration(profile.getRealm());
+      accountUrl = config.getCustomParam("providerUrl");
+    } catch (Exception e) {
+      // ignored, does not apply
+    }
+    return Response.ok().entity(Dtos.asDto(profile, accountUrl)).build();
   }
 
   @Path("/bookmarks")

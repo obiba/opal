@@ -74,12 +74,20 @@ public class Dtos {
   }
 
   public static Opal.SubjectProfileDto asDto(SubjectProfile profile) {
-    return Opal.SubjectProfileDto.newBuilder() //
+    return asDto(profile, null);
+  }
+
+  public static Opal.SubjectProfileDto asDto(SubjectProfile profile, String accountUrl) {
+    Opal.SubjectProfileDto.Builder builder = Opal.SubjectProfileDto.newBuilder() //
         .setPrincipal(profile.getPrincipal()) //
         .setRealm(profile.getRealm()) //
         .setCreated(ISO_8601.format(profile.getCreated())) //
-        .setLastUpdate(ISO_8601.format(profile.getUpdated())) //
-        .build();
+        .setLastUpdate(ISO_8601.format(profile.getUpdated()));
+
+    if (!Strings.isNullOrEmpty(accountUrl))
+      builder.setAccountUrl(accountUrl);
+
+    return builder.build();
   }
 
   public static Opal.BookmarkDto asDto(Bookmark bookmark) {
@@ -158,7 +166,7 @@ public class Dtos {
       configuration.getCustomParams().put("providerUrl", dto.getProviderUrl());
     }
     configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
-    if (dto.getParametersCount()>0) {
+    if (dto.getParametersCount() > 0) {
       dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
     }
     return configuration;

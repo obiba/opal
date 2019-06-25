@@ -70,9 +70,9 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
           public void onResource(Response response, SubjectProfileDto resource) {
             if(response.getStatusCode() == Response.SC_OK) {
               profile = resource;
-              getView().enableChangePassword("opal-user-realm".equals(resource.getRealm()), resource.getRealm());
+              getView().enableChangePassword("opal-user-realm".equals(resource.getRealm()), resource.getRealm(), resource.getAccountUrl());
             } else {
-              getView().enableChangePassword(false, "?");
+              getView().enableChangePassword(false, "?", null);
             }
           }
         }) //
@@ -87,7 +87,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
 
   public interface Display extends View, HasUiHandlers<SubjectProfileUiHandlers> {
 
-    void enableChangePassword(boolean enabled, String realm);
+    void enableChangePassword(boolean enabled, String realm, String accountUrl);
 
   }
 }

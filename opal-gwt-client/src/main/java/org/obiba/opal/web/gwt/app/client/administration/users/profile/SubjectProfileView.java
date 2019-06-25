@@ -10,10 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -23,14 +23,19 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 
 public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandlers>
     implements SubjectProfilePresenter.Display {
 
-  interface Binder extends UiBinder<Widget, SubjectProfileView> {}
+  interface Binder extends UiBinder<Widget, SubjectProfileView> {
+  }
 
   @UiField
   Paragraph accountText;
+
+  @UiField
+  Button userAccount;
 
   @UiField
   Form accountForm;
@@ -47,10 +52,18 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   }
 
   @Override
-  public void enableChangePassword(boolean enabled, String realm) {
+  public void enableChangePassword(boolean enabled, String realm, String accountUrl) {
     accountForm.setVisible(enabled);
-    accountText
-        .setText(enabled ? translationMessages.accountEditable() : translationMessages.accountNotEditable(realm));
+    userAccount.setVisible(false);
+    if (enabled) {
+      accountText.setText(translationMessages.accountEditable());
+    } else if (Strings.isNullOrEmpty(accountUrl)) {
+      accountText.setText(translationMessages.accountNotEditable(realm));
+    } else {
+      userAccount.setVisible(true);
+      userAccount.setHref(accountUrl);
+      accountText.setText(translationMessages.accountDelegated());
+    }
   }
 
   @UiHandler("changePassword")
@@ -60,7 +73,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == SubjectProfilePresenter.BOOKMARKS) {
+    if (slot == SubjectProfilePresenter.BOOKMARKS) {
       bookmarks.clear();
       bookmarks.add(content);
     }
