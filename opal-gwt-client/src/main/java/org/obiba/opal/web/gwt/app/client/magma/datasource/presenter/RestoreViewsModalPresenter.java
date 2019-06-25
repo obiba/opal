@@ -53,6 +53,8 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
 
   private int remainingRestores;
 
+  private int restoredCount;
+
   @Inject
   public RestoreViewsModalPresenter(
     EventBus eventBus,
@@ -71,35 +73,35 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
   public void onSubmitFiles(List<File> files) {
     if (files.size() > 0) {
       remainingRestores = files.size();
+      restoredCount = 0;
 
       for (int i = 0; i < files.size(); i++) {
-        File file = files.get(i);
-
+        final File file = files.get(i);
         final FileReader fileReader = Browser.getWindow().newFileReader();
-
         fileReader.setOnloadend(new EventListener() {
           @Override
           public void handleEvent(Event evt) {
             String view = fileReader.getResult().toString();
-
             try {
               ViewDto dto = ViewDto.parse(view);
               if (!currentViews.contains(dto.getName())) {
                 createView(view);
-              } else if (currentViews.contains(dto.getName()) && getView().canOverride()) {
+              } else if (getView().canOverride()) {
                 overrideView(dto.getName(), view);
+              } else {
+                remainingRestores = remainingRestores - 1;
               }
             } catch (Exception e) {
-              fireEvent(NotificationEvent.newBuilder().error("InvalidViewBackupFile").build());
+              remainingRestores = remainingRestores - 1;
+              fireEvent(NotificationEvent.newBuilder().error("InvalidViewBackupFile").args(file.getName()).build());
             }
           }
         });
 
         fileReader.readAsText(file);
       }
+      getView().hideDialog();
     }
-
-    getView().hideDialog();
   }
 
   private void createView(String view) {
@@ -150,10 +152,13 @@ public class RestoreViewsModalPresenter extends ModalPresenterWidget<RestoreView
     public void onResponseCode(Request request, Response response) {
       if (response.getStatusCode() != SC_CREATED && response.getStatusCode() != SC_OK) {
         fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText())).build());
+      } else {
+        restoredCount = restoredCount + 1;
       }
       remainingRestores = remainingRestores - 1;
       if (remainingRestores == 0) {
         fireEvent(new ViewsRestoreSubmittedEvent());
+        fireEvent(NotificationEvent.newBuilder().info("RestoredViewsCount").args(restoredCount + "").build());
       }
     }
   }

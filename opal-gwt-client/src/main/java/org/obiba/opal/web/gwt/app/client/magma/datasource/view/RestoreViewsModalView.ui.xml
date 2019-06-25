@@ -20,7 +20,7 @@
     <g:FlowPanel>
       <b:ControlGroup>
         <b:ControlLabel>
-          <ui:msg description="Input files field">Views</ui:msg>
+          <ui:msg description="Restore views input files field">View Files</ui:msg>
           <o:RequiredIcon/>
         </b:ControlLabel>
 
@@ -29,13 +29,13 @@
         </b:Controls>
 
         <b:HelpBlock>
-          <ui:msg description="Input files help">Backed up views in JSON format.</ui:msg>
+          <ui:msg description="Restore views input files help">Select one or more previously backed up views in JSON format (extracted from the backup zip archive).</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
       <b:ControlGroup>
         <b:CheckBox ui:field="override" addStyleNames="inline-block">
-          <ui:msg description="Override views field">Override</ui:msg>
+          <ui:msg description="Override views field">Override the existing views having the same name</ui:msg>
         </b:CheckBox>
       </b:ControlGroup>
     </g:FlowPanel>
