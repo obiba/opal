@@ -18,6 +18,8 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -35,6 +37,7 @@ import org.obiba.shiro.realm.SudoRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,6 +55,10 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+
+  @Value("#{new Boolean('${org.obiba.opal.security.multiProfile}')}")
+  private boolean multiProfile;
 
   @Override
   @PostConstruct
@@ -75,7 +82,15 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
     try {
       SubjectProfile profile = getProfile(principal);
-      if(!profile.getRealm().equals(realm)) {
+      if (isMultipleRealms()) {
+        List<String> realms = Splitter.on(",").splitToList(profile.getRealm());
+        if (!realms.contains(realm)) {
+          List<String> newRealms = Lists.newArrayList(realms);
+          newRealms.add(realm);
+          profile.setRealm(Joiner.on(",").join(newRealms));
+          orientDbService.save(profile, profile);
+        }
+      } else if(!profile.getRealm().equals(realm)) {
         throw new AuthenticationException(
             "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
                 " expected). Make sure the same subject is not defined in several realms."
@@ -158,6 +173,10 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
         orientDbService.save(profile, profile);
       }
     }
+  }
+
+  private boolean isMultipleRealms() {
+    return multiProfile;
   }
 
   private void ensureUserHomeExists(String username) {

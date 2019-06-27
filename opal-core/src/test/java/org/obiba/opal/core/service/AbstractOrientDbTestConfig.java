@@ -39,10 +39,11 @@ public abstract class AbstractOrientDbTestConfig {
   }
 
   @Bean
-  public static PropertySourcesPlaceholderConfigurer propertiesResolver() {
+  public PropertySourcesPlaceholderConfigurer propertiesResolver() {
     PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer();
     Properties properties = new Properties();
     properties.setProperty("OPAL_HOME", TEMP_FILE.getAbsolutePath());
+    appendProperties(properties);
     placeholderConfigurer.setProperties(properties);
     return placeholderConfigurer;
   }
@@ -72,6 +73,10 @@ public abstract class AbstractOrientDbTestConfig {
     EasyMock.expect(mock.getOpalConfiguration()).andReturn(configuration).anyTimes();
     EasyMock.replay(mock);
     return mock;
+  }
+
+  protected void appendProperties(Properties properties) {
+
   }
 
 }

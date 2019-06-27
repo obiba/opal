@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.service;
 
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -174,5 +175,9 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
       return mock;
     }
 
+    @Override
+    protected void appendProperties(Properties properties) {
+      properties.setProperty("org.obiba.opal.security.multiProfile", "true");
+    }
   }
 }
