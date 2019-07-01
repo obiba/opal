@@ -167,9 +167,20 @@
           <property name="appliesTo" value="2.10.0"/>
         </bean>
 
+        <!-- 2.12.0 / Move limesurvey database to plugin -->
         <bean class="org.obiba.opal.core.upgrade.v2_12_x.LimeSurveyPluginUpgradeStep">
           <property name="description" value="Remove LimeSurvey databases"/>
           <property name="appliesTo" value="2.12.0"/>
+        </bean>
+
+        <!-- 2.14.0 / Magma API 2.0, R-Haven 2.0 -->
+        <bean class="org.obiba.opal.core.upgrade.DatasourcePluginsUpgradeStep">
+          <property name="description" value="Upgrade datasource plugins"/>
+          <property name="appliesTo" value="2.14.0"/>
+        </bean>
+        <bean class="org.obiba.opal.core.upgrade.AnalysisRPluginsUpgradeStep">
+          <property name="description" value="Upgrade R analysis plugins"/>
+          <property name="appliesTo" value="2.14.0"/>
         </bean>
 
       </list>

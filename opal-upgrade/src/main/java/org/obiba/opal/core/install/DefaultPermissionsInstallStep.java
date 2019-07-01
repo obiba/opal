@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultPermissionsInstallStep implements InstallStep {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultPluginsInstallStep.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultPermissionsInstallStep.class);
 
   private SubjectAclService subjectAclService;
 
