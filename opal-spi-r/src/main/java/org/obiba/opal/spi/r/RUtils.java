@@ -26,7 +26,7 @@ public class RUtils {
   public static String getSymbol(String name) {
     String symbol = name.replaceAll(" ", "_");
     int suffix = symbol.lastIndexOf(".");
-    if (suffix>0) {
+    if (suffix > 0) {
       symbol = symbol.substring(0, suffix);
     }
     return symbol;
@@ -55,5 +55,15 @@ public class RUtils {
     } catch (Exception e) {
       return false;
     }
+  }
+
+  /**
+   * Escape some special characters.
+   *
+   * @param label
+   * @return
+   */
+  public static String normalizeLabel(String label) {
+    return label.replace("\\", "\\\\").replace("'", "\\'");
   }
 }
