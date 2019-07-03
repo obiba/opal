@@ -24,6 +24,7 @@ import org.obiba.opal.r.magma.util.IntegerRange;
 import org.obiba.opal.r.magma.util.NumberRange;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -32,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -404,7 +403,7 @@ public class RAssignDatasource extends CsvDatasource {
     }
 
     private String normalize(String label) {
-      return label.replaceAll("'", "\\\\'");
+      return RUtils.normalizeLabel(label);
     }
 
     /**
