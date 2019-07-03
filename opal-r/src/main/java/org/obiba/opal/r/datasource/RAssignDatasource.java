@@ -349,6 +349,7 @@ public class RAssignDatasource extends CsvDatasource {
           if (naRange != null && naRange.hasRange()) {
             attributesList.add(String.format("na_range = c(%s)",
                 Joiner.on(", ").join(naRange.getRangeMin().toString(), naRange.getRangeMax().toString())));
+            missingCats = missingCats.stream().filter(cat -> naRange.getMissingCats().contains(cat.getName())).collect(Collectors.toList());
           }
           // add discrete missing values after na_range as the missingCats may have been modified
           if (!missingCats.isEmpty()) {
