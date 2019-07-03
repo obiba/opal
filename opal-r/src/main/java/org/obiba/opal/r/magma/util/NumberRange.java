@@ -70,6 +70,10 @@ public abstract class NumberRange {
     return hasRange() ? naRange.get(naRange.size() - 1) : null;
   }
 
+  public List<String> getMissingCats() {
+    return missingCats;
+  }
+
   protected abstract Number makeNumber(String valStr);
 
   @Override
