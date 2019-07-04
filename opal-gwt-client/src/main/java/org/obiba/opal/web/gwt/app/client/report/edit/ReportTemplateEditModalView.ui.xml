@@ -76,7 +76,7 @@
           <b:HelpBlock>
             <ui:msg description="Report Schedule help">
               See documentation about how to write a
-              <a href="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html" target="_blank">Cron trigger
+              <a href="http://www.quartz-scheduler.org/documentation/quartz-2.2.2/tutorials/tutorial-lesson-06.html" target="_blank">Cron trigger
                 expression</a>.
             </ui:msg>
           </b:HelpBlock>
