@@ -42,6 +42,9 @@ public class ReportTemplateScheduler {
 
   void updateSchedule(Opal.ReportTemplateDto dto) {
     String jobName = dto.getProject() + "." + dto.getName();
+    if (!commandSchedulerService.hasCommand(jobName, REPORT_SCHEDULING_GROUP)) {
+      scheduleCommand(dto);
+    }
     commandSchedulerService.unscheduleCommand(jobName, REPORT_SCHEDULING_GROUP);
     if(dto.hasCron()) {
       commandSchedulerService.scheduleCommand(jobName, REPORT_SCHEDULING_GROUP, dto.getCron());
