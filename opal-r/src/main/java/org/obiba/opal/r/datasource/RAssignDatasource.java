@@ -320,6 +320,7 @@ public class RAssignDatasource extends CsvDatasource {
     private void writeVariableAttributes(Variable variable) {
       // attributes
       List<String> attributesList = Lists.newArrayList();
+      attributesList.add(String.format("class = base::class(`%s`[['%s']])", getSymbol(tableName), variable.getName()));
       for (Map.Entry<String, String> entry : asAttributesMap(variable).entrySet()) {
         String name = entry.getKey();
         String value = entry.getValue();
