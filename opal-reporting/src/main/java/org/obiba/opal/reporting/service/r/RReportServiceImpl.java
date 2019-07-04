@@ -145,8 +145,7 @@ public class RReportServiceImpl implements ReportService {
         writeFileToR(rSession, file);
       }
     }
-    ensurePackage(rSession, "opal");
-    ensurePackage(rSession, "opaladdons"); // required
+    ensurePackage(rSession, "opalr");
     ensurePackage(rSession, "ggplot2");
     String options = buildOptions(parameters);
     if(!Strings.isNullOrEmpty(options)) {
@@ -160,8 +159,7 @@ public class RReportServiceImpl implements ReportService {
   private void prepareRServer() {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
     rSession.setExecutionContext("Report");
-    ensurePackage(rSession, "opal");
-    ensurePackage(rSession, "opaladdons");
+    ensurePackage(rSession, "opalr");
     ensurePackage(rSession, "ggplot2");
     opalRSessionManager.removeSubjectRSession(rSession.getId());
   }
@@ -175,7 +173,7 @@ public class RReportServiceImpl implements ReportService {
 
   private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
     StringBuilder script = new StringBuilder();
-    script.append("opal.report('").append(reportDesign).append("', progress=TRUE)");
+    script.append("opalr::opal.report('").append(reportDesign).append("', progress=TRUE)");
     return execute(rSession, script.toString());
   }
 
