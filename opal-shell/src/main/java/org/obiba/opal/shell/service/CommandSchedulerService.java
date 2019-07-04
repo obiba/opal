@@ -67,4 +67,5 @@ public interface CommandSchedulerService {
    */
   String getCommandSchedule(String name, String group);
 
+  boolean hasCommand(String name, String group);
 }

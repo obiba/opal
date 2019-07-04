@@ -109,4 +109,13 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
       throw new CommandSchedulerServiceException(ex);
     }
   }
+
+  public boolean hasCommand(String name, String group) {
+    try {
+      JobDetail detail = scheduler.getJobDetail(new JobKey(name, group));
+      return detail != null;
+    } catch (SchedulerException e) {
+      return false;
+    }
+  }
 }
