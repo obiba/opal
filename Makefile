@@ -17,7 +17,7 @@ jennite_project=${projects}/jennite
 obiba_home=${projects}/obiba-home
 
 ifdef OPAL_HOME
-  opal_home = ${OPAL_HOME}
+	opal_home = ${OPAL_HOME}
 else
 	opal_home = ${opal_project}/opal_home
 endif
