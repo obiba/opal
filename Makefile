@@ -12,7 +12,6 @@ opal_project=$(CURDIR)
 magma_project=${projects}/magma
 commons_project=${projects}/obiba-commons
 ds4j_project=${projects}/datashield4j
-opal_home=${opal_project}/opal_home
 jennite_project=${projects}/jennite
 obiba_home=${projects}/obiba-home
 
