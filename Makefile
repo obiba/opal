@@ -12,9 +12,14 @@ opal_project=$(CURDIR)
 magma_project=${projects}/magma
 commons_project=${projects}/obiba-commons
 ds4j_project=${projects}/datashield4j
-opal_home=${opal_project}/opal_home
 jennite_project=${projects}/jennite
 obiba_home=${projects}/obiba-home
+
+ifdef OPAL_HOME
+	opal_home = ${OPAL_HOME}
+else
+	opal_home = ${opal_project}/opal_home
+endif
 
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
