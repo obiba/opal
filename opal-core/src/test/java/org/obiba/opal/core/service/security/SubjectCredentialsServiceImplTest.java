@@ -27,7 +27,7 @@ import org.obiba.opal.core.service.AbstractOrientDbTestConfig;
 import org.obiba.opal.core.service.Asserts;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.security.realm.ApplicationRealm;
+import org.obiba.opal.core.service.security.realm.OpalApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -342,10 +342,10 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
       expect(subjectProfileService.getProfile("user1")).andReturn(new SubjectProfile("user1", OpalUserRealm.OPAL_REALM))
           .anyTimes();
       expect(subjectProfileService.getProfile("app1"))
-          .andReturn(new SubjectProfile("app1", ApplicationRealm.APPLICATION_REALM)).anyTimes();
+          .andReturn(new SubjectProfile("app1", OpalApplicationRealm.APPLICATION_REALM)).anyTimes();
       subjectProfileService.ensureProfile("user1", OpalUserRealm.OPAL_REALM);
       expectLastCall().anyTimes();
-      subjectProfileService.ensureProfile("app1", ApplicationRealm.APPLICATION_REALM);
+      subjectProfileService.ensureProfile("app1", OpalApplicationRealm.APPLICATION_REALM);
       expectLastCall().anyTimes();
       subjectProfileService.deleteProfile("user1");
       expectLastCall().anyTimes();

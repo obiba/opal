@@ -9,27 +9,10 @@
  */
 package org.obiba.opal.core.service.security.realm;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.shiro.authc.AccountException;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -38,11 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Realm for users defined in opal's own users database.
  */
 @Component
-public class OpalUserRealm extends AuthorizingRealm {
+public class OpalUserRealm extends OpalBaseRealm {
 
   public static final String OPAL_REALM = "opal-user-realm";
 
@@ -83,40 +68,18 @@ public class OpalUserRealm extends AuthorizingRealm {
     String username = upToken.getUsername();
 
     // Null username is invalid
-    if(username == null) {
+    if (username == null) {
       throw new AccountException("Null usernames are not allowed by this realm.");
     }
 
     SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
-    if(subjectCredentials == null || !subjectCredentials.isEnabled()) {
+    if (subjectCredentials == null || !subjectCredentials.isEnabled()) {
       throw new UnknownAccountException("No account found for subjectCredentials [" + username + "]");
     }
     SimpleAuthenticationInfo authInfo = new SimpleAuthenticationInfo(username, subjectCredentials.getPassword(),
         getName());
     authInfo.setCredentialsSalt(new SimpleByteSource(salt));
     return authInfo;
-  }
-
-  @Override
-  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    Collection<?> thisPrincipals = principals.fromRealm(getName());
-    if(thisPrincipals != null && !thisPrincipals.isEmpty()) {
-      Object primary = thisPrincipals.iterator().next();
-      PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
-
-      Set<String> roleNames = new HashSet<>();
-      String username = (String) getAvailablePrincipal(simplePrincipals);
-      SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
-      if(subjectCredentials != null) {
-        for(String group : subjectCredentials.getGroups()) {
-          roleNames.add(group);
-        }
-      }
-      return new SimpleAuthorizationInfo(roleNames);
-
-    }
-    return new SimpleAuthorizationInfo();
-
   }
 
 }

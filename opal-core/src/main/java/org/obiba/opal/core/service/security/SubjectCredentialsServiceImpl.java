@@ -29,7 +29,7 @@ import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileNotFoundException;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.security.realm.ApplicationRealm;
+import org.obiba.opal.core.service.security.realm.OpalApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -233,7 +233,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       case PASSWORD:
         return OpalUserRealm.OPAL_REALM;
       case CERTIFICATE:
-        return ApplicationRealm.APPLICATION_REALM;
+        return OpalApplicationRealm.APPLICATION_REALM;
     }
     return "";
   }

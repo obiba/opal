@@ -9,37 +9,25 @@
  */
 package org.obiba.opal.core.service.security.realm;
 
-import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
-import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.shiro.authc.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.GeneralSecurityException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Map;
 
 /**
  * Realm for applications authenticated by SSL certificate.
  */
 @Component
-public class ApplicationRealm extends AuthorizingRealm {
+public class OpalApplicationRealm extends OpalBaseRealm {
 
 //  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
 
@@ -48,8 +36,6 @@ public class ApplicationRealm extends AuthorizingRealm {
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
 
-  @Autowired
-  private SubjectCredentialsService subjectCredentialsService;
 
   @Override
   public String getName() {
@@ -65,7 +51,7 @@ public class ApplicationRealm extends AuthorizingRealm {
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
-    for(Map.Entry<String, Certificate> entry : keyStore.getCertificates().entrySet()) {
+    for (Map.Entry<String, Certificate> entry : keyStore.getCertificates().entrySet()) {
       String certificateAlias = entry.getKey();
       Certificate certificate = entry.getValue();
       try {
@@ -73,38 +59,17 @@ public class ApplicationRealm extends AuthorizingRealm {
         x509Cert.verify(certificate.getPublicKey());
         SubjectCredentials sc = subjectCredentialsService.getSubjectCredentialsByCertificateAlias(certificateAlias);
 
-        if(sc != null) {
+        if (sc != null) {
           SimplePrincipalCollection principals = new SimplePrincipalCollection();
           principals.add(sc.getName(), getName());
           principals.add(x509Token.getPrincipal(), getName());
           return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
         }
-      } catch(GeneralSecurityException e) {
+      } catch (GeneralSecurityException e) {
         // Ignore
       }
     }
     throw new IncorrectCredentialsException();
-  }
-
-  @Override
-  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    Collection<?> thisPrincipals = principals.fromRealm(getName());
-    if(thisPrincipals != null && !thisPrincipals.isEmpty()) {
-      Object primary = thisPrincipals.iterator().next();
-      PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
-
-      Set<String> roleNames = new HashSet<>();
-      String username = (String) getAvailablePrincipal(simplePrincipals);
-      SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
-      if(subjectCredentials != null) {
-        for(String group : subjectCredentials.getGroups()) {
-          roleNames.add(group);
-        }
-      }
-      return new SimpleAuthorizationInfo(roleNames);
-
-    }
-    return new SimpleAuthorizationInfo();
   }
 
 }
