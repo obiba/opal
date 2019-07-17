@@ -88,7 +88,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     try {
       subjectProfileService.getProfile(PRINCIPAL);
       Assert.fail("Should throw SubjectProfileNotFoundException");
-    } catch(SubjectProfileNotFoundException ignored) {
+    } catch(NoSuchSubjectProfileException ignored) {
     }
 
     assertThat(subjectProfileService.getProfiles()).isEmpty();
@@ -99,7 +99,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     subjectProfileService.deleteProfile("no profile");
   }
 
-  @Test(expected = SubjectProfileNotFoundException.class)
+  @Test(expected = NoSuchSubjectProfileException.class)
   public void test_get_null_profile() throws Exception {
     subjectProfileService.getProfile("no profile");
   }

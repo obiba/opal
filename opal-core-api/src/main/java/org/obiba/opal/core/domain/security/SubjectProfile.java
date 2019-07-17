@@ -9,18 +9,17 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SubjectProfile extends AbstractTimestamped implements HasUniqueProperties {
 
@@ -49,7 +48,7 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(principal);
+    return Lists.newArrayList(principal);
   }
 
   @NotNull
@@ -66,6 +65,10 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     return realm;
   }
 
+  public String getFirstRealm() {
+    return Splitter.on(",").split(realm).iterator().next();
+  }
+
   public void setRealm(@NotNull String realm) {
     this.realm = realm;
   }
@@ -79,7 +82,7 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   }
 
   public boolean addBookmark(String resource) {
-    if(bookmarks == null) bookmarks = new HashSet<>();
+    if (bookmarks == null) bookmarks = new HashSet<>();
     return bookmarks.add(new Bookmark(resource));
   }
 
@@ -106,8 +109,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) return true;
-    if(obj == null || getClass() != obj.getClass()) return false;
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
     SubjectProfile other = (SubjectProfile) obj;
     return Objects.equal(principal, other.principal) && Objects.equal(realm, other.realm);
   }

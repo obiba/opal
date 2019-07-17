@@ -13,10 +13,7 @@ package org.obiba.opal.web.security;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.oidc.OIDCConfiguration;
-import org.obiba.opal.core.domain.security.Bookmark;
-import org.obiba.opal.core.domain.security.Group;
-import org.obiba.opal.core.domain.security.SubjectCredentials;
-import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.util.StringUtils;
 
@@ -49,6 +46,14 @@ public class Dtos {
     return builder.build();
   }
 
+  public static SubjectToken fromDto(Opal.SubjectTokenDto dto) {
+    SubjectToken token = new SubjectToken();
+    token.setName(dto.getName());
+    if (dto.hasPrincipal()) token.setPrincipal(dto.getPrincipal());
+    if (dto.hasToken()) token.setToken(dto.getToken());
+    return token;
+  }
+
   public static Opal.SubjectCredentialsDto asDto(SubjectCredentials subjectCredentials) {
     Opal.SubjectCredentialsDto.Builder builder = Opal.SubjectCredentialsDto.newBuilder() //
         .setName(subjectCredentials.getName()) //
@@ -71,6 +76,17 @@ public class Dtos {
         .setName(group.getName()) //
         .addAllSubjectCredentials(group.getSubjectCredentials()) //
         .build();
+  }
+
+  public static Opal.SubjectTokenDto asDto(SubjectToken token) {
+    Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder() //
+        .setPrincipal(token.getPrincipal()) //
+        .setToken(token.getToken()) //
+        .setName(token.getName()) //
+        .setCreated(ISO_8601.format(token.getCreated())) //
+        .setLastUpdate(ISO_8601.format(token.getUpdated()));
+
+    return builder.build();
   }
 
   public static Opal.SubjectProfileDto asDto(SubjectProfile profile) {

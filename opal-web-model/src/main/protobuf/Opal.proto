@@ -251,6 +251,14 @@ message SubjectProfileDto {
   optional string accountUrl = 5;
 }
 
+message SubjectTokenDto {
+  optional string principal = 1;
+  optional string token = 2;
+  required string name = 3;
+  optional string created = 4;
+  optional string lastUpdate = 5;
+}
+
 message LinkDto {
   required string rel = 1;
   required string link = 2;

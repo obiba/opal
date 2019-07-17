@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2019 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.obiba.opal.web.system.subject;
+
+import org.apache.shiro.SecurityUtils;
+import org.obiba.opal.core.service.SubjectTokenService;
+import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+@Component
+@Scope("request")
+@Path("/system/subject-token/_current/token/{name}")
+public class SubjectTokenCurrentResource {
+
+  @PathParam("name")
+  private String name;
+
+  @Autowired
+  private SubjectTokenService subjectTokenService;
+
+  @DELETE
+  @NoAuthorization
+  public Response delete() {
+    subjectTokenService.deleteToken(getPrincipal(), name);
+    return Response.ok().build();
+  }
+
+  private String getPrincipal() {
+    return (String) SecurityUtils.getSubject().getPrincipal();
+  }
+}

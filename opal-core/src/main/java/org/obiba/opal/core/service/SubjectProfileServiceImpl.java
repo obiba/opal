@@ -23,7 +23,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -96,7 +95,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
                 " expected). Make sure the same subject is not defined in several realms."
         );
       }
-    } catch(SubjectProfileNotFoundException e) {
+    } catch(NoSuchSubjectProfileException e) {
       HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
       orientDbService.save(newProfile, newProfile);
     }
@@ -116,24 +115,24 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   public void deleteProfile(@NotNull String principal) {
     try {
       orientDbService.delete(getProfile(principal));
-    } catch(SubjectProfileNotFoundException ignored) {
+    } catch(NoSuchSubjectProfileException ignored) {
       // ignore
     }
   }
 
   @NotNull
   @Override
-  public SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException {
-    if(principal == null) throw new SubjectProfileNotFoundException(principal);
+  public SubjectProfile getProfile(@Nullable String principal) throws NoSuchSubjectProfileException {
+    if(principal == null) throw new NoSuchSubjectProfileException(principal);
     SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
     if(subjectProfile == null) {
-      throw new SubjectProfileNotFoundException(principal);
+      throw new NoSuchSubjectProfileException(principal);
     }
     return subjectProfile;
   }
 
   @Override
-  public void updateProfile(@NotNull String principal) throws SubjectProfileNotFoundException {
+  public void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     profile.setUpdated(new Date());
     orientDbService.save(profile, profile);
@@ -145,7 +144,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException {
+  public void addBookmarks(String principal, List<String> resources) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     for(String resource : resources) {
       profile.addBookmark(resource);
@@ -154,7 +153,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException {
+  public void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     if(profile.hasBookmark(path) && profile.removeBookmark(path)) {
       orientDbService.save(profile, profile);
@@ -162,7 +161,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void deleteBookmarks(String path) throws SubjectProfileNotFoundException{
+  public void deleteBookmarks(String path) throws NoSuchSubjectProfileException {
     for (SubjectProfile profile : orientDbService.list(SubjectProfile.class)) {
       if (!profile.hasBookmarks()) return;
       List<Bookmark> toRemove = profile.getBookmarks().stream()

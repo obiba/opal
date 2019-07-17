@@ -16,7 +16,6 @@ import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
-import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,9 +35,6 @@ public class OpalUserRealm extends OpalBaseRealm {
    */
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;
-
-  @Autowired
-  private SubjectCredentialsService subjectCredentialsService;
 
   @Autowired
   private OpalConfigurationService opalConfigurationService;

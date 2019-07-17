@@ -9,18 +9,16 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Lists;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Lists;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
 
 public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
 
@@ -57,12 +55,12 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
   }
 
   public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull Subject subject,
-      @NotNull String permission) {
+                    @NotNull String permission) {
     this(domain, node, subject.getPrincipal(), subject.getType(), permission);
   }
 
   private SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull String principal, @NotNull SubjectType type,
-      @NotNull String permission) {
+                     @NotNull String permission) {
     this.domain = domain;
     this.node = node;
     this.principal = principal;
@@ -77,7 +75,7 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(domain, node, principal, type.toString(), permission);
+    return Lists.newArrayList(domain, node, principal, type.toString(), permission);
   }
 
   @NotNull
@@ -136,10 +134,10 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
+    if (this == obj) {
       return true;
     }
-    if(obj == null || getClass() != obj.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
     SubjectAcl other = (SubjectAcl) obj;
@@ -194,8 +192,8 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
     @Override
     public boolean equals(Object obj) {
-      if(this == obj) return true;
-      if(obj == null || getClass() != obj.getClass()) return false;
+      if (this == obj) return true;
+      if (obj == null || getClass() != obj.getClass()) return false;
       Subject other = (Subject) obj;
       return Objects.equal(principal, other.principal) && Objects.equal(type, other.type);
     }

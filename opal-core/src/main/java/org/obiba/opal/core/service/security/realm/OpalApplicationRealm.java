@@ -18,6 +18,7 @@ import org.obiba.shiro.authc.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -36,15 +37,14 @@ public class OpalApplicationRealm extends OpalBaseRealm {
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
 
+  @PostConstruct
+  public void postConstruct() {
+    setAuthenticationTokenClass(X509CertificateAuthenticationToken.class);
+  }
 
   @Override
   public String getName() {
     return APPLICATION_REALM;
-  }
-
-  @Override
-  public Class<X509CertificateAuthenticationToken> getAuthenticationTokenClass() {
-    return X509CertificateAuthenticationToken.class;
   }
 
   @Override
