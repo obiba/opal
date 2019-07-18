@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.obiba.opal.core.service.SubjectTokenService;
+import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -38,6 +39,7 @@ public class SubjectTokensCurrentResource {
   @GET
   @NoAuthorization
   public List<Opal.SubjectTokenDto> getAll() {
+    checkSubjectNotToken();
     return subjectTokenService.getTokens(getPrincipal()).stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
@@ -46,6 +48,7 @@ public class SubjectTokensCurrentResource {
   @POST
   @NoAuthorization
   public Response create(Opal.SubjectTokenDto token) {
+    checkSubjectNotToken();
     if (token.hasToken() || Strings.isNullOrEmpty(token.getName()))
       return Response.status(Response.Status.BAD_REQUEST).build();
     SubjectToken tokenObj = Dtos.fromDto(token);
@@ -58,6 +61,7 @@ public class SubjectTokensCurrentResource {
   @DELETE
   @NoAuthorization
   public Response deleteAll() {
+    checkSubjectNotToken();
     subjectTokenService.deleteTokens(getPrincipal());
     return Response.noContent().build();
   }
@@ -66,4 +70,11 @@ public class SubjectTokensCurrentResource {
     return (String) SecurityUtils.getSubject().getPrincipal();
   }
 
+  /**
+   * Verifies that the requesting subject is not authenticated by a token.
+   */
+  private void checkSubjectNotToken() {
+    if (!SecurityUtils.getSubject().getPrincipals().fromRealm(OpalTokenRealm.TOKEN_REALM).isEmpty())
+      throw new ForbiddenException();
+  }
 }

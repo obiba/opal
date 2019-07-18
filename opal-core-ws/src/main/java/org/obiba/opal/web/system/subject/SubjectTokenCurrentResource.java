@@ -11,12 +11,14 @@ package org.obiba.opal.web.system.subject;
 
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.service.SubjectTokenService;
+import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -35,11 +37,20 @@ public class SubjectTokenCurrentResource {
   @DELETE
   @NoAuthorization
   public Response delete() {
+    checkSubjectNotToken();
     subjectTokenService.deleteToken(getPrincipal(), name);
     return Response.ok().build();
   }
 
   private String getPrincipal() {
     return (String) SecurityUtils.getSubject().getPrincipal();
+  }
+
+  /**
+   * Verifies that the requesting subject is not authenticated by a token.
+   */
+  private void checkSubjectNotToken() {
+    if (!SecurityUtils.getSubject().getPrincipals().fromRealm(OpalTokenRealm.TOKEN_REALM).isEmpty())
+      throw new ForbiddenException();
   }
 }

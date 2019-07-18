@@ -255,8 +255,9 @@ message SubjectTokenDto {
   optional string principal = 1;
   optional string token = 2;
   required string name = 3;
-  optional string created = 4;
-  optional string lastUpdate = 5;
+  optional bool readOnly = 4 [default = true];
+  optional string created = 5;
+  optional string lastUpdate = 6;
 }
 
 message LinkDto {

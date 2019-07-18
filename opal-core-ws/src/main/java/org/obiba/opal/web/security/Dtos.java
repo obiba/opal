@@ -51,6 +51,7 @@ public class Dtos {
     token.setName(dto.getName());
     if (dto.hasPrincipal()) token.setPrincipal(dto.getPrincipal());
     if (dto.hasToken()) token.setToken(dto.getToken());
+    if (dto.hasReadOnly()) token.setReadOnly(dto.getReadOnly());
     return token;
   }
 
@@ -79,11 +80,12 @@ public class Dtos {
   }
 
   public static Opal.SubjectTokenDto asDto(SubjectToken token) {
-    Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder() //
-        .setPrincipal(token.getPrincipal()) //
-        .setToken(token.getToken()) //
-        .setName(token.getName()) //
-        .setCreated(ISO_8601.format(token.getCreated())) //
+    Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder()
+        .setPrincipal(token.getPrincipal())
+        .setToken(token.getToken())
+        .setName(token.getName())
+        .setReadOnly(token.isReadOnly())
+        .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));
 
     return builder.build();
