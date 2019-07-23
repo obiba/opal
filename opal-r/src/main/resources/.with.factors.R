@@ -5,12 +5,13 @@
         rval <- as.data.frame(`x`, stringsAsFactors=FALSE)
     }
     for (n in colnames(rval)) {
-        if ("haven_labelled" %in% class(rval[[n]]) && !is.null(attributes(rval[[n]])$labels)) {
-            v <- factor(rval[[n]], levels = attributes(rval[[n]])$labels)
+        attrs <- attributes(rval[[n]])
+        if (attrs$opal.nature == 'CATEGORICAL' && "haven_labelled" %in% class(rval[[n]]) && !is.null(attrs$labels)) {
+            v <- factor(rval[[n]], levels = attrs$labels)
             # restore attributes (without conflicting with factor's ones)
-            for (attr in names(attributes(rval[[n]]))) {
+            for (attr in names(attrs)) {
                 if (!(attr %in% c("levels", "class"))) {
-                    attributes(v)[[attr]] <- attributes(rval[[n]])[[attr]]
+                    attributes(v)[[attr]] <- attrs[[attr]]
                 }
             }
             rval[[n]] <- v
