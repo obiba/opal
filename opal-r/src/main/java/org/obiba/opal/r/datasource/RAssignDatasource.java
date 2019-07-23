@@ -18,6 +18,7 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.*;
 import org.obiba.opal.r.magma.util.DoubleRange;
 import org.obiba.opal.r.magma.util.IntegerRange;
@@ -366,6 +367,7 @@ public class RAssignDatasource extends CsvDatasource {
             Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories()))));
       }
       attributesList.add(String.format("'opal.value_type' = '%s'", variable.getValueType().getName()));
+      attributesList.add(String.format("'opal.nature' = '%s'", VariableNature.getNature(variable).name()));
       attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
           getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
     }
