@@ -25,9 +25,9 @@
           <b:ControlLabel>
             <ui:msg description="Variables File label">Variables File</ui:msg>
           </b:ControlLabel>
-          <o:OpalSimplePanel ui:field="fileSelectionPanel" o:id="fileSelectionPanel"/>
+          <o:OpalSimplePanel ui:field="fileSelectionPanel"/>
           <b:HelpBlock>
-            <ui:msg description="Supported file formats">Valid file extensions: xls, xlsx and sav</ui:msg>
+            <ui:msg description="Supported file formats">Valid file extensions: xls, xlsx (Excel file) and xml (View file)</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 
@@ -53,14 +53,14 @@
               <b:ControlLabel>
                 <ui:msg description="Spss Entity type">Label Locale</ui:msg>
               </b:ControlLabel>
-              <o:DropdownSuggestBox ui:field="localeNameBox" o:id="localeNameBox"/>
+              <o:DropdownSuggestBox ui:field="localeNameBox"/>
             </b:ControlGroup>
 
             <b:ControlGroup ui:field="charsetGroup">
               <b:ControlLabel>
                 <ui:msg description="Character set label">Character Set</ui:msg>
               </b:ControlLabel>
-              <o:CharacterSetView ui:field="charsetView" o:id="charsetView"/>
+              <o:CharacterSetView ui:field="charsetView"/>
             </b:ControlGroup>
 
             <g:FlowPanel>
