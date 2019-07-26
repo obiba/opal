@@ -421,7 +421,7 @@ public interface Translations extends Constants {
       "RXPTFileRequired", "A SAS Transport file is required.", //
       "RStataFileRequired", "A Stata file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
-      "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and sav.",//
+      "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and xml.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
       "ReportJobStarted", "Report task has been launched.  You can follow its progress in the task list.",//
       "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
@@ -1165,7 +1165,7 @@ public interface Translations extends Constants {
 
   @Description("Variables Import File Selection Step")
   @DefaultStringValue(
-      "Select an Excel or SPSS variables file for batch edition of tables and variables.")
+      "Select an Excel variables file or a View XML file for batch edition of tables and variables.")
   String variablesImportFileSelectionStep();
 
   @Description("Variables Import Compare Step")

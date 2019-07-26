@@ -16,7 +16,7 @@
 
   <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
     <b:Paragraph>
-      <ui:msg description="Supported variables file format btn-information">Select an Excel or an XML for batch
+      <ui:msg description="Supported variables file format btn-information">Select an Excel variables file or a View XML file for batch
         edition or creation of variables.
       </ui:msg>
     </b:Paragraph>

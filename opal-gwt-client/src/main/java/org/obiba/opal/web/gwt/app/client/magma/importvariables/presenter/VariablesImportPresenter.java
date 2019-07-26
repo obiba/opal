@@ -288,31 +288,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       DatasourceFileType fileType = DatasourceFileType.getFileType(getView().getSelectedFile());
       validators.add(new FileTypeValidator(fileType, Display.FormField.FILE_SELECTION.name()));
-
-      if(DatasourceFileType.SAV == fileType) {
-        validators.add(createLocaleValidator());
-        validators.add(createCharacterSetEncodingValidator());
-      }
-
       return validators;
-    }
-
-    private FieldValidator createLocaleValidator() {
-      String localeName = getView().getLocale();
-      LocaleValidator localeValidator = new LocaleValidator(localeName, "InvalidLocaleName",
-          Display.FormField.LOCALE.name());
-      localeValidator.setArgs(Lists.newArrayList(localeName));
-
-      return localeValidator;
-    }
-
-    private FieldValidator createCharacterSetEncodingValidator() {
-      String encoding = getView().getCharsetText().getText();
-      CharacterSetEncodingValidator encodingValidator = new CharacterSetEncodingValidator(encoding,
-          "InvalidCharacterSetName", Display.FormField.CHARSET.name());
-      encodingValidator.setArgs(Lists.newArrayList(encoding));
-
-      return encodingValidator;
     }
 
     @Override

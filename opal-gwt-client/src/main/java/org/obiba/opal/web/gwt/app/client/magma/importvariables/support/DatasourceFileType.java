@@ -13,7 +13,6 @@ public enum DatasourceFileType {
   XLS,
   XLSX,
   XML,
-  SAV,
   INVALID;
 
   public static DatasourceFileType getFileType(String filename) {
