@@ -9,55 +9,14 @@
  */
 package org.obiba.opal.web;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.UUID;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelector;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -76,7 +35,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 @Path("/files")
@@ -105,14 +79,14 @@ public class FilesResource {
   @GET
   @Path("/_meta")
   @NoAuthorization
-  public Response getFileSystemRootDetails() throws FileSystemException {
+  public Response getFileSystemRootDetails() throws IOException {
     return getFileDetails("/");
   }
 
   @GET
   @Path("/_meta/{path:.*}")
   @NoAuthorization
-  public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
+  public Response getFileDetails(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     return file.exists()
         ? file.getType() == FileType.FILE ? getFileDetails(file) : getFolderDetails(file)
@@ -131,7 +105,7 @@ public class FilesResource {
   @Path("/{path:.*}")
   @AuthenticatedByCookie
   public Response getFileFromForm(@PathParam("path") String path, @QueryParam("file") List<String> children,
-      @Nullable @FormParam("key") String fileKey) throws IOException {
+                                  @Nullable @FormParam("key") String fileKey) throws IOException {
     return getFileInternal(path, children, fileKey);
   }
 
@@ -144,7 +118,7 @@ public class FilesResource {
   }
 
   private Response getFileInternal(String path, List<String> children, String fileKey) throws IOException {
-    if (!Strings.isNullOrEmpty(fileKey) && fileKey.length()<8) {
+    if (!Strings.isNullOrEmpty(fileKey) && fileKey.length() < 8) {
       return Response.status(Status.BAD_REQUEST).entity("The file key is too short (minimum 8 characters).").build();
     }
     FileObject file = resolveFileInFileSystem(path);
@@ -157,7 +131,7 @@ public class FilesResource {
    * Copy or move a file to the current folder.
    *
    * @param destinationPath
-   * @param action 'copy' (default) or 'move'
+   * @param action          'copy' (default) or 'move'
    * @param sourcesPath
    * @return
    * @throws IOException
@@ -166,27 +140,27 @@ public class FilesResource {
   @Path("/{path:.*}")
   @AuthenticatedByCookie
   public Response updateFile(@PathParam("path") String destinationPath,
-      @QueryParam("action") @DefaultValue("copy") String action, @QueryParam("file") List<String> sourcesPath)
+                             @QueryParam("action") @DefaultValue("copy") String action, @QueryParam("file") List<String> sourcesPath)
       throws IOException {
 
     // destination check
     FileObject destinationFile = resolveFileInFileSystem(destinationPath);
-    if(!destinationFile.isWriteable())
+    if (!destinationFile.isWriteable())
       return Response.status(Status.FORBIDDEN).entity("Destination file is not writable: " + destinationPath).build();
 
     // sources check
-    if(sourcesPath == null || sourcesPath.isEmpty())
+    if (sourcesPath == null || sourcesPath.isEmpty())
       return Response.status(Status.BAD_REQUEST).entity("Source file is missing").build();
 
     // filter actions: copy, move
-    if("move".equals(action.toLowerCase())) return moveTo(destinationFile, sourcesPath);
-    if("copy".equals(action.toLowerCase())) return copyFrom(destinationFile, sourcesPath);
+    if ("move".equals(action.toLowerCase())) return moveTo(destinationFile, sourcesPath);
+    if ("copy".equals(action.toLowerCase())) return copyFrom(destinationFile, sourcesPath);
 
     return Response.status(Status.BAD_REQUEST).entity("Unexpected file action: " + action).build();
   }
 
   private Response moveTo(FileObject destinationFile, List<String> sourcesPath) throws IOException {
-    if (sourcesPath.size()>1) {
+    if (sourcesPath.size() > 1) {
       // several files or folders can only be moved into an existing folder
       return moveToFolder(destinationFile, sourcesPath);
     }
@@ -209,18 +183,18 @@ public class FilesResource {
   private Response moveToFolder(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
-    if(!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
-    if(destinationFolder.getType() != FileType.FOLDER)
+    if (!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
+    if (destinationFolder.getType() != FileType.FOLDER)
       return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
 
     // sources check
-    for(String sourcePath : sourcesPath) {
+    for (String sourcePath : sourcesPath) {
       Response check = checkSourceFile(resolveFileInFileSystem(sourcePath));
       if (check != null) return check;
     }
 
     // do action
-    for(String sourcePath : sourcesPath) {
+    for (String sourcePath : sourcesPath) {
       if (!sourcePath.equals(destinationPath)) {
         FileObject sourceFile = resolveFileInFileSystem(sourcePath);
         FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
@@ -246,9 +220,9 @@ public class FilesResource {
     if (check != null) return check;
 
     String destinationPath = destinationFile.getName().getPath();
-    if(sourceFile.getType() == FileType.FOLDER && destinationFile.getType() == FileType.FILE)
+    if (sourceFile.getType() == FileType.FOLDER && destinationFile.getType() == FileType.FILE)
       return Response.status(Status.BAD_REQUEST).entity("Cannot rename a folder into an existing file: " + destinationPath).build();
-    if(!destinationFile.getParent().isWriteable()) {
+    if (!destinationFile.getParent().isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
     }
 
@@ -267,11 +241,11 @@ public class FilesResource {
    */
   private Response checkSourceFile(FileObject sourceFile) throws IOException {
     String sourcePath = sourceFile.getName().getPath();
-    if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
-    if(!sourceFile.isReadable()) {
+    if (!sourceFile.exists()) getPathNotExistResponse(sourcePath);
+    if (!sourceFile.isReadable()) {
       return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
     }
-    if(!sourceFile.isWriteable()) {
+    if (!sourceFile.isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
     }
     return null;
@@ -280,21 +254,21 @@ public class FilesResource {
   private Response copyFrom(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
-    if(!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
-    if(destinationFolder.getType() != FileType.FOLDER)
+    if (!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
+    if (destinationFolder.getType() != FileType.FOLDER)
       return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
 
     // sources check
-    for(String sourcePath : sourcesPath) {
+    for (String sourcePath : sourcesPath) {
       FileObject sourceFile = resolveFileInFileSystem(sourcePath);
-      if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
-      if(!sourceFile.isReadable()) {
+      if (!sourceFile.exists()) getPathNotExistResponse(sourcePath);
+      if (!sourceFile.isReadable()) {
         return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
       }
     }
 
     // do action
-    for(String sourcePath : sourcesPath) {
+    for (String sourcePath : sourcesPath) {
       if (!sourcePath.equals(destinationPath)) {
         FileObject sourceFile = resolveFileInFileSystem(sourcePath);
         FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
@@ -312,7 +286,7 @@ public class FilesResource {
   @Produces("text/html")
   @AuthenticatedByCookie
   public Response uploadFile(@Context UriInfo uriInfo, @Context HttpServletRequest request)
-      throws FileSystemException, FileUploadException {
+      throws IOException, FileUploadException {
     return uploadFile("/", uriInfo, request);
   }
 
@@ -323,20 +297,20 @@ public class FilesResource {
   @Produces("text/html")
   @AuthenticatedByCookie
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo,
-      @Context HttpServletRequest request) throws FileSystemException, FileUploadException {
+                             @Context HttpServletRequest request) throws IOException, FileUploadException {
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
 
-    if(folder == null || !folder.exists()) {
+    if (folder == null || !folder.exists()) {
       return getPathNotExistResponse(path);
     }
-    if(folder.getType() != FileType.FOLDER) {
+    if (folder.getType() != FileType.FOLDER) {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
 
     List<FileItem> uploadedFiles = getUploadedFiles(request);
-    if(uploadedFiles.isEmpty()) {
+    if (uploadedFiles.isEmpty()) {
       return Response.status(Status.BAD_REQUEST)
           .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
           .build();
@@ -379,7 +353,7 @@ public class FilesResource {
   @POST
   @Path("/")
   @Consumes("text/plain")
-  public Response createFolder(String folderName, @Context UriInfo uriInfo) throws FileSystemException {
+  public Response createFolder(String folderName, @Context UriInfo uriInfo) throws IOException {
     return createFolder("/", folderName, uriInfo);
   }
 
@@ -387,17 +361,17 @@ public class FilesResource {
   @Path("/{path:.*}")
   @Consumes("text/plain")
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo)
-      throws FileSystemException {
-    if(folderName == null || folderName.trim().isEmpty()) return Response.status(Status.BAD_REQUEST).build();
+      throws IOException {
+    if (folderName == null || folderName.trim().isEmpty()) return Response.status(Status.BAD_REQUEST).build();
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
     Response folderResponse = validateFolder(folder, path);
-    if(folderResponse != null) return folderResponse;
+    if (folderResponse != null) return folderResponse;
 
     FileObject file = folder.resolveFile(folderName);
     Response fileResponse = validateFile(file);
-    if(fileResponse != null) return fileResponse;
+    if (fileResponse != null) return fileResponse;
 
     try {
       file.createFolder();
@@ -406,17 +380,17 @@ public class FilesResource {
       return Response.created(folderUri)//
           .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
           .entity(dto).build();
-    } catch(FileSystemException couldNotCreateTheFolder) {
+    } catch (FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
     }
   }
 
   @Nullable
-  private Response validateFolder(FileObject folder, String path) throws FileSystemException {
-    if(folder == null || !folder.exists()) {
+  private Response validateFolder(FileObject folder, String path) throws IOException {
+    if (folder == null || !folder.exists()) {
       return getPathNotExistResponse(path);
     }
-    if(folder.getType() != FileType.FOLDER) {
+    if (folder.getType() != FileType.FOLDER) {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
     return null;
@@ -425,12 +399,12 @@ public class FilesResource {
   @Nullable
   private Response validateFile(FileObject file) throws FileSystemException {
     // Folder or file already exist at specified path.
-    if(file.exists()) {
+    if (file.exists()) {
       return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderPathAlreadyExist").build();
     }
 
     // Parent folder is read-only.
-    if(!file.getParent().isWriteable()) {
+    if (!file.getParent().isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("cannotCreateFolderParentIsReadOnly").build();
     }
 
@@ -439,28 +413,28 @@ public class FilesResource {
 
   @DELETE
   @Path("/{path:.*}")
-  public Response deleteFile(@PathParam("path") String path) throws FileSystemException {
+  public Response deleteFile(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
 
     // File or folder does not exist.
-    if(!file.exists()) {
+    if (!file.exists()) {
       return getPathNotExistResponse(path);
     }
 
     // Read-only file or folder.
-    if(!file.isWriteable()) {
+    if (!file.isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
     }
 
     try {
-      if(file.getType() == FileType.FOLDER) {
+      if (file.getType() == FileType.FOLDER) {
         deleteFolder(file);
       } else {
         file.delete();
       }
       subjectAclService.deleteNodePermissions("/files/" + path);
       return Response.ok("The following file or folder has been deleted : " + path).build();
-    } catch(FileSystemException couldNotDeleteFile) {
+    } catch (FileSystemException couldNotDeleteFile) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
     }
   }
@@ -476,7 +450,7 @@ public class FilesResource {
   public Response getAvailableCharsets() {
     SortedMap<String, Charset> charsets = Charset.availableCharsets();
     List<String> names = new ArrayList<>();
-    for(Charset charSet : charsets.values()) {
+    for (Charset charSet : charsets.values()) {
       names.add(charSet.name());
       names.addAll(charSet.aliases());
     }
@@ -562,7 +536,7 @@ public class FilesResource {
     fileBuilder.setReadable(file.isReadable()).setWritable(file.isWriteable());
 
     // Set size on files only, not folders.
-    if(file.getType() == FileType.FILE) {
+    if (file.getType() == FileType.FILE) {
       fileBuilder.setSize(file.getContent().getSize());
     }
 
@@ -576,7 +550,7 @@ public class FilesResource {
     Opal.FileDto.Builder folderBuilder = getBaseFolderBuilder(folder);
 
     // Create FileDtos for each file & folder in the folder corresponding to the path.
-    if(folder.isReadable()) {
+    if (folder.isReadable()) {
       addChildren(folderBuilder, folder, 2);
     }
 
@@ -604,7 +578,7 @@ public class FilesResource {
     Collections.sort(children, (arg0, arg1) -> arg0.getName().compareTo(arg1.getName()));
 
     // Loop through all children.
-    for(FileObject child : children) {
+    for (FileObject child : children) {
       // Build a FileDto representing the child.
       fileBuilder = Opal.FileDto.newBuilder();
       fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
@@ -612,13 +586,13 @@ public class FilesResource {
       fileBuilder.setReadable(child.isReadable()).setWritable(child.isWriteable());
 
       // Set size on files only, not folders.
-      if(child.getType() == FileType.FILE) {
+      if (child.getType() == FileType.FILE) {
         fileBuilder.setSize(child.getContent().getSize());
       }
 
       fileBuilder.setLastModifiedTime(child.getContent().getLastModifiedTime());
 
-      if(child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
+      if (child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
         addChildren(fileBuilder, child, level - 1);
       }
 
@@ -631,8 +605,8 @@ public class FilesResource {
     return path.startsWith("/tmp/") ? "/tmp/" + UUID.randomUUID() + ".tmp" : path;
   }
 
-  private Response getPathNotExistResponse(String path) {
-    return Response.status(Status.NOT_FOUND).entity("The path specified does not exist: " + path).build();
+  private Response getPathNotExistResponse(String path) throws NoSuchFileException {
+    throw new NoSuchFileException(path);
   }
 
   /**
@@ -647,8 +621,8 @@ public class FilesResource {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
     List<FileItem> files = Lists.newArrayList();
-    for(FileItem fileItem : upload.parseRequest(request)) {
-      if(!fileItem.isFormField()) {
+    for (FileItem fileItem : upload.parseRequest(request)) {
+      if (!fileItem.isFormField()) {
         files.add(fileItem);
       }
     }
@@ -660,7 +634,7 @@ public class FilesResource {
     // OPAL-919: We need to wrap the OutputStream returned by commons-vfs into another OutputStream
     // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
     // when copying large files.
-    try(OutputStream localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
+    try (OutputStream localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
       @Override
       public synchronized void write(byte[] b, int off, int len) throws IOException {
         flush();
@@ -668,10 +642,10 @@ public class FilesResource {
       }
 
     };
-        InputStream uploadedFileStream = uploadedFile.getInputStream()) {
+         InputStream uploadedFileStream = uploadedFile.getInputStream()) {
 
       StreamUtil.copy(uploadedFileStream, localFileStream);
-    } catch(IOException couldNotWriteUploadedFile) {
+    } catch (IOException couldNotWriteUploadedFile) {
       throw new RuntimeException("Could not write uploaded file to Opal file system", couldNotWriteUploadedFile);
     }
   }
@@ -683,17 +657,17 @@ public class FilesResource {
    * @throws FileSystemException
    */
   private void deleteFolder(FileObject folder) throws FileSystemException {
-    if(!folder.isWriteable()) return;
+    if (!folder.isWriteable()) return;
 
     FileObject[] files = folder.getChildren();
-    for(FileObject file : files) {
-      if(file.getType() == FileType.FOLDER) {
+    for (FileObject file : files) {
+      if (file.getType() == FileType.FOLDER) {
         deleteFolder(file);
-      } else if(file.isWriteable()) {
+      } else if (file.isWriteable()) {
         file.delete();
       }
     }
-    if(folder.getChildren().length == 0) {
+    if (folder.getChildren().length == 0) {
       folder.delete();
     }
   }
