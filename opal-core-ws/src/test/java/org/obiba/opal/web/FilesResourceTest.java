@@ -9,33 +9,10 @@
  */
 package org.obiba.opal.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileName;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -46,13 +23,23 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-@SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+@SuppressWarnings({"OverlyLongMethod", "PMD.NcssMethodCount"})
 public class FilesResourceTest {
 
   private OpalRuntime opalRuntimeMock;
@@ -81,7 +68,7 @@ public class FilesResourceTest {
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
     File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
-    if(!emptyDir.exists()) {
+    if (!emptyDir.exists()) {
       assertThat(emptyDir.mkdirs()).isTrue();
     }
     fileSystem = new DefaultOpalFileSystem(rootDir);
@@ -96,18 +83,18 @@ public class FilesResourceTest {
   }
 
   @After
-  public void tearDown() throws FileSystemException {
+  public void tearDown() throws IOException {
     // Delete any files created by the test.
-    for(String filePath : filesCreatedByTest) {
+    for (String filePath : filesCreatedByTest) {
       FileObject file = fileSystem.getRoot().resolveFile(filePath);
-      if(file.exists()) {
+      if (file.exists()) {
         file.delete();
       }
     }
   }
 
   @Test
-  public void testGetFileSystem() throws FileSystemException {
+  public void testGetFileSystem() throws IOException {
 
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -125,7 +112,7 @@ public class FilesResourceTest {
 
   @Test
   @Ignore
-  public void verifyThatAllFilesAndFoldersInDtoStructureExistInFileSystem() throws FileSystemException {
+  public void verifyThatAllFilesAndFoldersInDtoStructureExistInFileSystem() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     replay(opalRuntimeMock);
@@ -144,14 +131,14 @@ public class FilesResourceTest {
     verify(opalRuntimeMock);
   }
 
-  private int verifyThatChildrenExistInFileSystem(FileDto folder, int childrenCounter) throws FileSystemException {
+  private int verifyThatChildrenExistInFileSystem(FileDto folder, int childrenCounter) throws IOException {
     FileObject correspondingFileObj;
     int counter = childrenCounter;
-    for(FileDto child : folder.getChildrenList()) {
+    for (FileDto child : folder.getChildrenList()) {
       counter++;
       correspondingFileObj = fileSystem.getRoot().resolveFile(child.getPath());
       assertThat(correspondingFileObj.exists()).isTrue();
-      if(child.getType() == FileDto.FileType.FOLDER) {
+      if (child.getType() == FileDto.FileType.FOLDER) {
         counter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
       }
     }
@@ -160,7 +147,7 @@ public class FilesResourceTest {
 
   @Ignore("SecurityManager dependency not satisfied")
   @Test
-  public void testGetFoldersDetailsInFileSystem() throws FileSystemException {
+  public void testGetFoldersDetailsInFileSystem() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
 
     replay(opalRuntimeMock);
@@ -179,7 +166,7 @@ public class FilesResourceTest {
   }
 
   private void checkGetFileDetailsResponse(String path, String... expectedFolderContentArray)
-      throws FileSystemException {
+      throws IOException {
 
     Set<String> expectedFolderContent = new HashSet<>(Arrays.asList(expectedFolderContentArray));
     Response response = filesResource.getFileDetails(path);
@@ -198,10 +185,10 @@ public class FilesResourceTest {
 
   private void checkFolderContent(Set<String> expectedFolderContent, Iterable<FileDto> folderContent, int level) {
     // Make sure folder content is as expected.
-    for(FileDto oneFileOrFolder : folderContent) {
+    for (FileDto oneFileOrFolder : folderContent) {
       assertThat(expectedFolderContent).contains(oneFileOrFolder.getName());
       expectedFolderContent.remove(oneFileOrFolder.getName());
-      if(level > 0 && oneFileOrFolder.getChildrenCount() > 0) {
+      if (level > 0 && oneFileOrFolder.getChildrenCount() > 0) {
         checkFolderContent(expectedFolderContent, oneFileOrFolder.getChildrenList(), level - 1);
       }
     }
@@ -237,14 +224,14 @@ public class FilesResourceTest {
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
 
     // Check that all folders and files exist in the compressed archive that represents the folder.
-    for(String anExpectedFolderContentArray : expectedFolderContentArray) {
+    for (String anExpectedFolderContentArray : expectedFolderContentArray) {
       assertThat(zipfile.getEntry(anExpectedFolderContentArray)).isNotNull();
     }
 
     Enumeration<ZipEntry> zipEnum = (Enumeration<ZipEntry>) zipfile.entries();
     int count = 0;
 
-    while(zipEnum.hasMoreElements()) {
+    while (zipEnum.hasMoreElements()) {
       zipEnum.nextElement();
       count++;
     }
@@ -256,13 +243,16 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testGetPathThatDoesNotExist() throws FileSystemException {
+  public void testGetPathThatDoesNotExist() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     replay(opalRuntimeMock);
 
-    Response response = filesResource.getFileDetails("/folder1/folder2");
-    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+    try {
+      filesResource.getFileDetails("/folder1/folder2");
+      assertThat(false).isTrue();
+    } catch (NoSuchFileException e) {
+    }
 
     verify(opalRuntimeMock);
 
@@ -305,7 +295,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFileNoContentSubmitted() throws FileSystemException, FileUploadException, URISyntaxException {
+  public void testUploadFileNoContentSubmitted() throws IOException, FileUploadException, URISyntaxException {
 
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -345,30 +335,34 @@ public class FilesResourceTest {
 
     // Upload the file.
     String destinationPath = "/folder1/folder11/folder111/patate";
-    Response response = fileResource.uploadFile(destinationPath, uriInfoMock, null);
-    filesCreatedByTest.add(destinationPath);
+    try {
+      fileResource.uploadFile(destinationPath, uriInfoMock, null);
+      assertThat(false).isTrue();
+    } catch (NoSuchFileException e) {
 
-    // Verify that the service response is CREATED.
-    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+    }
 
     verify(opalRuntimeMock, fileItemMock, uriInfoMock);
   }
 
   @Test
-  public void testDeleteFile_FileDoesNotExist() throws FileSystemException {
+  public void testDeleteFile_FileDoesNotExist() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     replay(opalRuntimeMock);
 
-    Response response = filesResource.deleteFile("/folder1/folder2/filethatdoesnotexist.txt");
-    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+    try {
+      filesResource.deleteFile("/folder1/folder2/filethatdoesnotexist.txt");
+      assertThat(false).isTrue();
+    } catch (NoSuchFileException e) {
+    }
 
     verify(opalRuntimeMock);
   }
 
   @Test
   @Ignore
-  public void testDeleteFile_CannotDeleteFolderWithContent() throws FileSystemException {
+  public void testDeleteFile_CannotDeleteFolderWithContent() throws IOException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     replay(opalRuntimeMock);
@@ -381,7 +375,7 @@ public class FilesResourceTest {
 
   @Test
   @Ignore
-  public void testDeleteFile_CannotDeleteReadOnlyFile() throws FileSystemException {
+  public void testDeleteFile_CannotDeleteReadOnlyFile() throws IOException {
     expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.isWriteable()).andReturn(false).atLeastOnce();
@@ -395,7 +389,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testDeleteFile_FileDeletedSuccessfully() throws FileSystemException {
+  public void testDeleteFile_FileDeletedSuccessfully() throws IOException {
     expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.isWriteable()).andReturn(true).atLeastOnce();
@@ -411,7 +405,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testDeleteFile_CouldNotDeleteFile() throws FileSystemException {
+  public void testDeleteFile_CouldNotDeleteFile() throws IOException {
     expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.isWriteable()).andReturn(true).atLeastOnce();
@@ -428,7 +422,7 @@ public class FilesResourceTest {
   private FilesResource getFileResource() {
     FilesResource resource = new FilesResource() {
       @Override
-      protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+      protected FileObject resolveFileInFileSystem(String path) {
         return fileObjectMock;
       }
     };
@@ -438,7 +432,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testCreateFolder_CannotCreateFolderPathAlreadyExist() throws FileSystemException, URISyntaxException {
+  public void testCreateFolder_CannotCreateFolderPathAlreadyExist() throws IOException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.resolveFile("folder11")).andReturn(fileSystem.getRoot().resolveFile("/folder1/folder11"))
@@ -453,7 +447,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testCreateFolder_CannotCreateFolderParentIsReadOnly() throws FileSystemException, URISyntaxException {
+  public void testCreateFolder_CannotCreateFolderParentIsReadOnly() throws IOException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
     FileObject childFolderMock = createMock(FileObject.class);
@@ -472,7 +466,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testCreateFolder_FolderCreatedSuccessfully() throws FileSystemException, URISyntaxException {
+  public void testCreateFolder_FolderCreatedSuccessfully() throws IOException, URISyntaxException {
     expect(fileObjectMock.getType()).andReturn(FileType.FOLDER).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
 
