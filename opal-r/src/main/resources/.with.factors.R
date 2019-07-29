@@ -16,6 +16,10 @@
             }
             rval[[n]] <- v
         }
+        # do not want haven things in data frame (plus datashield supports only a single class)
+        if (as.data.frame) {
+            attributes(rval[[n]])[["class"]] <- attrs[["class"]][1]
+        }
     }
     rval
 }
