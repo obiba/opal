@@ -321,11 +321,12 @@ public class RAssignDatasource extends CsvDatasource {
     private void writeVariableAttributes(Variable variable) {
       // attributes
       List<String> attributesList = Lists.newArrayList();
-      attributesList.add(String.format("class = base::class(`%s`[['%s']])", getSymbol(tableName), variable.getName()));
+      String baseClassCall = String.format("base::class(`%s`[['%s']])", getSymbol(tableName), variable.getName());
+      attributesList.add(String.format("class = %s", baseClassCall));
       for (Map.Entry<String, String> entry : asAttributesMap(variable).entrySet()) {
         String name = entry.getKey();
         String value = entry.getValue();
-        if (!name.equals("class")) { // exclude class attribute as it is an interpreted by R
+        if (!name.equals("class")) { // exclude class attribute as it is interpreted by R
           attributesList.add(String.format("'%s' = '%s'", name, normalize(value)));
         }
         // to help haven R package to write spss or stata formats
@@ -344,7 +345,7 @@ public class RAssignDatasource extends CsvDatasource {
           }
         }
         if (!missingCats.isEmpty()) {
-          attributesList.add(String.format("class = c('%s')",
+          attributesList.add(String.format("class = c(%s, '%s')", baseClassCall,
               Joiner.on("', '").join("haven_labelled_spss", "haven_labelled")));
           NumberRange naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).collect(Collectors.toList()));
           if (naRange != null && naRange.hasRange()) {
@@ -361,7 +362,7 @@ public class RAssignDatasource extends CsvDatasource {
                 Joiner.on(", ").join(getLabelledCategories(variable, missingCats))));
           }
         } else {
-          attributesList.add("class = 'haven_labelled'");
+          attributesList.add(String.format("class = c(%s, 'haven_labelled')", baseClassCall));
         }
         attributesList.add(String.format("labels = c(%s)",
             Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories()))));
