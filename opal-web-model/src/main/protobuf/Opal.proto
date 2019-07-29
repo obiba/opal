@@ -249,6 +249,7 @@ message SubjectProfileDto {
   required string created = 3;
   required string lastUpdate = 4;
   optional string accountUrl = 5;
+  repeated string groups = 6;
 }
 
 message SubjectTokenDto {

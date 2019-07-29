@@ -105,6 +105,8 @@ public class Dtos {
     if (!Strings.isNullOrEmpty(accountUrl))
       builder.setAccountUrl(accountUrl);
 
+    builder.addAllGroups(profile.getGroups());
+
     return builder.build();
   }
 

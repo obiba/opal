@@ -11,6 +11,10 @@
 package org.obiba.opal.core.service.security.realm;
 
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.domain.security.SubjectToken;
@@ -23,12 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A realm for handling personal access API tokens represented by {@link org.obiba.opal.core.domain.security.SubjectToken}.
  */
 @Component
-public class OpalTokenRealm extends OpalBaseRealm {
+public class OpalTokenRealm extends AuthorizingRealm {
 
   public static final String TOKEN_REALM = "opal-token-realm";
 
@@ -59,8 +66,31 @@ public class OpalTokenRealm extends OpalBaseRealm {
       principals.add(subToken.getPrincipal(), subProfile.getFirstRealm());
       principals.add(subToken.getToken(), getName());
       return new SimpleAuthenticationInfo(principals, subToken.getToken());
-    } catch(NoSuchSubjectTokenException| NoSuchSubjectProfileException e) {
+    } catch (NoSuchSubjectTokenException | NoSuchSubjectProfileException e) {
       throw new UnknownAccountException("No account found for subjectToken [" + tokenId + "]");
     }
+  }
+
+  /**
+   * Roles are inherited from original user, extracted from ts profile (has the primary authenticating realm is not accessible).
+   * 
+   * @param principals
+   * @return
+   */
+  @Override
+  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    Collection<?> thisPrincipals = principals.fromRealm(getName());
+    if (thisPrincipals != null && !thisPrincipals.isEmpty()) {
+      Set<String> roleNames = new HashSet<>();
+      String username = principals.getPrimaryPrincipal().toString();
+      try {
+        SubjectProfile subjectProfile = subjectProfileService.getProfile(username);
+        roleNames.addAll(subjectProfile.getGroups());
+        return new SimpleAuthorizationInfo(roleNames);
+      } catch (NoSuchSubjectProfileException e) {
+        // ignore
+      }
+    }
+    return new SimpleAuthorizationInfo();
   }
 }

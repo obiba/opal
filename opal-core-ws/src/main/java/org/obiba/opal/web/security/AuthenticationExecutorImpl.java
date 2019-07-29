@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.security;
 
+import com.google.common.base.Joiner;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 
 /**
  * Perform the authentication, either by username-password token or by obiba ticket token.
@@ -28,45 +30,45 @@ import javax.annotation.PostConstruct;
 @Component
 public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
 
-    @Value("${org.obiba.opal.security.login.maxTry}")
-    private int maxTry;
+  @Value("${org.obiba.opal.security.login.maxTry}")
+  private int maxTry;
 
-    @Value("${org.obiba.opal.security.login.trialTime}")
-    private int trialTime;
+  @Value("${org.obiba.opal.security.login.trialTime}")
+  private int trialTime;
 
-    @Value("${org.obiba.opal.security.login.banTime}")
-    private int banTime;
+  @Value("${org.obiba.opal.security.login.banTime}")
+  private int banTime;
 
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationExecutorImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(AuthenticationExecutorImpl.class);
 
-    private static final String ENSURED_PROFILE = "ensuredProfile";
+  private static final String ENSURED_PROFILE = "ensuredProfile";
 
-    @Autowired
-    private SubjectProfileService subjectProfileService;
+  @Autowired
+  private SubjectProfileService subjectProfileService;
 
-    @PostConstruct
-    public void configure() {
-        configureBan(maxTry, trialTime, banTime);
+  @PostConstruct
+  public void configure() {
+    configureBan(maxTry, trialTime, banTime);
+  }
+
+  @Override
+  protected void ensureProfile(Subject subject) {
+    Object principal = subject.getPrincipal();
+
+    if (!subjectProfileService.supportProfile(principal)) {
+      return;
     }
 
-    @Override
-    protected void ensureProfile(Subject subject) {
-        Object principal = subject.getPrincipal();
-
-        if (!subjectProfileService.supportProfile(principal)) {
-            return;
-        }
-
-        Session subjectSession = subject.getSession(false);
-        boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
-        if (!ensuredProfile) {
-            String username = principal.toString();
-            log.debug("Ensure HOME folder for {}", username);
-            subjectProfileService.ensureProfile(subject.getPrincipals());
-            if (subjectSession != null) {
-                subjectSession.setAttribute(ENSURED_PROFILE, true);
-            }
-        }
+    Session subjectSession = subject.getSession(false);
+    boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
+    if (!ensuredProfile) {
+      String username = principal.toString();
+      log.debug("Ensure HOME folder for {}", username);
+      subjectProfileService.ensureProfile(subject.getPrincipals());
+      if (subjectSession != null) {
+        subjectSession.setAttribute(ENSURED_PROFILE, true);
+      }
     }
+  }
 
 }

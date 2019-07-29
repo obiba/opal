@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -78,6 +79,19 @@ public class SubjectProfilesAdministrationView extends ViewImpl
       }
 
     }, translations.realmLabel());
+
+    profilesTable.addColumn(new TextColumn<SubjectProfileDto>() {
+
+      @Override
+      public String getValue(SubjectProfileDto object) {
+        String groupsTxt = "";
+        for (String gp : JsArrays.toIterable(object.getGroupsArray())) {
+          groupsTxt = groupsTxt.length() == 0 ? gp : groupsTxt + ", " + gp;
+        }
+        return groupsTxt;
+      }
+
+    }, translations.userGroupsLabel());
     profilesTable.addColumn(new TextColumn<SubjectProfileDto>() {
 
       @Override
