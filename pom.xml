@@ -16,7 +16,7 @@
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal</artifactId>
   <packaging>pom</packaging>
-  <version>2.14-SNAPSHOT</version>
+  <version>2.14.4</version>
 
   <name>opal</name>
   <description>Opal Application</description>
@@ -1860,7 +1860,7 @@
     <connection>scm:git:https://github.com/obiba/opal.git</connection>
     <developerConnection>scm:git:https://github.com/obiba/opal.git</developerConnection>
     <url>https://github.com/obiba/opal</url>
-    <tag>opal-2.14.x</tag>
+    <tag>2.14.4</tag>
   </scm>
 
   <issueManagement>
