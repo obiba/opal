@@ -115,7 +115,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   @Override
   public String toString() {
-    return "report -n '" + getOptions().getName() + "' -p '" + getOptions().getProject() + "'";
+    return "report -n \"" + getOptions().getName() + "\" -p \"" + getOptions().getProject() + "\"";
   }
 
   private int renderAndSendEmail(ReportTemplate reportTemplate, FileObject reportOutput) throws FileSystemException {

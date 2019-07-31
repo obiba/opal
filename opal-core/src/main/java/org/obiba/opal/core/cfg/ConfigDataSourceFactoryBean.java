@@ -12,6 +12,7 @@ package org.obiba.opal.core.cfg;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.slf4j.Logger;
@@ -46,7 +47,9 @@ public class ConfigDataSourceFactoryBean extends DataSourceFactoryBean {
     if(password == null) {
       setPassword(cryptoService.decrypt(opalConfigurationService.getOpalConfiguration().getDatabasePassword()));
     }
-    return super.getObject();
+    BasicDataSource ds = (BasicDataSource)super.getObject();
+    ds.setDefaultAutoCommit(true);
+    return ds;
   }
 
 }
