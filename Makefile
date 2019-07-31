@@ -24,6 +24,7 @@ endif
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
 orientdb_version=2.2.37
+hsqldb_version=2.3.3
 
 mysql_root=root
 mysql_password=1234
@@ -284,6 +285,10 @@ orientdb-console:
 	@echo "  connect plocal:$(opal_home)/data/orientdb/opal-config admin admin"
 	@echo
 	@cd ${opal_home}/work/orientdb-community-importers-$(orientdb_version)/bin && ./console.sh
+
+hsqldb-tool:
+	cd ${opal_home} && \
+	java -jar ../opal-server/target/opal-server-$(version)/lib/hsqldb-$(hsqldb_version).jar --url jdbc:hsqldb:file:data/hsql/opal_config --user opal --password $(hsqldb_pwd)
 
 #
 # GWT locales
