@@ -104,9 +104,15 @@ public class OpalJettyServer {
     // OPAL-2752
     String includedCipherSuites = properties.getProperty("org.obiba.opal.ssl.includedCipherSuites");
 
+    boolean allowInvalidCertificates = false;
+    try {
+      allowInvalidCertificates = Boolean.valueOf(properties.getProperty("org.obiba.opal.security.ssl.allowInvalidCertificates"));
+    } catch (Exception e) {
+    }
+
     configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), createHttpConfiguration(maxIdleTime));
     configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), createHttpConfiguration(maxIdleTime),
-        excludedProtocols, includedCipherSuites);
+        excludedProtocols, includedCipherSuites, allowInvalidCertificates);
 
     // OPAL-2652
     int maxFormContentSize = Integer
@@ -142,13 +148,13 @@ public class OpalJettyServer {
   }
 
   private void configureSslConnector(@Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
-                                     String includedCipherSuites) {
+                                     String includedCipherSuites, Boolean allowInvalidCertificates) {
     if (httpsPort == null || httpsPort <= 0) return;
     httpConfig.setSecureScheme("https");
     httpConfig.setSecurePort(httpsPort);
     httpConfig.addCustomizer(new SecureRequestCustomizer());
     ServerConnector sslConnector = new ServerConnector(jettyServer,
-        new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites), HttpVersion.HTTP_1_1.asString()),
+        new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites, allowInvalidCertificates), HttpVersion.HTTP_1_1.asString()),
         new HttpConnectionFactory(httpConfig));
     sslConnector.setPort(httpsPort);
     jettyServer.addConnector(sslConnector);
@@ -162,7 +168,7 @@ public class OpalJettyServer {
     return httpConfig;
   }
 
-  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites) {
+  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites, boolean allowInvalidCertificates) {
     SslContextFactory jettySsl = new SslContextFactory() {
 
       @Override
@@ -175,6 +181,7 @@ public class OpalJettyServer {
       }
 
     };
+    jettySsl.setTrustAll(allowInvalidCertificates);
     jettySsl.setWantClientAuth(true);
     jettySsl.setNeedClientAuth(false);
     jettySsl.setRenegotiationAllowed(false);
@@ -193,7 +200,7 @@ public class OpalJettyServer {
   }
 
   private Handler createServletHandler(Properties properties) {
-    servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS|ServletContextHandler.SECURITY);
+    servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath("/");
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
@@ -223,7 +230,7 @@ public class OpalJettyServer {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
 
     initOIDCFilter(properties);
-    
+
     FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
     authenticationFilterHolder.setName("authenticationFilter");
     authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
@@ -233,8 +240,8 @@ public class OpalJettyServer {
   }
 
   private void initOIDCFilter(Properties properties) {
-      servletContextHandler.addFilter(OpalLoginFilter.Wrapper.class, "/auth/login/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-      servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, "/auth/callback/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+    servletContextHandler.addFilter(OpalLoginFilter.Wrapper.class, "/auth/login/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+    servletContextHandler.addFilter(OpalCallbackFilter.Wrapper.class, "/auth/callback/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
   }
 
   private void initNotAllowedMethods() {
