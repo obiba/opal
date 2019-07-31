@@ -104,15 +104,9 @@ public class OpalJettyServer {
     // OPAL-2752
     String includedCipherSuites = properties.getProperty("org.obiba.opal.ssl.includedCipherSuites");
 
-    boolean allowInvalidCertificates = false;
-    try {
-      allowInvalidCertificates = Boolean.valueOf(properties.getProperty("org.obiba.opal.security.ssl.allowInvalidCertificates"));
-    } catch (Exception e) {
-    }
-
     configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), createHttpConfiguration(maxIdleTime));
     configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), createHttpConfiguration(maxIdleTime),
-        excludedProtocols, includedCipherSuites, allowInvalidCertificates);
+        excludedProtocols, includedCipherSuites);
 
     // OPAL-2652
     int maxFormContentSize = Integer
@@ -148,13 +142,13 @@ public class OpalJettyServer {
   }
 
   private void configureSslConnector(@Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
-                                     String includedCipherSuites, Boolean allowInvalidCertificates) {
+                                     String includedCipherSuites) {
     if (httpsPort == null || httpsPort <= 0) return;
     httpConfig.setSecureScheme("https");
     httpConfig.setSecurePort(httpsPort);
     httpConfig.addCustomizer(new SecureRequestCustomizer());
     ServerConnector sslConnector = new ServerConnector(jettyServer,
-        new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites, allowInvalidCertificates), HttpVersion.HTTP_1_1.asString()),
+        new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites), HttpVersion.HTTP_1_1.asString()),
         new HttpConnectionFactory(httpConfig));
     sslConnector.setPort(httpsPort);
     jettyServer.addConnector(sslConnector);
@@ -168,7 +162,7 @@ public class OpalJettyServer {
     return httpConfig;
   }
 
-  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites, boolean allowInvalidCertificates) {
+  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites) {
     SslContextFactory jettySsl = new SslContextFactory() {
 
       @Override
@@ -181,7 +175,7 @@ public class OpalJettyServer {
       }
 
     };
-    jettySsl.setTrustAll(allowInvalidCertificates);
+    jettySsl.setTrustAll(true);
     jettySsl.setWantClientAuth(true);
     jettySsl.setNeedClientAuth(false);
     jettySsl.setRenegotiationAllowed(false);
