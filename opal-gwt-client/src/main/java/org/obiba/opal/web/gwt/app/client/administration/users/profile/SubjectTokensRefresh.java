@@ -10,15 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import com.gwtplatform.dispatch.annotation.GenEvent;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
-public interface SubjectProfileUiHandlers extends UiHandlers {
+@GenEvent
+public class SubjectTokensRefresh {
 
-  void onChangePassword();
-
-  void onAddToken();
-
-  void onRemoveToken(SubjectTokenDto token);
+  SubjectTokenDto token;
 
 }

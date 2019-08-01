@@ -81,7 +81,6 @@ public class Dtos {
   public static Opal.SubjectTokenDto asDto(SubjectToken token) {
     Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder()
         .setPrincipal(token.getPrincipal())
-        .setToken(token.getToken())
         .setName(token.getName())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));

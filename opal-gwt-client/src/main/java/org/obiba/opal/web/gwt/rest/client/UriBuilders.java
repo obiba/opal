@@ -701,6 +701,22 @@ public enum UriBuilders {
     }
   },
 
+  CURRENT_SUBJECT_TOKENS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-token", "_current", "tokens");
+
+    }
+  },
+
+  CURRENT_SUBJECT_TOKEN {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-token", "_current", "token", "{}");
+
+    }
+  },
+
   ID_PROVIDERS {
     @Override
     public UriBuilder create() {

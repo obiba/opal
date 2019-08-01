@@ -10,15 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
-public interface SubjectProfileUiHandlers extends UiHandlers {
+public interface AddSubjectTokenModalUiHandlers extends ModalUiHandlers {
 
-  void onChangePassword();
+  void onCreateToken(SubjectTokenDto token);
 
-  void onAddToken();
-
-  void onRemoveToken(SubjectTokenDto token);
-
+  String onGenerateToken();
 }

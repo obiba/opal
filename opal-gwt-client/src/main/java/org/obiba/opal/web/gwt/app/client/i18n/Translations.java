@@ -718,7 +718,9 @@ public interface Translations extends Constants {
       "IDProviderClientSecretIsRequired", "Client secret is required.",
       "IDProviderDiscoveryUriIsRequired", "Discovery URI is required.",
       "IDProviderDiscoveryUriIsUri", "Discovery URI must start with https (recommended) or http.",
-      "IDProviderProviderUrlIsUri", "Account login page address must start with https (recommended) or http."
+      "IDProviderProviderUrlIsUri", "Account login page address must start with https (recommended) or http.",
+      "TokenToCopyReminder", "Make sure to copy your new personal access token now. You won't be able to see it again!",
+      "NameMustBeUnique", "Name must be unique."
   })
   Map<String, String> userMessageMap();
 
@@ -948,8 +950,12 @@ public interface Translations extends Constants {
   String noSummaryDataAvailableLabel();
 
   @Description("No Options label")
-  @DefaultStringValue("No Options")
+  @DefaultStringValue("No options")
   String noOptionsLabel();
+
+  @Description("No Tokens label")
+  @DefaultStringValue("No tokens")
+  String noTokensLabel();
 
   @Description("Summary preview pending on label")
   @DefaultStringValue("Summary preview pending on")
@@ -2103,6 +2109,10 @@ public interface Translations extends Constants {
   @Description("Download Modal title")
   @DefaultStringValue("Download File")
   String downloadFileModalTitle();
+
+  @Description("Add Token title")
+  @DefaultStringValue("Add Token")
+  String addTokenModalTitle();
 
   @Description("Export VCF Modal title")
   @DefaultStringValue("Export VCF Files")

@@ -75,6 +75,8 @@ import org.obiba.opal.web.gwt.app.client.administration.users.edit.SubjectCreden
 import org.obiba.opal.web.gwt.app.client.administration.users.edit.SubjectCredentialsView;
 import org.obiba.opal.web.gwt.app.client.administration.users.list.SubjectCredentialsAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.list.SubjectCredentialsAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.users.profile.AddSubjectTokenModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.profile.AddSubjectTokenModalView;
 import org.obiba.opal.web.gwt.app.client.administration.users.profile.SubjectProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.profile.SubjectProfileView;
 import org.obiba.opal.web.gwt.app.client.administration.users.profile.admin.SubjectProfilesAdministrationPresenter;
@@ -147,6 +149,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         SubjectProfilePresenter.Proxy.class);
     bindPresenterWidget(ChangePasswordModalPresenter.class, ChangePasswordModalPresenter.Display.class,
         ChangePasswordModalView.class);
+    bindPresenterWidget(AddSubjectTokenModalPresenter.class, AddSubjectTokenModalPresenter.Display.class,
+        AddSubjectTokenModalView.class);
   }
 
   private void configureIDProviders() {

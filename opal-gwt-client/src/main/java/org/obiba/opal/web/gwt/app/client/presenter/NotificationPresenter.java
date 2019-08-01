@@ -52,7 +52,7 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
   }
 
   public enum NotificationType {
-    ERROR, WARNING, INFO
+    ERROR, WARNING, INFO, SUCCESS
   }
 
 }

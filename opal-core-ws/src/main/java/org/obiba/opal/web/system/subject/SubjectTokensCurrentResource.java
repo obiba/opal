@@ -49,12 +49,12 @@ public class SubjectTokensCurrentResource {
   @NoAuthorization
   public Response create(Opal.SubjectTokenDto token) {
     checkSubjectNotToken();
-    if (token.hasToken() || Strings.isNullOrEmpty(token.getName()))
+    if (!token.hasToken() || Strings.isNullOrEmpty(token.getName()))
       return Response.status(Response.Status.BAD_REQUEST).build();
     SubjectToken tokenObj = Dtos.fromDto(token);
     tokenObj.setPrincipal(getPrincipal());
-    tokenObj = subjectTokenService.saveToken(tokenObj);
-    URI tokenUri = UriBuilder.fromPath("/").path(SubjectTokenResource.class).build(getPrincipal(), tokenObj.getToken());
+    subjectTokenService.saveToken(tokenObj);
+    URI tokenUri = UriBuilder.fromPath("/").path(SubjectTokenResource.class).build(getPrincipal(), token.getName());
     return Response.created(tokenUri).build();
   }
 

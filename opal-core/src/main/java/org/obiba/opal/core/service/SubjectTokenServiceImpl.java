@@ -11,24 +11,38 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   private static final Logger log = LoggerFactory.getLogger(SubjectTokenServiceImpl.class);
 
+  /**
+   * Number of times the user password is hashed for attack resiliency
+   */
+  @Value("${org.obiba.opal.security.password.nbHashIterations}")
+  private int nbHashIterations;
+
+  private final OrientDbService orientDbService;
+
+  private final OpalConfigurationService opalConfigurationService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  public SubjectTokenServiceImpl(OrientDbService orientDbService, OpalConfigurationService opalConfigurationService) {
+    this.orientDbService = orientDbService;
+    this.opalConfigurationService = opalConfigurationService;
+  }
 
   @Override
   @PostConstruct
@@ -46,8 +60,9 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
       throw new IllegalArgumentException("Subject token with name " + token.getName() + " already exists for principal " + token.getPrincipal());
     }
     if (!token.hasToken()) {
-      token.setToken(UUID.randomUUID().toString());
+      throw new IllegalArgumentException("Access token is missing");
     }
+    token.setToken(hashToken(token.getToken()));
     orientDbService.save(token, token);
     return token;
   }
@@ -75,7 +90,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Override
   public SubjectToken getToken(String id) throws NoSuchSubjectTokenException {
     SubjectToken template = new SubjectToken();
-    template.setToken(id);
+    template.setToken(hashToken(id));
     SubjectToken token = orientDbService.findUnique(template);
     if (token == null) {
       throw new NoSuchSubjectTokenException(id);
@@ -93,7 +108,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Override
   public boolean hasToken(String id) {
     SubjectToken template = new SubjectToken();
-    template.setToken(id);
+    template.setToken(hashToken(id));
     SubjectToken token = orientDbService.findUnique(template);
     return token != null;
   }
@@ -112,5 +127,10 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   public List<SubjectToken> getTokens(String principal) {
     return Lists.newArrayList(orientDbService.list(SubjectToken.class,
         String.format("select from %s where principal = ?", SubjectToken.class.getSimpleName()), principal));
+  }
+
+  private String hashToken(String id) {
+    return new Sha512Hash(id, opalConfigurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
+        .toString();
   }
 }

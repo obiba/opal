@@ -39,11 +39,15 @@ public class OpalTokenRealm extends AuthorizingRealm {
 
   public static final String TOKEN_REALM = "opal-token-realm";
 
-  @Autowired
-  private SubjectTokenService subjectTokenService;
+  private final SubjectTokenService subjectTokenService;
+
+  private final SubjectProfileService subjectProfileService;
 
   @Autowired
-  private SubjectProfileService subjectProfileService;
+  public OpalTokenRealm(SubjectTokenService subjectTokenService, SubjectProfileService subjectProfileService) {
+    this.subjectTokenService = subjectTokenService;
+    this.subjectProfileService = subjectProfileService;
+  }
 
   @PostConstruct
   public void postConstruct() {
@@ -73,7 +77,7 @@ public class OpalTokenRealm extends AuthorizingRealm {
 
   /**
    * Roles are inherited from original user, extracted from ts profile (has the primary authenticating realm is not accessible).
-   * 
+   *
    * @param principals
    * @return
    */

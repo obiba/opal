@@ -176,13 +176,15 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
 
     private void appendRoleToSession(String roleString) {
       if (SecurityUtils.getSubject().getPrincipals().getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) return;
-      Session session = SecurityUtils.getSubject().getSession();
-      Set<String> roles = (Set<String>) session.getAttribute("roles");
-      if (roles == null) {
-        roles = Sets.newHashSet();
+      Session session = SecurityUtils.getSubject().getSession(false);
+      if (session != null) {
+        Set<String> roles = (Set<String>) session.getAttribute("roles");
+        if (roles == null) {
+          roles = Sets.newHashSet();
+        }
+        roles.add(roleString);
+        session.setAttribute("roles", roles);
       }
-      roles.add(roleString);
-      session.setAttribute("roles", roles);
     }
 
     private Collection<Permission> doGetGroupPermissions(Subject group) {
