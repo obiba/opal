@@ -9,32 +9,24 @@
  */
 package org.obiba.opal.core.service.security;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.*;
+import com.google.common.eventbus.EventBus;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.security.event.SubjectAclChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.orientechnologies.orient.core.metadata.schema.OType;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
@@ -45,11 +37,16 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSubjectAclService.class);
 
-  private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
+  private final EventBus eventBus;
+
+  private final OrientDbService orientDbService;
 
   @Autowired
-  private OrientDbService orientDbService;
-
+  public DefaultSubjectAclService(EventBus eventBus, OrientDbService orientDbService) {
+    this.eventBus = eventBus;
+    this.orientDbService = orientDbService;
+  }
+  
   @Override
   @PostConstruct
   public void start() {
@@ -66,17 +63,12 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addListener(SubjectAclChangeCallback callback) {
-    if(callback != null) callbacks.add(callback);
-  }
-
-  @Override
   public void deleteNodePermissions(String node) {
     Iterable<SubjectAcl> subjectAcls = orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ? or node like ?",
             node, node + "/%");
     Set<Subject> subjects = Sets.newTreeSet();
-    for(SubjectAcl acl : subjectAcls) {
+    for (SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
       delete(acl);
     }
@@ -90,7 +82,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteNodePermissions(String domain, String node) {
     Set<Subject> subjects = Sets.newTreeSet();
-    for(SubjectAcl acl : find(domain, node)) {
+    for (SubjectAcl acl : find(domain, node)) {
       subjects.add(acl.getSubject());
       delete(acl);
     }
@@ -101,7 +93,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public void deleteNodeHierarchyPermissions(String domain, String node) {
     deleteNodePermissions(domain, node);
     Set<Subject> subjects = Sets.newTreeSet();
-    for(SubjectAcl acl : Iterables.concat(find(domain, node), findLike(domain, node + "/"))) {
+    for (SubjectAcl acl : Iterables.concat(find(domain, node), findLike(domain, node + "/"))) {
       subjects.add(acl.getSubject());
       delete(acl);
     }
@@ -110,7 +102,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void deleteSubjectPermissions(Subject subject) {
-    for(SubjectAcl acl : find(subject)) {
+    for (SubjectAcl acl : find(subject)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -118,7 +110,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void deleteSubjectPermissions(String domain, String node, Subject subject) {
-    for(SubjectAcl acl : find(domain, node, subject)) {
+    for (SubjectAcl acl : find(domain, node, subject)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -127,7 +119,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteSubjectPermissions(String domain, String node, Subject subject, String permission) {
     SubjectAcl acl = find(domain, node, subject, permission);
-    if(acl != null) {
+    if (acl != null) {
       delete(acl);
       notifyListeners(subject);
     }
@@ -135,7 +127,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions) {
-    for(String permission : permissions) {
+    for (String permission : permissions) {
       addSubjectPermission(domain, node, subject, permission);
     }
   }
@@ -151,7 +143,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public Permissions getSubjectNodePermissions(@NotNull final String domain, @NotNull final String node,
-      @NotNull final Subject subject) {
+                                               @NotNull final Subject subject) {
     Assert.notNull(node, "node cannot be null");
     Assert.notNull(subject, "subject cannot be null");
 
@@ -186,13 +178,13 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public Iterable<Permissions> getSubjectNodeHierarchyPermissions(@NotNull String domain, @NotNull String node,
-      @NotNull Subject subject) {
+                                                                  @NotNull Subject subject) {
     Map<String, Permissions> entries = Maps.newHashMap();
 
-    for(SubjectAcl acl : Iterables.concat(find(domain, node, subject), findLike(domain, node + "/", subject))) {
+    for (SubjectAcl acl : Iterables.concat(find(domain, node, subject), findLike(domain, node + "/", subject))) {
       String key = acl.getSubject() + ":" + acl.getNode();
       PermissionsImpl perms = (PermissionsImpl) entries.get(key);
-      if(perms == null) {
+      if (perms == null) {
         perms = new PermissionsImpl(domain, acl.getNode(), acl.getSubject());
         entries.put(key, perms);
       }
@@ -228,13 +220,13 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   private Iterable<SubjectAcl> find(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
-        " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
+            " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
         subject.getType().toString());
   }
 
   private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
-        " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
+            " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
         subject.getType().toString());
   }
 
@@ -295,9 +287,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type) {
     Map<Subject, Permissions> entries = Maps.newHashMap();
 
-    for(SubjectAcl acl : type == null ? find(domain, node) : find(domain, node, type)) {
+    for (SubjectAcl acl : type == null ? find(domain, node) : find(domain, node, type)) {
       PermissionsImpl perms = (PermissionsImpl) entries.get(acl.getSubject());
-      if(perms == null) {
+      if (perms == null) {
         perms = new PermissionsImpl(domain, node, acl.getSubject());
         entries.put(acl.getSubject(), perms);
       }
@@ -315,10 +307,10 @@ public class DefaultSubjectAclService implements SubjectAclService {
         ? Iterables.concat(find(domain, node), findLike(domain, node + "/"))
         : Iterables.concat(find(domain, node, type), findLike(domain, node + "/", type));
 
-    for(SubjectAcl acl : acls) {
+    for (SubjectAcl acl : acls) {
       String key = acl.getSubject() + ":" + acl.getNode();
       PermissionsImpl perms = (PermissionsImpl) entries.get(key);
-      if(perms == null) {
+      if (perms == null) {
         perms = new PermissionsImpl(domain, acl.getNode(), acl.getSubject());
         entries.put(key, perms);
       }
@@ -352,7 +344,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
    * @param subjects
    */
   private void notifyListeners(Iterable<Subject> subjects) {
-    for(Subject s : subjects)
+    for (Subject s : subjects)
       notifyListeners(s);
   }
 
@@ -360,13 +352,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
    * @param subject
    */
   private void notifyListeners(Subject subject) {
-    for(SubjectAclChangeCallback c : callbacks) {
-      try {
-        c.onSubjectAclChanged(subject);
-      } catch(Exception e) {
-        log.warn("Ignoring exception during ACL callback", e);
-      }
-    }
+    eventBus.post(new SubjectAclChangedEvent(subject));
   }
 
   private static class PermissionsImpl implements Permissions {
@@ -406,7 +392,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
     }
 
     public void addPermission(String permission) {
-      if(!permissions.contains(permission)) {
+      if (!permissions.contains(permission)) {
         permissions.add(permission);
       }
     }

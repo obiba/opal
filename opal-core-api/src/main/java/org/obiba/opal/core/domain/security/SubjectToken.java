@@ -46,11 +46,6 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
   @NotBlank
   private String name;
 
-  /**
-   * Whether data access (project/datasource) is read only.
-   */
-  private boolean readOnly = true;
-
   public SubjectToken() {
   }
 
@@ -99,14 +94,6 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setName(@NotNull String name) {
     this.name = name;
-  }
-
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-  }
-
-  public boolean isReadOnly() {
-    return readOnly;
   }
 
   @Override

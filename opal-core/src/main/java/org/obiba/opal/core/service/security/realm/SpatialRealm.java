@@ -12,6 +12,7 @@ package org.obiba.opal.core.service.security.realm;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.Subscribe;
 import eu.flatwhite.shiro.spatial.SingleSpaceRelationProvider;
 import eu.flatwhite.shiro.spatial.SingleSpaceResolver;
 import eu.flatwhite.shiro.spatial.Spatial;
@@ -34,14 +35,13 @@ import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.event.SubjectAclChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,8 +57,6 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
 
   private final SubjectAclService subjectAclService;
 
-  private final SubjectTokenService subjectTokenService;
-
   private final RolePermissionResolver rolePermissionResolver;
 
   private final SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry;
@@ -66,11 +64,9 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   private Cache<Subject, Collection<Permission>> rolePermissionCache;
 
   @Autowired
-  public SpatialRealm(SubjectAclService subjectAclService, SubjectTokenService subjectTokenService,
-                      SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
+  public SpatialRealm(SubjectAclService subjectAclService, SubjectPermissionsConverterRegistry subjectPermissionsConverterRegistry) {
     if (subjectAclService == null) throw new IllegalArgumentException("subjectAclService cannot be null");
     this.subjectAclService = subjectAclService;
-    this.subjectTokenService = subjectTokenService;
     this.subjectPermissionsConverterRegistry = subjectPermissionsConverterRegistry;
 
     setPermissionResolver(new SpatialPermissionResolver(new SingleSpaceResolver(new RestSpace()), new NodeResolver(),
@@ -84,13 +80,12 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     return false;
   }
 
-  @PostConstruct
-  public void registerListener() {
+  @Subscribe
+  public void onSubjectAclChangedEvent(SubjectAclChangedEvent event) {
     if (isAuthorizationCachingEnabled()) {
-      subjectAclService.addListener(subject -> {
-        getAuthorizationCache().remove(subject);
-        getRolePermissionCache().remove(subject);
-      });
+      log.info("Clear cache perms for {}", event.getSubject());
+      getAuthorizationCache().remove(event.getSubject());
+      getRolePermissionCache().remove(event.getSubject());
     }
   }
 
@@ -135,24 +130,6 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
     Iterable<String> perms = loadSubjectPermissions(principals);
     if (perms == null) return null;
-
-    /*Collection<?> tokenPrincipals = principals.fromRealm(OpalTokenRealm.TOKEN_REALM);
-    if (tokenPrincipals != null && !tokenPrincipals.isEmpty()) {
-      SubjectToken token = subjectTokenService.getToken(tokenPrincipals.iterator().next().toString());
-      if (token.isReadOnly()) {
-        perms = StreamSupport.stream(perms.spliterator(), false)
-            .map(perm -> {
-              if (perm.startsWith("rest:/project") || perm.startsWith("rest:/datasource")) {
-                return perm.replaceAll("\\*", "GET")
-                    .replaceAll("PUT", "GET")
-                    .replaceAll("DELETE", "GET")
-                    .replaceAll("POST", "GET");
-              }
-              return perm;
-            })
-            .collect(Collectors.toList());
-      }
-    }*/
     SimpleAuthorizationInfo sai = new SimpleAuthorizationInfo();
     sai.setStringPermissions(ImmutableSet.copyOf(perms));
     return sai;

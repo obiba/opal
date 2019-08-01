@@ -18,13 +18,6 @@ import org.obiba.opal.core.service.SystemService;
 public interface SubjectAclService extends SystemService {
 
   /**
-   * Add permission change callback.
-   *
-   * @param callback
-   */
-  void addListener(SubjectAclChangeCallback callback);
-
-  /**
    * Delete all permissions starting with node.
    *
    * @param node
