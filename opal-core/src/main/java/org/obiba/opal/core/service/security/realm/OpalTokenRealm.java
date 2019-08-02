@@ -68,8 +68,8 @@ public class OpalTokenRealm extends AuthorizingRealm {
       SubjectProfile subProfile = subjectProfileService.getProfile(subToken.getPrincipal());
       SimplePrincipalCollection principals = new SimplePrincipalCollection();
       principals.add(subToken.getPrincipal(), subProfile.getFirstRealm());
-      principals.add(subToken.getToken(), getName());
-      return new SimpleAuthenticationInfo(principals, subToken.getToken());
+      principals.add(tokenId, getName());
+      return new SimpleAuthenticationInfo(principals, tokenId);
     } catch (NoSuchSubjectTokenException | NoSuchSubjectProfileException e) {
       throw new UnknownAccountException("No account found for subjectToken [" + tokenId + "]");
     }
