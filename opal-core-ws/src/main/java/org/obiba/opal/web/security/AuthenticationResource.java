@@ -85,6 +85,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   @DELETE
   @Path("/session/{id}")
+  @NoAuthorization
   public Response deleteSession(@PathParam("id") String sessionId) {
     // legacy
     return deleteCurrentSession();
