@@ -10,21 +10,20 @@
 
 package org.obiba.opal.web.system.subject;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-
-import org.obiba.opal.core.service.SubjectProfileNotFoundException;
+import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.core.service.NoSuchSubjectProfileException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class SubjectProfileNotFoundExceptionMapper extends ErrorDtoExceptionMapper<SubjectProfileNotFoundException> {
+public class NoSuchSubjectProfileExceptionMapper extends ErrorDtoExceptionMapper<NoSuchSubjectProfileException> {
 
   @Override
   protected Response.Status getStatus() {
@@ -32,7 +31,7 @@ public class SubjectProfileNotFoundExceptionMapper extends ErrorDtoExceptionMapp
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(SubjectProfileNotFoundException exception) {
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchSubjectProfileException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "SubjectProfileNotFound", exception.getPrincipal()).build();
   }
 

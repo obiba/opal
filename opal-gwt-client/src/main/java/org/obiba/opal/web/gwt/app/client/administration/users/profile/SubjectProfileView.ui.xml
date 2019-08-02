@@ -11,6 +11,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -45,6 +46,24 @@
     </b:Heading>
 
     <g:FlowPanel ui:field="bookmarks"/>
+
+    <b:Heading size="4">
+      <ui:msg description="Personal Access Tokens label">Personal Access Tokens</ui:msg>
+    </b:Heading>
+
+    <b:Paragraph>
+      <ui:msg description="Personal Access Tokens description">
+        Personal access tokens can be created for use in scripts and on the command line (using R or Python client API).
+        Be careful, these tokens are like passwords so you should guard them carefully. The advantage to using a token over
+        putting your password into a script is that a token can be revoked, and you can generate lots of them.</ui:msg>
+    </b:Paragraph>
+
+    <b:Button ui:field="addToken" type="INFO" icon="PLUS" addStyleNames="btn">
+      <ui:msg description="Add Access Token Button label">Add Access Token</ui:msg>
+    </b:Button>
+
+    <o:OpalSimplePager ui:field="tokensPager" location="RIGHT" addStyleNames="pull-right"/>
+    <o:Table ui:field="tokensTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>
 

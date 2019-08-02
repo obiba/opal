@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.common.base.Strings;
@@ -18,12 +19,27 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandlers>
     implements SubjectProfilePresenter.Display {
@@ -43,12 +59,29 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   @UiField
   FlowPanel bookmarks;
 
+  @UiField
+  Button addToken;
+
+  @UiField
+  OpalSimplePager tokensPager;
+
+  @UiField
+  CellTable<SubjectTokenDto> tokensTable;
+
+  private ActionsColumn<SubjectTokenDto> actionsColumn;
+
+  private final ListDataProvider<SubjectTokenDto> tokensDataProvider = new ListDataProvider<SubjectTokenDto>();
+
   private final TranslationMessages translationMessages;
 
+  private final Translations translations;
+
   @Inject
-  public SubjectProfileView(Binder uiBinder, TranslationMessages translationMessages) {
+  public SubjectProfileView(Binder uiBinder, TranslationMessages translationMessages, Translations translations) {
     this.translationMessages = translationMessages;
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
+    configTokensTable();
   }
 
   @Override
@@ -66,9 +99,25 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     }
   }
 
+  @Override
+  public void renderTokens(List<SubjectTokenDto> tokens) {
+    renderRows(tokens, tokensDataProvider, tokensPager);
+    tokensDataProvider.setList(tokens);
+    tokensPager.firstPage();
+    tokensDataProvider.refresh();
+    tokensPager.setPagerVisible(tokensDataProvider.getList().size() > tokensPager.getPageSize());
+    tokensTable.setVisible(!tokens.isEmpty());
+    tokensPager.setVisible(!tokens.isEmpty());
+  }
+
   @UiHandler("changePassword")
   public void onChangePassword(ClickEvent event) {
     getUiHandlers().onChangePassword();
+  }
+
+  @UiHandler("addToken")
+  public void onAddToken(ClickEvent event) {
+    getUiHandlers().onAddToken();
   }
 
   @Override
@@ -77,5 +126,44 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
       bookmarks.clear();
       bookmarks.add(content);
     }
+  }
+
+  private void configTokensTable() {
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
+      @Override
+      public String getValue(SubjectTokenDto object) {
+        return object.getName();
+      }
+
+    }, translations.nameLabel());
+    tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[]{REMOVE_ACTION};
+      }
+
+      @Override
+      public String[] getActions(SubjectTokenDto value) {
+        return new String[]{REMOVE_ACTION};
+      }
+    }), translations.actionsLabel());
+
+    actionsColumn.setActionHandler(new ActionHandler<SubjectTokenDto>() {
+      @Override
+      public void doAction(SubjectTokenDto object, String actionName) {
+        getUiHandlers().onRemoveToken(object);
+      }
+    });
+
+    tokensTable.setEmptyTableWidget(new Label(translations.noTokensLabel()));
+    tokensPager.setDisplay(tokensTable);
+    tokensDataProvider.addDataDisplay(tokensTable);
+    renderTokens(new ArrayList<SubjectTokenDto>());
+  }
+
+  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, OpalSimplePager pager) {
+
   }
 }

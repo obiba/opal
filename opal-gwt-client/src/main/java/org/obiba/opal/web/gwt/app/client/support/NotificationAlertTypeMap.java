@@ -26,6 +26,8 @@ public final class NotificationAlertTypeMap {
         return AlertType.WARNING;
       case INFO:
         return AlertType.INFO;
+      case SUCCESS:
+        return AlertType.SUCCESS;
     }
 
     throw new IllegalArgumentException("Invalid NotificationType: " + type);

@@ -11,6 +11,7 @@
 package org.obiba.opal.core.service;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,12 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
  */
 public interface SubjectProfileService extends SystemService {
 
+  /**
+   * Whether the subject's principal has a system artifact.
+   *
+   * @param principal
+   * @return
+   */
   boolean supportProfile(@Nullable Object principal);
 
   /**
@@ -36,9 +43,17 @@ public interface SubjectProfileService extends SystemService {
   /**
    * Add or check profile of the subject: check will fail if a subject from a different realm has already a profile entry.
    *
-   * @param subject
+   * @param principalCollection
    */
   void ensureProfile(@NotNull PrincipalCollection principalCollection);
+
+  /**
+   * Associate observed groups to the profile (for reuse with API token).
+   *
+   * @param principal
+   * @param groups
+   */
+  void applyProfileGroups(String principal, Set<String> groups);
 
   /**
    * Delete profile.
@@ -54,14 +69,14 @@ public interface SubjectProfileService extends SystemService {
    * @return
    */
   @NotNull
-  SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException;
+  SubjectProfile getProfile(@Nullable String principal) throws NoSuchSubjectProfileException;
 
   /**
    * Update profile timestamp.
    *
    * @param principal
    */
-  void updateProfile(@NotNull String principal) throws SubjectProfileNotFoundException;
+  void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException;
 
   /**
    * Get all subject profiles.
@@ -75,24 +90,24 @@ public interface SubjectProfileService extends SystemService {
    *
    * @param principal
    * @param resources
-   * @throws SubjectProfileNotFoundException
+   * @throws NoSuchSubjectProfileException
    */
-  void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException;
+  void addBookmarks(String principal, List<String> resources) throws NoSuchSubjectProfileException;
 
   /**
    * Delete principal's bookmark (if it exists).
    *
    * @param principal
    * @param path
-   * @throws SubjectProfileNotFoundException
+   * @throws NoSuchSubjectProfileException
    */
-  void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException;
+  void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException;
 
   /**
    * Delete all bookmarks (which resource is equal to or starts with) from all profiles.
    *
    * @param path
-   * @throws SubjectProfileNotFoundException
+   * @throws NoSuchSubjectProfileException
    */
-  void deleteBookmarks(String path) throws SubjectProfileNotFoundException;
+  void deleteBookmarks(String path) throws NoSuchSubjectProfileException;
 }

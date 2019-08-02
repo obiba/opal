@@ -32,6 +32,8 @@
 
   <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.DefaultBeanValidator"/>
 
+  <bean id="eventBus" class="com.google.common.eventbus.EventBus"/>
+
   <bean id="orientDbService" class="org.obiba.opal.core.service.OrientDbServiceImpl"/>
 
   <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.LocalOrientDbServerFactory"/>

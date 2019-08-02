@@ -22,13 +22,21 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.common.base.Joiner;
 import org.apache.http.HttpStatus;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.jboss.resteasy.core.ResourceInvoker;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.IsHttpMethod;
+import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -63,6 +71,9 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   private SubjectAclService subjectAclService;
 
   @Autowired
+  private SubjectProfileService subjectProfileService;
+
+  @Autowired
   private RequestAttributesProvider requestAttributeProvider;
 
   @Nullable
@@ -94,6 +105,19 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
     if(response.getStatus() == HttpStatus.SC_CREATED) {
       addPermissions(response);
+    }
+
+    Subject subject = ThreadContext.getSubject();
+    if (subject != null && subject.isAuthenticated() && !subject.getPrincipals().getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) {
+      Session session = SecurityUtils.getSubject().getSession(false);
+      if (session != null && session.getAttribute("ensuredProfileGroups") == null) {
+        Set<String> roles = (Set<String>) session.getAttribute("roles");
+        if (roles != null) {
+          log.debug("{} has roles {}", subject.getPrincipal(), Joiner.on(",").join(roles));
+          subjectProfileService.applyProfileGroups(subject.getPrincipal().toString(), roles);
+        }
+        session.setAttribute("ensuredProfileGroups", true);
+      }
     }
   }
 

@@ -10,20 +10,11 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -39,6 +30,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class SubjectProfileServiceImpl implements SubjectProfileService {
@@ -67,7 +66,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void stop() {}
+  public void stop() {
+  }
 
   @Override
   public boolean supportProfile(@Nullable Object principal) {
@@ -88,15 +88,17 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
           List<String> newRealms = Lists.newArrayList(realms);
           newRealms.add(realm);
           profile.setRealm(Joiner.on(",").join(newRealms));
-          orientDbService.save(profile, profile);
+
         }
-      } else if(!profile.getRealm().equals(realm)) {
+      } else if (!profile.getRealm().equals(realm)) {
         throw new AuthenticationException(
             "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
                 " expected). Make sure the same subject is not defined in several realms."
         );
       }
-    } catch(SubjectProfileNotFoundException e) {
+      profile.setUpdated(new Date());
+      orientDbService.save(profile, profile);
+    } catch (NoSuchSubjectProfileException e) {
       HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
       orientDbService.save(newProfile, newProfile);
     }
@@ -112,28 +114,41 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     ensureFolderPermissions(principal, "/tmp");
   }
 
+
+  @Override
+  public void applyProfileGroups(@NotNull String principal, Set<String> groups) {
+    try {
+      SubjectProfile profile = getProfile(principal);
+      profile.setGroups(groups);
+      profile.setUpdated(new Date());
+      orientDbService.save(profile, profile);
+    } catch (NoSuchSubjectProfileException e) {
+      // ignore
+    }
+  }
+
   @Override
   public void deleteProfile(@NotNull String principal) {
     try {
       orientDbService.delete(getProfile(principal));
-    } catch(SubjectProfileNotFoundException ignored) {
+    } catch (NoSuchSubjectProfileException ignored) {
       // ignore
     }
   }
 
   @NotNull
   @Override
-  public SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException {
-    if(principal == null) throw new SubjectProfileNotFoundException(principal);
+  public SubjectProfile getProfile(@Nullable String principal) throws NoSuchSubjectProfileException {
+    if (principal == null) throw new NoSuchSubjectProfileException(principal);
     SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
-    if(subjectProfile == null) {
-      throw new SubjectProfileNotFoundException(principal);
+    if (subjectProfile == null) {
+      throw new NoSuchSubjectProfileException(principal);
     }
     return subjectProfile;
   }
 
   @Override
-  public void updateProfile(@NotNull String principal) throws SubjectProfileNotFoundException {
+  public void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     profile.setUpdated(new Date());
     orientDbService.save(profile, profile);
@@ -145,24 +160,24 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException {
+  public void addBookmarks(String principal, List<String> resources) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
-    for(String resource : resources) {
+    for (String resource : resources) {
       profile.addBookmark(resource);
     }
     orientDbService.save(profile, profile);
   }
 
   @Override
-  public void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException {
+  public void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
-    if(profile.hasBookmark(path) && profile.removeBookmark(path)) {
+    if (profile.hasBookmark(path) && profile.removeBookmark(path)) {
       orientDbService.save(profile, profile);
     }
   }
 
   @Override
-  public void deleteBookmarks(String path) throws SubjectProfileNotFoundException{
+  public void deleteBookmarks(String path) throws NoSuchSubjectProfileException {
     for (SubjectProfile profile : orientDbService.list(SubjectProfile.class)) {
       if (!profile.hasBookmarks()) return;
       List<Bookmark> toRemove = profile.getBookmarks().stream()
@@ -181,13 +196,13 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private void ensureUserHomeExists(String username) {
     try {
-      if(!opalRuntime.hasFileSystem()) return;
+      if (!opalRuntime.hasFileSystem()) return;
       FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
-      if(!home.exists()) {
+      if (!home.exists()) {
         log.info("Creating user home: /home/{}", username);
         home.createFolder();
       }
-    } catch(FileSystemException e) {
+    } catch (FileSystemException e) {
       log.error("Failed creating user home.", e);
     }
   }
@@ -196,7 +211,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     String folderNode = "/files" + path;
     SubjectAclService.Permissions acl = subjectAclService
         .getSubjectNodePermissions("opal", folderNode, new SubjectAcl.Subject(username, SubjectAcl.SubjectType.USER));
-    if(!findPermission(acl, FILES_SHARE_PERM)) {
+    if (!findPermission(acl, FILES_SHARE_PERM)) {
       subjectAclService
           .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username), FILES_SHARE_PERM);
     }
@@ -204,8 +219,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private boolean findPermission(SubjectAclService.Permissions acl, String permission) {
     boolean found = false;
-    for(String perm : acl.getPermissions()) {
-      if(perm.equals(permission)) {
+    for (String perm : acl.getPermissions()) {
+      if (perm.equals(permission)) {
         found = true;
         break;
       }

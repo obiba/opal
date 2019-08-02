@@ -9,18 +9,16 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.collect.Lists;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 
-import com.google.common.collect.Lists;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @NotNullIfAnotherFieldHasValue.List(
     @NotNullIfAnotherFieldHasValue(fieldName = "authenticationType", fieldValue = "PASSWORD",
@@ -67,7 +65,7 @@ public class SubjectCredentials extends AbstractTimestamped
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
+    return Lists.newArrayList(name);
   }
 
   public String generateCertificateAlias() {
@@ -125,7 +123,7 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   public void addGroup(String group) {
-    if(groups == null) groups = new HashSet<>();
+    if (groups == null) groups = new HashSet<>();
     groups.add(group);
   }
 
@@ -134,7 +132,7 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   public void removeGroup(String group) {
-    if(groups != null) groups.remove(group);
+    if (groups != null) groups.remove(group);
   }
 
   public boolean isEnabled() {
@@ -152,8 +150,8 @@ public class SubjectCredentials extends AbstractTimestamped
 
   @Override
   public boolean equals(Object o) {
-    if(this == o) return true;
-    if(!(o instanceof SubjectCredentials)) return false;
+    if (this == o) return true;
+    if (!(o instanceof SubjectCredentials)) return false;
     SubjectCredentials subjectCredentials = (SubjectCredentials) o;
     return name.equals(subjectCredentials.name);
   }

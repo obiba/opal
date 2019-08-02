@@ -27,7 +27,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.SubjectProfileNotFoundException;
+import org.obiba.opal.core.service.NoSuchSubjectProfileException;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.realm.OpalApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
@@ -250,7 +250,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       if(!realm.equals(profile.getRealm())) {
         throw new DuplicateSubjectProfileException(profile);
       }
-    } catch(SubjectProfileNotFoundException ignored) {
+    } catch(NoSuchSubjectProfileException ignored) {
       // do nothing as this principal has no profile
     }
   }

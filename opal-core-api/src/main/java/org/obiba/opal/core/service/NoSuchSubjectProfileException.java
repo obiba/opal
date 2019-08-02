@@ -10,13 +10,13 @@
 
 package org.obiba.opal.core.service;
 
-public class SubjectProfileNotFoundException extends RuntimeException {
+public class NoSuchSubjectProfileException extends RuntimeException {
 
   private static final long serialVersionUID = 8076327259073208897L;
 
   private final String principal;
 
-  public SubjectProfileNotFoundException(String principal) {
+  public NoSuchSubjectProfileException(String principal) {
     super("Subject profile not found for principal '" + principal + "'.");
     this.principal = principal;
   }

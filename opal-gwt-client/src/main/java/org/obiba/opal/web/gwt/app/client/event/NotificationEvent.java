@@ -9,20 +9,18 @@
  */
 package org.obiba.opal.web.gwt.app.client.event;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.shared.EventHandler;
-import com.google.gwt.event.shared.GwtEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -56,8 +54,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   //
 
   private NotificationEvent(NotificationType notificationType, List<String> messages, List<String> messageArgs,
-      NotificationCloseHandler notificationCloseHandler) {
-    if(messages.isEmpty()) {
+                            NotificationCloseHandler notificationCloseHandler) {
+    if (messages.isEmpty()) {
       throw new IllegalArgumentException("Missing message");
     }
 
@@ -97,24 +95,12 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     return notificationType;
   }
 
-  public NotificationEvent setNotificationType(NotificationType notificationType) {
-    this.notificationType = notificationType;
-    return this;
-  }
-
   public String getTitle() {
     return title;
   }
 
   public NotificationEvent setTitle(String title) {
     this.title = title;
-    return this;
-  }
-
-  public NotificationEvent addMessage(String message) {
-    if(message != null) {
-      getMessages().add(message);
-    }
     return this;
   }
 
@@ -140,7 +126,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   }
 
   public List<String> getMessageArgs() {
-    if(messageArgs == null) {
+    if (messageArgs == null) {
       messageArgs = new ArrayList<String>();
     }
     return Collections.unmodifiableList(messageArgs);
@@ -203,12 +189,21 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
       return info(Lists.newArrayList(messages));
     }
 
+    public Builder success(List<String> messages) {
+      event = new NotificationEvent(NotificationType.SUCCESS, messages, null);
+      return this;
+    }
+
+    public Builder success(String... messages) {
+      return success(Lists.newArrayList(messages));
+    }
+
     public Builder args(String... messageArgs) {
       return args(Lists.newArrayList(messageArgs));
     }
 
     public Builder args(JsArrayString messageArgs) {
-      if(messageArgs != null && messageArgs.length() > 0) {
+      if (messageArgs != null && messageArgs.length() > 0) {
         return args(JsArrays.toList(messageArgs));
       }
       return this;
