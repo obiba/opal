@@ -258,8 +258,10 @@ message SubjectTokenDto {
   required string name = 3;
   repeated string projects = 4;
   repeated string commands = 5;
-  optional string created = 6;
-  optional string lastUpdate = 7;
+  optional bool useR = 6 [default = false];
+  optional bool useDatashield = 7 [default = false];
+  optional string created = 8;
+  optional string lastUpdate = 9;
 }
 
 message LinkDto {

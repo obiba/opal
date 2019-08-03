@@ -92,6 +92,23 @@
       </b:Controls>
     </b:ControlGroup>
 
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token services label">Services</ui:msg>
+      </b:ControlLabel>
+      <b:HelpBlock>
+        <ui:msg description="Token services help">Select the services that can be performed. By default none is available. Note that this does not grant a permission that you do not have.</ui:msg>
+      </b:HelpBlock>
+      <b:Controls>
+        <b:CheckBox ui:field="rCheck">
+          <ui:msg description="Token R label">R</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="datashieldCheck">
+          <ui:msg description="Token datashield label">DataSHIELD</ui:msg>
+        </b:CheckBox>
+      </b:Controls>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save button label">Save</ui:msg>

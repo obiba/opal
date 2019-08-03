@@ -71,6 +71,11 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   @UiField
   CheckBox exportVCFCheck;
 
+  @UiField
+  CheckBox rCheck;
+  @UiField
+  CheckBox datashieldCheck;
+
   private String tokenValue;
 
   @Inject
@@ -108,6 +113,8 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     if (reportCheck.isChecked()) token.addCommands("report");
     if (importVCFCheck.isChecked()) token.addCommands("import_vcf");
     if (exportVCFCheck.isChecked()) token.addCommands("export_vcf");
+    token.setUseR(rCheck.isChecked());
+    token.setUseDatashield(datashieldCheck.isChecked());
 
     getUiHandlers().onCreateToken(token);
   }

@@ -144,7 +144,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         String projects = "";
         if (object.getProjectsCount()>0) {
           for (String p : JsArrays.toList(object.getProjectsArray())) {
-            projects = projects.length() == 0 ? p : projects + ", " + p;
+            projects = projects.isEmpty() ? p : projects + ", " + p;
           }
         } else {
           projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
@@ -152,12 +152,16 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         String tasks = "";
         if (object.getCommandsCount()>0) {
           for (String cmd : JsArrays.toList(object.getCommandsArray())) {
-            tasks = tasks.length() == 0 ? cmd : tasks + ", " + cmd;
+            tasks = tasks.isEmpty() ? cmd : tasks + ", " + cmd;
           }
         } else {
           tasks = "[" + translations.none().toLowerCase() + "]";
         }
-        return "Projects: " + projects + " | Tasks: " + tasks + " | Services: [none]";
+        String services = "";
+        if (object.getUseR()) services = "R";
+        if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
+        if (services.isEmpty()) services = "[" + translations.none().toLowerCase() + "]";
+        return "Projects: " + projects + " | Tasks: " + tasks + " | Services: " + services;
       }
     }, translations.scopeLabel());
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {

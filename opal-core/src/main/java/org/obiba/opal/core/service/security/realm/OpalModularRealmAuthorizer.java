@@ -65,6 +65,12 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (node.startsWith("/project/") || node.startsWith("/datasource/"))
       return isProjectActionPermitted(principals, node, action);
 
+    if (node.startsWith("/r/session"))
+      return isUsingRPermitted(principals);
+
+    if (node.startsWith("/datashield/session"))
+      return isUsingDatashieldPermitted(principals);
+
     return true;
   }
 
@@ -110,6 +116,13 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     return projectCmds;
   }
 
+  private boolean isUsingRPermitted(PrincipalCollection principals) {
+    return getToken(principals).isUseR();
+  }
+
+  private boolean isUsingDatashieldPermitted(PrincipalCollection principals) {
+    return getToken(principals).isUseDatashield();
+  }
 
   private SubjectToken getToken(PrincipalCollection principals) {
     SubjectToken token = tokenCache.getIfPresent(principals.toString());

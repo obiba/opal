@@ -53,6 +53,10 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private Set<String> commands;
 
+  private boolean useR;
+
+  private boolean useDatashield;
+
   public SubjectToken() {
   }
 
@@ -125,6 +129,22 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setCommands(Set<String> commands) {
     this.commands = commands;
+  }
+
+  public void setUseR(boolean useR) {
+    this.useR = useR;
+  }
+
+  public boolean isUseR() {
+    return useR;
+  }
+
+  public void setUseDatashield(boolean useDatashield) {
+    this.useDatashield = useDatashield;
+  }
+
+  public boolean isUseDatashield() {
+    return useDatashield;
   }
 
   @Override
