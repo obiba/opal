@@ -18,7 +18,10 @@ import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is a Personal API access token: allow a tier to connect to Opal on behalf of a subject and with restricted permissions.
@@ -45,6 +48,8 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
   @NotNull
   @NotBlank
   private String name;
+
+  private Set<String> projects;
 
   public SubjectToken() {
   }
@@ -94,6 +99,18 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setName(@NotNull String name) {
     this.name = name;
+  }
+
+  public Set<String> getProjects() {
+    return projects == null ? projects = new HashSet<>() : projects;
+  }
+
+  public void addAllProjects(Collection<String> projects) {
+    getProjects().addAll(projects);
+  }
+
+  public void setProjects(Set<String> projects) {
+    this.projects = projects;
   }
 
   @Override

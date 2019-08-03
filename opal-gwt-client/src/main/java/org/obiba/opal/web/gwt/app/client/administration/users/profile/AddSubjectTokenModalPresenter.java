@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -16,11 +17,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
 import java.util.List;
@@ -81,11 +85,29 @@ public class AddSubjectTokenModalPresenter extends ModalPresenterWidget<AddSubje
     return generated;
   }
 
+  @Override
+  protected void onReveal() {
+    initProjects();
+  }
+
+  private void initProjects() {
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder()
+        .forResource(UriBuilders.PROJECTS.create().query("digest", "true").build()).get()
+        .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<ProjectDto> resource) {
+            getView().setProjects(JsArrays.toList(resource));
+          }
+        }).send();
+  }
+
   public void setTokenNames(List<String> tokenNames) {
     this.tokenNames = tokenNames;
   }
 
   public interface Display extends PopupView, HasUiHandlers<AddSubjectTokenModalUiHandlers> {
+
+    void setProjects(List<ProjectDto> projects);
 
     void hideDialog();
 

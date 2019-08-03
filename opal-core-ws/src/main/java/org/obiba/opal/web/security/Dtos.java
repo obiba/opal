@@ -51,6 +51,7 @@ public class Dtos {
     token.setName(dto.getName());
     if (dto.hasPrincipal()) token.setPrincipal(dto.getPrincipal());
     if (dto.hasToken()) token.setToken(dto.getToken());
+    if (dto.getProjectsCount()>0) token.addAllProjects(dto.getProjectsList());
     return token;
   }
 
@@ -82,6 +83,7 @@ public class Dtos {
     Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder()
         .setPrincipal(token.getPrincipal())
         .setName(token.getName())
+        .addAllProjects(token.getProjects())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));
 

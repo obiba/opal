@@ -77,6 +77,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Project")
   String projectLabel();
 
+  @Description("Scope label")
+  @DefaultStringValue("Scope")
+  String scopeLabel();
+
   @Description("Start label")
   @DefaultStringValue("Start")
   String startLabel();
@@ -1791,6 +1795,10 @@ public interface Translations extends Constants {
   @Description("Table index is up-to-date label")
   @DefaultStringValue("Table index is up-to-date")
   String indexAlertUpToDate();
+
+  @Description("Select some projects label")
+  @DefaultStringValue("Select some projects...")
+  String selectSomeProjects();
 
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")

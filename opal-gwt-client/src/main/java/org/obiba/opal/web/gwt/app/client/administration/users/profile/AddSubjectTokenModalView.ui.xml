@@ -14,7 +14,7 @@
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false" minHeight="650">
 
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel>
@@ -41,6 +41,19 @@
         <ui:msg description="Token value help">Make sure to copy your new personal access token before saving.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token projects label">Projects</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:Chooser ui:field="tokenProjects" multipleSelect="true" width="500px"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Token projects help">Access can be limited to some projects. Leave empty to apply no restrictions.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

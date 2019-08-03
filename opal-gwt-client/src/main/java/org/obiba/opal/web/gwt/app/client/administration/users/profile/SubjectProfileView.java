@@ -29,6 +29,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -137,6 +138,20 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
       }
 
     }, translations.nameLabel());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+      @Override
+      public String getValue(SubjectTokenDto object) {
+        String projects = "";
+        if (object.getProjectsCount()>0) {
+          for (String p : JsArrays.toList(object.getProjectsArray())) {
+            projects = projects.length() == 0 ? p : projects + ", " + p;
+          }
+        } else {
+          projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
+        }
+        return projects;
+      }
+    }, translations.scopeLabel());
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {
 
       @Override

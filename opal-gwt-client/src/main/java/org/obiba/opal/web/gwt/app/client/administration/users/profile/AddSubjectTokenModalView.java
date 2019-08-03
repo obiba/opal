@@ -23,9 +23,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
+
+import java.util.List;
 
 public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSubjectTokenModalUiHandlers> implements AddSubjectTokenModalPresenter.Display {
 
@@ -47,6 +51,9 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   @UiField
   TextBox tokenText;
 
+  @UiField
+  Chooser tokenProjects;
+
   private String tokenValue;
 
   @Inject
@@ -61,11 +68,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
         tokenText.setText(tokenValue);
       }
     });
-  }
-
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+    tokenProjects.setPlaceholderTextMultiple(translations.selectSomeProjects());
   }
 
   @UiHandler("cancelButton")
@@ -73,12 +76,14 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     dialog.hide();
   }
 
-
   @UiHandler("saveButton")
-  public void onDownload(ClickEvent event) {
+  public void onSave(ClickEvent event) {
     SubjectTokenDto token = SubjectTokenDto.create();
     token.setName(nameText.getText());
     token.setToken(tokenText.getText());
+    for (String p : tokenProjects.getValues()) {
+      token.addProjects(p);
+    }
     getUiHandlers().onCreateToken(token);
   }
 
@@ -96,9 +101,22 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   }
 
   @Override
+  public void hideDialog() {
+    dialog.hide();
+  }
+
+  @Override
   public void showError(String message) {
     dialog.closeAlerts();
     dialog.addAlert(message, AlertType.ERROR, nameGroup);
+  }
+
+  @Override
+  public void setProjects(List<ProjectDto> projects) {
+    tokenProjects.clear();
+    for(ProjectDto project : projects) {
+      this.tokenProjects.addItem(project.getName());
+    }
   }
 
   private static native boolean copyToClipboard() /*-{
