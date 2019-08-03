@@ -149,7 +149,15 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         } else {
           projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
         }
-        return projects;
+        String tasks = "";
+        if (object.getCommandsCount()>0) {
+          for (String cmd : JsArrays.toList(object.getCommandsArray())) {
+            tasks = tasks.length() == 0 ? cmd : tasks + ", " + cmd;
+          }
+        } else {
+          tasks = "[" + translations.none().toLowerCase() + "]";
+        }
+        return "Projects: " + projects + " | Tasks: " + tasks + " | Services: [none]";
       }
     }, translations.scopeLabel());
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {

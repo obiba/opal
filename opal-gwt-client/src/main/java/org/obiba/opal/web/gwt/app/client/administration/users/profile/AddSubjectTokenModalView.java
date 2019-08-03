@@ -10,9 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -54,6 +56,21 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   @UiField
   Chooser tokenProjects;
 
+  @UiField
+  CheckBox importCheck;
+  @UiField
+  CheckBox exportCheck;
+  @UiField
+  CheckBox copyCheck;
+  @UiField
+  CheckBox analyseCheck;
+  @UiField
+  CheckBox reportCheck;
+  @UiField
+  CheckBox importVCFCheck;
+  @UiField
+  CheckBox exportVCFCheck;
+
   private String tokenValue;
 
   @Inject
@@ -84,6 +101,14 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     for (String p : tokenProjects.getValues()) {
       token.addProjects(p);
     }
+    if (importCheck.isChecked()) token.addCommands("import");
+    if (exportCheck.isChecked()) token.addCommands("export");
+    if (copyCheck.isChecked()) token.addCommands("copy");
+    if (analyseCheck.isChecked()) token.addCommands("analyse");
+    if (reportCheck.isChecked()) token.addCommands("report");
+    if (importVCFCheck.isChecked()) token.addCommands("import_vcf");
+    if (exportVCFCheck.isChecked()) token.addCommands("export_vcf");
+
     getUiHandlers().onCreateToken(token);
   }
 

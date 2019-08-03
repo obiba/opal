@@ -51,6 +51,8 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private Set<String> projects;
 
+  private Set<String> commands;
+
   public SubjectToken() {
   }
 
@@ -111,6 +113,18 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setProjects(Set<String> projects) {
     this.projects = projects;
+  }
+
+  public Set<String> getCommands() {
+    return commands == null ? commands = new HashSet<>() : commands;
+  }
+
+  public void addAllCommands(Collection<String> commands) {
+    getCommands().addAll(commands);
+  }
+
+  public void setCommands(Set<String> commands) {
+    this.commands = commands;
   }
 
   @Override

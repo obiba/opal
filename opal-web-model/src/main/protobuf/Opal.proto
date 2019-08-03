@@ -257,8 +257,9 @@ message SubjectTokenDto {
   optional string token = 2;
   required string name = 3;
   repeated string projects = 4;
-  optional string created = 5;
-  optional string lastUpdate = 6;
+  repeated string commands = 5;
+  optional string created = 6;
+  optional string lastUpdate = 7;
 }
 
 message LinkDto {

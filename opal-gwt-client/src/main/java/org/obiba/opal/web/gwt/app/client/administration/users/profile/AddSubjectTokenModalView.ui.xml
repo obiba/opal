@@ -54,6 +54,43 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token tasks label">Project tasks</ui:msg>
+      </b:ControlLabel>
+      <b:HelpBlock>
+        <ui:msg description="Token tasks help">Select the tasks that can be performed on each project. By default none is available. Note that this does not grant a permission that you do not have.</ui:msg>
+      </b:HelpBlock>
+      <b:Controls>
+        <b:Row>
+          <b:Column size="2">
+            <b:CheckBox ui:field="importCheck">
+              <ui:msg description="Token import task label">import</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="exportCheck">
+              <ui:msg description="Token export task label">export</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="copyCheck">
+              <ui:msg description="Token copy task label">copy</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="reportCheck">
+              <ui:msg description="Token report task label">report</ui:msg>
+            </b:CheckBox>
+          </b:Column>
+          <b:Column size="2">
+            <b:CheckBox ui:field="analyseCheck">
+              <ui:msg description="Token analyse task label">analyse</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="importVCFCheck">
+              <ui:msg description="Token import vcf task label">import VCF</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="exportVCFCheck">
+              <ui:msg description="Token export VCF task label">export VCF</ui:msg>
+            </b:CheckBox>
+          </b:Column>
+        </b:Row>
+      </b:Controls>
+    </b:ControlGroup>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

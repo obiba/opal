@@ -52,6 +52,7 @@ public class Dtos {
     if (dto.hasPrincipal()) token.setPrincipal(dto.getPrincipal());
     if (dto.hasToken()) token.setToken(dto.getToken());
     if (dto.getProjectsCount()>0) token.addAllProjects(dto.getProjectsList());
+    if (dto.getCommandsCount()>0) token.addAllCommands(dto.getCommandsList());
     return token;
   }
 
@@ -84,6 +85,7 @@ public class Dtos {
         .setPrincipal(token.getPrincipal())
         .setName(token.getName())
         .addAllProjects(token.getProjects())
+        .addAllCommands(token.getCommands())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));
 

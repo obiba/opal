@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * A authorizer that applies a posteriori restrictions to permissions granted to a {@link SubjectToken}.
@@ -33,7 +34,9 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private final SubjectTokenService subjectTokenService;
 
-  private final com.google.common.cache.Cache<String, List<String>> projectRestrictionsCache = CacheBuilder.newBuilder()
+  private final Pattern projectCmdPattern = Pattern.compile("^/project/\\w+/commands/_\\w+$");
+
+  private final com.google.common.cache.Cache<String, SubjectToken> tokenCache = CacheBuilder.newBuilder()
       .expireAfterAccess(10, TimeUnit.SECONDS)
       .build();
 
@@ -49,12 +52,15 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isTokenPermitted(PrincipalCollection principals, String permission) {
-    log.trace("Token permission on {}", permission);
+    log.info("Token permission on {}", permission);
     String[] parts = permission.split(":");
     if (parts.length < 3) return true;
 
     String node = parts[1];
     String action = parts[2];
+
+    if (projectCmdPattern.matcher(node).matches())
+      return isProjectCommandPermitted(principals, node);
 
     if (node.startsWith("/project/") || node.startsWith("/datasource/"))
       return isProjectActionPermitted(principals, node, action);
@@ -74,28 +80,46 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     return projectRestrictions.contains(basePath);
   }
 
+  private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
+    return getProjectCommands(principals).contains(node);
+  }
+
   private boolean isFromTokenRealm(PrincipalCollection principals) {
     return principals.getRealmNames().contains(OpalTokenRealm.TOKEN_REALM);
   }
 
   private List<String> getProjectRestrictions(PrincipalCollection principals) {
-    List<String> restrictions = projectRestrictionsCache.getIfPresent(principals.toString());
-    if (restrictions == null) {
-      restrictions = Lists.newArrayList();
-      try {
-        String principal = principals.getPrimaryPrincipal().toString();
-        String tk = principals.fromRealm(OpalTokenRealm.TOKEN_REALM).iterator().next().toString();
-        SubjectToken token = subjectTokenService.getToken(tk, principal);
-        for (String project : token.getProjects()) {
-          restrictions.add("/datasource/" + project);
-          restrictions.add("/project/" + project);
-        }
-        projectRestrictionsCache.put(principals.toString(), restrictions);
-      } catch (Exception e) {
-        log.error("Failed at getting subject token", e);
-      }
+    List<String> restrictions = Lists.newArrayList();
+    for (String project : getToken(principals).getProjects()) {
+      restrictions.add("/datasource/" + project);
+      restrictions.add("/project/" + project);
     }
     return restrictions;
+  }
+
+  private List<String> getProjectCommands(PrincipalCollection principals) {
+    List<String> projectCmds = Lists.newArrayList();
+    SubjectToken token = getToken(principals);
+    if (token.getCommands().isEmpty()) return projectCmds;
+
+    for (String project : token.getProjects()) {
+      for (String cmd : token.getCommands()) {
+        projectCmds.add("/project/" + project + "/commands/_" + cmd);
+      }
+    }
+    return projectCmds;
+  }
+
+
+  private SubjectToken getToken(PrincipalCollection principals) {
+    SubjectToken token = tokenCache.getIfPresent(principals.toString());
+    if (token == null) {
+      String principal = principals.getPrimaryPrincipal().toString();
+      String tk = principals.fromRealm(OpalTokenRealm.TOKEN_REALM).iterator().next().toString();
+      token = subjectTokenService.getToken(tk, principal);
+      tokenCache.put(principals.toString(), token);
+    }
+    return token;
   }
 
 }
