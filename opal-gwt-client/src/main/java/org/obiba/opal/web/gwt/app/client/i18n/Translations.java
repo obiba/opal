@@ -1272,6 +1272,18 @@ public interface Translations extends Constants {
   })
   Map<String, String> valueTypeMap();
 
+  @Description("Token Tasks map")
+  @DefaultStringMapValue({
+      "import", "Import",
+      "export", "Export",
+      "copy", "Copy",
+      "report", "Report",
+      "analyse", "Analyse",
+      "import_vcf", "Import VCF",
+      "export_vcf", "ExportVCF"
+  })
+  Map<String, String> tokenTasksMap();
+
   @Description("Subject Type map")
   @DefaultStringMapValue({ "USER", "User", //
       "GROUP", "Group" })
@@ -2662,6 +2674,10 @@ public interface Translations extends Constants {
   @Description("Tasks label")
   @DefaultStringValue("Tasks")
   String tasks();
+
+  @Description("Services label")
+  @DefaultStringValue("Services")
+  String servicesLabel();
 
   @Description("Derive label")
   @DefaultStringValue("Derive")

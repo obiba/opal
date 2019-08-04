@@ -42,12 +42,6 @@
     </b:Form>
 
     <b:Heading size="4">
-      <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
-    </b:Heading>
-
-    <g:FlowPanel ui:field="bookmarks"/>
-
-    <b:Heading size="4">
       <ui:msg description="Personal Access Tokens label">Personal Access Tokens</ui:msg>
     </b:Heading>
 
@@ -55,7 +49,10 @@
       <ui:msg description="Personal Access Tokens description">
         Personal access tokens can be created for use in scripts and on the command line (using R or Python client API).
         Be careful, these tokens are like passwords so you should guard them carefully. The advantage to using a token over
-        putting your password into a script is that a token can be revoked, and you can generate lots of them.</ui:msg>
+        putting your password into a script is that a token can be revoked, and you can generate lots of them. The scope
+        of the access granted to the token can be restricted by projects, operations that can performed on these projects
+        and system services. Note that this scope does not grant new permissions but rather alter the ones you have.
+      </ui:msg>
     </b:Paragraph>
 
     <b:Button ui:field="addToken" type="INFO" icon="PLUS" addStyleNames="btn">
@@ -64,6 +61,12 @@
 
     <o:OpalSimplePager ui:field="tokensPager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="tokensTable" addStyleNames="small-top-margin"/>
+
+    <b:Heading size="4">
+      <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
+    </b:Heading>
+
+    <g:FlowPanel ui:field="bookmarks"/>
 
   </g:FlowPanel>
 

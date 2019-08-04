@@ -139,6 +139,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
     }, translations.nameLabel());
     tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
       @Override
       public String getValue(SubjectTokenDto object) {
         String projects = "";
@@ -149,21 +150,34 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         } else {
           projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
         }
+        return projects;
+      }
+
+    }, translations.pageProjectsTitle());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
+      @Override
+      public String getValue(SubjectTokenDto object) {
         String tasks = "";
         if (object.getCommandsCount()>0) {
           for (String cmd : JsArrays.toList(object.getCommandsArray())) {
-            tasks = tasks.isEmpty() ? cmd : tasks + ", " + cmd;
+            String cmdLbl = translations.tokenTasksMap().get(cmd);
+            tasks = tasks.isEmpty() ? cmdLbl : tasks + ", " + cmdLbl;
           }
-        } else {
-          tasks = "[" + translations.none().toLowerCase() + "]";
         }
+        return tasks;
+      }
+
+    }, translations.tasks());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+      @Override
+      public String getValue(SubjectTokenDto object) {
         String services = "";
         if (object.getUseR()) services = "R";
         if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
-        if (services.isEmpty()) services = "[" + translations.none().toLowerCase() + "]";
-        return "Projects: " + projects + " | Tasks: " + tasks + " | Services: " + services;
+        return services;
       }
-    }, translations.scopeLabel());
+    }, translations.servicesLabel());
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {
 
       @Override
