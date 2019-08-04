@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -78,12 +79,15 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     String[] elems = node.split("/");
     if (elems.length < 3) return true;
 
-    String basePath = "/" + elems[1] + "/" + elems[2];
-    log.trace(" Token project permission base={} action={}", basePath, action);
-    List<String> projectRestrictions = getProjectRestrictions(principals);
+    String project = elems[2];
+    log.trace(" Token project ={} action={}", project, action);
+
+    if ("datasource".equals(elems[1]) && isTransientDatasource(project)) return true;
+
+    Collection<String> projectRestrictions = getProjectRestrictions(principals);
     if (projectRestrictions.isEmpty()) return true;
 
-    return projectRestrictions.contains(basePath);
+    return projectRestrictions.contains(project);
   }
 
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
@@ -94,13 +98,18 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     return principals.getRealmNames().contains(OpalTokenRealm.TOKEN_REALM);
   }
 
-  private List<String> getProjectRestrictions(PrincipalCollection principals) {
-    List<String> restrictions = Lists.newArrayList();
-    for (String project : getToken(principals).getProjects()) {
-      restrictions.add("/datasource/" + project);
-      restrictions.add("/project/" + project);
+  // Try to guess it is a transient datasource based on the UUID pattern.
+  private boolean isTransientDatasource(String name) {
+    try {
+      UUID.fromString(name);
+      return true;
+    } catch (Exception e) {
+      return false;
     }
-    return restrictions;
+  }
+
+  private Collection<String> getProjectRestrictions(PrincipalCollection principals) {
+    return getToken(principals).getProjects();
   }
 
   private List<String> getProjectCommands(PrincipalCollection principals) {
