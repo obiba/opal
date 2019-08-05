@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,6 +48,9 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   interface Binder extends UiBinder<Widget, SubjectProfileView> {
   }
+
+  @UiField
+  Paragraph groupsText;
 
   @UiField
   Paragraph accountText;
@@ -83,6 +87,17 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     configTokensTable();
+  }
+
+  @Override
+  public void renderGroups(List<String> groups) {
+    groupsText.setText("");
+    groupsText.setVisible(!groups.isEmpty());
+
+    if (!groups.isEmpty()) {
+      String gText = Joiner.on(", ").join(groups);
+      groupsText.setText(translationMessages.accountGroups(gText));
+    }
   }
 
   @Override
@@ -144,9 +159,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
       public String getValue(SubjectTokenDto object) {
         String projects = "";
         if (object.getProjectsCount()>0) {
-          for (String p : JsArrays.toList(object.getProjectsArray())) {
-            projects = projects.isEmpty() ? p : projects + ", " + p;
-          }
+          projects = Joiner.on(", ").join(JsArrays.toList(object.getProjectsArray()));
         } else {
           projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
         }

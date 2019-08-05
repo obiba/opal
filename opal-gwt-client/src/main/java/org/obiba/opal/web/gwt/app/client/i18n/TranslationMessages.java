@@ -267,6 +267,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Your account password can be updated on the identity provider site.")
   String accountDelegated();
 
+  @Description("Account groups text")
+  @DefaultMessage("Your account belongs to group(s): {0}")
+  String accountGroups(String groups);
+
   @Description("Last Update Ago label")
   @DefaultMessage("Last update {0}")
   String lastUpdateAgoLabel(String date);

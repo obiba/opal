@@ -105,10 +105,10 @@
       </b:HelpBlock>
       <b:Controls>
         <b:CheckBox ui:field="rCheck">
-          <ui:msg description="Token R label">R</ui:msg>
+          <ui:msg description="Token R label">Use R server</ui:msg>
         </b:CheckBox>
         <b:CheckBox ui:field="datashieldCheck">
-          <ui:msg description="Token datashield label">DataSHIELD</ui:msg>
+          <ui:msg description="Token datashield label">Use DataSHIELD</ui:msg>
         </b:CheckBox>
       </b:Controls>
     </b:ControlGroup>

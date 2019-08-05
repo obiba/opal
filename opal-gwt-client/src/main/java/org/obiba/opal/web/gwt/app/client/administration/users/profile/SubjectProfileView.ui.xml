@@ -26,6 +26,17 @@
       <ui:msg description="Account Settings label">Account Settings</ui:msg>
     </b:Heading>
 
+    <b:Heading size="5">
+      <ui:msg description="Account Settings Groups label">Groups</ui:msg>
+    </b:Heading>
+
+    <b:Paragraph ui:field="groupsText">
+    </b:Paragraph>
+
+    <b:Heading size="5">
+      <ui:msg description="Account Settings Password label">Password</ui:msg>
+    </b:Heading>
+
     <b:Paragraph ui:field="accountText">
     </b:Paragraph>
 
@@ -62,7 +73,7 @@
     <o:OpalSimplePager ui:field="tokensPager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="tokensTable" addStyleNames="small-top-margin"/>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xlarge-top-margin">
       <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
     </b:Heading>
 
