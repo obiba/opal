@@ -90,9 +90,8 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
       public String renderItem(String item) {
         String option = super.renderItem(item);
         String[] parts = option.split("=");
-        return parts.length == 2 //
-            ? parts[0] + "=" + ROptionsHelper.renderROptionValue(parts[0], parts[1]) //
-            : option;
+        return
+            parts[0] + "=" + ROptionsHelper.renderROptionValue(parts[0], parts.length == 2 ? parts[1] : "");
       }
     });
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
