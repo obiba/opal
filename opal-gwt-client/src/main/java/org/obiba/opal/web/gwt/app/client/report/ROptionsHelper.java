@@ -19,7 +19,7 @@ public class ROptionsHelper {
 
   public static String renderROptionValue(String key, String value) {
     String optValue = value;
-    RegExp regExp = RegExp.compile("password");
+    RegExp regExp = RegExp.compile("password|token");
     MatchResult matcher = regExp.exec(key);
     if(matcher != null) {
       return "******";

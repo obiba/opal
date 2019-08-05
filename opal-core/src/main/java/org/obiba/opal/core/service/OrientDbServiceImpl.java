@@ -182,6 +182,16 @@ public class OrientDbServiceImpl implements OrientDbService {
     }
   }
 
+  @Override
+  public String toJson(Object object) {
+    return gson.toJson(object);
+  }
+
+  @Override
+  public <T> T fromJson(String json, Class<T> classOfT) {
+    return gson.fromJson(json, classOfT);
+  }
+
   private ODocument findUniqueDocument(ODatabaseDocumentTx db, HasUniqueProperties template) {
     OIndex<?> index = getIndex(db, template);
     OIdentifiable identifiable = (OIdentifiable) index.get(getKey(template));

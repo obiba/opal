@@ -83,6 +83,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     Map<String, List<String>> suggestions = Maps.newLinkedHashMap();
     suggestions.put("opal.username", new ArrayList<String>());
     suggestions.put("opal.password", new ArrayList<String>());
+    suggestions.put("opal.token", new ArrayList<String>());
     suggestions.put("opal.url", new ArrayList<String>());
     parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView(suggestions) {
       @Override
@@ -286,7 +287,8 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
   }
 
   private String getParameterValue(String parameterStr) {
-    return parameterStr.split("=")[1].trim();
+    String[] parts = parameterStr.split("=");
+    return parts.length == 2 ? parts[1].trim() : "";
   }
 
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {

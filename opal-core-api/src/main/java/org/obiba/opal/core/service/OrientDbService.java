@@ -88,6 +88,10 @@ public interface OrientDbService {
 
   void dropDatabase();
 
+  String toJson(Object object);
+
+  <T> T fromJson(String json, Class<T> classOfT);
+
   interface WithinDocumentTxCallback<T> {
 
     T withinDocumentTx(ODatabaseDocumentTx db);

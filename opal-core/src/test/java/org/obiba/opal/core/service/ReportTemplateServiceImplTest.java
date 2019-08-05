@@ -13,6 +13,7 @@ package org.obiba.opal.core.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.ReportTemplate;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,7 @@ public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTe
   private OrientDbService orientDbService;
 
   @Before
-  public void clear() throws Exception {
+  public void clear() {
     orientDbService.deleteAll(ReportTemplate.class);
   }
 
@@ -52,7 +53,8 @@ public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTe
     reportTemplateService.save(template);
 
     assertThat(reportTemplateService.getReportTemplates()).hasSize(1);
-    assertEquals(reportTemplateService.getReportTemplates().iterator().next(), template);
+    ReportTemplate firstTemplate = reportTemplateService.getReportTemplates().iterator().next();
+    assertEquals(firstTemplate, template);
 
     assertThat(reportTemplateService.getReportTemplates(template.getProject())).hasSize(1);
     assertEquals(reportTemplateService.getReportTemplates(template.getProject()).iterator().next(), template);
@@ -101,6 +103,26 @@ public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public ReportTemplateService reportTemplateService() {
       return new ReportTemplateServiceImpl();
+    }
+
+    @Bean
+    public CryptoService cryptoService() {
+      return new CryptoService() {
+        @Override
+        public String generateSecretKey() {
+          return null;
+        }
+
+        @Override
+        public String encrypt(String plain) {
+          return plain;
+        }
+
+        @Override
+        public String decrypt(String encrypted) {
+          return encrypted;
+        }
+      };
     }
 
   }
