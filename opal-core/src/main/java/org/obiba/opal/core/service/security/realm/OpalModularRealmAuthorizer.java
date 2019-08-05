@@ -72,6 +72,10 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (node.startsWith("/datashield/session"))
       return isUsingDatashieldPermitted(principals);
 
+    if (node.startsWith("/system"))
+      return isSystemAdministrationPermitted(principals, node);
+
+
     return true;
   }
 
@@ -131,6 +135,21 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private boolean isUsingDatashieldPermitted(PrincipalCollection principals) {
     return getToken(principals).isUseDatashield();
+  }
+
+  private boolean isSystemAdministrationPermitted(PrincipalCollection principals, String node) {
+    boolean sysAdmin = getToken(principals).isSystemAdmin();
+    if (sysAdmin) return true;
+
+    // pattern for managing own settings
+    if (node.contains("/_current")) return true;
+
+    // non-critical but still useful resources
+    if (node.startsWith("/system/conf/taxonomies")
+        || node.startsWith("/system/conf/taxonomy")
+        || node.startsWith("/system/crypto")) return true;
+
+    return false;
   }
 
   private SubjectToken getToken(PrincipalCollection principals) {

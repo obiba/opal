@@ -75,6 +75,8 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   CheckBox rCheck;
   @UiField
   CheckBox datashieldCheck;
+  @UiField
+  CheckBox sysAdminCheck;
 
   private String tokenValue;
 
@@ -115,7 +117,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     if (exportVCFCheck.isChecked()) token.addCommands("export_vcf");
     token.setUseR(rCheck.isChecked());
     token.setUseDatashield(datashieldCheck.isChecked());
-
+    token.setSysAdmin(sysAdminCheck.isChecked());
     getUiHandlers().onCreateToken(token);
   }
 

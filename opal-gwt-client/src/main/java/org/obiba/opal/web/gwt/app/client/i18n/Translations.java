@@ -1280,7 +1280,7 @@ public interface Translations extends Constants {
       "report", "Report",
       "analyse", "Analyse",
       "import_vcf", "Import VCF",
-      "export_vcf", "ExportVCF"
+      "export_vcf", "Export VCF"
   })
   Map<String, String> tokenTasksMap();
 

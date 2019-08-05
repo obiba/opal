@@ -188,6 +188,10 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         String services = "";
         if (object.getUseR()) services = "R";
         if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
+        if (object.getSysAdmin()) {
+          String sysAdmin = translations.pageAdministrationTitle();
+          services = services.isEmpty() ? sysAdmin : services + ", " + sysAdmin;
+        }
         return services;
       }
     }, translations.servicesLabel());

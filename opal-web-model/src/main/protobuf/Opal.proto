@@ -260,8 +260,9 @@ message SubjectTokenDto {
   repeated string commands = 5;
   optional bool useR = 6 [default = false];
   optional bool useDatashield = 7 [default = false];
-  optional string created = 8;
-  optional string lastUpdate = 9;
+  optional bool sysAdmin = 8 [default = false];
+  optional string created = 9;
+  optional string lastUpdate = 10;
 }
 
 message LinkDto {

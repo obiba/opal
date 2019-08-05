@@ -55,6 +55,7 @@ public class Dtos {
     if (dto.getCommandsCount()>0) token.addAllCommands(dto.getCommandsList());
     token.setUseR(dto.hasUseR() && dto.getUseR());
     token.setUseDatashield(dto.hasUseDatashield() && dto.getUseDatashield());
+    token.setSystemAdmin(dto.hasSysAdmin() && dto.getSysAdmin());
     return token;
   }
 
@@ -90,6 +91,7 @@ public class Dtos {
         .addAllCommands(token.getCommands())
         .setUseR(token.isUseR())
         .setUseDatashield(token.isUseDatashield())
+        .setSysAdmin(token.isSystemAdmin())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));
 

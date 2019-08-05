@@ -57,6 +57,8 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private boolean useDatashield;
 
+  private boolean systemAdmin;
+
   public SubjectToken() {
   }
 
@@ -145,6 +147,14 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public boolean isUseDatashield() {
     return useDatashield;
+  }
+
+  public void setSystemAdmin(boolean systemAdmin) {
+    this.systemAdmin = systemAdmin;
+  }
+
+  public boolean isSystemAdmin() {
+    return systemAdmin;
   }
 
   @Override
