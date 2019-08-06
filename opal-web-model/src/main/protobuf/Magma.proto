@@ -126,8 +126,9 @@ message StaticDatasourceFactoryDto {
 
 message RestDatasourceFactoryDto {
   required string url = 1;
-  required string username = 2;
-  required string password = 3;
+  optional string username = 2;
+  optional string password = 3;
+  optional string token = 5;
   required string remoteDatasource = 4;
   extend DatasourceFactoryDto {
     optional RestDatasourceFactoryDto params = 1007;

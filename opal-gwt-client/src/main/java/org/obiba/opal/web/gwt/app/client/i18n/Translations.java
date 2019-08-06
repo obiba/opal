@@ -446,8 +446,9 @@ public interface Translations extends Constants {
       "cannotSwitchTabBecauseOfUnsavedChanges",
       "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
       "UrlRequired", "You must provide the database's URL.",//
-      "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
-      "PasswordRequired", "You must indicate the password to be used for the database connection.", //
+      "OpalUsernameRequired", "You must indicate the user name.",//
+      "OpalPasswordRequired", "You must indicate the password.", //
+      "OpalTokenRequired", "You must indicate the personal access token.", //
       "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables",
       "You must indicate whether meta-data tables are to be used or not.",//
       "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
@@ -2832,5 +2833,13 @@ public interface Translations extends Constants {
   @Description("User account Label")
   @DefaultStringValue("User account")
   String userAccountLabel();
+
+  @Description("Token Label")
+  @DefaultStringValue("Personal access token")
+  String accessTokenLabel();
+
+  @Description("Credentials Label")
+  @DefaultStringValue("User credentials")
+  String credentialsLabel();
 
 }

@@ -29,6 +29,8 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
 
   private final String password;
 
+  private final String token;
+
   private final String remoteDatasource;
 
   private KeyStore keyStore;
@@ -50,6 +52,23 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     this.url = url;
     this.username = username;
     this.password = password;
+    this.token = null;
+    this.remoteDatasource = remoteDatasource;
+  }
+
+  /**
+   * Authenticate by personal access token.
+   * @param name
+   * @param url
+   * @param token
+   * @param remoteDatasource
+   */
+  public RestDatasourceFactory(String name, String url, String token, String remoteDatasource) {
+    setName(name);
+    this.url = url;
+    this.username = null;
+    this.password = null;
+    this.token = token;
     this.remoteDatasource = remoteDatasource;
   }
 
@@ -92,7 +111,10 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
       opalUrl = url + "/ws";
     }
     OpalJavaClient client;
-    client = new OpalJavaClient(opalUrl, keyStore, username, password);
+    if (token != null)
+      client = new OpalJavaClient(opalUrl, token);
+    else
+      client = new OpalJavaClient(opalUrl, keyStore, username, password);
 
     if(soTimeout != null) {
       client.setSoTimeout(soTimeout);

@@ -149,7 +149,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
             for (SubjectTokenDto tk : tokens) {
               tokenNames.add(tk.getName());
             }
-            getView().renderTokens(tokens);;
+            getView().renderTokens(tokens);
           }
         }) //
         .get().send();
