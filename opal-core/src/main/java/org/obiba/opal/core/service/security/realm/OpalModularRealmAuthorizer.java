@@ -12,6 +12,7 @@ package org.obiba.opal.core.service.security.realm;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -32,6 +33,8 @@ import java.util.regex.Pattern;
 public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private static final Logger log = LoggerFactory.getLogger(OpalModularRealmAuthorizer.class);
+
+  private static final Collection<String> EDIT_ACTIONS = Sets.newHashSet("PUT", "DELETE", "POST");
 
   private final SubjectTokenService subjectTokenService;
 
@@ -63,8 +66,17 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (projectCmdPattern.matcher(node).matches())
       return isProjectCommandPermitted(principals, node);
 
+    // cannot create a project using a token
+    if (node.equals("/projects") && EDIT_ACTIONS.contains(action)) return false;
+
     if (node.startsWith("/project/") || node.startsWith("/datasource/"))
       return isProjectActionPermitted(principals, node, action);
+
+    // cannot bypass projects to launch a command
+    if (node.startsWith("/shell/commands") && EDIT_ACTIONS.contains(action)) return false;
+
+    if (node.startsWith("/service/r/workspaces"))
+      return isUsingRPermitted(principals) || isUsingDatashieldPermitted(principals);
 
     if (node.startsWith("/r/session"))
       return isUsingRPermitted(principals);
@@ -72,9 +84,12 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (node.startsWith("/datashield/session"))
       return isUsingDatashieldPermitted(principals);
 
-    if (node.startsWith("/system"))
+    if ((node.startsWith("/system")
+        || node.startsWith("/datashield/option") || node.startsWith("/datashield/package")
+        || node.startsWith("/service")
+        || node.startsWith("/identifiers/mapping")
+        || node.startsWith("/plugin")) && EDIT_ACTIONS.contains(action))
       return isSystemAdministrationPermitted(principals, node);
-
 
     return true;
   }
@@ -87,6 +102,9 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     log.trace(" Token project ={} action={}", project, action);
 
     if ("datasource".equals(elems[1]) && isTransientDatasource(project)) return true;
+
+    // cannot modify datasource or project using a token
+    if (elems.length == 3 && EDIT_ACTIONS.contains(action)) return false;
 
     Collection<String> projectRestrictions = getProjectRestrictions(principals);
     if (projectRestrictions.isEmpty()) return true;
@@ -143,11 +161,6 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
     // pattern for managing own settings
     if (node.contains("/_current")) return true;
-
-    // non-critical but still useful resources
-    if (node.startsWith("/system/conf/taxonomies")
-        || node.startsWith("/system/conf/taxonomy")
-        || node.startsWith("/system/crypto")) return true;
 
     return false;
   }
