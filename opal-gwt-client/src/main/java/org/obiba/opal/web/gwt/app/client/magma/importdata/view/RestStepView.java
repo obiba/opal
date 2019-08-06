@@ -9,19 +9,22 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
-
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 
 public class RestStepView extends ViewImpl implements RestStepPresenter.Display {
 
@@ -29,10 +32,16 @@ public class RestStepView extends ViewImpl implements RestStepPresenter.Display 
   TextBox url;
 
   @UiField
+  Chooser authMethod;
+
+  @UiField
   TextBox username;
 
   @UiField
   PasswordTextBox password;
+
+  @UiField
+  PasswordTextBox token;
 
   @UiField
   TextBox remoteDatasource;
@@ -47,13 +56,23 @@ public class RestStepView extends ViewImpl implements RestStepPresenter.Display 
   ControlGroup passwordGroup;
 
   @UiField
+  ControlGroup tokenGroup;
+
+  @UiField
   ControlGroup remoteDatasourceGroup;
 
-  interface Binder extends UiBinder<Widget, RestStepView> {}
+  private final Translations translations;
+
+  interface Binder extends UiBinder<Widget, RestStepView> {
+  }
 
   @Inject
-  public RestStepView(Binder uiBinder) {
+  public RestStepView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    authMethod.addItem(translations.accessTokenLabel(), "token");
+    authMethod.addItem(translations.credentialsLabel(), "credentials");
+    onAuthMethodChosen(null);
   }
 
   @Override
@@ -72,6 +91,39 @@ public class RestStepView extends ViewImpl implements RestStepPresenter.Display 
   }
 
   @Override
+  public HasValue<Boolean> getUseCredentials() {
+    return new BooleanHasValue() {
+      @Override
+      public Boolean getValue() {
+        return usernameGroup.isVisible();
+      }
+    };
+  }
+
+  @Override
+  public PasswordTextBox getToken() {
+    return token;
+  }
+
+  @Override
+  public HasValue<Boolean> getUseToken() {
+    return new BooleanHasValue() {
+      @Override
+      public Boolean getValue() {
+        return tokenGroup.isVisible();
+      }
+    };
+  }
+
+  @UiHandler("authMethod")
+  public void onAuthMethodChosen(ChangeEvent e) {
+    boolean isToken = "token".equals(authMethod.getSelectedValue());
+    tokenGroup.setVisible(isToken);
+    usernameGroup.setVisible(!isToken);
+    passwordGroup.setVisible(!isToken);
+  }
+
+  @Override
   public HasText getUrl() {
     return url;
   }
@@ -79,17 +131,42 @@ public class RestStepView extends ViewImpl implements RestStepPresenter.Display 
   @Override
   public HasType<ControlGroupType> getGroupType(String id) {
     RestStepPresenter.Display.FormField field = RestStepPresenter.Display.FormField.valueOf(id);
-    switch(field) {
+    switch (field) {
       case URL:
         return urlGroup;
       case USERNAME:
         return usernameGroup;
       case PASSWORD:
         return passwordGroup;
+      case TOKEN:
+        return tokenGroup;
       case REMOTE_DATESOURCE:
         return remoteDatasourceGroup;
     }
 
     return null;
+  }
+
+  private abstract class BooleanHasValue implements HasValue<Boolean> {
+
+    @Override
+    public void setValue(Boolean value) {
+
+    }
+
+    @Override
+    public void setValue(Boolean value, boolean fireEvents) {
+
+    }
+
+    @Override
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+      return null;
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+
+    }
   }
 }

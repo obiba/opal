@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Strings;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.google.common.base.MoreObjects;
@@ -42,6 +43,8 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
 
   @NotNull
   private final Map<String, String> parameters = new HashMap<>();
+
+  private String encryptedParameters;
 
   private String schedule;
 
@@ -100,6 +103,24 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
     if(parameters != null) {
       this.parameters.putAll(parameters);
     }
+    this.encryptedParameters = null;
+  }
+
+  public boolean hasParameters() {
+    return !parameters.isEmpty();
+  }
+
+  public void setEncryptedParameters(String params) {
+    this.encryptedParameters = params;
+    this.parameters.clear();
+  }
+
+  public String getEncryptedParameters() {
+    return encryptedParameters;
+  }
+
+  public boolean hasEncryptedParameters() {
+    return !Strings.isNullOrEmpty(encryptedParameters);
   }
 
   public String getSchedule() {
@@ -167,14 +188,23 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
     private Builder() {
     }
 
-    public static Builder create(@Nullable ReportTemplate reportTemplate) {
+    public static Builder copy(@Nullable ReportTemplate reportTemplate) {
       Builder builder = new Builder();
-      builder.reportTemplate = reportTemplate == null ? new ReportTemplate() : reportTemplate;
+      builder.reportTemplate = new ReportTemplate();
+      builder.reportTemplate.name = reportTemplate.name;
+      builder.reportTemplate.project  = reportTemplate.project;
+      builder.reportTemplate.design  = reportTemplate.design;
+      builder.reportTemplate.format  = reportTemplate.format;
+      builder.reportTemplate.schedule  = reportTemplate.schedule;
+      builder.reportTemplate.setParameters(reportTemplate.parameters);
+      builder.reportTemplate.setEmailNotificationAddresses(reportTemplate.emailNotificationAddresses);
       return builder;
     }
 
     public static Builder create() {
-      return create(null);
+      Builder builder = new Builder();
+      builder.reportTemplate = new ReportTemplate();
+      return builder;
     }
 
     public Builder nameAndProject(String name, String project) {

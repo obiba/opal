@@ -18,7 +18,10 @@ import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is a Personal API access token: allow a tier to connect to Opal on behalf of a subject and with restricted permissions.
@@ -45,6 +48,16 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
   @NotNull
   @NotBlank
   private String name;
+
+  private Set<String> projects;
+
+  private Set<String> commands;
+
+  private boolean useR;
+
+  private boolean useDatashield;
+
+  private boolean systemAdmin;
 
   public SubjectToken() {
   }
@@ -94,6 +107,54 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setName(@NotNull String name) {
     this.name = name;
+  }
+
+  public Set<String> getProjects() {
+    return projects == null ? projects = new HashSet<>() : projects;
+  }
+
+  public void addAllProjects(Collection<String> projects) {
+    getProjects().addAll(projects);
+  }
+
+  public void setProjects(Set<String> projects) {
+    this.projects = projects;
+  }
+
+  public Set<String> getCommands() {
+    return commands == null ? commands = new HashSet<>() : commands;
+  }
+
+  public void addAllCommands(Collection<String> commands) {
+    getCommands().addAll(commands);
+  }
+
+  public void setCommands(Set<String> commands) {
+    this.commands = commands;
+  }
+
+  public void setUseR(boolean useR) {
+    this.useR = useR;
+  }
+
+  public boolean isUseR() {
+    return useR;
+  }
+
+  public void setUseDatashield(boolean useDatashield) {
+    this.useDatashield = useDatashield;
+  }
+
+  public boolean isUseDatashield() {
+    return useDatashield;
+  }
+
+  public void setSystemAdmin(boolean systemAdmin) {
+    this.systemAdmin = systemAdmin;
+  }
+
+  public boolean isSystemAdmin() {
+    return systemAdmin;
   }
 
   @Override

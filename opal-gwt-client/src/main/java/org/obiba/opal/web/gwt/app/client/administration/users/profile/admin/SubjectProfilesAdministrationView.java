@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.users.profile.admin;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Joiner;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
@@ -85,9 +86,8 @@ public class SubjectProfilesAdministrationView extends ViewImpl
       @Override
       public String getValue(SubjectProfileDto object) {
         String groupsTxt = "";
-        for (String gp : JsArrays.toIterable(object.getGroupsArray())) {
-          groupsTxt = groupsTxt.length() == 0 ? gp : groupsTxt + ", " + gp;
-        }
+        if (object.getGroupsCount()>0)
+          groupsTxt = Joiner.on(", ").join(JsArrays.toIterable(object.getGroupsArray()));
         return groupsTxt;
       }
 

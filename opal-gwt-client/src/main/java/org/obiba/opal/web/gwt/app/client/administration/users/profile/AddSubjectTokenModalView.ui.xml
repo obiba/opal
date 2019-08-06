@@ -14,7 +14,7 @@
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false" minHeight="650">
 
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel>
@@ -40,6 +40,80 @@
       <b:HelpBlock>
         <ui:msg description="Token value help">Make sure to copy your new personal access token before saving.</ui:msg>
       </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token projects label">Projects</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:Chooser ui:field="tokenProjects" multipleSelect="true" width="500px"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Token projects help">Access can be limited to some projects. Leave empty to apply no restrictions.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token tasks label">Project tasks</ui:msg>
+      </b:ControlLabel>
+      <b:HelpBlock>
+        <ui:msg description="Token tasks help">
+          Select the project tasks that can be performed using the token. By default none is available.
+        </ui:msg>
+      </b:HelpBlock>
+      <b:Controls>
+        <b:Row>
+          <b:Column size="2">
+            <b:CheckBox ui:field="importCheck">
+              <ui:msg description="Token import task label">Import</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="exportCheck">
+              <ui:msg description="Token export task label">Export</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="copyCheck">
+              <ui:msg description="Token copy task label">Copy</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="reportCheck">
+              <ui:msg description="Token report task label">Report</ui:msg>
+            </b:CheckBox>
+          </b:Column>
+          <b:Column size="2">
+            <b:CheckBox ui:field="analyseCheck">
+              <ui:msg description="Token analyse task label">Analyse</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="importVCFCheck">
+              <ui:msg description="Token import vcf task label">Import VCF</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="exportVCFCheck">
+              <ui:msg description="Token export VCF task label">Export VCF</ui:msg>
+            </b:CheckBox>
+          </b:Column>
+        </b:Row>
+      </b:Controls>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Token services label">Services</ui:msg>
+      </b:ControlLabel>
+      <b:HelpBlock>
+        <ui:msg description="Token services help">
+          Select the system services that can be performed using the token. By default none is available.
+        </ui:msg>
+      </b:HelpBlock>
+      <b:Controls>
+        <b:CheckBox ui:field="rCheck">
+          <ui:msg description="Token R label">Use R server</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="datashieldCheck">
+          <ui:msg description="Token datashield label">Use DataSHIELD</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="sysAdminCheck">
+          <ui:msg description="Token sys admin label">Administrate system</ui:msg>
+        </b:CheckBox>
+      </b:Controls>
     </b:ControlGroup>
 
     <b:ModalFooter>

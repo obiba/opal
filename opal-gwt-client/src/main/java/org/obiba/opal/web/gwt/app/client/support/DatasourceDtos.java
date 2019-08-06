@@ -86,8 +86,12 @@ public class DatasourceDtos {
   private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportConfig importConfig) {
     RestDatasourceFactoryDto factoryDto = RestDatasourceFactoryDto.create();
     factoryDto.setUrl(importConfig.getString("url"));
-    factoryDto.setUsername(importConfig.getString("username"));
-    factoryDto.setPassword(importConfig.getString("password"));
+    if (importConfig.getString("token") == null) {
+      factoryDto.setUsername(importConfig.getString("username"));
+      factoryDto.setPassword(importConfig.getString("password"));
+    } else
+      factoryDto.setToken(importConfig.getString("token"));
+
     factoryDto.setRemoteDatasource(importConfig.getString("remoteDatasource"));
 
     return createAndConfigureDatasourceFactoryDto(importConfig,

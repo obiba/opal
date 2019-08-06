@@ -19,9 +19,7 @@ import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
-import org.apache.shiro.authz.permission.PermissionResolverAware;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
@@ -35,6 +33,8 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.oidc.shiro.realm.OIDCRealm;
+import org.obiba.opal.core.service.SubjectTokenService;
+import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.obiba.shiro.realm.ObibaRealm;
 import org.springframework.beans.factory.FactoryBean;
@@ -61,6 +61,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
 
   private final RolePermissionResolver rolePermissionResolver;
 
+  private final SubjectTokenService subjectTokenService;
+
   @NotNull
   @Value("${org.obiba.realm.url}")
   private String obibaRealmUrl;
@@ -83,11 +85,12 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
 
   @Autowired
   @Lazy
-  public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners, RolePermissionResolver rolePermissionResolver, CacheManager cacheManager, OIDCConfigurationProvider oidcConfigurationProvider) {
+  public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners, RolePermissionResolver rolePermissionResolver, SubjectTokenService subjectTokenService, CacheManager cacheManager, OIDCConfigurationProvider oidcConfigurationProvider) {
     this.realms = realms;
     this.sessionListeners = sessionListeners;
     this.authenticationListeners = authenticationListeners;
     this.rolePermissionResolver = rolePermissionResolver;
+    this.subjectTokenService = subjectTokenService;
     this.cacheManager = cacheManager;
     this.oidcConfigurationProvider = oidcConfigurationProvider;
   }
@@ -166,7 +169,6 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
     sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
     sessionManager.setSessionValidationSchedulerEnabled(true);
     dsm.setSessionManager(sessionManager);
-    //dsm.setSessionManager(new ServletContainerSessionManager());
   }
 
   private void initializeSubjectDAO(DefaultSecurityManager dsm) {
@@ -176,10 +178,10 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   }
 
   private void initializeAuthorizer(DefaultSecurityManager dsm) {
-    if (dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
-      ((RolePermissionResolverAware) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
-      ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(permissionResolver);
-    }
+    ModularRealmAuthorizer authorizer = new OpalModularRealmAuthorizer(realms, subjectTokenService);
+    authorizer.setRolePermissionResolver(rolePermissionResolver);
+    authorizer.setPermissionResolver(permissionResolver);
+    dsm.setAuthorizer(authorizer);
   }
 
   private void initializeAuthenticator(DefaultSecurityManager dsm) {

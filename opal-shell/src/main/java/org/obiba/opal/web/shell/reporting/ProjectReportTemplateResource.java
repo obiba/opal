@@ -116,7 +116,7 @@ public class ProjectReportTemplateResource {
     Preconditions.checkArgument(dto.getName().equals(name),
         "The report template name in the URI does not match the name given in the request body DTO.");
 
-    reportTemplateService.save(Dtos.fromDto(dto));
+    reportTemplateService.save(Dtos.fromDto(dto, getReportTemplate()));
     reportTemplateScheduler.updateSchedule(dto);
 
     return Response.ok().build();

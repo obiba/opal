@@ -53,11 +53,13 @@
           <ui:msg description="Options label">Options</ui:msg>
         </b:ControlLabel>
         <g:SimplePanel ui:field="reportParametersPanel"/>
-        <b:HelpBlock>
+        <b:HelpBlock addStyleNames="top-margin">
           <ui:msg description="Report Parameters help">
             <a href="http://stat.ethz.ch/R-manual/R-patched/library/base/html/options.html" target="_blank">R options
             </a>
-            that will be passed to R at report execution time.
+            that will be passed to R at report execution time. It is highly recommended to use the options
+            <code>opal.username</code>/<code>opal.password</code> or (even better) <code>opal.token</code> to perform any <code>opal.login()</code>
+            calls in the report script.
           </ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
@@ -76,7 +78,7 @@
           <b:HelpBlock>
             <ui:msg description="Report Schedule help">
               See documentation about how to write a
-              <a href="http://www.quartz-scheduler.org/documentation/quartz-2.2.2/tutorials/tutorial-lesson-06.html" target="_blank">Cron trigger
+              <a href="http://www.quartz-scheduler.org/documentation/quartz-2.2.2/tutorials/crontrigger.html" target="_blank">Cron trigger
                 expression</a>.
             </ui:msg>
           </b:HelpBlock>

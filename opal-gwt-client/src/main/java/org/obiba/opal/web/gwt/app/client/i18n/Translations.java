@@ -77,6 +77,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Project")
   String projectLabel();
 
+  @Description("Scope label")
+  @DefaultStringValue("Scope")
+  String scopeLabel();
+
   @Description("Start label")
   @DefaultStringValue("Start")
   String startLabel();
@@ -442,8 +446,9 @@ public interface Translations extends Constants {
       "cannotSwitchTabBecauseOfUnsavedChanges",
       "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
       "UrlRequired", "You must provide the database's URL.",//
-      "UsernameRequired", "You must indicate the user name to be used for the database connection.",//
-      "PasswordRequired", "You must indicate the password to be used for the database connection.", //
+      "OpalUsernameRequired", "You must indicate the user name.",//
+      "OpalPasswordRequired", "You must indicate the password.", //
+      "OpalTokenRequired", "You must indicate the personal access token.", //
       "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables",
       "You must indicate whether meta-data tables are to be used or not.",//
       "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
@@ -1268,6 +1273,18 @@ public interface Translations extends Constants {
   })
   Map<String, String> valueTypeMap();
 
+  @Description("Token Tasks map")
+  @DefaultStringMapValue({
+      "import", "Import",
+      "export", "Export",
+      "copy", "Copy",
+      "report", "Report",
+      "analyse", "Analyse",
+      "import_vcf", "Import VCF",
+      "export_vcf", "Export VCF"
+  })
+  Map<String, String> tokenTasksMap();
+
   @Description("Subject Type map")
   @DefaultStringMapValue({ "USER", "User", //
       "GROUP", "Group" })
@@ -1791,6 +1808,10 @@ public interface Translations extends Constants {
   @Description("Table index is up-to-date label")
   @DefaultStringValue("Table index is up-to-date")
   String indexAlertUpToDate();
+
+  @Description("Select some projects label")
+  @DefaultStringValue("Select some projects...")
+  String selectSomeProjects();
 
   @Description("Select some Tables label")
   @DefaultStringValue("Select some tables...")
@@ -2655,6 +2676,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tasks")
   String tasks();
 
+  @Description("Services label")
+  @DefaultStringValue("Services")
+  String servicesLabel();
+
   @Description("Derive label")
   @DefaultStringValue("Derive")
   String derive();
@@ -2808,5 +2833,13 @@ public interface Translations extends Constants {
   @Description("User account Label")
   @DefaultStringValue("User account")
   String userAccountLabel();
+
+  @Description("Token Label")
+  @DefaultStringValue("Personal access token")
+  String accessTokenLabel();
+
+  @Description("Credentials Label")
+  @DefaultStringValue("User credentials")
+  String credentialsLabel();
 
 }

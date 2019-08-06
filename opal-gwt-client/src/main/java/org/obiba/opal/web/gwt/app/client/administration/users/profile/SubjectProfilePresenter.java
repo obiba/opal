@@ -105,6 +105,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
             } else {
               getView().enableChangePassword(false, "?", null);
             }
+            getView().renderGroups(JsArrays.toList(resource.getGroupsArray()));
           }
         }) //
         .get().send();
@@ -160,5 +161,6 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
 
     void renderTokens(List<SubjectTokenDto> tokens);
 
+    void renderGroups(List<String> groups);
   }
 }

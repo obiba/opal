@@ -9,27 +9,39 @@
  */
 package org.obiba.opal.web.reporting;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.ParameterDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class Dtos {
 
-  private Dtos() {}
+  private Dtos() {
+  }
 
   public static ReportTemplate fromDto(ReportTemplateDto dto) {
+    return fromDto(dto, null);
+  }
+
+  public static ReportTemplate fromDto(ReportTemplateDto dto, ReportTemplate original) {
     ReportTemplate.Builder builder = ReportTemplate.Builder.create() //
         .nameAndProject(dto.getName(), dto.getProject()) //
         .design(dto.getDesign()) //
         .format(dto.getFormat());
-    if(dto.hasCron()) builder.schedule(dto.getCron());
-    for(ParameterDto param : dto.getParametersList()) {
-      builder.parameter(param.getKey(), param.getValue());
+    if (dto.hasCron()) builder.schedule(dto.getCron());
+    for (ParameterDto param : dto.getParametersList()) {
+      String value = param.getValue();
+      // if empty password/token then means not modified
+      if (original != null && Strings.isNullOrEmpty(value)
+          && ("opal.password".equals(param.getKey()) || "opal.token".equals(param.getKey()))
+          && original.getParameters().containsKey(param.getKey()))
+        value = original.getParameters().get(param.getKey());
+      builder.parameter(param.getKey(), value);
     }
     builder.emailNotificationAddresses(dto.getEmailNotificationList());
     return builder.build();
@@ -41,17 +53,21 @@ public class Dtos {
         .setProject(reportTemplate.getProject()) //
         .setDesign(reportTemplate.getDesign()) //
         .setFormat(reportTemplate.getFormat());
-    for(Map.Entry<String, String> param : reportTemplate.getParameters().entrySet()) {
-      builder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(param.getValue()));
+    for (Map.Entry<String, String> param : reportTemplate.getParameters().entrySet()) {
+      String value = param.getValue();
+      if ("opal.password".equals(param.getKey()) || "opal.token".equals(param.getKey())) {
+        value = "";
+      }
+      builder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(value));
     }
-    if(reportTemplate.hasSchedule()) builder.setCron(reportTemplate.getSchedule());
+    if (reportTemplate.hasSchedule()) builder.setCron(reportTemplate.getSchedule());
     builder.addAllEmailNotification(reportTemplate.getEmailNotificationAddresses());
     return builder.build();
   }
 
   public static Set<ReportTemplateDto> asDto(Iterable<ReportTemplate> reportTemplates) {
     Set<Opal.ReportTemplateDto> reportTemplateDtos = new LinkedHashSet<>();
-    for(ReportTemplate reportTemplate : reportTemplates) {
+    for (ReportTemplate reportTemplate : reportTemplates) {
       reportTemplateDtos.add(asDto(reportTemplate));
     }
     return reportTemplateDtos;

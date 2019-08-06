@@ -256,8 +256,13 @@ message SubjectTokenDto {
   optional string principal = 1;
   optional string token = 2;
   required string name = 3;
-  optional string created = 4;
-  optional string lastUpdate = 5;
+  repeated string projects = 4;
+  repeated string commands = 5;
+  optional bool useR = 6 [default = false];
+  optional bool useDatashield = 7 [default = false];
+  optional bool sysAdmin = 8 [default = false];
+  optional string created = 9;
+  optional string lastUpdate = 10;
 }
 
 message LinkDto {

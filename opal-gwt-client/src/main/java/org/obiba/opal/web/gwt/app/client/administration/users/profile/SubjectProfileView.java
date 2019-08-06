@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -29,6 +30,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -46,6 +48,9 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   interface Binder extends UiBinder<Widget, SubjectProfileView> {
   }
+
+  @UiField
+  Paragraph groupsText;
 
   @UiField
   Paragraph accountText;
@@ -82,6 +87,17 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     configTokensTable();
+  }
+
+  @Override
+  public void renderGroups(List<String> groups) {
+    groupsText.setText("");
+    groupsText.setVisible(!groups.isEmpty());
+
+    if (!groups.isEmpty()) {
+      String gText = Joiner.on(", ").join(groups);
+      groupsText.setText(translationMessages.accountGroups(gText));
+    }
   }
 
   @Override
@@ -137,6 +153,48 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
       }
 
     }, translations.nameLabel());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
+      @Override
+      public String getValue(SubjectTokenDto object) {
+        String projects = "";
+        if (object.getProjectsCount()>0) {
+          projects = Joiner.on(", ").join(JsArrays.toList(object.getProjectsArray()));
+        } else {
+          projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
+        }
+        return projects;
+      }
+
+    }, translations.pageProjectsTitle());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
+      @Override
+      public String getValue(SubjectTokenDto object) {
+        String tasks = "";
+        if (object.getCommandsCount()>0) {
+          for (String cmd : JsArrays.toList(object.getCommandsArray())) {
+            String cmdLbl = translations.tokenTasksMap().get(cmd);
+            tasks = tasks.isEmpty() ? cmdLbl : tasks + ", " + cmdLbl;
+          }
+        }
+        return tasks;
+      }
+
+    }, translations.tasks());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+      @Override
+      public String getValue(SubjectTokenDto object) {
+        String services = "";
+        if (object.getUseR()) services = "R";
+        if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
+        if (object.getSysAdmin()) {
+          String sysAdmin = translations.pageAdministrationTitle();
+          services = services.isEmpty() ? sysAdmin : services + ", " + sysAdmin;
+        }
+        return services;
+      }
+    }, translations.servicesLabel());
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {
 
       @Override

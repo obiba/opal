@@ -9,24 +9,25 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 
@@ -50,10 +51,14 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setImportFormat(ImportFormat.REST);
-    importConfig.put("url", getView().getUrl().getText()) //
-        .put("username", getView().getUsername().getText())//
-        .put("password", getView().getPassword().getText())//
+    importConfig.put("url", getView().getUrl().getText())
         .put("remoteDatasource", getView().getRemoteDatasource().getText());
+
+    if (getView().getUseCredentials().getValue())
+        importConfig.put("username", getView().getUsername().getText())
+        .put("password", getView().getPassword().getText());
+    else
+        importConfig.put("token", getView().getToken().getText());
     return importConfig;
   }
 
@@ -72,6 +77,7 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
       URL,
       USERNAME,
       PASSWORD,
+      TOKEN,
       REMOTE_DATESOURCE
     }
 
@@ -80,6 +86,12 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
     HasText getPassword();
 
     HasText getUsername();
+
+    HasValue<Boolean> getUseCredentials();
+
+    HasText getToken();
+
+    HasValue<Boolean> getUseToken();
 
     HasText getUrl();
 
@@ -97,10 +109,12 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
       validators.add(new RequiredTextValidator(getView().getUrl(), "OpalURLIsRequired", Display.FormField.URL.name()));
-      validators.add(
-          new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired", Display.FormField.USERNAME.name()));
-      validators.add(
-          new RequiredTextValidator(getView().getPassword(), "PasswordRequired", Display.FormField.PASSWORD.name()));
+      validators.add(new ConditionalValidator(getView().getUseCredentials(),
+          new RequiredTextValidator(getView().getUsername(), "OpalUsernameRequired", Display.FormField.USERNAME.name())));
+      validators.add(new ConditionalValidator(getView().getUseCredentials(),
+          new RequiredTextValidator(getView().getPassword(), "OpalPasswordRequired", Display.FormField.PASSWORD.name())));
+      validators.add(new ConditionalValidator(getView().getUseToken(),
+          new RequiredTextValidator(getView().getToken(), "OpalTokenRequired", Display.FormField.TOKEN.name())));
       validators.add(new RequiredTextValidator(getView().getRemoteDatasource(), "RemoteDatasourceIsRequired",
           Display.FormField.REMOTE_DATESOURCE.name()));
 

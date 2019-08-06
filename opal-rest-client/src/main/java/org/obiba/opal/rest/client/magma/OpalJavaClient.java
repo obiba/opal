@@ -105,6 +105,8 @@ public class OpalJavaClient {
 
   private final Credentials credentials;
 
+  private final String token;
+
   private int soTimeout = DEFAULT_SO_TIMEOUT;
 
   private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
@@ -131,6 +133,21 @@ public class OpalJavaClient {
   }
 
   /**
+   * Authenticate by token.
+   * @param uri
+   * @param token personal access token
+   * @throws URISyntaxException
+   */
+  public OpalJavaClient(String uri, String token) throws URISyntaxException {
+    if(uri == null) throw new IllegalArgumentException("uri cannot be null");
+    if(token == null) throw new IllegalArgumentException("token cannot be null");
+
+    this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
+    this.credentials = null;
+    this.token = token;
+  }
+
+  /**
    * Authenticate by SSL 2-way encryption if a key store is provided, else authenticate by username/password.
    * @param uri
    * @param keyStore
@@ -143,8 +160,9 @@ public class OpalJavaClient {
     if(username == null) throw new IllegalArgumentException("username cannot be null");
     if(password == null) throw new IllegalArgumentException("password cannot be null");
 
-    opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
-    credentials = new UsernamePasswordCredentials(username, password);
+    this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
+    this.credentials = new UsernamePasswordCredentials(username, password);
+    this.token = null;
     this.keyStore = keyStore;
   }
 
@@ -169,7 +187,9 @@ public class OpalJavaClient {
   private void createClient() {
     log.info("Connecting to Opal: {}", opalURI);
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    if(keyStore == null) httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
+    if(keyStore == null && credentials != null)
+      httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
+
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
     httpClient.getParams()
         .setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuth.CREDENTIALS_HEADER));
@@ -377,7 +397,10 @@ public class OpalJavaClient {
 
   private void authenticate(HttpMessage msg) {
     if(keyStore == null) {
-      msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
+      if (credentials != null)
+        msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
+      else
+        msg.addHeader(OpalAuth.CREDENTIALS_HEADER, token);
     }
   }
 

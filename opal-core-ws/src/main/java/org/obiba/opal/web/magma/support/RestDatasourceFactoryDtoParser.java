@@ -28,7 +28,11 @@ public class RestDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     RestDatasourceFactoryDto rDto = dto.getExtension(RestDatasourceFactoryDto.params);
-    return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getUsername(), rDto.getPassword(),
+    if (rDto.hasToken())
+      return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getToken(),
+          rDto.getRemoteDatasource());
+    else
+      return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getUsername(), rDto.getPassword(),
         rDto.getRemoteDatasource());
   }
 
