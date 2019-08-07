@@ -87,6 +87,10 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     this.groups = groups;
   }
 
+  public void clearGroups() {
+    if (groups != null) groups.clear();
+  }
+
   public Set<Bookmark> getBookmarks() {
     return bookmarks == null ? bookmarks = new HashSet<>() : bookmarks;
   }

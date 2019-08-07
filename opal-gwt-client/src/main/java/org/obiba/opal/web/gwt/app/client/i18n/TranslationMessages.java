@@ -199,7 +199,7 @@ public interface TranslationMessages extends Messages {
   String confirmRemoveUser(String name);
 
   @Description("Confirm remove user profile label")
-  @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its preferences will be lost.")
+  @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its settings will be lost: user permissions, personal access tokens and bookmarks.")
   String confirmRemoveUserProfile(String name);
 
   @Description("Confirm remove id provider label")
@@ -270,6 +270,10 @@ public interface TranslationMessages extends Messages {
   @Description("Account groups text")
   @DefaultMessage("Your account belongs to group(s): {0}")
   String accountGroups(String groups);
+
+  @Description("Account no group text")
+  @DefaultMessage("Your account does not belong to any group.")
+  String accountNoGroup();
 
   @Description("Last Update Ago label")
   @DefaultMessage("Last update {0}")

@@ -11,9 +11,11 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectToken;
+import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +83,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
     try {
       getTokens(principal).stream()
           .filter(tk -> tk.getName().equals(name))
-          .forEach(tk -> orientDbService.delete(tk));
+          .forEach(orientDbService::delete);
     } catch (Exception e) {
       // ignore
     }
@@ -120,13 +122,18 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   @Override
   public void deleteTokens(String principal) {
-    getTokens(principal).forEach(t -> orientDbService.delete(t));
+    getTokens(principal).forEach(orientDbService::delete);
   }
 
   @Override
   public List<SubjectToken> getTokens(String principal) {
     return Lists.newArrayList(orientDbService.list(SubjectToken.class,
         String.format("select from %s where principal = ?", SubjectToken.class.getSimpleName()), principal));
+  }
+
+  @Subscribe
+  public void onSubjectProfileDeleted(SubjectProfileDeletedEvent event) {
+    deleteTokens(event.getProfile().getPrincipal());
   }
 
   private String hashToken(String id) {

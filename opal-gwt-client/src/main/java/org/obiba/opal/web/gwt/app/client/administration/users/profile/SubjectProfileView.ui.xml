@@ -23,7 +23,7 @@
     </b:PageHeader>
 
     <b:Heading size="4">
-      <ui:msg description="Account Settings label">Account Settings</ui:msg>
+      <ui:msg description="Account Settings label">Account</ui:msg>
     </b:Heading>
 
     <b:Heading size="5">

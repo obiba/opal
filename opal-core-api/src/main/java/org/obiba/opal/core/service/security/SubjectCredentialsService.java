@@ -9,15 +9,20 @@
  */
 package org.obiba.opal.core.service.security;
 
-import javax.validation.ConstraintViolationException;
-
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.SystemService;
 
+import javax.validation.ConstraintViolationException;
+
 public interface SubjectCredentialsService extends SystemService {
 
+  /**
+   * Get all the credentials.
+   *
+   * @return
+   */
   Iterable<SubjectCredentials> getSubjectCredentials();
 
   /**
@@ -38,7 +43,7 @@ public interface SubjectCredentialsService extends SystemService {
   /**
    * Returns the subjectCredentials with the specified login
    *
-   * @param login the unique login to match
+   * @param name the unique login to match
    * @return the subjectCredentials with the specified login or null if none exist
    */
   SubjectCredentials getSubjectCredentials(String name);
@@ -55,7 +60,8 @@ public interface SubjectCredentialsService extends SystemService {
 
   /**
    * Changes the principal's current password
-   * @param principal the subject principal
+   *
+   * @param principal   the subject principal
    * @param oldPassword the current password
    * @param newPassword the new password
    */
@@ -98,5 +104,4 @@ public interface SubjectCredentialsService extends SystemService {
    */
   void delete(Group group);
 
-  long countGroups();
 }

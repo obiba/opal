@@ -9,15 +9,12 @@
  */
 package org.obiba.opal.core.service.security;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolationException;
-
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -26,28 +23,27 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.NoSuchSubjectProfileException;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.event.GroupDeletedEvent;
+import org.obiba.opal.core.service.security.event.SubjectCredentialsDeletedEvent;
 import org.obiba.opal.core.service.security.realm.OpalApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-
-import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.validation.ConstraintViolationException;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 @Component
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
-
-  private static final String OPAL_DOMAIN = "opal";
 
   private static final int MINIMUM_LEMGTH = 6;
 
@@ -56,9 +52,6 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
    */
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;
-
-  @Autowired
-  private SubjectAclService subjectAclService;
 
   @Autowired
   private SubjectProfileService subjectProfileService;
@@ -71,6 +64,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
+
+  @Autowired
+  private EventBus eventBus;
 
   @Override
   @PostConstruct
@@ -102,11 +98,6 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
-  public long countGroups() {
-    return orientDbService.count(Group.class);
-  }
-
-  @Override
   public SubjectCredentials getSubjectCredentials(String name) {
     return orientDbService.findUnique(new SubjectCredentials(name));
   }
@@ -123,13 +114,13 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
     SubjectCredentials existing = getSubjectCredentials(subjectCredentials.getName());
     boolean newSubject = existing == null;
-    if(newSubject) {
+    if (newSubject) {
       validateProfile(subjectCredentials);
     } else {
       validateAuthenticationType(subjectCredentials, existing);
     }
     persist(subjectCredentials, ensureCredentials(subjectCredentials, existing));
-    if(newSubject) {
+    if (newSubject) {
       ensureProfile(subjectCredentials);
     }
   }
@@ -139,21 +130,21 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       throws PasswordException, SubjectPrincipalNotFoundException {
     SubjectCredentials subjectCredentials = getSubjectCredentials(principal);
 
-    if(subjectCredentials == null) {
+    if (subjectCredentials == null) {
       throw new SubjectPrincipalNotFoundException(principal);
     }
 
     String currentPassword = subjectCredentials.getPassword();
 
-    if(!currentPassword.equals(hashPassword(oldPassword))) {
+    if (!currentPassword.equals(hashPassword(oldPassword))) {
       throw new OldPasswordMismatchException();
     }
 
-    if(newPassword.length() < MINIMUM_LEMGTH) {
+    if (newPassword.length() < MINIMUM_LEMGTH) {
       throw new PasswordTooShortException(MINIMUM_LEMGTH);
     }
 
-    if(oldPassword.equals(newPassword)) {
+    if (oldPassword.equals(newPassword)) {
       throw new PasswordNotChangedException();
     }
 
@@ -172,21 +163,21 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   private OpalKeyStore ensureCredentials(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
     boolean newSubject = existing == null;
     OpalKeyStore keyStore = null;
-    switch(subjectCredentials.getAuthenticationType()) {
+    switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
         // Copy current password if password is empty for existing user
-        if(subjectCredentials.getPassword() == null && !newSubject) {
+        if (subjectCredentials.getPassword() == null && !newSubject) {
           subjectCredentials.setPassword(existing.getPassword());
         }
         break;
       case CERTIFICATE:
         // OPAL-2688
-        if(newSubject) {
+        if (newSubject) {
           subjectCredentials.setCertificateAlias(subjectCredentials.generateCertificateAlias());
         } else {
           subjectCredentials.setCertificateAlias(existing.getCertificateAlias());
         }
-        if(subjectCredentials.getCertificate() != null) {
+        if (subjectCredentials.getCertificate() != null) {
           keyStore = credentialsKeyStoreService.getKeyStore();
           try {
             keyStore.importCertificate(subjectCredentials.getCertificateAlias(), new ByteArrayInputStream(subjectCredentials.getCertificate()));
@@ -208,12 +199,12 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   private void persist(SubjectCredentials subjectCredentials, @Nullable OpalKeyStore keyStore) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     toSave.put(subjectCredentials, subjectCredentials);
-    for(Group group : findImpactedGroups(subjectCredentials)) {
+    for (Group group : findImpactedGroups(subjectCredentials)) {
       toSave.put(group, group);
     }
     orientDbService.save(toSave);
 
-    if(keyStore != null) {
+    if (keyStore != null) {
       credentialsKeyStoreService.saveKeyStore(keyStore);
     }
   }
@@ -229,7 +220,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   private String getRealmFromType(SubjectCredentials.AuthenticationType type) {
-    switch(type) {
+    switch (type) {
       case PASSWORD:
         return OpalUserRealm.OPAL_REALM;
       case CERTIFICATE:
@@ -247,16 +238,16 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     String realm = getRealmFromType(subjectCredentials.getAuthenticationType());
     try {
       SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
-      if(!realm.equals(profile.getRealm())) {
+      if (!realm.equals(profile.getRealm())) {
         throw new DuplicateSubjectProfileException(profile);
       }
-    } catch(NoSuchSubjectProfileException ignored) {
+    } catch (NoSuchSubjectProfileException ignored) {
       // do nothing as this principal has no profile
     }
   }
 
   private void validateAuthenticationType(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
-    if(existing.getAuthenticationType() != subjectCredentials.getAuthenticationType()) {
+    if (existing.getAuthenticationType() != subjectCredentials.getAuthenticationType()) {
       throw new IllegalArgumentException("Authentication type cannot be changed");
     }
   }
@@ -267,13 +258,13 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
     // check removed group
     SubjectCredentials previousSubjectCredentials = orientDbService.findUnique(subjectCredentials);
-    if(previousSubjectCredentials != null) {
+    if (previousSubjectCredentials != null) {
       Iterables
           .addAll(groups, Iterables.transform(previousSubjectCredentials.getGroups(), new Function<String, Group>() {
             @Nullable
             @Override
             public Group apply(String groupName) {
-              if(subjectCredentials.hasGroup(groupName)) return null;
+              if (subjectCredentials.hasGroup(groupName)) return null;
               Group group = getGroup(groupName);
               group.removeSubjectCredential(subjectCredentials.getName());
               return group;
@@ -287,12 +278,12 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       @Override
       public Group apply(String groupName) {
         Group group = getGroup(groupName);
-        if(group == null) {
+        if (group == null) {
           group = new Group(groupName);
           group.addSubjectCredential(subjectCredentials.getName());
           return group;
         }
-        if(!group.hasSubjectCredential(subjectCredentials.getName())) {
+        if (!group.hasSubjectCredential(subjectCredentials.getName())) {
           group.addSubjectCredential(subjectCredentials.getName());
           return group;
         }
@@ -307,23 +298,20 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   public void delete(SubjectCredentials subjectCredentials) {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    for(String groupName : subjectCredentials.getGroups()) {
+    for (String groupName : subjectCredentials.getGroups()) {
       Group group = getGroup(groupName);
       group.removeSubjectCredential(subjectCredentials.getName());
       toSave.put(group, group);
     }
-    // TODO we should execute these steps in a single transaction
     orientDbService.delete(subjectCredentials);
-    if(!toSave.isEmpty()) orientDbService.save(toSave);
-    // Delete subjectCredentials's permissions
-    subjectAclService.deleteSubjectPermissions(USER.subjectFor(subjectCredentials.getName()));
-    subjectProfileService.deleteProfile(subjectCredentials.getName());
+    if (!toSave.isEmpty()) orientDbService.save(toSave);
+    eventBus.post(new SubjectCredentialsDeletedEvent(subjectCredentials));
 
-    if(subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
+    if (subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
       OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
       String alias = subjectCredentials.getCertificateAlias();
       // OPAL-2688
-      if(!Strings.isNullOrEmpty(alias)) {
+      if (!Strings.isNullOrEmpty(alias)) {
         keyStore.deleteKey(alias);
         credentialsKeyStoreService.saveKeyStore(keyStore);
       }
@@ -348,7 +336,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   @Override
   public void delete(Group group) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    for(String userName : group.getSubjectCredentials()) {
+    for (String userName : group.getSubjectCredentials()) {
       SubjectCredentials subjectCredentials = getSubjectCredentials(userName);
       subjectCredentials.removeGroup(group.getName());
       toSave.put(subjectCredentials, subjectCredentials);
@@ -356,10 +344,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
-    if(!toSave.isEmpty()) orientDbService.save(toSave);
+    if (!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete group's permissions
-    subjectAclService
-        .deleteSubjectPermissions(SubjectType.valueOf(SubjectType.GROUP.name()).subjectFor(group.getName()));
+    eventBus.post(new GroupDeletedEvent(group));
   }
 
 }

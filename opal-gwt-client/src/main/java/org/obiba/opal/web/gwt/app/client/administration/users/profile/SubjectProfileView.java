@@ -91,12 +91,11 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @Override
   public void renderGroups(List<String> groups) {
-    groupsText.setText("");
-    groupsText.setVisible(!groups.isEmpty());
-
     if (!groups.isEmpty()) {
       String gText = Joiner.on(", ").join(groups);
       groupsText.setText(translationMessages.accountGroups(gText));
+    } else {
+      groupsText.setText(translationMessages.accountNoGroup());
     }
   }
 

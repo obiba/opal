@@ -13,10 +13,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
+import org.obiba.opal.core.service.security.event.GroupDeletedEvent;
 import org.obiba.opal.core.service.security.event.SubjectAclChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +36,20 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
-public class DefaultSubjectAclService implements SubjectAclService {
+public class SubjectAclServiceImpl implements SubjectAclService {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultSubjectAclService.class);
+  private static final Logger log = LoggerFactory.getLogger(SubjectAclServiceImpl.class);
 
   private final EventBus eventBus;
 
   private final OrientDbService orientDbService;
 
   @Autowired
-  public DefaultSubjectAclService(EventBus eventBus, OrientDbService orientDbService) {
+  public SubjectAclServiceImpl(EventBus eventBus, OrientDbService orientDbService) {
     this.eventBus = eventBus;
     this.orientDbService = orientDbService;
   }
-  
+
   @Override
   @PostConstruct
   public void start() {
@@ -192,6 +195,16 @@ public class DefaultSubjectAclService implements SubjectAclService {
     }
 
     return entries.values();
+  }
+
+  @Subscribe
+  public void onSubjectProfileDeleted(SubjectProfileDeletedEvent event) {
+    deleteSubjectPermissions(SubjectType.USER.subjectFor(event.getProfile().getPrincipal()));
+  }
+
+  @Subscribe
+  public void onGroupDeleted(GroupDeletedEvent event) {
+    deleteSubjectPermissions(SubjectType.GROUP.subjectFor(event.getGroup().getName()));
   }
 
   private Iterable<SubjectAcl> find(Subject subject) {

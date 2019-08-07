@@ -13,6 +13,7 @@ package org.obiba.opal.core.service;
 import java.util.Properties;
 import java.util.Set;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -147,6 +148,11 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
 
   @Configuration
   public static class Config extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public EventBus eventBus() {
+      return new EventBus();
+    }
 
     @Bean
     public SubjectProfileService subjectProfileService() {

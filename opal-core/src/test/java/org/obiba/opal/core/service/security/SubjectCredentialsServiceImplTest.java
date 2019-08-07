@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import com.google.common.eventbus.EventBus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   private CredentialsKeyStoreService credentialsKeyStoreService;
 
   @Before
-  public void clear() throws Exception {
+  public void clear() {
     orientDbService.deleteAll(SubjectCredentials.class);
     orientDbService.deleteAll(Group.class);
     orientDbService.deleteAll(KeyStoreState.class);
@@ -315,6 +316,11 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Configuration
   @PropertySource("classpath:org/obiba/opal/core/service/security/SubjectCredentialsServiceImplTest.properties")
   public static class Config extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public EventBus eventBus() {
+      return new EventBus();
+    }
 
     @Bean
     public SubjectCredentialsService subjectCredentialsService() {

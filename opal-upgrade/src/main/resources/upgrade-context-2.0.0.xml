@@ -58,7 +58,7 @@
 
   <bean id="passwordCallbackHandler" class="org.obiba.opal.core.crypt.OpalSecretKeyPasswordCallbackHandler"/>
 
-  <bean id="subjectAclService" class="org.obiba.opal.core.service.security.DefaultSubjectAclService"/>
+  <bean id="subjectAclService" class="org.obiba.opal.core.service.security.SubjectAclServiceImpl"/>
 
   <bean id="subjectProfileService" class="org.obiba.opal.core.service.SubjectProfileServiceImpl"/>
 

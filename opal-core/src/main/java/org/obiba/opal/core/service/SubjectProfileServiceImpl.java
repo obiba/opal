@@ -13,6 +13,8 @@ package org.obiba.opal.core.service;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -22,7 +24,9 @@ import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.event.SubjectCredentialsDeletedEvent;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
 import org.obiba.shiro.realm.SudoRealm;
 import org.slf4j.Logger;
@@ -55,6 +59,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Autowired
   private OpalRuntime opalRuntime;
 
+  @Autowired
+  private EventBus eventBus;
 
   @Value("#{new Boolean('${org.obiba.opal.security.multiProfile}')}")
   private boolean multiProfile;
@@ -97,6 +103,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
         );
       }
       profile.setUpdated(new Date());
+      // in case some groups have been removed
+      profile.clearGroups();
       orientDbService.save(profile, profile);
     } catch (NoSuchSubjectProfileException e) {
       HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
@@ -130,7 +138,9 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public void deleteProfile(@NotNull String principal) {
     try {
-      orientDbService.delete(getProfile(principal));
+      SubjectProfile profile = getProfile(principal);
+      orientDbService.delete(profile);
+      eventBus.post(new SubjectProfileDeletedEvent(profile));
     } catch (NoSuchSubjectProfileException ignored) {
       // ignore
     }
@@ -188,6 +198,11 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
         orientDbService.save(profile, profile);
       }
     }
+  }
+
+  @Subscribe
+  public void onSubjectCredentialsDeleted(SubjectCredentialsDeletedEvent event) {
+    deleteProfile(event.getCredentials().getName());
   }
 
   private boolean isMultipleRealms() {
