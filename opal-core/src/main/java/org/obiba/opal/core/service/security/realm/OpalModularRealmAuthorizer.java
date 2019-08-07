@@ -56,7 +56,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isTokenPermitted(PrincipalCollection principals, String permission) {
-    log.info("Token permission on {}", permission);
+    log.trace("Token permission on {}", permission);
     String[] parts = permission.split(":");
     if (parts.length < 3) return true;
 

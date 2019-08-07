@@ -178,7 +178,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   }
 
   private void initializeAuthorizer(DefaultSecurityManager dsm) {
-    ModularRealmAuthorizer authorizer = new OpalModularRealmAuthorizer(realms, subjectTokenService);
+    ModularRealmAuthorizer authorizer = new OpalModularRealmAuthorizer(dsm.getRealms(), subjectTokenService);
     authorizer.setRolePermissionResolver(rolePermissionResolver);
     authorizer.setPermissionResolver(permissionResolver);
     dsm.setAuthorizer(authorizer);
