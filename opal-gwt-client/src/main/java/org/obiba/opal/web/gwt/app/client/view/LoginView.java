@@ -77,7 +77,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   Panel authPanel;
 
   @UiField
-  VerticalPanel authClientsPanel;
+  FlowPanel authClientsPanel;
 
   private final Translations translations;
 
@@ -174,30 +174,22 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     for (int i=0;i<providers.length(); i++) {
       AuthProviderDto provider = providers.get(i);
 
-      FlowPanel panel = new FlowPanel();
-      if (i > 0) {
-        panel.addStyleName("top-margin");
-      }
       String key = provider.getName();
       String title = translations.signInWith() + " " + (provider.hasLabel() ? provider.getLabel() : provider.getName());
       Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
       anchor.addStyleName("btn btn-inverse");
-      panel.add(anchor);
-      if (!Strings.isNullOrEmpty(provider.getProviderUrl())) {
-        Anchor accountAnchor = new Anchor(translations.userAccountLabel(), false, provider.getProviderUrl());
-        accountAnchor.addStyleName("small-indent");
-        accountAnchor.setTarget("_blank");
-        panel.add(accountAnchor);
+      if (i > 0) {
+        anchor.addStyleName("top-margin");
       }
-      widgets.add(panel);
+      widgets.add(anchor);
     }
 
     if (widgets.size() > 0) {
       for (Widget w: widgets) {
+        w.setWidth("100%");
         authClientsPanel.add(w);
       }
     }
-    authClientsPanel.setBorderWidth(0);
     authPanel.setVisible(widgets.size() > 0);
   }
 

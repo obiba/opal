@@ -46,7 +46,7 @@
               <g:HTMLPanel>
                 <hr></hr>
               </g:HTMLPanel>
-              <g:VerticalPanel ui:field="authClientsPanel"/>
+              <g:FlowPanel ui:field="authClientsPanel" addStyleNames="large-right-indent"/>
             </g:FlowPanel>
           </b:Well>
         </b:Column>
