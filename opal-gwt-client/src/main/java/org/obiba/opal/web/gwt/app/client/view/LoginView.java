@@ -177,7 +177,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
       String key = provider.getName();
       String title = translations.signInWith() + " " + (provider.hasLabel() ? provider.getLabel() : provider.getName());
       Anchor anchor = new Anchor(title, false, "../auth/login/" + key);
-      anchor.addStyleName("btn btn-inverse");
+      anchor.addStyleName("btn btn-primary");
       if (i > 0) {
         anchor.addStyleName("top-margin");
       }
