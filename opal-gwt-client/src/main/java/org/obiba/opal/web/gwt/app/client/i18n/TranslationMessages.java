@@ -268,7 +268,7 @@ public interface TranslationMessages extends Messages {
   String accountDelegated();
 
   @Description("Account groups text")
-  @DefaultMessage("Your account belongs to group(s): {0}")
+  @DefaultMessage("Your account belongs to the group(s): {0}.")
   String accountGroups(String groups);
 
   @Description("Account no group text")
