@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Scope("request")
 @Path("/datashield/package/{name}")
-public class DataShieldPackageResourceRestImpl extends RPackageResource implements DataShieldPackageResource {
+public class DataShieldPackageResourceRestImpl extends DataShieldRPackageResource implements DataShieldPackageResource {
 
   @Autowired
   private DataShieldPackageMethodImpl methodPublisherImpl;

@@ -7,14 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.datashield.provider;
+package org.obiba.opal.web.r;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
+import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -10,25 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.r;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ServiceDto;
-import org.obiba.opal.web.model.client.opal.ServiceStatus;
-import org.obiba.opal.web.model.client.opal.r.RSessionDto;
-
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -41,9 +23,36 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ServiceDto;
+import org.obiba.opal.web.model.client.opal.ServiceStatus;
+import org.obiba.opal.web.model.client.opal.r.RPackageDto;
+import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_OK;
+import java.util.List;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
@@ -53,17 +62,22 @@ public class RAdministrationPresenter
 
   private final RWorkspacesPresenter rWorkspacesPresenter;
 
+  private final ModalProvider<RPackageInstallModalPresenter> rPackageInstallModalPresenterModalProvider;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
+  private Runnable confirmation;
+
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      RSessionsPresenter rSessionsPresenter, RWorkspacesPresenter rWorkspacesPresenter,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+                                  RSessionsPresenter rSessionsPresenter, RWorkspacesPresenter rWorkspacesPresenter,
+                                  ModalProvider<RPackageInstallModalPresenter> rPackageInstallModalPresenterModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.rSessionsPresenter = rSessionsPresenter;
     this.rWorkspacesPresenter = rWorkspacesPresenter;
+    this.rPackageInstallModalPresenterModalProvider = rPackageInstallModalPresenterModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
@@ -90,6 +104,22 @@ public class RAdministrationPresenter
   protected void onBind() {
     setInSlot(Display.Slots.RSessions, rSessionsPresenter);
     setInSlot(Display.Slots.RWorkspaces, rWorkspacesPresenter);
+    // Register event handlers
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if(confirmation != null && event.getSource().equals(confirmation) && event.isConfirmed()) {
+          confirmation.run();
+          confirmation = null;
+        }
+      }
+    });
+    addRegisteredHandler(RPackageInstalledEvent.getType(), new RPackageInstalledEvent.RPackageInstalledHandler() {
+      @Override
+      public void onRPackageInstalled(RPackageInstalledEvent event) {
+        refreshPackages();
+      }
+    });
   }
 
   @Override
@@ -104,6 +134,7 @@ public class RAdministrationPresenter
         .send();
 
     refreshStatus();
+    refreshPackages();
   }
 
   private void refreshStatus() {
@@ -112,7 +143,7 @@ public class RAdministrationPresenter
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
-            if(response.getStatusCode() == SC_OK) {
+            if (response.getStatusCode() == SC_OK) {
               getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
                   ? Display.Status.Stoppable
                   : Display.Status.Startable);
@@ -122,6 +153,20 @@ public class RAdministrationPresenter
         .get().send();
   }
 
+  private void refreshPackages() {
+    // Fetch all packages
+    ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder() //
+        .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<RPackageDto> resource) {
+            getView().renderPackages(JsArrays.toList(resource));
+          }
+        }) //
+        .get().send();
+  }
+
+
   @Override
   public void start() {
     // Start service
@@ -129,7 +174,7 @@ public class RAdministrationPresenter
     ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
+        if (response.getStatusCode() == SC_OK) {
           refreshStatus();
         } else {
           getView().setServiceStatus(Display.Status.Startable);
@@ -157,6 +202,65 @@ public class RAdministrationPresenter
     ResourceRequestBuilderFactory.<RSessionDto>newBuilder().forResource("/r/sessions").post()//
         .withCallback(new RSessionCreatedCallback())//
         .withCallback(SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
+  }
+
+  @Override
+  public void onRemovePackage(final RPackageDto rPackage) {
+    confirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
+            .forResource(UriBuilders.SERVICE_R_PACKAGE.create().build(rPackage.getName()))
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                refreshPackages();
+              }
+            }, SC_OK, SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND)
+            .delete().send();
+      }
+    };
+    String title = translations.removeRPackage();
+    String message = translationMessages.confirmRemoveRPackage(rPackage.getName());
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(confirmation, title, message));
+  }
+
+  @Override
+  public void onRefreshPackages() {
+    refreshPackages();
+  }
+
+  @Override
+  public void onInstallPackage() {
+    rPackageInstallModalPresenterModalProvider.get();
+  }
+
+  @Override
+  public void onUpdatePackages() {
+    confirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build())
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                refreshPackages();
+              }
+            }, SC_OK, SC_INTERNAL_SERVER_ERROR)
+            .put().send();
+      }
+    };
+    String title = translations.updateRPackages();
+    String message = translationMessages.confirmUpdateRPackages();
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(confirmation, title, message));
+  }
+
+  @Override
+  public void onDownloadRserveLog() {
+    fireEvent(new FileDownloadRequestEvent("/service/r/log/Rserve.log"));
   }
 
   @Override
@@ -211,7 +315,8 @@ public class RAdministrationPresenter
 
   @ProxyStandard
   @NameToken(Places.R)
-  public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
+  public interface Proxy extends ProxyPlace<RAdministrationPresenter> {
+  }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<RAdministrationUiHandlers> {
 
@@ -230,6 +335,8 @@ public class RAdministrationPresenter
     HasAuthorization getPermissionsAuthorizer();
 
     HasAuthorization getTestAuthorizer();
+
+    void renderPackages(List<RPackageDto> packages);
 
   }
 

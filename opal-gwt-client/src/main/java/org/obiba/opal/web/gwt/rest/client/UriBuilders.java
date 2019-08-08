@@ -1040,6 +1040,22 @@ public enum UriBuilders {
     }
   },
 
+  SERVICE_R_PACKAGES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "packages");
+
+    }
+  },
+
+  SERVICE_R_PACKAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "package", "{}");
+
+    }
+  },
+
   DATASHIELD_PACKAGES {
     @Override
     public UriBuilder create() {

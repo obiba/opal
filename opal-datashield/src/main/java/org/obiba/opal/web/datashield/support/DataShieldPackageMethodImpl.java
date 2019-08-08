@@ -18,7 +18,7 @@ import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.web.datashield.RPackageResource;
+import org.obiba.opal.web.datashield.DataShieldRPackageResource;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
-public class DataShieldPackageMethodImpl extends RPackageResource {
+public class DataShieldPackageMethodImpl extends DataShieldRPackageResource {
 
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;

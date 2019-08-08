@@ -11,6 +11,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -23,39 +24,100 @@
     <b:Heading size="4">
       <ui:msg description="R server admin label">R Server</ui:msg>
     </b:Heading>
-    <b:Paragraph>
-      <ui:msg description="R server text">
-      Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
-      server will destroy all current client connections.
-      </ui:msg>
-    </b:Paragraph>
-    <g:FlowPanel addStyleNames="large-bottom-margin">
-      <b:ButtonGroup>
-        <b:Button ui:field="startStopButton" type="INVERSE">
-          Start/Stop
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button ui:field="rTestButton" type="SUCCESS">
-          <ui:msg description="R server test label">Test connection with R</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
-    </g:FlowPanel>
 
-    <b:Heading size="4">
-      <ui:msg description="R sessions label">R Sessions</ui:msg>
-    </b:Heading>
-    <b:Paragraph>
-      <ui:msg description="R sessions text">
-        R server activity monitoring: each R session is a computation unit started by R/DataSHIELD users or the report
-        framework. R sessions without activity for a while will be automatically terminated.
-      </ui:msg>
-    </b:Paragraph>
-    <g:SimplePanel ui:field="rSessions"/>
+    <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
+      <g:Anchor>
+        <ui:msg description="R server status label">Status</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel>
+        <b:Paragraph>
+          <ui:msg description="R server text">
+            Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
+            server will destroy all current client connections.
+          </ui:msg>
+        </b:Paragraph>
+        <g:FlowPanel addStyleNames="large-bottom-margin">
+          <b:ButtonGroup>
+            <b:Button ui:field="startStopButton" type="INVERSE">
+              Start/Stop
+            </b:Button>
+          </b:ButtonGroup>
+          <b:ButtonGroup>
+            <b:Button ui:field="rTestButton" type="SUCCESS">
+              <ui:msg description="R server test label">Test connection with R</ui:msg>
+            </b:Button>
+          </b:ButtonGroup>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+          <b:Paragraph>
+            <ui:msg description="Rserve logs description">R server activity logs can be downloaded in their raw form.</ui:msg>
+          </b:Paragraph>
+          <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
+            <ui:msg description="Download Rserve logs label">Download</ui:msg>
+          </b:Button>
+        </g:FlowPanel>
+      </g:FlowPanel>
+      <g:Anchor>
+        <ui:msg description="R server packages label">Packages</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel>
+
+        <b:Paragraph>
+          <ui:msg description="R server packages text">
+            List of all the R packages installed on the server.
+          </ui:msg>
+        </b:Paragraph>
+
+        <g:FlowPanel>
+          <g:FlowPanel addStyleNames="pull-left">
+            <b:ButtonGroup>
+              <b:DropdownButton text="Install" icon="PLUS" type="INFO">
+                <b:NavLink ui:field="installPackage">
+                  <ui:msg description="Server logs label">Install package...</ui:msg>
+                </b:NavLink>
+                <b:NavLink ui:field="updateAllPackages">
+                  <ui:msg description="Update R packages label">Update all packages...</ui:msg>
+                </b:NavLink>
+              </b:DropdownButton>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+              <b:Button ui:field="refresh" icon="REFRESH">
+                <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
+          </g:FlowPanel>
+          <o:OpalSimplePager ui:field="packagesPager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+          <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>
+        </g:FlowPanel>
+
+        <o:Table ui:field="packagesTable" addStyleNames="small-top-margin" pageSize="20"/>
+
+      </g:FlowPanel>
+
+      <g:Anchor>
+        <ui:msg description="R sessions label">Sessions</ui:msg>
+      </g:Anchor>
+      <g:FlowPanel>
+        <b:Paragraph>
+          <ui:msg description="R sessions text">
+            R server activity monitoring: each R session is a computation unit started by R/DataSHIELD users or the report
+            framework. R sessions without activity for a while will be automatically terminated.
+          </ui:msg>
+        </b:Paragraph>
+        <g:SimplePanel ui:field="rSessions"/>
+
+      </g:FlowPanel>
+
+    </o:NavTabsPanel>
 
     <b:Heading size="4">
       <ui:msg description="R workspaces label">R Workspaces</ui:msg>
     </b:Heading>
+
     <b:Paragraph>
       <ui:msg description="R workspaces text">
         R workspaces storage: each saved R/DataSHIELD workspace contains the session's image and files (if any).

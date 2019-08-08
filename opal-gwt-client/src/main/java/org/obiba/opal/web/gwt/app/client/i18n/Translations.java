@@ -1253,6 +1253,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("R Function")
   String rFunctionLabel();
 
+  @Description("Install R package label")
+  @DefaultStringValue("Install R Package")
+  String installRPackage();
+
   @Description("Value Type map")
   @DefaultStringMapValue({ "TEXTUAL", "Textual", //
       "text.type", "text",//
@@ -2507,6 +2511,14 @@ public interface Translations extends Constants {
   @Description("Remove ID Provider label")
   @DefaultStringValue("Remove ID Provider")
   String removeIDProvider();
+
+  @Description("Remove R Package label")
+  @DefaultStringValue("Remove R Package")
+  String removeRPackage();
+
+  @Description("Update R Packages label")
+  @DefaultStringValue("Update R Packages")
+  String updateRPackages();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")

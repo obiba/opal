@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.r;
 
 import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 public interface RAdministrationUiHandlers extends UiHandlers {
 
@@ -20,4 +21,13 @@ public interface RAdministrationUiHandlers extends UiHandlers {
 
   void test();
 
+  void onRemovePackage(RPackageDto rPackage);
+
+  void onRefreshPackages();
+
+  void onInstallPackage();
+
+  void onUpdatePackages();
+
+  void onDownloadRserveLog();
 }
