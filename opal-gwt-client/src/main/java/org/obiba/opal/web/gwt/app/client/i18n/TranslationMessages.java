@@ -140,6 +140,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Package")
   String removeDataShieldPackage();
 
+  @Description("Remove all DS Packages label")
+  @DefaultMessage("Remove all Packages")
+  String removeAllDataShieldPackages();
+
   @Description("Publish Package Methods label")
   @DefaultMessage("Publish Package Methods")
   String publishDataShieldMethods();
@@ -477,8 +481,12 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteDataShieldAggregateMethod();
 
   @Description("Please confirm that you want to remove this package and all its methods message")
-  @DefaultMessage("Please confirm that you want to remove this package and all its methods.")
+  @DefaultMessage("Please confirm that you want to remove this package and all its methods and options.")
   String confirmDeleteDataShieldPackage();
+
+  @Description("Please confirm that you want to remove all the packages and all their methods message")
+  @DefaultMessage("Please confirm that you want to remove all the packages and the associated methods and options.")
+  String confirmDeleteAllDataShieldPackages();
 
   @Description("Please confirm that you want to publish this package methods message")
   @DefaultMessage("Please confirm that you want to publish this package methods.")

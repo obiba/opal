@@ -19,6 +19,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -62,6 +63,14 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
+            refresh();
+          }
+        });
+    addHandler(DataShieldPackageRemovedEvent.getType(),
+        new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
+
+          @Override
+          public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
             refresh();
           }
         });

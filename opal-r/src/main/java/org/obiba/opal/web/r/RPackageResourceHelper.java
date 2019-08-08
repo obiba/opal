@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -31,19 +32,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Base class for R package management.
+ * Helper class for R package management.
  */
-public abstract class RPackageResource {
+@Component
+public class RPackageResourceHelper {
 
-  private static final Logger log = LoggerFactory.getLogger(RPackageResource.class);
+  private static final Logger log = LoggerFactory.getLogger(RPackageResourceHelper.class);
 
-  protected static final String VERSION = "Version";
+  public static final String VERSION = "Version";
 
-  protected static final String AGGREGATE_METHODS = "AggregateMethods";
+  public static final String AGGREGATE_METHODS = "AggregateMethods";
 
-  protected static final String ASSIGN_METHODS = "AssignMethods";
+  public static final String ASSIGN_METHODS = "AssignMethods";
 
-  protected static final String OPTIONS = "Options";
+  public static final String OPTIONS = "Options";
 
   private static final String[] defaultFields = new String[]{"Title", "Description", "Author", "Maintainer",
       "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS};
@@ -54,24 +56,17 @@ public abstract class RPackageResource {
   @Autowired
   protected OpalRService opalRService;
 
-  protected RScriptROperation getInstalledPackages() {
-    return getInstalledPackages(new ArrayList<String>());
+  public RScriptROperation getInstalledPackages() {
+    return getInstalledPackages(new ArrayList<>());
   }
 
-  protected RScriptROperation getInstalledPackages(Iterable<String> fields) {
-    Iterable<String> allFields = Iterables.concat(Arrays.asList(defaultFields), fields);
-    String fieldStr = Joiner.on("','").join(allFields);
-    String cmd = "installed.packages(fields=c('" + fieldStr + "'))";
-    return execute(cmd);
-  }
-
-  protected RScriptROperation removePackage(String name) {
+  public RScriptROperation removePackage(String name) {
     checkAlphanumeric(name);
     String cmd = "remove.packages('" + name + "')";
     return execute(cmd);
   }
 
-  protected RScriptROperation installPackage(String name, String ref, String defaultName) {
+  public RScriptROperation installPackage(String name, String ref, String defaultName) {
     String cmd;
     if (Strings.isNullOrEmpty(ref)) {
       checkAlphanumeric(name);
@@ -93,17 +88,7 @@ public abstract class RPackageResource {
     return rval;
   }
 
-  /**
-   * Simple security check: the provided name (package name or Github user/organization name) must be alphanumeric.
-   *
-   * @param name
-   */
-  protected void checkAlphanumeric(String name) {
-    if (!name.matches("[a-zA-Z0-9]+"))
-      throw new IllegalArgumentException("Not a valid name: " + name);
-  }
-
-  protected void restartRServer() {
+  void restartRServer() {
     try {
       opalRService.stop();
       opalRService.start();
@@ -112,21 +97,8 @@ public abstract class RPackageResource {
     }
   }
 
-  protected List<String> getDefaultRepos() {
-    return Lists.newArrayList(defaultRepos.split(",")).stream().map(r -> r.trim()).collect(Collectors.toList());
-  }
-
-  protected String getInstallPackagesCommand(String name) {
-    String repos = Joiner.on("','").join(getDefaultRepos());
-    return "install.packages('" + name + "', repos=c('" + repos + "'), dependencies=TRUE)";
-  }
-
-  protected String getInstallDevtoolsPackageCommand() {
-    return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
-  }
-
-  protected String getInstallGitHubCommand(String name, String username, String ref) {
-    return String.format("devtools::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE)", username, name, ref);
+  List<String> getDefaultRepos() {
+    return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
   }
 
   protected RScriptROperation execute(String rscript) {
@@ -135,6 +107,37 @@ public abstract class RPackageResource {
     opalRService.execute(rop);
     return rop;
   }
+
+  private RScriptROperation getInstalledPackages(Iterable<String> fields) {
+    Iterable<String> allFields = Iterables.concat(Arrays.asList(defaultFields), fields);
+    String fieldStr = Joiner.on("','").join(allFields);
+    String cmd = "installed.packages(fields=c('" + fieldStr + "'))";
+    return execute(cmd);
+  }
+
+  /**
+   * Simple security check: the provided name (package name or Github user/organization name) must be alphanumeric.
+   *
+   * @param name
+   */
+  private void checkAlphanumeric(String name) {
+    if (!name.matches("[a-zA-Z0-9]+"))
+      throw new IllegalArgumentException("Not a valid name: " + name);
+  }
+
+  private String getInstallPackagesCommand(String name) {
+    String repos = Joiner.on("','").join(getDefaultRepos());
+    return "install.packages('" + name + "', repos=c('" + repos + "'), dependencies=TRUE)";
+  }
+
+  private String getInstallDevtoolsPackageCommand() {
+    return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
+  }
+
+  private String getInstallGitHubCommand(String name, String username, String ref) {
+    return String.format("devtools::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE)", username, name, ref);
+  }
+
 
   public static class StringsToRPackageDto implements Function<String[], OpalR.RPackageDto> {
 

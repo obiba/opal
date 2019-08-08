@@ -18,6 +18,7 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -33,17 +34,20 @@ import java.util.stream.StreamSupport;
 @Component
 @Scope("request")
 @Path("/service/r/packages")
-public class RServicePackagesResource extends RPackageResource {
+public class RServicePackagesResource {
 
   private static final Logger log = LoggerFactory.getLogger(RServicePackagesResource.class);
 
+  @Autowired
+  private RPackageResourceHelper rPackageHelper;
+
   @GET
   public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
-    RScriptROperation rop = getInstalledPackages();
+    RScriptROperation rop = rPackageHelper.getInstalledPackages();
     REXP rexp = rop.getResult();
     RStringMatrix matrix = new RStringMatrix(rexp);
     return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
-        .map(new StringsToRPackageDto(matrix))
+        .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
         .collect(Collectors.toList());
   }
 
@@ -51,18 +55,18 @@ public class RServicePackagesResource extends RPackageResource {
   public Response updateAllPackages() {
     try {
       // dump all R sessions
-      restartRServer();
+      rPackageHelper.restartRServer();
       String cmd = ".libPaths()";
-      RScriptROperation rop = execute(cmd);
+      RScriptROperation rop = rPackageHelper.execute(cmd);
       REXP rexp = rop.getResult();
       cmd = "getwd()";
-      rop = execute(cmd);
+      rop = rPackageHelper.execute(cmd);
       log.info("getwd={}", rop.getResult().asString());
       String libpath = rexp.asStrings()[0];
-      String repos = Joiner.on("','").join(getDefaultRepos());
+      String repos = Joiner.on("','").join(rPackageHelper.getDefaultRepos());
       cmd = String.format("update.packages(ask = FALSE, repos = c('%s'), instlib = '%s')", repos, libpath);
-      execute(cmd);
-      restartRServer();
+      rPackageHelper.execute(cmd);
+      rPackageHelper.restartRServer();
     } catch (Exception e) {
       log.error("Failed at updating all R packages", e);
     }
@@ -72,7 +76,7 @@ public class RServicePackagesResource extends RPackageResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref) {
-    installPackage(name, ref, "obiba");
+    rPackageHelper.installPackage(name, ref, "obiba");
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();

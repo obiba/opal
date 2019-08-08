@@ -15,30 +15,32 @@ import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
 @Scope("request")
 @Path("/service/r/package/{name}")
-public class RServicePackageResource extends RPackageResource {
+public class RServicePackageResource {
+
+  @Autowired
+  private RPackageResourceHelper rPackageHelper;
 
   @GET
   public OpalR.RPackageDto getPackage(@PathParam("name") String name) throws REXPMismatchException {
-    RScriptROperation rop = getInstalledPackages();
+    RScriptROperation rop = rPackageHelper.getInstalledPackages();
     REXP rexp = rop.getResult();
     RStringMatrix matrix = new RStringMatrix(rexp);
     return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
-        .map(new StringsToRPackageDto(matrix))
+        .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
         .filter(dto -> dto.getName().equals(name))
         .findFirst()
         .orElseThrow(() -> new NoSuchRPackageException(name));
@@ -47,7 +49,7 @@ public class RServicePackageResource extends RPackageResource {
   @DELETE
   public Response deletePackage(@PathParam("name") String name) {
     try {
-      removePackage(name);
+      rPackageHelper.removePackage(name);
     } catch (Exception e) {
       // ignore
     }

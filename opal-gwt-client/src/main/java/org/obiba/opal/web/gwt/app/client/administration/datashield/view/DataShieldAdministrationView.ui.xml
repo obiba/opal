@@ -101,7 +101,7 @@
         </b:InputAddOn>
       </b:Controls>
     </g:FlowPanel>
-    <o:Table ui:field="methodsTable" visible="false"/>
+    <o:Table ui:field="methodsTable"/>
 
   </g:FlowPanel>
 </ui:UiBinder>

@@ -101,7 +101,6 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     renderMethods(filterMethods(filter.getText()));
   }
 
-
   @Override
   public HandlerRegistration addMethodHandler(ClickHandler handler) {
     return addMethodButton.addClickHandler(handler);
@@ -130,9 +129,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     methodsDataProvider.setList(rows);
     int size = methodsDataProvider.getList().size();
     methodsTablePager.firstPage();
-    methodsTable.setVisible(size > 0);
     methodsDataProvider.refresh();
-    methodsTablePager.setPagerVisible(size > methodsTablePager.getPageSize());
   }
 
   @Override

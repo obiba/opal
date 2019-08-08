@@ -9,7 +9,23 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -22,30 +38,16 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.ViewImpl;
-
 /**
  *
  */
-public class DataShieldPackageAdministrationView extends ViewImpl
+public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<DataShieldPackageAdministrationUiHandlers>
     implements DataShieldPackageAdministrationPresenter.Display {
 
   private static final int PAGE_SIZE = 10;
 
-  interface Binder extends UiBinder<Widget, DataShieldPackageAdministrationView> {}
+  interface Binder extends UiBinder<Widget, DataShieldPackageAdministrationView> {
+  }
 
   private final Translations translations;
 
@@ -56,6 +58,9 @@ public class DataShieldPackageAdministrationView extends ViewImpl
 
   @UiField
   Button addPackageButton;
+
+  @UiField
+  Button deleteAllPackagesButton;
 
   @UiField
   CellTable<RPackageDto> packagesTable;
@@ -71,6 +76,11 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     initPackagesTable();
   }
 
+  @UiHandler("deleteAllPackagesButton")
+  public void onDeleteAllPackages(ClickEvent event) {
+    getUiHandlers().deleteAllPackages(packagesDataProvider.getList());
+  }
+
   @Override
   public HandlerRegistration addPackageHandler(ClickHandler handler) {
     return addPackageButton.addClickHandler(handler);
@@ -81,6 +91,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     packagesDataProvider.setArray(rows);
     packagesTable.setVisible(true);
     packagesDataProvider.refresh();
+    deleteAllPackagesButton.setEnabled(rows.length() > 0);
   }
 
   @Override
@@ -121,14 +132,13 @@ public class DataShieldPackageAdministrationView extends ViewImpl
         new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,
             ActionsPackageRColumn.PUBLISH_ACTION));
     packagesTable.addColumn(actionsColumn, translations.actionsLabel());
-    packagesTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
   }
 
   private String getEntryDtoValue(RPackageDto object, String key) {
     JsArray<EntryDto> entries = JsArrays.toSafeArray(object.getDescriptionArray());
 
-    for(int i = 0; i < entries.length(); i++) {
-      if(entries.get(i).getKey().equalsIgnoreCase(key)) {
+    for (int i = 0; i < entries.length(); i++) {
+      if (entries.get(i).getKey().equalsIgnoreCase(key)) {
         return entries.get(i).getValue();
       }
     }
@@ -151,7 +161,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
 
   @Override
   public HasAuthorization getAddPackageAuthorizer() {
-    return new WidgetAuthorizer(addPackageButton);
+    return new WidgetAuthorizer(addPackageButton, deleteAllPackagesButton);
   }
 
   @Override

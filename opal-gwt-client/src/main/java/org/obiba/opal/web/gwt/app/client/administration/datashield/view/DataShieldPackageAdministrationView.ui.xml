@@ -17,9 +17,19 @@
     ui:generateLocales="default">
 
   <g:FlowPanel ui:field="packagesPanel">
-    <b:Button ui:field="addPackageButton" icon="PLUS" type="INFO" styleName="btn" addStyleNames="small-bottom-margin">
-      <ui:msg description="Add DataShield Package label">Add Package</ui:msg>
-    </b:Button>
+    <g:FlowPanel addStyleNames="small-bottom-margin">
+      <b:ButtonGroup>
+        <b:Button ui:field="addPackageButton" icon="PLUS" type="INFO" styleName="btn">
+          <ui:msg description="Add DataShield Package label">Add Package</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="deleteAllPackagesButton" icon="TRASH" styleName="btn">
+          <ui:msg description="Delete all DataShield Packages label">Delete all</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
+
     <o:Table ui:field="packagesTable" visible="false"/>
   </g:FlowPanel>
 
