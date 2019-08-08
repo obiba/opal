@@ -91,6 +91,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
   }
 
   private void registerEntity(RVariableEntity e) {
+    if (entitiesMap.containsKey(e.getIdentifier())) return;
     entities.add(e);
     entitiesMap.put(e.getIdentifier(), e);
   }
