@@ -7,17 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.datashield.support;
 
-/**
- *
- */
-public class NoSuchRPackageException extends RuntimeException {
+package org.obiba.opal.web.gwt.app.client.administration.r;
 
-  private static final long serialVersionUID = 1L;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-  public NoSuchRPackageException(String name) {
-    super("No such R package: " + name);
-  }
+public interface RPackageInstallModalUiHandlers  extends ModalUiHandlers {
+
+  void installPackage(String name, String ref);
 
 }

@@ -116,7 +116,6 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @Override
   public void renderTokens(List<SubjectTokenDto> tokens) {
-    renderRows(tokens, tokensDataProvider, tokensPager);
     tokensDataProvider.setList(tokens);
     tokensPager.firstPage();
     tokensDataProvider.refresh();
@@ -220,7 +219,4 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     renderTokens(new ArrayList<SubjectTokenDto>());
   }
 
-  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, OpalSimplePager pager) {
-
-  }
 }

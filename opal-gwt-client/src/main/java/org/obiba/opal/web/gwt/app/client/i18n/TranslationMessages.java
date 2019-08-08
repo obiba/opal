@@ -206,6 +206,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove the identity provider {0}. None of its users will be able to login anymore.")
   String confirmRemoveIDProvider(String name);
 
+  @Description("Confirm remove R package label")
+  @DefaultMessage("Please confirm that you want to remove the R package {0}. Depending on its installation path (LibPath) it may not succeed.")
+  String confirmRemoveRPackage(String name);
+
+  @Description("Confirm update R packages label")
+  @DefaultMessage("Please confirm that you want to update all the R packages to their latest version. It may take some time. If any error happens, look for possible reasons (system dependency missing, network connection failure etc.) by downloading the Rserve.log")
+  String confirmUpdateRPackages();
+
   @Description("Vocabulary count label")
   @DefaultMessage("{0} vocabularies")
   @AlternateMessage({ "=0", "No vocabularies", "one", "1 vocabulary" })

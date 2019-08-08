@@ -49,6 +49,8 @@ import org.obiba.opal.web.gwt.app.client.administration.plugins.PluginsAdministr
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalView;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsView;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
@@ -165,6 +167,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         RAdministrationPresenter.Proxy.class);
     bindPresenterWidget(RSessionsPresenter.class, RSessionsPresenter.Display.class, RSessionsView.class);
     bindPresenterWidget(RWorkspacesPresenter.class, RWorkspacesPresenter.Display.class, RWorkspacesView.class);
+    bindPresenterWidget(RPackageInstallModalPresenter.class, RPackageInstallModalPresenter.Display.class,
+        RPackageInstallModalView.class);
   }
 
   private void configureDatashield() {

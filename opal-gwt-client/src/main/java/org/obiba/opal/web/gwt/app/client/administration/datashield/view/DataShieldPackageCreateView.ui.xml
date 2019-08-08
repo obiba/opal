@@ -26,7 +26,7 @@
       <g:FlowPanel addStyleNames="indent">
         <b:TextBox ui:field="name" enabled="false"/>
         <b:HelpBlock>
-          <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
+          <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed with its dependencies
             on the R server. When installing a Git reference, the name can be fully qualified, i.e. prefixed with the
             GitHub user/organization name (default is "datashield"), for example "someUser/somePackage".
           </ui:msg>

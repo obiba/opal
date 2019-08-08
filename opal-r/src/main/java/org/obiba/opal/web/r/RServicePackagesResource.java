@@ -7,22 +7,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.datashield;
 
+package org.obiba.opal.web.r;
+
+import com.google.common.base.Joiner;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.spi.r.RStringMatrix;
-import org.obiba.opal.web.datashield.support.DataShieldPackageMethodImpl;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -31,41 +30,51 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-/**
- * Manages Datashield packages.
- */
 @Component
-@Transactional
-@Path("/datashield/packages")
-public class DataShieldPackagesResource extends DataShieldRPackageResource {
+@Scope("request")
+@Path("/service/r/packages")
+public class RServicePackagesResource extends RPackageResource {
 
-  @Autowired
-  private DataShieldPackageMethodImpl dataShieldPackageMethodPublisher;
+  private static final Logger log = LoggerFactory.getLogger(RServicePackagesResource.class);
 
   @GET
   public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
     RScriptROperation rop = getInstalledPackages();
     REXP rexp = rop.getResult();
     RStringMatrix matrix = new RStringMatrix(rexp);
-
     return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
         .map(new StringsToRPackageDto(matrix))
-        .filter(this::isDataShieldPackage)
         .collect(Collectors.toList());
+  }
+
+  @PUT
+  public Response updateAllPackages() {
+    try {
+      // dump all R sessions
+      restartRServer();
+      String cmd = ".libPaths()";
+      RScriptROperation rop = execute(cmd);
+      REXP rexp = rop.getResult();
+      cmd = "getwd()";
+      rop = execute(cmd);
+      log.info("getwd={}", rop.getResult().asString());
+      String libpath = rexp.asStrings()[0];
+      String repos = Joiner.on("','").join(getDefaultRepos());
+      cmd = String.format("update.packages(ask = FALSE, repos = c('%s'), instlib = '%s')", repos, libpath);
+      execute(cmd);
+      restartRServer();
+    } catch (Exception e) {
+      log.error("Failed at updating all R packages", e);
+    }
+    return Response.ok().build();
   }
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-                                 @QueryParam("ref") String ref) throws REXPMismatchException {
-    installDatashieldPackage(name, ref);
+                                 @QueryParam("ref") String ref) {
+    installPackage(name, ref, "obiba");
 
-    // install or re-install all known datashield package methods
-    for (OpalR.RPackageDto pkg : getPackages()) {
-      dataShieldPackageMethodPublisher.publish(pkg.getName());
-    }
-
-    UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResourceRestImpl.class);
+    UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();
   }
-
 }
