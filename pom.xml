@@ -99,7 +99,7 @@
     <newrelic.version>3.20.0</newrelic.version>
     <nimbus-jose-jwt.version>5.4</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>1.13.0</obiba-commons.version>
+    <obiba-commons.version>1.13.1</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
