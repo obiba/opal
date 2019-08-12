@@ -172,7 +172,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
     writeVariablesToTable(table);
-    getEventBus().post(new ValueTableAddedEvent(datasource.getValueTable(table.getName())));
+    getEventBus().post(new ValueTableAddedEvent(datasource.getName(), table.getName()));
     URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable")
         .build(datasource.getName(), table.getName());
     return Response.created(tableUri)//
