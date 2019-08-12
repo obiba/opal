@@ -12,6 +12,7 @@ package org.obiba.opal.core.service;
 
 import java.util.Locale;
 
+import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -35,6 +36,9 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private EventBus eventBus;
 
   @Before
   public void setUp() throws Exception {
@@ -92,6 +96,11 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
 
   @Configuration
   public static class Config extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public EventBus eventBus() {
+      return new EventBus();
+    }
 
     @Bean
     public OpalGeneralConfigService userService() {

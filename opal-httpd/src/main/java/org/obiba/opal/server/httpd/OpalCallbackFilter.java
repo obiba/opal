@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.server.httpd;
 
+import com.google.common.base.Strings;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -16,6 +18,8 @@ import org.apache.shiro.util.ThreadContext;
 import org.obiba.oidc.*;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.oidc.web.filter.OIDCCallbackFilter;
+import org.obiba.opal.core.event.OpalGeneralConfigUpdatedEvent;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +41,45 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
 
   private static final Logger log = LoggerFactory.getLogger(OpalCallbackFilter.class);
 
-  @Autowired
-  private OIDCConfigurationProvider oidcConfigurationProvider;
+  private final OIDCConfigurationProvider oidcConfigurationProvider;
 
-  @Autowired
-  private OIDCSessionManager oidcSessionManager;
+  private final OIDCSessionManager oidcSessionManager;
 
-  @Autowired
-  private AuthenticationExecutor authenticationExecutor;
+  private final AuthenticationExecutor authenticationExecutor;
+
+  private final OpalGeneralConfigService opalGeneralConfigService;
 
   @Value("${org.obiba.opal.public.url}")
+  private String defaultOpalPublicUrl;
+
   private String opalPublicUrl;
+
+  @Autowired
+  public OpalCallbackFilter(OIDCConfigurationProvider oidcConfigurationProvider,
+                            OIDCSessionManager oidcSessionManager,
+                            AuthenticationExecutor authenticationExecutor,
+                            OpalGeneralConfigService  opalGeneralConfigService) {
+    this.oidcConfigurationProvider = oidcConfigurationProvider;
+    this.oidcSessionManager = oidcSessionManager;
+    this.authenticationExecutor = authenticationExecutor;
+    this.opalGeneralConfigService = opalGeneralConfigService;
+  }
 
   @PostConstruct
   public void init() {
     setOIDCConfigurationProvider(oidcConfigurationProvider);
     setOIDCSessionManager(oidcSessionManager);
+    initFilterUrls();
+  }
+
+  @Subscribe
+  public void onOpalGeneralConfigUpdated(OpalGeneralConfigUpdatedEvent event) {
+    initFilterUrls();
+  }
+
+  private void initFilterUrls() {
+    String publicUrl = opalGeneralConfigService.getConfig().getPublicUrl();
+    opalPublicUrl = Strings.isNullOrEmpty(publicUrl) ? defaultOpalPublicUrl : publicUrl;
     setDefaultRedirectURL(opalPublicUrl);
     String callbackUrl = opalPublicUrl + (opalPublicUrl.endsWith("/") ? "" : "/") + "auth/callback/";
     setCallbackURL(callbackUrl);
