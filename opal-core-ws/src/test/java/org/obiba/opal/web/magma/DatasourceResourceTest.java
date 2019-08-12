@@ -298,7 +298,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
     expect(datasourceMock.getName()).andReturn("testDatasource").atLeastOnce();
     expect(datasourceMock.hasValueTable("table")).andReturn(false);
-    expect(datasourceMock.getValueTable("table")).andReturn(valueTableMock);
     datasourceMock.dispose();
     expectLastCall().atLeastOnce();
     variableWriterMock.writeVariable(isA(Variable.class));

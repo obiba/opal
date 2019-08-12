@@ -10,17 +10,11 @@
 
 package org.obiba.opal.core.event;
 
-import org.obiba.magma.ValueTable;
-
 public class ValueTableAddedEvent extends ValueTableEvent {
 
   private String datasourceName;
 
   private String tableName;
-
-  public ValueTableAddedEvent(ValueTable table) {
-    super(table);
-  }
 
   public ValueTableAddedEvent(String datasourceName, String tableName) {
     super(null);
