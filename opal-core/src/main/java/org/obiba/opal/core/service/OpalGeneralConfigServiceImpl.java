@@ -12,7 +12,9 @@ package org.obiba.opal.core.service;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.event.OpalGeneralConfigUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private EventBus eventBus;
 
   @Override
   public void start() {
@@ -59,6 +64,7 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
         log.debug("save {}", document);
         document.save();
         db.commit();
+        eventBus.post(new OpalGeneralConfigUpdatedEvent(config));
       }
     });
   }
