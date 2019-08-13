@@ -21,7 +21,9 @@
   <import resource="spring/opal-core/version.xml"/>
 
   <bean id="opalRuntime" class="org.obiba.opal.core.upgrade.support.OpalRuntimeMock"/>
-  
+
+  <bean id="eventBus" class="com.google.common.eventbus.EventBus"/>
+
   <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>
 
   <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>

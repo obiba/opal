@@ -34,11 +34,15 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
 
   private static final Logger log = LoggerFactory.getLogger(OpalGeneralConfigServiceImpl.class);
 
-  @Autowired
-  private OrientDbService orientDbService;
+  private final OrientDbService orientDbService;
+
+  private final EventBus eventBus;
 
   @Autowired
-  private EventBus eventBus;
+  public OpalGeneralConfigServiceImpl(OrientDbService orientDbService, EventBus eventBus) {
+    this.orientDbService = orientDbService;
+    this.eventBus = eventBus;
+  }
 
   @Override
   public void start() {
