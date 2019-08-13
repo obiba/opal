@@ -104,7 +104,7 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
 
     @Bean
     public OpalGeneralConfigService userService() {
-      return new OpalGeneralConfigServiceImpl();
+      return new OpalGeneralConfigServiceImpl(orientDbService(), eventBus());
     }
 
   }
