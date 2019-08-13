@@ -122,7 +122,23 @@
         <b:TextBox ui:field="scope" value="openid"/>
         <b:HelpBlock>
           <ui:msg description="Provider Scope help label">
-            List of scope names to be specified to retrieve user information. Usually <code>openid</code> is enough.
+            List of scope names to be specified to retrieve user information. Usually <code>openid</code> is enough
+            and is the default.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:Controls>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Provider Groups Claim label">Groups Claim</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="groupsClaim"/>
+        <b:HelpBlock>
+          <ui:msg description="Provider Groups Claim help label">
+            Name of the (non-standard) claim in the UserInfo response that represents the groups to which the user belongs. These groups
+            will be applied to the authenticated user. The value of this claim can be an array of strings or a string of space-separated group names.
           </ui:msg>
         </b:HelpBlock>
       </b:Controls>

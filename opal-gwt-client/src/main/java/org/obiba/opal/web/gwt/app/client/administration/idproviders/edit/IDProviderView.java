@@ -60,6 +60,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   TextBox groups;
 
   @UiField
+  TextBox groupsClaim;
+
+  @UiField
   ControlGroup nameGroup;
 
   @UiField
@@ -190,7 +193,10 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setSecret(secret.getValue());
     provider.setDiscoveryURI(discoveryUri.getValue());
     provider.setScope(Strings.isNullOrEmpty(scope.getValue()) ? "openid" : scope.getValue());
-    provider.setGroups(groups.getValue());
+    if (!Strings.isNullOrEmpty(groups.getText()))
+      provider.setGroups(groups.getText());
+    if (!Strings.isNullOrEmpty(groupsClaim.getText()))
+      provider.setGroupsClaim(groupsClaim.getText());
     provider.setProviderUrl(providerUrl.getValue());
     provider.setLabel(label.getValue());
     provider.setUseNonce(useNonce.getValue());

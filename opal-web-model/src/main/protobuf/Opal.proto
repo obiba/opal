@@ -426,8 +426,9 @@ message IDProviderDto {
   optional int32 connectTimeout = 9;
   optional int32 readTimeout = 10;
   optional string groups = 11;
-  repeated ParameterDto parameters = 12;
-  required bool enabled = 13;
+  optional string groupsClaim = 12;
+  repeated ParameterDto parameters = 13;
+  required bool enabled = 14;
 }
 
 message AuthProviderDto {

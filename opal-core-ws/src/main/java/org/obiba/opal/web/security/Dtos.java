@@ -151,6 +151,8 @@ public class Dtos {
         builder.setProviderUrl(entry.getValue());
       else if ("groups".equals(entry.getKey()))
         builder.setGroups(entry.getValue());
+      else if ("groupsClaim".equals(entry.getKey()))
+        builder.setGroupsClaim(entry.getValue());
       else if ("enabled".equals(entry.getKey())) {
         try {
           builder.setEnabled(Boolean.parseBoolean(entry.getValue()));
@@ -185,6 +187,9 @@ public class Dtos {
     }
     if (dto.hasGroups()) {
       configuration.getCustomParams().put("groups", dto.getGroups());
+    }
+    if (dto.hasGroupsClaim()) {
+      configuration.getCustomParams().put("groupsClaim", dto.getGroupsClaim());
     }
     if (dto.hasLabel()) {
       configuration.getCustomParams().put("label", dto.getLabel());
