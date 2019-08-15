@@ -2712,6 +2712,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Manage Participant Identifiers")
   String manageParticipantIdentifiers();
 
+  @Description("My Profile label")
+  @DefaultStringValue("My Profile")
+  String myProfile();
+
   @Description("RSA label")
   @DefaultStringValue("RSA")
   String rsa();

@@ -7,9 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.dashboard.view;
+package org.obiba.opal.web.gwt.app.client.dashboard;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -51,6 +50,9 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   IconAnchor identifiersLink;
 
   @UiField
+  IconAnchor myprofileLink;
+
+  @UiField
   Panel projects;
 
   @UiField
@@ -77,6 +79,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     reportsLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
     exploreFilesLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
     tasksLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.TASKS);
+    myprofileLink.setHref("#" + Places.PROFILE);
     pageTitle.setText(translations.pageDashboardTitle());
 
     exploreProjectsLink.setText(translations.exploreVariables());
@@ -85,6 +88,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     tasksLink.setText(translations.tasks());
     reportsLink.setText(translations.runReports());
     identifiersLink.setText(translations.manageParticipantIdentifiers());
+    myprofileLink.setText(translations.myProfile());
   }
 
   @Override

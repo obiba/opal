@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.dashboard.presenter;
+package org.obiba.opal.web.gwt.app.client.dashboard;
 
 import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;

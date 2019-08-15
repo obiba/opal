@@ -79,6 +79,14 @@
               </g:Label>
             </g:FlowPanel>
 
+            <g:FlowPanel>
+              <b2:IconAnchor ui:field="myprofileLink" icon="USER"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="My profile link description">Change password and create personal access tokens.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
           </b:NavList>
         </b:Column>
 

@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.dashboard;
 
-import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
-import org.obiba.opal.web.gwt.app.client.dashboard.view.DashboardView;
-
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 public class DashboardModule extends AbstractPresenterModule {
