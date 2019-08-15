@@ -68,7 +68,11 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   }
 
   public String getFirstRealm() {
-    return Splitter.on(",").split(realm).iterator().next();
+    return getRealms().iterator().next();
+  }
+
+  public Iterable<String> getRealms() {
+    return Splitter.on(",").split(realm);
   }
 
   public void setRealm(@NotNull String realm) {

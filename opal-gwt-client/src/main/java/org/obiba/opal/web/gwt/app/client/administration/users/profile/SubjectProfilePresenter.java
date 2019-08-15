@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -99,9 +100,10 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
         .withCallback(new ResourceCallback<SubjectProfileDto>() {
           @Override
           public void onResource(Response response, SubjectProfileDto resource) {
+            List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
             if (response.getStatusCode() == Response.SC_OK) {
               profile = resource;
-              getView().enableChangePassword("opal-user-realm".equals(resource.getRealm()), resource.getRealm(), resource.getAccountUrl());
+              getView().enableChangePassword(realms.contains("opal-user-realm"), resource.getRealm(), resource.getAccountUrl());
             } else {
               getView().enableChangePassword(false, "?", null);
             }

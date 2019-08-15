@@ -22,6 +22,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -63,11 +65,14 @@ public class SubjectProfileCurrentResource {
   public Response get() {
     SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
     String accountUrl = null;
-    try {
-      OIDCConfiguration config = idProvidersService.getConfiguration(profile.getRealm());
-      accountUrl = config.getCustomParam("providerUrl");
-    } catch (Exception e) {
-      // ignored, does not apply
+    for (String realm : profile.getRealms()) {
+      try {
+        OIDCConfiguration config = idProvidersService.getConfiguration(realm);
+        accountUrl = config.getCustomParam("providerUrl");
+      } catch (Exception e) {
+        // ignored, does not apply
+      }
+      if (!Strings.isNullOrEmpty(accountUrl)) break;
     }
     return Response.ok().entity(Dtos.asDto(profile, accountUrl)).build();
   }
