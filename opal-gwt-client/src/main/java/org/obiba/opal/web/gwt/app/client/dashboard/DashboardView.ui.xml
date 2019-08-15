@@ -100,7 +100,7 @@
 
             <g:FlowPanel ui:field="newsGroup" visible="false">
               <b:NavHeader>
-                <ui:msg description="News label">News</ui:msg>
+                <ui:msg description="Latest news label">Latest News</ui:msg>
               </b:NavHeader>
 
               <g:FlowPanel ui:field="news"/>
