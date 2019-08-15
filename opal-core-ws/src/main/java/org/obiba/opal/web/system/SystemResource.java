@@ -22,6 +22,9 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.KeyStoreResource;
+import org.obiba.opal.web.system.news.ObibaNews;
+import org.obiba.opal.web.system.news.ObibaNewsDatum;
+import org.obiba.opal.web.system.news.ObibaNewsYaml;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -30,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.lang.management.*;
 import java.util.*;
@@ -69,13 +69,36 @@ public class SystemResource {
   }
 
   @GET
+  @Path("/news")
+  public Opal.NewsDto getNews() {
+    try {
+      ObibaNews news = ObibaNewsYaml.loadNews();
+      Opal.NewsDto.Builder builder = Opal.NewsDto.newBuilder();
+      for (ObibaNewsDatum datum : news.getData()) {
+        if (datum.getTitle().toLowerCase().contains("opal") || (datum.hasSummary() && datum.getSummary().toLowerCase().contains("opal"))) {
+          Opal.NewsDto.NoteDto.Builder note = builder.addNotesBuilder()
+              .setTitle(datum.getTitle())
+              .setLink(datum.getLink())
+              .setDate(datum.getDate());
+          if (datum.hasSummary())
+            note.setSummary(datum.getSummary());
+        }
+      }
+      return builder.build();
+    } catch (Exception e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+
+  @GET
   @Path("/env")
   public Opal.OpalEnv getEnvironment() {
 
     Collection<Opal.EntryDto> systemProperties = new ArrayList<>();
     Collection<String> keys = ManagementFactory.getRuntimeMXBean().getSystemProperties().keySet();
     Map<String, String> properties = ManagementFactory.getRuntimeMXBean().getSystemProperties();
-    for(String k : keys) {
+    for (String k : keys) {
       Opal.EntryDto entry = Opal.EntryDto.newBuilder().setKey(k).setValue(properties.get(k)).build();
       systemProperties.add(entry);
     }
@@ -95,7 +118,7 @@ public class SystemResource {
   public Opal.OpalStatus getStatus() {
     List<GarbageCollectorMXBean> garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
     Collection<Opal.OpalStatus.GarbageCollectorUsage> garbageCollectorUsagesValues = new ArrayList<>();
-    for(GarbageCollectorMXBean GC : garbageCollectorMXBeanList) {
+    for (GarbageCollectorMXBean GC : garbageCollectorMXBeanList) {
       garbageCollectorUsagesValues.add(getGarbageCollector(GC));
     }
 
@@ -154,7 +177,7 @@ public class SystemResource {
   @Path("/conf")
   public Opal.OpalConf getOpalConfiguration() {
     Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<>();
-    for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
+    for (Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
       taxonomies.add(Dtos.asDto(taxonomy));
     }
     return Opal.OpalConf.newBuilder()//
@@ -172,7 +195,7 @@ public class SystemResource {
         .addAllLanguages(conf.getLocalesAsString())//
         .setDefaultCharSet(conf.getDefaultCharacterSet());
 
-    if(conf.getPublicUrl() != null) {
+    if (conf.getPublicUrl() != null) {
       builder.setPublicURL(conf.getPublicUrl());
     }
 
@@ -186,7 +209,7 @@ public class SystemResource {
     conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
     conf.setPublicUrl(dto.getPublicURL());
 
-    if(dto.getLanguagesList().isEmpty()) {
+    if (dto.getLanguagesList().isEmpty()) {
       conf.setLocales(Lists.newArrayList(OpalGeneralConfig.DEFAULT_LOCALE));
     } else {
       conf.setLocales(Lists.newArrayList(Iterables.transform(dto.getLanguagesList(), new Function<String, Locale>() {

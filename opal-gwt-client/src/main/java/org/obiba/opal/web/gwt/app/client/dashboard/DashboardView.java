@@ -9,24 +9,25 @@
  */
 package org.obiba.opal.web.gwt.app.client.dashboard;
 
+import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.PageHeader;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.*;
+import com.google.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-
-import com.github.gwtbootstrap.client.ui.PageHeader;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import org.obiba.opal.web.model.client.opal.NewsDto;
 
 public class DashboardView extends Composite implements DashboardPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DashboardView> {}
+  interface Binder extends UiBinder<Widget, DashboardView> {
+  }
 
   @UiField
   PageHeader pageTitle;
@@ -70,9 +71,19 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Panel bookmarks;
 
+  @UiField
+  Panel newsGroup;
+
+  @UiField
+  Panel news;
+
+  private final Translations translations;
+
   @Inject
   public DashboardView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+
     exploreProjectsLink.setHref("#" + Places.PROJECTS);
     searchLink.setHref("#" + Places.SEARCH);
     identifiersLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.IDENTIFIERS);
@@ -92,6 +103,32 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   }
 
   @Override
+  public void showNews(NewsDto notes) {
+    newsGroup.setVisible(notes != null && notes.getNotesCount() > 0);
+    if (!newsGroup.isVisible()) return;
+
+    news.clear();
+    int i = 0;
+    for (NewsDto.NoteDto note : JsArrays.toIterable(notes.getNotesArray())) {
+      if (i<6) {
+        FlowPanel panel = new FlowPanel();
+        Heading heading = new Heading(6, note.getTitle());
+        heading.addStyleName("no-bottom-margin");
+        panel.add(heading);
+        String summary = note.getDate() + (note.hasSummary() ? " - " + note.getSummary() : "");
+        Label label = new Label(summary);
+        label.addStyleName("help-block no-bottom-margin xsmall-right-indent inline");
+        panel.add(label);
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.appendHtmlConstant("<a href='" + note.getLink() + "' target='_blank'>" + translations.moreLabel() + "</a>");
+        panel.add(new Anchor(builder.toSafeHtml()));
+        news.add(panel);
+        i++;
+      }
+    }
+  }
+
+  @Override
   public void addToSlot(Object slot, IsWidget content) {
   }
 
@@ -101,7 +138,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == DashboardPresenter.BOOKMARKS) {
+    if (slot == DashboardPresenter.BOOKMARKS) {
       bookmarks.clear();
       bookmarks.add(content);
     }

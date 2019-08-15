@@ -2716,6 +2716,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("My Profile")
   String myProfile();
 
+  @Description("More label")
+  @DefaultStringValue("more ...")
+  String moreLabel();
+
   @Description("RSA label")
   @DefaultStringValue("RSA")
   String rsa();

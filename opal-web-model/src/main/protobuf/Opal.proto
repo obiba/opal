@@ -436,3 +436,13 @@ message AuthProviderDto {
   optional string label = 2;
   optional string providerUrl = 3;
 }
+
+message NewsDto {
+  message NoteDto {
+    required string title = 1;
+    required string link = 2;
+    required string date = 3;
+    optional string summary = 4;
+  }
+  repeated NoteDto notes = 1;
+}

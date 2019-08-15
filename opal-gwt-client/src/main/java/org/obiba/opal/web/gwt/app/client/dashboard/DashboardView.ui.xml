@@ -97,6 +97,15 @@
             </b:NavHeader>
 
             <g:SimplePanel ui:field="bookmarks"/>
+
+            <g:FlowPanel ui:field="newsGroup" visible="false">
+              <b:NavHeader>
+                <ui:msg description="News label">News</ui:msg>
+              </b:NavHeader>
+
+              <g:FlowPanel ui:field="news"/>
+            </g:FlowPanel>
+
           </b:NavList>
         </b:Column>
       </b:FluidRow>

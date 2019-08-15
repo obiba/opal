@@ -9,16 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.dashboard;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -28,6 +21,14 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.NewsDto;
 
 import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_ONLY;
 
@@ -36,7 +37,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
   @ProxyStandard
   @NameToken(Places.DASHBOARD)
-  public interface Proxy extends ProxyPlace<DashboardPresenter> {}
+  public interface Proxy extends ProxyPlace<DashboardPresenter> {
+  }
 
   private final BookmarkListPresenter bookmarkListPresenter;
 
@@ -47,7 +49,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
   @Inject
   public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
-      BookmarkListPresenter bookmarkListPresenter) {
+                            BookmarkListPresenter bookmarkListPresenter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.bookmarkListPresenter = bookmarkListPresenter.setMode(VIEW_ONLY);
@@ -56,6 +58,11 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   @Override
   public String getTitle() {
     return translations.pageDashboardTitle();
+  }
+
+  @Override
+  protected void onBind() {
+    initReleaseNotes();
   }
 
   @Override
@@ -74,6 +81,23 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     setInSlot(BOOKMARKS, bookmarkListPresenter);
   }
 
+  private void initReleaseNotes() {
+    ResourceRequestBuilderFactory.<NewsDto>newBuilder().forResource("/system/news")
+        .withCallback(new ResourceCallback<NewsDto>() {
+          @Override
+          public void onResource(Response response, NewsDto resource) {
+            getView().showNews(resource);
+          }
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // ignore
+          }
+        }, Response.SC_INTERNAL_SERVER_ERROR)
+        .get().send();
+  }
+
   //
   // Inner Classes / Interfaces
   //
@@ -90,6 +114,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
     HasAuthorization getTasksAuthorizer();
 
+    void showNews(NewsDto notes);
   }
 
 }
