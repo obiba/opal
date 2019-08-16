@@ -63,12 +63,14 @@ public class SystemResource {
   private ApplicationContext applicationContext;
 
   @GET
+  @NoAuthorization
   @Path("/version")
   public String getVersion() {
     return opalVersionProvider.getVersion().toString();
   }
 
   @GET
+  @NoAuthorization
   @Path("/news")
   public Opal.NewsDto getNews() {
     try {
