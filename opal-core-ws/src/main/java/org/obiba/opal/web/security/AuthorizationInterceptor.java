@@ -112,11 +112,11 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       Session session = SecurityUtils.getSubject().getSession(false);
       if (session != null && session.getAttribute("ensuredProfileGroups") == null) {
         Set<String> roles = (Set<String>) session.getAttribute("roles");
-        if (roles != null) {
+        if (roles != null && !roles.isEmpty()) {
           log.debug("{} has roles {}", subject.getPrincipal(), Joiner.on(",").join(roles));
           subjectProfileService.applyProfileGroups(subject.getPrincipal().toString(), roles);
+          session.setAttribute("ensuredProfileGroups", true);
         }
-        session.setAttribute("ensuredProfileGroups", true);
       }
     }
   }
