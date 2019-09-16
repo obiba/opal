@@ -38,7 +38,7 @@
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
         </b:NavLink>
-        <b:NavLink target="_blank" href="http://opaldoc.obiba.org/en/latest/web-user-guide/index.html">
+        <b:NavLink target="_blank" href="http://opaldoc.obiba.org/">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
         <b:Nav>

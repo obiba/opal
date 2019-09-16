@@ -105,6 +105,7 @@ public class SubjectProfilesAdministrationPresenter extends
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    refreshProfiles();
   }
 
   @Override

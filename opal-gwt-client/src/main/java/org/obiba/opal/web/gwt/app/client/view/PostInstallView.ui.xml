@@ -19,7 +19,7 @@
       <b:Brand href="#!install">Opal</b:Brand>
 
       <b:Nav alignment="RIGHT">
-        <b:NavLink target="_blank" href="http://opaldoc.obiba.org/en/latest/web-user-guide/index.html">
+        <b:NavLink target="_blank" href="http://opaldoc.obiba.org/">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
         <b:Nav>
