@@ -99,3 +99,14 @@ enum AnalysisStatusDto {
 message OpalAnalysisResultsDto {
   repeated OpalAnalysisResultDto analysisResults = 1;
 }
+
+message ResourceReferenceDto {
+  required string name = 1;
+  required string project = 2;
+  required string provider = 3;
+  required string factory = 4;
+  required string parameters = 5;
+  required string credentials = 6;
+  optional string created = 8;
+  optional string updated = 9;
+}

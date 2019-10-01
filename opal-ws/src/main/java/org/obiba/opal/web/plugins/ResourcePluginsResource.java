@@ -14,7 +14,6 @@ import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.resource.ResourceFactoryService;
 import org.obiba.opal.web.model.Plugins;
-import org.obiba.opal.web.model.Plugins.AnalysisPluginPackageDto;
 import org.obiba.opal.web.model.Plugins.PluginPackageDto;
 import org.obiba.opal.web.model.Plugins.PluginPackageDto.Builder;
 import org.obiba.opal.web.ws.security.NoAuthorization;
