@@ -52,6 +52,22 @@ message AnalysisPluginTemplateDto {
     optional string routinePath = 7;
 }
 
+message ResourcePluginPackageDto {
+    repeated ResourceFactoryDto resourceFactories = 1;
+
+    extend PluginPackageDto {
+        optional ResourcePluginPackageDto resource = 3000;
+    }
+}
+
+message ResourceFactoryDto {
+    required string name = 1;
+    required string title = 2;
+    optional string description = 3;
+    required string parametersSchemaForm = 4;
+    required string credentialsSchemaForm = 5;
+}
+
 message PluginDto {
     required string name = 1;
     required string title = 2;

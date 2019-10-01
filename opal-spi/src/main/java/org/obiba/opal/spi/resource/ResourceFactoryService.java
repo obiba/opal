@@ -16,6 +16,8 @@ import java.util.List;
 
 public interface ResourceFactoryService extends ServicePlugin {
 
+  String SERVICE_TYPE = "opal-resource";
+
   /**
    * Get the list of {@link ResourceFactory} taht are provided by this plugin.
    *

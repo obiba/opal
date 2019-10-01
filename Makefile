@@ -320,7 +320,7 @@ analysis-plugins:
 	$(call install-plugin,opal-analysis-validate)
 
 resource-plugins:
-	$(call install-plugin,opal-resource-base)
+	$(call install-plugin,opal-resource-commons)
 
 plugin:
 	$(call install-plugin,${p})

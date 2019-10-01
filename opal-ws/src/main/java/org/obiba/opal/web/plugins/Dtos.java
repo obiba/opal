@@ -20,6 +20,8 @@ import org.obiba.opal.spi.analysis.Analysis;
 import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisService;
 import org.obiba.opal.spi.analysis.AnalysisTemplate;
+import org.obiba.opal.spi.resource.ResourceFactory;
+import org.obiba.opal.spi.resource.ResourceFactoryService;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.model.Plugins.AnalysisPluginPackageDto;
@@ -166,6 +168,25 @@ public class Dtos {
     if (template.getRoutinePath() != null) {
       builder.setRoutinePath(template.getRoutinePath().toString());
     }
+
+    return builder.build();
+  }
+
+  public static Plugins.ResourcePluginPackageDto.Builder asDto(ResourceFactoryService resourceFactoryService) {
+    Plugins.ResourcePluginPackageDto.Builder builder = Plugins.ResourcePluginPackageDto.newBuilder();
+
+    builder.addAllResourceFactories(resourceFactoryService.getResourceFactories().stream().map(Dtos::asDto).collect(Collectors.toList()));
+
+    return builder;
+  }
+
+  public static Plugins.ResourceFactoryDto asDto(ResourceFactory resourceFactory) {
+    Plugins.ResourceFactoryDto.Builder builder = Plugins.ResourceFactoryDto.newBuilder()
+        .setName(resourceFactory.getName())
+        .setTitle(resourceFactory.getTitle())
+        .setDescription(resourceFactory.getDescription())
+        .setParametersSchemaForm(resourceFactory.getParametersSchemaForm().toString())
+        .setCredentialsSchemaForm(resourceFactory.getCredentialsSchemaForm().toString());
 
     return builder.build();
   }
