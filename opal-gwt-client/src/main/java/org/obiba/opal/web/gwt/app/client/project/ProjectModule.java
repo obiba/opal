@@ -15,12 +15,6 @@ import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationView
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalView;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.*;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypeEditMappingTableModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypeEditMappingTableModalView;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesView;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectImportVcfFileModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectImportVcfFileModalView;
 import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsModalView;
 import org.obiba.opal.web.gwt.app.client.project.identifiersmappings.ProjectIdentifiersMappingsPresenter;
@@ -29,6 +23,8 @@ import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresent
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
+import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesPresenter;
+import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 
@@ -59,9 +55,10 @@ public class ProjectModule extends AbstractOpalModule {
     bindPresenterWidget(ProjectGenotypeEditMappingTableModalPresenter.class,
         ProjectGenotypeEditMappingTableModalPresenter.Display.class, ProjectGenotypeEditMappingTableModalView.class);
     bindPresenterWidget(ProjectIdentifiersMappingsPresenter.class, ProjectIdentifiersMappingsPresenter.Display.class,
-      ProjectIdentifiersMappingsView.class);
+        ProjectIdentifiersMappingsView.class);
     bindPresenterWidget(ProjectIdentifiersMappingsModalPresenter.class, ProjectIdentifiersMappingsModalPresenter.Display.class,
-      ProjectIdentifiersMappingsModalView.class);
-
+        ProjectIdentifiersMappingsModalView.class);
+    bindPresenterWidget(ProjectResourcesPresenter.class, ProjectResourcesPresenter.Display.class,
+        ProjectResourcesView.class);
   }
 }

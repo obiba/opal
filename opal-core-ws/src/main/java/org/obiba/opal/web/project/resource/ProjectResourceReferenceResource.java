@@ -34,7 +34,8 @@ public class ProjectResourceReferenceResource {
 
   @GET
   public Projects.ResourceReferenceDto get(@PathParam("project") String project, @PathParam("name") String name) {
-    return Dtos.asDto(resourceReferenceService.getResourceReference(project, name));
+    ResourceReference reference = resourceReferenceService.getResourceReference(project, name);
+    return Dtos.asDto(reference, resourceReferenceService.createResource(reference));
   }
 
   @PUT

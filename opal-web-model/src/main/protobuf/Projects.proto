@@ -109,4 +109,11 @@ message ResourceReferenceDto {
   required string credentials = 6;
   optional string created = 8;
   optional string updated = 9;
+  optional ResourceSummaryDto resource = 10;
+}
+
+message ResourceSummaryDto {
+  required string name = 1;
+  required string url = 2;
+  optional string format = 3;
 }

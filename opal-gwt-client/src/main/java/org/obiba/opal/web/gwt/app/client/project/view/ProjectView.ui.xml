@@ -31,6 +31,10 @@
       <b:Tab icon="TABLE">
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
+      <b:Tab icon="LINK">
+        <b:Heading size="3" addStyleNames="no-top-margin">Resources</b:Heading>
+        <g:SimplePanel ui:field="resourcesPanel"/>
+      </b:Tab>
       <b:Tab icon="BEAKER">
         <b:Heading size="3" addStyleNames="no-top-margin span5 no-left-margin">Genotypes</b:Heading>
         <g:SimplePanel ui:field="genotypesPanel"/>

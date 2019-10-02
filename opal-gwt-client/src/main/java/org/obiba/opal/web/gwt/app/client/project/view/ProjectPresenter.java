@@ -10,37 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import com.google.common.collect.Lists;
-import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
-import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
-import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
-import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -57,6 +28,31 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
+import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
+import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesPresenter;
+import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
@@ -65,6 +61,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     enum ProjectTab {
       TABLES,
+      RESOURCES,
       GENOTYPES,
       FILES,
       REPORTS,
@@ -86,11 +83,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @ProxyStandard
   @NameToken(Places.PROJECT)
-  public interface Proxy extends ProxyPlace<ProjectPresenter> {}
+  public interface Proxy extends ProxyPlace<ProjectPresenter> {
+  }
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARK_ICON
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARK_ICON = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -99,11 +96,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> FILES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> RESOURCES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> GENOTYPES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TASKS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -112,12 +111,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
+
+  private final Provider<ProjectResourcesPresenter> projectResourcesPresenterProvider;
 
   private final Provider<ProjectGenotypesPresenter> projectGenotypesPresenterProvider;
 
@@ -143,6 +143,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private FileExplorerPresenter fileExplorerPresenter;
 
+  private ProjectResourcesPresenter projectResourcesPresenter;
+
   private ProjectGenotypesPresenter projectGenotypesPresenter;
 
   private ReportsPresenter reportsPresenter;
@@ -160,20 +162,21 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private BookmarkIconPresenter bookmarkIconPresenter;
 
   @Inject
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
-  public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
-      Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
-      Provider<ProjectGenotypesPresenter> projectGenotypesPresenterProvider,
-      Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
-      Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
-      Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider,
-      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider,
-      DataExportFolderService dataExportFolderService) {
+  @SuppressWarnings({"PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters"})
+  public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Provider<ProjectResourcesPresenter> projectResourcesPresenterProvider, PlaceManager placeManager,
+                          Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
+                          Provider<ProjectGenotypesPresenter> projectGenotypesPresenterProvider,
+                          Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
+                          Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
+                          Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider,
+                          Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider,
+                          DataExportFolderService dataExportFolderService) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.magmaPresenterProvider = magmaPresenterProvider;
     this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
+    this.projectResourcesPresenterProvider = projectResourcesPresenterProvider;
     this.projectGenotypesPresenterProvider = projectGenotypesPresenterProvider;
     this.reportsPresenterProvider = reportsPresenterProvider;
     this.tasksPresenterProvider = tasksPresenterProvider;
@@ -203,8 +206,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
     path = Strings.nullToEmpty(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
-    if(!projectName.equals(oldProject) && path.isEmpty()) {
-      if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
+    if (!projectName.equals(oldProject) && path.isEmpty()) {
+      if (fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
 
@@ -212,7 +215,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void authorize() {
-    if(projectName == null) return;
+    if (projectName == null) return;
 
     new DefaultTabAuthorizer().authorizeTables();
 
@@ -225,7 +228,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   public void refresh() {
     // TODO handle wrong or missing project name
-    if(projectName == null) return;
+    if (projectName == null) return;
 
     // reset
     ResourceRequestBuilderFactory.<ProjectDto>newBuilder()
@@ -239,13 +242,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().setProject(project);
             authorize();
 
-            if(tab != Display.ProjectTab.TABLES && tab != Display.ProjectTab.GENOTYPES) {
+            if (tab != Display.ProjectTab.TABLES && tab != Display.ProjectTab.GENOTYPES) {
               // these two tabs will be selected upon their authorization
               onTabSelected(tab.ordinal());
               getView().selectTab(tab.ordinal());
             }
 
-            if(bookmarkIconPresenter == null) {
+            if (bookmarkIconPresenter == null) {
               bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
               bookmarkIconPresenter.addStyleName("small-indent");
               setInSlot(BOOKMARK_ICON, bookmarkIconPresenter);
@@ -279,7 +282,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Lists.newArrayList(ParameterTokens.TOKEN_NAME))
         .with(ParameterTokens.TOKEN_TAB, tab.toString());
-    if(!Strings.isNullOrEmpty(queryPathParam)) {
+    if (!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
     }
     placeManager.updateHistory(builder.build(), true);
@@ -288,12 +291,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @SuppressWarnings("PMD.NcssMethodCount")
   private void selectTab(int index, String queryPathParam) {
     tab = Display.ProjectTab.values()[index];
-    switch(tab) {
+    switch (tab) {
       case TABLES:
         onTablesTabSelected(queryPathParam);
         break;
       case FILES:
         onFilesTabSelected(queryPathParam);
+        break;
+      case RESOURCES:
+        onResourcesTabSelected();
         break;
       case GENOTYPES:
         onGenotypesTabSelected();
@@ -314,7 +320,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onTablesTabSelected(String path) {
-    if(magmaPresenter == null) {
+    if (magmaPresenter == null) {
       magmaPresenter = magmaPresenterProvider.get();
       setInSlot(TABLES_PANE, magmaPresenter);
     }
@@ -324,7 +330,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onFilesTabSelected(String path) {
-    if(fileExplorerPresenter == null) {
+    if (fileExplorerPresenter == null) {
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);
     }
@@ -334,8 +340,17 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
   }
 
+  private void onResourcesTabSelected() {
+    if (projectResourcesPresenter == null) {
+      projectResourcesPresenter = projectResourcesPresenterProvider.get();
+      setInSlot(RESOURCES_PANE, projectResourcesPresenter);
+    }
+
+    projectResourcesPresenter.initialize(project);
+  }
+
   private void onGenotypesTabSelected() {
-    if(projectGenotypesPresenter == null) {
+    if (projectGenotypesPresenter == null) {
       projectGenotypesPresenter = projectGenotypesPresenterProvider.get();
       setInSlot(GENOTYPES_PANE, projectGenotypesPresenter);
     }
@@ -344,7 +359,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onReportsTabSelected() {
-    if(reportsPresenter == null) {
+    if (reportsPresenter == null) {
       reportsPresenter = reportsPresenterProvider.get();
       setInSlot(REPORTS_PANE, reportsPresenter);
     }
@@ -352,7 +367,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onTasksTabSelected() {
-    if(tasksPresenter == null) {
+    if (tasksPresenter == null) {
       tasksPresenter = tasksPresenterProvider.get();
       setInSlot(TASKS_PANE, tasksPresenter);
     }
@@ -360,7 +375,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onPermissionsTabSelected() {
-    if(projectPermissionsPresenter == null) {
+    if (projectPermissionsPresenter == null) {
       projectPermissionsPresenter = projectResourcePermissionsProvider.get();
       setInSlot(PERMISSION_PANE, projectPermissionsPresenter);
     }
@@ -368,7 +383,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onAdminTabSelected() {
-    if(projectAdministrationPresenter == null) {
+    if (projectAdministrationPresenter == null) {
       projectAdministrationPresenter = projectAdministrationPresenterProvider.get();
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
@@ -377,8 +392,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onFolderUpdated(FolderUpdatedEvent event) {
-    if(fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
-    if(tab == Display.ProjectTab.FILES) updateHistory(event.getFolder().getPath());
+    if (fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
+    if (tab == Display.ProjectTab.FILES) updateHistory(event.getFolder().getPath());
   }
 
   private void updateHistory(String queryPathParam) {
@@ -386,7 +401,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Lists.newArrayList(ParameterTokens.TOKEN_NAME, ParameterTokens.TOKEN_TAB));
 
-    if(!Strings.isNullOrEmpty(queryPathParam)) {
+    if (!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam).build();
     }
 
@@ -395,19 +410,19 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private Display.ProjectTab validateTab(String tabName) {
-    if(!Strings.isNullOrEmpty(tabName)) {
+    if (!Strings.isNullOrEmpty(tabName)) {
       try {
         return Display.ProjectTab.valueOf(tabName);
-      } catch(IllegalArgumentException ignored) {
+      } catch (IllegalArgumentException ignored) {
       }
     }
     return Display.ProjectTab.TABLES;
   }
 
   private String validatePath(String name, String path) {
-    if(tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
+    if (tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
       String datasourceName = MagmaPath.Parser.parse(path).getDatasource();
-      if(!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
+      if (!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
         return path;
       }
     }

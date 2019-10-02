@@ -97,6 +97,13 @@ public class ProjectPlacesHelper {
         .build();
   }
 
+  public static PlaceRequest getResourcesPlace(String project) {
+    return new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, project)
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.RESOURCES.toString())
+        .build();
+  }
+
   public static PlaceRequest getVcfStorePlace(String project) {
     return new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project)

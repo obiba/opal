@@ -54,6 +54,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_RESOURCES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "resources");
+    }
+  },
+
+  PROJECT_RESOURCE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "resource", "{}");
+    }
+  },
+
   PROJECT_REPORT_TEMPLATES {
     @Override
     public UriBuilder create() {
@@ -887,6 +901,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("analysis-plugins");
+    }
+  },
+
+  PLUGINS_RESOURCE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("resource-plugins");
     }
   },
 

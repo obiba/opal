@@ -14,6 +14,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.*;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
+import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -150,8 +152,8 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Projects.ResourceReferenceDto asDto(ResourceReference resourceReference) {
-    return Projects.ResourceReferenceDto.newBuilder()
+  public static Projects.ResourceReferenceDto asDto(ResourceReference resourceReference, Resource resource) {
+    Projects.ResourceReferenceDto.Builder builder = Projects.ResourceReferenceDto.newBuilder()
         .setName(resourceReference.getName())
         .setProject(resourceReference.getProject())
         .setProvider(resourceReference.getProvider())
@@ -159,8 +161,18 @@ public class Dtos {
         .setParameters(resourceReference.getParametersModel())
         .setCredentials(resourceReference.getCredentialsModel())
         .setCreated(Instant.ofEpochMilli(resourceReference.getCreated().getTime()).toString())
-        .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString())
-        .build();
+        .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString());
+    if (resource != null) {
+      try {
+        builder.setResource(Projects.ResourceSummaryDto.newBuilder()
+            .setName(resource.getName())
+            .setUrl(resource.toURI().toString())
+            .setFormat(resource.getFormat()).build());
+      } catch (URISyntaxException e) {
+        log.error("Cannot get resource url", e);
+      }
+    }
+    return builder.build();
   }
 
   public static ResourceReference fromDto(Projects.ResourceReferenceDto referenceDto) {

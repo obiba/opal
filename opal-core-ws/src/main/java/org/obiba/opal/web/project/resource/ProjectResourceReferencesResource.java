@@ -41,7 +41,7 @@ public class ProjectResourceReferencesResource {
   @GET
   public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name) {
     return StreamSupport.stream(resourceReferenceService.getResourceReferences(name).spliterator(), false)
-        .map(Dtos::asDto).collect(Collectors.toList());
+        .map(ref -> Dtos.asDto(ref, resourceReferenceService.createResource(ref))).collect(Collectors.toList());
   }
 
   @POST

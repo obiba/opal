@@ -8,20 +8,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.analysis.support;
+package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
-public class AnalysisPluginsResource extends PluginsResource {
+public class ResourcePluginsResource extends PluginsResource {
 
   @Override
   public String getResource() {
-    return UriBuilders.PLUGINS_ANALYSIS.create().build();
+    return UriBuilders.PLUGINS_RESOURCE.create().build();
   }
 
-  public static AnalysisPluginsResource getInstance() {
-    return new AnalysisPluginsResource();
+  public static ResourcePluginsResource getInstance() {
+    return new ResourcePluginsResource();
   }
 
 }

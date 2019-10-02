@@ -57,6 +57,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Panel filesPanel;
 
   @UiField
+  Panel resourcesPanel;
+
+  @UiField
   Panel genotypesPanel;
 
   @UiField
@@ -172,6 +175,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.FILES_PANE) {
       filesPanel.clear();
       filesPanel.add(content);
+    } else if(slot == ProjectPresenter.RESOURCES_PANE) {
+      resourcesPanel.clear();
+      resourcesPanel.add(content);
     } else if(slot == ProjectPresenter.GENOTYPES_PANE) {
       genotypesPanel.clear();
       genotypesPanel.add(content);
