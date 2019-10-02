@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Date;
 
 @Component
 public class ResourceReferenceServiceImpl implements ResourceReferenceService {
@@ -72,12 +73,24 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public void save(ResourceReference resourceReference) {
+    if (resourceReference == null) return;
+    resourceReference.setUpdated(new Date());
     orientDbService.save(resourceReference, resourceReference);
   }
 
   @Override
   public void delete(ResourceReference resourceReference) {
+    if (resourceReference == null) return;
     orientDbService.delete(resourceReference);
+  }
+
+  @Override
+  public void delete(String project, String name) {
+    try {
+      orientDbService.delete(getResourceReference(project, name));
+    } catch(NoSuchResourceReferenceException e) {
+      // ignore
+    }
   }
 
   @Override

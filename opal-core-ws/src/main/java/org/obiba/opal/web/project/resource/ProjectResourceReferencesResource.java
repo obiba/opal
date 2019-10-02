@@ -18,10 +18,7 @@ import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -56,5 +53,14 @@ public class ProjectResourceReferencesResource {
     resourceReferenceService.save(reference);
     URI uri = uriInfo.getBaseUriBuilder().path("project").path(name).path("resource").path(reference.getName()).build();
     return Response.created(uri).build();
+  }
+
+  @DELETE
+  public Response deleteAll(@PathParam("name") String name, @QueryParam("names") List<String> names) {
+    if (names != null && !names.isEmpty())
+      names.forEach(n -> resourceReferenceService.delete(name, n));
+    else
+      resourceReferenceService.deleteAll(name);
+    return Response.noContent().build();
   }
 }

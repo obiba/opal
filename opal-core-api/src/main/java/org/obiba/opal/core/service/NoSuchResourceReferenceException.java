@@ -21,4 +21,12 @@ public class NoSuchResourceReferenceException extends RuntimeException {
     this.project = project;
     this.name = name;
   }
+
+  public String getProject() {
+    return project;
+  }
+
+  public String getName() {
+    return name;
+  }
 }

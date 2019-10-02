@@ -60,6 +60,14 @@ public interface ResourceReferenceService extends SystemService {
   void delete(ResourceReference resourceReference);
 
   /**
+   * Delete a resource reference, by its name and project, ignored if it does not exist.
+   *
+   * @param project
+   * @param name
+   */
+  void delete(String project, String name);
+
+  /**
    * Delete all the resource references from a project.
    *
    * @param project
