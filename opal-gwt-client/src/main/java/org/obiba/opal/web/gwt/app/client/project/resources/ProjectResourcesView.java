@@ -12,7 +12,12 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.Controls;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -24,12 +29,13 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +56,21 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
   Button addResource;
 
   @UiField
+  Button refresh;
+
+  @UiField
+  Controls filterControls;
+
+  @UiField
+  TextBoxClearable filter;
+
+  @UiField
   OpalSimplePager pager;
 
   @UiField
   CellTable<ResourceReferenceDto> table;
+
+  private List<ResourceReferenceDto> resources;
 
   private final ListDataProvider<ResourceReferenceDto> dataProvider = new ListDataProvider<ResourceReferenceDto>();
 
@@ -69,12 +86,16 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
 
   @Override
   public void renderResources(List<ResourceReferenceDto> resources) {
+    filter.setText("");
+    this.resources = resources;
     dataProvider.setList(resources);
     pager.firstPage();
     dataProvider.refresh();
     pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
     table.setVisible(!resources.isEmpty());
     pager.setVisible(!resources.isEmpty());
+    refresh.setVisible(!resources.isEmpty());
+    filterControls.setVisible(!resources.isEmpty());
   }
 
   @UiHandler("addResource")
@@ -82,6 +103,27 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
     getUiHandlers().onAddResource();
   }
 
+  @UiHandler("refresh")
+  public void onRefresh(ClickEvent event) {
+    getUiHandlers().onRefresh();
+  }
+
+  @UiHandler("filter")
+  public void onFilterUpdate(KeyUpEvent event) {
+    List<ResourceReferenceDto> filteredResources = Lists.newArrayList();
+    String text = filter.getText();
+    if (!Strings.isNullOrEmpty(text)) {
+      List<String> tokens = FilterHelper.tokenize(text);
+      for (ResourceReferenceDto resource : resources) {
+        String indexText = Joiner.on(" ").join(resource.getName(), resource.getResource().getUrl());
+        if (FilterHelper.matches(indexText, tokens)) filteredResources.add(resource);
+      }
+    } else
+      filteredResources = resources;
+    dataProvider.setList(filteredResources);
+    pager.firstPage();
+    dataProvider.refresh();
+  }
 
   private void configureTable() {
     table.addColumn(new TextColumn<ResourceReferenceDto>() {

@@ -112,9 +112,12 @@ public class SchemaUiContainer extends ControlGroup {
 
         if ("string".equals(type)) {
           editableWidget.setValue(ensureStringValue(value));
-        } else if ("integer".equals(type) || "number".equals(type)) {
-          Double aDouble = value.isNumber().doubleValue();
-          editableWidget.setValue("number".equals(type) ? aDouble : aDouble.intValue());
+        } else if ("integer".equals(type)) {
+          Integer aInt = ensureIntegerValue(value);
+          editableWidget.setValue(aInt);
+        } else if ("number".equals(type)) {
+          Double aDouble = ensureNumberValue(value);
+          editableWidget.setValue(aDouble);
         } else if ("array".equals(type)) {
           if (schema.get("items").isArray() != null) {
             editableWidget.setValue(value.isArray());
@@ -147,6 +150,23 @@ public class SchemaUiContainer extends ControlGroup {
 
   private String ensureStringValue(JSONValue value) {
     return value != null && value.isString() != null ? value.isString().stringValue() : "";
+  }
+
+  private Double ensureNumberValue(JSONValue value) {
+    if (value != null && value.isNumber() != null)
+      return value.isNumber().doubleValue();
+
+    String nbStr = ensureStringValue(value);
+    try {
+      return Double.parseDouble(nbStr);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private Integer ensureIntegerValue(JSONValue value) {
+    Double aDouble = ensureNumberValue(value);
+    return aDouble == null ? null : aDouble.intValue();
   }
 
   public boolean isValid() {

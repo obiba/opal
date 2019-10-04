@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.project;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
@@ -164,10 +165,12 @@ public class Dtos {
         .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString());
     if (resource != null) {
       try {
-        builder.setResource(Projects.ResourceSummaryDto.newBuilder()
+        Projects.ResourceSummaryDto.Builder rbuilder = Projects.ResourceSummaryDto.newBuilder()
             .setName(resource.getName())
-            .setUrl(resource.toURI().toString())
-            .setFormat(resource.getFormat()).build());
+            .setUrl(resource.toURI().toString());
+        if (!Strings.isNullOrEmpty(resource.getFormat()))
+          rbuilder.setFormat(resource.getFormat());
+        builder.setResource(rbuilder);
       } catch (URISyntaxException e) {
         log.error("Cannot get resource url", e);
       }

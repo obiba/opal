@@ -42,6 +42,8 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
 
   private String credentialsModel;
 
+  private String encryptedCredentialsModel;
+
   private Date created = new Date();
 
   private Date updated;
@@ -97,6 +99,14 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
 
   public void setCredentialsModel(String credentialsModel) {
     this.credentialsModel = credentialsModel;
+  }
+
+  public String getEncryptedCredentialsModel() {
+    return encryptedCredentialsModel;
+  }
+
+  public void setEncryptedCredentialsModel(String encryptedCredentialsModel) {
+    this.encryptedCredentialsModel = encryptedCredentialsModel;
   }
 
   public JSONObject getCredentials() {

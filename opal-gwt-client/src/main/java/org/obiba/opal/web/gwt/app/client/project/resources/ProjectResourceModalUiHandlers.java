@@ -10,16 +10,11 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.gwtplatform.mvp.client.UiHandlers;
-import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import com.google.gwt.json.client.JSONObject;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface ProjectResourcesUiHandlers extends UiHandlers {
+public interface ProjectResourceModalUiHandlers extends ModalUiHandlers {
 
-  void onAddResource();
+    void onSave(String name, String factoryKey, JSONObject parameters, JSONObject credentials);
 
-  void onEditResource(ResourceReferenceDto resource);
-
-  void onRemoveResource(ResourceReferenceDto resource);
-
-  void onRefresh();
 }

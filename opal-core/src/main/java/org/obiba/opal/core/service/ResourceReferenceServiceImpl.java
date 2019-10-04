@@ -14,6 +14,7 @@ import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.spi.resource.ResourceFactoryService;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class ResourceReferenceServiceImpl implements ResourceReferenceService {
@@ -35,10 +38,13 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private final OpalRuntime opalRuntime;
 
+  private final CryptoService cryptoService;
+
   @Autowired
-  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime) {
+  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService) {
     this.orientDbService = orientDbService;
     this.opalRuntime = opalRuntime;
+    this.cryptoService = cryptoService;
   }
 
   @Override
@@ -47,7 +53,9 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
         .table(ResourceReference.class.getSimpleName())
         .whereClauses("project = ?")
         .build();
-    return orientDbService.list(ResourceReference.class, query, project);
+    return StreamSupport.stream(orientDbService.list(ResourceReference.class, query, project).spliterator(), false)
+        .map(this::decryptCredentials)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -59,7 +67,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
     if (resourceReference == null)
       throw new NoSuchResourceReferenceException(project, name);
-    return resourceReference;
+    return decryptCredentials(resourceReference);
   }
 
   @Override
@@ -75,7 +83,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   public void save(ResourceReference resourceReference) {
     if (resourceReference == null) return;
     resourceReference.setUpdated(new Date());
-    orientDbService.save(resourceReference, resourceReference);
+    ResourceReference resourceReference1 = encryptCredentials(resourceReference);
+    orientDbService.save(resourceReference1, resourceReference1);
   }
 
   @Override
@@ -113,5 +122,21 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   @Subscribe
   public void onProjectDeleted(DatasourceDeletedEvent event) {
     deleteAll(event.getDatasource().getName());
+  }
+
+  private ResourceReference encryptCredentials(ResourceReference resourceReference) {
+    if (resourceReference.getCredentialsModel() != null) {
+      resourceReference.setEncryptedCredentialsModel(cryptoService.encrypt(resourceReference.getCredentialsModel()));
+      resourceReference.setCredentialsModel(null);
+    }
+    return resourceReference;
+  }
+
+  private ResourceReference decryptCredentials(ResourceReference resourceReference) {
+    if (resourceReference.getEncryptedCredentialsModel() != null) {
+      resourceReference.setCredentialsModel(cryptoService.decrypt(resourceReference.getEncryptedCredentialsModel()));
+      resourceReference.setEncryptedCredentialsModel(null);
+    }
+    return resourceReference;
   }
 }

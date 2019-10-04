@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 
 public class ResourcePluginsResource extends PluginsResource {
 
@@ -22,6 +24,14 @@ public class ResourcePluginsResource extends PluginsResource {
 
   public static ResourcePluginsResource getInstance() {
     return new ResourcePluginsResource();
+  }
+
+  public static String makeResourceFactoryKey(PluginPackageDto plugin, ResourceFactoryDto factory) {
+    return plugin.getName() + ":" + factory.getName();
+  }
+
+  public static String[] splitResourceFactoryKey(String key) {
+    return key.split(":");
   }
 
 }

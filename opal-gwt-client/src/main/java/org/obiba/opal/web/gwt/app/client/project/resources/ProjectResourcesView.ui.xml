@@ -25,14 +25,29 @@
             </ui:msg>
         </b:Paragraph>
 
-        <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn">
-            <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
-        </b:Button>
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="pull-left">
+                <b:ButtonGroup>
+                    <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn">
+                        <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
+                    </b:Button>
+                </b:ButtonGroup>
+                <b:ButtonGroup>
+                    <b:Button ui:field="refresh" icon="REFRESH">
+                        <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+                    </b:Button>
+                </b:ButtonGroup>
+            </g:FlowPanel>
+            <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+            <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+                <b:InputAddOn prependIcon="FILTER">
+                    <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+                </b:InputAddOn>
+            </b:Controls>
+        </g:FlowPanel>
 
-        <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
         <o:Table ui:field="table" addStyleNames="small-top-margin"/>
-
-
+        
     </g:FlowPanel>
 
 </ui:UiBinder>

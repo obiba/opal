@@ -2139,6 +2139,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
 
+  @Description("Add Resource title")
+  @DefaultStringValue("Add Resource")
+  String addResourceModalTitle();
+
+  @Description("Edit Resource title")
+  @DefaultStringValue("Edit Resource")
+  String editResourceModalTitle();
+
   @Description("Export VCF Modal title")
   @DefaultStringValue("Export VCF Files")
   String exportVcfModalTitle();

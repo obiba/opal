@@ -20,6 +20,9 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -35,12 +38,15 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
 
   private ProjectDto projectDto;
 
+  private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
+
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
   @Inject
-  public ProjectResourcesPresenter(Display display, EventBus eventBus) {
+  public ProjectResourcesPresenter(Display display, EventBus eventBus, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
   }
 
   public void initialize(ProjectDto dto) {
@@ -57,22 +63,41 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
         for (PluginPackageDto plugin : plugins) {
           ResourcePluginPackageDto resourcePlugin = plugin.getExtension(ResourcePluginPackageDto.PluginPackageDtoExtensions.resource).cast();
           for (ResourceFactoryDto factory : JsArrays.toIterable(resourcePlugin.getResourceFactoriesArray())) {
-            String key = plugin.getName() + ":" + factory.getName();
+            String key = ResourcePluginsResource.makeResourceFactoryKey(plugin, factory);
             resourceFactories.put(key, factory);
           }
         }
       }
     });
+    addRegisteredHandler(ResourceCreatedEvent.getType(), new ResourceCreatedEvent.ResourceCreatedHandler() {
+      @Override
+      public void onResourceCreated(ResourceCreatedEvent event) {
+        refreshResources();
+      }
+    });
+    addRegisteredHandler(ResourceUpdatedEvent.getType(), new ResourceUpdatedEvent.ResourceUpdatedHandler() {
+      @Override
+      public void onResourceUpdated(ResourceUpdatedEvent event) {
+        refreshResources();
+      }
+    });
+  }
+
+  @Override
+  public void onRefresh() {
+    refreshResources();
   }
 
   @Override
   public void onAddResource() {
-    
+    ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
+    modal.initialize(projectDto, resourceFactories, null);
   }
 
   @Override
   public void onEditResource(ResourceReferenceDto resource) {
-
+    ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
+    modal.initialize(projectDto, resourceFactories, resource);
   }
 
   @Override
@@ -83,6 +108,7 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
           @Override
           public void onResponseCode(Request request, Response response) {
             // TODO display error message (if any)
+            refreshResources();
           }
         }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
         .delete().send();
