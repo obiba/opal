@@ -77,6 +77,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     resource.setOpalRSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
+    resource.setResourceReferenceService(getResourceReferenceService());
     return resource;
   }
 

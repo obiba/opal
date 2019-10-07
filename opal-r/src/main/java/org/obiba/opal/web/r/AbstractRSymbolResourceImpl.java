@@ -12,11 +12,14 @@ package org.obiba.opal.web.r;
 import com.google.common.base.Strings;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.ResourceAssignROperation;
+import org.obiba.opal.spi.resource.Resource;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +43,9 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @NotNull
   protected DataExportService dataExportService;
 
+  @NotNull
+  private ResourceReferenceService resourceReferenceService;
+
   @Override
   public void setName(String name) {
     this.name = name;
@@ -62,6 +68,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public void setDataExportService(DataExportService dataExportService) {
     this.dataExportService = dataExportService;
+  }
+
+  @Override
+  public void setResourceReferenceService(ResourceReferenceService resourceReferenceService) {
+    this.resourceReferenceService = resourceReferenceService;
   }
 
   @Override
@@ -90,7 +101,21 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings,
                            String idName, String identifiersMapping,
                            String rClass, boolean async) {
+    return putTable(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
+  }
+
+  @Override
+  public Response putTable(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName, String identifiersMapping, String rClass, boolean async) {
     return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
+  }
+
+  @Override
+  public Response putResource(UriInfo uri, String path, boolean async) {
+    // TODO ensure resource name is valid, and permission
+    String[] parts = path.split("\\.");
+    Resource resource = resourceReferenceService.createResource(resourceReferenceService.getResourceReference(parts[0], parts[1]));
+    ROperation rop = new ResourceAssignROperation(name, resource);
+    return assignSymbol(uri, rop, async);
   }
 
   @Override
