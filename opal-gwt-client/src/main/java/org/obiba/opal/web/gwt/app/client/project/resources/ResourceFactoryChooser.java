@@ -14,16 +14,23 @@ import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
-import java.util.Map;
+import java.util.*;
 
 public class ResourceFactoryChooser extends Chooser {
 
   private Map<String, ResourceFactoryDto> resourceFactories;
 
-  public void setResourceFactories(Map<String, ResourceFactoryDto> resourceFactories) {
+  public void setResourceFactories(final Map<String, ResourceFactoryDto> resourceFactories) {
     this.resourceFactories = resourceFactories;
     clear();
-    for (String key : resourceFactories.keySet()) {
+    List<String> keys = new ArrayList<>(resourceFactories.keySet());
+    Collections.sort(keys, new Comparator<String>() {
+      @Override
+      public int compare(String r1, String r2) {
+        return resourceFactories.get(r1).getTitle().compareToIgnoreCase(resourceFactories.get(r2).getTitle());
+      }
+    });
+    for (String key : keys) {
       ResourceFactoryDto factory = resourceFactories.get(key);
       addItem(factory.getTitle(), key);
     }

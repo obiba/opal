@@ -356,7 +356,7 @@ public class SchemaUiContainer extends ControlGroup {
 
   private Widget createWidgetForString(final JSONValue aDefault) {
 
-    List<String> enumItems = JsonSchemaGWT.getEnum(schema);
+    List<JSONObject> enumItems = JsonSchemaGWT.getEnum(schema);
     boolean hasEnum = enumItems.size() > 0;
 
     if(("file".equals(format) || "folder".equals(format)) && eventBus != null) {
@@ -401,7 +401,7 @@ public class SchemaUiContainer extends ControlGroup {
     }
   }
 
-  private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {
+  private Widget createWidgetForStringWithEnum(@NotNull final List<JSONObject> enumItems) {
     if(format.equals("radio")) {
       return new DynamicRadioGroup(key, enumItems);
     }
@@ -409,8 +409,10 @@ public class SchemaUiContainer extends ControlGroup {
     OpalListBox listBox = new OpalListBox();
     listBox.setName(key);
 
-    for(String item : enumItems) {
-      listBox.addItem(item);
+    for(JSONObject item : enumItems) {
+      String key = item.get("key").isString().stringValue();
+      String title = item.containsKey("title") ? item.get("title").isString().stringValue() : key;
+      listBox.addItem(title, key);
     }
 
     return listBox;
@@ -425,7 +427,7 @@ public class SchemaUiContainer extends ControlGroup {
       } else {
         JSONObject items = itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
 
-        List<String> enumItems = JsonSchemaGWT.getEnum(items);
+        List<JSONObject> enumItems = JsonSchemaGWT.getEnum(items);
 
         if (enumItems.size() == 0) {
           String type = JsonSchemaGWT.getType(items);
