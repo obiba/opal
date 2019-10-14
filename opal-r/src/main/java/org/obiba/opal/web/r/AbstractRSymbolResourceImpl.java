@@ -112,8 +112,10 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public Response putResource(UriInfo uri, String path, boolean async) {
     // TODO ensure resource name is valid, and permission
-    String[] parts = path.split("\\.");
-    Resource resource = resourceReferenceService.createResource(resourceReferenceService.getResourceReference(parts[0], parts[1]));
+    int idx = path.indexOf(".");
+    String project = path.substring(0, idx);
+    String res = path.substring(idx + 1);
+    Resource resource = resourceReferenceService.createResource(resourceReferenceService.getResourceReference(project, res));
     ROperation rop = new ResourceAssignROperation(name, resource);
     return assignSymbol(uri, rop, async);
   }
