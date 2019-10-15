@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.Controls;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,10 +36,12 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
@@ -76,6 +79,8 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
 
   private ActionsColumn<ResourceReferenceDto> actionsColumn;
 
+  private Map<String, ResourceFactoryDto> resourceFactories;
+
   @Inject
   public ProjectResourcesView(ProjectResourcesView.Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
     this.translations = translations;
@@ -85,7 +90,8 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
   }
 
   @Override
-  public void renderResources(List<ResourceReferenceDto> resources) {
+  public void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories) {
+    this.resourceFactories = resourceFactories;
     filter.setText("");
     this.resources = resources;
     dataProvider.setList(resources);
@@ -136,11 +142,29 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
     table.addColumn(new TextColumn<ResourceReferenceDto>() {
       @Override
       public String getValue(ResourceReferenceDto object) {
+        String key = object.getProvider() + ":" + object.getFactory();
+        return resourceFactories.get(key).getTitle();
+      }
+    }, translations.typeLabel());
+
+
+    table.addColumn(new TextColumn<ResourceReferenceDto>() {
+      @Override
+      public String getValue(ResourceReferenceDto object) {
         if (object.hasResource())
           return object.getResource().getUrl();
         return "";
       }
     }, translations.urlLabel());
+
+    table.addColumn(new TextColumn<ResourceReferenceDto>() {
+      @Override
+      public String getValue(ResourceReferenceDto object) {
+        if (object.hasResource())
+          return object.getResource().getFormat();
+        return "";
+      }
+    }, translations.formatLabel());
 
     table.addColumn(actionsColumn = new ActionsColumn<ResourceReferenceDto>(new ActionsProvider<ResourceReferenceDto>() {
 
@@ -169,7 +193,7 @@ public class ProjectResourcesView extends ViewWithUiHandlers<ProjectResourcesUiH
     table.setEmptyTableWidget(new Label(translations.noItems()));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
-    renderResources(new ArrayList<ResourceReferenceDto>());
+    renderResources(new ArrayList<ResourceReferenceDto>(), resourceFactories);
   }
 
 }

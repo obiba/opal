@@ -1653,6 +1653,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Format label")
+  @DefaultStringValue("Format")
+  String formatLabel();
+
   @Description("Account Login label")
   @DefaultStringValue("Account Login")
   String accountLoginLabel();

@@ -121,7 +121,7 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
         .withCallback(new ResourceCallback<JsArray<ResourceReferenceDto>>() {
           @Override
           public void onResource(Response response, JsArray<ResourceReferenceDto> resources) {
-            getView().renderResources(JsArrays.toList(resources));
+            getView().renderResources(JsArrays.toList(resources), resourceFactories);
           }
         }) //
         .get().send();
@@ -129,7 +129,7 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
 
   public interface Display extends View, HasUiHandlers<ProjectResourcesUiHandlers> {
 
-    void renderResources(List<ResourceReferenceDto> resources);
+    void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories);
 
   }
 }
