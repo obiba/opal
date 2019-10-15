@@ -64,8 +64,9 @@ message ResourceFactoryDto {
     required string name = 1;
     required string title = 2;
     optional string description = 3;
-    required string parametersSchemaForm = 4;
-    required string credentialsSchemaForm = 5;
+    optional string group = 4;
+    required string parametersSchemaForm = 5;
+    required string credentialsSchemaForm = 6;
 }
 
 message PluginDto {

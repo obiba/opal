@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
@@ -23,17 +25,34 @@ public class ResourceFactoryChooser extends Chooser {
   public void setResourceFactories(final Map<String, ResourceFactoryDto> resourceFactories) {
     this.resourceFactories = resourceFactories;
     clear();
-    List<String> keys = new ArrayList<>(resourceFactories.keySet());
-    Collections.sort(keys, new Comparator<String>() {
-      @Override
-      public int compare(String r1, String r2) {
-        return resourceFactories.get(r1).getTitle().compareToIgnoreCase(resourceFactories.get(r2).getTitle());
-      }
-    });
-    for (String key : keys) {
+    Map<String, List<String>> resourceFactoriesByGroup = Maps.newHashMap();
+    for (String key : resourceFactories.keySet()) {
       ResourceFactoryDto factory = resourceFactories.get(key);
-      addItem(factory.getTitle(), key);
+      String group = factory.hasGroup() ? factory.getGroup() : "Other";
+      if (!resourceFactoriesByGroup.containsKey(group)) {
+        resourceFactoriesByGroup.put(group, new ArrayList<String>());
+      }
+      resourceFactoriesByGroup.get(group).add(key);
     }
+
+    String firstKey = null;
+    for (String group : resourceFactoriesByGroup.keySet()) {
+      addGroup(group);
+      List<String> factoryKeys = resourceFactoriesByGroup.get(group);
+      Collections.sort(factoryKeys, new Comparator<String>() {
+        @Override
+        public int compare(String k1, String k2) {
+          return resourceFactories.get(k1).getTitle().compareToIgnoreCase(resourceFactories.get(k2).getTitle());
+        }
+      });
+      for (String key : factoryKeys) {
+        ResourceFactoryDto factory = resourceFactories.get(key);
+        if (firstKey == null)
+          firstKey = key;
+        addItemToGroup(factory.getTitle(), key);
+      }
+    }
+    setSelectedValue(firstKey);
   }
 
   public Map<String, ResourceFactoryDto> getResourceFactories() {

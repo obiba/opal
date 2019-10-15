@@ -36,6 +36,13 @@ public interface ResourceFactory {
   String getDescription();
 
   /**
+   * Group to which the resource belongs.
+   *
+   * @return
+   */
+  String getGroup();
+
+  /**
    * The form to collect resource type parameters, described by a JSON object.
    *
    * @return

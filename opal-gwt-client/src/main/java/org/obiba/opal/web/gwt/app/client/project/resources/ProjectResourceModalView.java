@@ -126,7 +126,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
 
   private void initializeResourceFactoryUI() {
     ResourceFactoryDto factory = factoryChooser.getSelectedFactory();
-    factoryDescription.setHTML(Markdown.parseNoStyle(factory.getDescription()));
+    factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
 
     applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), originalResource == null ? null : originalResource.getParameters());
     applySchemaForm(credentialsFormPanel, factory.getCredentialsSchemaForm(), originalResource == null ? null : originalResource.getCredentials());

@@ -184,9 +184,14 @@ public class Dtos {
     Plugins.ResourceFactoryDto.Builder builder = Plugins.ResourceFactoryDto.newBuilder()
         .setName(resourceFactory.getName())
         .setTitle(resourceFactory.getTitle())
-        .setDescription(resourceFactory.getDescription())
         .setParametersSchemaForm(resourceFactory.getParametersSchemaForm().toString())
         .setCredentialsSchemaForm(resourceFactory.getCredentialsSchemaForm().toString());
+
+    if (!Strings.isNullOrEmpty(resourceFactory.getDescription()))
+      builder.setDescription(resourceFactory.getDescription());
+
+    if (!Strings.isNullOrEmpty(resourceFactory.getGroup()))
+      builder.setGroup(resourceFactory.getGroup());
 
     return builder.build();
   }

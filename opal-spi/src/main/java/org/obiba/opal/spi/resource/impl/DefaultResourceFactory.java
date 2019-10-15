@@ -60,6 +60,8 @@ public class DefaultResourceFactory implements ResourceFactory {
 
   private String description;
 
+  private String group;
+
   private JSONObject parametersSchemaForm;
 
   private JSONObject credentialsSchemaForm;
@@ -92,6 +94,15 @@ public class DefaultResourceFactory implements ResourceFactory {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @Override
+  public String getGroup() {
+    return group;
+  }
+
+  public void setGroup(String group) {
+    this.group = group;
   }
 
   @Override
@@ -164,6 +175,7 @@ public class DefaultResourceFactory implements ResourceFactory {
         this.name = prop.getProperty("name", defaultName);
         this.title = prop.getProperty("title", this.name);
         this.description = prop.getProperty("description");
+        this.group = prop.getProperty("group");
       } catch (Exception e) {
         log.warn("Failed reading plugin properties: {}", settingsFile.getAbsolutePath(), e);
       }
@@ -171,6 +183,7 @@ public class DefaultResourceFactory implements ResourceFactory {
       this.name = defaultName;
       this.title = this.name;
       this.description = null;
+      this.group = null;
     }
     this.toResourceFile = new File(settingsFolder, getToResourceFunctionFilename());
     this.parametersSchemaForm = readSchemaForm(new File(settingsFolder, PARAMS_FORM_FILENAME));
