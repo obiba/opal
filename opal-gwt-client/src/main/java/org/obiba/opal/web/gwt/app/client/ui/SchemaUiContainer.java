@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
@@ -340,10 +338,8 @@ public class SchemaUiContainer extends ControlGroup {
   }
 
   private Widget createWidgetForInteger(final JSONValue aDefault) {
-    IntegerBox input = new IntegerBox();
+    HtmlIntegerBox input = new HtmlIntegerBox();
     input.setName(key);
-    input.getElement().setAttribute("type", "number");
-    input.getElement().setAttribute("step", "1");
     setNumericSchemaValidations(input);
 
     if(aDefault != null && aDefault.isNumber() != null) {

@@ -36,7 +36,9 @@ public class ResourceFactoryChooser extends Chooser {
     }
 
     String firstKey = null;
-    for (String group : resourceFactoriesByGroup.keySet()) {
+    List<String> groups = new ArrayList<String>(resourceFactoriesByGroup.keySet());
+    Collections.sort(groups);
+    for (String group : groups) {
       addGroup(group);
       List<String> factoryKeys = resourceFactoriesByGroup.get(group);
       Collections.sort(factoryKeys, new Comparator<String>() {
