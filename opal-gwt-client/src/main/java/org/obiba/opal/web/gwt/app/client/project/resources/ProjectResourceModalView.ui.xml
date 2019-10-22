@@ -27,7 +27,7 @@
                 <b:TextBox ui:field="nameText" visibleLength="40"/>
             </b:Controls>
             <b:HelpBlock>
-                <ui:msg description="Resource name help">The name of the resource that will be used as unique identifier (only alphanumeric characters allowed).</ui:msg>
+                <ui:msg description="Resource name help">The name of the resource, unique in the project.</ui:msg>
             </b:HelpBlock>
         </b:ControlGroup>
 
@@ -53,11 +53,13 @@
             </b:Tab>
         </b:TabPanel>
 
+        <b:ModalFooter ui:field="viewFooter">
+            <b:Button ui:field="closeButton" type="PRIMARY">
+                <ui:msg description="Close button label">Close</ui:msg>
+            </b:Button>
+        </b:ModalFooter>
 
-
-
-
-        <b:ModalFooter>
+        <b:ModalFooter ui:field="editFooter">
             <b:Button ui:field="saveButton" type="PRIMARY">
                 <ui:msg description="Save button label">Save</ui:msg>
             </b:Button>

@@ -10,10 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.support;
 
+import org.obiba.opal.web.model.client.opal.AclAction;
+
 import java.util.ArrayList;
 import java.util.Collections;
-
-import org.obiba.opal.web.model.client.opal.AclAction;
 
 public enum ResourcePermissionType {
   ADMINISTRATION(AclAction.PROJECT_ADD, AclAction.SYSTEM_ALL),
@@ -25,23 +25,25 @@ public enum ResourcePermissionType {
   TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
       AclAction.TABLE_ALL),
   VARIABLE(AclAction.VARIABLE_READ),
-  REPORT_TEMPLATE(AclAction.REPORT_TEMPLATE_READ, AclAction.REPORT_TEMPLATE_ALL);
+  REPORT_TEMPLATE(AclAction.REPORT_TEMPLATE_READ, AclAction.REPORT_TEMPLATE_ALL),
+  RESOURCES(AclAction.RESOURCES_ALL, AclAction.RESOURCES_VIEW),
+  RESOURCE(AclAction.RESOURCE_ALL, AclAction.RESOURCE_VIEW);
 
   public ArrayList<AclAction> getPermissions() {
     return (ArrayList<AclAction>) permissions.clone();
   }
 
   public boolean hasPermission(String name) {
-    for(AclAction permission : permissions) {
-      if(permission.getName().equals(name)) return true;
+    for (AclAction permission : permissions) {
+      if (permission.getName().equals(name)) return true;
     }
     return false;
   }
 
   public static ResourcePermissionType getTypeByPermission(String permission) {
-    for(ResourcePermissionType type : ResourcePermissionType.values()) {
-      for(AclAction action : type.permissions) {
-        if(action.getName().equals(permission)) {
+    for (ResourcePermissionType type : ResourcePermissionType.values()) {
+      for (AclAction action : type.permissions) {
+        if (action.getName().equals(permission)) {
           return type;
         }
       }

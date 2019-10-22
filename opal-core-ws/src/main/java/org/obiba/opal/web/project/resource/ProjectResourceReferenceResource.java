@@ -11,6 +11,8 @@
 package org.obiba.opal.web.project.resource;
 
 
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.web.model.Projects;
@@ -25,6 +27,8 @@ import javax.ws.rs.core.Response;
 @Path("/project/{project}/resource/{name}")
 public class ProjectResourceReferenceResource {
 
+  private final static Authorizer authorizer = new ShiroAuthorizer();
+
   private final ResourceReferenceService resourceReferenceService;
 
   @Autowired
@@ -35,7 +39,7 @@ public class ProjectResourceReferenceResource {
   @GET
   public Projects.ResourceReferenceDto get(@PathParam("project") String project, @PathParam("name") String name) {
     ResourceReference reference = resourceReferenceService.getResourceReference(project, name);
-    return Dtos.asDto(reference, resourceReferenceService.createResource(reference));
+    return Dtos.asDto(reference, resourceReferenceService.createResource(reference), isEditable(project, name));
   }
 
   @PUT
@@ -60,6 +64,10 @@ public class ProjectResourceReferenceResource {
   public Response delete(@PathParam("project") String project, @PathParam("name") String name) {
     resourceReferenceService.delete(project, name);
     return Response.noContent().build();
+  }
+
+  private boolean isEditable(String project, String name) {
+    return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":PUT");
   }
 
 }

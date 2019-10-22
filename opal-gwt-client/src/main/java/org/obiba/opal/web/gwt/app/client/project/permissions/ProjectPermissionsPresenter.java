@@ -170,6 +170,18 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
             .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
             .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
 
+      case RESOURCES:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+
+      case RESOURCE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+
       default:
         return null;
     }
@@ -282,6 +294,11 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           placeRequest = ProjectPlacesHelper
               .getReportsPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
+        case RESOURCES:
+        case RESOURCE:
+          placeRequest = ProjectPlacesHelper
+              .getResourcesPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+          break;
         case VCF_STORE:
           placeRequest = ProjectPlacesHelper
               .getVcfStorePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
@@ -333,6 +350,14 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
         case REPORT_TEMPLATE:
           name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE);
+          break;
+
+        case RESOURCES:
+          name = translations.allResourcesLabel();
+          break;
+
+        case RESOURCE:
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.RESOURCE);
           break;
 
         case VCF_STORE:

@@ -10,13 +10,11 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
@@ -58,6 +56,9 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   HelpBlock factoryDescription;
 
   @UiField
+  TabPanel tabPanel;
+
+  @UiField
   Button saveButton;
 
   @UiField
@@ -75,6 +76,14 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   @UiField
   FlowPanel credentialsFormPanel;
 
+  @UiField
+  ModalFooter viewFooter;
+
+  @UiField
+  ModalFooter editFooter;
+
+  private boolean readOnly;
+
   @Inject
   public ProjectResourceModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
@@ -84,28 +93,37 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
     factoryChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent event) {
-        initializeResourceFactoryUI();
+        initializeResourceFactoryUI(readOnly);
       }
     });
   }
 
   @Override
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
+  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
+    this.readOnly = readOnly;
     factoryChooser.setResourceFactories(resourceFactories);
+    factoryChooser.setEnabled(!readOnly);
 
     if (resource != null) {
       nameText.setText(resource.getName());
-      modal.setTitle(translations.editResourceModalTitle());
+      modal.setTitle(readOnly ? translations.viewResourceModalTitle() : translations.editResourceModalTitle());
       factoryChooser.setSelectedFactory(resource);
     }
     this.originalResource = resource;
     nameText.setEnabled(resource == null);
+    viewFooter.setVisible(readOnly);
+    editFooter.setVisible(!readOnly);
 
-    initializeResourceFactoryUI();
+    initializeResourceFactoryUI(readOnly);
   }
 
   @Override
   public void hideDialog() {
+    modal.hide();
+  }
+
+  @UiHandler("closeButton")
+  public void onCloseButton(ClickEvent event) {
     modal.hide();
   }
 
@@ -124,17 +142,21 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
         getSchemaFormModel(paramsFormPanel), getSchemaFormModel(credentialsFormPanel));
   }
 
-  private void initializeResourceFactoryUI() {
+  private void initializeResourceFactoryUI(boolean readOnly) {
     ResourceFactoryDto factory = factoryChooser.getSelectedFactory();
     factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
 
-    applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), originalResource == null ? null : originalResource.getParameters());
-    applySchemaForm(credentialsFormPanel, factory.getCredentialsSchemaForm(), originalResource == null ? null : originalResource.getCredentials());
+    if (readOnly)
+      tabPanel.getWidget(0).setVisible(false);
+
+    applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), originalResource == null ? null : originalResource.getParameters(), readOnly);
+    applySchemaForm(credentialsFormPanel, factory.getCredentialsSchemaForm(), originalResource == null ? null : originalResource.getCredentials(), readOnly);
   }
 
-  private void applySchemaForm(Panel containerPanel, String schemaForm, String values) {
+  private void applySchemaForm(Panel containerPanel, String schemaForm, String values, boolean readOnly) {
     containerPanel.clear();
     JSONObject jsonObject = (JSONObject) JSONParser.parseStrict(schemaForm);
+    jsonObject.put("readOnly", JSONBoolean.getInstance(readOnly));
     JSONValue description = jsonObject.get("description");
     if (description != null && description.isString() != null) {
       String descriptionStringValue = description.isString().stringValue();

@@ -17,6 +17,8 @@ public interface ProjectResourcesUiHandlers extends UiHandlers {
 
   void onAddResource();
 
+  void onViewResource(ResourceReferenceDto resource);
+
   void onEditResource(ResourceReferenceDto resource);
 
   void onRemoveResource(ResourceReferenceDto resource);

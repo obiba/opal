@@ -106,10 +106,11 @@ message ResourceReferenceDto {
   required string provider = 3;
   required string factory = 4;
   required string parameters = 5;
-  required string credentials = 6;
+  optional string credentials = 6;
   optional string created = 8;
   optional string updated = 9;
   optional ResourceSummaryDto resource = 10;
+  optional bool editable = 11;
 }
 
 message ResourceSummaryDto {

@@ -15,19 +15,24 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.*;
 
 import java.util.List;
@@ -40,18 +45,21 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
 
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
   @Inject
-  public ProjectResourcesPresenter(Display display, EventBus eventBus, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
+  public ProjectResourcesPresenter(Display display, EventBus eventBus, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
   }
 
   public void initialize(ProjectDto dto) {
     projectDto = dto;
-    refreshResources();
+    authorizeAndRefreshResources();
   }
 
   @Override
@@ -91,13 +99,19 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
   @Override
   public void onAddResource() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectDto, resourceFactories, null);
+    modal.initialize(projectDto, resourceFactories, null, false);
+  }
+
+  @Override
+  public void onViewResource(ResourceReferenceDto resource) {
+    ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
+    modal.initialize(projectDto, resourceFactories, resource, true);
   }
 
   @Override
   public void onEditResource(ResourceReferenceDto resource) {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectDto, resourceFactories, resource);
+    modal.initialize(projectDto, resourceFactories, resource, false);
   }
 
   @Override
@@ -127,9 +141,60 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
         .get().send();
   }
 
+  private void authorizeAndRefreshResources() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectDto.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getAddResourceAuthorizer(), new Authorizer(getEventBus()) {
+          @Override
+          public void authorized() {
+            refreshResources();
+          }
+
+          @Override
+          public void unauthorized() {
+            refreshResources();
+          }
+        })) //
+        .post().send();
+    // set permissions
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_DATASOURCE.create().build(projectDto.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .post().send();
+  }
+
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+
+    private static final String PERMISSIONS_SLOT = "permissions";
+
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      clearSlot(PERMISSIONS_SLOT);
+    }
+
+    @Override
+    public void authorized() {
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.RESOURCES,
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES, projectDto.getName());
+      setInSlot(PERMISSIONS_SLOT, resourcePermissionsPresenter);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<ProjectResourcesUiHandlers> {
 
     void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories);
 
+    HasAuthorization getAddResourceAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 }

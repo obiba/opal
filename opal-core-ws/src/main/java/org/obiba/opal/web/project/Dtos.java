@@ -153,16 +153,20 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Projects.ResourceReferenceDto asDto(ResourceReference resourceReference, Resource resource) {
+  public static Projects.ResourceReferenceDto asDto(ResourceReference resourceReference, Resource resource, boolean isEditable) {
     Projects.ResourceReferenceDto.Builder builder = Projects.ResourceReferenceDto.newBuilder()
         .setName(resourceReference.getName())
         .setProject(resourceReference.getProject())
         .setProvider(resourceReference.getProvider())
         .setFactory(resourceReference.getFactory())
         .setParameters(resourceReference.getParametersModel())
-        .setCredentials(resourceReference.getCredentialsModel())
         .setCreated(Instant.ofEpochMilli(resourceReference.getCreated().getTime()).toString())
-        .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString());
+        .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString())
+        .setEditable(isEditable);
+
+    if (isEditable)
+      builder.setCredentials(resourceReference.getCredentialsModel());
+
     if (resource != null) {
       try {
         Projects.ResourceSummaryDto.Builder rbuilder = Projects.ResourceSummaryDto.newBuilder()

@@ -11,6 +11,8 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.eventbus.Subscribe;
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -34,6 +36,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private static final Logger logger = LoggerFactory.getLogger(ResourceReferenceServiceImpl.class);
 
+  private final static Authorizer authorizer = new ShiroAuthorizer();
+
   private final OrientDbService orientDbService;
 
   private final OpalRuntime opalRuntime;
@@ -54,6 +58,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
         .whereClauses("project = ?")
         .build();
     return StreamSupport.stream(orientDbService.list(ResourceReference.class, query, project).spliterator(), false)
+        .filter(ref -> canViewResourceReference(project, ref.getName()))
         .map(this::decryptCredentials)
         .collect(Collectors.toList());
   }
@@ -65,7 +70,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
         .whereClauses("project = ?", "name = ?")
         .build();
     ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
-    if (resourceReference == null)
+    if (resourceReference == null || !canViewResourceReference(project, name))
       throw new NoSuchResourceReferenceException(project, name);
     return decryptCredentials(resourceReference);
   }
@@ -139,4 +144,9 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     }
     return resourceReference;
   }
+
+  private boolean canViewResourceReference(String project, String name) {
+    return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":GET");
+  }
+
 }

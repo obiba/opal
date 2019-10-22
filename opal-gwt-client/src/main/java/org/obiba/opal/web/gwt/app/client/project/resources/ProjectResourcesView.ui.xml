@@ -12,7 +12,6 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
@@ -20,34 +19,40 @@
     <g:FlowPanel>
         <b:Paragraph>
             <ui:msg description="Project Resources text">
-                Resources are references to data or computation units. Usually access to resources is protected by credentials. When assigned to a
-                R/DataSHIELD server session, remote large datasets or high performance computers are made accessible to data analysts.
+                Resources are datasets or computation units which location is described by a URL and access is protected by credentials.
+                When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance computers are made accessible to
+                data analysts.
             </ui:msg>
         </b:Paragraph>
 
-        <g:FlowPanel>
-            <g:FlowPanel addStyleNames="pull-left">
-                <b:ButtonGroup>
-                    <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn">
-                        <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
-                    </b:Button>
-                </b:ButtonGroup>
-                <b:ButtonGroup>
-                    <b:Button ui:field="refresh" icon="REFRESH">
-                        <ui:msg description="Refresh R packages label">Refresh</ui:msg>
-                    </b:Button>
-                </b:ButtonGroup>
-            </g:FlowPanel>
-            <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="small-indent pull-right"/>
-            <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
-                <b:InputAddOn prependIcon="FILTER">
-                    <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-                </b:InputAddOn>
-            </b:Controls>
-        </g:FlowPanel>
+        <b:TabPanel tabPosition="above" ui:field="tabPanel">
 
-        <o:Table ui:field="table" addStyleNames="small-top-margin"/>
-        
+            <b:Tab heading="References" active="true">
+                <g:FlowPanel>
+                    <g:FlowPanel addStyleNames="pull-left">
+                        <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn small-right-indent">
+                            <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
+                        </b:Button>
+                        <b:Button ui:field="refresh" icon="REFRESH">
+                            <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+                        </b:Button>
+                    </g:FlowPanel>
+                    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+                    <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+                        <b:InputAddOn prependIcon="FILTER">
+                            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+                        </b:InputAddOn>
+                    </b:Controls>
+                </g:FlowPanel>
+
+                <o:Table ui:field="table" addStyleNames="small-top-margin"/>
+            </b:Tab>
+
+            <b:Tab heading="Permissions">
+                <g:SimplePanel ui:field="permissionsPanel"/>
+            </b:Tab>
+
+        </b:TabPanel>
     </g:FlowPanel>
 
 </ui:UiBinder>

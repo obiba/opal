@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
@@ -51,11 +50,11 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     this.translations = translations;
   }
 
-  public void initialize(ProjectDto projectDto, Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
+  public void initialize(ProjectDto projectDto, Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
     this.resourceFactories = resourceFactories;
     this.projectDto = projectDto;
     this.originalResource = resource;
-    getView().initialize(resourceFactories, resource);
+    getView().initialize(resourceFactories, resource, readOnly);
   }
 
   @Override
@@ -108,7 +107,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   public interface Display extends PopupView, HasUiHandlers<ProjectResourceModalUiHandlers> {
 
-    void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource);
+    void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly);
 
     void hideDialog();
   }
