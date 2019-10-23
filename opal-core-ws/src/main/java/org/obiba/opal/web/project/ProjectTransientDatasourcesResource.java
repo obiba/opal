@@ -13,11 +13,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -34,6 +30,7 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.magma.MergingDatasourceFactory;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -94,13 +91,23 @@ public class ProjectTransientDatasourcesResource {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 
+  /**
+   * Make a datasource factory from the provided factory DTO and optionally merge the variable properties and attributes.
+   *
+   * @param factoryDto
+   * @param merge
+   * @return
+   */
   @POST
-  public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
+  public Response createDatasource(Magma.DatasourceFactoryDto factoryDto, @QueryParam("merge") @DefaultValue("false") boolean merge) {
     String uid = null;
     try {
       safeRemoveParseErrorLogCache();
 
       DatasourceFactory factory = pluginDatasourceFactoryDtoParser.canParse(factoryDto) ? pluginDatasourceFactoryDtoParser.parse(factoryDto, getDatasourceEncryptionStrategy()) : datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy());
+      if (merge) {
+        factory = new MergingDatasourceFactory(factory, MagmaEngine.get().getDatasource(name));
+      }
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
       return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))

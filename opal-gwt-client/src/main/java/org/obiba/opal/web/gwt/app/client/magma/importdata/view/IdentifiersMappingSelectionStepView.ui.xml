@@ -18,6 +18,17 @@
   <g:FlowPanel>
     <b:ControlGroup>
       <b:Controls>
+        <b:CheckBox ui:field="mergeDictionaries">
+          <ui:msg description="Merge dictionaries">Merge dictionaries</ui:msg>
+        </b:CheckBox>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Merge dictionaries help">When a table already exists, the variable characteristics (properties, categories, attributes) will be merged with the imported ones instead of being simply overridden. This allows to preserve the variable annotations on subsequent imports.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:Controls>
         <b:CheckBox ui:field="incremental">
           <ui:msg description="Incremental import">Incremental import</ui:msg>
         </b:CheckBox>

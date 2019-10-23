@@ -9,42 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
-import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
-import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlSettingsDto;
-import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
-import org.obiba.opal.web.model.client.opal.PluginPackageDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -59,13 +23,33 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.*;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_CREATED;
-import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
-import static com.google.gwt.http.client.Response.SC_OK;
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.gwt.http.client.Response.*;
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -104,18 +88,18 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private String destination;
 
   @Inject
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
+  @SuppressWarnings({"PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters"})
   public DataImportPresenter(Display display, EventBus eventBus, //
-      CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
-      JdbcStepPresenter jdbcStepPresenter, //
-      RHavenStepPresenter rHavenStepPresenter,//
-      RestStepPresenter restStepPresenter,//
-      NoFormatStepPresenter noFormatStepPresenter,//
-      IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
-      ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
-      ArchiveStepPresenter archiveStepPresenter, //
-      DatasourceValuesStepPresenter datasourceValuesStepPresenter, Translations translations,
-      DatasourcePluginFormatStepPresenter datasourcePluginFormatStepPresenter) {
+                             CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
+                             JdbcStepPresenter jdbcStepPresenter, //
+                             RHavenStepPresenter rHavenStepPresenter,//
+                             RestStepPresenter restStepPresenter,//
+                             NoFormatStepPresenter noFormatStepPresenter,//
+                             IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
+                             ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
+                             ArchiveStepPresenter archiveStepPresenter, //
+                             DatasourceValuesStepPresenter datasourceValuesStepPresenter, Translations translations,
+                             DatasourcePluginFormatStepPresenter datasourcePluginFormatStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -150,7 +134,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         new NotificationEvent.Handler() {
           @Override
           public void onUserMessage(NotificationEvent event) {
-            for(String message : event.getMessages()) {
+            for (String message : event.getMessages()) {
               getView().showError(TranslationsUtils
                   .replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs()), null);
             }
@@ -184,14 +168,14 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> resource) {
             boolean jdbc = false;
-            for(int i = 0; i < resource.length(); i++) {
+            for (int i = 0; i < resource.length(); i++) {
               SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
-              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
+              if (sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
                   resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
                 jdbc = true;
               }
             }
-            if(!jdbc) {
+            if (!jdbc) {
               getView().removeFormat(ImportFormat.JDBC);
             }
           }
@@ -247,8 +231,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length != 0) {
-      if(event.getEventParameters()[0] instanceof String) {
+    if (event.getEventParameters().length != 0) {
+      if (event.getEventParameters()[0] instanceof String) {
         String datasourceName = (String) event.getEventParameters()[0];
         destination = datasourceName;
         csvFormatStepPresenter.setDestination(datasourceName);
@@ -264,18 +248,18 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @Override
   protected void onCancel() {
     super.onCancel();
-    if(transientDatasourceHandler != null) {
+    if (transientDatasourceHandler != null) {
       transientDatasourceHandler.removeTransientDatasource();
     }
   }
 
-  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
+  @SuppressWarnings({"PMD.NcssMethodCount", "OverlyLongMethod"})
   private void updateFormatStepDisplay() { //
     getView().updateHelp();
     try {
       ImportFormat format = ImportFormat.valueOf(getView().getSelectedFormat());
 
-      switch(format) {
+      switch (format) {
         case CSV:
           csvFormatStepPresenter.clear();
           formatStepPresenter = csvFormatStepPresenter;
@@ -306,7 +290,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           formatStepPresenter = noFormatStepPresenter;
           getView().setFormatStepDisplay(noFormatStepPresenter.getView());
       }
-    } catch(IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // HERE> must be a format from a plugin datasource
       formatStepPresenter = datasourcePluginFormatStepPresenter;
       datasourcePluginFormatStepPresenter.getView().setDatasourcePluginName(getView().getSelectedFormat());
@@ -314,10 +298,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({"OverlyLongMethod", "PMD.NcssMethodCount"})
   private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportConfig importConfig) {
     this.importConfig = importConfig;
-    switch(importConfig.getImportFormat()) {
+    switch (importConfig.getImportFormat()) {
       case XML:
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
@@ -366,13 +350,13 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private ImportCommandOptionsDto createImportCommandOptionsDto(@Nullable String selectedFile) {
     ImportCommandOptionsDto dto = ImportCommandOptionsDto.create();
     dto.setDestination(importConfig.getDestinationDatasourceName());
-    if(importConfig.isArchiveMove()) {
+    if (importConfig.isArchiveMove()) {
       dto.setArchive(importConfig.getArchiveDirectory());
       JsArrayString selectedFiles = JavaScriptObject.createArray().cast();
       selectedFiles.push(selectedFile);
       dto.setFilesArray(selectedFiles);
     }
-    if(importConfig.isIdentifierSharedWithUnit()) {
+    if (importConfig.isIdentifierSharedWithUnit()) {
       IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
       idConfig.setName(importConfig.getIdentifiersMapping());
       idConfig.setAllowIdentifierGeneration(importConfig.isAllowIdentifierGeneration());
@@ -380,7 +364,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       dto.setIdConfig(idConfig);
     }
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-    for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
+    for (String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
       selectedTables.push(importConfig.getTransientDatasourceName() + "." + tableName);
     }
     dto.setTablesArray(selectedTables);
@@ -390,7 +374,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private final class SubmitJobResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == SC_CREATED) {
+      if (response.getStatusCode() == SC_CREATED) {
         String location = response.getHeader("Location");
         String jobId = location.substring(location.lastIndexOf('/') + 1);
         getEventBus()
@@ -405,9 +389,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public boolean validateFormat() {
       getView().clearError();
-      if(formatStepPresenter.validate()) return true;
+      if (formatStepPresenter.validate()) return true;
 
-      for(Map.Entry<HasType<ControlGroupType>, String> entry : getErrorEntries()) {
+      for (Map.Entry<HasType<ControlGroupType>, String> entry : getErrorEntries()) {
         getView().showError(entry.getValue(), entry.getKey());
       }
 
@@ -419,7 +403,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           = new HashSet<Map.Entry<HasType<ControlGroupType>, String>>();
 
       try {
-        switch(ImportFormat.valueOf(getView().getSelectedFormat())) {
+        switch (ImportFormat.valueOf(getView().getSelectedFormat())) {
           case CSV:
             entries = csvFormatStepPresenter.getErrors().entrySet();
             break;
@@ -436,7 +420,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             entries = rHavenStepPresenter.getErrors().entrySet();
             break;
         }
-      } catch(IllegalArgumentException e) {
+      } catch (IllegalArgumentException e) {
         entries = datasourcePluginFormatStepPresenter.getErrors().entrySet();
       }
 
@@ -446,7 +430,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public boolean validateComparedDatasourcesReport() {
       getView().clearError();
-      if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
+      if (comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
         getView().showError("TableSelectionIsRequired");
         return false;
       }
@@ -500,12 +484,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     private void removeTransientDatasource() {
-      if(importConfig == null) return;
-      if(transientRequest != null) {
+      if (importConfig == null) return;
+      if (transientRequest != null) {
         transientRequest.cancel();
         transientRequest = null;
       }
-      if(diffRequest != null) {
+      if (diffRequest != null) {
         diffRequest.cancel();
         diffRequest = null;
       }
@@ -515,7 +499,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
 
     private void deleteTransientDatasource() {
-      if(importConfig.getTransientDatasourceName() == null) return;
+      if (importConfig.getTransientDatasourceName() == null) return;
 
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilder.create().segment("datasource", importConfig.getTransientDatasourceName()).build()) //
@@ -533,7 +517,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       datasourcePluginFormatStepPresenter.getView();
 
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
-          UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
+          UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create()
+              .query("merge", "" + importConfig.isMergeDictionaries()).build(importConfig.getDestinationDatasourceName())) //
           .withResourceBody(factoryStr) //
           .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
               SC_INTERNAL_SERVER_ERROR) //
@@ -551,7 +536,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       @Override
       public void onResponseCode(Request request, Response response) {
         transientRequest = null;
-        if(response.getStatusCode() == SC_CREATED) {
+        if (response.getStatusCode() == SC_CREATED) {
           DatasourceDto datasourceDto = JsonUtils.unsafeEval(response.getText());
           importConfig.setTransientDatasourceName(datasourceDto.getName());
           datasourceDiff(datasourceDto);
@@ -566,13 +551,13 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
           @Override
           public void onSuccess(@SuppressWarnings("ParameterHidesMemberVariable") DatasourceFactoryDto factory,
-              DatasourceDto datasource) {
+                                DatasourceDto datasource) {
             getView().showDatasourceCreationSuccess();
           }
 
           @Override
           public void onFailure(@SuppressWarnings("ParameterHidesMemberVariable") DatasourceFactoryDto factory,
-              ClientErrorDto error) {
+                                ClientErrorDto error) {
             getView().showDatasourceCreationError(error);
           }
         };

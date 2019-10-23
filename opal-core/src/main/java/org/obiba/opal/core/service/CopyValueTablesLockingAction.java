@@ -10,13 +10,13 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-import org.obiba.magma.*;
+import org.obiba.magma.DatasourceCopierProgressListener;
+import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
-import org.obiba.magma.views.View;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
@@ -34,6 +34,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
+
+
+
 /**
  *
  */
@@ -41,15 +44,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(CopyValueTablesLockingAction.class);
 
-  private final Set<ValueTable> sourceTables;
-
-  private final Datasource destination;
-
-  private final String idMapping;
-
-  private final boolean allowIdentifierGeneration;
-
-  private final boolean ignoreUnknownIdentifier;
+  private final CopyValueTablesOptions copyValueTablesOptions;
 
   private final IdentifiersTableService identifiersTableService;
 
@@ -63,18 +58,13 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService, IdentifierGenerator identifierGenerator,
-                               TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
-                               String idMapping, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+                               TransactionTemplate txTemplate, CopyValueTablesOptions copyValueTablesOptions,
                                DatasourceCopierProgressListener progressListener) {
     this.identifiersTableService = identifiersTableService;
     this.identifierService = identifierService;
     this.identifierGenerator = identifierGenerator;
     this.txTemplate = txTemplate;
-    this.sourceTables = Sets.filter(sourceTables, input -> input != null && !Strings.isNullOrEmpty(input.getName()));
-    this.destination = destination;
-    this.idMapping = idMapping;
-    this.allowIdentifierGeneration = allowIdentifierGeneration;
-    this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
+    this.copyValueTablesOptions = copyValueTablesOptions;
     this.progressListener = progressListener;
   }
 
@@ -86,7 +76,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   private Set<String> getTablesToLock() {
     Set<String> tablesToLock = new TreeSet<>();
 
-    for (ValueTable valueTable : sourceTables) {
+    for (ValueTable valueTable : copyValueTablesOptions.getSourceTables()) {
       tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
       if (identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
         String ref = identifiersTableService.getTableReference(valueTable.getEntityType());
@@ -110,18 +100,18 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   private class CopyAction implements Action {
     @Override
     public boolean isTransactional() {
-      return destination.isTransactional();
+      return copyValueTablesOptions.getDestination().isTransactional();
     }
 
     @Override
     public void execute() throws Exception {
-      for (final ValueTable valueTable : sourceTables) {
+      for (final ValueTable valueTable : copyValueTablesOptions.getSourceTables()) {
         if (Thread.interrupted()) {
           throw new InterruptedException("Thread interrupted");
         }
 
         ValueTable tableToCopy = valueTable;
-        if (!Strings.isNullOrEmpty(idMapping) && identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
+        if (!Strings.isNullOrEmpty(copyValueTablesOptions.getIdMapping()) && identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
           tableToCopy = importUnitIdentifiers(valueTable);
         }
 
@@ -136,7 +126,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
             .withProgressListener(progressListener) //
             .withCopier(newCopier()) //
             .from(tableToCopy) //
-            .to(destination).build() //
+            .to(copyValueTablesOptions.getDestination()).build() //
             .copy();
       }
     }
@@ -161,13 +151,16 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     }
 
     private ValueTable importUnitIdentifiers(ValueTable table) throws IOException {
-      log.info("Preparing identifiers for mapping [{}]", idMapping);
-      identifiersTableService.ensureIdentifiersMapping(new IdentifiersMapping(idMapping, table.getEntityType()));
+      log.info("Preparing identifiers for mapping [{}]", copyValueTablesOptions.getIdMapping());
+      identifiersTableService.ensureIdentifiersMapping(new IdentifiersMapping(copyValueTablesOptions.getIdMapping(), table.getEntityType()));
 
-      IdentifiersMappingView identifiersMappingView = new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
-          table, identifiersTableService, allowIdentifierGeneration ? identifierGenerator : null, ignoreUnknownIdentifier);
+      IdentifiersMappingView identifiersMappingView = new IdentifiersMappingView(copyValueTablesOptions.getIdMapping(),
+          IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
+          table, identifiersTableService,
+          copyValueTablesOptions.isAllowIdentifierGeneration() ? identifierGenerator : null,
+          copyValueTablesOptions.isIgnoreUnknownIdentifier());
 
-      if (allowIdentifierGeneration) {
+      if (copyValueTablesOptions.isAllowIdentifierGeneration()) {
         log.info("Saving generated identifiers");
         PrivateVariableEntityMap entityMap = identifiersMappingView.getPrivateVariableEntityMap();
         // force entities listing to both generate and persist missing IDs

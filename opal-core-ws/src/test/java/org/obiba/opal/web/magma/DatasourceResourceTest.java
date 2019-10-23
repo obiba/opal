@@ -223,7 +223,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
                 .build()).build();
 
     replay(projectMock, projectServiceMock, projectKeyStoreServiceMock, keyStore);
-    Response response = resource.createDatasource(factoryDto);
+    Response response = resource.createDatasource(factoryDto, false);
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     Object entity = response.getEntity();
