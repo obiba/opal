@@ -17,6 +17,7 @@ import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.security.CryptoService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.spi.resource.ResourceFactoryService;
@@ -44,11 +45,14 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private final CryptoService cryptoService;
 
+  private final SubjectAclService subjectAclService;
+
   @Autowired
-  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService) {
+  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService, SubjectAclService subjectAclService) {
     this.orientDbService = orientDbService;
     this.opalRuntime = opalRuntime;
     this.cryptoService = cryptoService;
+    this.subjectAclService = subjectAclService;
   }
 
   @Override
@@ -96,12 +100,14 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   public void delete(ResourceReference resourceReference) {
     if (resourceReference == null) return;
     orientDbService.delete(resourceReference);
+    subjectAclService.deleteNodePermissions(getPermissionNode(resourceReference.getProject(), resourceReference.getName()));
   }
 
   @Override
   public void delete(String project, String name) {
     try {
       orientDbService.delete(getResourceReference(project, name));
+      subjectAclService.deleteNodePermissions(getPermissionNode(project, name));
     } catch(NoSuchResourceReferenceException e) {
       // ignore
     }
@@ -110,6 +116,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   @Override
   public void deleteAll(String project) {
     getResourceReferences(project).forEach(orientDbService::delete);
+    subjectAclService.deleteNodePermissions("/project/" + project + "/resource");
   }
 
   @Override
@@ -147,6 +154,10 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private boolean canViewResourceReference(String project, String name) {
     return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":GET");
+  }
+
+  private String getPermissionNode(String project, String name) {
+    return "/project/" + project + "/resource/" + name;
   }
 
 }
