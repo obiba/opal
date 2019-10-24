@@ -81,9 +81,9 @@ public class IdentifiersMappingSelectionStepPresenter
     importConfig.setIdentifierSharedWithUnit(withUnit);
     importConfig.setIdentifierAsIs(!withUnit);
     importConfig.setIdentifiersMapping(getView().getSelectedIdentifiersMapping());
+    importConfig.setMergeDictionaries(getView().mergeDictionaries());
     importConfig.setIncremental(getView().isIncremental());
     importConfig.setLimit(getView().getLimit());
-    //GWT.log("ignore=" + getView().ignoreUnknownIdentifier() + " ; allow=" + getView().allowIdentifierGeneration());
     importConfig.setAllowIdentifierGeneration(getView().allowIdentifierGeneration());
     importConfig.setIgnoreUnknownIdentifier(getView().ignoreUnknownIdentifier());
   }
@@ -97,6 +97,8 @@ public class IdentifiersMappingSelectionStepPresenter
     String getSelectedIdentifiersMapping();
 
     boolean isIncremental();
+
+    boolean mergeDictionaries();
 
     Integer getLimit();
 

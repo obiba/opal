@@ -34,6 +34,8 @@ public class ImportConfig {
 
   private boolean incremental;
 
+  private boolean mergeDictionaries;
+
   private Integer limit;
 
   private String file;
@@ -92,6 +94,7 @@ public class ImportConfig {
   public void clear() {
     importFormat = null;
     incremental = false;
+    mergeDictionaries = false;
     file = null;
     destinationDatasourceName = null;
     destinationTableName = null;
@@ -289,6 +292,14 @@ public class ImportConfig {
 
   public void setIncremental(boolean incremental) {
     this.incremental = incremental;
+  }
+
+  public void setMergeDictionaries(boolean mergeDictionaries) {
+    this.mergeDictionaries = mergeDictionaries;
+  }
+
+  public boolean isMergeDictionaries() {
+    return mergeDictionaries;
   }
 
   public void setLimit(Integer limit) {

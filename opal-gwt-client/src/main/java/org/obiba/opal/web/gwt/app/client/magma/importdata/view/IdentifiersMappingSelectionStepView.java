@@ -40,6 +40,9 @@ public class IdentifiersMappingSelectionStepView extends ViewImpl implements Ide
   CheckBox incremental;
 
   @UiField
+  CheckBox mergeDictionaries;
+
+  @UiField
   NumericTextBox limit;
 
   @UiField
@@ -95,6 +98,11 @@ public class IdentifiersMappingSelectionStepView extends ViewImpl implements Ide
   @Override
   public boolean isIncremental() {
     return incremental.getValue();
+  }
+
+  @Override
+  public boolean mergeDictionaries() {
+    return mergeDictionaries.getValue();
   }
 
   @Override
