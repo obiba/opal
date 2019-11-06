@@ -100,7 +100,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private void initialiseVariable(REXP attr) {
     String repeatableProp = extractProperty(attr, "opal.repeatable");
     boolean repeatable = Strings.isNullOrEmpty(repeatableProp) ?
-        valueTable.isMultilines() : "1".equals(repeatableProp);
+        valueTable.isMultilines() : ("1.0".equals(repeatableProp) || "1".equals(repeatableProp));
 
     this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
         .unit(extractProperty(attr, "opal.unit"))
