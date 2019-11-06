@@ -10,6 +10,7 @@
 
 package org.obiba.opal.spi.r.datasource.magma;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
@@ -41,7 +42,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private final String colName;
 
-  private final String colClass;
+  private final List<String> colClasses;
 
   private final List<String> colTypes;
 
@@ -52,7 +53,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   RVariableValueSource(RValueTable valueTable, RList column, int position) throws REXPMismatchException {
     this.valueTable = valueTable;
     this.colName = column.at("name").asString();
-    this.colClass = column.at("class").asString();
+    this.colClasses = Lists.newArrayList(column.at("class").asStrings());
     this.colTypes = Lists.newArrayList(column.at("type").asString().split("\\+"));
     REXP colAttr = column.at("attributes");
     this.position = position;
@@ -97,9 +98,20 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   //
 
   private void initialiseVariable(REXP attr) {
+    String repeatableProp = extractProperty(attr, "opal.repeatable");
+    boolean repeatable = Strings.isNullOrEmpty(repeatableProp) ?
+        valueTable.isMultilines() : "1".equals(repeatableProp);
+
     this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
-        .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr)).index(position)
-        .repeatable(valueTable.isMultilines()).occurrenceGroup(valueTable.isMultilines() ? valueTable.getSymbol() : null).build();
+        .unit(extractProperty(attr, "opal.unit"))
+        .referencedEntityType(extractProperty(attr, "opal.referenced_entity_type"))
+        .mimeType(extractProperty(attr, "opal.mime_type"))
+        .repeatable(repeatable)
+        .occurrenceGroup(extractProperty(attr, "opal.occurrence_group"))
+        .addAttributes(extractAttributes(attr))
+        .addCategories(extractCategories(attr))
+        .index(position)
+        .build();
   }
 
   private ValueType extractValueType(REXP attr) {
@@ -111,16 +123,16 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     else if (isDateTime()) type = DateTimeType.get();
     else if (isBoolean()) type = BooleanType.get();
     else if (isBinary()) type = BinaryType.get();
-    log.debug("Tibble '{}' has column '{}' of class {} mapped to {}", valueTable.getSymbol(), colName, colClass, type.getName());
+    log.debug("Tibble '{}' has column '{}' of class '{}' mapped to {}", valueTable.getSymbol(), colName, Joiner.on(", ").join(colClasses), type.getName());
     return type;
   }
 
   private boolean isNumeric() {
-    return "numeric".equals(colClass);
+    return colClasses.contains("numeric");
   }
 
   private boolean isInteger() {
-    return "integer".equals(colClass) || colTypes.contains("int");
+    return colClasses.contains("integer") || colTypes.contains("int");
   }
 
   private boolean isDecimal() {
@@ -128,23 +140,42 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean isBoolean() {
-    return "logical".equals(colClass);
+    return colClasses.contains("logical");
   }
 
   private boolean isBinary() {
-    return "raw".equals(colClass);
+    return colClasses.contains("raw");
   }
 
   private boolean isDate() {
-    return "Date".equals(colClass);
+    return colClasses.contains("Date");
   }
 
   private boolean isDateTime() {
-    return "POSIXct".equals(colClass) || "POSIXt".equals(colClass);
+    return colClasses.contains("POSIXct") || colClasses.contains("POSIXt");
+  }
+
+  private String extractProperty(REXP attr, String property) {
+    if (attr == null || !attr.isList()) return null;
+    try {
+      RList rList = attr.asList();
+      if (!rList.isNamed()) return null;
+      for (String key : rList.keys()) {
+        if (property.equals(key)) {
+          REXP value = rList.at(key);
+          return value.asString();
+        }
+      }
+    } catch (REXPMismatchException e) {
+      // ignore
+    }
+    return null;
   }
 
   private boolean hasCategories() {
-    return "labelled".equals(colClass) || "haven_labelled".equals(colClass) || "labelled_spss".equals(colClass) || "haven_labelled_spss".equals(colClass) || "factor".equals(colClass);
+    return colClasses.contains("labelled") || colClasses.contains("haven_labelled")
+        || colClasses.contains("labelled_spss") || colClasses.contains("haven_labelled_spss")
+        || colClasses.contains("factor");
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -186,7 +217,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     String[] strValues = value.split("\\|");
     Pattern pattern = Pattern.compile("^\\(([a-z]{2})\\) (.+)");
     for (String strValue : strValues) {
-      Matcher matcher = pattern.matcher(strValue);
+      Matcher matcher = pattern.matcher(strValue.trim());
       if (matcher.find()) {
         String localeStr = matcher.group(1);
         if (!RUtils.isLocaleValid(localeStr))
@@ -202,13 +233,12 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private List<Category> extractCategories(REXP attr) {
-    if ("labelled".equals(colClass) || "haven_labelled".equals(colClass))
-      return extractCategoriesFromLabels(extractAttribute(attr, "labels"), null, null);
-    else if ("labelled_spss".equals(colClass) || "haven_labelled_spss".equals(colClass)) {
+    if (colClasses.contains("labelled") || colClasses.contains("haven_labelled")
+        || colClasses.contains("labelled_spss") || colClasses.contains("haven_labelled_spss")) {
       REXP naValues = extractAttribute(attr, "na_values");
       REXP naRange = extractAttribute(attr, "na_range");
       return extractCategoriesFromLabels(extractAttribute(attr, "labels"), naValues, naRange);
-    } else if ("factor".equals(colClass))
+    } else if (colClasses.contains("factor"))
       return extractCategoriesFromLevels(extractAttribute(attr, "levels"));
     return Lists.newArrayList();
   }
