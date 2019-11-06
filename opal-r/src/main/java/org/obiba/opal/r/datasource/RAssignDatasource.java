@@ -368,6 +368,16 @@ public class RAssignDatasource extends CsvDatasource {
             Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories()))));
       }
       attributesList.add(String.format("'opal.value_type' = '%s'", variable.getValueType().getName()));
+      attributesList.add(String.format("'opal.entity_type' = '%s'", variable.getEntityType()));
+      if (!Strings.isNullOrEmpty(variable.getUnit()))
+        attributesList.add(String.format("'opal.unit' = '%s'", variable.getUnit()));
+      if (!Strings.isNullOrEmpty(variable.getReferencedEntityType()))
+        attributesList.add(String.format("'opal.referenced_entity_type' = '%s'", variable.getReferencedEntityType()));
+      if (!Strings.isNullOrEmpty(variable.getMimeType()))
+        attributesList.add(String.format("'opal.mime_type' = '%s'", variable.getMimeType()));
+      attributesList.add(String.format("'opal.repeatable' = %s", variable.isRepeatable() ? "1" : "0"));
+      if (!Strings.isNullOrEmpty(variable.getOccurrenceGroup()))
+        attributesList.add(String.format("'opal.occurrence_group' = '%s'", variable.getOccurrenceGroup()));
       attributesList.add(String.format("'opal.nature' = '%s'", VariableNature.getNature(variable).name()));
       attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
           getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
@@ -384,7 +394,8 @@ public class RAssignDatasource extends CsvDatasource {
           value = cat.getName().toUpperCase();
         else
           value = "'" + normalize(cat.getName()) + "'";
-        labelledCat.add(String.format("'%s'=%s", label, value));
+        if (!cat.isMissing() || withMissings) // obiba/opal#3541
+          labelledCat.add(String.format("'%s'=%s", label, value));
       }
       return labelledCat;
     }
