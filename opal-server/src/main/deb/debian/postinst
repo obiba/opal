@@ -29,10 +29,12 @@ case "$1" in
     	RET=""
       db_get opal-server/admin_password
 
+      new_release="$(dpkg -s $DPKG_MAINTSCRIPT_PACKAGE | grep '^Version' | sed -e 's/^Version:\s*/opal-server-/')"
+
       if [ -z "$2" ] && [ "$RET" != "" ] ; then
         echo Updating administrator password.
         # hash the password and escape the possible '$/&' characters
-        adminpw=$(echo -n $RET | xargs java -jar /usr/share/opal-*/tools/lib/obiba-password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
+        adminpw=$(echo -n $RET | xargs java -jar /usr/share/${new_release}/tools/lib/obiba-password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
         tfile=`mktemp`
         if [ ! -f "$tfile" ]; then
           return 1
@@ -55,7 +57,7 @@ case "$1" in
       # /var/log: logs
 
       rm -f /usr/share/opal
-      ln -s /usr/share/opal-* /usr/share/opal
+      ln -s /usr/share/${new_release} /usr/share/opal
 
       if [ ! -e /var/lib/opal/conf ] ; then
         ln -s /etc/opal /var/lib/opal/conf
