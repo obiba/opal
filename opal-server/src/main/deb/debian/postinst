@@ -29,7 +29,7 @@ case "$1" in
     	RET=""
       db_get opal-server/admin_password
 
-      new_release="$(ls -t /usr/share/ |grep opal-server|head -1)"
+      new_release="$(dpkg -s $DPKG_MAINTSCRIPT_PACKAGE | grep '^Version' | sed -e 's/^Version:\s*/opal-server-/')"
 
       if [ -z "$2" ] && [ "$RET" != "" ] ; then
         echo Updating administrator password.
