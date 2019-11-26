@@ -12,12 +12,14 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -72,6 +74,9 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   @UiField
   Panel permissionsPanel;
 
+  @UiField
+  Panel buttonsPanel;
+
   private ResourceReferenceDto resource;
 
   private Map<String, ResourceFactoryDto> resourceFactories;
@@ -84,6 +89,16 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     initWidget(uiBinder.createAndBindUi(this));
   }
 
+  @UiHandler("remove")
+  void onRemove(ClickEvent event) {
+    getUiHandlers().onDelete();
+  }
+
+  @UiHandler("edit")
+  void onEdit(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
   @Override
   public void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
     this.resourceFactories = resourceFactories;
@@ -94,6 +109,7 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     if (!resource.getEditable())
       tabPanel.selectTab(0);
     tabPanel.getWidget(0).setVisible(resource.getEditable());
+    buttonsPanel.setVisible(resource.getEditable());
 
     initializeResourceFactoryUI();
   }

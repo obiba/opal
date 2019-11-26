@@ -20,10 +20,14 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.presenter.slots.SingleSlot;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
+import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -39,7 +43,11 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePresenter.Display>
     implements ProjectResourceUiHandlers {
 
+  private final PlaceManager placeManager;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
+  private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
 
   private String projectName;
 
@@ -50,8 +58,10 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   @Inject
   public ProjectResourcePresenter(EventBus eventBus,
                                   Display view,
-                                  Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
+                                  PlaceManager placeManager, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
     super(eventBus, view);
+    this.placeManager = placeManager;
+    this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
   }
@@ -67,16 +77,31 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         }
       }
     });
+    addRegisteredHandler(ResourceUpdatedEvent.getType(), new ResourceUpdatedEvent.ResourceUpdatedHandler() {
+      @Override
+      public void onResourceUpdated(ResourceUpdatedEvent event) {
+        refreshResource(resource.getName());
+      }
+    });
   }
 
   @Override
   public void onEdit() {
-
+    ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
+    modal.initialize(projectName, resourceFactories, resource, false);
   }
 
   @Override
   public void onDelete() {
-
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectName, resource.getName()))
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            placeManager.revealPlace(ProjectPlacesHelper.getResourcesPlace(projectName));
+          }
+        }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
+        .delete().send();
   }
 
   private void refreshResource(String name) {
@@ -101,7 +126,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            fireEvent(new ResourceSelectionChangedEvent(projectName, null));
+            placeManager.revealPlace(ProjectPlacesHelper.getResourcesPlace(projectName));
           }
         }, SC_FORBIDDEN)
         .get().send();

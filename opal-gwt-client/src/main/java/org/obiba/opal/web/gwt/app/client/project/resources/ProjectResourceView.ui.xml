@@ -18,6 +18,18 @@
 
     <g:FlowPanel>
 
+        <g:FlowPanel ui:field="buttonsPanel" addStyleNames="pull-right">
+            <b:ButtonGroup>
+                <b:Button icon="PENCIL" ui:field="edit">
+                    <ui:msg description="Edit resource label">Edit</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+                <b:Button icon="TRASH" ui:field="remove">
+                </b:Button>
+            </b:ButtonGroup>
+        </g:FlowPanel>
+
         <b:TabPanel tabPosition="above" ui:field="tabPanel">
 
             <b:Tab heading="Reference" active="true">

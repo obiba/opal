@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -99,7 +98,6 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   @Override
   public void onAddResource() {
-    GWT.log("visible=" + this.isVisible());
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
     modal.initialize(projectName, resourceFactories, null, false);
   }
