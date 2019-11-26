@@ -13,11 +13,9 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
-public interface ProjectResourcesUiHandlers extends UiHandlers {
+public interface ProjectResourceListUiHandlers extends UiHandlers {
 
   void onAddResource();
-
-  void onViewResource(ResourceReferenceDto resource);
 
   void onEditResource(ResourceReferenceDto resource);
 

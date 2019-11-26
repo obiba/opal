@@ -19,40 +19,16 @@
     <g:FlowPanel>
         <b:Paragraph>
             <ui:msg description="Project Resources text">
-                Resources are datasets or computation units which location is described by a URL and access is protected by credentials.
-                When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance computers are made accessible to
+                Resources are datasets or computation units which location is described by a URL and access is protected
+                by credentials.
+                When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance
+                computers are made accessible to
                 data analysts.
             </ui:msg>
         </b:Paragraph>
-
-        <b:TabPanel tabPosition="above" ui:field="tabPanel">
-
-            <b:Tab heading="References" active="true">
-                <g:FlowPanel>
-                    <g:FlowPanel addStyleNames="pull-left">
-                        <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn small-right-indent">
-                            <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
-                        </b:Button>
-                        <b:Button ui:field="refresh" icon="REFRESH">
-                            <ui:msg description="Refresh R packages label">Refresh</ui:msg>
-                        </b:Button>
-                    </g:FlowPanel>
-                    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="small-indent pull-right"/>
-                    <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
-                        <b:InputAddOn prependIcon="FILTER">
-                            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-                        </b:InputAddOn>
-                    </b:Controls>
-                </g:FlowPanel>
-
-                <o:Table ui:field="table" addStyleNames="small-top-margin"/>
-            </b:Tab>
-
-            <b:Tab heading="Permissions">
-                <g:SimplePanel ui:field="permissionsPanel"/>
-            </b:Tab>
-
-        </b:TabPanel>
+        <o:BreadcrumbsTabPanel animationEnabled="false" ui:field="tabPanel"/>
+        <g:SimplePanel ui:field="resourceListPanel"/>
+        <g:SimplePanel ui:field="resourcePanel"/>
     </g:FlowPanel>
 
 </ui:UiBinder>

@@ -13,7 +13,7 @@ package org.obiba.opal.web.gwt.app.client.project.resources.event;
 import com.gwtplatform.dispatch.annotation.GenEvent;
 
 @GenEvent
-public class ResourceCreated {
+public class ResourceSelectionChanged {
 
   String project;
 

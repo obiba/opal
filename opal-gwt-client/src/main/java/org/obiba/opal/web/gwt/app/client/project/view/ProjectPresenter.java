@@ -45,6 +45,7 @@ import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
 import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesPresenter;
+import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
 import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
@@ -299,7 +300,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         onFilesTabSelected(queryPathParam);
         break;
       case RESOURCES:
-        onResourcesTabSelected();
+        onResourcesTabSelected(queryPathParam);
         break;
       case GENOTYPES:
         onGenotypesTabSelected();
@@ -340,13 +341,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
   }
 
-  private void onResourcesTabSelected() {
+  private void onResourcesTabSelected(String path) {
     if (projectResourcesPresenter == null) {
       projectResourcesPresenter = projectResourcesPresenterProvider.get();
       setInSlot(RESOURCES_PANE, projectResourcesPresenter);
     }
-
-    projectResourcesPresenter.initialize(project);
+    String resourceName = null;
+    if (!Strings.isNullOrEmpty(path)) {
+      // TODO make a proper resource path parser
+      MagmaPath.Parser parser = MagmaPath.Parser.parse(path);
+      if (!Strings.isNullOrEmpty(parser.getDatasource()) && projectName.equals(parser.getDatasource())) {
+        resourceName = parser.getTable();
+      }
+    }
+    fireEvent(new ResourceSelectionChangedEvent(projectName, resourceName));
   }
 
   private void onGenotypesTabSelected() {
@@ -420,7 +428,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private String validatePath(String name, String path) {
-    if (tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
+    if ((tab == Display.ProjectTab.TABLES || tab == Display.ProjectTab.RESOURCES) && !Strings.isNullOrEmpty(path)) {
       String datasourceName = MagmaPath.Parser.parse(path).getDatasource();
       if (!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
         return path;
@@ -448,7 +456,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             @Override
             public void authorized() {
               viewAuthorizer.authorized();
-              getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
+              getView().setTabData(tab.ordinal(), (tab == Display.ProjectTab.TABLES || tab == Display.ProjectTab.RESOURCES) ? validatePath(projectName, path) : null);
               onTabSelected(tab.ordinal());
               getView().selectTab(tab.ordinal());
               authorizeGenotypes();

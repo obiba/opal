@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.permissions;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -385,7 +386,10 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
     @Override
     public String map(Acl acl) {
       ResourcePermissionType type = ResourcePermissionType.getTypeByPermission(acl.getActions(0));
-      return TranslationsUtils.replaceArguments(translations.permissionResourceNodeTypeMap().get(type.name()));
+      String typeStr = translations.permissionResourceNodeTypeMap().get(type.name());
+      if (Strings.isNullOrEmpty(typeStr))
+        typeStr = type.name();
+      return TranslationsUtils.replaceArguments(typeStr);
     }
   }
 

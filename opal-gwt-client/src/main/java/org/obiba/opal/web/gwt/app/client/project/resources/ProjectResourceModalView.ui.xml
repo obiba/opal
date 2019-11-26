@@ -43,7 +43,7 @@
         </b:ControlGroup>
 
         <b:TabPanel tabPosition="above" ui:field="tabPanel">
-            <b:Tab heading="Parameters"  active="true">
+            <b:Tab heading="Parameters" active="true">
                 <g:FlowPanel ui:field="paramsFormPanel">
                 </g:FlowPanel>
             </b:Tab>

@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;

@@ -205,7 +205,9 @@ public interface Translations extends Constants {
       "TABLE", "Table",//
       "VARIABLE", "Variable",//
       "REPORT_TEMPLATE", "Report",//
-      "VCF_STORE", "VCF Store"
+      "VCF_STORE", "VCF Store",
+      "RESOURCE", "Resource",
+      "RESOURCES", "Resources"
   })
   Map<String, String> permissionResourceNodeTypeMap();
 

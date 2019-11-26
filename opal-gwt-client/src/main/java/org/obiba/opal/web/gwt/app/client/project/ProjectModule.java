@@ -23,10 +23,7 @@ import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresent
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
-import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourceModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourceModalView;
-import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesPresenter;
-import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesView;
+import org.obiba.opal.web.gwt.app.client.project.resources.*;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 
@@ -62,6 +59,10 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectIdentifiersMappingsModalView.class);
     bindPresenterWidget(ProjectResourcesPresenter.class, ProjectResourcesPresenter.Display.class,
         ProjectResourcesView.class);
+    bindPresenterWidget(ProjectResourceListPresenter.class, ProjectResourceListPresenter.Display.class,
+        ProjectResourceListView.class);
+    bindPresenterWidget(ProjectResourcePresenter.class, ProjectResourcePresenter.Display.class,
+        ProjectResourceView.class);
     bindPresenterWidget(ProjectResourceModalPresenter.class, ProjectResourceModalPresenter.Display.class,
         ProjectResourceModalView.class);
   }

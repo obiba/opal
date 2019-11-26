@@ -10,11 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.google.gwt.json.client.JSONObject;
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ProjectResourceModalUiHandlers extends ModalUiHandlers {
+public interface ProjectResourceUiHandlers extends UiHandlers {
 
-  void onSave(String name, String factoryKey, JSONObject parameters, JSONObject credentials);
+  void onEdit();
+
+  void onDelete();
 
 }

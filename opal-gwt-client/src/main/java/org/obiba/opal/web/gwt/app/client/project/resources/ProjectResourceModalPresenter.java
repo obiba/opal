@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdated
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
@@ -35,7 +34,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   private final Translations translations;
 
-  private ProjectDto projectDto;
+  private String projectName;
 
   private Map<String, ResourceFactoryDto> resourceFactories;
 
@@ -50,9 +49,9 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     this.translations = translations;
   }
 
-  public void initialize(ProjectDto projectDto, Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
+  public void initialize(String projectName, Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
     this.resourceFactories = resourceFactories;
-    this.projectDto = projectDto;
+    this.projectName = projectName;
     this.originalResource = resource;
     getView().initialize(resourceFactories, resource, readOnly);
   }
@@ -62,7 +61,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     String[] token = ResourcePluginsResource.splitResourceFactoryKey(factoryKey);
     ResourceReferenceDto resource = ResourceReferenceDto.create();
     resource.setName(name);
-    resource.setProject(projectDto.getName());
+    resource.setProject(projectName);
     resource.setProvider(token[0]);
     resource.setFactory(token[1]);
     resource.setParameters(parameters.toString());
@@ -75,14 +74,14 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   private void onUpdate(final ResourceReferenceDto resource) {
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectDto.getName(), originalResource.getName()))
+        .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectName, originalResource.getName()))
         .withResourceBody(ResourceReferenceDto.stringify(resource))
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             if (response.getStatusCode() == Response.SC_OK) {
               getView().hideDialog();
-              fireEvent(new ResourceUpdatedEvent(projectDto.getName(), resource.getName()));
+              fireEvent(new ResourceUpdatedEvent(projectName, resource.getName()));
             }
           }
         }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST)
@@ -91,14 +90,14 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   private void onCreate(final ResourceReferenceDto resource) {
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectDto.getName()))
+        .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectName))
         .withResourceBody(ResourceReferenceDto.stringify(resource))
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             if (response.getStatusCode() == Response.SC_CREATED) {
               getView().hideDialog();
-              fireEvent(new ResourceCreatedEvent(projectDto.getName(), resource.getName()));
+              fireEvent(new ResourceCreatedEvent(projectName, resource.getName()));
             }
           }
         }, Response.SC_CREATED, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST)
