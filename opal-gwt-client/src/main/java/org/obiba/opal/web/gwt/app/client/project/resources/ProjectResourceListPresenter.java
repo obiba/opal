@@ -93,11 +93,6 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   }
 
   @Override
-  protected void onReveal() {
-    GWT.log("resource list revealed -> " + isVisible());
-  }
-
-  @Override
   public void onRefresh() {
     refreshResources();
   }

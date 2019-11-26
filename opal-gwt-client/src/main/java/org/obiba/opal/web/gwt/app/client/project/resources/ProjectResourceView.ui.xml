@@ -76,17 +76,17 @@
                         <b:Heading size="4">
                             <ui:msg description="Parameters label">Parameters</ui:msg>
                         </b:Heading>
-
                         <g:FlowPanel ui:field="paramsFormPanel">
                         </g:FlowPanel>
 
                     </b:Column>
                     <b:Column size="5">
-                        <b:Heading size="4">
-                            <ui:msg description="Credentials label">Credentials</ui:msg>
-                        </b:Heading>
-
-                        <g:FlowPanel ui:field="credentialsFormPanel">
+                        <g:FlowPanel ui:field="credentialsPanel">
+                            <b:Heading size="4">
+                                <ui:msg description="Credentials label">Credentials</ui:msg>
+                            </b:Heading>
+                            <g:FlowPanel ui:field="credentialsFormPanel">
+                            </g:FlowPanel>
                         </g:FlowPanel>
                     </b:Column>
                 </b:Row>

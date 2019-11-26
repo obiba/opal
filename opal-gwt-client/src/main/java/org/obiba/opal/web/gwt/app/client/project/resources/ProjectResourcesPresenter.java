@@ -12,15 +12,12 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.presenter.slots.SingleSlot;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
 import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
@@ -32,8 +29,6 @@ import java.util.Map;
 
 public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesPresenter.Display> {
 
-  private final PlaceManager placeManager;
-
   private final ProjectResourceListPresenter projectResourceListPresenter;
 
   private final ProjectResourcePresenter projectResourcePresenter;
@@ -41,16 +36,10 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
   @Inject
-  public ProjectResourcesPresenter(Display display, EventBus eventBus, PlaceManager placeManager, ProjectResourceListPresenter projectResourceListPresenter, ProjectResourcePresenter projectResourcePresenter) {
+  public ProjectResourcesPresenter(Display display, EventBus eventBus, ProjectResourceListPresenter projectResourceListPresenter, ProjectResourcePresenter projectResourcePresenter) {
     super(eventBus, display);
-    this.placeManager = placeManager;
     this.projectResourceListPresenter = projectResourceListPresenter;
     this.projectResourcePresenter = projectResourcePresenter;
-  }
-
-  @Override
-  protected void onReveal() {
-    GWT.log("resources on reveal");
   }
 
   @Override

@@ -26,7 +26,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
@@ -65,6 +64,9 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   FlowPanel paramsFormPanel;
 
   @UiField
+  FlowPanel credentialsPanel;
+
+  @UiField
   FlowPanel credentialsFormPanel;
 
   @UiField
@@ -86,28 +88,14 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   public void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
     this.resourceFactories = resourceFactories;
     this.resource = resource;
+
+    credentialsPanel.setVisible(resource.getEditable());
+    permissionsPanel.setVisible(resource.getEditable());
+    if (!resource.getEditable())
+      tabPanel.selectTab(0);
+    tabPanel.getWidget(0).setVisible(resource.getEditable());
+
     initializeResourceFactoryUI();
-  }
-
-  @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new HasAuthorization() {
-      @Override
-      public void beforeAuthorization() {
-        tabPanel.setVisible(false);
-      }
-
-      @Override
-      public void authorized() {
-        tabPanel.setVisible(true);
-      }
-
-      @Override
-      public void unauthorized() {
-        tabPanel.getWidget(0).setVisible(false);
-        tabPanel.setVisible(true);
-      }
-    };
   }
 
   @Override

@@ -39,7 +39,7 @@ public class ProjectResourceReferencePermissionConverter extends OpalPermissionC
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)/resource/(.+)");
-        return Lists.newArrayList(toRest("/project/{0}/resource/{1}", "GET:GET/*", args),
+        return Lists.newArrayList(toRest("/project/{0}/resource/{1}", "*:GET/*", args),
             toRest("/project/{0}", "GET:GET", args),
             toRest("/project/{0}/state", "GET:GET", args),
             toRest("/project/{0}/permissions/resource/{1}", "*:GET/*", args));

@@ -20,7 +20,7 @@ public class ProjectResourceReferencePermissionConverterTest
   @Test
   public void testResourceAll() {
     testConversion("/project/patate/resource/pwel", ProjectResourceReferencePermissionConverter.Permission.RESOURCE_ALL, //
-        "rest:/project/patate/resource/pwel:GET:GET/*",
+        "rest:/project/patate/resource/pwel:*:GET/*",
         "rest:/project/patate:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/permissions/resource/pwel:*:GET/*");

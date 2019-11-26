@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -92,6 +93,12 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
           public void onResource(Response response, JsArray<Acl> acls) {
             getView().setData(JsArrays.toList(acls));
           }
+        })
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setData(new ArrayList<Acl>());
+          }
         }).send();
   }
 
@@ -121,6 +128,12 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
           public void onResponseCode(Request request, Response response) {
             retrievePermissions();
           }
+        })
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setData(new ArrayList<Acl>());
+          }
         }).send();
   }
 
@@ -138,6 +151,12 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
           @Override
           public void onResponseCode(Request request, Response response) {
             retrievePermissions();
+          }
+        })
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setData(new ArrayList<Acl>());
           }
         }).send();
   }
