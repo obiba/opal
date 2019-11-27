@@ -18,14 +18,19 @@
 
     <g:FlowPanel>
 
-        <g:FlowPanel ui:field="buttonsPanel" addStyleNames="pull-right">
+        <g:FlowPanel ui:field="buttonsPanel" addStyleNames="pull-right" visible="false">
             <b:ButtonGroup>
                 <b:Button icon="PENCIL" ui:field="edit">
                     <ui:msg description="Edit resource label">Edit</ui:msg>
                 </b:Button>
             </b:ButtonGroup>
             <b:ButtonGroup>
-                <b:Button icon="TRASH" ui:field="remove">
+                <b:Button icon="COPY" ui:field="duplicate">
+                    <ui:msg description="Duplicate label">Duplicate</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+                <b:Button icon="TRASH" ui:field="remove" addStyleNames="btn-danger">
                 </b:Button>
             </b:ButtonGroup>
         </g:FlowPanel>

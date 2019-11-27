@@ -13,6 +13,8 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 
+import java.util.List;
+
 public interface ProjectResourceListUiHandlers extends UiHandlers {
 
   void onAddResource();
@@ -21,5 +23,8 @@ public interface ProjectResourceListUiHandlers extends UiHandlers {
 
   void onRemoveResource(ResourceReferenceDto resource);
 
+  void onRemoveResources(List<ResourceReferenceDto> selectedItems);
+
   void onRefresh();
+
 }

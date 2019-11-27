@@ -12,6 +12,7 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
@@ -21,7 +22,8 @@
         <b:TabPanel tabPosition="above" ui:field="resourcesTabPanel">
 
             <b:Tab heading="References" active="true">
-                <g:FlowPanel>
+
+                <g:FlowPanel addStyleNames="no-bottom-margin clearfix">
                     <g:FlowPanel addStyleNames="pull-left">
                         <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn small-right-indent">
                             <ui:msg description="Add Resource Button label">Add Resource</ui:msg>
@@ -38,7 +40,30 @@
                     </b:Controls>
                 </g:FlowPanel>
 
-                <o:Table ui:field="table" addStyleNames="small-top-margin"/>
+                <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+
+                    <g:FlowPanel addStyleNames="pull-left">
+                        <b2:IconAnchor icon="TRASH" ui:field="deleteResources" addStyleNames="inline">
+                            <ui:msg description="Remove label">Remove</ui:msg>
+                        </b2:IconAnchor>
+                    </g:FlowPanel>
+
+                    <g:FlowPanel addStyleNames="pull-right">
+                        <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+                        <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
+                        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
+                            <ui:msg description="Clear label">Clear</ui:msg>
+                        </b2:IconAnchor>
+                    </g:FlowPanel>
+                </b:Alert>
+
+                <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+                    <g:Label>
+                        <ui:msg description="Select resources tips label">Select resources to remove.</ui:msg>
+                    </g:Label>
+                </b:Alert>
+
+                <o:Table ui:field="table"/>
             </b:Tab>
 
             <b:Tab heading="Permissions">

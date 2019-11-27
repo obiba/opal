@@ -296,9 +296,13 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
               .getReportsPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
         case RESOURCES:
-        case RESOURCE:
           placeRequest = ProjectPlacesHelper
               .getResourcesPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+          break;
+        case RESOURCE:
+          placeRequest = ProjectPlacesHelper
+              .getResourcePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                  tokenizer.getToken(AclResourceTokenizer.ResourceTokens.RESOURCE));
           break;
         case VCF_STORE:
           placeRequest = ProjectPlacesHelper

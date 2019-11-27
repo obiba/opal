@@ -20,10 +20,8 @@
         <b:Paragraph>
             <ui:msg description="Project Resources text">
                 Resources are datasets or computation units which location is described by a URL and access is protected
-                by credentials.
-                When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance
-                computers are made accessible to
-                data analysts.
+                by credentials. When assigned to a R/DataSHIELD server session, remote big/complex datasets or high
+                performance computers are made accessible to data analysts.
             </ui:msg>
         </b:Paragraph>
         <o:BreadcrumbsTabPanel animationEnabled="false" ui:field="tabPanel"/>

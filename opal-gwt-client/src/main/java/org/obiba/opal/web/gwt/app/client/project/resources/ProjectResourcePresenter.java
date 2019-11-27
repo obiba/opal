@@ -21,11 +21,16 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.presenter.slots.SingleSlot;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -45,6 +50,8 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
 
   private final PlaceManager placeManager;
 
+  private final TranslationMessages translationMessages;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
@@ -55,12 +62,15 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
 
   private ResourceReferenceDto resource;
 
+  private Runnable removeConfirmation;
+
   @Inject
   public ProjectResourcePresenter(EventBus eventBus,
                                   Display view,
-                                  PlaceManager placeManager, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
+                                  PlaceManager placeManager, TranslationMessages translationMessages, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
     super(eventBus, view);
     this.placeManager = placeManager;
+    this.translationMessages = translationMessages;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
@@ -83,6 +93,16 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         refreshResource(resource.getName());
       }
     });
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (removeConfirmation != null && event.getSource().equals(removeConfirmation) &&
+            event.isConfirmed()) {
+          removeConfirmation.run();
+          removeConfirmation = null;
+        }
+      }
+    });
   }
 
   @Override
@@ -92,16 +112,24 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   }
 
   @Override
+  public void onDuplicate() {
+    ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
+    ResourceReferenceDto resourceCopy = ResourceReferenceDto.parse(ResourceReferenceDto.stringify(resource));
+    resourceCopy.setName(null);
+    modal.setResourceCreatedHandler(new ResourceCreatedEvent.ResourceCreatedHandler() {
+      @Override
+      public void onResourceCreated(ResourceCreatedEvent event) {
+        placeManager.revealPlace(ProjectPlacesHelper.getResourcePlace(projectName, event.getName()));
+      }
+    });
+    modal.initialize(projectName, resourceFactories, resourceCopy, false);
+  }
+
+  @Override
   public void onDelete() {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectName, resource.getName()))
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            placeManager.revealPlace(ProjectPlacesHelper.getResourcesPlace(projectName));
-          }
-        }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
-        .delete().send();
+    removeConfirmation = new RemoveRunnable();
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeResource(),
+        translationMessages.confirmRemoveResource(resource.getName())));
   }
 
   private void refreshResource(String name) {
@@ -141,6 +169,22 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
     SingleSlot<ResourcePermissionsPresenter> RESOURCE_PERMISSIONS = new SingleSlot<ResourcePermissionsPresenter>();
 
     void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource);
+  }
 
+  private class RemoveRunnable implements Runnable {
+
+    @Override
+    public void run() {
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectName, resource.getName()))
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              fireEvent(ConfirmationTerminatedEvent.create());
+              placeManager.revealPlace(ProjectPlacesHelper.getResourcesPlace(projectName));
+            }
+          }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
+          .delete().send();
+    }
   }
 }

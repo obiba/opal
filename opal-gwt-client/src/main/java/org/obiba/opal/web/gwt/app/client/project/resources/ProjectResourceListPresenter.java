@@ -10,7 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -22,6 +24,10 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.presenter.slots.SingleSlot;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
@@ -45,6 +51,8 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   private String projectName;
 
+  private final TranslationMessages translationMessages;
+
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
@@ -53,9 +61,12 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   private List<ResourceReferenceDto> resources;
 
+  private Runnable removeConfirmation;
+
   @Inject
-  public ProjectResourceListPresenter(Display display, EventBus eventBus, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
+  public ProjectResourceListPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
@@ -63,7 +74,6 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   @Override
   protected void onBind() {
-
     addRegisteredHandler(ResourceCreatedEvent.getType(), new ResourceCreatedEvent.ResourceCreatedHandler() {
       @Override
       public void onResourceCreated(ResourceCreatedEvent event) {
@@ -89,6 +99,16 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
         }
       }
     });
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (removeConfirmation != null && event.getSource().equals(removeConfirmation) &&
+            event.isConfirmed()) {
+          removeConfirmation.run();
+          removeConfirmation = null;
+        }
+      }
+    });
   }
 
   @Override
@@ -110,16 +130,23 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   @Override
   public void onRemoveResource(ResourceReferenceDto resource) {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_RESOURCE.create().build(projectName, resource.getName()))
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            // TODO display error message (if any)
-            refreshResources();
-          }
-        }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
-        .delete().send();
+    if (!resource.getEditable()) return;
+    removeConfirmation = new RemoveRunnable(Lists.newArrayList(resource));
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeResource(),
+        translationMessages.confirmRemoveResource(resource.getName())));
+  }
+
+  @Override
+  public void onRemoveResources(List<ResourceReferenceDto> selectedItems) {
+    removeConfirmation = new RemoveRunnable(selectedItems);
+    List<String> names = Lists.newArrayList();
+    for (ResourceReferenceDto res : selectedItems) {
+      if (res.getEditable())
+        names.add(res.getName());
+    }
+    if (names.isEmpty()) return;
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeResources(),
+        translationMessages.confirmRemoveResources(Joiner.on(", ").join(names))));
   }
 
   private void refreshResources() {
@@ -195,5 +222,36 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
     HasAuthorization getAddResourceAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+  }
+
+  private class RemoveRunnable implements Runnable {
+
+    private final List<ResourceReferenceDto> resources;
+
+    public RemoveRunnable(List<ResourceReferenceDto> resources) {
+      this.resources = resources;
+    }
+
+    private UriBuilder getUriBuilder() {
+      UriBuilder builder = UriBuilders.PROJECT_RESOURCES.create();
+      for (ResourceReferenceDto res : resources) {
+        builder.query("names", res.getName());
+      }
+      return builder;
+    }
+
+    @Override
+    public void run() {
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(getUriBuilder().build(projectName))
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              fireEvent(ConfirmationTerminatedEvent.create());
+              refreshResources();
+            }
+          }, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN)
+          .delete().send();
+    }
   }
 }

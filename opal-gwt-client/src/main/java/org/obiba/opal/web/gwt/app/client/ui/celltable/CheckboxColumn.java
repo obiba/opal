@@ -162,6 +162,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   public void clearSelection() {
     selectionModel.clear();
+    display.getTable().redraw();
   }
 
   public void setSelected(T item, boolean selected) {

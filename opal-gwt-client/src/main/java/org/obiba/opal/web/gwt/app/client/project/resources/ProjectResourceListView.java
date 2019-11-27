@@ -10,13 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.Controls;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,10 +25,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -35,16 +34,16 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 import org.obiba.opal.web.model.client.opal.ResourceSummaryDto;
@@ -85,7 +84,22 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   OpalSimplePager pager;
 
   @UiField
-  CellTable<ResourceReferenceDto> table;
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  IconAnchor selectAllAnchor;
+
+  @UiField
+  IconAnchor clearSelectionAnchor;
+
+  @UiField
+  Table<ResourceReferenceDto> table;
 
   @UiField
   Panel permissionsPanel;
@@ -93,6 +107,8 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   private List<ResourceReferenceDto> resources;
 
   private final ListDataProvider<ResourceReferenceDto> dataProvider = new ListDataProvider<ResourceReferenceDto>();
+
+  private CheckboxColumn<ResourceReferenceDto> checkColumn;
 
   private ActionsColumn<ResourceReferenceDto> actionsColumn;
 
@@ -110,6 +126,17 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   public void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories) {
     this.resourceFactories = resourceFactories;
     configureTable();
+    table.removeColumn(checkColumn);
+    table.removeColumn(actionsColumn);
+    selectItemTipsAlert.setVisible(false);
+    for (ResourceReferenceDto res : resources) {
+      if (res.getEditable()) {
+        table.insertColumn(0, checkColumn, checkColumn.getCheckColumnHeader());
+        table.addColumn(actionsColumn, translations.actionsLabel());
+        selectItemTipsAlert.setVisible(true);
+        break;
+      }
+    }
     filter.setText("");
     this.resources = resources;
     dataProvider.setList(resources);
@@ -176,6 +203,12 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     dataProvider.refresh();
   }
 
+  @UiHandler("deleteResources")
+  void onDeleteTables(ClickEvent event) {
+    getUiHandlers().onRemoveResources(checkColumn.getSelectedItems());
+    checkColumn.clearSelection();
+  }
+
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     if (content != null) {
@@ -188,6 +221,10 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
 
   private void configureTable() {
     if (actionsColumn != null) return;
+
+    checkColumn = new CheckboxColumn<ResourceReferenceDto>(new ResourcesCheckDisplay());
+    table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
 
     table.addColumn(new NameColumn(new ResourceLinkCell(placeManager)), translations.nameLabel());
 
@@ -284,4 +321,51 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
 
   }
 
+  private class ResourcesCheckDisplay implements CheckboxColumn.Display<ResourceReferenceDto> {
+    @Override
+    public Table<ResourceReferenceDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public Object getItemKey(ResourceReferenceDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public IconAnchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public IconAnchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public HasText getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<ResourceReferenceDto> handler) {
+      for (ResourceReferenceDto item : dataProvider.getList())
+        handler.onItemSelection(item);
+    }
+
+    @Override
+    public String getNItemLabel(int nb) {
+      return translationMessages.nResourcesLabel(nb).toLowerCase();
+    }
+
+    @Override
+    public Alert getSelectActionsAlert() {
+      return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return selectItemTipsAlert;
+    }
+  }
 }

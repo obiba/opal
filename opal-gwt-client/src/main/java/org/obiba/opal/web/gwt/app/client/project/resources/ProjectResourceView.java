@@ -99,6 +99,11 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     getUiHandlers().onEdit();
   }
 
+  @UiHandler("duplicate")
+  void onDuplicate(ClickEvent event) {
+    getUiHandlers().onDuplicate();
+  }
+
   @Override
   public void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
     this.resourceFactories = resourceFactories;

@@ -110,7 +110,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
       factoryChooser.setSelectedFactory(resource);
     }
     this.originalResource = resource;
-    nameText.setEnabled(resource == null);
+    nameText.setEnabled(resource == null || !resource.hasName());
     viewFooter.setVisible(readOnly);
     editFooter.setVisible(!readOnly);
 

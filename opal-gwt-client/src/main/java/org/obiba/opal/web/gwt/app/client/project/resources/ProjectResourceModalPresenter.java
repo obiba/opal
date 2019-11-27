@@ -40,6 +40,8 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   private ResourceReferenceDto originalResource;
 
+  private ResourceCreatedEvent.ResourceCreatedHandler resourceCreatedHandler;
+
   @Inject
   public ProjectResourceModalPresenter(EventBus eventBus,
                                        Display view,
@@ -66,7 +68,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     resource.setFactory(token[1]);
     resource.setParameters(parameters.toString());
     resource.setCredentials(credentials == null ? "{}" : credentials.toString());
-    if (originalResource == null)
+    if (originalResource == null || !originalResource.hasName())
       onCreate(resource);
     else
       onUpdate(resource);
@@ -97,11 +99,18 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
           public void onResponseCode(Request request, Response response) {
             if (response.getStatusCode() == Response.SC_CREATED) {
               getView().hideDialog();
-              fireEvent(new ResourceCreatedEvent(projectName, resource.getName()));
+              ResourceCreatedEvent event = new ResourceCreatedEvent(projectName, resource.getName());
+              fireEvent(event);
+              if (resourceCreatedHandler != null)
+                resourceCreatedHandler.onResourceCreated(event);
             }
           }
         }, Response.SC_CREATED, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST)
         .post().send();
+  }
+
+  public void setResourceCreatedHandler(ResourceCreatedEvent.ResourceCreatedHandler resourceCreatedHandler) {
+    this.resourceCreatedHandler = resourceCreatedHandler;
   }
 
   public interface Display extends PopupView, HasUiHandlers<ProjectResourceModalUiHandlers> {

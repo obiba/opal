@@ -16,6 +16,8 @@ public interface ProjectResourceUiHandlers extends UiHandlers {
 
   void onEdit();
 
+  void onDuplicate();
+
   void onDelete();
 
 }
