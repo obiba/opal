@@ -143,7 +143,6 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     pager.firstPage();
     dataProvider.refresh();
     pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
-    table.setVisible(!resources.isEmpty());
     pager.setVisible(!resources.isEmpty());
     refresh.setVisible(!resources.isEmpty());
     filterControls.setVisible(!resources.isEmpty());

@@ -155,6 +155,16 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
+  public HasAuthorization getReportsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.REPORTS.ordinal());
+  }
+
+  @Override
+  public HasAuthorization getTasksAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.TASKS.ordinal());
+  }
+
+  @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, ProjectTab.PERMISSIONS.ordinal());
   }

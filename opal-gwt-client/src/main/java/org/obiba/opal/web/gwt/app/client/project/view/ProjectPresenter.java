@@ -81,6 +81,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     HasAuthorization getGenotypesAuthorizer();
 
+    HasAuthorization getReportsAuthorizer();
+
+    HasAuthorization getTasksAuthorizer();
+
     HasAuthorization getPermissionsAuthorizer();
   }
 
@@ -209,7 +213,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
     path = Strings.nullToEmpty(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
-    if (!projectName.equals(oldProject) && path.isEmpty()) {
+    if (!projectName.equals(oldProject) && Strings.isNullOrEmpty(path)) {
       if (fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
@@ -447,6 +451,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     void authorize() {
       authorizeTables();
+      authorizeReports();
+      authorizeTasks();
     }
 
     void authorizeTables() {
@@ -562,6 +568,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
               viewAuthorizer.unauthorized();
             }
           })
+          .send();
+    }
+
+    void authorizeReports() {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(projectName)).get()
+          .authorize(getView().getReportsAuthorizer())
+          .send();
+    }
+
+    void authorizeTasks() {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(projectName)).get()
+          .authorize(getView().getTasksAuthorizer())
           .send();
     }
   }
