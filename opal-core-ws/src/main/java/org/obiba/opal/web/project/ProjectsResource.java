@@ -9,20 +9,14 @@
  */
 package org.obiba.opal.web.project;
 
-import java.net.URI;
-import java.util.List;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.collect.Lists;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -31,11 +25,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.util.List;
 
 @Component
 @Path("/projects")
 public class ProjectsResource {
+
+  private final static Authorizer authorizer = new ShiroAuthorizer();
 
   @Autowired
   private ProjectService projectService;
@@ -47,7 +48,7 @@ public class ProjectsResource {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for (Project project : projectService.getProjects()) {
       try {
-        if (MagmaEngine.get().hasDatasource(project.getName())) {
+        if (isReadable(project.getName())) {
           projects.add(
               digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
         }
@@ -69,6 +70,10 @@ public class ProjectsResource {
     return Response.created(projectUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL))
         .build();
+  }
+
+  private boolean isReadable(String project) {
+    return authorizer.isPermitted("rest:/project/" + project + ":GET");
   }
 
 }

@@ -165,12 +165,7 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   public Datasource getDatasource() {
     if (MagmaEngine.get().hasDatasource(name))
       return MagmaEngine.get().getDatasource(name);
-    // if datasource is not permitted
-    if(!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
-      "rest:/datasource/" + name + ":GET")) {
-      throw new NoSuchDatasourceException(name);
-    }
-    // if datasource init failed, return the null one so that project keeps being accessible
+    // if datasource init failed or permission is denied, return the null one so that project keeps being accessible
     return new NullDatasource(name);
   }
 
