@@ -63,7 +63,7 @@
       </b:Column>
     </b:FluidRow>
 
-    <b:FluidRow>
+    <b:FluidRow ui:field="editPropertiesStorage">
       <b:Column size="6">
         <b:Alert type="WARNING" close="false" animation="true" ui:field="noDatabasePanel">
           <ui:msg description="No Project Database label">No database is defined for this project. No data can be
@@ -123,10 +123,9 @@
       </b:Column>
     </b:FluidRow>
 
-
-    <g:FlowPanel ui:field="idMappingsPanel">
+    <g:FlowPanel ui:field="idMappingsPanel" visible="false">
       <b:Heading size="4">
-        <ui:msg description="Permissions label">Identifiers Mappings</ui:msg>
+        <ui:msg description="Identifiers Mappings label">Identifiers Mappings</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="idMappings"/>
     </g:FlowPanel>
@@ -145,7 +144,7 @@
       <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>
 
-    <g:FlowPanel>
+    <g:FlowPanel ui:field="refreshDatabasePanel">
       <b:Heading size="4">
         <ui:msg description="Project Database label">Database</ui:msg>
       </b:Heading>

@@ -160,7 +160,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   private void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(project.getLink())
-        .authorize(new CompositeAuthorizer(getView().getEditAuthorizer(), new ProjectIdentifiersMappingsSlotAuthorizer())) 
+        .authorize(new CompositeAuthorizer(getView().getEditAuthorizer(), getView().getIdentifiersMappingsAuthorizer(), new ProjectIdentifiersMappingsSlotAuthorizer()))
         .put().send();
 
     // set permissions
@@ -180,6 +180,13 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         .forResource(project.getLink())
         .authorize(getView().getDeleteAuthorizer())
         .delete().send();
+
+    // refresh database
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(project.getName()))
+        .authorize(getView().getRefreshAuthorizer())
+        .post().send();
+
   }
 
   private void showVcfServiceNamePanel(boolean show) {
@@ -373,6 +380,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     HasAuthorization getKeyStoreAuthorizer();
 
     HasAuthorization getDeleteAuthorizer();
+
+    HasAuthorization getRefreshAuthorizer();
 
     void toggleRefreshButton(boolean toggleOn);
   }

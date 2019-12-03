@@ -28,7 +28,8 @@ import org.obiba.opal.web.model.client.opal.ProjectDto;
 public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdministrationUiHandlers>
     implements ProjectAdministrationPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ProjectAdministrationView> {}
+  interface Binder extends UiBinder<Widget, ProjectAdministrationView> {
+  }
 
   private final Translations translations;
 
@@ -46,6 +47,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @UiField
   IconAnchor editProperties;
+
+  @UiField
+  Widget editPropertiesStorage;
 
   @UiField
   Paragraph databaseText;
@@ -99,12 +103,14 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Label refreshProjectBusy;
 
-
   @UiField
   FlowPanel idMappingsPanel;
 
   @UiField
   FlowPanel idMappings;
+
+  @UiField
+  FlowPanel refreshDatabasePanel;
 
   private ProjectDto project;
 
@@ -122,12 +128,12 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     description.setText(project.getDescription());
     refreshProjectBusy.getElement().addClassName("help-block");
     tags.setText("");
-    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
+    if (project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
     if (project.getExportFolder() != null) exportFolder.setText(project.getExportFolder());
 
     noDatabasePanel.setVisible(!project.hasDatabase());
     databasePanel.setVisible(project.hasDatabase());
-    if(project.hasDatabase()) {
+    if (project.hasDatabase()) {
       databaseText.setText(translations.projectDatabaseName());
       dbName.setText(project.getDatabase());
       dbType.setText(translations.datasourceTypeMap().get(project.getDatasource().getType()));
@@ -139,18 +145,18 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    switch (Places.valueOf(slot+"")) {
+    switch (Places.valueOf(slot + "")) {
       case KEYSTORE:
         keyStore.clear();
-        if(content != null) keyStore.add(content);
+        if (content != null) keyStore.add(content);
         break;
       case PERMISSIONS:
         permissions.clear();
-        if(content != null) permissions.add(content);
+        if (content != null) permissions.add(content);
         break;
       case MAPPINGS:
         idMappings.clear();
-        if(content != null) idMappings.add(content);
+        if (content != null) idMappings.add(content);
         break;
     }
   }
@@ -169,7 +175,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(editProperties);
+    return new WidgetAuthorizer(editProperties, editPropertiesStorage);
   }
 
   @Override
@@ -190,6 +196,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public HasAuthorization getDeleteAuthorizer() {
     return new WidgetAuthorizer(deletePanel);
+  }
+
+  @Override
+  public HasAuthorization getRefreshAuthorizer() {
+    return new WidgetAuthorizer(refreshDatabasePanel);
   }
 
   @Override
