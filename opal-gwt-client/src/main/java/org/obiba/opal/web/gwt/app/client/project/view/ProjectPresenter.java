@@ -77,6 +77,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     HasAuthorization getTablesAuthorizer();
 
+    HasAuthorization getResourcesAuthorizer();
+
     HasAuthorization getGenotypesAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
@@ -218,7 +220,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private void authorize() {
     if (projectName == null) return;
 
-    new DefaultTabAuthorizer().authorizeTables();
+    new DefaultTabAuthorizer().authorize();
 
     // permissions tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
@@ -442,7 +444,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
    * Helper class to show TABLES or GENOTYPES TABs based on authorization results
    */
   private class DefaultTabAuthorizer {
-    public void authorizeTables() {
+
+    void authorize() {
+      authorizeTables();
+    }
+
+    void authorizeTables() {
       ResourceAuthorizationRequestBuilderFactory.newBuilder()
           .forResource(UriBuilders.DATASOURCE_TABLES.create().build(projectName)).get()
           .authorize(new HasAuthorization() {
@@ -456,15 +463,54 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             @Override
             public void authorized() {
               viewAuthorizer.authorized();
-              getView().setTabData(tab.ordinal(), (tab == Display.ProjectTab.TABLES || tab == Display.ProjectTab.RESOURCES) ? validatePath(projectName, path) : null);
-              onTabSelected(tab.ordinal());
-              getView().selectTab(tab.ordinal());
+              if (tab == Display.ProjectTab.TABLES) {
+                getView().setTabData(tab.ordinal(), validatePath(projectName, path));
+                onTabSelected(tab.ordinal());
+                getView().selectTab(tab.ordinal());
+              }
+              authorizeResources();
+            }
+
+            @Override
+            public void unauthorized() {
+              viewAuthorizer.unauthorized();
+              if (tab == Display.ProjectTab.TABLES) {
+                tab = Display.ProjectTab.RESOURCES;
+              }
+              authorizeResources();
+            }
+          })
+          .send();
+    }
+
+    void authorizeResources() {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectName)).get()
+          .authorize(new HasAuthorization() {
+            HasAuthorization viewAuthorizer = getView().getResourcesAuthorizer();
+
+            @Override
+            public void beforeAuthorization() {
+              viewAuthorizer.beforeAuthorization();
+            }
+
+            @Override
+            public void authorized() {
+              viewAuthorizer.authorized();
+              if (tab == Display.ProjectTab.RESOURCES) {
+                getView().setTabData(tab.ordinal(), validatePath(projectName, path));
+                onTabSelected(tab.ordinal());
+                getView().selectTab(tab.ordinal());
+              }
               authorizeGenotypes();
             }
 
             @Override
             public void unauthorized() {
               viewAuthorizer.unauthorized();
+              if (tab == Display.ProjectTab.TABLES) {
+                tab = Display.ProjectTab.FILES;
+              }
               authorizeGenotypes();
             }
           })

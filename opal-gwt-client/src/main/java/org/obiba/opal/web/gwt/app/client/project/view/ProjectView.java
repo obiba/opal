@@ -145,6 +145,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
+  public HasAuthorization getResourcesAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.RESOURCES.ordinal());
+  }
+
+  @Override
   public HasAuthorization getGenotypesAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, ProjectTab.GENOTYPES.ordinal());
   }
