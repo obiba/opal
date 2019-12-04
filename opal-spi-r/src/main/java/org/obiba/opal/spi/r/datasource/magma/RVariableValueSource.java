@@ -102,6 +102,16 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     boolean repeatable = Strings.isNullOrEmpty(repeatableProp) ?
         valueTable.isMultilines() : ("1.0".equals(repeatableProp) || "1".equals(repeatableProp));
 
+    int index = position;
+    String indexStr = extractProperty(attr, "opal.index");
+    if (!Strings.isNullOrEmpty(indexStr)) {
+      try {
+        index = new Double(indexStr).intValue();
+      } catch (NumberFormatException e) {
+        // ignore
+      }
+    }
+
     this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
         .unit(extractProperty(attr, "opal.unit"))
         .referencedEntityType(extractProperty(attr, "opal.referenced_entity_type"))
@@ -110,7 +120,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         .occurrenceGroup(extractProperty(attr, "opal.occurrence_group"))
         .addAttributes(extractAttributes(attr))
         .addCategories(extractCategories(attr))
-        .index(position)
+        .index(index)
         .build();
   }
 

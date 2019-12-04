@@ -378,6 +378,7 @@ public class RAssignDatasource extends CsvDatasource {
       attributesList.add(String.format("'opal.repeatable' = %s", variable.isRepeatable() ? "1" : "0"));
       if (!Strings.isNullOrEmpty(variable.getOccurrenceGroup()))
         attributesList.add(String.format("'opal.occurrence_group' = '%s'", variable.getOccurrenceGroup()));
+      attributesList.add(String.format("'opal.index' = %d", variable.getIndex()));
       attributesList.add(String.format("'opal.nature' = '%s'", VariableNature.getNature(variable).name()));
       attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
           getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
