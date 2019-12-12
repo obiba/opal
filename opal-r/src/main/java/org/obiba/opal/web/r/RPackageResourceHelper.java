@@ -121,7 +121,7 @@ public class RPackageResourceHelper {
    * @param name
    */
   private void checkAlphanumeric(String name) {
-    if (!name.matches("[a-zA-Z0-9]+"))
+    if (!name.matches("[a-zA-Z0-9\\-]+"))
       throw new IllegalArgumentException("Not a valid name: " + name);
   }
 
