@@ -66,4 +66,13 @@ public interface ResourceFactory {
    */
   Resource createResource(String name, JSONObject parameters, JSONObject credentials);
 
+  /**
+   * Get the required package name to be loaded prior to the resource resolution (if any).
+   *
+   * @param name
+   * @param parameters
+   * @param credentials
+   * @return
+   */
+  String getRequiredPackage(String name, JSONObject parameters, JSONObject credentials);
 }

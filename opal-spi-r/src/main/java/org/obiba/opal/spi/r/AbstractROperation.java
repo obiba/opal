@@ -190,6 +190,17 @@ public abstract class AbstractROperation implements ROperation {
   }
 
   /**
+   * Load a R package.
+   *
+   * @param packageName
+   * @return
+   */
+  protected REXP loadPackage(String packageName) {
+    String cmd = String.format("library('%s')", packageName);
+    return eval(cmd, false);
+  }
+
+  /**
    * Ensure that a R package is installed: check it is available, if not install it.
    *
    * @param packageName

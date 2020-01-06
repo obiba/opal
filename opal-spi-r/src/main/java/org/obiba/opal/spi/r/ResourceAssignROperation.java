@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.spi.r;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.spi.resource.Resource;
 
 import java.net.URISyntaxException;
@@ -21,10 +22,13 @@ public class ResourceAssignROperation extends AbstractROperation {
   private final String symbol;
 
   private final Resource resource;
+  
+  private final String requiredPackage;
 
-  public ResourceAssignROperation(String symbol, Resource resource) {
+  public ResourceAssignROperation(String symbol, Resource resource, String requiredPackage) {
     this.symbol = symbol;
     this.resource = resource;
+    this.requiredPackage = requiredPackage;
   }
 
   @Override
@@ -33,13 +37,15 @@ public class ResourceAssignROperation extends AbstractROperation {
     Resource.Credentials credentials = resource.getCredentials();
 
     try {
+      ensureGitHubPackage("obiba", "resourcer", "master");
+      if (!Strings.isNullOrEmpty(requiredPackage))
+        loadPackage(requiredPackage);
       String script = String.format("resourcer::newResourceClient(resourcer::newResource(name='%s', url='%s', identity=%s, secret=%s, format=%s))",
           resource.getName(),
           resource.toURI().toString(),
           credentials.getIdentity() == null ? "NULL" : "'" + credentials.getIdentity() + "'",
           credentials.getSecret() == null ? "NULL" : "'" + credentials.getSecret() + "'",
           resource.getFormat() == null ? "NULL" : "'" + resource.getFormat() + "'");
-      ensureGitHubPackage("obiba", "resourcer", "master");
       eval(String.format("is.null(base::assign('%s', %s))", symbol, script), false);
     } catch (URISyntaxException e) {
       throw new RRuntimeException(e);

@@ -46,6 +46,13 @@ public interface ResourceReferenceService extends SystemService {
   Resource createResource(ResourceReference resourceReference);
 
   /**
+   * Get the required package name from the appropriate {@link org.obiba.opal.spi.resource.ResourceFactory}.
+   * @param resourceReference
+   * @return null if none
+   */
+  String getRequiredPackageName(ResourceReference resourceReference);
+
+  /**
    * Save (create or update) the resource reference.
    *
    * @param resourceReference

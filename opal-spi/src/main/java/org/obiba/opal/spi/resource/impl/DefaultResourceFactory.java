@@ -13,19 +13,16 @@ package org.obiba.opal.spi.resource.impl;
 import com.google.common.base.Strings;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.json.JSONObject;
-import org.obiba.opal.spi.utils.JSONUtils;
 import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.spi.resource.ResourceFactory;
+import org.obiba.opal.spi.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Properties;
@@ -48,6 +45,8 @@ public class DefaultResourceFactory implements ResourceFactory {
 
   private static final String TORESOURCE_FUNCTION_FILENAME = "toResource.js";
 
+  private static final String REQUIRE_FUNCTION_FILENAME = "require.js";
+
   private static final String IDENTITY_KEY = "identity";
 
   private static final String SECRET_KEY = "secret";
@@ -67,6 +66,8 @@ public class DefaultResourceFactory implements ResourceFactory {
   private JSONObject credentialsSchemaForm;
 
   private File toResourceFile;
+
+  private File requireFile;
 
   public DefaultResourceFactory(File settingsFolder) {
     this.settingsFolder = settingsFolder;
@@ -149,12 +150,45 @@ public class DefaultResourceFactory implements ResourceFactory {
     return null;
   }
 
+  @Override
+  public String getRequiredPackage(String name, JSONObject parameters, JSONObject credentials) {
+    try {
+      String require = null;
+      Reader requireReader = getRequireScriptReader();
+      if (requireReader == null) {
+        if (parameters.has("_package"))
+          require = parameters.getString("_package");
+      } else {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        engine.eval(requireReader);
+        Invocable inv = (Invocable) engine;
+        Object rval = inv.invokeFunction("require", name, JSONUtils.toMap(parameters), JSONUtils.toMap(credentials));
+        require = rval == null ? null : rval.toString();
+      }
+      log.trace("require = {}", require);
+      return require;
+    } catch (Exception e) {
+      log.error("Unable to extract required Resource package", e);
+    }
+    return null;
+  }
+
   protected Reader getToResourceScriptReader() throws IOException {
     return Files.newBufferedReader(toResourceFile.toPath(), StandardCharsets.UTF_8);
   }
 
   protected String getToResourceFunctionFilename() {
     return TORESOURCE_FUNCTION_FILENAME;
+  }
+
+  protected Reader getRequireScriptReader() throws IOException {
+    if (!requireFile.exists()) return null;
+    return Files.newBufferedReader(requireFile.toPath(), StandardCharsets.UTF_8);
+  }
+
+  protected String getRequireFunctionFilename() {
+    return REQUIRE_FUNCTION_FILENAME;
   }
 
   protected String getIdentityKey() {
@@ -186,6 +220,7 @@ public class DefaultResourceFactory implements ResourceFactory {
       this.group = null;
     }
     this.toResourceFile = new File(settingsFolder, getToResourceFunctionFilename());
+    this.requireFile = new File(settingsFolder, getRequireFunctionFilename());
     this.parametersSchemaForm = readSchemaForm(new File(settingsFolder, PARAMS_FORM_FILENAME));
     this.credentialsSchemaForm = readSchemaForm(new File(settingsFolder, CREDENTIALS_FORM_FILENAME));
   }

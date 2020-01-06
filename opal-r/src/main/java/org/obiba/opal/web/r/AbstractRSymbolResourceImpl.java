@@ -10,6 +10,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
@@ -115,8 +116,10 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     int idx = path.indexOf(".");
     String project = path.substring(0, idx);
     String res = path.substring(idx + 1);
-    Resource resource = resourceReferenceService.createResource(resourceReferenceService.getResourceReference(project, res));
-    ROperation rop = new ResourceAssignROperation(name, resource);
+    ResourceReference ref = resourceReferenceService.getResourceReference(project, res);
+    Resource resource = resourceReferenceService.createResource(ref);
+    String requiredPackage = resourceReferenceService.getRequiredPackageName(ref);
+    ROperation rop = new ResourceAssignROperation(name, resource, requiredPackage);
     return assignSymbol(uri, rop, async);
   }
 

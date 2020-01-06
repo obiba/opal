@@ -16,10 +16,7 @@ import org.junit.Test;
 import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.spi.resource.ResourceFactory;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -35,7 +32,7 @@ public class DefaultResourceFactoryTest {
         return new InputStreamReader(is, StandardCharsets.UTF_8);
       }
     };
-    JSONObject params = new JSONObject("{ path: '/work/dir', format: 'csv' }");
+    JSONObject params = new JSONObject("{ path: '/work/dir', format: 'csv', package: 'dsXxx' }");
     JSONObject credentials = new JSONObject("{ username: 'user1', password: '1234' }");
     Resource resource = resourceFactory.createResource("toto", params, credentials);
     assertThat(resource.getName()).isEqualTo("toto");
@@ -43,5 +40,33 @@ public class DefaultResourceFactoryTest {
     assertThat(resource.getFormat()).isEqualTo("csv");
     assertThat(resource.getCredentials().getIdentity()).isEqualTo("user1");
     assertThat(resource.getCredentials().getSecret()).isEqualTo("1234");
+  }
+
+  @Test
+  public void testRequirePackageFromJs() throws Exception {
+    ResourceFactory resourceFactory = new DefaultResourceFactory(new File("/tmp")) {
+      @Override
+      protected Reader getRequireScriptReader() throws IOException {
+        InputStream is = getClass().getClassLoader().getResourceAsStream("require.js");
+        return new InputStreamReader(is, StandardCharsets.UTF_8);
+      }
+    };
+    JSONObject params = new JSONObject("{ path: '/work/dir', format: 'csv', package: 'dsXxx' }");
+    JSONObject credentials = new JSONObject("{ username: 'user1', password: '1234' }");
+    assertThat(resourceFactory.getRequiredPackage("toto", params, credentials)).isEqualTo("dsXxx");
+  }
+
+  @Test
+  public void testRequirePackageFromParameter() throws Exception {
+    ResourceFactory resourceFactory = new DefaultResourceFactory(new File("/tmp")) {
+      @Override
+      protected Reader getToResourceScriptReader() {
+        InputStream is = getClass().getClassLoader().getResourceAsStream("resource.js");
+        return new InputStreamReader(is, StandardCharsets.UTF_8);
+      }
+    };
+    JSONObject params = new JSONObject("{ path: '/work/dir', format: 'csv', _package: 'dsXxx' }");
+    JSONObject credentials = new JSONObject("{ username: 'user1', password: '1234' }");
+    assertThat(resourceFactory.getRequiredPackage("toto", params, credentials)).isEqualTo("dsXxx");
   }
 }

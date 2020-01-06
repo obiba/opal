@@ -89,6 +89,15 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
+  public String getRequiredPackageName(ResourceReference resourceReference) {
+    ResourceFactoryService resourceFactoryService = (ResourceFactoryService) opalRuntime.getServicePlugin(resourceReference.getProvider());
+    return resourceFactoryService.getResourceFactories().stream()
+        .filter(fac -> fac.getName().equals(resourceReference.getFactory()))
+        .map(fac -> fac.getRequiredPackage(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials()))
+        .findFirst().orElse(null);
+  }
+
+  @Override
   public void save(ResourceReference resourceReference) {
     if (resourceReference == null) return;
     resourceReference.setUpdated(new Date());
