@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.swing.text.html.Option;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -85,6 +88,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     return resourceFactoryService.getResourceFactories().stream()
         .filter(fac -> fac.getName().equals(resourceReference.getFactory()))
         .map(fac -> fac.createResource(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials()))
+        .filter(Objects::nonNull)
         .findFirst().orElse(null);
   }
 
@@ -94,6 +98,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     return resourceFactoryService.getResourceFactories().stream()
         .filter(fac -> fac.getName().equals(resourceReference.getFactory()))
         .map(fac -> fac.getRequiredPackage(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials()))
+        .filter(Objects::nonNull)
         .findFirst().orElse(null);
   }
 
