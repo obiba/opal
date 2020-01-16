@@ -1,4 +1,5 @@
 # Opal [![Build Status](https://travis-ci.org/obiba/opal.svg?branch=master)](https://travis-ci.org/obiba/opal)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fobiba%2Fopal.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fobiba%2Fopal?ref=badge_shield)
 
 Opal is OBiBa’s core database application for biobanks or epidemiological studies.
 
@@ -34,6 +35,9 @@ obiba-users@googlegroups.com
 ## License
 
 OBiBa software are open source and made available under the [GPL3 licence](http://www.obiba.org/pages/license/). OBiBa software are free of charge.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fobiba%2Fopal.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fobiba%2Fopal?ref=badge_large)
 
 # OBiBa acknowledgments
 
