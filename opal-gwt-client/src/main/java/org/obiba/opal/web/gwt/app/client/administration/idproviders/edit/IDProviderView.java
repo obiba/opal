@@ -142,6 +142,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     label.setValue(provider.getLabel());
     providerUrl.setValue(provider.getProviderUrl());
     groups.setValue(provider.getGroups());
+    groupsClaim.setValue(provider.getGroupsClaim());
     connectTimeout.setValue(provider.getConnectTimeout());
     readTimeout.setValue(provider.getReadTimeout());
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
