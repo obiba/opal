@@ -56,10 +56,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionT
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.support.*;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -187,7 +184,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
     this.opalSystemCache = opalSystemCache;
 
-    AnalysisPluginsResource.getInstance().getAnalysisPlugins(new AnalysisPluginsHandler(analysesPresenterProvider));
+    AnalysisPluginsResource.getInstance().getPlugins(new AnalysisPluginsHandler(analysesPresenterProvider));
     getView().setUiHandlers(this);
   }
 
@@ -839,7 +836,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
-  private class AnalysisPluginsHandler implements AnalysisPluginsResource.Handler {
+  private class AnalysisPluginsHandler implements PluginsResource.Handler {
 
     private final Provider<AnalysesPresenter> analysesPresenterProvider;
 

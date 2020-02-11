@@ -40,7 +40,7 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="TRASH" ui:field="remove">
+        <b:Button icon="TRASH" ui:field="remove" addStyleNames="btn-danger">
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>

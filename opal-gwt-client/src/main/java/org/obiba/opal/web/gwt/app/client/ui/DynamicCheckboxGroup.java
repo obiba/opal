@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.ui.HasEnabled;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<St
 
   private boolean enabled;
 
-  public DynamicCheckboxGroup(String key, List<String> items) {
+  public DynamicCheckboxGroup(String key, List<JSONObject> items) {
     this.enabled = true;
     this.key = key;
     checkBoxes = new ArrayList<>();
@@ -40,10 +41,12 @@ public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<St
     FlowPanel panel = new FlowPanel();
 
     if (items != null) {
-      for(String item : items) {
-        CheckBox checkBox = new CheckBox(item);
+      for(JSONObject item : items) {
+        String itemKey = item.isString().stringValue();
+        String itemTitle = item.containsKey("title") ? item.get("title").isString().stringValue() : itemKey;
+        CheckBox checkBox = new CheckBox(itemKey);
         checkBox.setName(getFormKey());
-        checkBox.setFormValue(item);
+        checkBox.setFormValue(itemKey);
 
         checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
           @Override
@@ -62,7 +65,7 @@ public class DynamicCheckboxGroup extends Composite implements TakesValue<Set<St
         });
 
         checkBoxes.add(checkBox);
-        checkBox.setText(item);
+        checkBox.setText(itemTitle);
 
         FlowPanel checkBoxPanel = new FlowPanel();
         checkBoxPanel.getElement().addClassName("checkbox");

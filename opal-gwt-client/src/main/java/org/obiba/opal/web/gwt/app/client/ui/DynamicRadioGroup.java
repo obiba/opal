@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.ui.HasEnabled;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String>, 
     return key;
   }
 
-  public DynamicRadioGroup(String key, List<String> items) {
+  public DynamicRadioGroup(String key, List<JSONObject> items) {
     this.enabled = true;
     this.key = key;
     radios = new ArrayList<>();
@@ -56,10 +57,12 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String>, 
     FlowPanel panel = new FlowPanel();
 
     if (items != null) {
-      for(String item: items) {
-        RadioButton radioButton = new RadioButton(item);
+      for(JSONObject item: items) {
+        String itemKey = item.isString().stringValue();
+        String itemTitle = item.containsKey("title") ? item.get("title").isString().stringValue() : itemKey;
+        RadioButton radioButton = new RadioButton(itemKey);
         radioButton.setName(key);
-        radioButton.setFormValue(item);
+        radioButton.setFormValue(itemKey);
 
         radioButton.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
           @Override
@@ -74,7 +77,7 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String>, 
         });
 
         radios.add(radioButton);
-        radioButton.setText(item);
+        radioButton.setText(itemTitle);
 
         FlowPanel radioPanel = new FlowPanel();
         radioPanel.getElement().addClassName("radio");

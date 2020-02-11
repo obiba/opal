@@ -99,6 +99,20 @@ public final class ResourcePermissionRequestPaths {
       public UriBuilder create() {
         return UriBuilder.create().segment("project", "{}", "permissions", "vcf-store");
       }
+    },
+
+    PROJECT_PERMISSIONS_RESOURCES {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "resources");
+      }
+    },
+
+    PROJECT_PERMISSIONS_RESOURCE {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "resource", "{}");
+      }
     };
 
     public abstract UriBuilder create();

@@ -68,15 +68,23 @@ public abstract class JsonSchemaGWT {
     return type != null && type.isString() != null ? type.isString().stringValue() : "string";
   }
 
-  public static List<String> getEnum(final JSONObject schema) {
-    List<String> result = new ArrayList<>();
+  public static List<JSONObject> getEnum(final JSONObject schema) {
+    List<JSONObject> result = new ArrayList<>();
 
     JSONValue anEnum = schema.get("enum");
     if (anEnum != null && anEnum.isArray() != null) {
       JSONArray enumArray = anEnum.isArray();
 
       for(int i = 0; i < enumArray.size(); i++) {
-        result.add(enumArray.get(i).isString().stringValue());
+        if (enumArray.get(i).isObject() != null) {
+          result.add(enumArray.get(i).isObject());
+        } else if (enumArray.get(i).isString() != null) {
+          JSONString key = enumArray.get(i).isString();
+          JSONObject obj = new JSONObject();
+          obj.put("key", key);
+          obj.put("title", key);
+          result.add(obj);
+        }
       }
     }
 

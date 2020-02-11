@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.OpalRSession;
 
 import javax.ws.rs.*;
@@ -29,6 +30,8 @@ public interface RSymbolResource {
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
 
   void setDataExportService(DataExportService dataExportService);
+
+  void setResourceReferenceService(ResourceReferenceService resourceReferenceService);
 
   String getName();
 
@@ -64,6 +67,19 @@ public interface RSymbolResource {
                     @QueryParam("identifiers") String identifiersMapping,
                     @QueryParam("class") @DefaultValue("data.frame") String rClass,
                     @QueryParam("async") @DefaultValue("false") boolean async);
+
+  @PUT
+  @Path("/table/{path}")
+  Response putTable(@Context UriInfo uri, @PathParam("path") String path, @QueryParam("variables") String variableFilter,
+                    @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("id") String idName,
+                    @QueryParam("identifiers") String identifiersMapping,
+                    @QueryParam("class") @DefaultValue("data.frame") String rClass,
+                    @QueryParam("async") @DefaultValue("false") boolean async);
+
+  @PUT
+  @Path("/resource/{path}")
+  Response putResource(@Context UriInfo uri, @PathParam("path") String path,
+                       @QueryParam("async") @DefaultValue("false") boolean async);
 
   @DELETE
   Response rm();

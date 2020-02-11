@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import org.obiba.opal.web.gwt.app.client.ui.resources.ChooserResources;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.watopi.chosen.client.ChosenOptions;
 import com.watopi.chosen.client.gwt.ChosenListBox;
+import org.obiba.opal.web.gwt.app.client.ui.resources.ChooserResources;
 
 /**
  * List box based on @{ChosenListBox}.
@@ -43,7 +42,7 @@ public class Chooser extends ChosenListBox {
     addAttachHandler(new AttachEvent.Handler() {
       @Override
       public void onAttachOrDetach(AttachEvent event) {
-        if(event.isAttached()) {
+        if (event.isAttached()) {
           getChosenElement().addClass("chooser");
           getChosenElement().children("div").last().addClass("chooser-dropdown");
           getChosenElement().find("div > ul").last().addClass("chooser-options");
@@ -95,10 +94,8 @@ public class Chooser extends ChosenListBox {
   }
 
   public void setSelectedValue(String value) {
-    for(int i = 0; i < getItemCount(); i++) {
-      com.google.gwt.core.shared.GWT.log(">>>> ProjectIdentifiersMappingsPresenter::*** " + getValue(i));
-
-      if(getValue(i).equals(value)) {
+    for (int i = 0; i < getItemCount(); i++) {
+      if (getValue(i).equals(value)) {
         super.setItemSelected(i, true);
       }
     }

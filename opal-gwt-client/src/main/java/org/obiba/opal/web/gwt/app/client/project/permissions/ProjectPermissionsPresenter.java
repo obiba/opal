@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.permissions;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -170,6 +171,18 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
             .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
             .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
 
+      case RESOURCES:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+
+      case RESOURCE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+
       default:
         return null;
     }
@@ -282,6 +295,15 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           placeRequest = ProjectPlacesHelper
               .getReportsPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
+        case RESOURCES:
+          placeRequest = ProjectPlacesHelper
+              .getResourcesPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+          break;
+        case RESOURCE:
+          placeRequest = ProjectPlacesHelper
+              .getResourcePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                  tokenizer.getToken(AclResourceTokenizer.ResourceTokens.RESOURCE));
+          break;
         case VCF_STORE:
           placeRequest = ProjectPlacesHelper
               .getVcfStorePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
@@ -335,6 +357,14 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE);
           break;
 
+        case RESOURCES:
+          name = translations.allResourcesLabel();
+          break;
+
+        case RESOURCE:
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.RESOURCE);
+          break;
+
         case VCF_STORE:
           name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.VCFSTORE);
           break;
@@ -360,7 +390,10 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
     @Override
     public String map(Acl acl) {
       ResourcePermissionType type = ResourcePermissionType.getTypeByPermission(acl.getActions(0));
-      return TranslationsUtils.replaceArguments(translations.permissionResourceNodeTypeMap().get(type.name()));
+      String typeStr = translations.permissionResourceNodeTypeMap().get(type.name());
+      if (Strings.isNullOrEmpty(typeStr))
+        typeStr = type.name();
+      return TranslationsUtils.replaceArguments(typeStr);
     }
   }
 

@@ -130,6 +130,10 @@ enum AclAction {
   VCF_STORE_VIEW = 27;
   VCF_STORE_VALUES = 28;
   VCF_STORE_ALL = 29;
+  RESOURCES_ALL = 30;
+  RESOURCES_VIEW = 31;
+  RESOURCE_ALL = 32;
+  RESOURCE_VIEW = 33;
 }
 
 message OpalMap {

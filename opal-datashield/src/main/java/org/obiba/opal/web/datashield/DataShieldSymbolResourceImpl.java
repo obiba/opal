@@ -42,11 +42,15 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   private boolean useTibble;
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
-                           String identifiersMapping, String rClass,
-                           boolean async) {
+  public Response putTable(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName, String identifiersMapping, String rClass, boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
+    return super.putTable(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
+  }
+
+  @Override
+  public Response putResource(UriInfo uri, String path, boolean async) {
+    DataShieldLog.userLog("creating symbol '{}' from opal resource '{}'", getName(), path);
+    return super.putResource(uri, path, async);
   }
 
   @Override

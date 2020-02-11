@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.opal.spi.datasource.DatasourceServiceLoader;
 import org.obiba.opal.spi.r.analysis.RAnalysisServiceLoader;
+import org.obiba.opal.spi.resource.ResourceFactoryServiceLoader;
 import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.obiba.plugins.PluginResources;
@@ -136,6 +137,10 @@ public class PluginsManager {
     RAnalysisServiceLoader.get().getServices().stream()
       .filter(service -> pluginsMap.containsKey(service.getName()))
       .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+    ResourceFactoryServiceLoader.get().getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+
   }
 
   //

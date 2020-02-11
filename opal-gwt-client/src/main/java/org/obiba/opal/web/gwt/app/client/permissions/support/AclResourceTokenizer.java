@@ -26,7 +26,8 @@ public class AclResourceTokenizer {
     TABLE,
     VARIABLE,
     REPORTTEMPLATE,
-    VCFSTORE
+    VCFSTORE,
+    RESOURCE
   }
 
   public AclResourceTokenizer(String resource) {
@@ -41,6 +42,7 @@ public class AclResourceTokenizer {
         return tokens[PROJECT_INDEX];
       case TABLE:
       case REPORTTEMPLATE:
+      case RESOURCE:
         return tokens[TABLE_INDEX];
       case VARIABLE:
         return tokens[VARIABLE_INDEX];

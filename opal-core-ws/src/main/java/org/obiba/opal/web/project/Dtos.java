@@ -9,17 +9,13 @@
  */
 package org.obiba.opal.web.project;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-
-import java.time.Instant;
-
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
-import org.obiba.opal.core.domain.OpalAnalysis;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.domain.ProjectIdentifiersMapping;
+import org.obiba.opal.core.domain.*;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
+import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
@@ -33,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,11 +45,11 @@ public class Dtos {
 
   public static ProjectDto asDto(Project project, @NotNull String directory) {
     ProjectDto.Builder builder = ProjectDto.newBuilder() //
-      .setName(project.getName()) //
-      .setTitle(project.getTitle()) //
-      .setDirectory(directory) //
-      .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
-      .setArchived(project.isArchived());
+        .setName(project.getName()) //
+        .setTitle(project.getTitle()) //
+        .setDirectory(directory) //
+        .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
+        .setArchived(project.isArchived());
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
     if (project.hasDatabase()) builder.setDatabase(project.getDatabase());
@@ -59,9 +57,9 @@ public class Dtos {
     if (project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
     if (project.hasIdentifiersMappings()) {
       builder.addAllIdMappings(
-        project.getIdentifiersMappings().stream()
-        .map(mapping -> asDto(mapping))
-        .collect(Collectors.toList())
+          project.getIdentifiersMappings().stream()
+              .map(mapping -> asDto(mapping))
+              .collect(Collectors.toList())
       );
     }
 
@@ -82,8 +80,8 @@ public class Dtos {
 
   public static Projects.ProjectDto asDtoDigest(Project project) {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder()
-      .setName(project.getName())
-      .setTitle(project.getTitle());
+        .setName(project.getName())
+        .setTitle(project.getTitle());
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
     builder.setTimestamps(asTimestampsDto(project));
@@ -93,26 +91,26 @@ public class Dtos {
 
   public static Project fromDto(ProjectDto projectDto) {
     Project.Builder builder = Project.Builder.create() //
-      .name(projectDto.getName()) //
-      .title(projectDto.getTitle()) //
-      .description(projectDto.getDescription()) //
-      .database(projectDto.getDatabase()) //
-      .vcfStoreService(projectDto.getVcfStoreService()) //
-      .exportFolder(projectDto.getExportFolder()) //
-      .archived(projectDto.getArchived()) //
-      .tags(projectDto.getTagsList());
+        .name(projectDto.getName()) //
+        .title(projectDto.getTitle()) //
+        .description(projectDto.getDescription()) //
+        .database(projectDto.getDatabase()) //
+        .vcfStoreService(projectDto.getVcfStoreService()) //
+        .exportFolder(projectDto.getExportFolder()) //
+        .archived(projectDto.getArchived()) //
+        .tags(projectDto.getTagsList());
 
     if (projectDto.getIdMappingsCount() > 0) {
       projectDto.getIdMappingsList()
-        .forEach(dto ->
-          builder.idMapping(
-            ProjectIdentifiersMapping.newBuilder()
-              .entityType(dto.getEntityType())
-              .name(dto.getName())
-              .mapping(dto.getMapping())
-              .build()
-          )
-        );
+          .forEach(dto ->
+              builder.idMapping(
+                  ProjectIdentifiersMapping.newBuilder()
+                      .entityType(dto.getEntityType())
+                      .name(dto.getName())
+                      .mapping(dto.getMapping())
+                      .build()
+              )
+          );
     }
 
     return builder.build();
@@ -120,14 +118,14 @@ public class Dtos {
 
   public static Project fromDto(Projects.ProjectFactoryDto projectFactoryDto) {
     return Project.Builder.create() //
-      .name(projectFactoryDto.getName()) //
-      .title(projectFactoryDto.getTitle()) //
-      .description(projectFactoryDto.getDescription()) //
-      .database(projectFactoryDto.getDatabase()) //
-      .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
-      .exportFolder(projectFactoryDto.getExportFolder()) //
-      .tags(projectFactoryDto.getTagsList()) //
-      .build();
+        .name(projectFactoryDto.getName()) //
+        .title(projectFactoryDto.getTitle()) //
+        .description(projectFactoryDto.getDescription()) //
+        .database(projectFactoryDto.getDatabase()) //
+        .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
+        .exportFolder(projectFactoryDto.getExportFolder()) //
+        .tags(projectFactoryDto.getTagsList()) //
+        .build();
   }
 
   @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -153,6 +151,46 @@ public class Dtos {
     builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
 
     return builder.build();
+  }
+
+  public static Projects.ResourceReferenceDto asDto(ResourceReference resourceReference, Resource resource, boolean isEditable) {
+    Projects.ResourceReferenceDto.Builder builder = Projects.ResourceReferenceDto.newBuilder()
+        .setName(resourceReference.getName())
+        .setProject(resourceReference.getProject())
+        .setProvider(resourceReference.getProvider())
+        .setFactory(resourceReference.getFactory())
+        .setParameters(resourceReference.getParametersModel())
+        .setCreated(Instant.ofEpochMilli(resourceReference.getCreated().getTime()).toString())
+        .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString())
+        .setEditable(isEditable);
+
+    if (isEditable)
+      builder.setCredentials(resourceReference.getCredentialsModel());
+
+    if (resource != null) {
+      try {
+        Projects.ResourceSummaryDto.Builder rbuilder = Projects.ResourceSummaryDto.newBuilder()
+            .setName(resource.getName())
+            .setUrl(resource.toURI().toString());
+        if (!Strings.isNullOrEmpty(resource.getFormat()))
+          rbuilder.setFormat(resource.getFormat());
+        builder.setResource(rbuilder);
+      } catch (URISyntaxException e) {
+        log.error("Cannot get resource url", e);
+      }
+    }
+    return builder.build();
+  }
+
+  public static ResourceReference fromDto(Projects.ResourceReferenceDto referenceDto) {
+    ResourceReference reference = new ResourceReference();
+    reference.setName(referenceDto.getName());
+    reference.setProject(referenceDto.getProject());
+    reference.setProvider(referenceDto.getProvider());
+    reference.setFactory(referenceDto.getFactory());
+    reference.setParametersModel(referenceDto.getParameters());
+    reference.setCredentialsModel(referenceDto.getCredentials());
+    return reference;
   }
 
   public static OpalAnalysisDto.Builder asDto(OpalAnalysis analysis) {
@@ -197,10 +235,10 @@ public class Dtos {
 
   public static ProjectDto.IdentifiersMappingDto asDto(ProjectIdentifiersMapping mapping) {
     return ProjectDto.IdentifiersMappingDto.newBuilder()
-      .setEntityType(mapping.getEntityType())
-      .setName(mapping.getName())
-      .setMapping(mapping.getMapping())
-      .build();
+        .setEntityType(mapping.getEntityType())
+        .setName(mapping.getName())
+        .setMapping(mapping.getMapping())
+        .build();
   }
 
   private static AnalysisResultItemDto asDto(AnalysisResultItem item) {

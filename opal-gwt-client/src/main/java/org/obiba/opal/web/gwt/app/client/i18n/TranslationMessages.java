@@ -188,6 +188,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Tables")
   String removeTables();
 
+  @Description("Remove Resources label")
+  @DefaultMessage("Remove Resources")
+  String removeResources();
+
+  @Description("Remove Resource label")
+  @DefaultMessage("Remove Resource")
+  String removeResource();
+
   @Description("Confirm remove group label")
   @DefaultMessage("Please confirm that you want to remove the group {0}.")
   String confirmRemoveGroup(String name);
@@ -500,6 +508,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove the taxonomy {0}.")
   String confirmRemoveTaxonomy(String name);
 
+  @Description("Please confirm that you want to remove the resource {0) message")
+  @DefaultMessage("Please confirm that you want to remove the resource {0}.")
+  String confirmRemoveResource(String name);
+
+  @Description("Please confirm that you want to remove the resource {0) message")
+  @DefaultMessage("Please confirm that you want to remove the resources: {0}.")
+  String confirmRemoveResources(String names);
+
   @Description("Please confirm that you want to remove {0} variables message")
   @DefaultMessage("Please confirm that you want to remove {0} variables.")
   @AlternateMessage({ "one", "Please confirm that you want to remove {0} variable." })
@@ -529,6 +545,11 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} Tables")
   @AlternateMessage({ "one", "1 Table" })
   String nTablesLabel(@PluralCount int nb);
+
+  @Description("N Resources label")
+  @DefaultMessage("{0} Resources")
+  @AlternateMessage({ "one", "1 Resource" })
+  String nResourcesLabel(@PluralCount int nb);
 
   @Description("N Indices label")
   @DefaultMessage("{0} Indices")

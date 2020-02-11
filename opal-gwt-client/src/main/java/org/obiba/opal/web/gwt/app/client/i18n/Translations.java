@@ -184,6 +184,12 @@ public interface Translations extends Constants {
 
       "VARIABLE_READ", "View dictionary and summary", //
 
+      "RESOURCES_ALL", "Administrate", //
+      "RESOURCES_VIEW", "View any resource (no credentials)", //
+
+      "RESOURCE_ALL", "Administrate", //
+      "RESOURCE_VIEW", "View resource (no credentials)", //
+
       "DATABASES_ALL", "Administrate", //
       "R_USE", "Use", //
       "DATASHIELD_ALL", "Administrate", //
@@ -199,7 +205,9 @@ public interface Translations extends Constants {
       "TABLE", "Table",//
       "VARIABLE", "Variable",//
       "REPORT_TEMPLATE", "Report",//
-      "VCF_STORE", "VCF Store"
+      "VCF_STORE", "VCF Store",
+      "RESOURCE", "Resource",
+      "RESOURCES", "Resources"
   })
   Map<String, String> permissionResourceNodeTypeMap();
 
@@ -229,6 +237,12 @@ public interface Translations extends Constants {
       "TABLE_VALUES_EDIT.help", "Edit dictionary and view individual values.", //
 
       "VARIABLE_READ.help", "View variable description and values summary (no access to individual values).", //
+
+      "RESOURCES_ALL.help", "Full access to project resources.", //
+      "RESOURCES_VIEW.help", "View any resource without having access to the associated credentials (DataSHIELD compliant permission).", //
+
+      "RESOURCE_ALL.help", "Full access to the resource.", //
+      "RESOURCE_VIEW.help", "View resource without having access to the associated credentials (DataSHIELD compliant permission).", //
 
       "DATABASES_ALL.help", "Administrate databases.", //
       "R_USE.help", "Use R services: can push accessible data to R and can execute ANY R commands on them.", //
@@ -1653,6 +1667,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Format label")
+  @DefaultStringValue("Format")
+  String formatLabel();
+
   @Description("Account Login label")
   @DefaultStringValue("Account Login")
   String accountLoginLabel();
@@ -2131,6 +2149,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("All tables")
   String allTablesLabel();
 
+  @Description("All Resources label")
+  @DefaultStringValue("All resources")
+  String allResourcesLabel();
+
   @Description("Download Modal title")
   @DefaultStringValue("Download File")
   String downloadFileModalTitle();
@@ -2138,6 +2160,18 @@ public interface Translations extends Constants {
   @Description("Add Token title")
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
+
+  @Description("Add Resource title")
+  @DefaultStringValue("Add Resource")
+  String addResourceModalTitle();
+
+  @Description("Edit Resource title")
+  @DefaultStringValue("Edit Resource")
+  String editResourceModalTitle();
+
+  @Description("View Resource title")
+  @DefaultStringValue("View Resource")
+  String viewResourceModalTitle();
 
   @Description("Export VCF Modal title")
   @DefaultStringValue("Export VCF Files")
