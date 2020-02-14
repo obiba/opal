@@ -54,6 +54,8 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private String originalWorkDir;
 
+  private String originalTempDir;
+
   private boolean busy = false;
 
   private String executionContext = DEFAULT_CONTEXT;
@@ -97,6 +99,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
     try {
       originalWorkDir = getRWorkDir();
+      originalTempDir = updateRTempDir();
     } catch (Exception e) {
       // ignore
     }
@@ -246,6 +249,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
     try {
       cleanRWorkDir();
+      cleanRTempDir();
     } catch(Exception e) {
       // ignore
     }
@@ -280,14 +284,32 @@ public class OpalRSession implements RASyncOperationTemplate {
 
 
   private String getRWorkDir() throws REXPMismatchException {
-    RScriptROperation rop = new RScriptROperation("getwd()", false);
+    RScriptROperation rop = new RScriptROperation("base::getwd()", false);
     execute(rop);
     return rop.getResult().asString();
   }
 
   private void cleanRWorkDir() {
     if (Strings.isNullOrEmpty(originalWorkDir)) return;
-    RScriptROperation rop = new RScriptROperation(String.format("unlink('%s', recursive=TRUE)", originalWorkDir), false);
+    RScriptROperation rop = new RScriptROperation(String.format("base::unlink('%s', recursive=TRUE)", originalWorkDir), false);
+    execute(rop);
+  }
+
+  private String updateRTempDir() throws REXPMismatchException {
+    RScriptROperation rop = new RScriptROperation("if (!require(unixtools)) { install.packages('unixtools', repos = 'http://www.rforge.net/') }", false);
+    execute(rop);
+    rop = new RScriptROperation("unixtools::set.tempdir(base::file.path(base::tempdir(), base::basename(base::getwd())))", false);
+    execute(rop);
+    rop = new RScriptROperation("base::dir.create(base::tempdir(), recursive = TRUE)", false);
+    execute(rop);
+    rop = new RScriptROperation("base::tempdir()", false);
+    execute(rop);
+    return rop.getResult().asString();
+  }
+
+  private void cleanRTempDir() {
+    if (Strings.isNullOrEmpty(originalTempDir)) return;
+    RScriptROperation rop = new RScriptROperation(String.format("base::unlink('%s', recursive=TRUE)", originalTempDir), false);
     execute(rop);
   }
 
