@@ -10,11 +10,7 @@
 
 package org.obiba.opal.web.r;
 
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.model.OpalR;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +20,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import java.util.stream.StreamSupport;
 
 @Component
 @Scope("request")
@@ -35,12 +30,8 @@ public class RServicePackageResource {
   private RPackageResourceHelper rPackageHelper;
 
   @GET
-  public OpalR.RPackageDto getPackage(@PathParam("name") String name) throws REXPMismatchException {
-    RScriptROperation rop = rPackageHelper.getInstalledPackages();
-    REXP rexp = rop.getResult();
-    RStringMatrix matrix = new RStringMatrix(rexp);
-    return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
-        .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
+  public OpalR.RPackageDto getPackage(@PathParam("name") String name) {
+    return rPackageHelper.getInstalledPackagesDtos().stream()
         .filter(dto -> dto.getName().equals(name))
         .findFirst()
         .orElseThrow(() -> new NoSuchRPackageException(name));

@@ -11,11 +11,9 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Joiner;
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RStringMatrix;
+import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +26,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 @Scope("request")
@@ -42,13 +38,8 @@ public class RServicePackagesResource {
   private RPackageResourceHelper rPackageHelper;
 
   @GET
-  public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
-    RScriptROperation rop = rPackageHelper.getInstalledPackages();
-    REXP rexp = rop.getResult();
-    RStringMatrix matrix = new RStringMatrix(rexp);
-    return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
-        .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
-        .collect(Collectors.toList());
+  public List<OpalR.RPackageDto> getPackages() {
+    return rPackageHelper.getInstalledPackagesDtos();
   }
 
   @PUT
@@ -57,7 +48,7 @@ public class RServicePackagesResource {
       // dump all R sessions
       rPackageHelper.restartRServer();
       String cmd = ".libPaths()";
-      RScriptROperation rop = rPackageHelper.execute(cmd);
+      ROperationWithResult rop = rPackageHelper.execute(cmd);
       REXP rexp = rop.getResult();
       cmd = "getwd()";
       rop = rPackageHelper.execute(cmd);

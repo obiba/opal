@@ -15,9 +15,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.spi.r.RMatrix;
+import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Helper class for R package management.
@@ -56,17 +61,31 @@ public class RPackageResourceHelper {
   @Autowired
   protected OpalRService opalRService;
 
-  public RScriptROperation getInstalledPackages() {
+  public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
+    ROperationWithResult rop = getInstalledPackages();
+    REXP rexp = rop.getResult();
+    try {
+      RStringMatrix matrix = new RStringMatrix(rexp);
+      return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
+          .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
+          .collect(Collectors.toList());
+    } catch (REXPMismatchException e) {
+      log.error("Error when reading installed packages", e);
+      return Lists.newArrayList();
+    }
+  }
+
+  private ROperationWithResult getInstalledPackages() {
     return getInstalledPackages(new ArrayList<>());
   }
 
-  public RScriptROperation removePackage(String name) {
+  public ROperationWithResult removePackage(String name) {
     checkAlphanumeric(name);
     String cmd = "remove.packages('" + name + "')";
     return execute(cmd);
   }
 
-  public RScriptROperation installPackage(String name, String ref, String defaultName) {
+  public ROperationWithResult installPackage(String name, String ref, String defaultName) {
     String cmd;
     if (Strings.isNullOrEmpty(ref)) {
       checkAlphanumeric(name);
@@ -83,7 +102,7 @@ public class RPackageResourceHelper {
         cmd = getInstallGitHubCommand(name, defaultName, ref);
       }
     }
-    RScriptROperation rval = execute(cmd);
+    ROperationWithResult rval = execute(cmd);
     restartRServer();
     return rval;
   }
@@ -101,14 +120,17 @@ public class RPackageResourceHelper {
     return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
   }
 
-  protected RScriptROperation execute(String rscript) {
-    log.info(rscript);
+  public ROperationWithResult execute(String rscript) {
     RScriptROperation rop = new RScriptROperation(rscript, false);
+    return execute(rop);
+  }
+
+  public ROperationWithResult execute(ROperationWithResult rop) {
     opalRService.execute(rop);
     return rop;
   }
 
-  private RScriptROperation getInstalledPackages(Iterable<String> fields) {
+  private ROperationWithResult getInstalledPackages(Iterable<String> fields) {
     Iterable<String> allFields = Iterables.concat(Arrays.asList(defaultFields), fields);
     String fieldStr = Joiner.on("','").join(allFields);
     String cmd = "installed.packages(fields=c('" + fieldStr + "'))";

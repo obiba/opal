@@ -9,12 +9,8 @@
  */
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.OpalR;
-import org.obiba.opal.web.r.RPackageResourceHelper;
-import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,8 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Manages Datashield packages.
@@ -41,15 +35,8 @@ public class DataShieldPackagesResource {
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
 
   @GET
-  public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
-    RScriptROperation rop = dsPackageMethodeHelper.getInstalledPackages();
-    REXP rexp = rop.getResult();
-    RStringMatrix matrix = new RStringMatrix(rexp);
-
-    return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
-        .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
-        .filter(dsPackageMethodeHelper::isDataShieldPackage)
-        .collect(Collectors.toList());
+  public List<OpalR.RPackageDto> getPackages() {
+    return dsPackageMethodeHelper.getInstalledPackagesDtos();
   }
 
   @POST

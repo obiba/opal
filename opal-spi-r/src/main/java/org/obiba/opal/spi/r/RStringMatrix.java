@@ -25,8 +25,8 @@ public class RStringMatrix implements RMatrix<String> {
 
   public RStringMatrix(REXP matrix) throws REXPMismatchException {
     RList dimnames = matrix.getAttribute("dimnames").asList();
-    rowNames = dimnames.at(0).asStrings();
-    columnNames = dimnames.at(1).asStrings();
+    rowNames = dimnames.at(0).isNull() ? new String[]{""} : dimnames.at(0).asStrings();
+    columnNames = dimnames.at(1).isNull() ? new String[]{""} : dimnames.at(1).asStrings();
     values = matrix.asStrings();
   }
 
@@ -82,22 +82,12 @@ public class RStringMatrix implements RMatrix<String> {
 
   @Override
   public Iterable<String[]> iterateRows() {
-    return new Iterable<String[]>() {
-      @Override
-      public Iterator<String[]> iterator() {
-        return new RowsIterator();
-      }
-    };
+    return RowsIterator::new;
   }
 
   @Override
   public Iterable<String[]> iterateColumns() {
-    return new Iterable<String[]>() {
-      @Override
-      public Iterator<String[]> iterator() {
-        return new ColumnsIterator();
-      }
-    };
+    return ColumnsIterator::new;
   }
 
   private class RowsIterator implements Iterator<String[]> {
