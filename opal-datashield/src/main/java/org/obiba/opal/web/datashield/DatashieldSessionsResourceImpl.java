@@ -13,15 +13,20 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
+import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.RSessionsResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles the list and the creation of the Datashield sessions of the invoking Opal user.
@@ -38,6 +43,19 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   @Autowired
   private OpalConfigurationService configurationService;
+
+  @Override
+  public List<OpalR.RSessionDto> getRSessionIds() {
+    return super.getRSessionIds().stream().filter(s -> DS_CONTEXT.equals(s.getContext())).collect(Collectors.toList());
+  }
+
+  @Override
+  public Response removeRSessions() {
+    opalRSessionManager.getSubjectRSessions().stream()
+        .filter(s -> DS_CONTEXT.equals(s.getExecutionContext()))
+        .forEach(s -> opalRSessionManager.removeRSession(s.getId()));
+    return super.removeRSessions();
+  }
 
   protected void onNewRSession(OpalRSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);

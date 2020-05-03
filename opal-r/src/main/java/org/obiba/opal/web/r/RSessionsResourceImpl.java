@@ -37,7 +37,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   static final String R_CONTEXT = "R";
 
-  private OpalRSessionManager opalRSessionManager;
+  protected OpalRSessionManager opalRSessionManager;
 
   @Autowired
   @Override
