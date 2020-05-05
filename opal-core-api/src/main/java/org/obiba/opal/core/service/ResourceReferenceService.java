@@ -37,7 +37,7 @@ public interface ResourceReferenceService extends SystemService {
   ResourceReference getResourceReference(String project, String name) throws NoSuchResourceReferenceException;
 
   /**
-   * From a resource reference get the appropriate {@link org.obiba.opal.spi.resource.ResourceFactory} and make
+   * From a resource reference get the appropriate resource factory and make
    * a {@link Resource}.
    *
    * @param resourceReference
@@ -46,7 +46,7 @@ public interface ResourceReferenceService extends SystemService {
   Resource createResource(ResourceReference resourceReference);
 
   /**
-   * Get the required package name from the appropriate {@link org.obiba.opal.spi.resource.ResourceFactory}.
+   * Get the required package name from the appropriate resource factory.
    * @param resourceReference
    * @return null if none
    */

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -19,10 +20,10 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.presenter.slots.SingleSlot;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
-import org.obiba.opal.web.gwt.app.client.support.PluginsResource;
-import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
-import org.obiba.opal.web.model.client.opal.ResourcePluginPackageDto;
+import org.obiba.opal.web.model.client.opal.ResourceProviderDto;
+import org.obiba.opal.web.model.client.opal.ResourceProvidersDto;
+import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
 
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
+  private List<ResourceTagDto> resourceTags = Lists.newArrayList();
+
   @Inject
   public ProjectResourcesPresenter(Display display, EventBus eventBus, ProjectResourceListPresenter projectResourceListPresenter, ProjectResourcePresenter projectResourcePresenter) {
     super(eventBus, display);
@@ -44,16 +47,16 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
 
   @Override
   protected void onBind() {
-    ResourcePluginsResource.getInstance().getPlugins(new PluginsResource.Handler() {
+    ResourceProvidersResource.getInstance().getProviders(new ResourceProvidersResource.Handler() {
       @Override
-      public void handle(List<PluginPackageDto> plugins) {
-        for (PluginPackageDto plugin : plugins) {
-          ResourcePluginPackageDto resourcePlugin = plugin.getExtension(ResourcePluginPackageDto.PluginPackageDtoExtensions.resource).cast();
-          for (ResourceFactoryDto factory : JsArrays.toIterable(resourcePlugin.getResourceFactoriesArray())) {
-            String key = ResourcePluginsResource.makeResourceFactoryKey(plugin, factory);
+      public void handle(ResourceProvidersDto providers) {
+        for (ResourceProviderDto provider : JsArrays.toIterable(providers.getProvidersArray())) {
+          for (ResourceFactoryDto factory : JsArrays.toIterable(provider.getResourceFactoriesArray())) {
+            String key = ResourceProvidersResource.makeResourceFactoryKey(factory);
             resourceFactories.put(key, factory);
           }
         }
+        resourceTags = JsArrays.toList(providers.getTagsArray());
       }
     });
     addRegisteredHandler(ResourceSelectionChangedEvent.getType(), new ResourceSelectionChangedEvent.ResourceSelectionChangedHandler() {
@@ -61,10 +64,10 @@ public class ProjectResourcesPresenter extends PresenterWidget<ProjectResourcesP
       public void onResourceSelectionChanged(ResourceSelectionChangedEvent event) {
         String selectedResourceName = event.getName();
         if (Strings.isNullOrEmpty(selectedResourceName)) {
-          projectResourceListPresenter.initialize(resourceFactories);
+          projectResourceListPresenter.initialize(resourceFactories, resourceTags);
           getView().renderResourceList(event.getProject());
         } else {
-          projectResourcePresenter.initialize(resourceFactories);
+          projectResourcePresenter.initialize(resourceFactories, resourceTags);
           getView().renderResource(event.getProject(), event.getName());
         }
       }

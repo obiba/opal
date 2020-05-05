@@ -34,7 +34,9 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
+import java.util.List;
 import java.util.Map;
 
 public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<ProjectResourceModalUiHandlers> implements ProjectResourceModalPresenter.Display {
@@ -48,6 +50,12 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
 
   @UiField
   Modal modal;
+
+  @UiField
+  ResourceTagChooser tagChooser;
+
+  @UiField
+  HelpBlock tagDescription;
 
   @UiField
   ResourceFactoryChooser factoryChooser;
@@ -90,6 +98,14 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
     modal.setTitle(translations.addResourceModalTitle());
+    tagChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent event) {
+        initializeResourceTagUI(readOnly);
+        factoryChooser.applyTagFilter(tagChooser.getSelectedTag());
+        initializeResourceFactoryUI(readOnly);
+      }
+    });
     factoryChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent event) {
@@ -99,9 +115,18 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   }
 
   @Override
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
+  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly) {
     this.readOnly = readOnly;
-    factoryChooser.setResourceFactories(resourceFactories);
+    ResourceFactoryDto selectedFactory = null;
+    if (resource != null) {
+      selectedFactory = resourceFactories.get(resource.getProvider() + ":" + resource.getFactory());
+    }
+    tagChooser.initialize(resourceTags);
+    tagChooser.setEnabled(!readOnly);
+    if (selectedFactory != null) {
+      tagChooser.setSelectedTag(selectedFactory);
+    }
+    factoryChooser.initialize(resourceFactories, resourceTags, tagChooser.getSelectedTag());
     factoryChooser.setEnabled(!readOnly);
 
     if (resource != null) {
@@ -114,6 +139,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
     viewFooter.setVisible(readOnly);
     editFooter.setVisible(!readOnly);
 
+    initializeResourceTagUI(readOnly);
     initializeResourceFactoryUI(readOnly);
   }
 
@@ -141,6 +167,14 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
     getUiHandlers().onSave(nameText.getText(), factoryChooser.getSelectedValue(),
         getSchemaFormModel(paramsFormPanel), getSchemaFormModel(credentialsFormPanel));
   }
+
+  private void initializeResourceTagUI(boolean readOnly) {
+    ResourceTagDto tag = tagChooser.getSelectedTag();
+    if (tag != null) {
+      tagDescription.setHTML(tag.hasDescription() ? Markdown.parseNoStyle(tag.getDescription()) : "");
+    }
+  }
+
 
   private void initializeResourceFactoryUI(boolean readOnly) {
     ResourceFactoryDto factory = factoryChooser.getSelectedFactory();

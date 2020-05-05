@@ -904,10 +904,10 @@ public enum UriBuilders {
     }
   },
 
-  PLUGINS_RESOURCE {
+  RESOURCE_PROVIDERS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("resource-plugins");
+      return UriBuilder.create().segment("resource-providers");
     }
   },
 

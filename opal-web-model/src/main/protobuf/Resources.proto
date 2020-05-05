@@ -1,0 +1,33 @@
+package Resources;
+
+option java_package = "org.obiba.opal.web.model";
+
+
+message ResourceProvidersDto {
+    repeated ResourceProviderDto providers = 1;
+    repeated ResourceTagDto tags = 2;
+}
+
+message ResourceProviderDto {
+    required string name = 1;
+    required string title = 2;
+    optional string description = 3;
+    repeated ResourceTagDto tags = 4;
+    repeated ResourceFactoryDto resourceFactories = 5;
+}
+
+message ResourceTagDto {
+    required string name = 1;
+    required string title = 2;
+    optional string description = 3;
+}
+
+message ResourceFactoryDto {
+    required string provider = 1;
+    required string name = 2;
+    required string title = 3;
+    optional string description = 4;
+    repeated string tags = 5;
+    required string parametersSchemaForm = 6;
+    required string credentialsSchemaForm = 7;
+}

@@ -42,6 +42,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,8 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
+
+  private List<ResourceTagDto> resourceTags = Lists.newArrayList();
 
   private List<ResourceReferenceDto> resources;
 
@@ -119,13 +122,13 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   @Override
   public void onAddResource() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, null, false);
+    modal.initialize(projectName, resourceFactories, resourceTags, null, false);
   }
 
   @Override
   public void onEditResource(ResourceReferenceDto resource) {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, resource, false);
+    modal.initialize(projectName, resourceFactories, resourceTags, resource, false);
   }
 
   @Override
@@ -185,8 +188,9 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
         .post().send();
   }
 
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories) {
+  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags) {
     this.resourceFactories = resourceFactories;
+    this.resourceTags = resourceTags;
   }
 
   /**

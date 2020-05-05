@@ -20,7 +20,6 @@ import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.spi.resource.Resource;
-import org.obiba.opal.spi.resource.ResourceFactoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.swing.text.html.Option;
 import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -50,12 +46,15 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private final SubjectAclService subjectAclService;
 
+  private final ResourceProvidersService resourceProvidersService;
+
   @Autowired
-  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService, SubjectAclService subjectAclService) {
+  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService, SubjectAclService subjectAclService, ResourceProvidersService resourceProvidersService) {
     this.orientDbService = orientDbService;
     this.opalRuntime = opalRuntime;
     this.cryptoService = cryptoService;
     this.subjectAclService = subjectAclService;
+    this.resourceProvidersService = resourceProvidersService;
   }
 
   @Override
@@ -84,22 +83,18 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public Resource createResource(ResourceReference resourceReference) {
-    ResourceFactoryService resourceFactoryService = (ResourceFactoryService) opalRuntime.getServicePlugin(resourceReference.getProvider());
-    return resourceFactoryService.getResourceFactories().stream()
-        .filter(fac -> fac.getName().equals(resourceReference.getFactory()))
-        .map(fac -> fac.createResource(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials()))
-        .filter(Objects::nonNull)
-        .findFirst().orElse(null);
+    try {
+      ResourceProvidersService.ResourceFactory factory = resourceProvidersService.getResourceFactory(resourceReference.getProvider(), resourceReference.getFactory());
+      return factory.createResource(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials());
+    } catch (Exception e) {
+      logger.error("Cannot make resource object of resource reference {}", resourceReference.getProject() + "." + resourceReference.getName(), e);
+    }
+    return null;
   }
 
   @Override
   public String getRequiredPackageName(ResourceReference resourceReference) {
-    ResourceFactoryService resourceFactoryService = (ResourceFactoryService) opalRuntime.getServicePlugin(resourceReference.getProvider());
-    return resourceFactoryService.getResourceFactories().stream()
-        .filter(fac -> fac.getName().equals(resourceReference.getFactory()))
-        .map(fac -> fac.getRequiredPackage(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials()))
-        .filter(Objects::nonNull)
-        .findFirst().orElse(null);
+    return resourceReference.getProvider();
   }
 
   @Override
@@ -122,7 +117,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     try {
       orientDbService.delete(getResourceReference(project, name));
       subjectAclService.deleteNodePermissions(getPermissionNode(project, name));
-    } catch(NoSuchResourceReferenceException e) {
+    } catch (NoSuchResourceReferenceException e) {
       // ignore
     }
   }

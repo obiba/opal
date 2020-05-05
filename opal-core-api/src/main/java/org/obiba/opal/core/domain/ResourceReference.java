@@ -66,7 +66,7 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
   }
 
   public String getProvider() {
-    return provider;
+    return "opal-resource-commons".equals(provider) ? "resourcer" : provider;
   }
 
   public void setProvider(String provider) {

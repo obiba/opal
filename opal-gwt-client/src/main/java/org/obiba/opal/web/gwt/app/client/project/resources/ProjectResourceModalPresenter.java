@@ -25,8 +25,10 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectResourceModalPresenter.Display>
@@ -37,6 +39,8 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
   private String projectName;
 
   private Map<String, ResourceFactoryDto> resourceFactories;
+
+  private List<ResourceTagDto> resourceTags;
 
   private ResourceReferenceDto originalResource;
 
@@ -51,16 +55,17 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     this.translations = translations;
   }
 
-  public void initialize(String projectName, Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly) {
+  public void initialize(String projectName, Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly) {
     this.resourceFactories = resourceFactories;
+    this.resourceTags = resourceTags;
     this.projectName = projectName;
     this.originalResource = resource;
-    getView().initialize(resourceFactories, resource, readOnly);
+    getView().initialize(resourceFactories, resourceTags, resource, readOnly);
   }
 
   @Override
   public void onSave(final String name, String factoryKey, JSONObject parameters, JSONObject credentials) {
-    String[] token = ResourcePluginsResource.splitResourceFactoryKey(factoryKey);
+    String[] token = ResourceProvidersResource.splitResourceFactoryKey(factoryKey);
     ResourceReferenceDto resource = ResourceReferenceDto.create();
     resource.setName(name);
     resource.setProject(projectName);
@@ -115,7 +120,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   public interface Display extends PopupView, HasUiHandlers<ProjectResourceModalUiHandlers> {
 
-    void initialize(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource, boolean readOnly);
+    void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly);
 
     void hideDialog();
   }

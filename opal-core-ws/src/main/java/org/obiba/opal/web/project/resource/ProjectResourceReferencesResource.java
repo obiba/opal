@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -45,6 +46,7 @@ public class ProjectResourceReferencesResource {
   @GET
   public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name) {
     return StreamSupport.stream(resourceReferenceService.getResourceReferences(name).spliterator(), false)
+        .sorted(Comparator.comparing(ResourceReference::getName))
         .map(ref -> Dtos.asDto(ref, resourceReferenceService.createResource(ref), isEditable(name, ref.getName())))
         .collect(Collectors.toList());
   }

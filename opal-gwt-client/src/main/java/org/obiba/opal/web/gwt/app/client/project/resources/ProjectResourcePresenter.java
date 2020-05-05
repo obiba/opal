@@ -39,8 +39,10 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
@@ -59,6 +61,8 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   private String projectName;
 
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
+
+  private List<ResourceTagDto> resourceTags;
 
   private ResourceReferenceDto resource;
 
@@ -108,7 +112,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   @Override
   public void onEdit() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, resource, false);
+    modal.initialize(projectName, resourceFactories, resourceTags, resource, false);
   }
 
   @Override
@@ -122,7 +126,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         placeManager.revealPlace(ProjectPlacesHelper.getResourcePlace(projectName, event.getName()));
       }
     });
-    modal.initialize(projectName, resourceFactories, resourceCopy, false);
+    modal.initialize(projectName, resourceFactories, resourceTags, resourceCopy, false);
   }
 
   @Override
@@ -160,8 +164,9 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         .get().send();
   }
 
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories) {
+  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags) {
     this.resourceFactories = resourceFactories;
+    this.resourceTags = resourceTags;
   }
 
   public interface Display extends View, HasUiHandlers<ProjectResourceUiHandlers> {

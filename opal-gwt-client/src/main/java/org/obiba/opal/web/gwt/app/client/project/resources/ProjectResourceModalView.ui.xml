@@ -33,6 +33,17 @@
 
         <b:ControlGroup>
             <b:ControlLabel>
+                <ui:msg description="Resource tag label">Category</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <r:ResourceTagChooser ui:field="tagChooser"/>
+            </b:Controls>
+            <b:HelpBlock ui:field="tagDescription">
+            </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
+            <b:ControlLabel>
                 <ui:msg description="Resource factory label">Type</ui:msg>
             </b:ControlLabel>
             <b:Controls>
