@@ -10,14 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
+import org.obiba.opal.web.model.client.opal.ResourceCategoryDto;
 
 import java.util.*;
 
@@ -25,15 +24,12 @@ public class ResourceFactoryChooser extends Chooser {
 
   private Map<String, ResourceFactoryDto> resourceFactories;
 
-  private List<ResourceTagDto> resourceTags;
-
-  public void initialize(final Map<String, ResourceFactoryDto> resourceFactories, final List<ResourceTagDto> resourceTags, ResourceTagDto filter) {
+  public void initialize(final Map<String, ResourceFactoryDto> resourceFactories, final List<ResourceCategoryDto> resourceCategories, ResourceCategoryDto filter) {
     this.resourceFactories = resourceFactories;
-    this.resourceTags = resourceTags;
     resetOptions(filter);
   }
 
-  private void resetOptions(ResourceTagDto filter) {
+  private void resetOptions(ResourceCategoryDto filter) {
     clear();
     Map<String, String> items = Maps.newHashMap();
 
@@ -53,10 +49,6 @@ public class ResourceFactoryChooser extends Chooser {
     setSelectedIndex(0);
   }
 
-  public Map<String, ResourceFactoryDto> getResourceFactories() {
-    return resourceFactories;
-  }
-
   public ResourceFactoryDto getSelectedFactory() {
     return resourceFactories.get(getSelectedValue());
   }
@@ -66,7 +58,7 @@ public class ResourceFactoryChooser extends Chooser {
     setSelectedValue(key);
   }
 
-  public void applyTagFilter(ResourceTagDto selectedTag) {
-    resetOptions(selectedTag);
+  public void applyCategoryFilter(ResourceCategoryDto selectedCategory) {
+    resetOptions(selectedCategory);
   }
 }

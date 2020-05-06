@@ -45,11 +45,11 @@ public interface ResourceProvidersService extends SystemService {
   ResourceFactory getResourceFactory(String provider, String name) throws NoSuchResourceProviderException, NoSuchResourceFactoryException;
 
   /**
-   * Get a merged list of {@link Tag} items.
+   * Get a merged list of {@link Category} items.
    *
    * @return
    */
-  List<Tag> getAllTags();
+  List<Category> getAllCategories();
 
   /**
    * Get the merged list of {@link ResourceFactory} items, matching the tag names (or all if none).
@@ -83,18 +83,25 @@ public interface ResourceProvidersService extends SystemService {
     String getDescription();
 
     /**
-     * Get the list of {@link Tag} items defined by this resource provider.
+     * URL to go to a page description of resource provider.
+     *
      * @return
      */
-    List<Tag> getTags();
+    String getWeb();
 
     /**
-     * Get {@link Tag} by name.
+     * Get the list of {@link Category} items defined by this resource provider.
+     * @return
+     */
+    List<Category> getCategories();
+
+    /**
+     * Get {@link Category} by name.
      *
      * @param name
      * @return
      */
-    Tag getTag(String name);
+    Category getCategory(String name);
 
     /**
      * Get the {@link ResourceFactory} items defined by this resource provider.
@@ -105,11 +112,11 @@ public interface ResourceProvidersService extends SystemService {
   }
 
   /**
-   * A tag helps at classifying the resources that can be built. Mot of the time a resource has several dimensions,
+   * A category helps at classifying the resources that can be built. Mot of the time a resource has several dimensions,
    * such as its location, the storage system and the data format. Multiple tags can be applied on a
    * {@link ResourceFactory} and by selecting these tags .
    */
-  interface Tag {
+  interface Category {
 
     /**
      * Unique identifier name of the tag.

@@ -10,7 +10,10 @@
 
 package org.obiba.opal.core.service;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import org.json.JSONArray;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -93,8 +97,18 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
-  public String getRequiredPackageName(ResourceReference resourceReference) {
-    return resourceReference.getProvider();
+  public List<String> getRequiredPackages(ResourceReference resourceReference) {
+    List<String> names = Lists.newArrayList(resourceReference.getProvider());
+    String pkg = resourceReference.getParameters().optString("_package");
+    if (!Strings.isNullOrEmpty(pkg)) names.add(pkg);
+    JSONArray pkgs = resourceReference.getParameters().optJSONArray("_packages");
+    if (pkgs != null) {
+      for (int i = 0; i<pkgs.length(); i++) {
+        String p = pkgs.optString(i);
+        if (!Strings.isNullOrEmpty(p)) names.add(p);
+      }
+    }
+    return names;
   }
 
   @Override

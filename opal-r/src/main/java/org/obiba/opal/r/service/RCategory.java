@@ -13,26 +13,26 @@ package org.obiba.opal.r.service;
 import org.json.JSONObject;
 import org.obiba.opal.core.service.ResourceProvidersService;
 
-class RTag implements ResourceProvidersService.Tag {
+class RCategory implements ResourceProvidersService.Category {
 
-  private final JSONObject tagObj;
+  private final JSONObject categoryObj;
 
-  RTag(JSONObject tagObj) {
-    this.tagObj = tagObj;
+  RCategory(JSONObject categoryObj) {
+    this.categoryObj = categoryObj;
   }
 
   @Override
   public String getName() {
-    return tagObj.optString("name");
+    return categoryObj.optString("name");
   }
 
   @Override
   public String getTitle() {
-    return tagObj.optString("title");
+    return categoryObj.optString("title");
   }
 
   @Override
   public String getDescription() {
-    return tagObj.optString("description");
+    return categoryObj.optString("description");
   }
 }

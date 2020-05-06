@@ -89,11 +89,12 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
     try {
       JSONObject resource = new JSONObject();
       if (engine != null) {
-        Invocable inv = (Invocable) engine;
-        ScriptObjectMirror rval = (ScriptObjectMirror) inv.invokeFunction(
-            provider + "_resource", getName(), name,
-            JSONUtils.toMap(parameters), JSONUtils.toMap(credentials));
-        resource = new JSONObject(rval);
+        String varName = provider.replaceAll("\\.", "_");
+        Object rsrc = engine.eval(String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), name,
+            parameters == null ? "undefined" : parameters.toString(),
+            credentials == null ? "undefined" : credentials.toString()));
+        if (rsrc != null)
+          resource = new JSONObject(rsrc.toString());
         log.trace("resource = {}", resource.toString(2));
       }
 

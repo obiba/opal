@@ -10,8 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Controls;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
@@ -26,7 +27,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -34,7 +34,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
@@ -43,14 +42,12 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
 import org.obiba.opal.web.model.client.opal.ResourceSummaryDto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.*;
 
@@ -61,6 +58,8 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   private final TranslationMessages translationMessages;
 
   private final PlaceManager placeManager;
+
+  private final ResourceProvidersService resourceProvidersService;
 
   interface Binder extends UiBinder<Widget, ProjectResourceListView> {
   }
@@ -112,19 +111,17 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
 
   private ActionsColumn<ResourceReferenceDto> actionsColumn;
 
-  private Map<String, ResourceFactoryDto> resourceFactories;
-
   @Inject
-  public ProjectResourceListView(Binder uiBinder, Translations translations, TranslationMessages translationMessages, PlaceManager placeManager) {
+  public ProjectResourceListView(Binder uiBinder, Translations translations, TranslationMessages translationMessages, PlaceManager placeManager, ResourceProvidersService resourceProvidersService) {
     this.translations = translations;
+    this.resourceProvidersService = resourceProvidersService;
     this.translationMessages = translationMessages;
     this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
-  public void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories) {
-    this.resourceFactories = resourceFactories;
+  public void renderResources(List<ResourceReferenceDto> resources) {
     configureTable();
     table.removeColumn(checkColumn);
     table.removeColumn(actionsColumn);
@@ -230,9 +227,8 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     table.addColumn(new TextColumn<ResourceReferenceDto>() {
       @Override
       public String getValue(ResourceReferenceDto object) {
-        String key = object.getProvider() + ":" + object.getFactory();
-        ResourceFactoryDto factory = resourceFactories.get(key);
-        if (factory == null || !factory.hasTitle()) return key;
+        ResourceFactoryDto factory = resourceProvidersService.getResourceFactory(object.getProvider(), object.getFactory());
+        if (factory == null || !factory.hasTitle()) return object.getProvider() + ":" + object.getFactory();
         return factory.getTitle();
       }
     }, translations.typeLabel());
@@ -285,7 +281,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     table.setEmptyTableWidget(new Label(translations.noItems()));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
-    renderResources(new ArrayList<ResourceReferenceDto>(), resourceFactories);
+    renderResources(new ArrayList<ResourceReferenceDto>());
   }
 
   private static class ResourceLinkCell extends PlaceRequestCell<ResourceReferenceDto> {

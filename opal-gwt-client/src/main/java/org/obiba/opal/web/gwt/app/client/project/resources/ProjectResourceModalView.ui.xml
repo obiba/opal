@@ -33,12 +33,12 @@
 
         <b:ControlGroup>
             <b:ControlLabel>
-                <ui:msg description="Resource tag label">Category</ui:msg>
+                <ui:msg description="Resource category label">Category</ui:msg>
             </b:ControlLabel>
             <b:Controls>
-                <r:ResourceTagChooser ui:field="tagChooser"/>
+                <r:ResourceCategoryChooser ui:field="categoryChooser"/>
             </b:Controls>
-            <b:HelpBlock ui:field="tagDescription">
+            <b:HelpBlock ui:field="categoryDescription">
             </b:HelpBlock>
         </b:ControlGroup>
 
@@ -49,6 +49,10 @@
             <b:Controls>
                 <r:ResourceFactoryChooser ui:field="factoryChooser"/>
             </b:Controls>
+            <g:FlowPanel>
+                <g:Label ui:field="providerLabel"></g:Label>
+                <g:Anchor ui:field="providerLink"></g:Anchor>
+            </g:FlowPanel>
             <b:HelpBlock ui:field="factoryDescription">
             </b:HelpBlock>
         </b:ControlGroup>

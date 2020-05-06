@@ -23,13 +23,9 @@ import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceUpdated
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
 
 public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectResourceModalPresenter.Display>
     implements ProjectResourceModalUiHandlers {
@@ -37,10 +33,6 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
   private final Translations translations;
 
   private String projectName;
-
-  private Map<String, ResourceFactoryDto> resourceFactories;
-
-  private List<ResourceTagDto> resourceTags;
 
   private ResourceReferenceDto originalResource;
 
@@ -55,17 +47,15 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
     this.translations = translations;
   }
 
-  public void initialize(String projectName, Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly) {
-    this.resourceFactories = resourceFactories;
-    this.resourceTags = resourceTags;
+  public void initialize(String projectName, ResourceReferenceDto resource, boolean readOnly) {
     this.projectName = projectName;
     this.originalResource = resource;
-    getView().initialize(resourceFactories, resourceTags, resource, readOnly);
+    getView().initialize(resource, readOnly);
   }
 
   @Override
   public void onSave(final String name, String factoryKey, JSONObject parameters, JSONObject credentials) {
-    String[] token = ResourceProvidersResource.splitResourceFactoryKey(factoryKey);
+    String[] token = ResourceProvidersService.splitResourceFactoryKey(factoryKey);
     ResourceReferenceDto resource = ResourceReferenceDto.create();
     resource.setName(name);
     resource.setProject(projectName);
@@ -120,7 +110,7 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
 
   public interface Display extends PopupView, HasUiHandlers<ProjectResourceModalUiHandlers> {
 
-    void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly);
+    void initialize(ResourceReferenceDto resource, boolean readOnly);
 
     void hideDialog();
   }

@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Provider;
@@ -37,13 +36,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 
@@ -59,10 +54,6 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
 
   private String projectName;
-
-  private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
-
-  private List<ResourceTagDto> resourceTags;
 
   private ResourceReferenceDto resource;
 
@@ -112,7 +103,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   @Override
   public void onEdit() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, resourceTags, resource, false);
+    modal.initialize(projectName, resource, false);
   }
 
   @Override
@@ -126,7 +117,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         placeManager.revealPlace(ProjectPlacesHelper.getResourcePlace(projectName, event.getName()));
       }
     });
-    modal.initialize(projectName, resourceFactories, resourceTags, resourceCopy, false);
+    modal.initialize(projectName, resourceCopy, false);
   }
 
   @Override
@@ -152,7 +143,7 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
               setInSlot(Display.RESOURCE_PERMISSIONS, resourcePermissionsPresenter);
             }
 
-            getView().renderResource(resourceFactories, resource);
+            getView().renderResource(resource);
           }
         })
         .withCallback(new ResponseCodeCallback() {
@@ -164,16 +155,11 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         .get().send();
   }
 
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags) {
-    this.resourceFactories = resourceFactories;
-    this.resourceTags = resourceTags;
-  }
-
   public interface Display extends View, HasUiHandlers<ProjectResourceUiHandlers> {
 
     SingleSlot<ResourcePermissionsPresenter> RESOURCE_PERMISSIONS = new SingleSlot<ResourcePermissionsPresenter>();
 
-    void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource);
+    void renderResource(ResourceReferenceDto resource);
   }
 
   private class RemoveRunnable implements Runnable {

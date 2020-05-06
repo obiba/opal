@@ -41,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionT
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.resources.ResourceProvidersService;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -68,18 +69,24 @@ public class RAdministrationPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
+  private final ResourceProvidersService resourceProvidersService;
+
   private Runnable confirmation;
 
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
                                   RSessionsPresenter rSessionsPresenter, RWorkspacesPresenter rWorkspacesPresenter,
-                                  ModalProvider<RPackageInstallModalPresenter> rPackageInstallModalPresenterModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+                                  ModalProvider<RPackageInstallModalPresenter> rPackageInstallModalPresenterModalProvider,
+                                  Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                  DefaultBreadcrumbsBuilder breadcrumbsHelper,
+                                  ResourceProvidersService resourceProvidersService) {
     super(eventBus, display, proxy);
     this.rSessionsPresenter = rSessionsPresenter;
     this.rWorkspacesPresenter = rWorkspacesPresenter;
     this.rPackageInstallModalPresenterModalProvider = rPackageInstallModalPresenterModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
+    this.resourceProvidersService = resourceProvidersService;
     getView().setUiHandlers(this);
   }
 
@@ -176,6 +183,7 @@ public class RAdministrationPresenter
       public void onResponseCode(Request request, Response response) {
         if (response.getStatusCode() == SC_OK) {
           refreshStatus();
+          resourceProvidersService.reset();
         } else {
           getView().setServiceStatus(Display.Status.Startable);
         }

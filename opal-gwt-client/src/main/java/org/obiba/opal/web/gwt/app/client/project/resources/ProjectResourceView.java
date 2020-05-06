@@ -29,15 +29,16 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
+import org.obiba.opal.web.model.client.opal.ResourceProviderDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-
-import java.util.Map;
 
 public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHandlers> implements ProjectResourcePresenter.Display {
 
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
+
+  private final ResourceProvidersService resourceProvidersService;
 
   private final EventBus eventBus;
 
@@ -49,6 +50,12 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
 
   @UiField
   Label name;
+
+  @UiField
+  com.google.gwt.user.client.ui.Label providerLabel;
+
+  @UiField
+  Anchor providerLink;
 
   @UiField
   Label factoryTitle;
@@ -79,12 +86,11 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
 
   private ResourceReferenceDto resource;
 
-  private Map<String, ResourceFactoryDto> resourceFactories;
-
   @Inject
-  public ProjectResourceView(Binder uiBinder, Translations translations, TranslationMessages translationMessages, EventBus eventBus) {
+  public ProjectResourceView(Binder uiBinder, Translations translations, TranslationMessages translationMessages, EventBus eventBus, ResourceProvidersService resourceProvidersService) {
     this.translations = translations;
     this.translationMessages = translationMessages;
+    this.resourceProvidersService = resourceProvidersService;
     this.eventBus = eventBus;
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -105,8 +111,7 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   }
 
   @Override
-  public void renderResource(Map<String, ResourceFactoryDto> resourceFactories, ResourceReferenceDto resource) {
-    this.resourceFactories = resourceFactories;
+  public void renderResource(ResourceReferenceDto resource) {
     this.resource = resource;
 
     credentialsPanel.setVisible(resource.getEditable());
@@ -128,9 +133,23 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   }
 
   private void initializeResourceFactoryUI() {
-    ResourceFactoryDto factory = resourceFactories.get(resource.getProvider() + ":" + resource.getFactory());
+    ResourceFactoryDto factory = resourceProvidersService.getResourceFactory(resource.getProvider(), resource.getFactory());
     factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
     factoryTitle.setText(factory.getTitle());
+    ResourceProviderDto provider = resourceProvidersService.getResourceProvider(factory.getProvider());
+    if (provider.hasWeb()) {
+      providerLabel.setVisible(false);
+      providerLink.setHref(provider.getWeb());
+      providerLink.setTarget("_blank");
+      providerLink.setText(provider.getName() + " - " + provider.getTitle());
+      providerLink.setTitle(provider.getDescription());
+      providerLink.setVisible(true);
+    } else {
+      providerLink.setVisible(false);
+      providerLabel.setText(provider.getName() + " - " + provider.getTitle());
+      providerLabel.setTitle(provider.getDescription());
+      providerLabel.setVisible(true);
+    }
     name.setText(resource.getName());
     url.setText(resource.getResource().getUrl());
     format.setText(resource.getResource().getFormat());

@@ -24,14 +24,17 @@ public class Dtos {
         .setTitle(resourceProvider.getTitle())
         .setDescription(resourceProvider.getDescription());
 
+    if (!Strings.isNullOrEmpty(resourceProvider.getWeb()))
+      builder.setWeb(resourceProvider.getWeb());
+
     builder.addAllResourceFactories(resourceProvider.getFactories().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    builder.addAllTags(resourceProvider.getTags().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    builder.addAllCategories(resourceProvider.getCategories().stream().map(Dtos::asDto).collect(Collectors.toList()));
 
     return builder.build();
   }
 
-  public static Resources.ResourceTagDto asDto(ResourceProvidersService.Tag tag) {
-    Resources.ResourceTagDto.Builder builder = Resources.ResourceTagDto.newBuilder()
+  public static Resources.ResourceCategoryDto asDto(ResourceProvidersService.Category tag) {
+    Resources.ResourceCategoryDto.Builder builder = Resources.ResourceCategoryDto.newBuilder()
         .setName(tag.getName())
         .setTitle(tag.getTitle())
         .setDescription(tag.getDescription());

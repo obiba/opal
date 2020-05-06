@@ -13,6 +13,8 @@ package org.obiba.opal.core.service;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.spi.resource.Resource;
 
+import java.util.List;
+
 /**
  * Manage the {@link ResourceReference}s persisted, by project.
  */
@@ -46,11 +48,11 @@ public interface ResourceReferenceService extends SystemService {
   Resource createResource(ResourceReference resourceReference);
 
   /**
-   * Get the required package name from the appropriate resource factory.
+   * Get the required package names from the appropriate resource factory.
    * @param resourceReference
-   * @return null if none
+   * @return empty if none
    */
-  String getRequiredPackageName(ResourceReference resourceReference);
+  List<String> getRequiredPackages(ResourceReference resourceReference);
 
   /**
    * Save (create or update) the resource reference.

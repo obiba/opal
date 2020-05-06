@@ -11,45 +11,41 @@
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.model.client.opal.ResourceCategoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ResourceTagChooser extends Chooser {
+public class ResourceCategoryChooser extends Chooser {
 
-  private List<ResourceTagDto> resourceTags;
+  private List<ResourceCategoryDto> resourceCategories;
 
-  public void initialize(final List<ResourceTagDto> resourceTags) {
-    this.resourceTags = resourceTags;
+  public void initialize(final List<ResourceCategoryDto> resourceCategories) {
+    this.resourceCategories = resourceCategories;
     clear();
-    Collections.sort(resourceTags, new Comparator<ResourceTagDto>() {
+    Collections.sort(resourceCategories, new Comparator<ResourceCategoryDto>() {
       @Override
-      public int compare(ResourceTagDto tag1, ResourceTagDto tag2) {
+      public int compare(ResourceCategoryDto tag1, ResourceCategoryDto tag2) {
         return tag1.getTitle().compareTo(tag2.getTitle());
       }
     });
-    for (ResourceTagDto tag : resourceTags) {
+    for (ResourceCategoryDto tag : resourceCategories) {
       addItem(tag.getTitle(), tag.getName());
     }
   }
 
-  public List<ResourceTagDto> getResourceTags() {
-    return resourceTags;
-  }
-
-  public ResourceTagDto getSelectedTag() {
+  public ResourceCategoryDto getSelectedCategory() {
     String selection = getSelectedValue();
-    for (ResourceTagDto tag : resourceTags) {
+    for (ResourceCategoryDto tag : resourceCategories) {
       if (tag.getName().equals(selection))
         return tag;
     }
     return null;
   }
 
-  public void setSelectedTag(ResourceFactoryDto factory) {
+  public void setSelectedCategory(ResourceFactoryDto factory) {
     String key = factory.getTags(0);
     setSelectedValue(key);
   }

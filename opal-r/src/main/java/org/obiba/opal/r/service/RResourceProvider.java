@@ -12,16 +12,20 @@ package org.obiba.opal.r.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.spi.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.List;
+import java.util.Map;
 
 class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
@@ -29,16 +33,12 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   private final String name;
 
-  private final JSONObject formsConfig;
-
-  private final String script;
+  private JSONObject settings;
 
   private ScriptEngine engine;
 
-  RResourceProvider(String name, JSONObject formsConfig, String script) {
+  RResourceProvider(String name, String script) {
     this.name = name;
-    this.formsConfig = formsConfig;
-    this.script = script;
     try {
       ScriptEngineManager manager = new ScriptEngineManager();
       this.engine = manager.getEngineByName("JavaScript");
@@ -55,34 +55,39 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   @Override
   public String getTitle() {
-    return formsConfig.optString("title");
+    return getSettings().optString("title");
   }
 
   @Override
   public String getDescription() {
-    return formsConfig.optString("description");
+    return getSettings().optString("description");
   }
 
   @Override
-  public List<ResourceProvidersService.Tag> getTags() {
-    JSONArray tags = formsConfig.optJSONArray("tags");
-    List<ResourceProvidersService.Tag> rTags = Lists.newArrayList();
-    if (tags != null) {
-      for (int i = 0; i < tags.length(); i++) {
-        rTags.add(new RTag(tags.getJSONObject(i)));
+  public String getWeb() {
+    return getSettings().optString("web");
+  }
+
+  @Override
+  public List<ResourceProvidersService.Category> getCategories() {
+    JSONArray categories = getSettings().optJSONArray("categories");
+    List<ResourceProvidersService.Category> rCats = Lists.newArrayList();
+    if (categories != null) {
+      for (int i = 0; i < categories.length(); i++) {
+        rCats.add(new RCategory(categories.getJSONObject(i)));
       }
     }
-    return rTags;
+    return rCats;
   }
 
   @Override
-  public ResourceProvidersService.Tag getTag(String name) {
+  public ResourceProvidersService.Category getCategory(String name) {
     if (Strings.isNullOrEmpty(name)) return null;
-    JSONArray tags = formsConfig.optJSONArray("tags");
-    if (tags != null) {
-      for (int i = 0; i < tags.length(); i++) {
-        if (name.equals(tags.getJSONObject(i).optString("name")))
-          return new RTag(tags.getJSONObject(i));
+    JSONArray categories = getSettings().optJSONArray("categories");
+    if (categories != null) {
+      for (int i = 0; i < categories.length(); i++) {
+        if (name.equals(categories.getJSONObject(i).optString("name")))
+          return new RCategory(categories.getJSONObject(i));
       }
     }
     return null;
@@ -90,13 +95,29 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   @Override
   public List<ResourceProvidersService.ResourceFactory> getFactories() {
-    JSONArray forms = formsConfig.optJSONArray("forms");
+    JSONArray types = getSettings().optJSONArray("types");
     List<ResourceProvidersService.ResourceFactory> factories = Lists.newArrayList();
-    if (forms != null) {
-      for (int i = 0; i < forms.length(); i++) {
-        factories.add(new RResourceFactory(name, forms.getJSONObject(i), engine));
+    if (types != null) {
+      for (int i = 0; i < types.length(); i++) {
+        factories.add(new RResourceFactory(name, types.getJSONObject(i), engine));
       }
     }
     return factories;
+  }
+
+  public JSONObject getSettings() {
+    if (settings == null) {
+      if (engine != null) {
+        String varName = name.replaceAll("\\.", "_");
+        try {
+          this.settings = new JSONObject(engine.eval(String.format("JSON.stringify(%s.settings)", varName)).toString());
+          log.trace("{} settings = {}", name, settings.toString(2));
+        } catch (ScriptException e) {
+          log.error("Unable to get resource settings from package: {}", name, e);
+          this.settings = new JSONObject();
+        }
+      }
+    }
+    return settings;
   }
 }

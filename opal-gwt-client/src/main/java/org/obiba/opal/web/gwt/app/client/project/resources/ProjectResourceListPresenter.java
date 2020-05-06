@@ -13,7 +13,6 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -40,12 +39,9 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
 
 import java.util.List;
-import java.util.Map;
 
 public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourceListPresenter.Display>
     implements ProjectResourceListUiHandlers {
@@ -58,18 +54,17 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
-  private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
-
-  private List<ResourceTagDto> resourceTags = Lists.newArrayList();
+  private final ResourceProvidersService resourceProvidersService;
 
   private List<ResourceReferenceDto> resources;
 
   private Runnable removeConfirmation;
 
   @Inject
-  public ProjectResourceListPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
+  public ProjectResourceListPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ResourceProvidersService resourceProvidersService) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
+    this.resourceProvidersService = resourceProvidersService;
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
@@ -112,6 +107,7 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
         }
       }
     });
+    resourceProvidersService.initialize();
   }
 
   @Override
@@ -122,13 +118,13 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   @Override
   public void onAddResource() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, resourceTags, null, false);
+    modal.initialize(projectName, null, false);
   }
 
   @Override
   public void onEditResource(ResourceReferenceDto resource) {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
-    modal.initialize(projectName, resourceFactories, resourceTags, resource, false);
+    modal.initialize(projectName, resource, false);
   }
 
   @Override
@@ -160,7 +156,7 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
           @Override
           public void onResource(Response response, JsArray<ResourceReferenceDto> resourceReferences) {
             resources = JsArrays.toList(resourceReferences);
-            getView().renderResources(resources, resourceFactories);
+            getView().renderResources(resources);
           }
         }) //
         .get().send();
@@ -186,11 +182,6 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
         .forResource(ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_RESOURCES.create().build(projectName)) //
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
         .post().send();
-  }
-
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags) {
-    this.resourceFactories = resourceFactories;
-    this.resourceTags = resourceTags;
   }
 
   /**
@@ -221,7 +212,7 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
     SingleSlot<ResourcePermissionsPresenter> RESOURCES_PERMISSIONS = new SingleSlot<ResourcePermissionsPresenter>();
 
-    void renderResources(List<ResourceReferenceDto> resources, Map<String, ResourceFactoryDto> resourceFactories);
+    void renderResources(List<ResourceReferenceDto> resources);
 
     HasAuthorization getAddResourceAuthorizer();
 

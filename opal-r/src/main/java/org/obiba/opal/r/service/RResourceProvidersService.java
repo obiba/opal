@@ -38,9 +38,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   private static final Logger log = LoggerFactory.getLogger(RResourceProvidersService.class);
 
-  private static final String RESOURCE_FORMS_FILE = "resource-forms.json";
-
-  private static final String RESOURCE_JS_FILE = "resource.js";
+  private static final String RESOURCE_JS_FILE = "resources/resource.js";
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
@@ -102,9 +100,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   }
 
   @Override
-  public List<Tag> getAllTags() {
-    List<Tag> allTags = Lists.newArrayList();
-    resourceProviders.values().forEach(p -> allTags.addAll(p.getTags()));
+  public List<Category> getAllCategories() {
+    List<Category> allTags = Lists.newArrayList();
+    resourceProviders.values().forEach(p -> allTags.addAll(p.getCategories()));
     return allTags;
   }
 
@@ -121,18 +119,13 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   public void onRServiceStarted(RServiceStartedEvent event) {
     resourceProviders.clear();
     try {
-      ResourcePackagesROperation rop = new ResourcePackagesROperation();
+      ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       REXP result = rPackageHelper.execute(rop).getResult();
       RList pkgList = result.asList();
       if (pkgList.isNamed()) {
         for (Object name : pkgList.names) {
           REXP rexp = pkgList.at(name.toString());
-          ResourcePackageFormsROperation formRop = new ResourcePackageFormsROperation(name.toString(), rexp.asString());
-          REXP formResult = rPackageHelper.execute(formRop).getResult();
-          JSONObject formsObj = new JSONObject(formResult.asString());
-          ResourcePackageScriptROperation scriptRop = new ResourcePackageScriptROperation(name.toString(), rexp.asString());
-          REXP scriptResult = rPackageHelper.execute(scriptRop).getResult();
-          resourceProviders.put(name.toString(), new RResourceProvider(name.toString(), formsObj, scriptResult.asString()));
+          resourceProviders.put(name.toString(), new RResourceProvider(name.toString(), rexp.asString()));
         }
       }
     } catch (Exception e) {
@@ -143,53 +136,13 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   /**
    * Fetch resource R package names and their location folder.
    */
-  private class ResourcePackagesROperation extends AbstractROperationWithResult {
+  private class ResourcePackageScriptsROperation extends AbstractROperationWithResult {
 
     @Override
     protected void doWithConnection() {
       setResult(null);
-      eval(String.format("is.null(assign('x', lapply(installed.packages()[,1], function(p) { system.file('%s', package=p) })))", RESOURCE_FORMS_FILE), false);
-      setResult(eval("lapply(x[lapply(x, nchar)>0], dirname)", false));
-    }
-  }
-
-  private class ResourcePackageFormsROperation extends AbstractROperationWithResult {
-
-    // package name
-    private final String name;
-
-    // package installation folder
-    private final String directory;
-
-    private ResourcePackageFormsROperation(String name, String directory) {
-      this.name = name;
-      this.directory = directory;
-    }
-
-    @Override
-    protected void doWithConnection() {
-      setResult(null);
-      setResult(eval(String.format("readChar(file.path('%s', '%s'), file.info(file.path('%s', '%s'))$size)", directory, RESOURCE_FORMS_FILE, directory, RESOURCE_FORMS_FILE), false));
-    }
-  }
-
-  private class ResourcePackageScriptROperation extends AbstractROperationWithResult {
-
-    // package name
-    private final String name;
-
-    // package installation folder
-    private final String directory;
-
-    private ResourcePackageScriptROperation(String name, String directory) {
-      this.name = name;
-      this.directory = directory;
-    }
-
-    @Override
-    protected void doWithConnection() {
-      setResult(null);
-      setResult(eval(String.format("readChar(file.path('%s', '%s'), file.info(file.path('%s', '%s'))$size)", directory, RESOURCE_JS_FILE, directory, RESOURCE_JS_FILE), false));
+      eval(String.format("is.null(assign('x', lapply(installed.packages()[,1], function(p) { system.file('%s', package=p) })))", RESOURCE_JS_FILE), false);
+      setResult(eval("lapply(x[lapply(x, nchar)>0], function(p) { readChar(p, file.info(p)$size) })", false));
     }
   }
 

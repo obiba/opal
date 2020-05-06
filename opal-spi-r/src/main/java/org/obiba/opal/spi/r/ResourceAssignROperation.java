@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import org.obiba.opal.spi.resource.Resource;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Bind the rows of R objects using dplyr and assign result to a symbol in R.
@@ -23,12 +24,12 @@ public class ResourceAssignROperation extends AbstractROperation {
 
   private final Resource resource;
   
-  private final String requiredPackage;
+  private final List<String> requiredPackages;
 
-  public ResourceAssignROperation(String symbol, Resource resource, String requiredPackage) {
+  public ResourceAssignROperation(String symbol, Resource resource, List<String> requiredPackages) {
     this.symbol = symbol;
     this.resource = resource;
-    this.requiredPackage = requiredPackage;
+    this.requiredPackages = requiredPackages;
   }
 
   @Override
@@ -38,8 +39,8 @@ public class ResourceAssignROperation extends AbstractROperation {
 
     try {
       ensureGitHubPackage("obiba", "resourcer", "master");
-      if (!Strings.isNullOrEmpty(requiredPackage))
-        loadPackage(requiredPackage);
+      if (requiredPackages != null && !requiredPackages.isEmpty())
+        requiredPackages.forEach(this::loadPackage);
       String script = String.format("resourcer::newResourceClient(resourcer::newResource(name='%s', url='%s', identity=%s, secret=%s, format=%s))",
           resource.getName(),
           resource.toURI().toString(),

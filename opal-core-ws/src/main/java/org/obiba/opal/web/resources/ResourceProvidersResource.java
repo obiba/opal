@@ -33,7 +33,7 @@ public class ResourceProvidersResource {
     Resources.ResourceProvidersDto.Builder builder = Resources.ResourceProvidersDto.newBuilder();
     builder.addAllProviders(resourceProvidersService.getResourceProviders().stream()
         .map(Dtos::asDto).collect(Collectors.toList()));
-    builder.addAllTags(resourceProvidersService.getAllTags().stream()
+    builder.addAllCategories(resourceProvidersService.getAllCategories().stream()
         .map(Dtos::asDto).collect(Collectors.toList()));
     return builder.build();
   }

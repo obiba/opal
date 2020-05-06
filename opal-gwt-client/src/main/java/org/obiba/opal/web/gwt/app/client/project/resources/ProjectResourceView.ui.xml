@@ -62,6 +62,10 @@
                                     <g:Label ui:field="factoryTitle"></g:Label>
                                     <b:HelpBlock ui:field="factoryDescription">
                                     </b:HelpBlock>
+                                    <g:FlowPanel>
+                                        <g:Label ui:field="providerLabel"></g:Label>
+                                        <g:Anchor ui:field="providerLink"></g:Anchor>
+                                    </g:FlowPanel>
                                 </g:FlowPanel>
                             </o:PropertyPanel>
 

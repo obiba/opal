@@ -21,6 +21,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,16 +33,16 @@ import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
+import org.obiba.opal.web.model.client.opal.ResourceCategoryDto;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
+import org.obiba.opal.web.model.client.opal.ResourceProviderDto;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
-import org.obiba.opal.web.model.client.opal.ResourceTagDto;
-
-import java.util.List;
-import java.util.Map;
 
 public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<ProjectResourceModalUiHandlers> implements ProjectResourceModalPresenter.Display {
 
   private final Translations translations;
+
+  private final ResourceProvidersService resourceProvidersService;
 
   private ResourceReferenceDto originalResource;
 
@@ -52,16 +53,22 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   Modal modal;
 
   @UiField
-  ResourceTagChooser tagChooser;
+  ResourceCategoryChooser categoryChooser;
 
   @UiField
-  HelpBlock tagDescription;
+  HelpBlock categoryDescription;
 
   @UiField
   ResourceFactoryChooser factoryChooser;
 
   @UiField
   HelpBlock factoryDescription;
+
+  @UiField
+  com.google.gwt.user.client.ui.Label providerLabel;
+
+  @UiField
+  Anchor providerLink;
 
   @UiField
   TabPanel tabPanel;
@@ -93,16 +100,17 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   private boolean readOnly;
 
   @Inject
-  public ProjectResourceModalView(EventBus eventBus, Binder binder, Translations translations) {
+  public ProjectResourceModalView(EventBus eventBus, Binder binder, Translations translations, ResourceProvidersService resourceProvidersService) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
+    this.resourceProvidersService = resourceProvidersService;
     modal.setTitle(translations.addResourceModalTitle());
-    tagChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+    categoryChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent event) {
-        initializeResourceTagUI(readOnly);
-        factoryChooser.applyTagFilter(tagChooser.getSelectedTag());
+        initializeResourceCategoryUI(readOnly);
+        factoryChooser.applyCategoryFilter(categoryChooser.getSelectedCategory());
         initializeResourceFactoryUI(readOnly);
       }
     });
@@ -115,18 +123,19 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   }
 
   @Override
-  public void initialize(Map<String, ResourceFactoryDto> resourceFactories, List<ResourceTagDto> resourceTags, ResourceReferenceDto resource, boolean readOnly) {
+  public void initialize(ResourceReferenceDto resource, boolean readOnly) {
     this.readOnly = readOnly;
     ResourceFactoryDto selectedFactory = null;
     if (resource != null) {
-      selectedFactory = resourceFactories.get(resource.getProvider() + ":" + resource.getFactory());
+      selectedFactory = resourceProvidersService.getResourceFactory(resource.getProvider(), resource.getFactory());
     }
-    tagChooser.initialize(resourceTags);
-    tagChooser.setEnabled(!readOnly);
+    categoryChooser.initialize(resourceProvidersService.getResourceCategories());
+    categoryChooser.setEnabled(!readOnly);
     if (selectedFactory != null) {
-      tagChooser.setSelectedTag(selectedFactory);
+      categoryChooser.setSelectedCategory(selectedFactory);
     }
-    factoryChooser.initialize(resourceFactories, resourceTags, tagChooser.getSelectedTag());
+    factoryChooser.initialize(resourceProvidersService.getResourceFactories(),
+        resourceProvidersService.getResourceCategories(), categoryChooser.getSelectedCategory());
     factoryChooser.setEnabled(!readOnly);
 
     if (resource != null) {
@@ -139,7 +148,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
     viewFooter.setVisible(readOnly);
     editFooter.setVisible(!readOnly);
 
-    initializeResourceTagUI(readOnly);
+    initializeResourceCategoryUI(readOnly);
     initializeResourceFactoryUI(readOnly);
   }
 
@@ -168,17 +177,30 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
         getSchemaFormModel(paramsFormPanel), getSchemaFormModel(credentialsFormPanel));
   }
 
-  private void initializeResourceTagUI(boolean readOnly) {
-    ResourceTagDto tag = tagChooser.getSelectedTag();
-    if (tag != null) {
-      tagDescription.setHTML(tag.hasDescription() ? Markdown.parseNoStyle(tag.getDescription()) : "");
+  private void initializeResourceCategoryUI(boolean readOnly) {
+    ResourceCategoryDto category = categoryChooser.getSelectedCategory();
+    if (category != null) {
+      categoryDescription.setHTML(category.hasDescription() ? Markdown.parseNoStyle(category.getDescription()) : "");
     }
   }
-
 
   private void initializeResourceFactoryUI(boolean readOnly) {
     ResourceFactoryDto factory = factoryChooser.getSelectedFactory();
     factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
+    ResourceProviderDto provider = resourceProvidersService.getResourceProvider(factory.getProvider());
+    if (provider.hasWeb()) {
+      providerLabel.setVisible(false);
+      providerLink.setHref(provider.getWeb());
+      providerLink.setTarget("_blank");
+      providerLink.setText(provider.getName() + " - " + provider.getTitle());
+      providerLink.setTitle(provider.getDescription());
+      providerLink.setVisible(true);
+    } else {
+      providerLink.setVisible(false);
+      providerLabel.setText(provider.getName() + " - " + provider.getTitle());
+      providerLabel.setTitle(provider.getDescription());
+      providerLabel.setVisible(true);
+    }
 
     if (readOnly)
       tabPanel.getWidget(0).setVisible(false);

@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
@@ -118,8 +119,8 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     String res = path.substring(idx + 1);
     ResourceReference ref = resourceReferenceService.getResourceReference(project, res);
     Resource resource = resourceReferenceService.createResource(ref);
-    String requiredPackage = resourceReferenceService.getRequiredPackageName(ref);
-    ROperation rop = new ResourceAssignROperation(name, resource, requiredPackage);
+    List<String> requiredPackages = resourceReferenceService.getRequiredPackages(ref);
+    ROperation rop = new ResourceAssignROperation(name, resource, requiredPackages);
     return assignSymbol(uri, rop, async);
   }
 
