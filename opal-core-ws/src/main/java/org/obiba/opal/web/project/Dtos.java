@@ -164,6 +164,9 @@ public class Dtos {
         .setUpdated(Instant.ofEpochMilli(resourceReference.getUpdated().getTime()).toString())
         .setEditable(isEditable);
 
+    if (!Strings.isNullOrEmpty(resourceReference.getDescription()))
+      builder.setDescription(resourceReference.getDescription());
+
     if (isEditable)
       builder.setCredentials(resourceReference.getCredentialsModel());
 
@@ -185,6 +188,8 @@ public class Dtos {
   public static ResourceReference fromDto(Projects.ResourceReferenceDto referenceDto) {
     ResourceReference reference = new ResourceReference();
     reference.setName(referenceDto.getName());
+    if (referenceDto.hasDescription())
+      reference.setDescription(referenceDto.getDescription());
     reference.setProject(referenceDto.getProject());
     reference.setProvider(referenceDto.getProvider());
     reference.setFactory(referenceDto.getFactory());

@@ -86,6 +86,9 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
   TextBox nameText;
 
   @UiField
+  TextArea descriptionText;
+
+  @UiField
   FlowPanel paramsFormPanel;
 
   @UiField
@@ -140,6 +143,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
 
     if (resource != null) {
       nameText.setText(resource.getName());
+      descriptionText.setText(resource.getDescription());
       modal.setTitle(readOnly ? translations.viewResourceModalTitle() : translations.editResourceModalTitle());
       factoryChooser.setSelectedFactory(resource);
     }
@@ -173,7 +177,7 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
       modal.addAlert(translations.userMessageMap().get("NameIsRequired"), AlertType.ERROR, nameGroup);
       return;
     }
-    getUiHandlers().onSave(nameText.getText(), factoryChooser.getSelectedValue(),
+    getUiHandlers().onSave(nameText.getText(), descriptionText.getText(), factoryChooser.getSelectedValue(),
         getSchemaFormModel(paramsFormPanel), getSchemaFormModel(credentialsFormPanel));
   }
 

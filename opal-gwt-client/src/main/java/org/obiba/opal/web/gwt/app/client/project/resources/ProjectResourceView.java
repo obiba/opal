@@ -52,6 +52,9 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   Label name;
 
   @UiField
+  SimplePanel descriptionPanel;
+
+  @UiField
   com.google.gwt.user.client.ui.Label providerLabel;
 
   @UiField
@@ -151,6 +154,10 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
       providerLabel.setVisible(true);
     }
     name.setText(resource.getName());
+    descriptionPanel.clear();
+    if (resource.hasDescription()) {
+      descriptionPanel.setWidget(new HTMLPanel(Markdown.parse(resource.getDescription())));
+    }
     url.setText(resource.getResource().getUrl());
     format.setText(resource.getResource().getFormat());
 

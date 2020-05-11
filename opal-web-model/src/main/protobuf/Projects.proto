@@ -102,11 +102,12 @@ message OpalAnalysisResultsDto {
 
 message ResourceReferenceDto {
   required string name = 1;
-  required string project = 2;
-  required string provider = 3;
-  required string factory = 4;
-  required string parameters = 5;
-  optional string credentials = 6;
+  optional string description = 2;
+  required string project = 3;
+  required string provider = 4;
+  required string factory = 5;
+  required string parameters = 6;
+  optional string credentials = 7;
   optional string created = 8;
   optional string updated = 9;
   optional ResourceSummaryDto resource = 10;

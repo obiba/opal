@@ -32,6 +32,8 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
 
   private String name;
 
+  private String description;
+
   // plugin name or internal provider
   private String provider;
 
@@ -54,6 +56,14 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @NotNull

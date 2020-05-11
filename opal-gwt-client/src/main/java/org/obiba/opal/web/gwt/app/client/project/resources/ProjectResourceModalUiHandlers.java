@@ -15,6 +15,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface ProjectResourceModalUiHandlers extends ModalUiHandlers {
 
-  void onSave(String name, String factoryKey, JSONObject parameters, JSONObject credentials);
+  void onSave(String name, String description, String factoryKey, JSONObject parameters, JSONObject credentials);
 
 }

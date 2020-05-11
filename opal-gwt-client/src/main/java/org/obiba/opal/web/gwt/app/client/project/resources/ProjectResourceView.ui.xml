@@ -56,6 +56,18 @@
 
                             <o:PropertyPanel>
                                 <g:Label>
+                                    <ui:msg description="Description label">Description</ui:msg>
+                                </g:Label>
+                                <g:SimplePanel ui:field="descriptionPanel"/>
+                            </o:PropertyPanel>
+
+                        </o:PropertiesTable>
+                    </b:Column>
+                    <b:Column size="6">
+                        <o:PropertiesTable keyStyleNames="span3">
+
+                            <o:PropertyPanel>
+                                <g:Label>
                                     <ui:msg description="Resource type label">Type</ui:msg>
                                 </g:Label>
                                 <g:FlowPanel>
@@ -68,11 +80,6 @@
                                     </g:FlowPanel>
                                 </g:FlowPanel>
                             </o:PropertyPanel>
-
-                        </o:PropertiesTable>
-                    </b:Column>
-                    <b:Column size="6">
-                        <o:PropertiesTable keyStyleNames="span3">
 
                             <o:PropertyPanel>
                                 <g:Label>

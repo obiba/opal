@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.google.common.base.Strings;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
@@ -54,10 +55,11 @@ public class ProjectResourceModalPresenter extends ModalPresenterWidget<ProjectR
   }
 
   @Override
-  public void onSave(final String name, String factoryKey, JSONObject parameters, JSONObject credentials) {
+  public void onSave(final String name, String description, String factoryKey, JSONObject parameters, JSONObject credentials) {
     String[] token = ResourceProvidersService.splitResourceFactoryKey(factoryKey);
     ResourceReferenceDto resource = ResourceReferenceDto.create();
     resource.setName(name);
+    if (!Strings.isNullOrEmpty(description)) resource.setDescription(description);
     resource.setProject(projectName);
     resource.setProvider(token[0]);
     resource.setFactory(token[1]);

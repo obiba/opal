@@ -33,6 +33,18 @@
 
         <b:ControlGroup>
             <b:ControlLabel>
+                <ui:msg description="Resource description label">Description</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <b:TextArea ui:field="descriptionText" visibleLines="4"/>
+            </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="Resource description help">A short description of the resource, optional.</ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
+            <b:ControlLabel>
                 <ui:msg description="Resource category label">Category</ui:msg>
             </b:ControlLabel>
             <b:Controls>

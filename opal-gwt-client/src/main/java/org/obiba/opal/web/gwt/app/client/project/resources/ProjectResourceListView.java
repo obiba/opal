@@ -18,9 +18,14 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -40,6 +45,7 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ResourceFactoryDto;
@@ -234,14 +240,9 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     }, translations.typeLabel());
 
 
-    table.addColumn(new TextColumn<ResourceReferenceDto>() {
-      @Override
-      public String getValue(ResourceReferenceDto object) {
-        if (object.hasResource())
-          return object.getResource().getUrl();
-        return "";
-      }
-    }, translations.urlLabel());
+    table.addColumn(new ResourceDescriptionColumn(), translations.descriptionLabel());
+
+    table.addColumn(new ResourceURLColumn(), translations.urlLabel());
 
     table.addColumn(new TextColumn<ResourceReferenceDto>() {
       @Override
@@ -363,4 +364,59 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
       return selectItemTipsAlert;
     }
   }
+
+  private class ResourceDescriptionColumn extends Column<ResourceReferenceDto, String> {
+
+    public ResourceDescriptionColumn() {
+      super(new HTMLCell());
+    }
+
+    @Override
+    public String getValue(ResourceReferenceDto object) {
+      return object.hasDescription() ? Markdown.parse(object.getDescription()) : "";
+    }
+  }
+
+  private class ResourceURLColumn extends Column<ResourceReferenceDto, String> {
+
+    public ResourceURLColumn() {
+      super(new HTMLCell());
+    }
+
+    @Override
+    public String getValue(ResourceReferenceDto object) {
+      if (object.hasResource() && object.getResource().hasUrl()) {
+        String url = object.getResource().getUrl();
+        String urlTxt = url.length() > 50 ? url.substring(0, 50) + " ..." : url;
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          return "<a href='" + url + "' target='_blank' title='" + url + "'>" + urlTxt + "</a>";
+        } else if (!urlTxt.equals(url)){
+          return "<span title='" + url + "'>" + urlTxt + "</span>";
+        } else {
+          return url;
+        }
+      }
+      return "";
+    }
+  }
+
+  private class HTMLCell extends TextCell {
+
+    public HTMLCell() {
+      super(new SafeHtmlRenderer<String>() {
+
+        @Override
+        public SafeHtml render(String object) {
+          return object == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromTrustedString(object);
+        }
+
+        @Override
+        public void render(String object, SafeHtmlBuilder appendable) {
+          appendable.append(SafeHtmlUtils.fromTrustedString(object));
+        }
+      });
+    }
+
+  }
+
 }
