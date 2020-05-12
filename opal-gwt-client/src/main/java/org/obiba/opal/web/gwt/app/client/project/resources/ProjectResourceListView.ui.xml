@@ -23,7 +23,7 @@
 
             <b:Tab heading="References" active="true">
 
-                <g:FlowPanel addStyleNames="no-bottom-margin clearfix">
+                <g:FlowPanel addStyleNames="bottom-margin clearfix">
                     <g:FlowPanel addStyleNames="pull-left">
                         <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn small-right-indent">
                             <ui:msg description="Add Resource Button label">Add Resource</ui:msg>

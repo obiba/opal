@@ -423,7 +423,7 @@ public interface Translations extends Constants {
       "InternalError", "An internal error has occurred. Please contact technical support.", //
       "UnhandledException",
       "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
-      "ProjectMomentarilyNotRefreshable", "Project [{0}]'s command call is blocked momentarily.",
+      "ProjectMomentarilyNotReloadable", "Project [{0}]'s command call is blocked momentarily.",
       //
       "DatasourceNameDisallowedChars", "Project names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
@@ -1479,7 +1479,9 @@ public interface Translations extends Constants {
 
   @Description("Project Tab Names")
   @DefaultStringMapValue({ "HOME", "Home", //
+      "DASHBOARD", "Dashboard", //
       "TABLES", "Tables", //
+      "RESOURCES", "Resources", //
       "FILES", "Files", //
       "GENOTYPES", "Genotypes", //
       "VISUALISATION", "Data visualization", //
@@ -2257,8 +2259,15 @@ public interface Translations extends Constants {
   String serverRunningFor();
 
   @Description("")
-  @DefaultStringValue("The project's datasource is refreshing, Read and Write actions are temporarily unavailable. Try again later.")
-  String projectRefreshingText();
+  @DefaultStringValue("The project's datasource is loading, Read and Write actions are temporarily unavailable. Try again later.")
+  String projectLoadingText();
+
+  @Description("Project Datasource Status Labels")
+  @DefaultStringMapValue({ "READY", "Ready",//
+      "BUSY", "Busy: database has read, write or refresh commands that are pending or being processed.",//
+      "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",//
+      "NONE", "No associated database, data cannot be imported, only views can be defined." })
+  Map<String, String> datasourceStatusMap();
 
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//

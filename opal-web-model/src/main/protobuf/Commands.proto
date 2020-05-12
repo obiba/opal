@@ -112,6 +112,6 @@ message AnalyseCommandOptionsDto {
   repeated AnalyseDto analyses = 2;
 }
 
-message RefreshCommandOptionsDto {
+message ReloadDatasourceCommandOptionsDto {
   required string project = 1;
 }

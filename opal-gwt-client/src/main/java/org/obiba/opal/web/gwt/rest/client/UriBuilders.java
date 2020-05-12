@@ -89,6 +89,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands");
+    }
+  },
+
   PROJECT_COMMANDS_IMPORT {
     @Override
     public UriBuilder create() {
@@ -110,10 +117,10 @@ public enum UriBuilders {
     }
   },
 
-  PROJECT_COMMANDS_REFRESH {
+  PROJECT_COMMANDS_RELOAD {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("project", "{}", "commands", "_refresh");
+      return UriBuilder.create().segment("project", "{}", "commands", "_reload");
     }
   },
 

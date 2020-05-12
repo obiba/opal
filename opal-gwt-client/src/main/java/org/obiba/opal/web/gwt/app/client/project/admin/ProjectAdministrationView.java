@@ -98,10 +98,10 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
 
   @UiField
-  Button refreshProject;
+  Button reloadProject;
 
   @UiField
-  Label refreshProjectBusy;
+  Label reloadProjectBusy;
 
   @UiField
   FlowPanel idMappingsPanel;
@@ -110,7 +110,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   FlowPanel idMappings;
 
   @UiField
-  FlowPanel refreshDatabasePanel;
+  FlowPanel reloadDatabasePanel;
 
   private ProjectDto project;
 
@@ -126,7 +126,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     name.setText(project.getName());
     title.setText(project.getTitle());
     description.setText(project.getDescription());
-    refreshProjectBusy.getElement().addClassName("help-block");
+    reloadProjectBusy.getElement().addClassName("help-block");
     tags.setText("");
     if (project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
     if (project.getExportFolder() != null) exportFolder.setText(project.getExportFolder());
@@ -199,14 +199,14 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   }
 
   @Override
-  public HasAuthorization getRefreshAuthorizer() {
-    return new WidgetAuthorizer(refreshDatabasePanel);
+  public HasAuthorization getReloadAuthorizer() {
+    return new WidgetAuthorizer(reloadDatabasePanel);
   }
 
   @Override
-  public void toggleRefreshButton(boolean toggleOn) {
-    refreshProject.setEnabled(toggleOn);
-    refreshProjectBusy.setVisible(!toggleOn);
+  public void toggleReloadButton(boolean toggleOn) {
+    reloadProject.setEnabled(toggleOn);
+    reloadProjectBusy.setVisible(!toggleOn);
   }
 
   @UiHandler("editProperties")
@@ -235,9 +235,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     getUiHandlers().onArchive();
   }
 
-  @UiHandler("refreshProject")
-  public void onRefreshProject(ClickEvent event) {
-    getUiHandlers().onRefresh();
+  @UiHandler("reloadProject")
+  public void onReloadProject(ClickEvent event) {
+    getUiHandlers().onReload();
   }
 
 }

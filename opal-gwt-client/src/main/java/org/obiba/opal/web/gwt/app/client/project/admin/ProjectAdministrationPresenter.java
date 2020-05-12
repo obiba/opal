@@ -18,7 +18,6 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 import com.google.common.collect.Maps;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -78,7 +77,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private Runnable removeConfirmation;
 
-  private Runnable refreshConfirmation;
+  private Runnable reloadConfirmation;
 
   private final TranslationMessages translationMessages;
 
@@ -111,9 +110,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
-        if (event.getSource().equals(refreshConfirmation) && event.isConfirmed()) {
-          refreshConfirmation.run();
-          refreshConfirmation = null;
+        if (event.getSource().equals(reloadConfirmation) && event.isConfirmed()) {
+          reloadConfirmation.run();
+          reloadConfirmation = null;
         }
       }
     });
@@ -152,7 +151,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
           @Override
           public void onResponseCode(Request request, Response response) {
             String responseText = response.getText();
-            getView().toggleRefreshButton("READY".equals(responseText));
+            getView().toggleReloadButton("READY".equals(responseText));
           }
         }).get().send();
   }
@@ -181,10 +180,10 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         .authorize(getView().getDeleteAuthorizer())
         .delete().send();
 
-    // refresh database
+    // reload database
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(project.getName()))
-        .authorize(getView().getRefreshAuthorizer())
+        .forResource(UriBuilders.PROJECT_COMMANDS_RELOAD.create().build(project.getName()))
+        .authorize(getView().getReloadAuthorizer())
         .post().send();
 
   }
@@ -215,12 +214,12 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   }
 
   @Override
-  public void onRefresh() {
-    refreshConfirmation = new Runnable() {
+  public void onReload() {
+    reloadConfirmation = new Runnable() {
       @Override
       public void run() {
         ResourceRequestBuilderFactory.newBuilder() //
-            .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(project.getName()))
+            .forResource(UriBuilders.PROJECT_COMMANDS_RELOAD.create().build(project.getName()))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -228,7 +227,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
                 if(response.getStatusCode() != SC_CREATED) {
                   String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
                       ? "Forbidden"
-                      : "ProjectMomentarilyNotRefreshable" : response.getText();
+                      : "ProjectMomentarilyNotReloadable" : response.getText();
                   fireEvent(NotificationEvent.newBuilder().error(errorMessage).args(project.getName()).build());
                 } else {
                   initProjectState();
@@ -239,7 +238,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
       }
     };
 
-    fireEvent(ConfirmationRequiredEvent.createWithMessages(refreshConfirmation, translationMessages.refreshProject(), translationMessages.confirmRefreshProject()));
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(reloadConfirmation, translationMessages.reloadProject(), translationMessages.confirmReloadProject()));
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -381,9 +380,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
     HasAuthorization getDeleteAuthorizer();
 
-    HasAuthorization getRefreshAuthorizer();
+    HasAuthorization getReloadAuthorizer();
 
-    void toggleRefreshButton(boolean toggleOn);
+    void toggleReloadButton(boolean toggleOn);
   }
 
 }

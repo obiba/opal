@@ -19,14 +19,14 @@ import org.obiba.opal.core.domain.ProjectsState.State;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.ProjectsServiceImpl;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
-import org.obiba.opal.shell.commands.options.RefreshCommandOptions;
+import org.obiba.opal.shell.commands.options.ReloadDatasourceCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@CommandUsage(description = "Refresh a project's underlying datasource.", syntax = "Syntax: refresh --project PROJECT")
-public class RefreshCommand extends AbstractOpalRuntimeDependentCommand<RefreshCommandOptions> {
+@CommandUsage(description = "Reload a project's underlying datasource.", syntax = "Syntax: refresh --project PROJECT")
+public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand<ReloadDatasourceCommandOptions> {
 
   @Autowired
   private TransactionTemplate transactionTemplate;
@@ -49,7 +49,7 @@ public class RefreshCommand extends AbstractOpalRuntimeDependentCommand<RefreshC
     Project project = orientDbService.findUnique(new Project(projectName));
 
     if (project != null && MagmaEngine.get().hasDatasource(project.getName())) {
-      projectsState.updateProjectState(projectName, State.REFRESHING);
+      projectsState.updateProjectState(projectName, State.LOADING);
 
       transactionTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override

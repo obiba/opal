@@ -80,9 +80,9 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Archive Project")
   String archiveProject();
 
-  @Description("Refresh Project label")
-  @DefaultMessage("Refresh Project")
-  String refreshProject();
+  @Description("Reload Project label")
+  @DefaultMessage("Reload Project")
+  String reloadProject();
 
   @Description("Remove Datasource label")
   @DefaultMessage("Remove Datasource")
@@ -370,9 +370,9 @@ public interface TranslationMessages extends Messages {
   String confirmArchiveProject();
 
   @Description(
-      "Please confirm that you want to refresh the current project message.")
-  @DefaultMessage("Please confirm that you want to refresh the current project.")
-  String confirmRefreshProject();
+      "Please confirm that you want to reload the database of the current project message.")
+  @DefaultMessage("Please confirm that you want to reload the database of the current project.")
+  String confirmReloadProject();
 
   @Description("Please confirm that you want to remove the current datasource from Opal configuration message")
   @DefaultMessage("Please confirm that you want to remove the current datasource from Opal configuration")

@@ -247,7 +247,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   public void clearTable() {
     valuesTable.setVisible(false);
     pager.setPagerVisible(false);
-    setRefreshing(true);
+    setLoading(true);
   }
 
   @Override
@@ -268,7 +268,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     filter.getTextBox().setPlaceholder(translations.filterVariables());
     lastFilter = "";
     filter.getTextBox().setValue(lastFilter, false);
-    setRefreshing(false);
+    setLoading(false);
 
     oracle.setTable("\"" + table.getName() + "\"");
     oracle.setDatasource("\"" + table.getDatasourceName() + "\"");
@@ -312,7 +312,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     getUiHandlers().onSearchValueSets(visibleListVariable, criteriaPanel.getRQLQueryStrings(), offset, limit);
   }
 
-  private void setRefreshing(boolean refresh) {
+  private void setLoading(boolean refresh) {
     refreshPending.setVisible(refresh);
   }
 
@@ -687,7 +687,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     }
 
     private void refreshRows() {
-      setRefreshing(true);
+      setLoading(true);
       if (searchPanel.isVisible())
         onSearch(pager.getPageStart(), pager.getPageSize());
       else
@@ -780,7 +780,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       Range range = display.getVisibleRange();
-      setRefreshing(true);
+      setLoading(true);
       String filterText = filter.getText();
       if (searchPanel.isVisible())
         onSearch(range.getStart(), range.getLength());
@@ -793,7 +793,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void populateValues(int offset, int total, ValueSetsDto valueSets) {
-      setRefreshing(false);
+      setLoading(false);
 
       listValueSetVariable = JsArrays.toList(valueSets.getVariablesArray());
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
@@ -855,11 +855,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
           // variables list has changed so update all
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
-          setRefreshing(true);
+          setLoading(true);
           getUiHandlers().updateVariables(filter.getTextBox().getText());
         } else if (valuesTable.getPageSize() != page) {
           // page size only has changed
-          setRefreshing(true);
+          setLoading(true);
           valuesTable.setPageSize(page);
         }
         // else nothing to refresh
@@ -886,16 +886,16 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
           // variables list has changed so update all
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
-          setRefreshing(true);
+          setLoading(true);
           valuesTable.setPageSize(page);
           getUiHandlers().updateVariables(filter.getTextBox().getText());
         } else if (valuesTable.getPageSize() != page) {
           // page size only has changed
-          setRefreshing(true);
+          setLoading(true);
           valuesTable.setPageSize(page);
           getUiHandlers().updateVariables(filter.getTextBox().getText());
         }
-        setRefreshing(false);
+        setLoading(false);
         // else nothing to refresh
       }
     }

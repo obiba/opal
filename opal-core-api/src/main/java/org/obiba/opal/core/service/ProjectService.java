@@ -15,6 +15,9 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.domain.ResourceReference;
+
+import java.util.List;
 
 /**
  * Service to manage projects.
@@ -45,5 +48,10 @@ public interface ProjectService extends SystemService {
 
   @NotNull
   String getProjectDirectoryPath(@NotNull Project project);
+
+  @NotNull
+  String getProjectState(@NotNull Project project);
+
+  List<ResourceReference> getResourceReferences(Project project);
 
 }

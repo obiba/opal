@@ -24,6 +24,14 @@ message ProjectDto {
   optional string vcfStoreService = 11;
   optional string exportFolder = 12;
   repeated IdentifiersMappingDto idMappings = 13;
+  optional ProjectDatasourceStatusDto datasourceStatus = 14;
+}
+
+enum ProjectDatasourceStatusDto {
+  LOADING = 1;
+  READY = 2;
+  BUSY = 3;
+  NONE = 4;
 }
 
 message ProjectFactoryDto {
@@ -41,7 +49,11 @@ message ProjectSummaryDto {
   required int32 tableCount = 2;
   required int32 variableCount = 3;
   required int32 entityCount = 4;
-  optional Magma.TimestampsDto timestamps = 5;
+  required int32 viewCount = 5;
+  required int32 derivedVariableCount = 6;
+  required int32 resourceCount = 7;
+  required ProjectDatasourceStatusDto datasourceStatus = 8;
+  optional Magma.TimestampsDto timestamps = 9;
 }
 
 message OpalAnalysisDto {

@@ -27,7 +27,7 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.*;
 import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
-import org.obiba.opal.web.model.Commands.RefreshCommandOptionsDto;
+import org.obiba.opal.web.model.Commands.ReloadDatasourceCommandOptionsDto;
 import org.obiba.opal.web.support.ConflictingRequestException;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.slf4j.Logger;
@@ -88,7 +88,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_import")
   public Response importData(Commands.ImportCommandOptionsDto options) {
-    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
     if(!name.equals(options.getDestination())) {
       throw new InvalidRequestException("DataCanOnlyBeImportedInCurrentDatasource", name);
@@ -122,7 +122,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
     String commandName = "copy";
 
@@ -145,7 +145,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_export")
   public Response exportData(Commands.ExportCommandOptionsDto options) {
-    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
     String commandName = "export";
 
@@ -222,13 +222,13 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   }
 
   @POST
-  @Path("/_refresh")
-  public Response refreshProject() {
-    if (checkCommandIsBlocked(name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotRefreshable", name);
+  @Path("/_reload")
+  public Response reloadProject() {
+    if (checkCommandIsBlocked(name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
-    Command<Object> refreshCommand = commandRegistry.newCommand("refresh");
-    refreshCommand.setOptions(new RefreshCommandOptionsDtoImpl(RefreshCommandOptionsDto.newBuilder().setProject(name).build()));
-    return launchCommand(refreshCommand);
+    Command<Object> reloadCommand = commandRegistry.newCommand("reload");
+    reloadCommand.setOptions(new ReloadDatasourceCommandOptionsDtoImpl(ReloadDatasourceCommandOptionsDto.newBuilder().setProject(name).build()));
+    return launchCommand(reloadCommand);
   }
 
   @Override
@@ -244,7 +244,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     if (forProjectRefresh) {
       return !State.READY.name().equals(projectState);
     } else {
-      return State.REFRESHING.name().equals(projectState);
+      return State.LOADING.name().equals(projectState);
     }
   }
 

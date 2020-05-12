@@ -144,19 +144,19 @@
       <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>
 
-    <g:FlowPanel ui:field="refreshDatabasePanel">
+    <g:FlowPanel ui:field="reloadDatabasePanel">
       <b:Heading size="4">
         <ui:msg description="Project Database label">Database</ui:msg>
       </b:Heading>
       <b:Paragraph>
-        <ui:msg description="Refresh Project text">Refreshing a project database makes its data temporarily inaccessible (no table listing, no import or export)
+        <ui:msg description="Reload Project text">Reloading a project database makes its data temporarily inaccessible (no table listing, no import or export)
           while the connection to the database is being re-initialised.
           The time taken by this operation depends on the database type and schema.
         </ui:msg>
       </b:Paragraph>
       <b:Form>
-        <b:Button type="INFO" icon="REFRESH" ui:field="refreshProject">Refresh</b:Button>
-        <g:Label ui:field="refreshProjectBusy">The project is currently busy, refreshing is unavailable. Try again later.</g:Label>
+        <b:Button type="INFO" icon="REFRESH" ui:field="reloadProject">Refresh</b:Button>
+        <g:Label ui:field="reloadProjectBusy">The project is currently busy, reloading is unavailable. Try again later.</g:Label>
       </b:Form>
     </g:FlowPanel>
 

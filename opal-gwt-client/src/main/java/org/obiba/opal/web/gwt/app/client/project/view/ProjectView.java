@@ -10,11 +10,18 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import com.github.gwtbootstrap.client.ui.*;
-import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.*;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.*;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
@@ -22,18 +29,12 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implements ProjectPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ProjectView> {}
+  interface Binder extends UiBinder<Widget, ProjectView> {
+  }
 
   @UiField
   Breadcrumbs titleCrumbs;
@@ -49,6 +50,27 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiField
   OpalTabPanel tabPanel;
+
+  @UiField
+  Panel dashboardPanel;
+
+  @UiField
+  Panel datasourceStatus;
+
+  @UiField
+  Icon datasourceStatusIcon;
+
+  @UiField
+  Label datasourceStatusText;
+
+  @UiField
+  Label tableCount;
+
+  @UiField
+  Label variableCount;
+
+  @UiField
+  Label resourceCount;
 
   @UiField
   Panel tablesPanel;
@@ -74,10 +96,13 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   FlowPanel permissionsPanel;
 
+  private final Translations translations;
+
   @Inject
   ProjectView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
-    for(ProjectTab tab : ProjectTab.values()) {
+    this.translations = translations;
+    for (ProjectTab tab : ProjectTab.values()) {
       String title = translations.projectTabNameMap().get(tab.toString());
       TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), title);
     }
@@ -96,21 +121,52 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @Override
   public void setProject(ProjectDto project) {
-    if(titleCrumbs.getWidgetCount() > 1) {
+    if (titleCrumbs.getWidgetCount() > 1) {
       titleCrumbs.remove(1);
     }
     titleCrumbs.add(new NavLink(project.getTitle()));
     setTags(project);
     description.setVisible(project.hasDescription());
     description.setText(project.hasDescription() ? project.getDescription() : "");
+    tableCount.setText("-");
+    variableCount.setText("-");
+    resourceCount.setText("-");
+    setProjectStatus(project.getDatasourceStatus().getName());
+  }
+
+  @Override
+  public void setProjectSummary(ProjectSummaryDto projectSummary) {
+    tableCount.setText("" + projectSummary.getTableCount());
+    variableCount.setText("" + projectSummary.getVariableCount());
+    resourceCount.setText("" + projectSummary.getResourceCount());
+    setProjectStatus(projectSummary.getDatasourceStatus().getName());
+  }
+
+  private void setProjectStatus(String status) {
+    datasourceStatusText.setText(translations.datasourceStatusMap().get(status));
+    switch (status) {
+      case "READY":
+        datasourceStatusIcon.addStyleName("text-success");
+        break;
+      case "BUSY":
+        datasourceStatusIcon.addStyleName("text-warning");
+        break;
+      case "LOADING":
+        datasourceStatusIcon.addStyleName("text-error");
+        break;
+      default:
+        datasourceStatusIcon.addStyleName("text-info");
+    }
+    datasourceStatus.setVisible(true);
+
   }
 
   private void setTags(ProjectDto project) {
     tagsPanel.clear();
     JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
     tagsPanel.setVisible(tagsArray.length() > 0);
-    if(tagsArray.length() > 0) {
-      for(final String tag : JsArrays.toIterable(tagsArray)) {
+    if (tagsArray.length() > 0) {
+      for (final String tag : JsArrays.toIterable(tagsArray)) {
         Anchor tagLabel = new Anchor(tag);
         tagLabel.addClickHandler(new ClickHandler() {
           @Override
@@ -176,39 +232,39 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiHandler("tabPanel")
   void onShown(TabPanel.ShownEvent shownEvent) {
-    if(shownEvent.getTarget() == null) return;
+    if (shownEvent.getTarget() == null) return;
     getUiHandlers().onTabSelected(tabPanel.getSelectedTab());
   }
 
 
   @Override
-  @SuppressWarnings({ "PMD.NcssMethodCount", "IfStatementWithTooManyBranches", "OverlyLongMethod" })
+  @SuppressWarnings({"PMD.NcssMethodCount", "IfStatementWithTooManyBranches", "OverlyLongMethod"})
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == ProjectPresenter.TABLES_PANE) {
+    if (slot == ProjectPresenter.TABLES_PANE) {
       tablesPanel.clear();
       tablesPanel.add(content);
-    } else if(slot == ProjectPresenter.FILES_PANE) {
+    } else if (slot == ProjectPresenter.FILES_PANE) {
       filesPanel.clear();
       filesPanel.add(content);
-    } else if(slot == ProjectPresenter.RESOURCES_PANE) {
+    } else if (slot == ProjectPresenter.RESOURCES_PANE) {
       resourcesPanel.clear();
       resourcesPanel.add(content);
-    } else if(slot == ProjectPresenter.GENOTYPES_PANE) {
+    } else if (slot == ProjectPresenter.GENOTYPES_PANE) {
       genotypesPanel.clear();
       genotypesPanel.add(content);
-    } else if(slot == ProjectPresenter.REPORTS_PANE) {
+    } else if (slot == ProjectPresenter.REPORTS_PANE) {
       reportsPanel.clear();
       reportsPanel.add(content);
-    } else if(slot == ProjectPresenter.TASKS_PANE) {
+    } else if (slot == ProjectPresenter.TASKS_PANE) {
       tasksPanel.clear();
       tasksPanel.add(content);
-    } else if(slot == ProjectPresenter.PERMISSION_PANE) {
+    } else if (slot == ProjectPresenter.PERMISSION_PANE) {
       permissionsPanel.clear();
       permissionsPanel.add(content);
-    } else if(slot == ProjectPresenter.ADMIN_PANE) {
+    } else if (slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);
-    } else if(slot == ProjectPresenter.BOOKMARK_ICON) {
+    } else if (slot == ProjectPresenter.BOOKMARK_ICON) {
       bookmarkIcon.clear();
       bookmarkIcon.add(content);
     }

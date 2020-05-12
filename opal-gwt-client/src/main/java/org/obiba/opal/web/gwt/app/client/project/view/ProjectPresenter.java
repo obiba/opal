@@ -54,6 +54,7 @@ import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
+import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
@@ -61,6 +62,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
     enum ProjectTab {
+      DASHBOARD,
       TABLES,
       RESOURCES,
       GENOTYPES,
@@ -74,6 +76,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     boolean isTabVisible(int index);
 
     void setProject(ProjectDto project);
+
+    void setProjectSummary(ProjectSummaryDto projectSummary);
 
     HasAuthorization getTablesAuthorizer();
 
@@ -95,6 +99,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARK_ICON = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> DASHBOARD_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -323,7 +330,23 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       case ADMINISTRATION:
         onAdminTabSelected();
         break;
+      case DASHBOARD:
+      default:
+        onDashboardTabSelected();
+        break;
     }
+  }
+
+  private void onDashboardTabSelected() {
+    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
+        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName))
+        .withCallback(new ResourceCallback<ProjectSummaryDto>() {
+
+          @Override
+          public void onResource(Response response, ProjectSummaryDto resource) {
+            getView().setProjectSummary(resource);
+          }
+        }).get().send();
   }
 
   private void onTablesTabSelected(String path) {
@@ -430,7 +453,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       } catch (IllegalArgumentException ignored) {
       }
     }
-    return Display.ProjectTab.TABLES;
+    return Display.ProjectTab.DASHBOARD;
   }
 
   private String validatePath(String name, String path) {
@@ -481,7 +504,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             public void unauthorized() {
               viewAuthorizer.unauthorized();
               if (tab == Display.ProjectTab.TABLES) {
-                tab = Display.ProjectTab.RESOURCES;
+                tab = Display.ProjectTab.DASHBOARD;
               }
               authorizeResources();
             }
@@ -515,7 +538,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             public void unauthorized() {
               viewAuthorizer.unauthorized();
               if (tab == Display.ProjectTab.TABLES) {
-                tab = Display.ProjectTab.FILES;
+                tab = Display.ProjectTab.DASHBOARD;
               }
               authorizeGenotypes();
             }
@@ -580,7 +603,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     void authorizeTasks() {
       ResourceAuthorizationRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilders.PROJECT_COMMANDS_REFRESH.create().build(projectName)).get()
+          .forResource(UriBuilders.PROJECT_COMMANDS.create().build(projectName)).get()
           .authorize(getView().getTasksAuthorizer())
           .send();
     }

@@ -62,7 +62,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
-  public Iterable<ResourceReference> getResourceReferences(String project) {
+  public List<ResourceReference> getResourceReferences(String project) {
     String query = SimpleOrientDbQueryBuilder.newInstance()
         .table(ResourceReference.class.getSimpleName())
         .whereClauses("project = ?")

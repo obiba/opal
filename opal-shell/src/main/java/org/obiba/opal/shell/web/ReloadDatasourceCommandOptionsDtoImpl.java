@@ -10,14 +10,14 @@
 
 package org.obiba.opal.shell.web;
 
-import org.obiba.opal.shell.commands.options.RefreshCommandOptions;
-import org.obiba.opal.web.model.Commands.RefreshCommandOptionsDto;
+import org.obiba.opal.shell.commands.options.ReloadDatasourceCommandOptions;
+import org.obiba.opal.web.model.Commands.ReloadDatasourceCommandOptionsDto;
 
-public class RefreshCommandOptionsDtoImpl implements RefreshCommandOptions {
+public class ReloadDatasourceCommandOptionsDtoImpl implements ReloadDatasourceCommandOptions {
 
-  private final RefreshCommandOptionsDto dto;
+  private final ReloadDatasourceCommandOptionsDto dto;
 
-  public RefreshCommandOptionsDtoImpl(RefreshCommandOptionsDto dto) {
+  public ReloadDatasourceCommandOptionsDtoImpl(ReloadDatasourceCommandOptionsDto dto) {
     this.dto = dto;
   }
 

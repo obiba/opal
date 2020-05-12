@@ -135,11 +135,11 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
   }
 
   @Override
-  public void showRefreshingMessage(String datasource) {
+  public void showLoadingMessage(String datasource) {
     tabPanel.clear();
 
     FlowPanel flowPanel = new FlowPanel();
-    flowPanel.getElement().setInnerText(translations.projectRefreshingText());
+    flowPanel.getElement().setInnerText(translations.projectLoadingText());
     tabPanel.add(flowPanel, getDatasourceLink(datasource));
 
     tabPanel.setMenuVisible(true);

@@ -14,8 +14,8 @@ import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
 
 @CommandLineInterface(application = "refresh")
-public interface RefreshCommandOptions extends HelpOption {
+public interface ReloadDatasourceCommandOptions extends HelpOption {
 
-  @Option(longName = "project", shortName = "p", description = "The project for which the underlying datasource will be refreshed.")
+  @Option(longName = "project", shortName = "p", description = "The project for which the underlying datasource will be reloaded.")
   String getProject();
 }

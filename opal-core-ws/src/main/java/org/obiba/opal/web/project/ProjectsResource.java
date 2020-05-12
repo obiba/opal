@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
@@ -50,7 +49,7 @@ public class ProjectsResource {
       try {
         if (isReadable(project.getName())) {
           projects.add(
-              digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
+              digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService));
         }
       } catch (NoSuchDatasourceException e) {
         // ignore

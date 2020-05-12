@@ -220,7 +220,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     @Override
     public PlaceRequest getPlaceRequest(ProjectDto projectDto) {
-      return ProjectPlacesHelper.getTablesPlace(projectDto.getName());
+      return ProjectPlacesHelper.getDashboardPlace(projectDto.getName());
     }
 
     @Override

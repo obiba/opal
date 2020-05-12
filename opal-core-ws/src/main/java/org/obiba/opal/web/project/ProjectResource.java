@@ -15,6 +15,8 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ProjectsState;
@@ -22,9 +24,7 @@ import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.VCFSamplesMappingService;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
@@ -52,6 +52,8 @@ import java.util.stream.Collectors;
 @Path("/project/{name}")
 public class ProjectResource {
 
+  private final static Authorizer authorizer = new ShiroAuthorizer();
+
   private final OpalRuntime opalRuntime;
 
   private final ProjectService projectService;
@@ -65,8 +67,6 @@ public class ProjectResource {
   private final VCFSamplesMappingService vcfSamplesMappingService;
 
   private final SubjectProfileService subjectProfileService;
-
-  private final ProjectsState projectsState;
 
   @Autowired
   public ProjectResource(
@@ -85,28 +85,27 @@ public class ProjectResource {
     this.applicationContext = applicationContext;
     this.vcfSamplesMappingService = vcfSamplesMappingService;
     this.subjectProfileService = subjectProfileService;
-    this.projectsState = projectsState;
   }
 
   @GET
   @Transactional(readOnly = true)
   public Projects.ProjectDto get(@Context Request request, @PathParam("name") String name) {
-    Project project = projectService.getProject(name);
-    return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
+    Project project = getProject(name);
+    return Dtos.asDto(project, projectService);
   }
 
   @GET
   @Path("/summary")
   @Transactional(readOnly = true)
   public Projects.ProjectSummaryDto getSummary(@Context Request request, @PathParam("name") String name) {
-    Project project = projectService.getProject(name);
-    return Dtos.asSummaryDto(project);
+    Project project = getProject(name);
+    return Dtos.asSummaryDto(project, projectService);
   }
 
   @PUT
   public Response update(Projects.ProjectDto projectDto, @PathParam("name") String name) {
     // will throw a no such project exception
-    projectService.getProject(name);
+    getProject(name);
     if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -118,7 +117,7 @@ public class ProjectResource {
   @Transactional
   public Response delete(@PathParam("name") String name, @QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
     try {
-      Project project = projectService.getProject(name);
+      Project project = getProject(name);
       Datasource ds = project.hasDatasource() ? project.getDatasource() : null;
       projectService.delete(name, archive);
       if (ds != null) {
@@ -140,14 +139,14 @@ public class ProjectResource {
   @Path("/keystore")
   public KeyStoreResource getKeyStoreResource(@PathParam("name") String name) {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
-    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(projectService.getProject(name));
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject(name));
     resource.setKeyStore(keyStore);
     return resource;
   }
 
   @Path("/vcf-store")
   public VCFStoreResource getVCFStoreResource(@PathParam("name") String name) {
-    Project project = projectService.getProject(name);
+    Project project = getProject(name);
     if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) throw new NotFoundException("Project has no VCF store: " + project.getName());
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
@@ -158,7 +157,7 @@ public class ProjectResource {
   @GET
   @Path("/identifiers-mappings")
   public List<Projects.ProjectDto.IdentifiersMappingDto> getIdentifiersMappings(@PathParam("name") String name) {
-    Project project = projectService.getProject(name);
+    Project project = getProject(name);
 
     if (project.hasIdentifiersMappings()) {
       return project.getIdentifiersMappings().stream().map(Dtos::asDto).collect(Collectors.toList());
@@ -173,7 +172,7 @@ public class ProjectResource {
     @PathParam("name") String name,
     @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
 
-    Project project = projectService.getProject(name);
+    Project project = getProject(name);
     if (!project.hasIdentifiersMappings()) {
       return Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance();
     }
@@ -186,23 +185,19 @@ public class ProjectResource {
       .orElse(Projects.ProjectDto.IdentifiersMappingDto.getDefaultInstance());
   }
 
-  private static class ProjectTimestamps implements Timestamped {
-    final UnionTimestamps timestamps;
-
-    private ProjectTimestamps(Project project) {
-      timestamps = new UnionTimestamps(Arrays.asList(project, project.getDatasource()));
-    }
-
-    @Nonnull
-    @Override
-    public Timestamps getTimestamps() {
-      return timestamps;
-    }
-  }
-
   @GET
   @Path("/state")
   public Response getState(@PathParam("name") String name) {
-    return  Response.ok().entity(projectsState.getProjectState(name)).build();
+    return  Response.ok().entity(projectService.getProjectState(getProject(name))).build();
   }
+
+  private Project getProject(String name) {
+    if (!isReadable(name)) throw new NoSuchProjectException(name);
+    return projectService.getProject(name);
+  }
+
+  private boolean isReadable(String project) {
+    return authorizer.isPermitted("rest:/project/" + project + ":GET");
+  }
+
 }

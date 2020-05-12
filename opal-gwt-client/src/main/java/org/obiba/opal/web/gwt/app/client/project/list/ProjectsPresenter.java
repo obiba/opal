@@ -140,7 +140,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   private void goToProject(String name) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, name)
-        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()).build();
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.DASHBOARD.toString()).build();
     placeManager.revealPlace(request);
   }
 

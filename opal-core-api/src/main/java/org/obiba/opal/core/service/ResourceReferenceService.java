@@ -26,7 +26,7 @@ public interface ResourceReferenceService extends SystemService {
    * @param project
    * @return
    */
-  Iterable<ResourceReference> getResourceReferences(String project);
+  List<ResourceReference> getResourceReferences(String project);
 
   /**
    * Get a single resource reference by its name in a project.

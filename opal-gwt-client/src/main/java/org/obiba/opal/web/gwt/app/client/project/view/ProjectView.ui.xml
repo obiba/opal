@@ -28,6 +28,46 @@
       <b:HelpBlock ui:field="description" visible="false" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="left" ui:field="tabPanel">
+      <b:Tab icon="DASHBOARD">
+        <g:FlowPanel ui:field="dashboardPanel">
+          <b:Heading size="3" addStyleNames="no-top-margin">Dashboard</b:Heading>
+          <g:FlowPanel ui:field="datasourceStatus" addStyleNames="small-top-margin bottom-margin" visible="false">
+            <b:Icon type="CIRCLE" ui:field="datasourceStatusIcon"/>
+            <g:Label ui:field="datasourceStatusText" addStyleNames="xsmall-indent inline-block"/>
+          </g:FlowPanel>
+
+          <b:FluidRow addStyleNames="text-align-center">
+            <b:Column size="4">
+              <b:Well>
+                <b:Icon type="TABLE"/>
+                <g:Label addStyleNames="xsmall-indent inline-block">
+                  <ui:msg description="Number of tables label">Number of tables</ui:msg>
+                </g:Label>
+                <g:Label ui:field="tableCount"/>
+              </b:Well>
+            </b:Column>
+            <b:Column size="4">
+              <b:Well>
+                <b:Icon type="COLUMNS"/>
+                <g:Label addStyleNames="xsmall-indent inline-block">
+                  <ui:msg description="Number of variables label">Number of variables</ui:msg>
+                </g:Label>
+                <g:Label ui:field="variableCount"/>
+              </b:Well>
+            </b:Column>
+            <b:Column size="4">
+              <b:Well>
+                <b:Icon type="LINK"/>
+                <g:Label addStyleNames="xsmall-indent inline-block">
+                  <ui:msg description="Number of resources label">Number of resources</ui:msg>
+                </g:Label>
+                <g:Label ui:field="resourceCount"/>
+              </b:Well>
+            </b:Column>
+          </b:FluidRow>
+
+        </g:FlowPanel>
+      </b:Tab>
       <b:Tab icon="TABLE">
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>

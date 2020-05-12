@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.*;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.web.magma.DatasourceResource;
@@ -43,16 +44,21 @@ public class Dtos {
   private Dtos() {
   }
 
-  public static ProjectDto asDto(Project project, @NotNull String directory) {
+  public static ProjectDto asDto(Project project, ProjectService projectService) {
     ProjectDto.Builder builder = ProjectDto.newBuilder() //
         .setName(project.getName()) //
         .setTitle(project.getTitle()) //
-        .setDirectory(directory) //
+        .setDirectory(projectService.getProjectDirectoryPath(project)) //
         .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
         .setArchived(project.isArchived());
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
-    if (project.hasDatabase()) builder.setDatabase(project.getDatabase());
+    if (project.hasDatabase()) {
+      builder.setDatabase(project.getDatabase());
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
+    } else {
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
+    }
     if (project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
     if (project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
     if (project.hasIdentifiersMappings()) {
@@ -129,24 +135,38 @@ public class Dtos {
   }
 
   @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-  public static Projects.ProjectSummaryDto asSummaryDto(Project project) {
+  public static Projects.ProjectSummaryDto asSummaryDto(Project project, ProjectService projectService) {
     Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
     builder.setName(project.getName());
 
     // TODO get counts from elasticsearch
     int tableCount = 0;
-    int variablesCount = 0;
-    Set<String> ids = Sets.newHashSet();
-    for (ValueTable table : project.getDatasource().getValueTables()) {
-      tableCount++;
-      variablesCount = variablesCount + table.getVariableCount();
-      for (VariableEntity entity : table.getVariableEntities()) {
-        ids.add(entity.getType() + ":" + entity.getIdentifier());
+    int viewCount = 0;
+    int variableCount = 0;
+    int derivedVariableCount = 0;
+    if (!"LOADING".equals(projectService.getProjectState(project))) {
+      for (ValueTable table : project.getDatasource().getValueTables()) {
+        tableCount++;
+        int tableVariableCount = table.getVariableCount();
+        variableCount = variableCount + tableVariableCount;
+        if (table.isView()) {
+          viewCount++;
+          derivedVariableCount = derivedVariableCount + tableVariableCount;
+        }
+        table.getVariableEntityCount();
       }
     }
     builder.setTableCount(tableCount);
-    builder.setVariableCount(variablesCount);
-    builder.setEntityCount(ids.size());
+    builder.setViewCount(viewCount);
+    builder.setVariableCount(variableCount);
+    builder.setDerivedVariableCount(derivedVariableCount);
+    builder.setEntityCount(-1);
+    builder.setResourceCount(projectService.getResourceReferences(project).size());
+    if (project.hasDatabase()) {
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
+    } else {
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
+    }
 
     builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
 

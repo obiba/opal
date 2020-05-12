@@ -113,10 +113,10 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if (!"REFRESHING".equals(response.getText())) {
+              if (!"LOADING".equals(response.getText())) {
                 doShow(parser);
               } else {
-                getView().showRefreshingMessage(parser.getDatasource());
+                getView().showLoadingMessage(parser.getDatasource());
               }
             }
           }).get().send();
@@ -182,7 +182,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
     void selectVariable(String datasource, String table, String variable);
 
-    void showRefreshingMessage(String datasource);
+    void showLoadingMessage(String datasource);
   }
 
   private class TableDtoResourceCallback implements ResourceCallback<TableDto> {

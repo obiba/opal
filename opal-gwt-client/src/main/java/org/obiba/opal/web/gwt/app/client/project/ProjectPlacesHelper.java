@@ -97,6 +97,12 @@ public class ProjectPlacesHelper {
         .build();
   }
 
+  public static PlaceRequest getDashboardPlace(String project) {
+    return new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, project)
+        .build();
+  }
+
   public static PlaceRequest getResourcesPlace(String project) {
     return new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project)

@@ -130,7 +130,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
   public void setCurrentFolder(FileDto currentFolder) {
     this.currentFolder = currentFolder;
-    fileService.setLastFolder(currentFolder.getPath());
+    if (currentFolder != null)
+      fileService.setLastFolder(currentFolder.getPath());
   }
 
   private void updateTable(FileDto file) {
