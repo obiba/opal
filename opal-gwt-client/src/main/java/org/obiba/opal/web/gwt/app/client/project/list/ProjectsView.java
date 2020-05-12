@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.common.collect.Lists;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HTMLCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -173,6 +175,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsTable.addColumn(new TitleColumn() , translations.titleLabel());
     projectsTable.addColumn(new DescriptionColumn(), translations.descriptionLabel());
     projectsTable.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
+    projectsTable.addColumn(new StatusColumn(), translations.statusLabel());
     projectsDataProvider.addDataDisplay(projectsTable);
     typeSortHandler = new ListHandler<ProjectDto>(projectsDataProvider.getList());
     typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
@@ -293,6 +296,33 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         return m2 == null ? 0 : 1;
       }
       return m2 == null ? -1 : m2.unix() - m1.unix();
+    }
+  }
+
+  private class StatusColumn extends Column<ProjectDto, String> {
+
+
+    public StatusColumn() {
+      super(new HTMLCell());
+    }
+
+    @Override
+    public String getValue(ProjectDto object) {
+      String title = translations.datasourceStatusDescriptionsMap().get(object.getDatasourceStatus().getName());
+      return "<i class='icon-circle " + getStatusClass(object.getDatasourceStatus().getName()) + "' title='" + title + "'></i>";
+    }
+
+    private String getStatusClass(String status) {
+      switch (status) {
+        case "READY":
+          return "text-success";
+        case "BUSY":
+          return "text-warning";
+        case "LOADING":
+          return "text-error";
+        default:
+          return "text-info";
+      }
     }
   }
 }

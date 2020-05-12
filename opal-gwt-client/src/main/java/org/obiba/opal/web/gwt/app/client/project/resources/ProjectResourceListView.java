@@ -18,14 +18,9 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -398,25 +393,6 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
       }
       return "";
     }
-  }
-
-  private class HTMLCell extends TextCell {
-
-    public HTMLCell() {
-      super(new SafeHtmlRenderer<String>() {
-
-        @Override
-        public SafeHtml render(String object) {
-          return object == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromTrustedString(object);
-        }
-
-        @Override
-        public void render(String object, SafeHtmlBuilder appendable) {
-          appendable.append(SafeHtmlUtils.fromTrustedString(object));
-        }
-      });
-    }
-
   }
 
 }

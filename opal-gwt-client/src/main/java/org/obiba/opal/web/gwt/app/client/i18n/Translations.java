@@ -2264,10 +2264,17 @@ public interface Translations extends Constants {
 
   @Description("Project Datasource Status Labels")
   @DefaultStringMapValue({ "READY", "Ready",//
+      "BUSY", "Busy",//
+      "LOADING", "Loading",//
+      "NONE", "None" })
+  Map<String, String> datasourceStatusMap();
+
+  @Description("Project Datasource Status Descriptions")
+  @DefaultStringMapValue({ "READY", "Ready",//
       "BUSY", "Busy: database has read, write or refresh commands that are pending or being processed.",//
       "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",//
       "NONE", "No associated database, data cannot be imported, only views can be defined." })
-  Map<String, String> datasourceStatusMap();
+  Map<String, String> datasourceStatusDescriptionsMap();
 
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//

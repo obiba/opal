@@ -49,7 +49,7 @@ public class ProjectsResource {
       try {
         if (isReadable(project.getName())) {
           projects.add(
-              digest ? Dtos.asDtoDigest(project) : Dtos.asDto(project, projectService));
+              digest ? Dtos.asDtoDigest(project, projectService) : Dtos.asDto(project, projectService));
         }
       } catch (NoSuchDatasourceException e) {
         // ignore

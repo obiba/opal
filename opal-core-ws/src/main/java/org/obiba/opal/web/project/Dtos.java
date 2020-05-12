@@ -84,13 +84,19 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Projects.ProjectDto asDtoDigest(Project project) {
+  public static Projects.ProjectDto asDtoDigest(Project project, ProjectService projectService) {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder()
         .setName(project.getName())
         .setTitle(project.getTitle());
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
     builder.setTimestamps(asTimestampsDto(project));
+    if (project.hasDatabase()) {
+      builder.setDatabase(project.getDatabase());
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
+    } else {
+      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
+    }
 
     return builder.build();
   }

@@ -143,7 +143,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   private void setProjectStatus(String status) {
-    datasourceStatusText.setText(translations.datasourceStatusMap().get(status));
+    datasourceStatusText.setText(translations.datasourceStatusDescriptionsMap().get(status));
     switch (status) {
       case "READY":
         datasourceStatusIcon.addStyleName("text-success");
