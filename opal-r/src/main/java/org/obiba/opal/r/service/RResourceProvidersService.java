@@ -119,6 +119,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   public void onRServiceStarted(RServiceStartedEvent event) {
     resourceProviders.clear();
     try {
+
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       REXP result = rPackageHelper.execute(rop).getResult();
       RList pkgList = result.asList();

@@ -2262,16 +2262,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("The project's datasource is loading, Read and Write actions are temporarily unavailable. Try again later.")
   String projectLoadingText();
 
-  @Description("Project Datasource Status Labels")
-  @DefaultStringMapValue({ "READY", "Ready",//
-      "BUSY", "Busy",//
-      "LOADING", "Loading",//
-      "NONE", "None" })
-  Map<String, String> datasourceStatusMap();
-
   @Description("Project Datasource Status Descriptions")
   @DefaultStringMapValue({ "READY", "Ready",//
-      "BUSY", "Busy: database has read, write or refresh commands that are pending or being processed.",//
+      "BUSY", "Busy: database has write commands that are pending or being processed.",//
       "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",//
       "NONE", "No associated database, data cannot be imported, only views can be defined." })
   Map<String, String> datasourceStatusDescriptionsMap();

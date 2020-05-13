@@ -149,6 +149,7 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   }
 
   private void refreshResources() {
+    getView().beforeRenderResources();
     // Fetch all providers
     ResourceRequestBuilderFactory.<JsArray<ResourceReferenceDto>>newBuilder() //
         .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectName)) //
@@ -211,6 +212,8 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   public interface Display extends View, HasUiHandlers<ProjectResourceListUiHandlers> {
 
     SingleSlot<ResourcePermissionsPresenter> RESOURCES_PERMISSIONS = new SingleSlot<ResourcePermissionsPresenter>();
+
+    void beforeRenderResources();
 
     void renderResources(List<ResourceReferenceDto> resources);
 

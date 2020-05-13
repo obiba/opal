@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
@@ -98,8 +99,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
   @Inject
-  ProjectView(Binder uiBinder, Translations translations) {
+  ProjectView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     for (ProjectTab tab : ProjectTab.values()) {
@@ -136,13 +140,19 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @Override
   public void setProjectSummary(ProjectSummaryDto projectSummary) {
-    tableCount.setText("" + projectSummary.getTableCount());
-    variableCount.setText("" + projectSummary.getVariableCount());
+    String viewCountTxt = projectSummary.getViewCount() > 0 ? translationMessages.nViewCountLabel(projectSummary.getViewCount()) : "";
+    tableCount.setText(projectSummary.getTableCount() + " " + viewCountTxt);
+    String derivedVariableCountTxt = projectSummary.getDerivedVariableCount() > 0 ? translationMessages.nDerivedVariableCountLabel(projectSummary.getDerivedVariableCount()) : "";
+    variableCount.setText(projectSummary.getVariableCount() + " " + derivedVariableCountTxt);
     resourceCount.setText("" + projectSummary.getResourceCount());
     setProjectStatus(projectSummary.getDatasourceStatus().getName());
   }
 
   private void setProjectStatus(String status) {
+    datasourceStatusIcon.removeStyleName("text-success");
+    datasourceStatusIcon.removeStyleName("text-warning");
+    datasourceStatusIcon.removeStyleName("text-error");
+    datasourceStatusIcon.removeStyleName("text-info");
     datasourceStatusText.setText(translations.datasourceStatusDescriptionsMap().get(status));
     switch (status) {
       case "READY":

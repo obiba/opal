@@ -122,6 +122,11 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   }
 
   @Override
+  public void beforeRenderResources() {
+    table.showLoadingIndicator(dataProvider);
+  }
+
+  @Override
   public void renderResources(List<ResourceReferenceDto> resources) {
     configureTable();
     table.removeColumn(checkColumn);
@@ -136,6 +141,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
       }
     }
     filter.setText("");
+    table.hideLoadingIndicator();
     this.resources = resources;
     dataProvider.setList(resources);
     pager.firstPage();

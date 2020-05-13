@@ -155,7 +155,9 @@
         </ui:msg>
       </b:Paragraph>
       <b:Form>
-        <b:Button type="INFO" icon="REFRESH" ui:field="reloadProject">Refresh</b:Button>
+        <b:Button type="INFO" icon="REFRESH" ui:field="reloadProject">
+          <ui:msg description="Reload Project button">Reload</ui:msg>
+        </b:Button>
         <g:Label ui:field="reloadProjectBusy">The project is currently busy, reloading is unavailable. Try again later.</g:Label>
       </b:Form>
     </g:FlowPanel>

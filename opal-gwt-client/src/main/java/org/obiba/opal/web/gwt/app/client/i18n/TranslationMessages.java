@@ -546,6 +546,16 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "1 Table" })
   String nTablesLabel(@PluralCount int nb);
 
+  @Description("N view count label")
+  @DefaultMessage("({0} views)")
+  @AlternateMessage({ "one", "(1 view)" })
+  String nViewCountLabel(@PluralCount int nb);
+
+  @Description("N derived variable count label")
+  @DefaultMessage("({0} derived variables)")
+  @AlternateMessage({ "one", "(1 derived variable)" })
+  String nDerivedVariableCountLabel(@PluralCount int nb);
+
   @Description("N Resources label")
   @DefaultMessage("{0} Resources")
   @AlternateMessage({ "one", "1 Resource" })
