@@ -11,6 +11,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
@@ -66,8 +67,13 @@ public class RServicePackagesResource {
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-                                 @QueryParam("ref") String ref) {
-    rPackageHelper.installPackage(name, ref, "obiba");
+                                 @QueryParam("ref") String ref, @QueryParam("manager") String manager) {
+    if (Strings.isNullOrEmpty(manager) || "cran".equalsIgnoreCase(manager))
+      rPackageHelper.installCRANPackage(name);
+    else if ("gh".equalsIgnoreCase(manager) || "github".equalsIgnoreCase(manager))
+      rPackageHelper.installGitHubPackage(name, ref);
+    else if ("bioc".equalsIgnoreCase(manager) || "bioconductor".equalsIgnoreCase(manager))
+      rPackageHelper.installBioconductorPackage(name);
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();

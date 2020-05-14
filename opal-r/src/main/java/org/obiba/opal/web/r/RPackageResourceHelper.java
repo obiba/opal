@@ -85,6 +85,46 @@ public class RPackageResourceHelper {
     return execute(cmd);
   }
 
+  /**
+   * Install a R package from CRAN.
+   *
+   * @param name
+   */
+  public void installCRANPackage(String name) {
+    installPackage(name, null, null);
+  }
+
+  /**
+   * Install a R package from GitHub.
+   *
+   * @param name
+   * @param ref
+   */
+  public void installGitHubPackage(String name, String ref) {
+    installPackage(name, Strings.isNullOrEmpty(ref) ? "master" : ref, "obiba");
+  }
+
+  /**
+   * Install a Bioconductor package.
+   *
+   * @param name
+   */
+  public void installBioconductorPackage(String name) {
+    checkAlphanumeric(name);
+    String cmd = String.format("BiocManager::install('%s', ask = FALSE, dependencies=TRUE)", name);
+    execute(getInstallBiocManagerPackageCommand());
+    execute(cmd);
+    restartRServer();
+  }
+
+  /**
+   * Install a package from CRAN of no ref is specified, or from GitHub if a ref is specified.
+   *
+   * @param name
+   * @param ref
+   * @param defaultName When installing from GitHub, the default organization name.
+   * @return
+   */
   public ROperationWithResult installPackage(String name, String ref, String defaultName) {
     String cmd;
     if (Strings.isNullOrEmpty(ref)) {
@@ -154,6 +194,10 @@ public class RPackageResourceHelper {
 
   private String getInstallDevtoolsPackageCommand() {
     return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
+  }
+
+  private String getInstallBiocManagerPackageCommand() {
+    return "if (!require('BiocManager', character.only=TRUE)) { " + getInstallPackagesCommand("BiocManager") + " }";
   }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {

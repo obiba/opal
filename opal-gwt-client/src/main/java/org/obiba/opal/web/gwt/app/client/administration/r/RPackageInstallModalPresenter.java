@@ -36,10 +36,27 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
   }
 
   @Override
-  public void installPackage(final String name, String ref) {
+  public void installPackage(String name) {
+    doInstallPackage(name, null, "cran");
+  }
+
+  @Override
+  public void installGithubPackage(final String name, String ref) {
+    doInstallPackage(name, ref, "gh");
+  }
+
+  @Override
+  public void installBiocPackage(String name) {
+    doInstallPackage(name, null, "bioc");
+  }
+
+  private void doInstallPackage(final String name, String ref, String manager) {
     UriBuilder builder = UriBuilders.SERVICE_R_PACKAGES.create().query("name", name);
     if (!Strings.isNullOrEmpty(ref)) {
       builder.query("ref", ref);
+    }
+    if (!Strings.isNullOrEmpty(manager)) {
+      builder.query("manager", manager);
     }
     getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder() //

@@ -14,6 +14,10 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface RPackageInstallModalUiHandlers  extends ModalUiHandlers {
 
-  void installPackage(String name, String ref);
+  void installPackage(String name);
+
+  void installGithubPackage(String name, String ref);
+
+  void installBiocPackage(String name);
 
 }
