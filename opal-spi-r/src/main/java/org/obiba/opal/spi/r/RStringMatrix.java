@@ -12,22 +12,35 @@ package org.obiba.opal.spi.r;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
 public class RStringMatrix implements RMatrix<String> {
 
-  private final String[] rowNames;
+  private static final Logger log = LoggerFactory.getLogger(RStringMatrix.class);
 
-  private final String[] columnNames;
+  private String[] rowNames = new String[]{};
 
-  private final String[] values;
+  private String[] columnNames = new String[]{};
+
+  private String[] values = new String[]{};
 
   public RStringMatrix(REXP matrix) throws REXPMismatchException {
-    RList dimnames = matrix.getAttribute("dimnames").asList();
-    rowNames = dimnames.at(0).isNull() ? new String[]{""} : dimnames.at(0).asStrings();
-    columnNames = dimnames.at(1).isNull() ? new String[]{""} : dimnames.at(1).asStrings();
-    values = matrix.asStrings();
+    if (matrix != null) {
+      REXP dims = matrix.getAttribute("dimnames");
+      if (dims != null) {
+        try {
+          RList dimnames = dims.asList();
+          rowNames = dimnames.at(0).isNull() ? new String[]{""} : dimnames.at(0).asStrings();
+          columnNames = dimnames.at(1).isNull() ? new String[]{""} : dimnames.at(1).asStrings();
+          values = matrix.asStrings();
+        } catch (REXPMismatchException e) {
+          log.error("Failed at extracting strings from matrix", e);
+        }
+      }
+    }
   }
 
   @Override

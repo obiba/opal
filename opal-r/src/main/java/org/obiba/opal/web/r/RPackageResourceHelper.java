@@ -62,17 +62,18 @@ public class RPackageResourceHelper {
   protected OpalRService opalRService;
 
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    ROperationWithResult rop = getInstalledPackages();
-    REXP rexp = rop.getResult();
+    List<OpalR.RPackageDto> pkgs = Lists.newArrayList();
     try {
+      ROperationWithResult rop = getInstalledPackages();
+      REXP rexp = rop.getResult();
       RStringMatrix matrix = new RStringMatrix(rexp);
-      return StreamSupport.stream(matrix.iterateRows().spliterator(), false)
+      pkgs = StreamSupport.stream(matrix.iterateRows().spliterator(), false)
           .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
           .collect(Collectors.toList());
     } catch (REXPMismatchException e) {
       log.error("Error when reading installed packages", e);
-      return Lists.newArrayList();
     }
+    return pkgs;
   }
 
   private ROperationWithResult getInstalledPackages() {

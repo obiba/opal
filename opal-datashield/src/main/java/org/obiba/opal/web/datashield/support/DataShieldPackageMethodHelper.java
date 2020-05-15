@@ -233,6 +233,7 @@ public class DataShieldPackageMethodHelper {
 
   private List<Opal.EntryDto> getDataShieldPackagePropertiesDtos(REXP rexp) {
     List<Opal.EntryDto> entries = Lists.newArrayList();
+    if (rexp == null) return entries;
     try {
       RStringMatrix dsProperties = new RStringMatrix(rexp);
       String[] colNames = dsProperties.getColumnNames();
