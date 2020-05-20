@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -107,11 +108,17 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
         }
       }
     });
-    resourceProvidersService.initialize();
+    resourceProvidersService.initialize(new ResourceProvidersService.ResourceProvidersHandler() {
+      @Override
+      public void onReceived(boolean hasProviders) {
+        getView().showHasResourceProviders(hasProviders);
+      }
+    });
   }
 
   @Override
   protected void onReveal() {
+    GWT.log("onReveal: " + resourceProvidersService.hasResourceProviders());
     getView().showHasResourceProviders(resourceProvidersService.hasResourceProviders());
   }
 

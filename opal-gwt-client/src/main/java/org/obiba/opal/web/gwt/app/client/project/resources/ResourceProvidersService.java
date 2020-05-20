@@ -35,18 +35,18 @@ public class ResourceProvidersService {
 
   private ResourceProvidersDto resourceProviders;
 
-  private boolean hasResourceFactories = false;
-
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
-  public void reset() {
-    resourceProviders = null;
-    hasResourceFactories = false;
-    resourceFactories = Maps.newHashMap();
-    initialize();
+  public interface ResourceProvidersHandler {
+    void onReceived(boolean hasProviders);
   }
 
-  public void initialize() {
+  public void reset() {
+    setResourceProviders(null);
+    initialize(null);
+  }
+
+  public void initialize(final ResourceProvidersHandler handler) {
     if (resourceProviders == null) {
       ResourceRequestBuilderFactory.<ResourceProvidersDto>newBuilder()
           .forResource(UriBuilders.RESOURCE_PROVIDERS.create().build())
@@ -56,16 +56,17 @@ public class ResourceProvidersService {
               setResourceProviders(providers);
               for (ResourceProviderDto provider : JsArrays.toIterable(providers.getProvidersArray())) {
                 for (ResourceFactoryDto factory : JsArrays.toIterable(provider.getResourceFactoriesArray())) {
-                  hasResourceFactories = true;
                   resourceFactories.put(makeResourceFactoryKey(factory), factory);
                 }
               }
+              if (handler != null) handler.onReceived(hasResourceProviders());
             }
           })
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               setResourceProviders(null);
+              if (handler != null) handler.onReceived(hasResourceProviders());
             }
           }, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
           .get().send();
@@ -74,6 +75,7 @@ public class ResourceProvidersService {
 
   private void setResourceProviders(ResourceProvidersDto resourceProviders) {
     this.resourceProviders = resourceProviders;
+    resourceFactories.clear();
   }
 
   public ResourceProviderDto getResourceProvider(String name) {
@@ -84,7 +86,7 @@ public class ResourceProvidersService {
   }
 
   public boolean hasResourceProviders() {
-    return hasResourceFactories;
+    return !resourceFactories.isEmpty();
   }
 
   public Map<String, ResourceFactoryDto> getResourceFactories() {
