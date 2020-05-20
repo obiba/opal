@@ -68,7 +68,7 @@ public class ProjectResourceReferenceResource {
   @PUT
   @Path("_test")
   public Response test(@PathParam("project") String project, @PathParam("name") String name) {
-    ROperation rop = resourceReferenceService.asAssignOperation(project, name);
+    ROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
     opalRService.execute(rop);
     return Response.ok().build();
   }

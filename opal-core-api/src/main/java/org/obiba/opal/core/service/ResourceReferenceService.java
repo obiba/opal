@@ -92,6 +92,6 @@ public interface ResourceReferenceService extends SystemService {
    * @return
    * @throws NoSuchResourceReferenceException
    */
-  ROperation asAssignOperation(String project, String name) throws NoSuchResourceReferenceException;
+  ROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException;
 
 }
