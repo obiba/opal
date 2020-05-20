@@ -48,7 +48,7 @@ public class IdentifiersMappingSelectionStepPresenter
         getView().setIdentifiersMappings(JsArrays.toSafeArray(resource));
       }
 
-    }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
+    }).withCallback(ResponseCodeCallback.NO_OP, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND).send();
   }
 
   public void initializeDefaultIdentifiersMapping(String project, String entityType) {

@@ -132,9 +132,16 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean hasIdentifiersTable(@NotNull String entityType) {
-    for(ValueTable table : getDatasource().getValueTables()) {
-      if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
-        return true;
+    if (databaseRegistry.hasIdentifiersDatabase()) {
+      try {
+        for (ValueTable table : getDatasource().getValueTables()) {
+          if (table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
+            return true;
+          }
+        }
+      } catch (Exception e) {
+        log.error("Failed at getting identifiers database table for entity type {}", entityType, e);
+        return false;
       }
     }
     return false;

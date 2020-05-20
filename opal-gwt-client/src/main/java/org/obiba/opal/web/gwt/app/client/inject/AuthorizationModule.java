@@ -9,15 +9,12 @@
  */
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.presenter.PostInstallPresenter;
+import com.google.inject.Singleton;
+import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
-import org.obiba.opal.web.gwt.app.client.view.PostInstallView;
 import org.obiba.opal.web.gwt.app.client.view.LoginView;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
-
-import com.google.inject.Singleton;
-import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
 /**
  *
@@ -30,8 +27,6 @@ public class AuthorizationModule extends AbstractPresenterModule {
     bind(ResourceAuthorizationCache.class).in(Singleton.class);
 
     bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
-    bindPresenter(PostInstallPresenter.class, PostInstallPresenter.Display.class, PostInstallView.class,
-        PostInstallPresenter.Proxy.class);
   }
 
 }

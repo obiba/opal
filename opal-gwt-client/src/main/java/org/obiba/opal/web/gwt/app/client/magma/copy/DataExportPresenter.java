@@ -243,7 +243,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
         return false;
       }
 
-    }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
+    }).withCallback(errorCallback, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND).send();
   }
 
   @Override

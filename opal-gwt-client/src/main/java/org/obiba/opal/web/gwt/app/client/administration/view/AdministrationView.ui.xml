@@ -23,6 +23,24 @@
     </b:PageHeader>
 
     <g:FlowPanel>
+      <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="noIDDatabasePanel">
+        <ui:msg description="No ID Database label">No identifiers database is defined. No identifiers mapping can be performed when importing or exporting data.
+        </ui:msg>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Anchor ui:field="addIDDatabase">
+            <ui:msg description="Add ID Database label">Add ID database</ui:msg>
+          </g:Anchor>
+        </g:FlowPanel>
+      </b:Alert>
+      <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="noDataDatabasePanel">
+        <ui:msg description="No data Database label">No data database is defined. No data can be imported. Only views can be added.
+        </ui:msg>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Anchor ui:field="addDataDatabase">
+            <ui:msg description="Add Data Database label">Add data database</ui:msg>
+          </g:Anchor>
+        </g:FlowPanel>
+      </b:Alert>
       <b:FluidRow>
         <b:Column size="6">
           <g:FlowPanel addStyleNames="xlarge-bottom-margin">

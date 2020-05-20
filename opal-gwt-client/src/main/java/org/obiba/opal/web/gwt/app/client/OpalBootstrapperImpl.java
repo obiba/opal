@@ -183,15 +183,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private void revealCurrentPlace() {
-    ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
-        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
-        .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        placeManager.revealCurrentPlace();
-      }
-    }, Response.SC_FORBIDDEN)//
-        .send();
+    placeManager.revealCurrentPlace();
   }
 
   private class SubjectResourceCallback implements ResourceCallback<Subject> {
@@ -202,17 +194,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
         revealCurrentPlace();
       } else {
         eventBus.fireEvent(new SessionEndedEvent());
-      }
-    }
-  }
-
-  private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
-    @Override
-    public void onResource(Response response, DatabasesStatusDto resource) {
-      if(!resource.getHasIdentifiers() || !resource.getHasStorage()) {
-        placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.INSTALL).build());
-      } else {
-        placeManager.revealCurrentPlace();
       }
     }
   }

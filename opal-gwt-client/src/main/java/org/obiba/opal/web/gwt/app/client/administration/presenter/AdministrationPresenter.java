@@ -13,13 +13,15 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 import java.util.Arrays;
 
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
@@ -33,6 +35,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import com.gwtplatform.mvp.shared.proxy.TokenFormatter;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
     implements HasPageTitle {
@@ -68,6 +71,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     HasAuthorization getUsersGroupsAuthorizer();
 
     HasAuthorization getIdentifiersAuthorizer();
+
+    void showDataDatabasesAlert(boolean visible);
 
     void setUsersGroupsHistoryToken(String historyToken);
 
@@ -181,6 +186,14 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   protected void onReveal() {
     super.onReveal();
     authorize();
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+        .forResource(UriBuilders.DATABASES_FOR_STORAGE.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatabaseDto> resource) {
+            getView().showDataDatabasesAlert(response.getStatusCode() != Response.SC_OK || "[]".equals(response.getText()));
+          }
+        }).get().send();
   }
 
   private void setHistoryTokens(TokenFormatter tokenFormatter) {

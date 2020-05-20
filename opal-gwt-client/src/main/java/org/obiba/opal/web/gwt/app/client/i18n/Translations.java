@@ -549,7 +549,7 @@ public interface Translations extends Constants {
       "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}.",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "{0}: Connection successful.",//
-      "DatabaseConnectionFailed", "Failed to connect: {0}.",//
+      "DatabaseConnectionFailed", "Failed to connect to database.",//
       "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",//
       "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable.",//
       "CannotFindDatabase", "Cannot find database named {0}.",//

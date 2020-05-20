@@ -134,14 +134,20 @@ public class ProjectIdentifiersMappingsPresenter extends PresenterWidget<Project
           ensureValidMappingTables(JsArrays.toList(dtos));
           if (successCallback != null) successCallback.onSuccess();
         }
-      }) //
+      })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            ensureValidMappingTables(null);
+          }
+        }, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN)
       .get().send();
   }
 
   private void ensureValidMappingTables(List<TableDto> tables) {
     mappingTables = Lists.newArrayList();
 
-    if (tables.size() > 0) {
+    if (tables != null && tables.size() > 0) {
       for (TableDto table : tables) {
         if (table.getVariableCount() > 0) {
           mappingTables.add(table);

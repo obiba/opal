@@ -12,8 +12,14 @@ package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import java.util.Iterator;
 
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.Anchor;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
@@ -29,6 +35,18 @@ import com.gwtplatform.mvp.client.ViewImpl;
 public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
 
   interface Binder extends UiBinder<Widget, AdministrationView> {}
+
+  @UiField
+  Alert noIDDatabasePanel;
+
+  @UiField
+  Anchor addIDDatabase;
+
+  @UiField
+  Alert noDataDatabasePanel;
+
+  @UiField
+  Anchor addDataDatabase;
 
   @UiField
   OpalNavLink usersGroupsPlace;
@@ -194,7 +212,27 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   @Override
   public HasAuthorization getIdentifiersAuthorizer() {
-    return new WidgetAuthorizer(identifiersAuthorizable);
+    return new CompositeAuthorizer(new WidgetAuthorizer(identifiersAuthorizable), new HasAuthorization() {
+      @Override
+      public void beforeAuthorization() {
+        noIDDatabasePanel.setVisible(false);
+      }
+
+      @Override
+      public void authorized() {
+        noIDDatabasePanel.setVisible(false);
+      }
+
+      @Override
+      public void unauthorized() {
+        noIDDatabasePanel.setVisible(true);
+      }
+    });
+  }
+
+  @Override
+  public void showDataDatabasesAlert(boolean visible) {
+    noDataDatabasePanel.setVisible(visible);
   }
 
   @Override
@@ -218,8 +256,20 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public void setDatabasesHistoryToken(String historyToken) {
+  public void setDatabasesHistoryToken(final String historyToken) {
     databasesPlace.setHistoryToken(historyToken);
+    addIDDatabase.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        History.newItem(historyToken);
+      }
+    });
+    addDataDatabase.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        History.newItem(historyToken);
+      }
+    });
   }
 
   @Override
