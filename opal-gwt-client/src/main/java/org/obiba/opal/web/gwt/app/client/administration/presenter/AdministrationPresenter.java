@@ -10,21 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
-import java.util.Arrays;
-
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -35,14 +23,26 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import com.gwtplatform.mvp.shared.proxy.TokenFormatter;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.ResourceProvidersStatusDto;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
     implements HasPageTitle {
 
   @ProxyStandard
   @NameToken(Places.ADMINISTRATION)
-  public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
+  public interface Proxy extends ProxyPlace<AdministrationPresenter> {
+  }
 
   public interface Display extends View {
 
@@ -73,6 +73,10 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     HasAuthorization getIdentifiersAuthorizer();
 
     void showDataDatabasesAlert(boolean visible);
+
+    void showResourceProvidersAlert(boolean visible);
+
+    void showRServerAlert(boolean visible);
 
     void setUsersGroupsHistoryToken(String historyToken);
 
@@ -111,7 +115,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
   @Inject
   public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
-      TokenFormatter tokenFormatter) {
+                                 TokenFormatter tokenFormatter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     setHistoryTokens(tokenFormatter);
@@ -194,6 +198,16 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
             getView().showDataDatabasesAlert(response.getStatusCode() != Response.SC_OK || "[]".equals(response.getText()));
           }
         }).get().send();
+    ResourceRequestBuilderFactory.<ResourceProvidersStatusDto>newBuilder() //
+        .forResource(UriBuilders.RESOURCE_PROVIDERS_STATUS.create().build()) //
+        .withCallback(new ResourceCallback<ResourceProvidersStatusDto>() {
+          @Override
+          public void onResource(Response response, ResourceProvidersStatusDto resource) {
+            getView().showResourceProvidersAlert(resource.getProvidersCount() == 0);
+            getView().showRServerAlert(!resource.getRServerRunning());
+          }
+        }).get().send();
+
   }
 
   private void setHistoryTokens(TokenFormatter tokenFormatter) {

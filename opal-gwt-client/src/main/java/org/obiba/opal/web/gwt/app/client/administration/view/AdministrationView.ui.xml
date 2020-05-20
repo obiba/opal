@@ -23,6 +23,25 @@
     </b:PageHeader>
 
     <g:FlowPanel>
+      <b:Alert type="ERROR" close="false" visible="false" animation="true" ui:field="noRServerPanel">
+        <ui:msg description="No R server label">No R server is running. Some functionalities will not work properly: data import/export using R,
+          data and resource assignment to R server session, reporting etc.
+        </ui:msg>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Anchor ui:field="adminRServer">
+            <ui:msg description="Admin R server label">Administrate R server</ui:msg>
+          </g:Anchor>
+        </g:FlowPanel>
+      </b:Alert>
+      <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="noResourceProvidersPanel">
+        <ui:msg description="No R resource providers label">No resource description providers could be identified. You may need to install the <strong>resourcer</strong> R package.
+        </ui:msg>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Anchor ui:field="adminRPackages">
+            <ui:msg description="Admin R packages label">Administrate R packages</ui:msg>
+          </g:Anchor>
+        </g:FlowPanel>
+      </b:Alert>
       <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="noIDDatabasePanel">
         <ui:msg description="No ID Database label">No identifiers database is defined. No identifiers mapping can be performed when importing or exporting data.
         </ui:msg>

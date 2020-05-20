@@ -111,6 +111,11 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
   }
 
   @Override
+  protected void onReveal() {
+    getView().showHasResourceProviders(resourceProvidersService.hasResourceProviders());
+  }
+
+  @Override
   public void onRefresh() {
     refreshResources();
   }
@@ -150,7 +155,7 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   private void refreshResources() {
     getView().beforeRenderResources();
-    // Fetch all providers
+    // Fetch all resource references
     ResourceRequestBuilderFactory.<JsArray<ResourceReferenceDto>>newBuilder() //
         .forResource(UriBuilders.PROJECT_RESOURCES.create().build(projectName)) //
         .withCallback(new ResourceCallback<JsArray<ResourceReferenceDto>>() {
@@ -220,6 +225,8 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
     HasAuthorization getAddResourceAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    void showHasResourceProviders(boolean enabled);
   }
 
   private class RemoveRunnable implements Runnable {

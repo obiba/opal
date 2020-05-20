@@ -35,10 +35,14 @@ public class ResourceProvidersService {
 
   private ResourceProvidersDto resourceProviders;
 
+  private boolean hasResourceFactories = false;
+
   private Map<String, ResourceFactoryDto> resourceFactories = Maps.newHashMap();
 
   public void reset() {
     resourceProviders = null;
+    hasResourceFactories = false;
+    resourceFactories = Maps.newHashMap();
     initialize();
   }
 
@@ -52,6 +56,7 @@ public class ResourceProvidersService {
               setResourceProviders(providers);
               for (ResourceProviderDto provider : JsArrays.toIterable(providers.getProvidersArray())) {
                 for (ResourceFactoryDto factory : JsArrays.toIterable(provider.getResourceFactoriesArray())) {
+                  hasResourceFactories = true;
                   resourceFactories.put(makeResourceFactoryKey(factory), factory);
                 }
               }
@@ -60,14 +65,14 @@ public class ResourceProvidersService {
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              resourceProviders = null;
+              setResourceProviders(null);
             }
           }, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
           .get().send();
     }
   }
 
-  public void setResourceProviders(ResourceProvidersDto resourceProviders) {
+  private void setResourceProviders(ResourceProvidersDto resourceProviders) {
     this.resourceProviders = resourceProviders;
   }
 
@@ -76,6 +81,10 @@ public class ResourceProvidersService {
       if (provider.getName().equals(name)) return provider;
     }
     return null;
+  }
+
+  public boolean hasResourceProviders() {
+    return hasResourceFactories;
   }
 
   public Map<String, ResourceFactoryDto> getResourceFactories() {

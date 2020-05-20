@@ -918,6 +918,13 @@ public enum UriBuilders {
     }
   },
 
+  RESOURCE_PROVIDERS_STATUS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("resource-providers", "_status");
+    }
+  },
+
   PLUGIN {
     @Override
     public UriBuilder create() {

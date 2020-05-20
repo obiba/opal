@@ -69,6 +69,9 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   TabPanel resourcesTabPanel;
 
   @UiField
+  Alert noResourceProvidersPanel;
+
+  @UiField
   Button addResource;
 
   @UiField
@@ -176,6 +179,12 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
         resourcesTabPanel.setVisible(true);
       }
     };
+  }
+
+  @Override
+  public void showHasResourceProviders(boolean enabled) {
+    addResource.setEnabled(enabled);
+    noResourceProvidersPanel.setVisible(!enabled);
   }
 
   @UiHandler("addResource")
@@ -391,7 +400,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
         String urlTxt = url.length() > 50 ? url.substring(0, 50) + " ..." : url;
         if (url.startsWith("http://") || url.startsWith("https://")) {
           return "<a href='" + url + "' target='_blank' title='" + url + "'>" + urlTxt + "</a>";
-        } else if (!urlTxt.equals(url)){
+        } else if (!urlTxt.equals(url)) {
           return "<span title='" + url + "'>" + urlTxt + "</span>";
         } else {
           return url;

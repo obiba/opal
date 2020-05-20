@@ -46,6 +46,18 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   Alert noDataDatabasePanel;
 
   @UiField
+  Alert noRServerPanel;
+
+  @UiField
+  Anchor adminRServer;
+
+  @UiField
+  Alert noResourceProvidersPanel;
+
+  @UiField
+  Anchor adminRPackages;
+
+  @UiField
   Anchor addDataDatabase;
 
   @UiField
@@ -236,6 +248,16 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
+  public void showResourceProvidersAlert(boolean visible) {
+    noResourceProvidersPanel.setVisible(visible);
+  }
+
+  @Override
+  public void showRServerAlert(boolean visible) {
+    noRServerPanel.setVisible(visible);
+  }
+
+  @Override
   public void setUsersGroupsHistoryToken(String historyToken) {
     usersGroupsPlace.setHistoryToken(historyToken);
   }
@@ -278,8 +300,20 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public void setRHistoryToken(String historyToken) {
+  public void setRHistoryToken(final String historyToken) {
     rPlace.setHistoryToken(historyToken);
+    adminRServer.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        History.newItem(historyToken);
+      }
+    });
+    adminRPackages.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        History.newItem(historyToken);
+      }
+    });
   }
 
   @Override

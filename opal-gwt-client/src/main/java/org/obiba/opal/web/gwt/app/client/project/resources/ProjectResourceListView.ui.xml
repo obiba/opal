@@ -23,6 +23,12 @@
 
             <b:Tab heading="References" active="true">
 
+                <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="noResourceProvidersPanel">
+                    <ui:msg description="No R resource providers project label">No resource description providers could be identified.
+                        Please verify whether the R server is running and the <strong>resourcer</strong> R package is installed.
+                    </ui:msg>
+                </b:Alert>
+
                 <g:FlowPanel addStyleNames="bottom-margin clearfix">
                     <g:FlowPanel addStyleNames="pull-left">
                         <b:Button ui:field="addResource" type="INFO" icon="PLUS" addStyleNames="btn small-right-indent">

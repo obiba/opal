@@ -10,11 +10,15 @@
 
 package org.obiba.opal.core.tx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionalThread extends Thread {
+
+  private static final Logger log = LoggerFactory.getLogger(TransactionalThread.class);
 
   private final TransactionTemplate transactionTemplate;
 
@@ -29,11 +33,19 @@ public class TransactionalThread extends Thread {
 
   @Override
   public void run() {
-    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        runnable.run();
+    try {
+      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          runnable.run();
+        }
+      });
+    } catch (Exception e) {
+      if (log.isDebugEnabled()) {
+        log.error("Error in transaction execution", e);
+      } else {
+        log.error("Error in transaction execution: {}", e.getMessage());
       }
-    });
+    }
   }
 }

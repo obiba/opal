@@ -70,7 +70,7 @@ public class RPackageResourceHelper {
       pkgs = StreamSupport.stream(matrix.iterateRows().spliterator(), false)
           .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
           .collect(Collectors.toList());
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       log.error("Error when reading installed packages", e);
     }
     return pkgs;

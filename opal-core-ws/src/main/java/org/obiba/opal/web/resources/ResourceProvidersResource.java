@@ -11,6 +11,7 @@
 package org.obiba.opal.web.resources;
 
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.model.Resources;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class ResourceProvidersResource {
   @Autowired
   private ResourceProvidersService resourceProvidersService;
 
+  @Autowired
+  private OpalRService opalRService;
+
   @GET
   @NoAuthorization
   public Resources.ResourceProvidersDto list() {
@@ -37,4 +41,15 @@ public class ResourceProvidersResource {
         .map(Dtos::asDto).collect(Collectors.toList()));
     return builder.build();
   }
+
+  @GET
+  @Path("/_status")
+  @NoAuthorization
+  public Resources.ResourceProvidersStatusDto status() {
+    Resources.ResourceProvidersStatusDto.Builder builder = Resources.ResourceProvidersStatusDto.newBuilder()
+        .setProvidersCount(resourceProvidersService.getResourceProviders().size())
+        .setRServerRunning(opalRService.isRunning());
+    return builder.build();
+  }
+
 }

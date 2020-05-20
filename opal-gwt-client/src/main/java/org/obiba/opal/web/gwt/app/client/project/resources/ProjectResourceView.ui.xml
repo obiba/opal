@@ -85,7 +85,10 @@
                                 <g:Label>
                                     <ui:msg description="URL label">URL</ui:msg>
                                 </g:Label>
-                                <g:Label ui:field="url"/>
+                                <g:FlowPanel>
+                                    <g:Label ui:field="url"/>
+                                    <g:Anchor ui:field="urlLink"/>
+                                </g:FlowPanel>
                             </o:PropertyPanel>
 
                             <o:PropertyPanel>

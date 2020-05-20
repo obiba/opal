@@ -67,6 +67,9 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   Label url;
 
   @UiField
+  Anchor urlLink;
+
+  @UiField
   Label format;
 
   @UiField
@@ -158,7 +161,17 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     if (resource.hasDescription()) {
       descriptionPanel.setWidget(new HTMLPanel(Markdown.parse(resource.getDescription())));
     }
-    url.setText(resource.getResource().getUrl());
+    url.setVisible(false);
+    urlLink.setVisible(false);
+    if (resource.getResource().getUrl().startsWith("http")) {
+      urlLink.setText(resource.getResource().getUrl());
+      urlLink.setHref(resource.getResource().getUrl());
+      urlLink.setTarget("_blank");
+      urlLink.setVisible(true);
+    } else {
+      url.setText(resource.getResource().getUrl());
+      url.setVisible(true);
+    }
     format.setText(resource.getResource().getFormat());
 
     applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), resource.getParameters());

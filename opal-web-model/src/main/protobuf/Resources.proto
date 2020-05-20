@@ -2,6 +2,10 @@ package Resources;
 
 option java_package = "org.obiba.opal.web.model";
 
+message ResourceProvidersStatusDto {
+    required int32 providersCount = 1;
+    required bool rServerRunning = 2;
+}
 
 message ResourceProvidersDto {
     repeated ResourceProviderDto providers = 1;
