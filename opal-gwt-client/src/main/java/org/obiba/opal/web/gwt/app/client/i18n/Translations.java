@@ -740,7 +740,9 @@ public interface Translations extends Constants {
       "IDProviderProviderUrlIsUri", "Account login page address must start with https (recommended) or http.",
       "TokenToCopyReminder", "Make sure to copy your new personal access token now. You won't be able to see it again!",
       "NameMustBeUnique", "Name must be unique.",
-      "GHOrganizationIsRequired", "GitHub user or organization name is required"
+      "GHOrganizationIsRequired", "GitHub user or organization name is required",
+      "ResourceAssignSuccess", "Resource assignment in R was successful.",
+      "ResourceAssignFailed", "Resource assignment in R has failed: "
   })
   Map<String, String> userMessageMap();
 

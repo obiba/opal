@@ -11,6 +11,7 @@
 package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.ResourceReference;
+import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.resource.Resource;
 
 import java.util.List;
@@ -82,5 +83,15 @@ public interface ResourceReferenceService extends SystemService {
    * @param project
    */
   void deleteAll(String project);
+
+  /**
+   * Make assignment R operation from resource reference.
+   *
+   * @param project
+   * @param name
+   * @return
+   * @throws NoSuchResourceReferenceException
+   */
+  ROperation asAssignOperation(String project, String name) throws NoSuchResourceReferenceException;
 
 }

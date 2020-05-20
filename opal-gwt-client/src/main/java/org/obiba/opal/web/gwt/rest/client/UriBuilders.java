@@ -68,6 +68,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_RESOURCE_TEST {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "resource", "{}", "_test");
+    }
+  },
+
   PROJECT_REPORT_TEMPLATES {
     @Override
     public UriBuilder create() {

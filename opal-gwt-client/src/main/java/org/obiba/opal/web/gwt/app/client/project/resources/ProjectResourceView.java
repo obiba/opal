@@ -46,6 +46,9 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
   }
 
   @UiField
+  com.github.gwtbootstrap.client.ui.Button test;
+
+  @UiField
   TabPanel tabPanel;
 
   @UiField
@@ -101,6 +104,12 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     initWidget(uiBinder.createAndBindUi(this));
   }
 
+  @UiHandler("test")
+  void onTest(ClickEvent event) {
+    test.setEnabled(false);
+    getUiHandlers().onTest();
+  }
+
   @UiHandler("remove")
   void onRemove(ClickEvent event) {
     getUiHandlers().onDelete();
@@ -128,6 +137,11 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     buttonsPanel.setVisible(resource.getEditable());
 
     initializeResourceFactoryUI();
+  }
+
+  @Override
+  public void testCompleted() {
+    test.setEnabled(true);
   }
 
   @Override

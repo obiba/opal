@@ -23,7 +23,9 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
@@ -49,6 +51,8 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
 
   private final TranslationMessages translationMessages;
 
+  private final Translations translations;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
@@ -62,10 +66,11 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   @Inject
   public ProjectResourcePresenter(EventBus eventBus,
                                   Display view,
-                                  PlaceManager placeManager, TranslationMessages translationMessages, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
+                                  PlaceManager placeManager, TranslationMessages translationMessages, Translations translations, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
     super(eventBus, view);
     this.placeManager = placeManager;
     this.translationMessages = translationMessages;
+    this.translations = translations;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
@@ -127,6 +132,23 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
         translationMessages.confirmRemoveResource(resource.getName())));
   }
 
+  @Override
+  public void onTest() {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_RESOURCE_TEST.create().build(projectName, resource.getName()))
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == Response.SC_OK)
+              fireEvent(NotificationEvent.newBuilder().success(translations.userMessageMap().get("ResourceAssignSuccess")).build());
+            else
+              fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceAssignFailed") + response.getStatusText()).build());
+            getView().testCompleted();
+          }
+        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST)
+        .put().send();
+  }
+
   private void refreshResource(String name) {
     // Fetch all providers
     ResourceRequestBuilderFactory.<ResourceReferenceDto>newBuilder() //
@@ -160,6 +182,8 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
     SingleSlot<ResourcePermissionsPresenter> RESOURCE_PERMISSIONS = new SingleSlot<ResourcePermissionsPresenter>();
 
     void renderResource(ResourceReferenceDto resource);
+
+    void testCompleted();
   }
 
   private class RemoveRunnable implements Runnable {

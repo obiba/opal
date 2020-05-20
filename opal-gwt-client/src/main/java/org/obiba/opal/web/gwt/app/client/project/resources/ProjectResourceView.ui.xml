@@ -20,6 +20,11 @@
 
         <g:FlowPanel ui:field="buttonsPanel" addStyleNames="pull-right" visible="false">
             <b:ButtonGroup>
+                <b:Button icon="TERMINAL" type="INFO" ui:field="test">
+                    <ui:msg description="Test resource label">Test</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
                 <b:Button icon="PENCIL" ui:field="edit">
                     <ui:msg description="Edit resource label">Edit</ui:msg>
                 </b:Button>

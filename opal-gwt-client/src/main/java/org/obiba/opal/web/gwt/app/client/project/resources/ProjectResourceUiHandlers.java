@@ -20,4 +20,6 @@ public interface ProjectResourceUiHandlers extends UiHandlers {
 
   void onDelete();
 
+  void onTest();
+
 }

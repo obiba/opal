@@ -18,10 +18,11 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
+import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.spi.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,6 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private final OrientDbService orientDbService;
 
-  private final OpalRuntime opalRuntime;
-
   private final CryptoService cryptoService;
 
   private final SubjectAclService subjectAclService;
@@ -53,9 +52,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   private final ResourceProvidersService resourceProvidersService;
 
   @Autowired
-  public ResourceReferenceServiceImpl(OrientDbService orientDbService, OpalRuntime opalRuntime, CryptoService cryptoService, SubjectAclService subjectAclService, ResourceProvidersService resourceProvidersService) {
+  public ResourceReferenceServiceImpl(OrientDbService orientDbService, CryptoService cryptoService, SubjectAclService subjectAclService, ResourceProvidersService resourceProvidersService) {
     this.orientDbService = orientDbService;
-    this.opalRuntime = opalRuntime;
     this.cryptoService = cryptoService;
     this.subjectAclService = subjectAclService;
     this.resourceProvidersService = resourceProvidersService;
@@ -103,7 +101,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     if (!Strings.isNullOrEmpty(pkg)) names.add(pkg);
     JSONArray pkgs = resourceReference.getParameters().optJSONArray("_packages");
     if (pkgs != null) {
-      for (int i = 0; i<pkgs.length(); i++) {
+      for (int i = 0; i < pkgs.length(); i++) {
         String p = pkgs.optString(i);
         if (!Strings.isNullOrEmpty(p)) names.add(p);
       }
@@ -140,6 +138,14 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   public void deleteAll(String project) {
     getResourceReferences(project).forEach(orientDbService::delete);
     subjectAclService.deleteNodePermissions("/project/" + project + "/resource");
+  }
+
+  @Override
+  public ROperation asAssignOperation(String project, String name) throws NoSuchResourceReferenceException {
+    ResourceReference ref = getResourceReference(project, name);
+    Resource resource = createResource(ref);
+    List<String> requiredPackages = getRequiredPackages(ref);
+    return new ResourceAssignROperation(name, resource, requiredPackages);
   }
 
   @Override

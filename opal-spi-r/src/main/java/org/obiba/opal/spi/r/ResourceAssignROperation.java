@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import com.google.common.base.Strings;
 import org.obiba.opal.spi.resource.Resource;
 
 import java.net.URISyntaxException;
@@ -23,7 +22,7 @@ public class ResourceAssignROperation extends AbstractROperation {
   private final String symbol;
 
   private final Resource resource;
-  
+
   private final List<String> requiredPackages;
 
   public ResourceAssignROperation(String symbol, Resource resource, List<String> requiredPackages) {

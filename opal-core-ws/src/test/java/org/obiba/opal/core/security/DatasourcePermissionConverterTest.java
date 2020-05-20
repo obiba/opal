@@ -19,20 +19,21 @@ public class DatasourcePermissionConverterTest
 
   @Test
   public void testDatasourceAll() {
-    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_ALL, //
-        "rest:/datasource/patate:*:GET/*", //
-        "rest:/identifiers/mappings:GET", //
-        "rest:/datasource-plugin:GET:GET/GET", //
-        "rest:/project/patate:GET:GET", //
+    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_ALL,
+        "rest:/datasource/patate:*:GET/*",
+        "rest:/identifiers/mappings:GET",
+        "rest:/datasource-plugin:GET:GET/GET",
+        "rest:/project/patate:GET:GET",
+        "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/identifiers-mappings:GET:GET",
-        "rest:/project/patate/transient-datasource:*:GET/*", //
-        "rest:/project/patate/report-template:*:GET/*", //
-        "rest:/project/patate/command:*:GET/*", //
-        "rest:/project/patate/permissions/datasource:*:GET/*", //
-        "rest:/project/patate/permissions/table:*:GET/*", //
-        "rest:/project/patate/permissions/report-template:*:GET/*", //
-        "rest:/project/patate/permissions/subject:GET:GET/GET", //
+        "rest:/project/patate/transient-datasource:*:GET/*",
+        "rest:/project/patate/report-template:*:GET/*",
+        "rest:/project/patate/command:*:GET/*",
+        "rest:/project/patate/permissions/datasource:*:GET/*",
+        "rest:/project/patate/permissions/table:*:GET/*",
+        "rest:/project/patate/permissions/report-template:*:GET/*",
+        "rest:/project/patate/permissions/subject:GET:GET/GET",
         "rest:/files/projects/patate:GET:GET/*",//
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");
@@ -40,13 +41,13 @@ public class DatasourcePermissionConverterTest
 
   @Test
   public void testDatasourceView() {
-    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_VIEW, //
-        "rest:/datasource/patate:GET:GET/GET", //
-        "rest:/project/patate/commands/_analyse:POST:GET", //
-        "rest:/project/patate/commands/_export:POST:GET", //
-        "rest:/project/patate/commands/_copy:POST:GET", //
-        "rest:/project/patate/commands/_refresh:POST:GET", //
-        "rest:/project/patate:GET:GET", //
+    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_VIEW,
+        "rest:/datasource/patate:GET:GET/GET",
+        "rest:/project/patate/commands/_analyse:POST:GET",
+        "rest:/project/patate/commands/_export:POST:GET",
+        "rest:/project/patate/commands/_copy:POST:GET",
+        "rest:/project/patate/commands/_refresh:POST:GET",
+        "rest:/project/patate:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/analyses:GET:GET",
@@ -55,23 +56,23 @@ public class DatasourcePermissionConverterTest
 
   @Test
   public void testCreateTable() {
-    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.TABLE_ADD, //
-        "rest:/datasource/patate/tables:GET:GET", //
-        "rest:/datasource/patate/tables:POST:GET", //
-        "rest:/datasource/patate/tables:DELETE", //
-        "rest:/datasource/patate/views:POST:GET", //
-        "rest:/identifiers/mappings:GET", //
-        "rest:/datasource-plugin:GET:GET/GET", //
-        "rest:/project/patate:GET:GET", //
+    testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.TABLE_ADD,
+        "rest:/datasource/patate/tables:GET:GET",
+        "rest:/datasource/patate/tables:POST:GET",
+        "rest:/datasource/patate/tables:DELETE",
+        "rest:/datasource/patate/views:POST:GET",
+        "rest:/identifiers/mappings:GET",
+        "rest:/datasource-plugin:GET:GET/GET",
+        "rest:/project/patate:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/identifiers-mappings:GET:GET",
-        "rest:/project/patate/summary:GET:GET", //
-        "rest:/project/patate/transient-datasources:POST", //
-        "rest:/project/patate/commands/_import:POST:GET", //
-        "rest:/project/patate/commands/_export:POST:GET", //
-        "rest:/project/patate/commands/_copy:POST:GET", //
-        "rest:/project/patate/commands/_refresh:POST:GET", //
-        "rest:/files/projects/patate:GET:GET/*", //
+        "rest:/project/patate/summary:GET:GET",
+        "rest:/project/patate/transient-datasources:POST",
+        "rest:/project/patate/commands/_import:POST:GET",
+        "rest:/project/patate/commands/_export:POST:GET",
+        "rest:/project/patate/commands/_copy:POST:GET",
+        "rest:/project/patate/commands/_refresh:POST:GET",
+        "rest:/files/projects/patate:GET:GET/*",
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");
   }

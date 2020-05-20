@@ -15,6 +15,8 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
+import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +33,12 @@ public class ProjectResourceReferenceResource {
 
   private final ResourceReferenceService resourceReferenceService;
 
+  private final OpalRService opalRService;
+
   @Autowired
-  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService) {
+  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, OpalRService opalRService) {
     this.resourceReferenceService = resourceReferenceService;
+    this.opalRService = opalRService;
   }
 
   @GET
@@ -57,6 +62,14 @@ public class ProjectResourceReferenceResource {
     if (!originalReference.getName().equals(updatedReference.getName())) {
       // TODO change permissions for the new name
     }
+    return Response.ok().build();
+  }
+
+  @PUT
+  @Path("_test")
+  public Response test(@PathParam("project") String project, @PathParam("name") String name) {
+    ROperation rop = resourceReferenceService.asAssignOperation(project, name);
+    opalRService.execute(rop);
     return Response.ok().build();
   }
 

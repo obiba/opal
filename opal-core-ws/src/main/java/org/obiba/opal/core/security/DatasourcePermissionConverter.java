@@ -40,21 +40,22 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
-            toRest("/identifiers/mappings", "GET"), //
-            toRest("/datasource-plugin", "GET:GET/GET"), //
-            toRest("/project/{0}", "GET:GET", args),//
-            toRest("/project/{0}/state", "GET:GET", args),//
-            toRest("/project/{0}/identifiers-mappings", "GET:GET", args),//
-            toRest("/project/{0}/transient-datasource", "*:GET/*", args),//
-            toRest("/project/{0}/report-template", "*:GET/*", args),//
-            toRest("/project/{0}/command", "*:GET/*", args),//
-            toRest("/project/{0}/permissions/datasource", "*:GET/*", args),//
-            toRest("/project/{0}/permissions/table", "*:GET/*", args),//
-            toRest("/project/{0}/permissions/report-template", "*:GET/*", args),//
-            toRest("/project/{0}/permissions/subject", "GET:GET/GET", args),//
-            toRest("/files/projects/{0}", "GET:GET/*", args), //
-            toRest("/files/projects/{0}", "POST:GET/*", args), //
+        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args),
+            toRest("/identifiers/mappings", "GET"),
+            toRest("/datasource-plugin", "GET:GET/GET"),
+            toRest("/project/{0}", "GET:GET", args),
+            toRest("/project/{0}/summary", "GET:GET", args),
+            toRest("/project/{0}/state", "GET:GET", args),
+            toRest("/project/{0}/identifiers-mappings", "GET:GET", args),
+            toRest("/project/{0}/transient-datasource", "*:GET/*", args),
+            toRest("/project/{0}/report-template", "*:GET/*", args),
+            toRest("/project/{0}/command", "*:GET/*", args),
+            toRest("/project/{0}/permissions/datasource", "*:GET/*", args),
+            toRest("/project/{0}/permissions/table", "*:GET/*", args),
+            toRest("/project/{0}/permissions/report-template", "*:GET/*", args),
+            toRest("/project/{0}/permissions/subject", "GET:GET/GET", args),
+            toRest("/files/projects/{0}", "GET:GET/*", args),
+            toRest("/files/projects/{0}", "POST:GET/*", args),
             toRest("/files/projects/{0}", "PUT:GET/*", args));
       }
 
@@ -63,23 +64,23 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}/tables", "GET:GET", args), //
-            toRest("/datasource/{0}/tables", "POST:GET", args),//
-            toRest("/datasource/{0}/tables", "DELETE", args),//
-            toRest("/datasource/{0}/views", "POST:GET", args),//
-            toRest("/identifiers/mappings", "GET"), //
-            toRest("/datasource-plugin", "GET:GET/GET"), //
-            toRest("/project/{0}", "GET:GET", args),//
-            toRest("/project/{0}/state", "GET:GET", args),//
-            toRest("/project/{0}/identifiers-mappings", "GET:GET", args),//
-            toRest("/project/{0}/summary", "GET:GET", args),//
-            toRest("/project/{0}/transient-datasources", "POST", args),//
-            toRest("/project/{0}/commands/_import", "POST:GET", args),//
-            toRest("/project/{0}/commands/_export", "POST:GET", args),//
-            toRest("/project/{0}/commands/_copy", "POST:GET", args),//
-            toRest("/project/{0}/commands/_refresh", "POST:GET", args),//
-            toRest("/files/projects/{0}", "GET:GET/*", args), //
-            toRest("/files/projects/{0}", "POST:GET/*", args), //
+        return Lists.newArrayList(toRest("/datasource/{0}/tables", "GET:GET", args),
+            toRest("/datasource/{0}/tables", "POST:GET", args),
+            toRest("/datasource/{0}/tables", "DELETE", args),
+            toRest("/datasource/{0}/views", "POST:GET", args),
+            toRest("/identifiers/mappings", "GET"),
+            toRest("/datasource-plugin", "GET:GET/GET"),
+            toRest("/project/{0}", "GET:GET", args),
+            toRest("/project/{0}/state", "GET:GET", args),
+            toRest("/project/{0}/identifiers-mappings", "GET:GET", args),
+            toRest("/project/{0}/summary", "GET:GET", args),
+            toRest("/project/{0}/transient-datasources", "POST", args),
+            toRest("/project/{0}/commands/_import", "POST:GET", args),
+            toRest("/project/{0}/commands/_export", "POST:GET", args),
+            toRest("/project/{0}/commands/_copy", "POST:GET", args),
+            toRest("/project/{0}/commands/_refresh", "POST:GET", args),
+            toRest("/files/projects/{0}", "GET:GET/*", args),
+            toRest("/files/projects/{0}", "POST:GET/*", args),
             toRest("/files/projects/{0}", "PUT:GET/*", args));
       }
     },
@@ -87,13 +88,13 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}", "GET:GET/GET", args), //
-            toRest("/project/{0}/commands/_analyse", "POST:GET", args),//
-            toRest("/project/{0}/commands/_export", "POST:GET", args),//
-            toRest("/project/{0}/commands/_copy", "POST:GET", args),//
-            toRest("/project/{0}/commands/_refresh", "POST:GET", args),//
-            toRest("/project/{0}", "GET:GET", args),//
-            toRest("/project/{0}/state", "GET:GET", args),//
+        return Lists.newArrayList(toRest("/datasource/{0}", "GET:GET/GET", args),
+            toRest("/project/{0}/commands/_analyse", "POST:GET", args),
+            toRest("/project/{0}/commands/_export", "POST:GET", args),
+            toRest("/project/{0}/commands/_copy", "POST:GET", args),
+            toRest("/project/{0}/commands/_refresh", "POST:GET", args),
+            toRest("/project/{0}", "GET:GET", args),
+            toRest("/project/{0}/state", "GET:GET", args),
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/analyses", "GET:GET", args),
             toRest("/project/{0}/analyses/_export", "GET:GET", args));
