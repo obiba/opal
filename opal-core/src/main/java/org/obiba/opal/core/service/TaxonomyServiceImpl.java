@@ -108,10 +108,10 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
 
     try {
       ObjectMapper mapper = new ObjectMapper();
-      List<Map<String, String>> tagsInfo = mapper.readValue(new URL(String.format(GITHUB_API_REF_URL, user, repo)),
+      List<Map<String, Object>> tagsInfo = mapper.readValue(new URL(String.format(GITHUB_API_REF_URL, user, repo)),
           new TypeReference<List<Map<String, Object>>>() {});
-      for (Map<String, String> tag : tagsInfo) {
-        tags.add(tag.get("name"));
+      for (Map<String, Object> tag : tagsInfo) {
+        tags.add(tag.get("name").toString());
       }
 
       return tags;
