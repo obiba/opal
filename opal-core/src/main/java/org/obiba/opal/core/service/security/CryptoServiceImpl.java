@@ -14,7 +14,7 @@ import java.security.Key;
 
 import org.apache.shiro.codec.CodecSupport;
 import org.apache.shiro.codec.Hex;
-import org.apache.shiro.crypto.AesCipherService;
+import org.apache.shiro.crypto.DefaultBlockCipherService;
 import org.apache.shiro.util.ByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class CryptoServiceImpl implements CryptoService {
 
   private OpalConfigurationService configurationService;
 
-  private final AesCipherService cipherService = new AesCipherService();
+  private final LegacyAesCipherService cipherService = new LegacyAesCipherService();
 
   @Autowired
   public void setConfigurationService(OpalConfigurationService configurationService) {
@@ -52,5 +52,12 @@ public class CryptoServiceImpl implements CryptoService {
 
   private byte[] getSecretKey() {
     return Hex.decode(configurationService.getOpalConfiguration().getSecretKey());
+  }
+
+  private static class LegacyAesCipherService extends DefaultBlockCipherService {
+
+    public LegacyAesCipherService() {
+      super("AES");
+    }
   }
 }
