@@ -192,7 +192,11 @@ commons-all:
 	cd ${commons_project} && \
 	${mvn_exec} clean install && \
 	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep obiba- | xargs rm && \
-	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc` ${opal_project}/opal-server/target/opal-server-${version}/lib
+	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc` ${opal_project}/opal-server/target/opal-server-${version}/lib && \
+	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-*-cli.jar && \
+	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-jersey-*.jar && \
+	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-mongodb-*.jar && \
+	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-wicket-*.jar
 
 #
 # Compile and install all DataSHIELD4J sub-projects
