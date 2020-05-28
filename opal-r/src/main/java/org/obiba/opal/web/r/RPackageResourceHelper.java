@@ -87,6 +87,16 @@ public class RPackageResourceHelper {
   }
 
   /**
+   * Try to load a R package and install it if not found.
+   *
+   * @param name
+   */
+  public void ensureCRANPackage(String name) {
+    String cmd = String.format("if (!require(%s)) { %s }", name, getInstallPackagesCommand(name));
+    execute(cmd);
+  }
+
+  /**
    * Install a R package from CRAN.
    *
    * @param name
