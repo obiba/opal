@@ -154,6 +154,11 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     getUiHandlers().showAddProject();
   }
 
+  @UiHandler("refresh")
+  public void onRefresh(ClickEvent event) {
+    getUiHandlers().onRefresh();
+  }
+
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {
     getUiHandlers().onProjectsFilterUpdate(getSelectedTag(), filter.getText());

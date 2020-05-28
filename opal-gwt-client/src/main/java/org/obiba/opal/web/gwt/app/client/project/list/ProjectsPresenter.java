@@ -133,6 +133,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   }
 
   @Override
+  public void onRefresh() {
+    refresh();
+  }
+
+  @Override
   public void onProjectSelection(ProjectDto project) {
     goToProject(project.getName());
   }

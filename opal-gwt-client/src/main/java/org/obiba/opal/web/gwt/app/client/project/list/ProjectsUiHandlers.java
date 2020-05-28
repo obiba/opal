@@ -16,6 +16,8 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ProjectsUiHandlers extends UiHandlers {
 
+  void onRefresh();
+
   void onProjectSelection(ProjectDto project);
 
   void onProjectTableSelection(ProjectDto project, String table);

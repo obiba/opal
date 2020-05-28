@@ -45,6 +45,11 @@
           <ui:msg description="Add Project label">Add Project</ui:msg>
         </b:Button>
       </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="refresh" icon="REFRESH">
+          <ui:msg description="Refresh projects label">Refresh</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
 
     <o:Table ui:field="projectsTable" addStyleNames="small-top-margin"/>
