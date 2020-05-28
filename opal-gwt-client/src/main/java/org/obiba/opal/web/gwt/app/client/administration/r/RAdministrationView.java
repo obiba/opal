@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -81,7 +82,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   TextBoxClearable filter;
 
   @UiField
-  CellTable<RPackageDto> packagesTable;
+  Table<RPackageDto> packagesTable;
 
   private List<RPackageDto> originalPackages;
 
@@ -144,6 +145,8 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
   @UiHandler("refresh")
   public void onRefresh(ClickEvent event) {
+    packagesPager.setPagerVisible(false);
+    packagesTable.showLoadingIndicator(packagesDataProvider);
     getUiHandlers().onRefreshPackages();
   }
 
@@ -201,6 +204,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   }
 
   private void renderPackageList(List<RPackageDto> packages) {
+    packagesTable.hideLoadingIndicator();
     packagesDataProvider.setList(packages);
     packagesPager.firstPage();
     packagesDataProvider.refresh();
