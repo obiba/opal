@@ -81,7 +81,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private final BlockingQueue<Project> datasourceLoadQueue = new LinkedBlockingQueue<>();
 
-  private Thread datasourceLoaderThread;
+  private DatasourceLoader datasourceLoader;
 
   @Autowired
   public ProjectsServiceImpl(OpalRuntime opalRuntime,
@@ -255,22 +255,19 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   public static DatasourceFactory registerDatasource(final Project project, final TransactionTemplate transactionTemplate, final DatabaseRegistry databaseRegistry) {
-    return transactionTemplate.execute(new TransactionCallback<DatasourceFactory>() {
-      @Override
-      public DatasourceFactory doInTransaction(TransactionStatus status) {
-        log.info("Datasource load start: {}", project.getName());
-        DatasourceFactory dataSourceFactory;
-        if (project.hasDatabase()) {
-          Database database = databaseRegistry.getDatabase(project.getDatabase());
-          dataSourceFactory = databaseRegistry.createDatasourceFactory(project.getName(), database);
-        } else {
-          dataSourceFactory = new NullDatasourceFactory();
-          dataSourceFactory.setName(project.getName());
-        }
-        MagmaEngine.get().addDatasource(dataSourceFactory);
-        log.info("Datasource load end: {} ({})", project.getName(), dataSourceFactory.getClass().getSimpleName());
-        return dataSourceFactory;
+    return transactionTemplate.execute(status -> {
+      log.info("Datasource load start: {}", project.getName());
+      DatasourceFactory dataSourceFactory;
+      if (project.hasDatabase()) {
+        Database database = databaseRegistry.getDatabase(project.getDatabase());
+        dataSourceFactory = databaseRegistry.createDatasourceFactory(project.getName(), database);
+      } else {
+        dataSourceFactory = new NullDatasourceFactory();
+        dataSourceFactory.setName(project.getName());
       }
+      MagmaEngine.get().addDatasource(dataSourceFactory);
+      log.info("Datasource load end: {} ({})", project.getName(), dataSourceFactory.getClass().getSimpleName());
+      return dataSourceFactory;
     });
   }
 
@@ -346,22 +343,21 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   private void startDatasourceLoaderThread() {
-    DatasourceLoader datasourceLoader = new DatasourceLoader();
-    datasourceLoaderThread = transactionalThreadFactory.newThread(datasourceLoader);
-    datasourceLoaderThread.setName("Datasource Loader " + datasourceLoader);
-    datasourceLoaderThread.setPriority(Thread.MIN_PRIORITY);
-    datasourceLoaderThread.start();
+    datasourceLoader = new DatasourceLoader();
+    datasourceLoader.setName("Datasource Loader " + datasourceLoader);
+    datasourceLoader.setPriority(Thread.MIN_PRIORITY);
+    datasourceLoader.start();
   }
 
   public void terminateDatasourceLoaderThread() {
     try {
-      if (datasourceLoaderThread != null && datasourceLoaderThread.isAlive()) datasourceLoaderThread.interrupt();
+      if (datasourceLoader != null && datasourceLoader.isAlive()) datasourceLoader.interrupt();
     } catch (Exception e) {
       // ignore
     }
   }
 
-  private class DatasourceLoader implements Runnable {
+  private class DatasourceLoader extends Thread {
 
     @Override
     public void run() {
