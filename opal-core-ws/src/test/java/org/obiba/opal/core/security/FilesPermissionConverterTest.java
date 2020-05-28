@@ -18,19 +18,21 @@ public class FilesPermissionConverterTest extends OpalPermissionConverterTest<Fi
 
   @Test
   public void testFilesAll() {
-    testConversion("/files", FilesPermissionConverter.Permission.FILES_ALL, //
-        "rest:/files:*:GET/*");
-    testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_ALL, //
-        "rest:/files/patate:*:GET/*");
+    testConversion("/files", FilesPermissionConverter.Permission.FILES_ALL,
+        "rest:/files:*:GET/*",
+        "rest:/system/subject-profiles/_search:GET");
+    testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_ALL,
+        "rest:/files/patate:*:GET/*",
+        "rest:/system/subject-profiles/_search:GET");
   }
 
   @Test
   public void testFilesShare() {
-    testConversion("/files", FilesPermissionConverter.Permission.FILES_SHARE, //
-        "rest:/files:GET:GET/*", //
+    testConversion("/files", FilesPermissionConverter.Permission.FILES_SHARE,
+        "rest:/files:GET:GET/*",
         "rest:/files:POST:GET/*");
-    testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_SHARE, //
-        "rest:/files/patate:GET:GET/*", //
+    testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_SHARE,
+        "rest:/files/patate:GET:GET/*",
         "rest:/files/patate:POST:GET/*");
   }
 

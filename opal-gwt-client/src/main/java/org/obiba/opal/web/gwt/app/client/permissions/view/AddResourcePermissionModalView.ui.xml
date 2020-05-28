@@ -22,7 +22,9 @@
           <ui:msg description="Add Resource Permission Name label">Name</ui:msg>
           <o:RequiredIcon/>
         </b:ControlLabel>
-        <b:TextBox ui:field="principal" b:id="principal"/>
+        <b:Typeahead ui:field="principalTypeahead">
+          <b:TextBox ui:field="principal"/>
+        </b:Typeahead>
       </b:ControlGroup>
       <b:ControlGroup ui:field="permissionsGroup">
         <b1:InlineLabel><ui:msg description="Add Resource Permission label">Permissions</ui:msg></b1:InlineLabel>

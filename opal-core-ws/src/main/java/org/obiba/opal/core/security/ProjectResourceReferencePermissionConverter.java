@@ -43,7 +43,8 @@ public class ProjectResourceReferencePermissionConverter extends OpalPermissionC
             toRest("/project/{0}", "GET:GET", args),
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/state", "GET:GET", args),
-            toRest("/project/{0}/permissions/resource/{1}", "*:GET/*", args));
+            toRest("/project/{0}/permissions/resource/{1}", "*:GET/*", args),
+            toRest("/system/subject-profiles/_search", "GET"));
       }
 
     },

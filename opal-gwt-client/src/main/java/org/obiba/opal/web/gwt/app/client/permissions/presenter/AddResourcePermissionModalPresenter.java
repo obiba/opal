@@ -10,14 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
 import com.google.common.collect.Lists;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -27,11 +25,10 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
+import javax.annotation.Nonnull;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class AddResourcePermissionModalPresenter
     extends ModalPresenterWidget<AddResourcePermissionModalPresenter.Display>
@@ -50,7 +47,7 @@ public class AddResourcePermissionModalPresenter
   }
 
   public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler handler,
-      List<Acl> aclList, Subject.SubjectType subjectType) {
+                         List<Acl> aclList, Subject.SubjectType subjectType) {
     getView().setData(type, subjectType);
     updateHandler = handler;
     currentAclList = aclList;
@@ -60,8 +57,8 @@ public class AddResourcePermissionModalPresenter
   @Override
   public void save() {
     getView().clearErrors();
-    if(new ViewValidatorHandler().validate()) {
-      if(updateHandler != null) {
+    if (new ViewValidatorHandler().validate()) {
+      if (updateHandler != null) {
         updateHandler.update(Lists.newArrayList(getView().getPrincipal().getText()), currentSubjectType, getView().getPermission());
       }
       getView().close();
@@ -70,7 +67,8 @@ public class AddResourcePermissionModalPresenter
 
   private final class ViewValidatorHandler extends ViewValidationHandler {
 
-    private ViewValidatorHandler() {}
+    private ViewValidatorHandler() {
+    }
 
     @Override
     protected Set<FieldValidator> getValidators() {
@@ -106,9 +104,9 @@ public class AddResourcePermissionModalPresenter
     @Override
     protected boolean hasError() {
 
-      for(Acl acl : currentAclList) {
+      for (Acl acl : currentAclList) {
         Subject subject = acl.getSubject();
-        if(subject.getPrincipal().equals(principal) && subject.getType().isSubjectType(type)) {
+        if (subject.getPrincipal().equals(principal) && subject.getType().isSubjectType(type)) {
           return true;
         }
       }

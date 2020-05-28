@@ -57,7 +57,8 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/permissions/table/{1}", "*:GET/*", args),//
             toRest("/files/projects/{0}", "GET:GET/*", args), //
             toRest("/files/projects/{0}", "POST:GET/*", args), //
-            toRest("/files/projects/{0}", "PUT:GET/*", args));
+            toRest("/files/projects/{0}", "PUT:GET/*", args),
+            toRest("/system/subject-profiles/_search", "GET"));
 
         if(isView) perms.add(toRest("/datasource/{0}/view/{1}", "*:GET/*", args));
 

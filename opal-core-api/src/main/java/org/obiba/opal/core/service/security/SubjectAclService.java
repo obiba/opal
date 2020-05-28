@@ -15,7 +15,18 @@ import javax.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SystemService;
 
+import java.util.List;
+
 public interface SubjectAclService extends SystemService {
+
+  /**
+   * Suggest known user or group names.
+   *
+   * @param type
+   * @param query
+   * @return
+   */
+  List<String> suggestSubjects(SubjectAcl.SubjectType type, String query);
 
   /**
    * Delete all permissions starting with node.

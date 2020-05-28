@@ -27,7 +27,8 @@ public class ProjectResourceReferencesPermissionConverterTest
         "rest:/project/patate/permissions/resources:*:GET/*",
         "rest:/files/projects/patate:GET:GET/*",
         "rest:/files/projects/patate:POST:GET/*",
-        "rest:/files/projects/patate:PUT:GET/*");
+        "rest:/files/projects/patate:PUT:GET/*",
+        "rest:/system/subject-profiles/_search:GET");
   }
 
   @Test

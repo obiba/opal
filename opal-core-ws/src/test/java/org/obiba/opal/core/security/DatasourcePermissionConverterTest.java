@@ -34,9 +34,10 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/permissions/table:*:GET/*",
         "rest:/project/patate/permissions/report-template:*:GET/*",
         "rest:/project/patate/permissions/subject:GET:GET/GET",
-        "rest:/files/projects/patate:GET:GET/*",//
-        "rest:/files/projects/patate:POST:GET/*",//
-        "rest:/files/projects/patate:PUT:GET/*");
+        "rest:/files/projects/patate:GET:GET/*",
+        "rest:/files/projects/patate:POST:GET/*",
+        "rest:/files/projects/patate:PUT:GET/*",
+        "rest:/system/subject-profiles/_search:GET");
   }
 
   @Test
@@ -73,7 +74,7 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/commands/_copy:POST:GET",
         "rest:/project/patate/commands/_refresh:POST:GET",
         "rest:/files/projects/patate:GET:GET/*",
-        "rest:/files/projects/patate:POST:GET/*",//
+        "rest:/files/projects/patate:POST:GET/*",
         "rest:/files/projects/patate:PUT:GET/*");
   }
 

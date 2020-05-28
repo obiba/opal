@@ -20,12 +20,13 @@ public class ProjectPermissionConverterTest
 
   @Test
   public void testProjectAll() {
-    testConversion("/project/patate", ProjectPermissionConverter.Permission.PROJECT_ALL, //
-        "rest:/datasource/patate:*:GET/*", //
-        "rest:/identifiers/mappings:GET", //
-        "rest:/datasource-plugin:GET:GET/GET", //
-        "rest:/project/patate:*:GET/*",//
-        "rest:/files/projects/patate:*:GET/*");
+    testConversion("/project/patate", ProjectPermissionConverter.Permission.PROJECT_ALL,
+        "rest:/datasource/patate:*:GET/*",
+        "rest:/identifiers/mappings:GET",
+        "rest:/datasource-plugin:GET:GET/GET",
+        "rest:/project/patate:*:GET/*",
+        "rest:/files/projects/patate:*:GET/*",
+        "rest:/system/subject-profiles/_search:GET");
   }
 
   @Override

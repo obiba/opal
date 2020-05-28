@@ -11,12 +11,17 @@ package org.obiba.opal.core.service.security;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.event.GroupDeletedEvent;
@@ -30,6 +35,9 @@ import org.springframework.util.Assert;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
@@ -43,6 +51,10 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   private final EventBus eventBus;
 
   private final OrientDbService orientDbService;
+
+  private final Cache<SubjectType, Set<String>> suggestCache = CacheBuilder.newBuilder()
+      .expireAfterWrite(60, TimeUnit.SECONDS)
+      .build();
 
   @Autowired
   public SubjectAclServiceImpl(EventBus eventBus, OrientDbService orientDbService) {
@@ -63,6 +75,20 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   @Override
   public void stop() {
 
+  }
+
+  @Override
+  public List<String> suggestSubjects(SubjectType type, String query) {
+    if (Strings.isNullOrEmpty(query)) return Lists.newArrayList();
+    String token = normalizeQuery(query);
+    Set<String> suggestions = Sets.newHashSet();
+    for (String subject : getSubjectCache(type)) {
+      if (subject.toLowerCase().contains(token))
+        suggestions.add(subject);
+    }
+    List<String> rval = Lists.newArrayList(suggestions);
+    Collections.sort(rval);
+    return rval;
   }
 
   @Override
@@ -257,6 +283,52 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     return orientDbService.findUnique(new SubjectAcl(domain, node, subject, permission));
   }
 
+  private String normalizeQuery(String query) {
+    return query.toLowerCase().trim();
+  }
+
+  private Set<String> getSubjectCache(SubjectType type) {
+    Set<String> subjects = suggestCache.getIfPresent(type);
+    if (subjects == null) {
+      loadUserGroupCache();
+      return suggestCache.getIfPresent(type);
+    } else {
+      return subjects;
+    }
+  }
+
+  private synchronized void loadUserGroupCache() {
+    Set<String> users = Sets.newHashSet();
+    Set<String> groups = Sets.newHashSet();
+    // populate with the users who logged in
+    for (SubjectProfile profile : getProfiles()){
+      users.add(profile.getPrincipal());
+      groups.addAll(profile.getGroups());
+    }
+    // populate with the opal realm
+    for (SubjectCredentials credentials : getSubjectCredentials()) {
+      users.add(credentials.getName());
+      groups.addAll(credentials.getGroups());
+    }
+    // populate with the previously applied permissions
+    for (SubjectAcl acl : find("opal", SubjectType.USER)) {
+      users.add(acl.getPrincipal());
+    }
+    for (SubjectAcl acl : find("opal", SubjectType.GROUP)) {
+      groups.add(acl.getPrincipal());
+    }
+    suggestCache.put(SubjectType.USER, users);
+    suggestCache.put(SubjectType.GROUP, groups);
+  }
+
+  private Iterable<SubjectProfile> getProfiles() {
+    return orientDbService.list(SubjectProfile.class);
+  }
+
+  private Iterable<SubjectCredentials> getSubjectCredentials() {
+    return orientDbService.list(SubjectCredentials.class);
+  }
+
   @Override
   public Iterable<Permissions> getSubjectPermissions(final Subject subject) {
     return Iterables.transform(find(subject), new Function<SubjectAcl, Permissions>() {
@@ -335,22 +407,10 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
   @Override
   public Iterable<Subject> getSubjects(String domain, SubjectType type) {
-    return FluentIterable.from(find(domain, type)).transform(new Function<SubjectAcl, Subject>() {
-
-      @Override
-      public Subject apply(SubjectAcl from) {
-        return from.getSubject();
-      }
-
-    }).filter(new Predicate<Subject>() {
-      final Collection<Subject> set = new TreeSet<>();
-
-      @Override
-      public boolean apply(Subject input) {
-        // add returns false if the set already contains the element
-        return set.add(input);
-      }
-    });
+    return StreamSupport.stream(find(domain, type).spliterator(), false)
+        .map(SubjectAcl::getSubject)
+        .distinct()
+        .collect(Collectors.toList());
   }
 
   /**

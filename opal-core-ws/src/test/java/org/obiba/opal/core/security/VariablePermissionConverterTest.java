@@ -20,10 +20,9 @@ public class VariablePermissionConverterTest
   @Test
   public void testVariableRead() {
     testConversion("/datasource/patate/table/pwel/variable/pouet", VariablePermissionConverter.Permission.VARIABLE_READ,
-        //
-        "rest:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET", //
-        "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET", //
-        "rest:/project/patate:GET:GET", //
+        "rest:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET",
+        "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET",
+        "rest:/project/patate:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET");
   }

@@ -62,7 +62,8 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
             toRest("/project/{0}/vcf-store/vcfs", "DELETE", args),
             toRest("/project/{0}/vcf-store/samples", "PUT,DELETE", args),
             toRest("/project/{0}/commands/_export_vcf", "POST", args),
-            toRest("/project/{0}/commands/_import_vcf", "POST", args));
+            toRest("/project/{0}/commands/_import_vcf", "POST", args),
+            toRest("/system/subject-profiles/_search", "GET"));
       }
     };
 

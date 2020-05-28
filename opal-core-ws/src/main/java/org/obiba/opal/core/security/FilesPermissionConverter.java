@@ -44,8 +44,10 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         return args.length == 0
-            ? Lists.newArrayList(toRest("/files", "*:GET/*"))
-            : Lists.newArrayList(toRest("/files/{0}", "*:GET/*", args));
+            ? Lists.newArrayList(toRest("/files", "*:GET/*"),
+            toRest("/system/subject-profiles/_search", "GET"))
+            : Lists.newArrayList(toRest("/files/{0}", "*:GET/*", args),
+            toRest("/system/subject-profiles/_search", "GET"));
       }
     },
     /**

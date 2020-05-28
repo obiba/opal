@@ -39,26 +39,27 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
     DATASHIELD_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),//
-            toRest("/datashield/packages", "*:GET/*"),//
-            toRest("/datashield/options", "*:GET/*"),//
-            toRest("/datashield/env/aggregate/methods", "GET:GET"),//
-            toRest("/datashield/env/assign/methods", "GET:GET"),//
-            toRest("/service/r", "GET"), //
-            toRest("/service/r", "PUT"), //
-            toRest("/service/r", "DELETE"), //
-            toRest("/service/r/sessions", "GET"), //
-            toRest("/service/r/workspaces", "GET"), //
-            toRest("/service/r/workspaces", "DELETE"));
+        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),
+            toRest("/datashield/packages", "*:GET/*"),
+            toRest("/datashield/options", "*:GET/*"),
+            toRest("/datashield/env/aggregate/methods", "GET:GET"),
+            toRest("/datashield/env/assign/methods", "GET:GET"),
+            toRest("/service/r", "GET"),
+            toRest("/service/r", "PUT"),
+            toRest("/service/r", "DELETE"),
+            toRest("/service/r/sessions", "GET"),
+            toRest("/service/r/workspaces", "GET"),
+            toRest("/service/r/workspaces", "DELETE"),
+            toRest("/system/subject-profiles/_search", "GET"));
       }
 
     },
     DATASHIELD_USE {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"), //
-            toRest("/datashield/env", "GET:GET/GET"), //
-            toRest("/service/r/workspaces", "GET"), //
+        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),
+            toRest("/datashield/env", "GET:GET/GET"),
+            toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"));
       }
 

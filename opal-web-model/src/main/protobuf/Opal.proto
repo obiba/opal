@@ -84,6 +84,11 @@ message ParameterDto {
   required string value = 2;
 }
 
+message SuggestionsDto {
+  required string query = 1;
+  repeated string suggestions = 2;
+}
+
 message Subject {
   enum SubjectType {
     USER = 0;

@@ -10,16 +10,7 @@
 
 package org.obiba.opal.web.system.permissions;
 
-import java.util.List;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
+import com.google.common.collect.Iterables;
 import org.obiba.opal.core.security.DataShieldPermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
@@ -29,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Iterables;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
@@ -44,7 +37,6 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
   /**
    * Get DataShield permissions.
    *
-   * @param domain
    * @param type
    * @return
    */
@@ -64,8 +56,8 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
    */
   @POST
   public Response setDataShieldPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals,
-      @QueryParam("permission") DataShieldPermissionConverter.Permission permission) {
+                                          @QueryParam("principal") List<String> principals,
+                                          @QueryParam("permission") DataShieldPermissionConverter.Permission permission) {
     setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
@@ -79,7 +71,7 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
    */
   @DELETE
   public Response deleteDataShieldPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals) {
+                                              @QueryParam("principal") List<String> principals) {
     deletePermissions(principals, type);
     return Response.ok().build();
   }

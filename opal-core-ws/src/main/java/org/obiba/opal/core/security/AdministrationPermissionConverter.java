@@ -47,8 +47,8 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
     PROJECT_ADD {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/projects", "POST"),//
-            toRest("/files/projects", "GET"), //
+        return Lists.newArrayList(toRest("/projects", "POST"),
+            toRest("/files/projects", "GET"),
             toRest("/system/databases", "GET:GET/GET"));
       }
 

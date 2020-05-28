@@ -10,12 +10,16 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.view;
 
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.google.gwt.user.client.ui.SuggestOracle;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.permissions.SubjectSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
@@ -38,6 +42,9 @@ public class AddResourcePermissionModalView
 
   private final Translations translations;
 
+  @UiField(provided = true)
+  Typeahead principalTypeahead;
+
   @UiField
   TextBox principal;
 
@@ -47,16 +54,28 @@ public class AddResourcePermissionModalView
   @UiField
   ControlGroup permissionsGroup;
 
+  private SubjectSuggestOracle oracle;
+
   @Inject
   public AddResourcePermissionModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
+    oracle = new SubjectSuggestOracle();
+    principalTypeahead = new Typeahead(oracle);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
+    principalTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        principal.setText(selectedSuggestion.getReplacementString());
+        return selectedSuggestion.getReplacementString();
+      }
+    });
   }
 
   @Override
   public void setData(ResourcePermissionType type, Subject.SubjectType subjectType) {
     createPermissionRadios(type, null);
+    oracle.setSubjectType(subjectType);
     dialog.setTitle(translations.addSubjectPermissionMap().get(subjectType.getName() + ".title"));
   }
 

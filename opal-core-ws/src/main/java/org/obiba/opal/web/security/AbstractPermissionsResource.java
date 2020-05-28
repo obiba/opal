@@ -10,11 +10,11 @@
 
 package org.obiba.opal.web.security;
 
-import java.util.Collection;
-
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.support.InvalidRequestException;
+
+import java.util.Collection;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
@@ -25,7 +25,7 @@ public abstract class AbstractPermissionsResource {
   protected void setPermission(Collection<String> principals, SubjectType type, String permission) {
     validatePrincipals(principals);
 
-    for(String principal : principals) {
+    for (String principal : principals) {
       SubjectAcl.Subject subject = type.subjectFor(principal);
       getSubjectAclService().deleteSubjectPermissions(DOMAIN, getNode(), subject);
       getSubjectAclService().addSubjectPermission(DOMAIN, getNode(), subject, permission);
@@ -35,14 +35,14 @@ public abstract class AbstractPermissionsResource {
   protected void deletePermissions(Collection<String> principals, SubjectType type) {
     validatePrincipals(principals);
 
-    for(String principal : principals) {
+    for (String principal : principals) {
       SubjectAcl.Subject subject = type.subjectFor(principal);
       getSubjectAclService().deleteSubjectPermissions(DOMAIN, getNode(), subject);
     }
   }
 
   private void validatePrincipals(Collection<String> principals) {
-    if(principals == null || principals.isEmpty()) throw new InvalidRequestException("A principal is required.");
+    if (principals == null || principals.isEmpty()) throw new InvalidRequestException("A principal is required.");
   }
 
   protected abstract SubjectAclService getSubjectAclService();

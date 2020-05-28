@@ -40,11 +40,12 @@ public class ProjectPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
-            toRest("/identifiers/mappings", "GET"), //
-            toRest("/datasource-plugin", "GET:GET/GET"), //
-            toRest("/project/{0}", "*:GET/*", args),//
-            toRest("/files/projects/{0}", "*:GET/*", args));
+        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args),
+            toRest("/identifiers/mappings", "GET"),
+            toRest("/datasource-plugin", "GET:GET/GET"),
+            toRest("/project/{0}", "*:GET/*", args),
+            toRest("/files/projects/{0}", "*:GET/*", args),
+            toRest("/system/subject-profiles/_search", "GET"));
       }
 
     };
