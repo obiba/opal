@@ -456,10 +456,15 @@ public class RAssignDatasource extends CsvDatasource {
       // per namespace::name
       Map<String, String> rval = Maps.newHashMap();
       attributesMap.forEach((name, localeMap) -> {
-        String content = localeMap.entrySet()
-            .stream()
-            .map(entry -> (Strings.isNullOrEmpty(entry.getKey()) ? "" : "(" + entry.getKey() + ") ") + entry.getValue())
-            .collect(Collectors.joining(" | "));
+        String content;
+        if (localeMap.size() == 1) {
+          content = localeMap.values().iterator().next();
+        } else {
+          content = localeMap.entrySet()
+              .stream()
+              .map(entry -> (Strings.isNullOrEmpty(entry.getKey()) ? "" : "(" + entry.getKey() + ") ") + entry.getValue())
+              .collect(Collectors.joining(" | "));
+        }
         rval.put(name, content);
       });
       return rval;
