@@ -17,5 +17,7 @@ import java.util.List;
 
 public interface DataShieldPackageAdministrationUiHandlers extends UiHandlers {
 
+  void onRefresh();
+
   void deleteAllPackages(List<RPackageDto> packages);
 }

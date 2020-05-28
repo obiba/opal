@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
@@ -63,7 +64,7 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
   Button deleteAllPackagesButton;
 
   @UiField
-  CellTable<RPackageDto> packagesTable;
+  Table<RPackageDto> packagesTable;
 
   private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
 
@@ -74,6 +75,12 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initPackagesTable();
+  }
+
+  @UiHandler("refresh")
+  public void onRefresh(ClickEvent event) {
+    packagesTable.showLoadingIndicator(packagesDataProvider);
+    getUiHandlers().onRefresh();
   }
 
   @UiHandler("deleteAllPackagesButton")
@@ -88,6 +95,7 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
 
   @Override
   public void renderDataShieldPackagesRows(JsArray<RPackageDto> rows) {
+    packagesTable.hideLoadingIndicator();
     packagesDataProvider.setArray(rows);
     packagesTable.setVisible(true);
     packagesDataProvider.refresh();
@@ -104,6 +112,7 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
 
     packagesTable.setPageSize(PAGE_SIZE);
     packagesDataProvider.addDataDisplay(packagesTable);
+    packagesTable.showLoadingIndicator(packagesDataProvider);
   }
 
   private void addPackageTableColumns() {

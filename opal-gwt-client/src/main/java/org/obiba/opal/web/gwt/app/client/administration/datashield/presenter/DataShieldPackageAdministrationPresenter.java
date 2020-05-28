@@ -127,6 +127,11 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   @Override
+  public void onRefresh() {
+    authorize();
+  }
+
+  @Override
   public void deleteAllPackages(List<RPackageDto> packages) {
     removePackagesConfirmation = new Runnable() {
       @Override

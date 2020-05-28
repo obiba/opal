@@ -24,13 +24,18 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button ui:field="deleteAllPackagesButton" icon="TRASH" styleName="btn">
+        <b:Button ui:field="refresh" icon="REFRESH">
+          <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="deleteAllPackagesButton" icon="TRASH" type="DANGER" styleName="btn">
           <ui:msg description="Delete all DataShield Packages label">Delete all</ui:msg>
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>
 
-    <o:Table ui:field="packagesTable" visible="false"/>
+    <o:Table ui:field="packagesTable"/>
   </g:FlowPanel>
 
 
