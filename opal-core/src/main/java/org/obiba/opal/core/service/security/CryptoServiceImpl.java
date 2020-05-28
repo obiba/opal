@@ -14,18 +14,25 @@ import java.security.Key;
 
 import org.apache.shiro.codec.CodecSupport;
 import org.apache.shiro.codec.Hex;
+import org.apache.shiro.crypto.AesCipherService;
 import org.apache.shiro.crypto.DefaultBlockCipherService;
 import org.apache.shiro.util.ByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CryptoServiceImpl implements CryptoService {
 
+  private static final Logger log = LoggerFactory.getLogger(CryptoServiceImpl.class);
+
   private OpalConfigurationService configurationService;
 
-  private final LegacyAesCipherService cipherService = new LegacyAesCipherService();
+  private final AesCipherService cipherService = new AesCipherService();
+
+  private final LegacyAesCipherService legacyCipherService = new LegacyAesCipherService();
 
   @Autowired
   public void setConfigurationService(OpalConfigurationService configurationService) {
@@ -40,7 +47,15 @@ public class CryptoServiceImpl implements CryptoService {
 
   @Override
   public String decrypt(String encrypted) {
-    ByteSource decrypted = cipherService.decrypt(Hex.decode(encrypted), getSecretKey());
+    ByteSource decrypted;
+    try {
+      decrypted = cipherService.decrypt(Hex.decode(encrypted), getSecretKey());
+    } catch (Exception e) {
+      if (log.isDebugEnabled()) {
+        log.warn("Falling back on legacy crypto service", e);
+      }
+      decrypted = legacyCipherService.decrypt(Hex.decode(encrypted), getSecretKey());
+    }
     return CodecSupport.toString(decrypted.getBytes());
   }
 
