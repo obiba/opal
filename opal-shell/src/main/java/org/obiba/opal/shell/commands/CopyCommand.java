@@ -10,10 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import com.google.common.base.*;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -165,7 +162,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         getShell().printf("Copying tables [%s] to %s.\n", getTableNames(), destinationDatasource.getName());
         dataExportService
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
-                buildDatasourceCopier(destinationDatasource), !options.getNonIncremental(), new CopyProgressListener());
+                buildDatasourceCopier(destinationDatasource), !options.getNonIncremental(), new CopyProgressListener(tables.size()));
         Disposables.dispose(destinationDatasource);
         getShell().printf("Successfully copied all tables.\n");
         errorCode = CommandResultCode.SUCCESS;
@@ -762,13 +759,23 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     private int currentPercentComplete = -1;
 
+    private final int tableCount;
+
+    private final Set<String> tables = Sets.newLinkedHashSet();
+
     private List<String> tablesWithPermission = Lists.newArrayList();
+
+    private CopyProgressListener(int tableCount) {
+      this.tableCount = tableCount;
+    }
 
     @Override
     public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
-      if (percentComplete != currentPercentComplete) {
-        getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
-        currentPercentComplete = percentComplete;
+      tables.add(table);
+      int globalPercentComplete = ((tables.size() - 1) * 100 + percentComplete) / tableCount;
+      if (globalPercentComplete != currentPercentComplete) {
+        getShell().progress(table, entitiesCopied, entitiesToCopy, globalPercentComplete);
+        currentPercentComplete = globalPercentComplete;
       }
       if (!tablesWithPermission.contains(table)) {
         String node = "/datasource/" + options.getDestination() + "/table/" + table;

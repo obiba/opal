@@ -15,10 +15,12 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.*;
 import org.obiba.crypt.KeyProviderException;
 import org.obiba.magma.DatasourceCopierProgressListener;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.domain.ProjectsState;
@@ -36,10 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.obiba.opal.shell.commands.CommandResultCode.*;
 
@@ -139,7 +138,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     getShell().printf("  Importing datasource %s in %s...\n", options.getSource(), options.getDestination());
     try {
       dataImportService.importData(options.getSource(), options.getDestination(), options.getUnit(), options.isForce(), options.isIgnore(),
-          new ImportProgressListener());
+          new ImportProgressListener(MagmaEngine.get().getDatasource(options.getSource()).getValueTables().size()));
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -165,7 +164,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     getShell().printf("  Importing tables [%s] in %s ...\n", getTableNames(), options.getDestination());
     try {
       dataImportService.importData(options.getTables(), options.getDestination(), options.getUnit(), options.isForce(), options.isIgnore(),
-          new ImportProgressListener());
+          new ImportProgressListener(options.getTables().size()));
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {
@@ -325,13 +324,23 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     private int currentPercentComplete = -1;
 
+    private final int tableCount;
+
+    private final Set<String> tables = Sets.newLinkedHashSet();
+
     private List<String> tablesWithPermission = Lists.newArrayList();
+
+    private ImportProgressListener(int tableCount) {
+      this.tableCount = tableCount;
+    }
 
     @Override
     public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
-      if (percentComplete != currentPercentComplete) {
-        getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
-        currentPercentComplete = percentComplete;
+      tables.add(table);
+      int globalPercentComplete = ((tables.size() - 1) * 100 + percentComplete) / tableCount;
+      if (globalPercentComplete != currentPercentComplete) {
+        getShell().progress(table, entitiesCopied, entitiesToCopy, globalPercentComplete);
+        currentPercentComplete = globalPercentComplete;
       }
       if (!tablesWithPermission.contains(table)) {
         String node = "/datasource/" + options.getDestination() + "/table/" + table;
