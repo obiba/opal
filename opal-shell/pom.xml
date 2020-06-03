@@ -40,6 +40,10 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core-ws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-web-model</artifactId>
     </dependency>
     <dependency>

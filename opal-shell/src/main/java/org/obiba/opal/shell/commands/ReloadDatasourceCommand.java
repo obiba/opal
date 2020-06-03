@@ -25,7 +25,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@CommandUsage(description = "Reload a project's underlying datasource.", syntax = "Syntax: refresh --project PROJECT")
+@CommandUsage(description = "Reload a project's underlying datasource.", syntax = "Syntax: reload --project PROJECT")
 public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand<ReloadDatasourceCommandOptions> {
 
   @Autowired
@@ -64,6 +64,6 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
     }
 
     projectsState.updateProjectState(projectName, State.READY);
-    return 0;
+    return CommandResultCode.SUCCESS;
   }
 }

@@ -83,7 +83,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       errorCode = CRITICAL_ERROR;
     } else if(errorCode != SUCCESS) {
       getShell().printf("Import failed.\n");
-      log.info("Import failed in {}", stopwatch.stop());
+      log.warn("Import failed in {}", stopwatch.stop());
     } else {
       getShell().printf("Import done.\n");
       log.info("Import succeed in {}", stopwatch.stop());

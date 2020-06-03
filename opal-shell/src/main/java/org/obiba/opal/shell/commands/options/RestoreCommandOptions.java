@@ -13,9 +13,17 @@ package org.obiba.opal.shell.commands.options;
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
 
-@CommandLineInterface(application = "reload")
-public interface ReloadDatasourceCommandOptions extends HelpOption {
+@CommandLineInterface(application = "restore")
+public interface RestoreCommandOptions extends HelpOption {
 
-  @Option(longName = "project", shortName = "p", description = "The project for which the underlying datasource will be reloaded.")
+  @Option(longName = "project", shortName = "p", description = "The project to be restored.")
   String getProject();
+
+  @Option(longName = "archive", shortName = "a", description = "Archive directory or zip file.")
+  String getArchive();
+
+  @Option(longName="password", shortName = "pwd", description = "Password of the zip file (optional).")
+  String getPassword();
+
+  boolean isPassword();
 }

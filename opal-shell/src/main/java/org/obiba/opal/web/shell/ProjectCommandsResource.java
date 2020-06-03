@@ -38,10 +38,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.util.ArrayList;
@@ -213,13 +210,17 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @Path("/_report")
   public Response createReport(Commands.ReportCommandOptionsDto options) {
     // TODO ensure file access (report template file and report repo)
-
+    if (!name.equals(options.getProject())) throw new BadRequestException("Not a valid project name");
     ReportCommandOptions reportOptions = new ReportCommandOptionsDtoImpl(options);
     Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
     reportCommand.setOptions(reportOptions);
 
     return launchCommand(reportCommand);
   }
+
+  //
+  // Project management
+  //
 
   @POST
   @Path("/_reload")
@@ -229,6 +230,34 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     Command<Object> reloadCommand = commandRegistry.newCommand("reload");
     reloadCommand.setOptions(new ReloadDatasourceCommandOptionsDtoImpl(ReloadDatasourceCommandOptionsDto.newBuilder().setProject(name).build()));
     return launchCommand(reloadCommand);
+  }
+
+  @POST
+  @Path("/_backup")
+  public Response backupProject(Commands.BackupCommandOptionsDto options) {
+    if (!name.equals(options.getProject())) throw new BadRequestException("Not a valid project name");
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
+
+    String commandName = "backup";
+    ensureFileWriteAccess(options.getArchive());
+    Command<BackupCommandOptions> backupCommand = commandRegistry.newCommand(commandName);
+    backupCommand.setOptions(new BackupCommandOptionsDtoImpl(options));
+
+    return launchCommand(commandName, backupCommand);
+  }
+
+  @POST
+  @Path("/_restore")
+  public Response restoreProject(Commands.RestoreCommandOptionsDto options) {
+    if (!name.equals(options.getProject())) throw new BadRequestException("Not a valid project name");
+    if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
+
+    String commandName = "restore";
+    ensureFileReadAccess(options.getArchive());
+    Command<RestoreCommandOptions> restoreCommand = commandRegistry.newCommand(commandName);
+    restoreCommand.setOptions(new RestoreCommandOptionsDtoImpl(options));
+
+    return launchCommand(commandName, restoreCommand);
   }
 
   @Override
@@ -288,6 +317,12 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   private void ensureFileWriteAccess(String path) {
     if(!SecurityUtils.getSubject().isPermitted("rest:/file" + path + ":POST")) {
       throw new InvalidRequestException("FileWriteNotAuthorized", path);
+    }
+  }
+
+  private void ensureFileReadAccess(String path) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/file" + path + ":GET")) {
+      throw new InvalidRequestException("FileReadNotAuthorized", path);
     }
   }
 

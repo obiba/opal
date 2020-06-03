@@ -29,6 +29,8 @@ public class WebShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand("export", CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand("analyse", AnalyseCommand.class, AnalyseCommandOptions.class);
     addAvailableCommand("reload", ReloadDatasourceCommand.class, ReloadDatasourceCommandOptions.class);
+    addAvailableCommand("backup", BackupCommand.class, BackupCommandOptions.class);
+    addAvailableCommand("restore", RestoreCommand.class, RestoreCommandOptions.class);
     addAvailableCommand(ReportCommand.class, ReportCommandOptions.class);
     addAvailableCommand(ImportVCFCommand.class, ImportVCFCommandOptions.class);
     addAvailableCommand(ExportVCFCommand.class, ExportVCFCommandOptions.class);

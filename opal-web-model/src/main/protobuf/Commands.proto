@@ -115,3 +115,14 @@ message AnalyseCommandOptionsDto {
 message ReloadDatasourceCommandOptionsDto {
   required string project = 1;
 }
+
+message BackupCommandOptionsDto {
+  required string project = 1;
+  required string archive = 2;
+}
+
+message RestoreCommandOptionsDto {
+  required string project = 1;
+  required string archive = 2;
+  optional string password = 3;
+}
