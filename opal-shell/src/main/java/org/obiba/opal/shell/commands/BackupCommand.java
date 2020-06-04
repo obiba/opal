@@ -54,7 +54,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@CommandUsage(description = "Backup a project's data.", syntax = "Syntax: backup --project PROJECT --archive FILE")
+@CommandUsage(description = "Backup a project's data.", syntax = "Syntax: backup --project PROJECT --archive FILE [--override BOOL]")
 public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
@@ -80,6 +80,8 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
   @Autowired
   private ReportTemplateService reportTemplateService;
 
+  private File archiveFolder;
+
   @Override
   public int execute() {
     int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
@@ -95,15 +97,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
       try {
         Project project = orientDbService.findUnique(new Project(projectName));
         projectsState.updateProjectState(projectName, State.BUSY);
-        File archiveFolder = getArchiveFolder();
-        if (archiveFolder.exists()) {
-          if (getOptions().getOverride()) {
-            log.warn("Deleting the existing archive {}", archivePath);
-            FileUtil.delete(archiveFolder);
-          } else {
-            throw new RuntimeException("Backup archive already exists, use override option");
-          }
-        }
+        getArchiveFolder();
         if (project != null && MagmaEngine.get().hasDatasource(project.getName())) {
           backupTables();
           backupViews();
@@ -140,12 +134,23 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
 
   @Override
   protected File getArchiveFolder() {
+    if (archiveFolder != null) return archiveFolder;
     try {
       // Get the file specified on the command line.
       FileObject archiveFile = getFile(getOptions().getArchive());
-      archiveFile.createFolder();
-      return getLocalFile(archiveFile);
-    } catch (Exception e) {
+      archiveFolder = getLocalFile(archiveFile);
+      if (archiveFolder.exists()) {
+        if (getOptions().getOverride()) {
+          log.warn("Deleting the existing archive {}", getOptions().getArchive());
+          FileUtil.delete(archiveFolder);
+        } else {
+          throw new RuntimeException("Backup archive already exists, use override option");
+        }
+      } else if (!archiveFolder.mkdirs()) {
+        throw new RuntimeException("Backup archive folder creation failed");
+      }
+      return archiveFolder;
+    } catch (IOException e) {
       log.error("There was an error accessing the archive folder", e);
       throw new RuntimeException("There was an error accessing the archive folder", e);
     }
@@ -314,6 +319,21 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     Initialisables.initialise(destinationDatasource);
     return destinationDatasource;
   }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("backup");
+    sb.append(" --project ").append(options.getProject());
+    sb.append(" --archive ").append(options.getArchive());
+
+    if(options.isOverride()) {
+      sb.append(" --override ").append(options.getOverride());
+    }
+
+    return sb.toString();
+  }
+
 
   private class BackupProgressListener implements DatasourceCopierProgressListener {
 

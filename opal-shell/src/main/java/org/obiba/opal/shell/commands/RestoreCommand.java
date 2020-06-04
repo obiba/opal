@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-@CommandUsage(description = "Restore a project's data.", syntax = "Syntax: restore --project PROJECT --archive FILE [--password PASSWORD]")
+@CommandUsage(description = "Restore a project's data.", syntax = "Syntax: restore --project PROJECT --archive FILE [--password PASSWORD] [--override BOOL]")
 public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(RestoreCommand.class);
@@ -360,6 +360,22 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
         }
       }
     }
+  }
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("restore");
+    sb.append(" --project ").append(options.getProject());
+    sb.append(" --archive ").append(options.getArchive());
+
+    if(options.isPassword()) {
+      sb.append(" --password *****");
+    }
+    if(options.isOverride()) {
+      sb.append(" --override ").append(options.getOverride());
+    }
+
+    return sb.toString();
   }
 
   private class ImportProgressListener implements DatasourceCopierProgressListener {
