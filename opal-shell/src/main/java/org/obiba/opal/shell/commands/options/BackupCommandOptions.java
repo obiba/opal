@@ -21,4 +21,9 @@ public interface BackupCommandOptions extends HelpOption {
 
   @Option(longName = "archive", shortName = "a", description = "Archive directory.")
   String getArchive();
+
+  @Option(longName="override", shortName = "o", description = "Override existing archive (optional, default is false).")
+  boolean getOverride();
+
+  boolean isOverride();
 }

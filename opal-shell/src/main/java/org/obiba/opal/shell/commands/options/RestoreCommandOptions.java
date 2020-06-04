@@ -26,4 +26,9 @@ public interface RestoreCommandOptions extends HelpOption {
   String getPassword();
 
   boolean isPassword();
+
+  @Option(longName="override", shortName = "o", description = "Override existing item to restore (optional, default is false).")
+  boolean getOverride();
+
+  boolean isOverride();
 }

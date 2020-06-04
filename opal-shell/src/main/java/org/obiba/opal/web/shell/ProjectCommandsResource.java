@@ -235,13 +235,12 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_backup")
   public Response backupProject(Commands.BackupCommandOptionsDto options) {
-    if (!name.equals(options.getProject())) throw new BadRequestException("Not a valid project name");
     if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
     String commandName = "backup";
     ensureFileWriteAccess(options.getArchive());
     Command<BackupCommandOptions> backupCommand = commandRegistry.newCommand(commandName);
-    backupCommand.setOptions(new BackupCommandOptionsDtoImpl(options));
+    backupCommand.setOptions(new BackupCommandOptionsDtoImpl(name, options));
 
     return launchCommand(commandName, backupCommand);
   }
@@ -249,13 +248,12 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_restore")
   public Response restoreProject(Commands.RestoreCommandOptionsDto options) {
-    if (!name.equals(options.getProject())) throw new BadRequestException("Not a valid project name");
     if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 
     String commandName = "restore";
     ensureFileReadAccess(options.getArchive());
     Command<RestoreCommandOptions> restoreCommand = commandRegistry.newCommand(commandName);
-    restoreCommand.setOptions(new RestoreCommandOptionsDtoImpl(options));
+    restoreCommand.setOptions(new RestoreCommandOptionsDtoImpl(name, options));
 
     return launchCommand(commandName, restoreCommand);
   }

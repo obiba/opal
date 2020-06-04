@@ -31,24 +31,29 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ProjectsState;
 import org.obiba.opal.core.domain.ProjectsState.State;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.shell.commands.options.RestoreCommandOptions;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 @CommandUsage(description = "Restore a project's data.", syntax = "Syntax: restore --project PROJECT --archive FILE [--password PASSWORD]")
@@ -76,6 +81,13 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
+  @Autowired
+  private ReportTemplateService reportTemplateService;
+
+  private File archiveFolder;
+
+  private File workDir;
+
   @Override
   public int execute() {
     int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
@@ -96,6 +108,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
           restoreViews();
           restoreResources();
           restoreFiles();
+          restoreReports();
           errorCode = CommandResultCode.SUCCESS;
         } catch (Exception e) {
           if (!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
@@ -113,25 +126,47 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     else
       log.warn("Restore of {} failed in {}", projectName, stopwatch.stop());
 
-    return CommandResultCode.SUCCESS;
+    if (workDir != null) {
+      try {
+        FileUtil.delete(workDir);
+      } catch (IOException e) {
+        log.warn("Cannot delete temp directory: {}", workDir.getAbsolutePath(), e);
+      }
+    }
+
+    return errorCode;
   }
 
   @Override
   protected File getArchiveFolder() {
+    if (archiveFolder != null) return archiveFolder;
     try {
       // Get the file specified on the command line.
       FileObject archiveFile = getFile(getOptions().getArchive());
-      File archiveFolder = getLocalFile(archiveFile);
-      if (archiveFolder.isDirectory()) return archiveFolder;
-      else if (archiveFolder.getName().endsWith(".zip")) {
+      File archive = getLocalFile(archiveFile);
+      if (archive.isDirectory()) {
+        archiveFolder = archive;
+        return archiveFolder;
+      }
+      else if (archive.getName().endsWith(".zip")) {
         // uncompress in the opal's work directory
-        // TODO
+        workDir = new File(WORK_DIR, new Random().nextInt(20) + "");
+        workDir.mkdirs();
+        log.debug("Uncompresing archive {}", getOptions().getArchive());
+        FileUtil.unzip(archive, workDir, getOptions().getPassword());
+        File[] dirs = workDir.listFiles(file -> file.isDirectory());
+        // supposed to be one directory
+        if (dirs != null) {
+          archiveFolder = dirs[0];
+          return archiveFolder;
+        }
+        log.error("Project archive does not seem to be a valid backup folder");
       }
     } catch (Exception e) {
       log.error("There was an error accessing the archive folder", e);
       throw new RuntimeException("There was an error accessing the archive folder", e);
     }
-    throw new RuntimeException("Not a valid project archive file, expecting a folder: " + getOptions().getArchive());
+    throw new RuntimeException("Not a valid project archive file, expecting a folder or a zip file: " + getOptions().getArchive());
   }
 
   @Override
@@ -228,6 +263,9 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
             JsonFormat.merge(reader, registry, builder);
             ResourceReference reference = org.obiba.opal.web.project.Dtos.fromDto(builder.build());
             reference.setProject(getProjectName());
+            if (resourceReferenceService.hasResourceReference(reference.getProject(), reference.getName()) && !getOptions().getOverride()) {
+              throw new RuntimeException("Resource already exists, use override option: " + reference.getName());
+            }
             resourceReferenceService.save(reference);
           } catch (IOException e) {
             log.error("Resource restore failed: {}", resourceDtoFile.getAbsolutePath(), e);
@@ -254,6 +292,35 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     log.info("Restore of {} files done in {}", getProjectName(), stopwatch.stop());
   }
 
+  private void restoreReports() {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    log.debug("Restore of {} reports started", getProjectName());
+    File reportsFolder = getReportsFolder();
+    if (reportsFolder.exists()) {
+      File[] reportFiles = reportsFolder.listFiles(file -> !file.isDirectory() &&  file.getName().endsWith(".json"));
+      if (reportFiles != null) {
+        for (File reportDtoFile : reportFiles) {
+          try (FileReader reader = new FileReader(reportDtoFile)) {
+            Opal.ReportTemplateDto.Builder builder = Opal.ReportTemplateDto.newBuilder();
+            ExtensionRegistry registry = ExtensionRegistry.newInstance();
+            Opal.registerAllExtensions(registry);
+            JsonFormat.merge(reader, registry, builder);
+            builder.setProject(getProjectName());
+            ReportTemplate reportTemplate = org.obiba.opal.web.reporting.Dtos.fromDto(builder.build());
+            if (reportTemplateService.hasReportTemplate(reportTemplate.getName(), reportTemplate.getProject()) && !getOptions().getOverride()) {
+              throw new RuntimeException("Report template already exists, use override option: " + reportTemplate.getName());
+            }
+            reportTemplateService.save(reportTemplate);
+          } catch (IOException e) {
+            log.error("Report template restore failed: {}", reportDtoFile.getAbsolutePath(), e);
+            throw new RuntimeException("Report template restore failed", e);
+          }
+        }
+      }
+    }
+    log.info("Restore of {} reports done in {}", getProjectName(), stopwatch.stop());
+  }
+
   private Datasource getSourceDatasource(Map<String, File> tableFoldersMap) {
     CsvDatasource sourceDatasource = new CsvDatasource("tables");
     Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
@@ -276,13 +343,21 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
 
   private void removeTableOrView(String name) {
     if (viewManager.hasView(getProjectName(), name)) {
-      log.warn("Removing view {}", name);
-      viewManager.removeView(getProjectName(), name);
+      if (getOptions().getOverride()) {
+        log.warn("Removing view {}", name);
+        viewManager.removeView(getProjectName(), name);
+      } else {
+        throw new RuntimeException("View already exists, use override option: " + name);
+      }
     } else {
       Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
       if (datasource.hasValueTable(name)) {
-        log.warn("Dropping table {}", name);
-        datasource.dropTable(name);
+        if (getOptions().getOverride()) {
+          log.warn("Dropping table {}", name);
+          datasource.dropTable(name);
+        } else {
+          throw new RuntimeException("Table already exists, use override option: " + name);
+        }
       }
     }
   }

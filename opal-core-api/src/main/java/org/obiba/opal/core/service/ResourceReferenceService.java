@@ -40,6 +40,15 @@ public interface ResourceReferenceService extends SystemService {
   ResourceReference getResourceReference(String project, String name) throws NoSuchResourceReferenceException;
 
   /**
+   * Verify if there is a resource reference in a project with the provided name.
+   *
+   * @param project
+   * @param name
+   * @return
+   */
+  boolean hasResourceReference(String project, String name);
+
+  /**
    * From a resource reference get the appropriate resource factory and make
    * a {@link Resource}.
    *

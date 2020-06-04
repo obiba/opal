@@ -117,12 +117,12 @@ message ReloadDatasourceCommandOptionsDto {
 }
 
 message BackupCommandOptionsDto {
-  required string project = 1;
-  required string archive = 2;
+  required string archive = 1;
+  optional bool override = 2 [default = false];
 }
 
 message RestoreCommandOptionsDto {
-  required string project = 1;
-  required string archive = 2;
-  optional string password = 3;
+  required string archive = 1;
+  optional string password = 2;
+  optional bool override = 3 [default = false];
 }

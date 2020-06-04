@@ -15,15 +15,18 @@ import org.obiba.opal.web.model.Commands;
 
 public class RestoreCommandOptionsDtoImpl implements RestoreCommandOptions {
 
+  private final String project;
+
   private final Commands.RestoreCommandOptionsDto dto;
 
-  public RestoreCommandOptionsDtoImpl(Commands.RestoreCommandOptionsDto dto) {
+  public RestoreCommandOptionsDtoImpl(String project, Commands.RestoreCommandOptionsDto dto) {
+    this.project = project;
     this.dto = dto;
   }
 
   @Override
   public String getProject() {
-    return dto.getProject();
+    return project;
   }
 
   @Override
@@ -33,12 +36,22 @@ public class RestoreCommandOptionsDtoImpl implements RestoreCommandOptions {
 
   @Override
   public String getPassword() {
-    return dto.getPassword();
+    return isPassword() ? dto.getPassword() : null;
   }
 
   @Override
   public boolean isPassword() {
     return dto.hasPassword();
+  }
+
+  @Override
+  public boolean getOverride() {
+    return isOverride() && dto.getOverride();
+  }
+
+  @Override
+  public boolean isOverride() {
+    return dto.hasOverride();
   }
 
   @Override

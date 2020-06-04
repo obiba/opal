@@ -68,6 +68,10 @@ public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntim
     return getFolder("files");
   }
 
+  protected File getReportsFolder() {
+    return getFolder("reports");
+  }
+
   /**
    * Get or create a folder with provided name.
    *

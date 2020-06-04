@@ -30,13 +30,16 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ProjectsState;
 import org.obiba.opal.core.domain.ProjectsState.State;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.shell.commands.options.BackupCommandOptions;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.slf4j.Logger;
@@ -74,6 +77,9 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
+  @Autowired
+  private ReportTemplateService reportTemplateService;
+
   @Override
   public int execute() {
     int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
@@ -91,14 +97,19 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
         projectsState.updateProjectState(projectName, State.BUSY);
         File archiveFolder = getArchiveFolder();
         if (archiveFolder.exists()) {
-          log.warn("Deleting the existing archive {}", archivePath);
-          FileUtil.delete(archiveFolder);
+          if (getOptions().getOverride()) {
+            log.warn("Deleting the existing archive {}", archivePath);
+            FileUtil.delete(archiveFolder);
+          } else {
+            throw new RuntimeException("Backup archive already exists, use override option");
+          }
         }
         if (project != null && MagmaEngine.get().hasDatasource(project.getName())) {
           backupTables();
           backupViews();
           backupResources();
           backupFiles();
+          backupReports();
         }
         errorCode = CommandResultCode.SUCCESS;
       } catch (Exception e) {
@@ -243,6 +254,28 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
       getShell().printf("Successful backup of all files.\n");
     }
     log.info("Backup of {} files done in {}", getProjectName(), stopwatch.stop());
+  }
+
+  private void backupReports() {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    log.debug("Backup of {} reports started", getProjectName());
+    List<ReportTemplate> reportTemplates = StreamSupport.stream(reportTemplateService.getReportTemplates(getProjectName()).spliterator(), false)
+        .collect(Collectors.toList());
+    if (!reportTemplates.isEmpty()) {
+      File reportsFolder = getReportsFolder();
+      for (ReportTemplate reportTemplate : reportTemplates) {
+        Opal.ReportTemplateDto reportTemplateDto = org.obiba.opal.web.reporting.Dtos.asDto(reportTemplate);
+        File reportTemplateFile = new File(reportsFolder, reportTemplate.getName() + ".json");
+        try {
+          writeDto(reportTemplateFile, reportTemplateDto);
+        } catch (IOException e) {
+          log.error("Report backup failed: {}", reportTemplateFile.getAbsolutePath(), e);
+          throw new RuntimeException("Report backup failed", e);
+        }
+      }
+      getShell().printf("Successful backup of all report templates.\n");
+    }
+    log.info("Backup of {} reports done in {}", getProjectName(), stopwatch.stop());
   }
 
   private void writeDto(File file, Message message) throws IOException {

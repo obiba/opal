@@ -84,6 +84,16 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
+  public boolean hasResourceReference(String project, String name) {
+    try {
+      getResourceReference(project, name);
+      return true;
+    } catch (NoSuchResourceReferenceException e) {
+      return false;
+    }
+  }
+
+  @Override
   public Resource createResource(ResourceReference resourceReference) {
     try {
       ResourceProvidersService.ResourceFactory factory = resourceProvidersService.getResourceFactory(resourceReference.getProvider(), resourceReference.getFactory());

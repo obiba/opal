@@ -15,20 +15,33 @@ import org.obiba.opal.web.model.Commands;
 
 public class BackupCommandOptionsDtoImpl implements BackupCommandOptions {
 
+  private final String project;
+
   private final Commands.BackupCommandOptionsDto dto;
 
-  public BackupCommandOptionsDtoImpl(Commands.BackupCommandOptionsDto dto) {
+  public BackupCommandOptionsDtoImpl(String project, Commands.BackupCommandOptionsDto dto) {
+    this.project = project;
     this.dto = dto;
   }
 
   @Override
   public String getProject() {
-    return dto.getProject();
+    return project;
   }
 
   @Override
   public String getArchive() {
     return dto.getArchive();
+  }
+
+  @Override
+  public boolean getOverride() {
+    return isOverride() && dto.getOverride();
+  }
+
+  @Override
+  public boolean isOverride() {
+    return dto.hasOverride();
   }
 
   @Override
