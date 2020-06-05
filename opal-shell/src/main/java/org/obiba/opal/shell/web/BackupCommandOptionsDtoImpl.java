@@ -45,6 +45,16 @@ public class BackupCommandOptionsDtoImpl implements BackupCommandOptions {
   }
 
   @Override
+  public boolean getViewsAsTables() {
+    return isViewsAsTables() && dto.getViewsAsTables();
+  }
+
+  @Override
+  public boolean isViewsAsTables() {
+    return dto.hasViewsAsTables();
+  }
+
+  @Override
   public boolean isHelp() {
     return false;
   }

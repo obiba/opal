@@ -45,8 +45,6 @@ import org.obiba.opal.web.project.Dtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
@@ -57,7 +55,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@CommandUsage(description = "Backup a project's data.", syntax = "Syntax: backup --project PROJECT --archive FILE [--override BOOL]")
+@CommandUsage(description = "Backup a project's data.", syntax = "Syntax: backup --project PROJECT --archive FILE [--viewsAsTables BOOL] [--override BOOL]")
 public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
@@ -170,7 +168,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     Stopwatch stopwatch = Stopwatch.createStarted();
     log.debug("Backup of {} tables started", getProjectName());
     Set<ValueTable> tables = getDatasource().getValueTables().stream()
-        .filter(table -> !table.isView())
+        .filter(table -> getOptions().getViewsAsTables() || !table.isView())
         .collect(Collectors.toSet());
 
     if (tables.isEmpty()) {
@@ -195,6 +193,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
   }
 
   private void backupViews() {
+    if (getOptions().getViewsAsTables()) return;
     Stopwatch stopwatch = Stopwatch.createStarted();
     log.debug("Backup of {} views started", getProjectName());
     List<Magma.ViewDto> views = getDatasource().getValueTables().stream()
@@ -333,7 +332,10 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     sb.append(" --project ").append(options.getProject());
     sb.append(" --archive ").append(options.getArchive());
 
-    if(options.isOverride()) {
+    if (options.isViewsAsTables()) {
+      sb.append(" --viewsAsTables ").append(options.getViewsAsTables());
+    }
+    if (options.isOverride()) {
       sb.append(" --override ").append(options.getOverride());
     }
 

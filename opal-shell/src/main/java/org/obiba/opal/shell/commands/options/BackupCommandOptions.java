@@ -26,4 +26,9 @@ public interface BackupCommandOptions extends HelpOption {
   boolean getOverride();
 
   boolean isOverride();
+
+  @Option(longName="viewsAsTables", shortName = "vt", description = "Treat views as tables, i.e. export data (optional, default is false).")
+  boolean getViewsAsTables();
+
+  boolean isViewsAsTables();
 }

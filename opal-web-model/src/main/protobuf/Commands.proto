@@ -119,6 +119,7 @@ message ReloadDatasourceCommandOptionsDto {
 message BackupCommandOptionsDto {
   required string archive = 1;
   optional bool override = 2 [default = false];
+  optional bool viewsAsTables = 3 [default = false]; // backup as a view (logical) or a table (data dump)
 }
 
 message RestoreCommandOptionsDto {

@@ -12,7 +12,6 @@ package org.obiba.opal.shell.commands;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ExtensionRegistry;
@@ -51,10 +50,8 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -153,8 +150,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       if (archive.isDirectory()) {
         archiveFolder = archive;
         return archiveFolder;
-      }
-      else if (archive.getName().endsWith(".zip")) {
+      } else if (archive.getName().endsWith(".zip")) {
         // uncompress in the opal's work directory
         workDir = new File(WORK_DIR, new Random().nextInt(20) + "");
         workDir.mkdirs();
@@ -308,7 +304,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     log.debug("Restore of {} reports started", getProjectName());
     File reportsFolder = getReportsFolder();
     if (reportsFolder.exists()) {
-      File[] reportFiles = reportsFolder.listFiles(file -> !file.isDirectory() &&  file.getName().endsWith(".json"));
+      File[] reportFiles = reportsFolder.listFiles(file -> !file.isDirectory() && file.getName().endsWith(".json"));
       if (reportFiles != null) {
         for (File reportDtoFile : reportFiles) {
           try (FileReader reader = new FileReader(reportDtoFile)) {
@@ -372,6 +368,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       }
     }
   }
+
   public String toString() {
     StringBuilder sb = new StringBuilder();
 
@@ -379,10 +376,10 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     sb.append(" --project ").append(options.getProject());
     sb.append(" --archive ").append(options.getArchive());
 
-    if(options.isPassword()) {
+    if (options.isPassword()) {
       sb.append(" --password *****");
     }
-    if(options.isOverride()) {
+    if (options.isOverride()) {
       sb.append(" --override ").append(options.getOverride());
     }
 
