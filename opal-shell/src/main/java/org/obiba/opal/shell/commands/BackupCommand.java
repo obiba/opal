@@ -45,6 +45,9 @@ import org.obiba.opal.web.project.Dtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -58,6 +61,9 @@ import java.util.stream.StreamSupport;
 public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
+
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Autowired
   private DataExportService dataExportService;
@@ -298,7 +304,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     CsvDatasource destinationDatasource = new CsvDatasource("tables");
     for (ValueTable table : tables) {
       File tableFolder = getTableFolder(table.getName());
-      Magma.TableDto.Builder tableDtoBuilder = org.obiba.opal.web.magma.Dtos.asDto(table, false);
+      Magma.TableDto.Builder tableDtoBuilder = transactionTemplate.execute(status -> org.obiba.opal.web.magma.Dtos.asDto(table, false));
       tableDtoBuilder.clearLink();
       StreamSupport.stream(table.getVariables().spliterator(), false)
           .map(org.obiba.opal.web.magma.Dtos::asDto)
