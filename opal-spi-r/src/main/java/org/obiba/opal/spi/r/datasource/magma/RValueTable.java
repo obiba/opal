@@ -111,7 +111,8 @@ public class RValueTable extends AbstractValueTable {
       // ignore
       log.error("Variable init failure for tibble {}", getSymbol(), e);
     }
-    int optimizedBatchSize = MAX_DATA_POINTS / getVariableCount();
+    int varCount = getVariableCount();
+    int optimizedBatchSize = varCount > 0 ? MAX_DATA_POINTS / varCount : 0;
     log.debug("Optimized batch size: {}", optimizedBatchSize);
     if (optimizedBatchSize > getVariableEntityBatchSize())
       setVariableEntityBatchSize(optimizedBatchSize);
