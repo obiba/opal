@@ -16,8 +16,12 @@ import java.util.List;
 import org.obiba.opal.web.model.DataShield;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataShieldROptionsParser {
+
+  private static final Logger log = LoggerFactory.getLogger(DataShieldROptionsParser.class);
 
   @SuppressWarnings({ "OverlyLongMethod" })
   public List<DataShield.DataShieldROptionDto> parse(String options) {
@@ -41,7 +45,11 @@ public class DataShieldROptionsParser {
       }
 
       if(comma) {
-        optionDtos.add(buildOptionDto(source.substring(b, i)));
+        try {
+          optionDtos.add(buildOptionDto(source.substring(b, i)));
+        } catch(IllegalArgumentException e) {
+          log.warn("Datashield R option parse failed", e);
+        }
         b = i + 1;
         comma = false;
       }
@@ -49,14 +57,20 @@ public class DataShieldROptionsParser {
       i++;
     }
 
-    if(b < i) optionDtos.add(buildOptionDto(source.substring(b, i)));
+    if(b < i) {
+      try {
+        optionDtos.add(buildOptionDto(source.substring(b, i)));
+      } catch(IllegalArgumentException e) {
+        log.warn("Datashield R option parse failed", e);
+      }
+    }
 
     return optionDtos;
   }
 
   private DataShield.DataShieldROptionDto buildOptionDto(String option) {
     int pos = option.indexOf('=');
-    Preconditions.checkArgument(pos != -1, "R option format is invalid");
+    Preconditions.checkArgument(pos != -1, "R option format is invalid: '" + option + "'");
 
     return DataShield.DataShieldROptionDto.newBuilder()//
         .setName(option.substring(0, pos).replaceAll(" ", ""))//

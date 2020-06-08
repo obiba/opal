@@ -58,6 +58,24 @@ public class DataShieldROptionsParserTest {
   }
 
   @Test
+  public void test_failingOption() {
+    List<DataShield.DataShieldROptionDto> options = parser.parse("zorro");
+    assertThat(options.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void test_failingOptions() {
+    List<DataShield.DataShieldROptionDto> options = parser.parse("zorro=5,toto,tutu=4");
+    assertThat(options.size()).isEqualTo(2);
+    DataShield.DataShieldROptionDto dto = options.get(0);
+    assertThat(dto.getName()).isEqualTo("zorro");
+    assertThat(dto.getValue()).isEqualTo("5");
+    dto = options.get(1);
+    assertThat(dto.getName()).isEqualTo("tutu");
+    assertThat(dto.getValue()).isEqualTo("4");
+  }
+
+  @Test
   public void test_functionOption() {
     List<DataShield.DataShieldROptionDto> options = parser.parse("zorro=base:::log(x=10, base=5)");
     DataShield.DataShieldROptionDto dto = options.get(0);

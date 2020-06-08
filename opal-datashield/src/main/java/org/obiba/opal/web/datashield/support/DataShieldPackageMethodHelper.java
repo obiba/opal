@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.datashield.support;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.datashield.core.DSEnvironment;
@@ -135,6 +136,26 @@ public class DataShieldPackageMethodHelper {
     rPackageHelper.removePackage(pkg.getName());
   }
 
+  public static Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String packageName, String packageVersion,
+                                                                               String value) {
+    String normalized = value.replaceAll("[\n\r\t ]", "");
+    List<DataShield.DataShieldMethodDto> methodDtos = Lists.newArrayList();
+    for (String map : normalized.split(",")) {
+      String[] entry = map.split("=");
+      if (!Strings.isNullOrEmpty(entry[0])) {
+        DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder()
+            .setFunc(entry.length == 1 ? packageName + "::" + entry[0] : entry[1])
+            .setRPackage(packageName)
+            .setVersion(packageVersion).build();
+        DataShield.DataShieldMethodDto.Builder builder = DataShield.DataShieldMethodDto.newBuilder();
+        builder.setName(entry[0]);
+        builder.setExtension(DataShield.RFunctionDataShieldMethodDto.method, methodDto);
+        methodDtos.add(builder.build());
+      }
+    }
+    return methodDtos;
+  }
+
   //
   // Private methods
   //
@@ -194,23 +215,6 @@ public class DataShieldPackageMethodHelper {
     }
     // will not happen in R
     return null;
-  }
-
-  private Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String packageName, String packageVersion,
-                                                                         String value) {
-    String normalized = value.replaceAll("[\n\r\t ]", "");
-    List<DataShield.DataShieldMethodDto> methodDtos = Lists.newArrayList();
-    for (String map : normalized.split(",")) {
-      String[] entry = map.split("=");
-      DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder()
-          .setFunc(entry.length == 1 ? packageName + "::" + entry[0] : entry[1]).setRPackage(packageName)
-          .setVersion(packageVersion).build();
-      DataShield.DataShieldMethodDto.Builder builder = DataShield.DataShieldMethodDto.newBuilder();
-      builder.setName(entry[0]);
-      builder.setExtension(DataShield.RFunctionDataShieldMethodDto.method, methodDto);
-      methodDtos.add(builder.build());
-    }
-    return methodDtos;
   }
 
   private Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
