@@ -212,6 +212,11 @@ public class ProjectsServiceImpl implements ProjectService {
 
     synchronized (this) {
       orientDbService.save(project, project);
+      try {
+        getProjectDirectory(project);
+      } catch (FileSystemException e) {
+        log.warn("Project's directory is not accessible: {}", project.getName(), e);
+      }
     }
   }
 
