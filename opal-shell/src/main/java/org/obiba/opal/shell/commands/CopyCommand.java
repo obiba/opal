@@ -347,7 +347,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       ((RDatasourceService) datasourceService).setRSessionHandler(rSessionHandler);
       // ugly: no need to request creation of a datasource
       RDatasourceFactory rDatasourceFactory = (RDatasourceFactory) datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters);
-      return new RExportDatasource(rDatasourceFactory.create().getName(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
+      RExportDatasource ds = new RExportDatasource(rDatasourceFactory.create().getName(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
+      ds.setMultilines(options.getMultilines());
+      ds.setEntityIdNames(getEntityIdMap());
+      return ds;
     } else {
       return datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters).create();
     }
@@ -748,6 +751,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         }
         getValueTables().size();
         RExportDatasource ds = new RExportDatasource(outputFile.getName().getBaseName(), sessionHandler, new RFileSymbolWriter(sessionHandler, outFiles));
+        ds.setMultilines(options.getMultilines());
         ds.setEntityIdNames(getEntityIdMap());
         return ds;
       }
