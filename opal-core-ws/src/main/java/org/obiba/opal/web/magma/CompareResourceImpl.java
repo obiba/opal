@@ -9,29 +9,13 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import org.obiba.magma.Attribute;
-import org.obiba.magma.Category;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchVariableException;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableBean;
+import com.google.common.annotations.VisibleForTesting;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.CsvValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.ValueTableWrapper;
+import org.obiba.magma.support.VariableHelper;
 import org.obiba.opal.web.model.Magma.ConflictDto;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
@@ -44,9 +28,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @NoAuthorization
 @Component
@@ -80,12 +67,12 @@ public class CompareResourceImpl implements CompareResource {
 
   @Override
   public Response compare(String with, boolean merge) {
-    if(comparedDatasource != null) {
+    if (comparedDatasource != null) {
       Datasource withDatasource = getDatasource(with);
       DatasourceCompareDto dto = createDatasourceCompareDto(comparedDatasource, withDatasource, merge);
       return Response.ok().entity(dto).build();
     }
-    if(comparedTable != null) {
+    if (comparedTable != null) {
       ValueTable withTable = getValueTable(with);
       TableCompareDto dto = createTableCompareDto(comparedTable, withTable, merge);
       return Response.ok().entity(dto).build();
@@ -111,7 +98,7 @@ public class CompareResourceImpl implements CompareResource {
         .setCompared(Dtos.asDto(compared)) //
         .setWithDatasource(Dtos.asDto(with));
 
-    for(ValueTable vt : compared.getValueTables()) {
+    for (ValueTable vt : compared.getValueTables()) {
       TableCompareDto tableCompareDto = with.hasValueTable(vt.getName()) //
           ? createTableCompareDto(vt, with.getValueTable(vt.getName()), merge) //
           : createTableCompareDtoWhereSecondTableDoesNotExist(vt);
@@ -125,26 +112,9 @@ public class CompareResourceImpl implements CompareResource {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> variablesInWith = asSet(with.getVariables());
 
-    Iterable<Variable> newVariables = Iterables.filter(variablesInCompared, new Predicate<Variable>() {
-      @Override
-      public boolean apply(@Nullable Variable input) {
-        return input != null && !with.hasVariable(input.getName());
-      }
-    });
-
-    Iterable<Variable> missingVariables = Iterables.filter(variablesInWith, new Predicate<Variable>() {
-      @Override
-      public boolean apply(@Nullable Variable input) {
-        return input != null && !compared.hasVariable(input.getName());
-      }
-    });
-
-    Iterable<Variable> existingVariables = Iterables.filter(variablesInCompared, new Predicate<Variable>() {
-      @Override
-      public boolean apply(@Nullable Variable input) {
-        return input != null && with.hasVariable(input.getName());
-      }
-    });
+    Iterable<Variable> newVariables = variablesInCompared.stream().filter(input -> input != null && !with.hasVariable(input.getName())).collect(Collectors.toList());
+    Iterable<Variable> missingVariables = variablesInWith.stream().filter(input -> input != null && !compared.hasVariable(input.getName())).collect(Collectors.toList());
+    Iterable<Variable> existingVariables = variablesInCompared.stream().filter(input -> input != null && with.hasVariable(input.getName())).collect(Collectors.toList());
 
     return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables, merge);
   }
@@ -159,11 +129,11 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Iterable<Variable> newVariables,
-      Iterable<Variable> missingVariables, Iterable<Variable> existingVariables, boolean merge) {
+                                                Iterable<Variable> missingVariables, Iterable<Variable> existingVariables, boolean merge) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared, true, false));
 
-    if(with != null) {
+    if (with != null) {
       dtoBuilder.setWithTable(Dtos.asDto(with, true, false));
     }
 
@@ -174,10 +144,10 @@ public class CompareResourceImpl implements CompareResource {
     conflicts.addAll(getConflicts(compared, with, newVariables, true));
     dtoBuilder.addAllConflicts(conflicts);
 
-    for(Variable v : getUnconflicting(newVariables, conflicts)) {
+    for (Variable v : getUnconflicting(newVariables, conflicts)) {
       dtoBuilder.addNewVariables(Dtos.asDto(v));
     }
-    for(Variable v : missingVariables) {
+    for (Variable v : missingVariables) {
       dtoBuilder.addMissingVariables(Dtos.asDto(v));
     }
 
@@ -185,16 +155,16 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable with,
-      Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts, boolean merge) {
+                                                                  Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts, boolean merge) {
     Set<Variable> unconflicting = getUnconflicting(existingVariables, conflicts);
-    if(with != null) {
+    if (with != null) {
       Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflicting, merge);
-      for(Variable variable : modifiedVariables) {
+      for (Variable variable : modifiedVariables) {
         dtoBuilder.addModifiedVariables(Dtos.asDto(variable));
       }
       unconflicting.removeAll(modifiedVariables);
     }
-    for(Variable variable : unconflicting) {
+    for (Variable variable : unconflicting) {
       dtoBuilder.addUnmodifiedVariables(Dtos.asDto(variable));
     }
 
@@ -203,12 +173,12 @@ public class CompareResourceImpl implements CompareResource {
 
   private Collection<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
     Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
-    if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
+    if (compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       // support IncrementalView wrapping compared table
       CsvValueTable csvValueTable = (CsvValueTable) (compared instanceof ValueTableWrapper //
           ? ((ValueTableWrapper) compared).getInnermostWrappedValueTable() //
           : compared);
-      for(Variable missingVariable : csvValueTable.getMissingVariables()) {
+      for (Variable missingVariable : csvValueTable.getMissingVariables()) {
         conflicts
             .add(createConflictDto(Dtos.asDto(missingVariable).setIsNewVariable(true).build(), CSV_VARIABLE_MISSING));
       }
@@ -217,11 +187,11 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private Collection<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Iterable<Variable> variables,
-      boolean newVariable) {
+                                               boolean newVariable) {
     String entityType = null;
     Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
-    for(Variable variable : variables) {
-      if(entityType == null) {
+    for (Variable variable : variables) {
+      if (entityType == null) {
         entityType = variable.getEntityType();
       }
       getVariableConflicts(compared, with, newVariable, conflicts, entityType, variable);
@@ -230,10 +200,10 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private void getVariableConflicts(ValueTable compared, ValueTable with, boolean newVariable,
-      Collection<ConflictDto> conflicts, String entityType, Variable variable) {
-    if(with == null) {
+                                    Collection<ConflictDto> conflicts, String entityType, Variable variable) {
+    if (with == null) {
       // Target (with) will be created
-      if(!entityType.equals(variable.getEntityType())) {
+      if (!entityType.equals(variable.getEntityType())) {
         conflicts.add(
             createConflictDto(Dtos.asDto(variable).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType,
                 variable.getEntityType()));
@@ -242,19 +212,19 @@ public class CompareResourceImpl implements CompareResource {
       // Target (with) table already exist
       String name = variable.getName();
       Variable variableInCompared = compared.getVariable(name);
-      if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
+      if (!variableInCompared.getEntityType().equals(with.getEntityType())) {
         conflicts.add(
             createConflictDto(Dtos.asDto(variable).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE,
                 variableInCompared.getEntityType(), with.getEntityType()));
       }
       try {
         Variable variableInWith = with.getVariable(name);
-        if(!variableInCompared.getValueType().equals(variableInWith.getValueType()) && !with.isView()) {
+        if (!variableInCompared.getValueType().equals(variableInWith.getValueType()) && !with.isView()) {
           conflicts.add(
               createConflictDto(Dtos.asDto(variable).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE,
                   variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
         }
-      } catch(NoSuchVariableException variableDoesNotExist) {
+      } catch (NoSuchVariableException variableDoesNotExist) {
         // Case where the variable does not exist in Opal but its destination table already exist.
       }
     }
@@ -264,12 +234,12 @@ public class CompareResourceImpl implements CompareResource {
     Set<Variable> unconflicting = new LinkedHashSet<>(INITIAL_CAPACITY);
 
     Collection<String> conflicting = new LinkedHashSet<>(INITIAL_CAPACITY);
-    for(ConflictDto dto : conflicts) {
+    for (ConflictDto dto : conflicts) {
       conflicting.add(dto.getVariable().getName());
     }
 
-    for(Variable v : variables) {
-      if(!conflicting.contains(v.getName())) {
+    for (Variable v : variables) {
+      if (!conflicting.contains(v.getName())) {
         unconflicting.add(v);
       }
     }
@@ -280,9 +250,9 @@ public class CompareResourceImpl implements CompareResource {
   private Set<Variable> getUnconflictingModified(ValueTable with, Iterable<Variable> variables, boolean merge) {
     Set<Variable> modified = new LinkedHashSet<>(INITIAL_CAPACITY);
 
-    for(Variable v : variables) {
+    for (Variable v : variables) {
       Variable withVar = with.getVariable(v.getName());
-      if(isModified(v, withVar)) {
+      if (VariableHelper.isModified(v, withVar)) {
         if (merge) {
           modified.add(mergeVariables(withVar, v));
         } else {
@@ -299,91 +269,11 @@ public class CompareResourceImpl implements CompareResource {
     return merge.build();
   }
 
-  private boolean isModified(Variable compared, Variable with) {
-    return isModified(compared.getMimeType(), with.getMimeType()) ||
-        isModified(compared.getOccurrenceGroup(), with.getOccurrenceGroup()) ||
-        isModified(compared.getReferencedEntityType(), with.getReferencedEntityType()) ||
-        isModified(compared.getUnit(), with.getUnit()) ||
-        compared.isRepeatable() != with.isRepeatable() ||
-        compared.getIndex() != with.getIndex() ||
-        areCategoriesModified(compared.getCategories(), with.getCategories()) ||
-        areAttributesModified(compared.getAttributes(), with.getAttributes());
-  }
-
-  @SuppressWarnings("SimplifiableIfStatement")
-  private boolean isModified(@Nullable String compared, @Nullable String with) {
-    if(compared == null && with == null) return false;
-    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
-    if(compared != null && with == null) return true;
-    return !(compared != null && compared.equals(with.replace("\r", "")));
-  }
-
-  @SuppressWarnings("PMD.NcssMethodCount")
-  private boolean areCategoriesModified(Collection<Category> compared, Collection<Category> with) {
-    if(compared == null && with == null) return false;
-    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
-    if(compared == null && with != null || compared != null && with == null) return true;
-    if(compared != null && with != null && compared.size() != with.size()) return true;
-
-    if(compared != null && with != null) {
-      for(Category comparedCat : compared) {
-        boolean found = false;
-        for(Category withCat : with) {
-          if(comparedCat.getName().equals(withCat.getName())) {
-            if(isModified(comparedCat, withCat)) return true;
-            found = true;
-          }
-        }
-        if(!found) return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean isModified(Category compared, Category with) {
-    return compared.isMissing() != with.isMissing() ||
-        areAttributesModified(compared.getAttributes(), with.getAttributes());
-  }
-
-  @SuppressWarnings("PMD.NcssMethodCount")
-  private boolean areAttributesModified(Collection<Attribute> compared, Collection<Attribute> with) {
-    if(compared == null && with == null) return false;
-    if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
-    if(compared == null || with == null) return true;
-    if(compared.size() != with.size()) return true;
-
-    for(Attribute comparedAttr : compared) {
-      boolean found = false;
-      for(Attribute withAttr : with) {
-        if(isSameAttribute(comparedAttr, withAttr)) {
-          if(isModified(comparedAttr.getValue(), withAttr.getValue())) return true;
-          found = true;
-        }
-      }
-      if(!found) return true;
-    }
-    return false;
-  }
-
-  private boolean isModified(Value compared, Value with) {
-    if(compared == null && with == null) return false;
-    String comparedStr = compared == null || compared.isNull() ? null : compared.toString();
-    String withStr = with == null || with.isNull() ? null : with.toString();
-    return isModified(comparedStr, withStr);
-  }
-
-  private boolean isSameAttribute(Attribute compared, Attribute with) {
-    if(!compared.getName().equals(with.getName())) return false;
-    Locale comparedLocale = compared.isLocalised() ? compared.getLocale() : null;
-    Locale withLocale = with.isLocalised() ? with.getLocale() : null;
-    return Objects.equals(comparedLocale, withLocale);
-  }
-
   private ConflictDto createConflictDto(VariableDto variableDto, String code, String... args) {
     ConflictDto.Builder dtoBuilder = ConflictDto.newBuilder();
     dtoBuilder.setVariable(variableDto);
     dtoBuilder.setCode(code);
-    for(String arg : args) {
+    for (String arg : args) {
       dtoBuilder.addArguments(arg);
     }
     return dtoBuilder.build();
@@ -391,7 +281,7 @@ public class CompareResourceImpl implements CompareResource {
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
     Set<T> set = new LinkedHashSet<>(INITIAL_CAPACITY);
-    for(T elem : iterable) {
+    for (T elem : iterable) {
       set.add(elem);
     }
     return set;
