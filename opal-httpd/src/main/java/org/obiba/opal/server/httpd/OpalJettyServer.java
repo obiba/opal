@@ -76,6 +76,8 @@ public class OpalJettyServer {
 
   private String httpsPort;
 
+  private String contextPath = "/";
+
   public void start() throws Exception {
     init();
     log.info("Starting Opal HTTP/s Server on ports {}/{}", httpPort, httpsPort);
@@ -97,6 +99,11 @@ public class OpalJettyServer {
     httpPort = properties.getProperty("org.obiba.opal.http.port");
     httpsPort = properties.getProperty("org.obiba.opal.https.port");
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
+
+    contextPath = properties.getProperty("org.obiba.opal.server.context-path", "");
+    if (!Strings.isNullOrEmpty(contextPath) && !contextPath.startsWith("/") || contextPath.endsWith("/")) {
+      throw new IllegalArgumentException("ContextPath must start with '/' and not end with '/'");
+    }
 
     // OPAL-2687
     String excludedProtocols = properties.getProperty("org.obiba.opal.ssl.excludedProtocols");
@@ -195,7 +202,7 @@ public class OpalJettyServer {
 
   private Handler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
-    servletContextHandler.setContextPath("/");
+    servletContextHandler.setContextPath(Strings.isNullOrEmpty(contextPath) ? "/" : contextPath);
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
     initEventListeners();
