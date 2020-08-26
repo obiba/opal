@@ -59,7 +59,7 @@ public class OpalJettyServer {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
 
-  private static final String MAX_IDLE_TIME = "30000";
+  private static final String MAX_IDLE_TIME = "1800000";
 
   private static final int REQUEST_HEADER_SIZE = 8192;
 
