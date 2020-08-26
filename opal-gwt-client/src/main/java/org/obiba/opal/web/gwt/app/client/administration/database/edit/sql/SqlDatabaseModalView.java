@@ -242,10 +242,13 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       int end = urlTxt.indexOf(':', start + 1);
       if (getDriver().getText().contains("mysql")) {
         urlTxt = "jdbc:mysql" + urlTxt.substring(end);
+        urlTxt = urlTxt.replaceAll( "5432", "3306");
       } else if (getDriver().getText().contains("mariadb")) {
         urlTxt = "jdbc:mariadb" + urlTxt.substring(end);
+        urlTxt = urlTxt.replaceAll("5432", "3306");
       }else if (getDriver().getText().contains("postgresql")) {
         urlTxt = "jdbc:postgresql" + urlTxt.substring(end);
+        urlTxt = urlTxt.replaceAll("3306", "5432");
       }
       url.setText(urlTxt);
     }
