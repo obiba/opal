@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0.3</version>
   </parent>
   <artifactId>opal-search</artifactId>
   <name>opal-search</name>
