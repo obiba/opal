@@ -35,9 +35,7 @@ import java.util.stream.Collectors;
 class RVariableValueSource extends AbstractVariableValueSource implements VariableValueSource, VectorSource {
 
   private static final Logger log = LoggerFactory.getLogger(RVariableValueSource.class);
-
-  public static final String EPOCH = "1970-01-01";
-
+  
   private RValueTable valueTable;
 
   private final String colName;
@@ -125,25 +123,26 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private ValueType extractValueType(REXP attr) {
-    ValueType type = TextType.get();
-    // column's data type has the priority
-    if (isNumeric()) type = isInteger() ? IntegerType.get() : DecimalType.get();
-    else if (isInteger()) type = IntegerType.get();
-    else if (isDecimal()) type = DecimalType.get();
-    else if (isDate()) type = DateType.get();
-    else if (isDateTime()) type = DateTimeType.get();
-    else if (isBoolean()) type = BooleanType.get();
-    else if (isBinary()) type = BinaryType.get();
-    else {
-      // fallback to opal.value_type attribute, if defined
-      String typePropertyStr = extractProperty(attr, "opal.value_type");
-      if (!Strings.isNullOrEmpty(typePropertyStr)) {
-        try {
-          type = ValueType.Factory.forName(typePropertyStr);
-        } catch (Exception e) {
-          // ignore
-        }
+    ValueType type = null;
+    String typePropertyStr = extractProperty(attr, "opal.value_type");
+    if (!Strings.isNullOrEmpty(typePropertyStr)) {
+      try {
+        type = ValueType.Factory.forName(typePropertyStr);
+      } catch (Exception e) {
+        // ignore
+        log.warn("Not a valid 'opal.value_type' attribute value: {}", typePropertyStr);
       }
+    }
+    if (type == null) {
+      type = TextType.get();
+      // column's data type has the priority
+      if (isNumeric()) type = isInteger() ? IntegerType.get() : DecimalType.get();
+      else if (isInteger()) type = IntegerType.get();
+      else if (isDecimal()) type = DecimalType.get();
+      else if (isDate()) type = DateType.get();
+      else if (isDateTime()) type = DateTimeType.get();
+      else if (isBoolean()) type = BooleanType.get();
+      else if (isBinary()) type = BinaryType.get();
     }
     log.debug("Tibble '{}' has column '{}' of class '{}' mapped to {}", valueTable.getSymbol(), colName, Joiner.on(", ").join(colClasses), type.getName());
     return type;
