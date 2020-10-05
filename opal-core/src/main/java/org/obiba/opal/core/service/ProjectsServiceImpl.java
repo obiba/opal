@@ -270,6 +270,12 @@ public class ProjectsServiceImpl implements ProjectService {
         dataSourceFactory = new NullDatasourceFactory();
         dataSourceFactory.setName(project.getName());
       }
+
+      if (MagmaEngine.get().hasDatasource(project.getName())) {
+        // not supposed to be here
+        MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(project.getName()));
+      }
+
       MagmaEngine.get().addDatasource(dataSourceFactory);
       log.info("Datasource load end: {} ({})", project.getName(), dataSourceFactory.getClass().getSimpleName());
       return dataSourceFactory;
