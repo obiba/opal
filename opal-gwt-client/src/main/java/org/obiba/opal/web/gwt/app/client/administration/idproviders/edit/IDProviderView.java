@@ -194,10 +194,16 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setSecret(secret.getValue());
     provider.setDiscoveryURI(discoveryUri.getValue());
     provider.setScope(Strings.isNullOrEmpty(scope.getValue()) ? "openid" : scope.getValue());
-    if (!Strings.isNullOrEmpty(groups.getText()))
+    if (Strings.isNullOrEmpty(groups.getText())) {
+      provider.clearGroups();
+    } else {
       provider.setGroups(groups.getText());
-    if (!Strings.isNullOrEmpty(groupsClaim.getText()))
+    }
+    if (Strings.isNullOrEmpty(groupsClaim.getText())) {
+      provider.clearGroupsClaim();
+    } else {
       provider.setGroupsClaim(groupsClaim.getText());
+    }
     provider.setProviderUrl(providerUrl.getValue());
     provider.setLabel(label.getValue());
     provider.setUseNonce(useNonce.getValue());
