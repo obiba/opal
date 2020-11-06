@@ -60,7 +60,7 @@
             </b:InputAddOn>
           </b:Controls>
           <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
-              addStyleNames="small-top-margin">
+              addStyleNames="small-top-margin small-right-indent">
             <b:NavLink icon="TABLE" ui:field="addTable">
               <ui:msg description="Add Table label">Add table...</ui:msg>
             </b:NavLink>
@@ -74,7 +74,7 @@
               <ui:msg description="Restore views label">Restore views...</ui:msg>
             </b:NavLink>
           </b:DropdownButton>
-          <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-top-margin small-indent">
+          <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-top-margin">
             <ui:msg description="Refresh tables list">Refresh</ui:msg>
           </b:Button>
         </g:FlowPanel>
