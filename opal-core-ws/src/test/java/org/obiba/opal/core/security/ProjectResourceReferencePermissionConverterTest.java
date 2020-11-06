@@ -22,6 +22,7 @@ public class ProjectResourceReferencePermissionConverterTest
     testConversion("/project/patate/resource/pwel", ProjectResourceReferencePermissionConverter.Permission.RESOURCE_ALL, //
         "rest:/project/patate/resource/pwel:*:GET/*",
         "rest:/project/patate:GET:GET",
+        "rest:/datasource/patate/tables:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/permissions/resource/pwel:*:GET/*",
@@ -33,6 +34,7 @@ public class ProjectResourceReferencePermissionConverterTest
     testConversion("/project/patate/resource/pwel", ProjectResourceReferencePermissionConverter.Permission.RESOURCE_VIEW, //
         "rest:/project/patate/resource/pwel:GET:GET/GET",
         "rest:/project/patate:GET:GET",
+        "rest:/datasource/patate/tables:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/state:GET:GET");
   }
