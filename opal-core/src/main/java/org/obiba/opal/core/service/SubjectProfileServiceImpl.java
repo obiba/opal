@@ -85,18 +85,39 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   @Override
   public void ensureProfile(@NotNull String principal, @NotNull String realm) {
-    ensureProfile(principal, realm, !OpalTokenRealm.TOKEN_REALM.equals(realm));
+    log.debug("ensure profile of user {} from realm: {}", principal, realm);
+
+    try {
+      SubjectProfile profile = getProfile(principal);
+      if (isMultipleRealms()) {
+        List<String> realms = Splitter.on(",").splitToList(profile.getRealm());
+        if (!realms.contains(realm)) {
+          List<String> newRealms = Lists.newArrayList(realms);
+          newRealms.add(realm);
+          profile.setRealm(Joiner.on(",").join(newRealms));
+        }
+      } else if (!profile.getRealm().equals(realm)) {
+        throw new AuthenticationException(
+                "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
+                        " expected). Make sure the same subject is not defined in several realms."
+        );
+      }
+      profile.setUpdated(new Date());
+      orientDbService.save(profile, profile);
+    } catch (NoSuchSubjectProfileException e) {
+      HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
+      orientDbService.save(newProfile, newProfile);
+    }
   }
   @Override
   public void ensureProfile(@NotNull PrincipalCollection principalCollection) {
     String principal = principalCollection.getPrimaryPrincipal().toString();
     String realm = principalCollection.getRealmNames().iterator().next();
-    ensureProfile(principal, realm, !principalCollection.getRealmNames().contains(OpalTokenRealm.TOKEN_REALM));
+    ensureProfile(principal, realm);
     ensureUserHomeExists(principal);
     ensureFolderPermissions(principal, "/home/" + principal);
     ensureFolderPermissions(principal, "/tmp");
   }
-
 
   @Override
   public void applyProfileGroups(@NotNull String principal, Set<String> groups) {
@@ -186,35 +207,6 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private boolean isMultipleRealms() {
     return multiProfile;
-  }
-
-  private void ensureProfile(@NotNull String principal, @NotNull String realm, boolean clearGroups) {
-    log.debug("ensure profile of user {} from realm: {} (clear groups: {})", principal, realm, clearGroups);
-
-    try {
-      SubjectProfile profile = getProfile(principal);
-      if (isMultipleRealms()) {
-        List<String> realms = Splitter.on(",").splitToList(profile.getRealm());
-        if (!realms.contains(realm)) {
-          List<String> newRealms = Lists.newArrayList(realms);
-          newRealms.add(realm);
-          profile.setRealm(Joiner.on(",").join(newRealms));
-
-        }
-      } else if (!profile.getRealm().equals(realm)) {
-        throw new AuthenticationException(
-                "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
-                        " expected). Make sure the same subject is not defined in several realms."
-        );
-      }
-      profile.setUpdated(new Date());
-      // in case some groups have been removed
-      if (clearGroups) profile.clearGroups();
-      orientDbService.save(profile, profile);
-    } catch (NoSuchSubjectProfileException e) {
-      HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
-      orientDbService.save(newProfile, newProfile);
-    }
   }
 
   private void ensureUserHomeExists(String username) {
