@@ -72,8 +72,6 @@ public class OpalJettyServer {
 
   private ServletContextHandler servletContextHandler;
 
-  private String httpHost;
-
   private String httpPort;
 
   private String httpsPort;
@@ -98,7 +96,6 @@ public class OpalJettyServer {
     jettyServer.setStopAtShutdown(false);
 
     Properties properties = loadProperties();
-    httpHost = new URL(properties.getProperty("org.obiba.opal.public.url")).getHost();
     httpPort = properties.getProperty("org.obiba.opal.http.port");
     httpsPort = properties.getProperty("org.obiba.opal.https.port");
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
@@ -114,8 +111,8 @@ public class OpalJettyServer {
     // OPAL-2752
     String includedCipherSuites = properties.getProperty("org.obiba.opal.ssl.includedCipherSuites");
 
-    configureHttpConnector(httpHost, httpPort == null ? null : Integer.valueOf(httpPort), createHttpConfiguration(maxIdleTime));
-    configureSslConnector(httpHost, httpsPort == null ? null : Integer.valueOf(httpsPort), createHttpConfiguration(maxIdleTime),
+    configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), createHttpConfiguration(maxIdleTime));
+    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), createHttpConfiguration(maxIdleTime),
         excludedProtocols, includedCipherSuites);
 
     // OPAL-2652
@@ -144,16 +141,14 @@ public class OpalJettyServer {
     }
   }
 
-  private void configureHttpConnector(String host, @Nullable Integer httpPort, HttpConfiguration httpConfig) {
+  private void configureHttpConnector(@Nullable Integer httpPort, HttpConfiguration httpConfig) {
     if (httpPort == null || httpPort <= 0) return;
     ServerConnector httpConnector = new ServerConnector(jettyServer, new HttpConnectionFactory(httpConfig));
     httpConnector.setPort(httpPort);
-    if (!Strings.isNullOrEmpty(host) && !"localhost".equals(host))
-      httpConnector.setHost(host);
     jettyServer.addConnector(httpConnector);
   }
 
-  private void configureSslConnector(String host, @Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
+  private void configureSslConnector(@Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
                                      String includedCipherSuites) {
     if (httpsPort == null || httpsPort <= 0) return;
     httpConfig.setSecureScheme("https");
@@ -163,8 +158,6 @@ public class OpalJettyServer {
         new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites), HttpVersion.HTTP_1_1.asString()),
         new HttpConnectionFactory(httpConfig));
     sslConnector.setPort(httpsPort);
-    if (!Strings.isNullOrEmpty(host) && !"localhost".equals(host))
-      sslConnector.setHost(host);
     jettyServer.addConnector(sslConnector);
   }
 
