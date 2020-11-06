@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.security.IDProvidersService;
@@ -70,7 +71,9 @@ public class OpalIDProvidersService implements IDProvidersService {
     }
     if ("true".equals(configuration.getCustomParam("enabled"))) {
       RealmSecurityManager securityManager = ((RealmSecurityManager) SecurityUtils.getSecurityManager());
-      securityManager.getRealms().add(new OIDCRealm(configuration));
+      Collection<Realm> realms = securityManager.getRealms();
+      realms.add(new OIDCRealm(configuration));
+      securityManager.setRealms(realms);
     }
   }
 
@@ -106,9 +109,11 @@ public class OpalIDProvidersService implements IDProvidersService {
 
   private void removeRealm(String name) {
     RealmSecurityManager securityManager = ((RealmSecurityManager) SecurityUtils.getSecurityManager());
-    securityManager.getRealms().stream()
+    Collection<Realm> realms = securityManager.getRealms();
+    realms.stream()
         .filter(realm -> realm.getName().equals(name))
-        .findFirst().ifPresent(realm -> securityManager.getRealms().remove(realm));
+        .findFirst().ifPresent(realms::remove);
+    securityManager.setRealms(realms);
   }
 
   private File getConfigurationDirectory() {
