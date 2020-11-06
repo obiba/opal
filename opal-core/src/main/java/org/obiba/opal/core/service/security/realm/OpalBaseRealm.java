@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.service.security.realm;
 
+import com.google.common.collect.Sets;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -43,7 +44,7 @@ public abstract class OpalBaseRealm extends AuthorizingRealm {
       Object primary = thisPrincipals.iterator().next();
       PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
 
-      Set<String> roleNames = new HashSet<>();
+      Set<String> roleNames = Sets.newHashSet(getName());
       String username = (String) getAvailablePrincipal(simplePrincipals);
       SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
       if (subjectCredentials != null) {
