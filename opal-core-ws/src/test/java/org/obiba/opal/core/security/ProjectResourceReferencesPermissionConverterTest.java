@@ -22,6 +22,7 @@ public class ProjectResourceReferencesPermissionConverterTest
     testConversion("/project/patate/resources", ProjectResourceReferencesPermissionConverter.Permission.RESOURCES_ALL, //
         "rest:/project/patate/resources:*:GET/*",
         "rest:/project/patate:GET:GET",
+        "rest:/datasource/patate/tables:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/permissions/resources:*:GET/*",
@@ -36,6 +37,7 @@ public class ProjectResourceReferencesPermissionConverterTest
     testConversion("/project/patate/resources", ProjectResourceReferencesPermissionConverter.Permission.RESOURCES_VIEW, //
         "rest:/project/patate/resources:GET:GET/GET",
         "rest:/project/patate:GET:GET",
+        "rest:/datasource/patate/tables:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/state:GET:GET");
   }

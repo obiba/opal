@@ -41,6 +41,7 @@ public class ProjectResourceReferencePermissionConverter extends OpalPermissionC
         String[] args = args(node, "/project/(.+)/resource/(.+)");
         return Lists.newArrayList(toRest("/project/{0}/resource/{1}", "*:GET/*", args),
             toRest("/project/{0}", "GET:GET", args),
+            toRest("/datasource/{0}/tables", "GET:GET", args),
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/state", "GET:GET", args),
             toRest("/project/{0}/permissions/resource/{1}", "*:GET/*", args),
@@ -54,6 +55,7 @@ public class ProjectResourceReferencePermissionConverter extends OpalPermissionC
         String[] args = args(node, "/project/(.+)/resource/(.+)");
         return Lists.newArrayList(toRest("/project/{0}/resource/{1}", "GET:GET/GET", args),
             toRest("/project/{0}", "GET:GET", args),
+            toRest("/datasource/{0}/tables", "GET:GET", args),
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/state", "GET:GET", args));
       }
