@@ -98,6 +98,11 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
     return Response.ok().build();
   }
 
+  @Override
+  protected String getExecutionContext() {
+    return RSessionsResourceImpl.R_CONTEXT;
+  }
+
   //
   // private methods
   //
