@@ -81,4 +81,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     return resource;
   }
 
+  @Override
+  protected String getExecutionContext() {
+    return DatashieldSessionsResourceImpl.DS_CONTEXT;
+  }
 }

@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -59,6 +60,8 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public void setOpalRSession(OpalRSession rSession) {
+    if (!getExecutionContext().equals(rSession.getExecutionContext()))
+      throw new BadRequestException(String.format("Not a valid execution context '%s', expecting '%s'", rSession.getExecutionContext(), getExecutionContext()));
     this.rSession = rSession;
   }
 
@@ -217,4 +220,6 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   protected ResourceReferenceService getResourceReferenceService() {
     return resourceReferenceService;
   }
+
+  protected abstract String getExecutionContext();
 }
