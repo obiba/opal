@@ -29,8 +29,15 @@ public interface IdentifiersTableService extends SystemService {
    *
    * @return
    */
-  @NotNull
+  @Nullable
   Datasource getDatasource();
+
+  /**
+   * Identifiers database may not be defined.
+   *
+   * @return
+   */
+  boolean hasDatasource();
 
   /**
    * Check if any identifiers table exists for the given entity type.

@@ -204,10 +204,15 @@ public class IdentifiersMappingViewTest {
 
   private class IdentifiersTableServiceTester implements IdentifiersTableService {
 
-    @NotNull
+    @Nullable
     @Override
     public Datasource getDatasource() {
       return null;
+    }
+
+    @Override
+    public boolean hasDatasource() {
+      return false;
     }
 
     @Override
