@@ -60,7 +60,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public void setOpalRSession(OpalRSession rSession) {
-    if (!getExecutionContext().equals(rSession.getExecutionContext()))
+    if (rSession.getExecutionContext().equals("DataSHIELD") && !getExecutionContext().equals(rSession.getExecutionContext()))
       throw new BadRequestException(String.format("Not a valid execution context '%s', expecting '%s'", rSession.getExecutionContext(), getExecutionContext()));
     this.rSession = rSession;
   }
