@@ -327,14 +327,14 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Subscribe
   public void onValueTableDeleted(ValueTableDeletedEvent event) {
-    if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
+    if (identifiersTableService.hasDatasource() && identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
       removeProjectsIdentifiersMappingByEntityType(event.getValueTable());
     }
   }
 
   @Subscribe
   public void onVariableDeleted(VariableDeletedEvent event) {
-    if (identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
+    if (identifiersTableService.hasDatasource() && identifiersTableService.getDatasource().equals(event.getValueTable().getDatasource())) {
       removeProjectsIdentifiersMappingByMapping(event.getVariable());
     }
   }

@@ -96,8 +96,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean hasEntities() {
-    for(ValueTable table : getDatasource().getValueTables()) {
-      if(table.getVariableEntityCount() > 0) return true;
+    if (!hasDatasource()) return false;
+    for (ValueTable table : getDatasource().getValueTables()) {
+      if (table.getVariableEntityCount() > 0) return true;
     }
     return false;
   }
@@ -110,9 +111,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
-  @NotNull
+  @Nullable
   public Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
-    if(datasource == null) {
+    if(datasource == null && databaseRegistry.hasIdentifiersDatabase()) {
       DatasourceFactory datasourceFactory = databaseRegistry
           .createDatasourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
       Initialisables.initialise(datasourceFactory);
@@ -131,7 +132,13 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
+  public boolean hasDatasource() {
+    return databaseRegistry.hasIdentifiersDatabase();
+  }
+
+  @Override
   public boolean hasIdentifiersTable(@NotNull String entityType) {
+    if (!hasDatasource()) return false;
     if (databaseRegistry.hasIdentifiersDatabase()) {
       try {
         for (ValueTable table : getDatasource().getValueTables()) {
@@ -202,6 +209,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean hasIdentifiersMapping(@NotNull String idMapping) {
+    if (!hasDatasource()) return false;
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.hasVariable(idMapping)) return true;
     }
@@ -210,6 +218,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean hasIdentifiersMapping(@NotNull String entityType, @NotNull String idMapping) {
+    if (!hasDatasource()) return false;
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase()) && table.hasVariable(idMapping))
         return true;

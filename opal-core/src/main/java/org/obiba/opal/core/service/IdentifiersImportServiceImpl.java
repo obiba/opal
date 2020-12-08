@@ -124,6 +124,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
   @Override
   public void importIdentifiers(ValueTable sourceValueTable) throws IOException {
+    if (!identifiersTableService.hasDatasource()) return;
     ValueTable identifiersTable = identifiersTableService.ensureIdentifiersTable(sourceValueTable.getEntityType());
 
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
@@ -144,6 +145,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
   @Override
   public void copyIdentifiers(ValueTable identifiersValueTable) throws IOException {
+    if (!identifiersTableService.hasDatasource()) return;
     ValueTable destinationIdentifiersTable = identifiersTableService
         .ensureIdentifiersTable(identifiersValueTable.getEntityType());
     ValueTable sourceIdentifiersTable = identifiersValueTable;
