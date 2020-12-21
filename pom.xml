@@ -123,7 +123,7 @@
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
     <xmlunit.version>1.6</xmlunit.version>
-    <xstream.version>1.4.8</xstream.version>
+    <xstream.version>1.4.15</xstream.version>
 
     <!-- maven plugins -->
     <bintray-maven-plugin.version>1.2.20180117184439</bintray-maven-plugin.version>
