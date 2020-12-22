@@ -113,7 +113,14 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
-    return getProjectCommands(principals).contains(node);
+    Collection<String> projectRestrictions = getProjectRestrictions(principals);
+    if (projectRestrictions.isEmpty()) {
+      for (String cmd : getToken(principals).getCommands()) {
+        if (node.endsWith("/commands/_" + cmd)) return true;
+      }
+      return false;
+    } else
+      return getProjectCommands(principals).contains(node);
   }
 
   private boolean isFromTokenRealm(PrincipalCollection principals) {
