@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -134,4 +134,16 @@ public interface OpalRuntime extends SystemService {
    */
   ServicePlugin getServicePlugin(String name);
 
+  /**
+   * Get all external applications.
+   *
+   * @return
+   */
+  Collection<App> getApps();
+
+  /**
+   * GEt a app from name.
+   * @return
+   */
+  App getApp(String name);
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2020 OBiBa. All rights reserved.
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
   ~
   ~ This program and the accompanying materials
   ~ are made available under the terms of the GNU Public License v3.0.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses />.
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -275,6 +275,27 @@
             </protoModule>
             <protoModule>
               <source>src/main/protobuf/Plugins.proto</source>
+              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
+              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
+              <options>
+                <property>
+                  <!-- Override the package name -->
+                  <name>generate_helper_methods</name>
+                  <value>true</value>
+                </property>
+                <property>
+                  <name>use_global_json</name>
+                  <value>true</value>
+                </property>
+                <property>
+                  <!-- Override the package name -->
+                  <name>org.obiba.opal.web.model</name>
+                  <value>org.obiba.opal.web.model.client.opal</value>
+                </property>
+              </options>
+            </protoModule>
+            <protoModule>
+              <source>src/main/protobuf/Apps.proto</source>
               <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
               <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
               <options>

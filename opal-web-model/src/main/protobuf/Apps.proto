@@ -1,0 +1,13 @@
+package Apps;
+
+option java_package = "org.obiba.opal.web.model";
+
+message AppDto {
+  required string name = 1;
+  required string type = 2;
+  optional string server = 3;
+}
+
+message AppsDto {
+  repeated AppDto apps = 1;
+}

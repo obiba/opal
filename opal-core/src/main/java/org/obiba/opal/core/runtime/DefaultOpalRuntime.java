@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -10,6 +10,7 @@
 package org.obiba.opal.core.runtime;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -198,6 +199,16 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   public ServicePlugin getServicePlugin(String name) {
     return pluginsManager.getServicePlugin(name);
+  }
+
+  @Override
+  public Collection<App> getApps() {
+    return Lists.newArrayList();
+  }
+
+  @Override
+  public App getApp(String name) {
+    return null;
   }
 
   //

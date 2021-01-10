@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -17,6 +17,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.plugins.spi.ServicePlugin;
@@ -61,6 +62,15 @@ public class ServicesResource {
           .setLink(link.getPath()).build();
       serviceDtos.add(dto);
     }
+
+    for (App app : opalRuntime.getApps()) {
+      Opal.ServiceStatus status = app.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
+      URI link = UriBuilder.fromPath("/").path(PluginResource.class).segment("service").build(app.getName());
+      Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(app.getName()).setStatus(status)
+              .setLink(link.getPath()).build();
+      serviceDtos.add(dto);
+    }
+
 
     return serviceDtos;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
@@ -84,6 +85,16 @@ public class OpalRuntimeMock implements OpalRuntime {
   @Override
   public Collection<ServicePlugin> getServicePlugins() {
     return Lists.newArrayList();
+  }
+
+  @Override
+  public Collection<App> getApps() {
+    return Lists.newArrayList();
+  }
+
+  @Override
+  public App getApp(String name) {
+    throw new NoSuchElementException(name);
   }
 
   @Override
