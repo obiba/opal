@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -215,7 +215,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
           name = nsn[1];
           namespace = nsn[0];
         }
-        if (value.isString() && value.length() > 0) {
+        if (value.isString() && value.length() > 0 && !Strings.isNullOrEmpty(value.asStrings()[0])) {
           String strValue = value.asStrings()[0];
           if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
             attributes.addAll(extractLocalizedAttributes(namespace, name, strValue));
@@ -235,6 +235,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private List<Attribute> extractLocalizedAttributes(String namespace, String name, String value) {
     List<Attribute> attributes = Lists.newArrayList();
+    if (Strings.isNullOrEmpty(value)) return attributes;
+
     String[] strValues = value.split("\\|");
     Pattern pattern = Pattern.compile("^\\(([a-z]{2})\\) (.+)");
     for (String strValue : strValues) {
@@ -305,7 +307,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
           i++;
         }
       }
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       // ignore
       log.warn("Error while parsing variable categories: {}", colName, e);
     }
