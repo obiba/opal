@@ -12,11 +12,6 @@ package org.obiba.opal.spi.r;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.IOUtils;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REngineException;
-import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,58 +25,48 @@ public abstract class AbstractROperation implements ROperation {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractROperation.class);
 
-  private static int DEFAULT_BUFFER_SIZE = 81920;
-
-  RConnection connection;
+  RServerConnection connection;
 
   private List<String> repositories = Lists.newArrayList("https://cloud.r-project.org", "https://cran.obiba.org");
-
-  /**
-   * Check if connection is still operational.
-   *
-   * @return
-   */
-  protected boolean isConnected() {
-    return connection.isConnected();
-  }
 
   /**
    * Assign a string value to a symbol in R.
    *
    * @param sym symbol
-   * @param ct content
-   * @see RConnection#assign(String, String)
+   * @param ct  content
    */
   protected void assign(String sym, String ct) {
     try {
       connection.assign(sym, ct);
-    } catch(RserveException e) {
+    } catch (RServerException e) {
       log.warn("Failed assigning '{}' with: {}", sym, ct, e);
       throw new RRuntimeException(e);
     }
   }
 
+  /*
   protected void assign(String sym, byte[] ct, boolean serialized) {
     try {
       connection.assign(sym, ct);
       if (serialized) assign(sym, eval(String.format("unserialize(%s)", sym), false));
-    } catch (REngineException e) {
+    } catch (RServerException e) {
       log.warn("Failed assigning '{}' with: byte[{}]", sym, ct == null ? 0 : ct.length, e);
       throw new RRuntimeException(e);
     }
   }
+  */
 
   /**
-   * Assign a REXP object to a symbol in R.
+   * Assign raw data to a symbol in R.
    *
    * @param sym
    * @param ct
    */
-  protected void assign(String sym, REXP ct) {
+  protected void assign(String sym, byte[] ct) {
     try {
       connection.assign(sym, ct);
-    } catch(RserveException e) {
-      log.warn("Failed assigning '{}' with REXP", sym, e);
+    } catch (RServerException e) {
+      log.warn("Failed assigning '{}' with raw data", sym, e);
       throw new RRuntimeException(e);
     }
   }
@@ -92,8 +77,8 @@ public abstract class AbstractROperation implements ROperation {
    * @param script
    * @return result serialized
    */
-  protected REXP eval(String script) {
-    return eval(script, true);
+  protected void eval(String script) {
+    eval(script, true);
   }
 
   /**
@@ -103,34 +88,27 @@ public abstract class AbstractROperation implements ROperation {
    * @param serialize
    * @return
    */
-  protected REXP eval(String script, boolean serialize) {
-    if(script == null) throw new IllegalArgumentException("R script cannot be null");
+  protected RServerResult eval(String script, boolean serialize) {
+    if (script == null) throw new IllegalArgumentException("R script cannot be null");
 
-    REXP evaled;
     try {
       log.debug("evaluating: {}", script);
       String cmd = script;
-      if(serialize) {
+      if (serialize) {
         cmd = "serialize({" + script + "}, NULL)";
       }
-      evaled = connection.eval("try(" + cmd + ")");
-    } catch(RserveException e) {
+      return connection.eval("try(" + cmd + ")");
+    } catch (RServerException e) {
       log.warn("Failed evaluating: {}", script, e);
       throw new RRuntimeException(e);
     }
-    if(evaled.inherits("try-error")) {
-      // Deal with an error
-      throw new REvaluationRuntimeException("Error while evaluating '" + script + "'", evaled);
-    }
-
-    return evaled;
   }
 
   /**
    * Write a file on the R server from a local file.
    *
    * @param fileName R server file name
-   * @param in local file
+   * @param in       local file
    */
   protected void writeFile(String fileName, File in) {
     try {
@@ -145,23 +123,17 @@ public abstract class AbstractROperation implements ROperation {
    * Write a file on the R server from a input stream.
    *
    * @param fileName R server file name
-   * @param in local stream
+   * @param in       local stream
    */
   protected void writeFile(String fileName, InputStream in) {
-    try (OutputStream out = new BufferedOutputStream(connection.createFile(fileName));) {
-      IOUtils.copy(in, out);
-      in.close();
-    } catch (IOException e) {
-      log.warn("Failed creating file '{}'", fileName, e);
-      throw new RRuntimeException(e);
-    }
+    connection.writeFile(fileName, in);
   }
 
   /**
    * Read a file on the R server into a local file.
    *
    * @param fileName R server file name
-   * @param out local file
+   * @param out      local file
    */
   protected void readFile(String fileName, File out) {
     try {
@@ -177,16 +149,10 @@ public abstract class AbstractROperation implements ROperation {
    * Read a file on the R server into a output stream.
    *
    * @param fileName R server file name
-   * @param out local stream
+   * @param out      local stream
    */
   protected void readFile(String fileName, OutputStream out) {
-    try (InputStream in = new BufferedInputStream(connection.openFile(fileName), DEFAULT_BUFFER_SIZE)) {
-      IOUtils.copy(in, out);
-      out.close();
-    } catch( IOException e){
-      log.warn("Failed reading file '{}'", fileName, e);
-      throw new RRuntimeException(e);
-    }
+    connection.readFile(fileName, out);
   }
 
   /**
@@ -195,9 +161,9 @@ public abstract class AbstractROperation implements ROperation {
    * @param packageName
    * @return
    */
-  protected REXP loadPackage(String packageName) {
+  protected void loadPackage(String packageName) {
     String cmd = String.format("library('%s')", packageName);
-    return eval(cmd, false);
+    eval(cmd, false);
   }
 
   /**
@@ -206,11 +172,11 @@ public abstract class AbstractROperation implements ROperation {
    * @param packageName
    * @return
    */
-  protected REXP ensurePackage(String packageName) {
+  protected void ensurePackage(String packageName) {
     String repos = Joiner.on("','").join(getRepositories());
     String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('%s'), dependencies=TRUE) }",
         packageName, packageName, repos);
-    return eval(cmd, false);
+    eval(cmd, false);
   }
 
   /**
@@ -218,14 +184,14 @@ public abstract class AbstractROperation implements ROperation {
    *
    * @param user
    * @param packageName
-   * @param reference if null, master is used
+   * @param reference   if null, master is used
    * @return
    */
-  protected REXP ensureGitHubPackage(String user, String packageName, String reference) {
-    ensurePackage("devtools");
-    String cmd = String.format("if (!require(%s)) { devtools::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE) }",
+  protected void ensureGitHubPackage(String user, String packageName, String reference) {
+    ensurePackage("remotes");
+    String cmd = String.format("if (!require(%s)) { remotes::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE) }",
         packageName, user, packageName, Strings.isNullOrEmpty(reference) ? "master" : reference);
-    return eval(cmd, false);
+    eval(cmd, false);
   }
 
   /**
@@ -233,7 +199,7 @@ public abstract class AbstractROperation implements ROperation {
    *
    * @return
    */
-  protected RConnection getConnection() {
+  protected RServerConnection getConnection() {
     return connection;
   }
 
@@ -241,8 +207,8 @@ public abstract class AbstractROperation implements ROperation {
    * Set the R connection to make it available for operations.
    */
   @Override
-  public void doWithConnection(RConnection connection) {
-    if(connection == null) throw new IllegalArgumentException("R connection cannot be null");
+  public void doWithConnection(RServerConnection connection) {
+    if (connection == null) throw new IllegalArgumentException("R connection cannot be null");
     this.connection = connection;
     doWithConnection();
   }
@@ -253,21 +219,11 @@ public abstract class AbstractROperation implements ROperation {
   protected abstract void doWithConnection();
 
   /**
-   * Set the CRAN repositories for installing packages.
-   *
-   * @param repositories
-   */
-  protected void setRepositories(List<String> repositories) {
-    if (repositories != null && !repositories.isEmpty())
-      this.repositories = repositories;
-  }
-
-  /**
    * Get the CRAN repositories for installing packages.
    *
    * @return
    */
-  protected List<String> getRepositories() {
+  private List<String> getRepositories() {
     return repositories;
   }
 }

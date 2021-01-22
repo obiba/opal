@@ -13,7 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
-import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.REvaluationRuntimeException;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.web.model.OpalR;
@@ -31,7 +31,7 @@ public class Dtos {
 
   private Dtos() {}
 
-  public static OpalR.RSessionDto asDto(OpalRSession rSession) {
+  public static OpalR.RSessionDto asDto(RServerSession rSession) {
     UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class)
         .path(OpalRSessionParentResource.class, "getOpalRSessionResource");
     return OpalR.RSessionDto.newBuilder().setId(rSession.getId()) //

@@ -10,24 +10,20 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
-import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
-import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.ResourceAssignROperation;
-import org.obiba.opal.spi.resource.Resource;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.List;
 
 /**
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
@@ -37,7 +33,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   private String name;
 
-  private OpalRSession rSession;
+  private RServerSession rSession;
 
   @NotNull
   protected IdentifiersTableService identifiersTableService;
@@ -54,11 +50,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public void setOpalRSession(OpalRSession rSession) {
+  public void setRServerSession(RServerSession rSession) {
     this.rSession = rSession;
   }
 
-  protected OpalRSession getRSession() {
+  protected RServerSession getRSession() {
     return rSession;
   }
 

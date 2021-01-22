@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -7,8 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.spi.r;
+package org.obiba.opal.r.rserve;
 
+import com.google.common.collect.Lists;
+import org.obiba.opal.spi.r.RMatrix;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
@@ -16,10 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.List;
 
-public class RStringMatrix implements RMatrix<String> {
+class RserveStringMatrix implements RMatrix<String> {
 
-  private static final Logger log = LoggerFactory.getLogger(RStringMatrix.class);
+  private static final Logger log = LoggerFactory.getLogger(RserveStringMatrix.class);
 
   private String[] rowNames = new String[]{};
 
@@ -27,7 +30,7 @@ public class RStringMatrix implements RMatrix<String> {
 
   private String[] values = new String[]{};
 
-  public RStringMatrix(REXP matrix) throws REXPMismatchException {
+  public RserveStringMatrix(REXP matrix) {
     if (matrix != null) {
       REXP dims = matrix.getAttribute("dimnames");
       if (dims != null) {
@@ -44,33 +47,8 @@ public class RStringMatrix implements RMatrix<String> {
   }
 
   @Override
-  public int getColumnCount() {
-    return columnNames.length;
-  }
-
-  @Override
   public String[] getColumnNames() {
     return columnNames;
-  }
-
-  @Override
-  public String getColumnName(int idx) {
-    return columnNames[idx];
-  }
-
-  @Override
-  public int getColumnIndex(String name) {
-    for(int i = 0; i < columnNames.length; i++) {
-      if(columnNames[i].equals(name)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public int getRowCount() {
-    return rowNames.length;
   }
 
   @Override
@@ -79,28 +57,25 @@ public class RStringMatrix implements RMatrix<String> {
   }
 
   @Override
-  public String getRowName(int idx) {
-    return rowNames[idx];
+  public List<String[]> iterateRows() {
+    return Lists.newArrayList(RowsIterator::new);
   }
 
   @Override
-  public int getRowIndex(String name) {
-    for(int i = 0; i < rowNames.length; i++) {
-      if(rowNames[i].equals(name)) {
-        return i;
-      }
-    }
-    return -1;
+  public List<String[]> iterateColumns() {
+    return Lists.newArrayList(ColumnsIterator::new);
   }
 
-  @Override
-  public Iterable<String[]> iterateRows() {
-    return RowsIterator::new;
+  //
+  // Private methods and classes
+  //
+
+  private int getColumnCount() {
+    return columnNames.length;
   }
 
-  @Override
-  public Iterable<String[]> iterateColumns() {
-    return ColumnsIterator::new;
+  private int getRowCount() {
+    return rowNames.length;
   }
 
   private class RowsIterator implements Iterator<String[]> {
@@ -115,7 +90,7 @@ public class RStringMatrix implements RMatrix<String> {
     @Override
     public String[] next() {
       String[] row = new String[getColumnCount()];
-      for(int i = 0; i < getColumnCount(); i++) {
+      for (int i = 0; i < getColumnCount(); i++) {
         row[i] = values[current + i * getRowCount()];
       }
       current++;
@@ -140,7 +115,7 @@ public class RStringMatrix implements RMatrix<String> {
     @Override
     public String[] next() {
       String[] col = new String[getRowCount()];
-      for(int i = 0; i < getRowCount(); i++) {
+      for (int i = 0; i < getRowCount(); i++) {
         col[i] = values[current * getColumnCount() + i];
       }
       current++;

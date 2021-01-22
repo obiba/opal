@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import org.rosuda.REngine.Rserve.RConnection;
-
 /**
  * Once a R connection is setup by a {@link ROperationTemplate}, this class handles the real things to be done on it.
  */
@@ -21,6 +19,6 @@ public interface ROperation {
    *
    * @param connection
    */
-  void doWithConnection(RConnection connection);
+  void doWithConnection(RServerConnection connection);
 
 }

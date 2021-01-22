@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPRaw;
-
 /**
  * A {@link ROperation} that has a result.
  */
@@ -19,10 +16,6 @@ public interface ROperationWithResult extends ROperation {
 
   boolean hasResult();
 
-  REXP getResult();
-
-  boolean hasRawResult();
-
-  REXPRaw getRawResult();
+  RServerResult getResult();
 
 }

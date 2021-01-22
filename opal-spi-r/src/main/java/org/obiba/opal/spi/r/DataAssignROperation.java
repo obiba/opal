@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import org.rosuda.REngine.REXPRaw;
-
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -30,9 +27,9 @@ public class DataAssignROperation extends AbstractROperation {
 
   @Override
   public void doWithConnection() {
-    if(symbol == null) return;
+    if (symbol == null) return;
     // write the byte array and unserialize it
-    assign(symbol, new REXPRaw(content));
+    assign(symbol, content);
     eval(String.format("is.null(base::assign('%s', value=unserialize(%s)))", symbol, symbol), false);
   }
 

@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.r;
 
-import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 
 import javax.ws.rs.*;
@@ -21,13 +21,14 @@ import java.util.List;
 
 public interface RSessionResource {
 
-  void setOpalRSession(OpalRSession rSession);
+  void setRServerSession(RServerSession rSession);
 
   @GET
   OpalR.RSessionDto getRSession();
 
   /**
    * Destroy the R session and optionally save the associated workspace.
+   *
    * @param saveId
    * @return
    */
@@ -68,7 +69,7 @@ public interface RSessionResource {
   @Path("/command/{rid}/result")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
-      @QueryParam("wait") @DefaultValue("false") boolean wait);
+                             @QueryParam("wait") @DefaultValue("false") boolean wait);
 
   @POST
   @Path("/workspaces")

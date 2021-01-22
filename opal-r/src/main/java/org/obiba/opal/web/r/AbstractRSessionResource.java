@@ -18,8 +18,8 @@ import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.web.model.OpalR;
@@ -56,10 +56,10 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
-  private OpalRSession rSession;
+  private RServerSession rSession;
 
   @Override
-  public void setOpalRSession(OpalRSession rSession) {
+  public void setRServerSession(RServerSession rSession) {
     if (rSession.getExecutionContext().equals("DataSHIELD") && !getExecutionContext().equals(rSession.getExecutionContext()))
       throw new BadRequestException(String.format("Not a valid execution context '%s', expecting '%s'", rSession.getExecutionContext(), getExecutionContext()));
     this.rSession = rSession;
@@ -175,8 +175,8 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     Response resp = Response.noContent().build();
     if (rCommand.hasResult()) {
       ROperationWithResult rop = rCommand.asROperationWithResult();
-      if (rop.hasRawResult()) {
-        resp = Response.ok().entity(rop.getRawResult().asBytes()).build();
+      if (rop.hasResult() && rop.getResult().isRaw()) {
+        resp = Response.ok().entity(rop.getResult().asBytes()).build();
       }
     }
     if (remove) getOpalRSession().removeRCommand(rCommand.getId());
@@ -206,14 +206,14 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     OpalRSymbolResource resource = applicationContext
         .getBean("opalRSymbolResource", OpalRSymbolResource.class);
     resource.setName(name);
-    resource.setOpalRSession(rSession);
+    resource.setRServerSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
     resource.setResourceReferenceService(resourceReferenceService);
     return resource;
   }
 
-  protected OpalRSession getOpalRSession() {
+  protected RServerSession getOpalRSession() {
     return rSession;
   }
 

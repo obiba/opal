@@ -11,8 +11,8 @@ package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -60,7 +60,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   @Override
   public Response newRSession(UriInfo info, String restore) {
-    OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    RServerSession rSession = opalRSessionManager.newSubjectRSession();
     onNewRSession(rSession);
     if (!Strings.isNullOrEmpty(restore)) {
       opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
@@ -70,7 +70,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
         .build();
   }
 
-  protected void onNewRSession(OpalRSession rSession) {
+  protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(R_CONTEXT);
   }
 

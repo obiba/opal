@@ -11,7 +11,6 @@ package org.obiba.opal.spi.r;
 
 import com.google.common.collect.Sets;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
-import org.rosuda.REngine.REXPMismatchException;
 
 import java.io.File;
 import java.util.Set;
@@ -48,7 +47,7 @@ public class FolderReadROperation extends AbstractROperation {
         if (!dirNames.contains(fileName))
           readFile(fileName, new File(destination, fileName));
       }
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       throw new MagmaRRuntimeException("Unable to retrieve content of the R folde: " + folderName, e);
     }
   }

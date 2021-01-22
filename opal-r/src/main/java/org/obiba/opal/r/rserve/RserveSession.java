@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -7,56 +7,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r.service;
+package org.obiba.opal.r.rserve;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.service.AbstractRServerSession;
+import org.obiba.opal.r.service.NoSuchRSessionException;
 import org.obiba.opal.spi.r.*;
 import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Reference to a R session.
+ * Reference to a Rserve session.
  */
-public class OpalRSession implements RASyncOperationTemplate {
+class RserveSession extends AbstractRServerSession {
 
-  private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
-
-  private static final String DEFAULT_CONTEXT = "default";
+  private static final Logger log = LoggerFactory.getLogger(RserveSession.class);
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
-  private final String id;
-
   private final Lock lock = new ReentrantLock();
 
-  private final RConnection rConnection;
-
-  private final String user;
-
-  private final Date created;
-
-  private Date timestamp;
+  private final RserveConnection rConnection;
 
   private String originalWorkDir;
 
   private String originalTempDir;
-
-  private boolean busy = false;
-
-  private String executionContext = DEFAULT_CONTEXT;
 
   /**
    * R commands to be processed.
@@ -66,7 +57,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   /**
    * All R commands.
    */
-  private final List<RCommand> rCommandList = Collections.synchronizedList(new LinkedList<RCommand>());
+  private final List<RCommand> rCommandList = Collections.synchronizedList(new LinkedList<>());
 
   private RCommandsConsumer rCommandsConsumer;
 
@@ -82,14 +73,10 @@ public class OpalRSession implements RASyncOperationTemplate {
    *
    * @param connection
    */
-  OpalRSession(RConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
+  RserveSession(RserveConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
+    super(UUID.randomUUID().toString(), user);
     this.rConnection = connection;
     this.transactionalThreadFactory = transactionalThreadFactory;
-    id = UUID.randomUUID().toString();
-    this.user = user;
-    created = new Date();
-    timestamp = created;
-
     try {
       originalWorkDir = getRWorkDir();
       originalTempDir = updateRTempDir();
@@ -99,68 +86,35 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   /**
-   * Get the unique identifier of the R session.
-   *
-   * @return
-   */
-  public String getId() {
-    return id;
-  }
-
-  public void touch() {
-    timestamp = new Date();
-  }
-
-  public String getUser() {
-    return user;
-  }
-
-  public Date getCreated() {
-    return created;
-  }
-
-  public Date getTimestamp() {
-    return timestamp;
-  }
-
-  public boolean isBusy() {
-    return busy;
-  }
-
-  public void setExecutionContext(String executionContext) {
-    this.executionContext = executionContext;
-  }
-
-  public String getExecutionContext() {
-    return Strings.isNullOrEmpty(executionContext) ? DEFAULT_CONTEXT : executionContext;
-  }
-
-  /**
-   * Check if the R session is not busy and has expired.
-   *
-   * @param timeout in minutes
-   * @return
-   */
-  public boolean hasExpired(long timeout) {
-    Date now = new Date();
-    return !busy && now.getTime() - timestamp.getTime() > timeout * 60 * 1000;
-  }
-
-  /**
    * Get the {@link File} directory specific to this user's R session. Create it if it does not exist.
    *
-   * @param sessionId
+   * @param saveId
    * @return
    */
-  public File getWorkspace(String sessionId) {
-    File ws = new File(getWorkspaces(), getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
+  @Override
+  public File getWorkspace(String saveId) {
+    File ws = new File(getWorkspaces(), getUser() + File.separatorChar + (Strings.isNullOrEmpty(saveId) ? getId() : saveId));
     if (!ws.exists()) ws.mkdirs();
     return ws;
   }
 
   @Override
+  public void saveRSessionFiles(String saveId) {
+    // save the files (if any)
+    String rscript = "list.files(path = '.', recursive = TRUE)";
+    RScriptROperation rop = new RScriptROperation(rscript, false);
+    execute(rop);
+    if (!rop.hasResult()) return;
+    String[] files = rop.getResult().asStrings();
+    Lists.newArrayList(files).forEach(file -> {
+      FileReadROperation readop = new FileReadROperation(file, new File(getWorkspace(saveId), file));
+      execute(readop);
+    });
+  }
+
+  @Override
   public String toString() {
-    return id;
+    return getId();
   }
 
   //
@@ -174,12 +128,12 @@ public class OpalRSession implements RASyncOperationTemplate {
   @Override
   public synchronized void execute(ROperation rop) {
     lock.lock();
-    busy = true;
+    setBusy(true);
     touch();
     try {
       rop.doWithConnection(rConnection);
     } finally {
-      busy = false;
+      setBusy(false);
       touch();
       lock.unlock();
     }
@@ -189,7 +143,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   public synchronized String executeAsync(ROperation rop) {
     touch();
     ensureRCommandsConsumer();
-    String rCommandId = id + "-" + commandId++;
+    String rCommandId = getId() + "-" + commandId++;
     RCommand cmd = new RCommand(rCommandId, rop);
     rCommandList.add(cmd);
     rCommandQueue.offer(cmd);
@@ -205,8 +159,8 @@ public class OpalRSession implements RASyncOperationTemplate {
   @Override
   public boolean hasRCommand(String cmdId) {
     touch();
-    for(RCommand rCommand : rCommandList) {
-      if(rCommand.getId().equals(cmdId)) return true;
+    for (RCommand rCommand : rCommandList) {
+      if (rCommand.getId().equals(cmdId)) return true;
     }
     return false;
   }
@@ -214,8 +168,8 @@ public class OpalRSession implements RASyncOperationTemplate {
   @Override
   public RCommand getRCommand(String cmdId) {
     touch();
-    for(RCommand rCommand : rCommandList) {
-      if(rCommand.getId().equals(cmdId)) return rCommand;
+    for (RCommand rCommand : rCommandList) {
+      if (rCommand.getId().equals(cmdId)) return rCommand;
     }
     throw new NoSuchRCommandException(cmdId);
   }
@@ -224,7 +178,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   public RCommand removeRCommand(String cmdId) {
     touch();
     RCommand rCommand = getRCommand(cmdId);
-    synchronized(rCommand) {
+    synchronized (rCommand) {
       rCommand.notifyAll();
     }
     rCommandList.remove(rCommand);
@@ -234,26 +188,27 @@ public class OpalRSession implements RASyncOperationTemplate {
   /**
    * Close the R session.
    */
+  @Override
   public void close() {
-    if(isClosed()) return;
+    if (isClosed()) return;
 
     try {
       cleanRWorkDir();
       cleanRTempDir();
-    } catch(Exception e) {
+    } catch (Exception e) {
       // ignore
     }
 
     try {
-      rConnection.close();
-    } catch(Exception e) {
+      close(rConnection);
+    } catch (Exception e) {
       // ignore
     }
 
-    if(consumer == null) return;
+    if (consumer == null) return;
     try {
       consumer.interrupt();
-    } catch(Exception e) {
+    } catch (Exception e) {
       // ignore
     } finally {
       consumer = null;
@@ -262,6 +217,7 @@ public class OpalRSession implements RASyncOperationTemplate {
     }
   }
 
+  @Override
   public boolean isClosed() {
     return !rConnection.isConnected();
   }
@@ -270,11 +226,10 @@ public class OpalRSession implements RASyncOperationTemplate {
   // private methods
   //
 
-
   private String getRWorkDir() throws REXPMismatchException {
     RScriptROperation rop = new RScriptROperation("base::getwd()", false);
     execute(rop);
-    return rop.getResult().asString();
+    return rop.getResult().asStrings()[0];
   }
 
   private void cleanRWorkDir() {
@@ -292,7 +247,7 @@ public class OpalRSession implements RASyncOperationTemplate {
     execute(rop);
     rop = new RScriptROperation("base::tempdir()", false);
     execute(rop);
-    return rop.getResult().asString();
+    return rop.getResult().asStrings()[0];
   }
 
   private void cleanRTempDir() {
@@ -302,35 +257,26 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   /**
-   * Get the workspaces directory for the current execution context.
-   *
-   * @return
-   */
-  private File getWorkspaces() {
-    return new File(String.format(String.format(OpalRSessionManager.WORKSPACES_FORMAT, getExecutionContext())));
-  }
-
-  /**
    * Detach the R connection and updates the R session.
    *
    * @param connection
    */
-  private void close(RConnection connection) {
-    if(!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().toLowerCase().equals("ok")) {
-      throw new RRuntimeException("Unexpected R server error: " + connection.getLastError());
+  private void close(RserveConnection connection) {
+    if (!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().equalsIgnoreCase("ok")) {
+      log.warn("Unexpected R server error: " + connection.getLastError());
     }
     try {
-      connection.close();
-    } catch(Exception e) {
-      log.warn("Error while detaching R session.", e);
+      rConnection.close();
+    } catch (Exception e) {
+      log.warn("Error while closing R connection.", e);
     }
   }
 
   private void ensureRCommandsConsumer() {
-    if(rCommandsConsumer == null) {
+    if (rCommandsConsumer == null) {
       rCommandsConsumer = new RCommandsConsumer();
       startRCommandsConsumer();
-    } else if(consumer == null || !consumer.isAlive()) {
+    } else if (consumer == null || !consumer.isAlive()) {
       startRCommandsConsumer();
     }
   }
@@ -350,12 +296,12 @@ public class OpalRSession implements RASyncOperationTemplate {
       log.debug("Starting R operations consumer");
       try {
         //noinspection InfiniteLoopStatement
-        while(true) {
+        while (true) {
           consume(rCommandQueue.take());
         }
-      } catch(InterruptedException ignored) {
+      } catch (InterruptedException ignored) {
         log.debug("Stopping R operations consumer");
-      } catch(Exception e) {
+      } catch (Exception e) {
         log.error("Error in R command consumer", e);
       }
     }
@@ -365,11 +311,11 @@ public class OpalRSession implements RASyncOperationTemplate {
         rCommand.inProgress();
         execute(rCommand.getROperation());
         rCommand.completed();
-      } catch(Exception e) {
+      } catch (Exception e) {
         log.error("Error when consuming R command: {}", e.getMessage(), e);
         rCommand.failed(e.getMessage());
       }
-      synchronized(rCommand) {
+      synchronized (rCommand) {
         rCommand.notifyAll();
       }
     }

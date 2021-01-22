@@ -15,7 +15,7 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
-import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
@@ -33,12 +33,12 @@ public class ProjectResourceReferenceResource {
 
   private final ResourceReferenceService resourceReferenceService;
 
-  private final OpalRService opalRService;
+  private final RServerService rServerService;
 
   @Autowired
-  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, OpalRService opalRService) {
+  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, RServerService rServerService) {
     this.resourceReferenceService = resourceReferenceService;
-    this.opalRService = opalRService;
+    this.rServerService = rServerService;
   }
 
   @GET
@@ -69,7 +69,7 @@ public class ProjectResourceReferenceResource {
   @Path("_test")
   public Response test(@PathParam("project") String project, @PathParam("name") String name) {
     ROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
-    opalRService.execute(rop);
+    rServerService.execute(rop);
     return Response.ok().build();
   }
 

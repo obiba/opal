@@ -15,10 +15,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
+import org.obiba.opal.spi.r.RNamedList;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.spi.r.RUtils;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
 class RVariableValueSource extends AbstractVariableValueSource implements VariableValueSource, VectorSource {
 
   private static final Logger log = LoggerFactory.getLogger(RVariableValueSource.class);
-  
+
   private RValueTable valueTable;
 
   private final String colName;
@@ -48,12 +47,13 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private Variable variable;
 
-  RVariableValueSource(RValueTable valueTable, RList column, int position) throws REXPMismatchException {
+  RVariableValueSource(RValueTable valueTable, RServerResult columnDesc, int position) {
+    RNamedList<RServerResult> column = columnDesc.asNamedList();
     this.valueTable = valueTable;
-    this.colName = column.at("name").asString();
-    this.colClasses = Lists.newArrayList(column.at("class").asStrings());
-    this.colTypes = Lists.newArrayList(column.at("type").asString().split("\\+"));
-    REXP colAttr = column.at("attributes");
+    this.colName = column.get("name").asStrings()[0];
+    this.colClasses = Lists.newArrayList(column.get("class").asStrings());
+    this.colTypes = Lists.newArrayList(column.get("type").asStrings()[0].split("\\+"));
+    RServerResult colAttr = column.get("attributes");
     this.position = position;
     initialiseVariable(colAttr);
   }
@@ -95,7 +95,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   // Private methods
   //
 
-  private void initialiseVariable(REXP attr) {
+  private void initialiseVariable(RServerResult attr) {
     String repeatableProp = extractProperty(attr, "opal.repeatable");
     boolean repeatable = Strings.isNullOrEmpty(repeatableProp) ?
         valueTable.isMultilines() : ("1.0".equals(repeatableProp) || "1".equals(repeatableProp));
@@ -122,7 +122,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         .build();
   }
 
-  private ValueType extractValueType(REXP attr) {
+  private ValueType extractValueType(RServerResult attr) {
     ValueType type = null;
     String typePropertyStr = extractProperty(attr, "opal.value_type");
     if (!Strings.isNullOrEmpty(typePropertyStr)) {
@@ -176,18 +176,18 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     return colClasses.contains("POSIXct") || colClasses.contains("POSIXt");
   }
 
-  private String extractProperty(REXP attr, String property) {
-    if (attr == null || !attr.isList()) return null;
+  private String extractProperty(RServerResult attr, String property) {
+    if (attr == null) return null;
     try {
-      RList rList = attr.asList();
-      if (!rList.isNamed()) return null;
-      for (String key : rList.keys()) {
+      RNamedList<RServerResult> rList = attr.asNamedList();
+      if (rList.isEmpty()) return null;
+      for (String key : rList.keySet()) {
         if (property.equals(key)) {
-          REXP value = rList.at(key);
-          return value.asString();
+          RServerResult value = rList.get(key);
+          return value.asStrings()[0];
         }
       }
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       // ignore
     }
     return null;
@@ -199,15 +199,15 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         || colClasses.contains("factor");
   }
 
-  private List<Attribute> extractAttributes(REXP attr) {
+  private List<Attribute> extractAttributes(RServerResult attr) {
     List<Attribute> attributes = Lists.newArrayList();
-    if (attr == null || !attr.isList()) return attributes;
+    if (attr == null) return attributes;
     try {
-      RList rList = attr.asList();
-      if (!rList.isNamed()) return attributes;
-      for (String key : rList.keys()) {
+      RNamedList<RServerResult> rList = attr.asNamedList();
+      if (rList.isEmpty()) return attributes;
+      for (String key : rList.keySet()) {
         if (key.equals("labels")) continue;
-        REXP value = rList.at(key);
+        RServerResult value = rList.get(key);
         String name = key;
         String namespace = null;
         if (key.contains("::")) {
@@ -226,7 +226,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         }
       }
 
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       // ignore
       log.warn("Error while parsing variable attributes: {}", colName, e);
     }
@@ -255,11 +255,11 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     return attributes;
   }
 
-  private List<Category> extractCategories(REXP attr) {
+  private List<Category> extractCategories(RServerResult attr) {
     if (colClasses.contains("labelled") || colClasses.contains("haven_labelled")
         || colClasses.contains("labelled_spss") || colClasses.contains("haven_labelled_spss")) {
-      REXP naValues = extractAttribute(attr, "na_values");
-      REXP naRange = extractAttribute(attr, "na_range");
+      RServerResult naValues = extractAttribute(attr, "na_values");
+      RServerResult naRange = extractAttribute(attr, "na_range");
       return extractCategoriesFromLabels(extractAttribute(attr, "labels"), naValues, naRange);
     } else if (colClasses.contains("factor"))
       return extractCategoriesFromLevels(extractAttribute(attr, "levels"));
@@ -274,13 +274,13 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
    * @param missingsRange Range of missings
    * @return
    */
-  private List<Category> extractCategoriesFromLabels(REXP labels, REXP missings, REXP missingsRange) {
+  private List<Category> extractCategoriesFromLabels(RServerResult labels, RServerResult missings, RServerResult missingsRange) {
     List<Category> categories = Lists.newArrayList();
     if (labels == null) return categories;
     try {
       String[] catLabels = null;
-      if (labels.hasAttribute("names")) {
-        catLabels = labels.getAttribute("names").asStrings();
+      if (labels.hasNames()) {
+        catLabels = labels.getNames();
       }
       List<String> missingNames = Lists.newArrayList();
       if (missings != null) {
@@ -314,14 +314,14 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     return categories;
   }
 
-  private boolean integerRangeContains(REXP range, int value) throws REXPMismatchException {
+  private boolean integerRangeContains(RServerResult range, int value) {
     if (range == null) return false;
     int min = range.asIntegers()[0];
     int max = range.asIntegers()[1];
     return value >= min && value <= max;
   }
 
-  private boolean doubleRangeContains(REXP range, double value) throws REXPMismatchException {
+  private boolean doubleRangeContains(RServerResult range, double value) {
     if (range == null) return false;
     double min = range.asDoubles()[0];
     double max = range.asDoubles()[1];
@@ -332,18 +332,18 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     return (isNumeric() || isInteger() || isDecimal()) && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
   }
 
-  private List<Category> extractCategoriesFromLevels(REXP levels) {
+  private List<Category> extractCategoriesFromLevels(RServerResult levels) {
     log.warn("Extracting '{}' categories factor levels not implemented yet", colName);
     return Lists.newArrayList();
   }
 
-  private REXP extractAttribute(REXP attr, String attrName) {
-    if (attr == null || !attr.isList()) return null;
+  private RServerResult extractAttribute(RServerResult attr, String attrName) {
+    if (attr == null) return null;
     try {
-      RList rList = attr.asList();
-      if (!rList.isNamed() || !rList.containsKey(attrName)) return null;
-      return rList.at(attrName);
-    } catch (REXPMismatchException e) {
+      RNamedList<RServerResult> rList = attr.asNamedList();
+      if (!rList.containsKey(attrName)) return null;
+      return rList.get(attrName);
+    } catch (Exception e) {
       return null;
     }
   }

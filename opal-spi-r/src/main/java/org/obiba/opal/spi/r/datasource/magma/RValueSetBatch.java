@@ -13,7 +13,7 @@ package org.obiba.opal.spi.r.datasource.magma;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueSetBatch;
 import org.obiba.magma.VariableEntity;
-import org.rosuda.REngine.REXP;
+import org.obiba.opal.spi.r.RServerResult;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ class RValueSetBatch implements ValueSetBatch {
 
   @Override
   public List<ValueSet> getValueSets() {
-    REXP rexp = fetcher.getREXP(entities);
+    RServerResult rexp = fetcher.getResult(entities);
     return entities.stream().map(e -> {
       RValueSet vs = new RValueSet(table, e);
       vs.parseREXP(rexp);

@@ -43,7 +43,7 @@ public class DataShieldResource {
   public DataShieldSessionResource getSession(@PathParam("id") String id) {
     DataShieldSessionResource resource = applicationContext
         .getBean("dataShieldSessionResource", DataShieldSessionResource.class);
-    resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
+    resource.setRServerSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
 

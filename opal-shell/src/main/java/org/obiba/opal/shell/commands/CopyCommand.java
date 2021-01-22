@@ -43,8 +43,8 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.datasource.RExportDatasource;
 import org.obiba.opal.r.magma.RFileSymbolWriter;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.spi.datasource.DatasourceUsage;
@@ -331,7 +331,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     JSONObject parameters = new JSONObject(options.getOut());
     if (datasourceService instanceof RDatasourceService) {
-      final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+      final RServerSession rSession = opalRSessionManager.newSubjectRSession();
       rSession.setExecutionContext("Export");
       RSessionHandler rSessionHandler = new RSessionHandler() {
         @Override
@@ -725,7 +725,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
       String ext = outputFile.getName().getExtension();
       if ("sav".equals(ext) || "zsav".equals(ext) || "sas7bdat".equals(ext) || "dta".equals(ext) || "xpt".equals(ext)) {
-        final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+        final RServerSession rSession = opalRSessionManager.newSubjectRSession();
         rSession.setExecutionContext("Export");
         RSessionHandler sessionHandler = new RSessionHandler() {
           @Override

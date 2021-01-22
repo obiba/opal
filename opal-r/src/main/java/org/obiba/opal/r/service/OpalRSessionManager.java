@@ -17,13 +17,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +43,7 @@ public class OpalRSessionManager {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  static final String WORKSPACES_FORMAT = System.getenv().get("OPAL_HOME") + File.separatorChar + "data"
+  public static final String WORKSPACES_FORMAT = System.getenv().get("OPAL_HOME") + File.separatorChar + "data"
       + File.separatorChar + "R" + File.separatorChar + "workspaces" + File.separatorChar + "%s";
 
   private static final String R_IMAGE_FILE = ".RData";
@@ -55,9 +52,7 @@ public class OpalRSessionManager {
   private Long rSessionTimeout;
 
   @Autowired
-  private TransactionalThreadFactory transactionalThreadFactory;
-
-  private OpalRService opalRService;
+  private RServerService rServerService;
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
@@ -69,16 +64,11 @@ public class OpalRSessionManager {
     rSessionMap.clear();
   }
 
-  @Autowired
-  public void setOpalRService(OpalRService opalRService) {
-    this.opalRService = opalRService;
-  }
-
   @Subscribe
   public void onRServiceStopped(RServiceStoppedEvent event) {
     try {
       stop();
-    } catch(Exception e) {
+    } catch (Exception e) {
       log.warn("Error while stopping R session manager", e);
     }
   }
@@ -88,8 +78,8 @@ public class OpalRSessionManager {
    *
    * @return
    */
-  public List<OpalRSession> getRSessions() {
-    ImmutableList.Builder<OpalRSession> builder = ImmutableList.builder();
+  public List<RServerSession> getRSessions() {
+    ImmutableList.Builder<RServerSession> builder = ImmutableList.builder();
 
     for (SubjectRSessions rSessions : rSessionMap.values()) {
       builder.addAll(rSessions);
@@ -103,8 +93,8 @@ public class OpalRSessionManager {
    *
    * @return
    */
-  public List<OpalRSession> getSubjectRSessions() {
-    return new ImmutableList.Builder<OpalRSession>().addAll(getRSessions(getSubjectPrincipal())).build();
+  public List<RServerSession> getSubjectRSessions() {
+    return new ImmutableList.Builder<RServerSession>().addAll(getRSessions(getSubjectPrincipal())).build();
   }
 
   /**
@@ -112,7 +102,7 @@ public class OpalRSessionManager {
    *
    * @param rSessionId
    */
-  public OpalRSession getRSession(String rSessionId) {
+  public RServerSession getRSession(String rSessionId) {
     for (SubjectRSessions rSessions : rSessionMap.values()) {
       if (rSessions.hasRSession(rSessionId)) {
         return rSessions.getRSession(rSessionId);
@@ -169,8 +159,8 @@ public class OpalRSessionManager {
    *
    * @return R session
    */
-  public OpalRSession newSubjectRSession() {
-    return addRSession(getSubjectPrincipal(), opalRService.newConnection());
+  public RServerSession newSubjectRSession() {
+    return addRSession(getSubjectPrincipal());
   }
 
   /**
@@ -179,7 +169,7 @@ public class OpalRSessionManager {
    * @param rSessionId
    * @return
    */
-  public OpalRSession getSubjectRSession(String rSessionId) {
+  public RServerSession getSubjectRSession(String rSessionId) {
     return getRSession(getSubjectPrincipal(), rSessionId);
   }
 
@@ -188,8 +178,8 @@ public class OpalRSessionManager {
   }
 
   /**
-   * Check for expired {@link org.obiba.opal.r.service.OpalRSession}s, close them if any and clean subject
-   * {@link org.obiba.opal.r.service.OpalRSession} pool.
+   * Check for expired {@link RServerSession}s, close them if any and clean subject
+   * {@link RServerSession} pool.
    */
   @Scheduled(fixedDelay = 60 * 1000)
   public void checkRSessions() {
@@ -227,7 +217,7 @@ public class OpalRSessionManager {
     if (!rSessionMap.containsKey(principal)) return;
     log.debug("clearRSessions({})", principal);
     SubjectRSessions subjectRSessions = rSessionMap.get(principal);
-    for (OpalRSession rSession : subjectRSessions) {
+    for (RServerSession rSession : subjectRSessions) {
       if (rSession.hasExpired(rSessionTimeout)) {
         try {
           rSession.close();
@@ -240,7 +230,7 @@ public class OpalRSessionManager {
   }
 
   private void doClearRSessions(String principal) {
-    for (OpalRSession rSession : rSessionMap.get(principal)) {
+    for (RServerSession rSession : rSessionMap.get(principal)) {
       try {
         rSession.close();
       } catch (Exception e) {
@@ -249,14 +239,14 @@ public class OpalRSessionManager {
     }
   }
 
-  private OpalRSession addRSession(String principal, RConnection connection) {
+  private RServerSession addRSession(String principal) {
     SubjectRSessions rSessions = getRSessions(principal);
-    OpalRSession rSession = new OpalRSession(connection, transactionalThreadFactory, principal);
+    RServerSession rSession = rServerService.newRServerSession(principal);
     rSessions.addRSession(rSession);
     return rSession;
   }
 
-  private OpalRSession getRSession(String principal, String rSessionId) {
+  private RServerSession getRSession(String principal, String rSessionId) {
     return getRSessions(principal).getRSession(rSessionId);
   }
 
@@ -278,12 +268,12 @@ public class OpalRSessionManager {
   // Nested classes
   //
 
-  private static final class SubjectRSessions implements Iterable<OpalRSession> {
+  private static final class SubjectRSessions implements Iterable<RServerSession> {
 
-    private final List<OpalRSession> rSessions = Collections.synchronizedList(new ArrayList<OpalRSession>());
+    private final List<RServerSession> rSessions = Collections.synchronizedList(new ArrayList<RServerSession>());
 
     void saveRSession(String rSessionId, String saveId) {
-      OpalRSession rSession = getRSession(rSessionId);
+      RServerSession rSession = getRSession(rSessionId);
       // make sure the session storage folder is empty
       File store = rSession.getWorkspace(saveId);
       Lists.newArrayList(store.listFiles()).forEach(file -> {
@@ -298,13 +288,13 @@ public class OpalRSessionManager {
     }
 
     void restoreRSession(String rSessionId, String restoreId) {
-      OpalRSession rSession = getRSession(rSessionId);
+      RServerSession rSession = getRSession(rSessionId);
       restoreSessionImage(rSession, restoreId);
       restoreSessionFiles(rSession, restoreId);
     }
 
     void removeRSession(String rSessionId) {
-      OpalRSession rSession = getRSession(rSessionId);
+      RServerSession rSession = getRSession(rSessionId);
       try {
         rSession.close();
         rSessions.remove(rSession);
@@ -314,7 +304,7 @@ public class OpalRSessionManager {
     }
 
     void removeRSessions() {
-      for (OpalRSession rSession : rSessions) {
+      for (RServerSession rSession : rSessions) {
         try {
           rSession.close();
         } catch (Exception e) {
@@ -325,8 +315,8 @@ public class OpalRSessionManager {
     }
 
     void clean() {
-      List<OpalRSession> toRemove = Lists.newArrayList();
-      for (OpalRSession rSession : rSessions) {
+      List<RServerSession> toRemove = Lists.newArrayList();
+      for (RServerSession rSession : rSessions) {
         if (rSession.isClosed()) {
           toRemove.add(rSession);
         }
@@ -334,20 +324,11 @@ public class OpalRSessionManager {
       rSessions.removeAll(toRemove);
     }
 
-    private void saveRSessionFiles(OpalRSession rSession, String saveId) {
-      // save the files (if any)
-      String rscript = "list.files(path = '.', recursive = TRUE)";
-      RScriptROperation rop = new RScriptROperation(rscript, false);
-      rSession.execute(rop);
-      if (!rop.hasResult()) return;
-      REXPString files = (REXPString) rop.getResult();
-      Lists.newArrayList(files.asStrings()).forEach(file -> {
-        FileReadROperation readop = new FileReadROperation(file, new File(rSession.getWorkspace(saveId), file));
-        rSession.execute(readop);
-      });
+    private void saveRSessionFiles(RServerSession rSession, String saveId) {
+      rSession.saveRSessionFiles(saveId);
     }
 
-    private void saveRSessionImage(OpalRSession rSession, String saveId) {
+    private void saveRSessionImage(RServerSession rSession, String saveId) {
       // then save the memory image
       String rscript = "base::save.image()";
       RScriptROperation rop = new RScriptROperation(rscript, false);
@@ -356,7 +337,7 @@ public class OpalRSessionManager {
       rSession.execute(readop);
     }
 
-    private void restoreSessionImage(OpalRSession rSession, String restoreId) {
+    private void restoreSessionImage(RServerSession rSession, String restoreId) {
       File source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE);
       if (!source.exists()) return;
       FileWriteROperation writeop = new FileWriteROperation(R_IMAGE_FILE, source);
@@ -366,7 +347,7 @@ public class OpalRSessionManager {
       rSession.execute(rop);
     }
 
-    private void restoreSessionFiles(OpalRSession rSession, String restoreId) {
+    private void restoreSessionFiles(RServerSession rSession, String restoreId) {
       File source = rSession.getWorkspace(restoreId);
       FileUtils.listFiles(source, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).forEach(file -> {
         String destination = file.getAbsolutePath().replace(source.getAbsolutePath(), "");
@@ -383,7 +364,7 @@ public class OpalRSessionManager {
     }
 
     private boolean hasRSession(String rSessionId) {
-      for (OpalRSession rs : rSessions) {
+      for (RServerSession rs : rSessions) {
         if (rs.getId().equals(rSessionId)) {
           return true;
         }
@@ -391,12 +372,12 @@ public class OpalRSessionManager {
       return false;
     }
 
-    private void addRSession(OpalRSession rSession) {
+    private void addRSession(RServerSession rSession) {
       rSessions.add(rSession);
     }
 
-    private OpalRSession getRSession(String rSessionId) {
-      for (OpalRSession rs : rSessions) {
+    private RServerSession getRSession(String rSessionId) {
+      for (RServerSession rs : rSessions) {
         if (rs.getId().equals(rSessionId)) {
           return rs;
         }
@@ -405,7 +386,7 @@ public class OpalRSessionManager {
     }
 
     @Override
-    public Iterator<OpalRSession> iterator() {
+    public Iterator<RServerSession> iterator() {
       return rSessions.iterator();
     }
 

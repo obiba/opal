@@ -13,7 +13,7 @@ package org.obiba.opal.r.datasource;
 import com.google.common.base.Strings;
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
-import org.rosuda.REngine.Rserve.RConnection;
+import org.obiba.opal.spi.r.RServerConnection;
 
 import javax.validation.constraints.NotNull;
 
@@ -21,13 +21,13 @@ public class RAssignDatasourceFactory extends AbstractDatasourceFactory {
 
   private final String symbol;
 
-  private final RConnection rConnection;
+  private final RServerConnection rConnection;
 
   private String idColumnName;
 
   private boolean withMissings = true;
 
-  public RAssignDatasourceFactory(String name, String symbol, RConnection rConnection) {
+  public RAssignDatasourceFactory(String name, String symbol, RServerConnection rConnection) {
     setName(name);
     this.symbol = symbol;
     this.rConnection = rConnection;

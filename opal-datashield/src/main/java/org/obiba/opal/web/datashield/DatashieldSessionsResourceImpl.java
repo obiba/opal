@@ -13,7 +13,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.OpalR;
@@ -57,7 +57,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return super.removeRSessions();
   }
 
-  protected void onNewRSession(OpalRSession rSession) {
+  protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
     DatashieldConfiguration config = configurationSupplier.get();
     if (config.hasOptions()) {

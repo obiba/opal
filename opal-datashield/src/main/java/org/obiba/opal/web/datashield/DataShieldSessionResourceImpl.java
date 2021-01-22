@@ -61,7 +61,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
       } else {
         getOpalRSession().execute(operation);
-        return Response.ok().entity(operation.getRawResult().asBytes()).build();
+        return Response.ok().entity(operation.getResult().asBytes()).build();
       }
     } catch (ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
@@ -74,7 +74,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     DataShieldSymbolResource resource = applicationContext
         .getBean("dataShieldSymbolResource", DataShieldSymbolResource.class);
     resource.setName(name);
-    resource.setOpalRSession(getOpalRSession());
+    resource.setRServerSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
     resource.setResourceReferenceService(getResourceReferenceService());

@@ -13,7 +13,6 @@ package org.obiba.opal.r.service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import org.json.JSONObject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
@@ -22,9 +21,9 @@ import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.event.RServiceStartedEvent;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
+import org.obiba.opal.spi.r.RNamedList;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.r.RPackageResourceHelper;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -141,12 +139,12 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
     resourceProviders.clear();
     try {
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
-      REXP result = rPackageHelper.execute(rop).getResult();
-      RList pkgList = result.asList();
-      if (pkgList.isNamed()) {
-        for (Object name : pkgList.names) {
-          REXP rexp = pkgList.at(name.toString());
-          resourceProviders.put(name.toString(), new RResourceProvider(name.toString(), rexp.asString()));
+      RServerResult result = rPackageHelper.execute(rop).getResult();
+      if (result.isNamedList()) {
+        RNamedList<RServerResult> pkgList = result.asNamedList();
+        for (String name : pkgList.keySet()) {
+          RServerResult rexp = pkgList.get(name);
+          resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
         }
       }
       return true;

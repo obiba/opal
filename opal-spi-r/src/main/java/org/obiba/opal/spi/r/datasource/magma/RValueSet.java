@@ -14,10 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.ValueSetBean;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPGenericVector;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.RList;
+import org.obiba.opal.spi.r.RServerResult;
 
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Array;
@@ -40,7 +37,7 @@ class RValueSet extends ValueSetBean {
 
   public Map<Integer, List<Object>> getValuesByPosition() {
     if (columnValues == null) {
-      parseREXP(fetcher.getREXP(getVariableEntity()));
+      parseREXP(fetcher.getResult(getVariableEntity()));
     }
     return columnValues;
   }
@@ -50,46 +47,40 @@ class RValueSet extends ValueSetBean {
    *
    * @param rexp
    */
-  public void parseREXP(REXP rexp) {
+  public void parseREXP(RServerResult rexp) {
     columnValues = Maps.newHashMap();
-    if (rexp instanceof REXPGenericVector) {
-      try {
-        REXPGenericVector tibble = (REXPGenericVector) rexp;
-        RList vectors = tibble.asList();
-        REXP vectorId = (REXP) vectors.get(getIdPosition() - 1);
-        String[] ids = vectorId.asStrings();
-        List<Integer> rowIdx = Lists.newArrayList();
-        int row = 0;
-        for (String id : ids) {
-          if (getRVariableEntity().getRIdentifier().equals(id)) {
-            rowIdx.add(row);
-          }
-          row++;
+    if (rexp.isList()) {
+      List<RServerResult> list = rexp.asList();
+      String[] ids = list.get(getIdPosition()).asStrings();
+      List<Integer> rowIdx = Lists.newArrayList();
+      int row = 0;
+      for (String id : ids) {
+        if (getRVariableEntity().equals(new RVariableEntity(getRValueTable().getEntityType(), id))) {
+          rowIdx.add(row);
         }
-        for (int col = 0; col < vectors.size(); col++) {
-          if (getIdPosition() == col + 1) continue;
-          int position = col + 1;
-          columnValues.put(position, Lists.newArrayList());
-          REXP vector = (REXP) vectors.get(col);
-          boolean[] nas = vector.isNA();
-          Object[] objectValues = asObjects(vector);
-          // #3303 force NA representation
-          for (int i = 0; i < nas.length; i++) {
-            if (nas[i]) objectValues[i] = null;
-          }
-          for (int r = 0; r < objectValues.length; r++) {
-            if (rowIdx.contains(r)) {
-              columnValues.get(position).add(objectValues[r]);
-            }
+        row++;
+      }
+
+      for (int col = 0; col < list.size(); col++) {
+        if (getIdPosition() == col) continue;
+        columnValues.put(col, Lists.newArrayList());
+        RServerResult vector = list.get(col);
+        boolean[] nas = vector.isNA();
+        Object[] objectValues = asObjects(vector);
+        // #3303 force NA representation
+        for (int i = 0; i < nas.length; i++) {
+          if (nas[i]) objectValues[i] = null;
+        }
+        for (int r = 0; r < objectValues.length; r++) {
+          if (rowIdx.contains(r)) {
+            columnValues.get(col).add(objectValues[r]);
           }
         }
-      } catch (REXPMismatchException e) {
-        // ignore
       }
     }
   }
 
-  private Object[] asObjects(REXP vector) throws REXPMismatchException {
+  private Object[] asObjects(RServerResult vector) {
     Object payload = vector.asNativeJavaObject();
     int arrlength = Array.getLength(payload);
     Object[] outputArray = new Object[arrlength];

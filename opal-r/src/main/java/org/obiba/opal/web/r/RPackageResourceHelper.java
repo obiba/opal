@@ -13,15 +13,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.spi.r.RMatrix;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,15 +56,14 @@ public class RPackageResourceHelper {
   private String defaultRepos;
 
   @Autowired
-  protected OpalRService opalRService;
+  protected RServerService rServerService;
 
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
     List<OpalR.RPackageDto> pkgs = Lists.newArrayList();
     try {
       ROperationWithResult rop = getInstalledPackages();
-      REXP rexp = rop.getResult();
-      RStringMatrix matrix = new RStringMatrix(rexp);
-      pkgs = StreamSupport.stream(matrix.iterateRows().spliterator(), false)
+      RMatrix<String> matrix = rop.getResult().asStringMatrix();
+      pkgs = matrix.iterateRows().stream()
           .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
           .collect(Collectors.toList());
     } catch (Exception e) {
@@ -160,8 +156,8 @@ public class RPackageResourceHelper {
 
   void restartRServer() {
     try {
-      opalRService.stop();
-      opalRService.start();
+      rServerService.stop();
+      rServerService.start();
     } catch (Exception ex) {
       log.error("Error while restarting R server after package install: {}", ex.getMessage(), ex);
     }
@@ -177,7 +173,7 @@ public class RPackageResourceHelper {
   }
 
   public ROperationWithResult execute(ROperationWithResult rop) {
-    opalRService.execute(rop);
+    rServerService.execute(rop);
     return rop;
   }
 
@@ -233,13 +229,13 @@ public class RPackageResourceHelper {
         for (int i = 0; i < input.length; i++) {
           if (!Strings.isNullOrEmpty(input[i]) && !"NA".equals(input[i])) {
             Opal.EntryDto.Builder entry = Opal.EntryDto.newBuilder();
-            entry.setKey(matrix.getColumnName(i));
+            entry.setKey(matrix.getColumnNames()[i]);
             entry.setValue(input[i]);
             builder.addDescription(entry);
           }
         }
       }
-      builder.setName(matrix.getRowName(current++));
+      builder.setName(matrix.getRowNames()[current++]);
       return builder.build();
     }
   }

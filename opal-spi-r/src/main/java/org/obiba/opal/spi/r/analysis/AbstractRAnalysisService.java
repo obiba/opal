@@ -13,16 +13,9 @@ package org.obiba.opal.spi.r.analysis;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.*;
-import org.obiba.opal.spi.r.FileReadROperation;
-import org.obiba.opal.spi.r.FileWriteROperation;
-import org.obiba.opal.spi.r.ROperationTemplate;
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REXPString;
+import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -69,7 +61,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
         analysisResultBuilder.message("No analysis to run.");
       } else {
         prepare(analysis.getSession(), template);
-        REXP rexp = run(analysis);
+        RServerResult rexp = run(analysis);
         createAnalysisResult(analysisResultBuilder, parseResult(rexp));
 
         Path fileName = template.getReportPath().getFileName();
@@ -86,7 +78,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
   private void createAnalysisResult(RAnalysisResult.Builder analysisResultBuilder, JSONObject parsedResult) {
     analysisResultBuilder.message(parsedResult.optString("message", ""));
     analysisResultBuilder.status(
-      AnalysisStatus.valueOf(parsedResult.optString("status", "ERROR").toUpperCase())
+        AnalysisStatus.valueOf(parsedResult.optString("status", "ERROR").toUpperCase())
     );
 
     JSONArray items = parsedResult.getJSONArray("items");
@@ -95,10 +87,10 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
     for (int i = 0, length = items.length(); i < length; i++) {
       JSONObject itemJson = items.getJSONObject(i);
       resultItems.add(
-        new RAnalysisResult.RAnalysisResultItem(
-          AnalysisStatus.valueOf(itemJson.optString("status", "ERROR").toUpperCase()),
-          itemJson.optString("message", "")
-        )
+          new RAnalysisResult.RAnalysisResultItem(
+              AnalysisStatus.valueOf(itemJson.optString("status", "ERROR").toUpperCase()),
+              itemJson.optString("message", "")
+          )
       );
     }
     analysisResultBuilder.items(resultItems);
@@ -151,14 +143,11 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
     RScriptROperation rop = new RScriptROperation(rscript, false);
     session.execute(rop);
     if (!rop.hasResult()) return;
-    REXPString files = (REXPString) rop.getResult();
-
-
-    Lists.newArrayList(files.asStrings())
-      .stream()
-      .filter(file -> !REPORT_FILE_NAME.equals(file) && !ROUTINE_FILE_NAME.equals(file))
-      .forEach(file -> downloadFileToFromRSession(session, Paths.get(path.toString(), file)));
-
+    String[] files = rop.getResult().asStrings();
+    Lists.newArrayList(files)
+        .stream()
+        .filter(file -> !REPORT_FILE_NAME.equals(file) && !ROUTINE_FILE_NAME.equals(file))
+        .forEach(file -> downloadFileToFromRSession(session, Paths.get(path.toString(), file)));
   }
 
   private void uploadFileToRSession(ROperationTemplate session, Path path) {
@@ -184,11 +173,11 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
 
   protected List<AnalysisTemplate> initAnalysisTemplates() {
     Path templateDirectoryPath = Paths.get(getProperties().getProperty(INSTALL_DIR_PROPERTY), TEMPLATES_DIR)
-      .toAbsolutePath();
+        .toAbsolutePath();
 
     if (Files.isDirectory(templateDirectoryPath)) {
       try {
-        return Files.list(templateDirectoryPath).filter(p -> Files.isDirectory(p)).map(p -> {
+        return Files.list(templateDirectoryPath).filter(Files::isDirectory).map(p -> {
           AnalysisTemplateImpl analysisTemplate = new AnalysisTemplateImpl(p.getFileName().toString());
 
           Path schemaFormPath = Paths.get(p.toString(), SCHEMA_FORM_FILE_NAME);
@@ -199,7 +188,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
             try {
               String schemaForm = Files.lines(schemaFormPath).reduce("", String::concat).trim();
               analysisTemplate
-                .setSchemaForm(new JSONObject(Strings.isNullOrEmpty(schemaForm) ? "{}" : schemaForm));
+                  .setSchemaForm(new JSONObject(Strings.isNullOrEmpty(schemaForm) ? "{}" : schemaForm));
 
               analysisTemplate.setTitle(analysisTemplate.getJSONSchemaForm().optString("title"));
               analysisTemplate.setDescription(analysisTemplate.getJSONSchemaForm().optString("description"));
@@ -218,13 +207,13 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
     return Lists.newArrayList();
   }
 
-  protected abstract REXP run(RAnalysis analysis);
+  protected abstract RServerResult run(RAnalysis analysis);
 
-  JSONObject parseResult(REXP rexp) {
+  JSONObject parseResult(RServerResult result) {
     try {
-      return new JSONObject(rexp.asString());
-    } catch (REXPMismatchException | JSONException e) {
-      log.error("Failed to parse analysis result {}", e);
+      return new JSONObject(result.asStrings()[0]);
+    } catch (Exception e) {
+      log.error("Failed to parse analysis result", e);
     }
 
     return new JSONObject().put("status", AnalysisStatus.ERROR.toString());
@@ -232,7 +221,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
 
   private AnalysisTemplate getTemplate(String name) throws NoSuchAnalysisTemplateException {
     return getAnalysisTemplates().stream().filter(t -> name.equals(t.getName())).findFirst()
-      .orElseThrow(() -> new NoSuchAnalysisTemplateException(name));
+        .orElseThrow(() -> new NoSuchAnalysisTemplateException(name));
   }
 
 }

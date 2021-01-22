@@ -10,7 +10,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
-import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class RResource {
   private static final Logger log = LoggerFactory.getLogger(RResource.class);
 
   @Autowired
-  private OpalRService opalRService;
+  private RServerService rServerService;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -50,18 +50,18 @@ public class RResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response query(@QueryParam("script") String script, String body) {
     String rScript = script;
-    if(Strings.isNullOrEmpty(rScript)) {
+    if (Strings.isNullOrEmpty(rScript)) {
       rScript = body;
     }
 
-    if(Strings.isNullOrEmpty(rScript)) return Response.status(Status.BAD_REQUEST).build();
+    if (Strings.isNullOrEmpty(rScript)) return Response.status(Status.BAD_REQUEST).build();
 
     ROperationWithResult rop = new RScriptROperation(rScript);
-    opalRService.execute(rop);
-    if(rop.hasResult() && rop.hasRawResult()) {
-      return Response.ok().entity(rop.getRawResult().asBytes()).build();
+    rServerService.execute(rop);
+    if (rop.hasResult() && rop.getResult().isRaw()) {
+      return Response.ok().entity(rop.getResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", rScript, rop.hasResult(), rop.hasRawResult());
+      log.error("R Script '{}' has result: {}, has raw result: {}", rScript, rop.hasResult(), rop.hasResult() && rop.getResult().isRaw());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
