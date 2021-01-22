@@ -182,13 +182,22 @@ class RserveResult implements RServerResult {
 
   @Override
   public boolean hasNames() {
-    return result.hasAttribute("names");
+    return isNamedList() || result.hasAttribute("names");
   }
 
   @Override
   public String[] getNames() {
     try {
-      return result.getAttribute("names").asStrings();
+      if (isNamedList()) {
+        String[] namesStr = new String[result.asList().names.size()];
+        int i = 0;
+        for (Object name : result.asList().names) {
+          namesStr[i++] = name == null ? null : name.toString();
+        }
+        return namesStr;
+      } else {
+        return result.getAttribute("names").asStrings();
+      }
     } catch (REXPMismatchException e) {
       throw new RRuntimeException(e);
     }

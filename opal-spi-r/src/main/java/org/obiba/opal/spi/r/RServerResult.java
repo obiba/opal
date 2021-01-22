@@ -119,11 +119,31 @@ public interface RServerResult {
    */
   RNamedList<RServerResult> asNamedList();
 
+  /**
+   * Get whether there are NAs in a vector of data.
+   *
+   * @return
+   */
   boolean[] isNA();
 
+  /**
+   * Get the data as a Java object.
+   *
+   * @return
+   */
   Object asNativeJavaObject();
 
+  /**
+   * Check if there are names associated to the evaluation result.
+   *
+   * @return
+   */
   boolean hasNames();
 
+  /**
+   * Get the names associated to the evaluation result.
+   *
+   * @return
+   */
   String[] getNames();
 }
