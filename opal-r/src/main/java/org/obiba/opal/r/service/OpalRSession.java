@@ -17,8 +17,6 @@ import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.spi.r.*;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RSession;
-import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +42,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private final Lock lock = new ReentrantLock();
 
-  private RSession rSession;
+  private final RConnection rConnection;
 
   private final String user;
 
@@ -85,13 +83,8 @@ public class OpalRSession implements RASyncOperationTemplate {
    * @param connection
    */
   OpalRSession(RConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
+    this.rConnection = connection;
     this.transactionalThreadFactory = transactionalThreadFactory;
-    try {
-      rSession = connection.detach();
-    } catch(RserveException e) {
-      log.error("Error while detaching R session.", e);
-      throw new RRuntimeException(e);
-    }
     id = UUID.randomUUID().toString();
     this.user = user;
     created = new Date();
@@ -180,18 +173,15 @@ public class OpalRSession implements RASyncOperationTemplate {
    */
   @Override
   public synchronized void execute(ROperation rop) {
-    RConnection connection = null;
     lock.lock();
     busy = true;
     touch();
     try {
-      connection = newConnection();
-      rop.doWithConnection(connection);
+      rop.doWithConnection(rConnection);
     } finally {
       busy = false;
       touch();
       lock.unlock();
-      if(connection != null) close(connection);
     }
   }
 
@@ -255,11 +245,9 @@ public class OpalRSession implements RASyncOperationTemplate {
     }
 
     try {
-      newConnection().close();
+      rConnection.close();
     } catch(Exception e) {
       // ignore
-    } finally {
-      rSession = null;
     }
 
     if(consumer == null) return;
@@ -275,7 +263,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   public boolean isClosed() {
-    return rSession == null;
+    return !rConnection.isConnected();
   }
 
   //
@@ -323,33 +311,17 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   /**
-   * Creates a new R connection from the last R session state.
-   *
-   * @return
-   */
-  private RConnection newConnection() {
-    if(rSession == null) throw new NoSuchRSessionException();
-    try {
-      return rSession.attach();
-    } catch(RserveException e) {
-      log.error("Error while attaching R session.", e);
-      throw new RRuntimeException(e);
-    }
-  }
-
-  /**
    * Detach the R connection and updates the R session.
    *
    * @param connection
    */
   private void close(RConnection connection) {
-    if(connection == null) return;
     if(!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().toLowerCase().equals("ok")) {
       throw new RRuntimeException("Unexpected R server error: " + connection.getLastError());
     }
     try {
-      rSession = connection.detach();
-    } catch(RserveException e) {
+      connection.close();
+    } catch(Exception e) {
       log.warn("Error while detaching R session.", e);
     }
   }
