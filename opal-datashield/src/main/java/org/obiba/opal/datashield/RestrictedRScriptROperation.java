@@ -33,6 +33,6 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     setResult(null);
     String script = restricted();
     DataShieldLog.userLog("evaluating '{}'", script);
-    eval(script);
+    setResult(eval(script));
   }
 }

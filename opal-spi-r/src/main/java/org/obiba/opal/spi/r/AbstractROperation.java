@@ -77,8 +77,8 @@ public abstract class AbstractROperation implements ROperation {
    * @param script
    * @return result serialized
    */
-  protected void eval(String script) {
-    eval(script, true);
+  protected RServerResult eval(String script) {
+    return eval(script, true);
   }
 
   /**
