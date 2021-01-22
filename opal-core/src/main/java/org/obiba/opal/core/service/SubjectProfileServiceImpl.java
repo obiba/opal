@@ -84,7 +84,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void ensureProfile(@NotNull String principal, @NotNull String realm) {
+  public synchronized void ensureProfile(@NotNull String principal, @NotNull String realm) {
     log.debug("ensure profile of user {} from realm: {}", principal, realm);
 
     try {
@@ -120,7 +120,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void applyProfileGroups(@NotNull String principal, Set<String> groups) {
+  public synchronized void applyProfileGroups(@NotNull String principal, Set<String> groups) {
     try {
       SubjectProfile profile = getProfile(principal);
       profile.setGroups(groups);
@@ -154,7 +154,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
+  public synchronized void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     profile.setUpdated(new Date());
     orientDbService.save(profile, profile);
@@ -166,7 +166,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void addBookmarks(String principal, List<String> resources) throws NoSuchSubjectProfileException {
+  public synchronized void addBookmarks(String principal, List<String> resources) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     for (String resource : resources) {
       profile.addBookmark(resource);
@@ -175,7 +175,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException {
+  public synchronized void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     if (profile.hasBookmark(path) && profile.removeBookmark(path)) {
       orientDbService.save(profile, profile);
@@ -183,7 +183,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void deleteBookmarks(String path) throws NoSuchSubjectProfileException {
+  public synchronized void deleteBookmarks(String path) throws NoSuchSubjectProfileException {
     for (SubjectProfile profile : orientDbService.list(SubjectProfile.class)) {
       if (!profile.hasBookmarks()) return;
       List<Bookmark> toRemove = profile.getBookmarks().stream()
