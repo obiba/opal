@@ -142,6 +142,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   @POST
   @Path("/entities/_import")
   public Response importIdentifiers(@NotNull Magma.DatasourceFactoryDto datasourceFactoryDto) {
+    if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     if (datasourceFactoryDto == null) throw new NoSuchDatasourceException("");
 
     try {
@@ -160,13 +161,14 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
    * Applies only to entity types that are handled by the identifiers datasource.
    *
    * @param datasource
-   * @param table
+   * @param tableList
    * @return
    */
   @POST
   @Path("/entities/_sync")
   public Response importIdentifiers(@QueryParam("datasource") String datasource,
                                     @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
+    if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     try {
       if (datasource != null) {
         Datasource ds = MagmaEngine.get().getDatasource(datasource);
@@ -201,6 +203,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   public List<Magma.TableIdentifiersSync> getIdentifiersToBeImported(
       @NotNull @QueryParam("datasource") String datasource,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
+    if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     if (datasource == null) throw new NoSuchDatasourceException("");
     final Datasource ds = MagmaEngine.get().getDatasource(datasource);
 
@@ -239,6 +242,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   @Produces("text/csv")
   @AuthenticatedByCookie
   public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
+    if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
 
@@ -314,12 +318,14 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
 
   private Map<String, List<String>> getIdentifiersMappings() {
     Map<String, List<String>> idsMappings = Maps.newHashMap();
-    for (ValueTable table : getDatasource().getValueTables()) {
-      for (Variable variable : table.getVariables()) {
-        if (!idsMappings.containsKey(variable.getName())) {
-          idsMappings.put(variable.getName(), new ArrayList<String>());
+    if (getIdentifiersTableService().hasDatasource()) {
+      for (ValueTable table : getDatasource().getValueTables()) {
+        for (Variable variable : table.getVariables()) {
+          if (!idsMappings.containsKey(variable.getName())) {
+            idsMappings.put(variable.getName(), new ArrayList<String>());
+          }
+          idsMappings.get(variable.getName()).add(table.getEntityType());
         }
-        idsMappings.get(variable.getName()).add(table.getEntityType());
       }
     }
     return idsMappings;
