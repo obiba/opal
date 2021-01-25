@@ -10,18 +10,18 @@
 
 package org.obiba.opal.web.identifiers;
 
-import java.io.File;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.File;
 
 public abstract class AbstractIdentifiersResource {
 
@@ -33,7 +33,7 @@ public abstract class AbstractIdentifiersResource {
     try {
       // note: does not ensure that file exists
       return getOpalRuntime().getFileSystem().getLocalFile(resolveFileInFileSystem(path));
-    } catch(FileSystemException e) {
+    } catch (FileSystemException e) {
       throw new IllegalArgumentException(e);
     }
   }
@@ -50,8 +50,8 @@ public abstract class AbstractIdentifiersResource {
    */
   @Nullable
   protected ValueTable getValueTable(@NotNull String entityType) {
-    for(ValueTable table : getDatasource().getValueTables()) {
-      if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
+    for (ValueTable table : getDatasource().getValueTables()) {
+      if (table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return table;
       }
     }
@@ -59,12 +59,14 @@ public abstract class AbstractIdentifiersResource {
   }
 
   protected void ensureEntityType(String entityType) {
-    if(entityType == null || !getIdentifiersTableService().hasIdentifiersTable(entityType)) {
+    if (entityType == null || !getIdentifiersTableService().hasIdentifiersTable(entityType)) {
       throw new InvalidRequestException("No such identifiers table for entity type: " + entityType);
     }
   }
 
   protected Datasource getDatasource() {
+    if (!getIdentifiersTableService().hasDatasource())
+      throw new NoSuchDatasourceException(getIdentifiersTableService().getDatasourceName());
     return getIdentifiersTableService().getDatasource();
   }
 

@@ -12,10 +12,7 @@ package org.obiba.opal.web.magma;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.ValueTable;
+import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.security.MagmaSecurityExtension;
@@ -94,6 +91,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @Override
   public List<TableDto> getTables(boolean counts, String entityType, boolean indexedOnly) {
     List<Magma.TableDto> tables = Lists.newArrayList();
+    if (datasource == null) return tables;
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getTable");
     UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
@@ -131,6 +129,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @AuthorizeResource
   @AuthenticatedByCookie
   public Response getExcelDictionary(List<String> tables) throws MagmaRuntimeException, IOException {
+    if (datasource == null) throw new NoSuchDatasourceException("?");
     String destinationName = datasource.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
     Datasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
@@ -158,6 +157,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @Override
   @POST
   public Response createTable(final TableDto table) {
+    if (datasource == null) throw new NoSuchDatasourceException("?");
     if(MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) {
       return MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer()
           .silentSudo(() -> createTableInternal(table));
@@ -182,6 +182,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @Override
   @DELETE
   public Response deleteTables(@QueryParam("table") List<String> tables) {
+    if (datasource == null) throw new NoSuchDatasourceException("?");
     for(String table : tables) {
       if(datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table)) {
         ValueTable toDrop = datasource.getValueTable(table);
