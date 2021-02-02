@@ -1,0 +1,242 @@
+/*
+ * Copyright (c) 2021 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.obiba.opal.r.rock;
+
+import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.auth.Credentials;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.service.AbstractRServerSession;
+import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.spi.r.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.UUID;
+
+class RockSession extends AbstractRServerSession implements RServerSession, RServerConnection {
+
+  private static final Logger log = LoggerFactory.getLogger(RockSession.class);
+
+  private final App app;
+
+  private final Credentials credentials;
+
+  private String rockSessionId;
+
+  protected RockSession(App app, Credentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory) throws RServerException {
+    super(UUID.randomUUID().toString(), user, transactionalThreadFactory);
+    this.app = app;
+    this.credentials = credentials;
+    openSession();
+  }
+
+  //
+  // Connection methods
+  //
+
+  @Override
+  public void assign(String symbol, byte[] content) throws RServerException {
+
+  }
+
+  @Override
+  public void assign(String symbol, String content) throws RServerException {
+    
+  }
+
+  @Override
+  public RServerResult eval(String expr, boolean serialize) throws RServerException {
+    String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_eval", rockSessionId));
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = createHeaders();
+    headers.setContentType(MediaType.valueOf("application/x-rscript"));
+
+    try {
+      if (serialize) {
+        // accept application/octet-stream
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
+        ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
+        return new RockResult(response.getBody());
+      } else {
+        // accept application/json
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), String.class);
+        String jsonSource = response.getBody();
+        if (jsonSource.startsWith("["))
+          return new RockResult(new JSONArray(jsonSource));
+        else if (jsonSource.startsWith("{"))
+          return new RockResult(new JSONObject(jsonSource));
+        else
+          return new RockResult(jsonSource);
+      }
+    } catch (RestClientException e) {
+      throw new RServerException("Eval failed", e);
+    }
+  }
+
+  @Override
+  public void writeFile(String fileName, InputStream in) throws RServerException {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+      body.add("file", new InputStreamResource(in));
+      body.add("path", fileName);
+      body.add("overwrite", true);
+
+      HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+      String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_upload", rockSessionId));
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
+      if (!response.getStatusCode().is2xxSuccessful()) {
+        log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
+        throw new RServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
+      }
+    } catch (RestClientException e) {
+      throw new RServerException("File upload failed", e);
+    }
+  }
+
+  @Override
+  public void readFile(String fileName, OutputStream out) throws RServerException {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setAccept(Collections.singletonList(MediaType.ALL));
+
+      String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_download", rockSessionId));
+      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+          .queryParam("path", fileName);
+
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.execute(builder.build().toUri(), HttpMethod.GET,
+          request -> request.getHeaders().putAll(headers),
+          (ResponseExtractor<Void>) response -> {
+            if (!response.getStatusCode().is2xxSuccessful()) {
+              log.error("File download from {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
+              throw new RRuntimeException("File download failed: " + response.getStatusCode().getReasonPhrase());
+            } else {
+              ByteStreams.copy(response.getBody(), out);
+            }
+            return null;
+          });
+    } catch (RestClientException e) {
+      throw new RServerException("File download failed", e);
+    }
+  }
+
+  @Override
+  public String getLastError() {
+    return null;
+  }
+
+  //
+  // Session methods
+  //
+
+  @Override
+  public void close() {
+    if (isClosed()) return;
+    cleanDirectories();
+    closeSession();
+    closeRCommandsQueue();
+  }
+
+  @Override
+  public boolean isClosed() {
+    return Strings.isNullOrEmpty(rockSessionId);
+  }
+
+  @Override
+  public synchronized void execute(ROperation rop) {
+    lock.lock();
+    setBusy(true);
+    touch();
+    try {
+      rop.doWithConnection(this);
+    } finally {
+      setBusy(false);
+      touch();
+      lock.unlock();
+    }
+  }
+
+  //
+  // Private methods
+  //
+
+  private void openSession() throws RServerException {
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRServerResourceUrl("/r/sessions"), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
+      RockSessionInfo info = response.getBody();
+      this.rockSessionId = info.getId();
+      initDirectories();
+    } catch (RestClientException e) {
+      throw new RServerException("Failure when opening a Rock R session", e);
+    }
+  }
+
+  private RockSessionInfo getSession() throws RServerException {
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRServerResourceUrl("/r/session/" + rockSessionId), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
+      return response.getBody();
+    } catch (RestClientException e) {
+      throw new RServerException("Failure when accessing a Rock R session", e);
+    }
+  }
+
+  private void closeSession() {
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.exchange(getRServerResourceUrl("/r/session/" + rockSessionId), HttpMethod.DELETE, new HttpEntity<>(createHeaders()), Void.class);
+      this.rockSessionId = null;
+    } catch (RestClientException e) {
+      String msg = "Failure when closing the Rock R session {}";
+      if (log.isDebugEnabled())
+        log.warn(msg, rockSessionId, e);
+      else
+        log.warn(msg, rockSessionId);
+    }
+  }
+
+  private String getRServerResourceUrl(String path) {
+    return app.getServer() + path;
+  }
+
+  private HttpHeaders createHeaders() {
+    return new HttpHeaders() {{
+      String auth = credentials.getUserPrincipal().getName() + ":" + credentials.getPassword();
+      byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
+      String authHeader = "Basic " + new String(encodedAuth);
+      add("Authorization", authHeader);
+    }};
+  }
+}

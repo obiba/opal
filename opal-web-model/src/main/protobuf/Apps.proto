@@ -3,9 +3,10 @@ package Apps;
 option java_package = "org.obiba.opal.web.model";
 
 message AppDto {
-  required string name = 1;
-  required string type = 2;
-  optional string server = 3;
+  optional string id = 1;
+  required string name = 2;
+  required string type = 3;
+  optional string server = 4;
 }
 
 message AppsDto {

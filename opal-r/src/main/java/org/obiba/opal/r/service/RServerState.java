@@ -10,35 +10,19 @@
 
 package org.obiba.opal.r.service;
 
-public class RServerState {
+import java.util.List;
 
-  private boolean isRunning;
+public interface RServerState {
 
-  private Integer port;
+  String getName();
 
-  private String encoding;
+  String getVersion();
 
-  public void setRunning(boolean running) {
-    isRunning = running;
-  }
+  boolean isRunning();
 
-  public void setPort(Integer port) {
-    this.port = port;
-  }
+  List<String> getTags();
 
-  public void setEncoding(String encoding) {
-    this.encoding = encoding;
-  }
+  int getRSessionsCount();
 
-  public boolean isRunning() {
-    return isRunning;
-  }
-
-  public Integer getPort() {
-    return port;
-  }
-
-  public String getEncoding() {
-    return encoding;
-  }
+  int getBusyRSessionsCount();
 }

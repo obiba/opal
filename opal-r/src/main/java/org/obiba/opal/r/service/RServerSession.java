@@ -35,12 +35,24 @@ public interface RServerSession extends RASyncOperationTemplate {
 
   String getExecutionContext();
 
+  /**
+   * Check if the R session is not busy and has expired.
+   *
+   * @param timeout in minutes
+   * @return
+   */
   boolean hasExpired(long timeout);
 
   void close();
 
   boolean isClosed();
 
+  /**
+   * Get the {@link File} directory specific to this user's R session. Create it if it does not exist.
+   *
+   * @param saveId
+   * @return
+   */
   File getWorkspace(String saveId);
 
   void saveRSessionFiles(String saveId);

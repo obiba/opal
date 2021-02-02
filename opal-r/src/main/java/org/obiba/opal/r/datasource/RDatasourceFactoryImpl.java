@@ -90,7 +90,8 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
   protected Datasource internalCreate() {
     RDatasource ds;
 
-    if (Strings.isNullOrEmpty(file)) ds = new RDatasource(getName(), getRSessionHandler(), symbol, entityType, idColumn);
+    if (Strings.isNullOrEmpty(file))
+      ds = new RDatasource(getName(), getRSessionHandler(), symbol, entityType, idColumn);
     else
       try {
         FileObject fileObj = resolveFileInFileSystem(file);
@@ -115,7 +116,7 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
           prepareFile(file);
           prepareFile(categoryFile);
           // read it into the symbol
-          execute(new DataReadROperation(symbol, file.getName(),  categoryFile != null ? categoryFile.getName() : null));
+          execute(new DataReadROperation(symbol, file.getName(), categoryFile != null ? categoryFile.getName() : null));
         }
 
         ds = new RDatasource(getName(), getRSessionHandler(), symbol, entityType, idColumn);
@@ -123,9 +124,9 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
         throw new IllegalArgumentException("Failed resolving file path: " + file);
       }
 
-      ds.setLocale(locale);
+    ds.setLocale(locale);
 
-      return ds;
+    return ds;
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {

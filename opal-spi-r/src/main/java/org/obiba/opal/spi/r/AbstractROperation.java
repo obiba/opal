@@ -90,14 +90,9 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected RServerResult eval(String script, boolean serialize) {
     if (script == null) throw new IllegalArgumentException("R script cannot be null");
-
     try {
       log.debug("evaluating: {}", script);
-      String cmd = script;
-      if (serialize) {
-        cmd = "serialize({" + script + "}, NULL)";
-      }
-      return connection.eval("try(" + cmd + ")");
+      return connection.eval(script, serialize);
     } catch (RServerException e) {
       log.warn("Failed evaluating: {}", script, e);
       throw new RRuntimeException(e);
@@ -113,7 +108,7 @@ public abstract class AbstractROperation implements ROperation {
   protected void writeFile(String fileName, File in) {
     try {
       writeFile(fileName, new BufferedInputStream(new FileInputStream(in)));
-    } catch (FileNotFoundException e) {
+    } catch (FileNotFoundException | RServerException e) {
       log.warn("Failed creating file '{}' from file {}", fileName, in.getName(), e);
       throw new RRuntimeException(e);
     }
@@ -125,7 +120,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param fileName R server file name
    * @param in       local stream
    */
-  protected void writeFile(String fileName, InputStream in) {
+  protected void writeFile(String fileName, InputStream in)  throws RServerException {
     connection.writeFile(fileName, in);
   }
 
@@ -135,7 +130,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param fileName R server file name
    * @param out      local file
    */
-  protected void readFile(String fileName, File out) {
+  protected void readFile(String fileName, File out) throws RServerException {
     try {
       if (!out.getParentFile().exists()) out.getParentFile().mkdirs();
       readFile(fileName, new BufferedOutputStream(new FileOutputStream(out)));
@@ -152,7 +147,11 @@ public abstract class AbstractROperation implements ROperation {
    * @param out      local stream
    */
   protected void readFile(String fileName, OutputStream out) {
-    connection.readFile(fileName, out);
+    try {
+      connection.readFile(fileName, out);
+    } catch (RServerException e) {
+      throw new RRuntimeException(e);
+    }
   }
 
   /**

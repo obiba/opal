@@ -41,11 +41,6 @@ class RserveConnection implements RServerConnection {
   }
 
   @Override
-  public boolean isConnected() {
-    return connection.isConnected();
-  }
-
-  @Override
   public String getLastError() {
     return connection.getLastError();
   }
@@ -69,8 +64,14 @@ class RserveConnection implements RServerConnection {
   }
 
   @Override
-  public RServerResult eval(String expr) throws RServerException {
-    return new RserveResult(evalREXP(expr));
+  public RServerResult eval(String expr, boolean serialize) throws RServerException {
+    String cmd;
+    if (serialize) {
+      cmd = String.format("try(serialize({%s}, NULL))", expr);
+    } else {
+      cmd = String.format("try(%s)", expr);
+    }
+    return new RserveResult(evalREXP(cmd));
   }
 
   @Override
@@ -95,8 +96,11 @@ class RserveConnection implements RServerConnection {
     }
   }
 
-  @Override
-  public void close() {
+  //
+  // Package methods
+  //
+
+  void close() {
     connection.close();
   }
 

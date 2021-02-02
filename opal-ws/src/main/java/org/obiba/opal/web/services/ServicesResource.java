@@ -64,7 +64,7 @@ public class ServicesResource {
     }
 
     for (App app : opalRuntime.getApps()) {
-      Opal.ServiceStatus status = app.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
+      Opal.ServiceStatus status = Opal.ServiceStatus.RUNNING;
       URI link = UriBuilder.fromPath("/").path(PluginResource.class).segment("service").build(app.getName());
       Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(app.getName()).setStatus(status)
               .setLink(link.getPath()).build();

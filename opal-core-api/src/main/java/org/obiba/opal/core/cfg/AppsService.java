@@ -27,9 +27,9 @@ public interface AppsService extends SystemService {
     /**
      * Unregister an app. Send an event to inform app users.
      *
-     * @param name
+     * @param app
      */
-    void unregisterApp(String name);
+    void unregisterApp(App app);
 
     /**
      * Get the apps registered in the system.
@@ -47,11 +47,11 @@ public interface AppsService extends SystemService {
     List<App> getApps(String type);
 
     /**
-     * Get the app from name.
+     * Get the app from id.
      *
-     * @param name
+     * @param id
      * @return
      */
-    App getApp(String name);
+    App getApp(String id);
 
 }

@@ -24,10 +24,10 @@ public class RRuntimeExceptionMapper implements ExceptionMapper<RRuntimeExceptio
   @Override
   public Response toResponse(RRuntimeException exception) {
     return Response
-      .status(Status.INTERNAL_SERVER_ERROR)
-      .type("application/x-protobuf+json")
-      .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
-      .build();
+        .status(Status.INTERNAL_SERVER_ERROR)
+        .type("application/x-protobuf+json")
+        .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
+        .build();
   }
 
 }

@@ -10,9 +10,25 @@
 
 package org.obiba.opal.r.service;
 
+import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.web.model.OpalR;
+
+import java.util.List;
 
 public interface RServerService {
+
+  String AGGREGATE_METHODS = "AggregateMethods";
+
+  String ASSIGN_METHODS = "AssignMethods";
+
+  String OPTIONS = "Options";
+
+  String[] defaultFields = new String[]{"Title", "Description", "Author", "Maintainer",
+      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS};
+
+  String getName();
 
   void start();
 
@@ -22,7 +38,71 @@ public interface RServerService {
 
   RServerState getState();
 
-  RServerSession newRServerSession(String user);
+  RServerSession newRServerSession(String user) throws RServerException;
 
-  void execute(ROperation rop);
+  /**
+   * Shortcut for one shot R code execution.
+   *
+   * @param rop
+   */
+  void execute(ROperation rop) throws RServerException;
+
+  /**
+   * Get the inner App from which the R server was built.
+   *
+   * @return
+   */
+  App getApp();
+
+  /**
+   * Check whether the App object is associated to the R server service, order to avoid name conflicts
+   * (same app name but from different server or with different type).
+   *
+   * @param app
+   * @return
+   */
+  boolean isFor(App app);
+
+  /**
+   * Get the list of installed R packages.
+   *
+   * @return
+   */
+  List<OpalR.RPackageDto> getInstalledPackagesDtos();
+
+  /**
+   * Remove package with provided name.
+   *
+   * @param name
+   */
+  void removePackage(String name) throws RServerException;
+
+  /**
+   * Install a R package from CRAN if not already installed.
+   *
+   * @param name
+   */
+  void ensureCRANPackage(String name) throws RServerException;
+
+  /**
+   * Install a R package from CRAN.
+   *
+   * @param name
+   */
+  void installCRANPackage(String name) throws RServerException;
+
+  /**
+   * Install a R package from GitHub.
+   *
+   * @param name
+   * @param ref
+   */
+  void installGitHubPackage(String name, String ref) throws RServerException;
+
+  /**
+   * Install a Bioconductor package.
+   *
+   * @param name
+   */
+  void installBioconductorPackage(String name) throws RServerException;
 }

@@ -10,11 +10,11 @@
 
 package org.obiba.opal.r.service.event;
 
-public class RServiceStartedEvent {
+public class RServiceInitializedEvent {
 
   private final String name;
 
-  public RServiceStartedEvent(String name) {
+  public RServiceInitializedEvent(String name) {
     this.name = name;
   }
 }

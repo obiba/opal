@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.spi.r;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +18,8 @@ import java.util.Map;
  * @param <T>
  */
 public interface RNamedList<T> extends Map<String, T> {
+
+  List<String> getNames();
 
   default T put(String s, T value) {
     throw new IllegalArgumentException("Operation not available");

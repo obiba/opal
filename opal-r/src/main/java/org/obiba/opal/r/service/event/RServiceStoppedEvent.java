@@ -11,4 +11,10 @@
 package org.obiba.opal.r.service.event;
 
 public class RServiceStoppedEvent {
+
+  private final String name;
+
+  public RServiceStoppedEvent(String name) {
+    this.name = name;
+  }
 }

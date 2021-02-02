@@ -12,7 +12,8 @@ package org.obiba.opal.spi.r;
 
 public class RServerException extends Exception {
 
-    public RServerException() {
+    public RServerException(String msg) {
+        super(msg);
     }
 
     public RServerException(String msg, Throwable throwable) {

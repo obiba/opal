@@ -11,7 +11,7 @@
 package org.obiba.opal.web.resources;
 
 import org.obiba.opal.core.service.ResourceProvidersService;
-import org.obiba.opal.r.service.RServerService;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.Resources;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class ResourceProvidersResource {
   private ResourceProvidersService resourceProvidersService;
 
   @Autowired
-  private RServerService rServerService;
+  private RServerManagerService rServerManagerService;
 
   @GET
   @NoAuthorization
@@ -48,7 +48,7 @@ public class ResourceProvidersResource {
   public Resources.ResourceProvidersStatusDto status() {
     Resources.ResourceProvidersStatusDto.Builder builder = Resources.ResourceProvidersStatusDto.newBuilder()
         .setProvidersCount(resourceProvidersService.getResourceProviders().size())
-        .setRServerRunning(rServerService.isRunning());
+        .setRServerRunning(rServerManagerService.getDefaultRServer().isRunning());
     return builder.build();
   }
 

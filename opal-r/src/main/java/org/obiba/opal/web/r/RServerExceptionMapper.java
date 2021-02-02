@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.spi.r.RServerException;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
@@ -18,11 +19,15 @@ import javax.ws.rs.ext.Provider;
 
 @Component
 @Provider
-public class NoSuchRPackageExceptionMapper implements ExceptionMapper<NoSuchRPackageException> {
+public class RServerExceptionMapper implements ExceptionMapper<RServerException> {
 
   @Override
-  public Response toResponse(NoSuchRPackageException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+  public Response toResponse(RServerException exception) {
+    return Response
+        .status(Status.INTERNAL_SERVER_ERROR)
+        .type("application/x-protobuf+json")
+        .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
+        .build();
   }
 
 }

@@ -20,6 +20,7 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
+import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class OpalRSessionManager {
   private Long rSessionTimeout;
 
   @Autowired
-  private RServerService rServerService;
+  private RServerManagerService rServerManagerService;
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
@@ -240,10 +241,14 @@ public class OpalRSessionManager {
   }
 
   private RServerSession addRSession(String principal) {
-    SubjectRSessions rSessions = getRSessions(principal);
-    RServerSession rSession = rServerService.newRServerSession(principal);
-    rSessions.addRSession(rSession);
-    return rSession;
+    try {
+      SubjectRSessions rSessions = getRSessions(principal);
+      RServerSession rSession = rServerManagerService.getDefaultRServer().newRServerSession(principal);
+      rSessions.addRSession(rSession);
+      return rSession;
+    } catch (Exception e) {
+      throw new RRuntimeException(e);
+    }
   }
 
   private RServerSession getRSession(String principal, String rSessionId) {

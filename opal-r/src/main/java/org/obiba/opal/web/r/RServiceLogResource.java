@@ -10,7 +10,8 @@
 
 package org.obiba.opal.web.r;
 
-import org.obiba.opal.r.service.RServerService;
+import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class RServiceLogResource {
   private static final Logger log = LoggerFactory.getLogger(RServiceLogResource.class);
 
   @Autowired
-  protected RServerService rServerService;
+  protected RServerManagerService rServerManagerService;
 
   @GET
   @Path("Rserve.log")
@@ -61,8 +62,12 @@ public class RServiceLogResource {
   protected RScriptROperation execute(String rscript) {
     log.info(rscript);
     RScriptROperation rop = new RScriptROperation(rscript, false);
-    rServerService.execute(rop);
-    return rop;
+    try {
+      rServerManagerService.getDefaultRServer().execute(rop);
+      return rop;
+    } catch (Exception e) {
+      throw new RRuntimeException(e);
+    }
   }
 
 

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.rserve;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
@@ -18,17 +19,22 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class RserveNamedList implements RNamedList<RServerResult> {
+class RserveNamedList implements RNamedList<RServerResult> {
 
   private final Map<String, RServerResult> namedList = Maps.newLinkedHashMap();
+
+  private List<String> names = Lists.newArrayList();
 
   public RserveNamedList(REXP rexp) throws REXPMismatchException {
     if (rexp != null && rexp.isList()) {
       RList list = rexp.asList();
       if (list.isNamed()) {
+        this.names = ((List<Object>) list.names).stream().map(n -> n == null ? null : n.toString()).collect(Collectors.toList());
         for (int i = 0; i < list.names.size(); i++) {
           String key = list.names.get(i).toString();
           REXP value = list.at(key);
@@ -36,6 +42,11 @@ public class RserveNamedList implements RNamedList<RServerResult> {
         }
       }
     }
+  }
+
+  @Override
+  public List<String> getNames() {
+    return names;
   }
 
   @Override

@@ -15,8 +15,8 @@ import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.spi.r.FileReadROperation;
@@ -49,7 +49,7 @@ public class RReportServiceImpl implements ReportService {
   private OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  private RServerService rServerService;
+  private RServerManagerService rServerManagerService;
 
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput)
@@ -65,7 +65,7 @@ public class RReportServiceImpl implements ReportService {
 
   @Override
   public boolean isRunning() {
-    return rServerService.isRunning();
+    return rServerManagerService.getDefaultRServer().isRunning();
   }
 
   @Override

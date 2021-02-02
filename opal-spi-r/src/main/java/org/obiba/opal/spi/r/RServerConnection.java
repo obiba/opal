@@ -16,13 +16,6 @@ import java.io.OutputStream;
 public interface RServerConnection {
 
   /**
-   * Check if connection is alive.
-   *
-   * @return
-   */
-  boolean isConnected();
-
-  /**
    * Assign raw data to a symbol.
    *
    * @param symbol
@@ -44,10 +37,11 @@ public interface RServerConnection {
    * Evaluate an expression and return the result object.
    *
    * @param expr
+   * @param serialize
    * @return
    * @throws RServerException
    */
-  RServerResult eval(String expr) throws RServerException;
+  RServerResult eval(String expr, boolean serialize) throws RServerException;
 
   /**
    * Write a file from the input stream.
@@ -55,7 +49,7 @@ public interface RServerConnection {
    * @param fileName
    * @param in
    */
-  void writeFile(String fileName, InputStream in);
+  void writeFile(String fileName, InputStream in) throws RServerException;
 
   /**
    * Read a file in the output stream.
@@ -63,7 +57,7 @@ public interface RServerConnection {
    * @param fileName
    * @param out
    */
-  void readFile(String fileName, OutputStream out);
+  void readFile(String fileName, OutputStream out) throws RServerException;
 
   /**
    * Get last operation error.
@@ -71,10 +65,5 @@ public interface RServerConnection {
    * @return
    */
   String getLastError();
-
-  /**
-   * Close the connection.
-   */
-  void close();
 
 }

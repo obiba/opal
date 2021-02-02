@@ -11,24 +11,25 @@
 package org.obiba.opal.web.app;
 
 import org.obiba.opal.core.runtime.App;
-import org.obiba.opal.core.runtime.DefaultApp;
 import org.obiba.opal.web.model.Apps;
 
 public class Dtos {
 
-    public static Apps.AppDto asDto(App app) {
-        Apps.AppDto.Builder builder = Apps.AppDto.newBuilder()
-                .setName(app.getName())
-                .setType(app.getType())
-                .setServer(app.getServer());
-        return builder.build();
-    }
+  public static Apps.AppDto asDto(App app) {
+    Apps.AppDto.Builder builder = Apps.AppDto.newBuilder()
+        .setId(app.getId())
+        .setName(app.getName())
+        .setType(app.getType())
+        .setServer(app.getServer());
+    return builder.build();
+  }
 
-    public static App fromDto(Apps.AppDto dto) {
-        DefaultApp app = new DefaultApp();
-        app.setName(dto.getName());
-        app.setType(dto.getType());
-        if (dto.hasServer()) app.setServer(dto.getServer());
-        return app;
-    }
+  public static App fromDto(Apps.AppDto dto) {
+    App app = new App();
+    if (dto.hasId()) app.setId(dto.getId());
+    app.setName(dto.getName());
+    app.setType(dto.getType());
+    if (dto.hasServer()) app.setServer(dto.getServer());
+    return app;
+  }
 }

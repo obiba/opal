@@ -25,25 +25,29 @@ import javax.ws.rs.core.Response;
 
 @Component
 @Scope("request")
-@Path("/app/{name}")
+@Path("/app/{id}")
 public class AppResource {
 
-    @PathParam("name")
-    private String name;
+  @PathParam("id")
+  private String id;
 
-    @Autowired
-    private AppsService appsService;
+  @Autowired
+  private AppsService appsService;
 
-    @GET
-    public Apps.AppDto get() {
-        return Dtos.asDto(appsService.getApp(name));
+  @GET
+  public Apps.AppDto get() {
+    return Dtos.asDto(appsService.getApp(id));
+  }
+
+  @DELETE
+  @NotAuthenticated
+  public Response unregister() {
+    try {
+      appsService.unregisterApp(appsService.getApp(id));
+    } catch (Exception e) {
+      // ignore
     }
-
-    @DELETE
-    @NotAuthenticated
-    public Response disable() {
-        appsService.unregisterApp(name);
-        return Response.noContent().build();
-    }
+    return Response.noContent().build();
+  }
 
 }

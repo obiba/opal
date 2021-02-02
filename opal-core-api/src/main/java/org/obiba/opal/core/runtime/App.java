@@ -9,48 +9,119 @@
  */
 package org.obiba.opal.core.runtime;
 
+import com.google.common.collect.Lists;
+import org.obiba.opal.core.domain.HasUniqueProperties;
+
+import java.util.List;
+
 /**
  * A high-level abstraction of an external application offering some type of service which has its own lifecycle. Application instances
  * can be registered directly to Opal or discovered though Consul.
  */
-public interface App {
+public class App implements HasUniqueProperties {
 
-    /**
-     * Get unique app name.
-     *
-     * @return
-     */
-    String getName();
+  private String id;
 
-    /**
-     * Get the type.
-     *
-     * @return
-     */
-    String getType();
+  private String name;
 
-    /**
-     * Server running the app instance.
-     *
-     * @return
-     */
-    String getServer();
+  private String type;
 
-    /**
-     * App service is available.
-     *
-     * @return
-     */
-    boolean isRunning();
+  private String server;
 
-    /**
-     * Start using the app.
-     */
-    void start();
+  public App() {
+  }
 
-    /**
-     * Stop using the app.
-     */
-    void stop();
+  public App(String id) {
+    this.id = id;
+  }
 
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  /**
+   * Get unique app name.
+   *
+   * @return
+   */
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Get the type.
+   *
+   * @return
+   */
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * Server running the app instance.
+   *
+   * @return
+   */
+  public String getServer() {
+    return server;
+  }
+
+  public void setServer(String server) {
+    this.server = server;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 1;
+    result = ((result * 31) + ((this.name == null) ? 0 : this.name.hashCode()));
+    result = ((result * 31) + ((this.type == null) ? 0 : this.type.hashCode()));
+    result = ((result * 31) + ((this.server == null) ? 0 : this.server.hashCode()));
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if (!(other instanceof App)) {
+      return false;
+    }
+    App rhs = ((App) other);
+    return this.name.equals(rhs.name)
+        && this.type.equals(rhs.type)
+        && this.server.equals(rhs.server);
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("id");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.newArrayList(id);
+  }
+
+  @Override
+  public String toString() {
+    return "App{" +
+        "id='" + id + '\'' +
+        ", name='" + name + '\'' +
+        ", type='" + type + '\'' +
+        ", server='" + server + '\'' +
+        '}';
+  }
 }

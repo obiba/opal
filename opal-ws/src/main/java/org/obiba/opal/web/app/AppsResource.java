@@ -18,10 +18,7 @@ import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.stream.Collectors;
 
@@ -45,6 +42,13 @@ public class AppsResource {
     @NotAuthenticated
     public Response registerApp(Apps.AppDto appDto) {
         appsService.registerApp(Dtos.fromDto(appDto));
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @NotAuthenticated
+    public Response unRegisterApp(Apps.AppDto appDto) {
+        appsService.unregisterApp(Dtos.fromDto(appDto));
         return Response.ok().build();
     }
 }
