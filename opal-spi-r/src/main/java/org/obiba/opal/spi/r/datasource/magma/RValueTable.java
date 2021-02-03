@@ -11,6 +11,7 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.NullTimestamps;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A value table based on a tibble.
@@ -33,6 +35,8 @@ public class RValueTable extends AbstractValueTable {
   private final String symbol;
 
   private int idPosition;
+
+  private Map<String, Integer> columnPositions = Maps.newHashMap();
 
   public RValueTable(@NotNull RDatasource datasource, @NotNull String name, @NotNull String symbol, String entityType, String idColumn) {
     super(datasource, name);
@@ -88,17 +92,23 @@ public class RValueTable extends AbstractValueTable {
   private void initialiseVariables() {
     String lambdaParam = "n";
     if (lambdaParam.equals(getSymbol())) lambdaParam = ".n";
-    RServerResult columnDescs = execute(String.format("lapply(colnames(`%s`), function(%s) { list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attributes(`%s`[[%s]])) })",
-        getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
+    RServerResult columnDescs = execute(String.format(
+        "lapply(colnames(`%s`), function(%s) { attrs <- attributes(`%s`[[%s]]) ; attrs$labels_names <- names(attrs$labels) ; list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attrs) })",
+        getSymbol(), lambdaParam, getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
     List<RServerResult> columns = columnDescs.asList();
     try {
       int i = 0;
       for (RServerResult columnDesc : columns) {
         RNamedList<RServerResult> column = columnDesc.asNamedList();
-        if (getIdColumn().equals(column.get("name").asStrings()[0]))
+        if (getIdColumn().equals(column.get("name").asStrings()[0])) {
           idPosition = i++;
-        else
-          addVariableValueSource(new RVariableValueSource(this, columnDesc, i++));
+          columnPositions.put(getIdColumn(), idPosition);
+        } else {
+          int pos = i++;
+          RVariableValueSource varSource = new RVariableValueSource(this, columnDesc, pos);
+          addVariableValueSource(varSource);
+          columnPositions.put(varSource.getName(), pos);
+        }
       }
     } catch (Exception e) {
       // ignore
@@ -154,5 +164,9 @@ public class RValueTable extends AbstractValueTable {
   public RVariableEntity getRVariableEntity(VariableEntity entity) {
     if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
     return ((RVariableEntityProvider) getVariableEntityProvider()).getRVariableEntity(entity);
+  }
+
+  public Map<String, Integer> getColumnPositions() {
+    return columnPositions;
   }
 }

@@ -37,7 +37,7 @@ class RValueSetBatch implements ValueSetBatch {
     RServerResult rexp = fetcher.getResult(entities);
     return entities.stream().map(e -> {
       RValueSet vs = new RValueSet(table, e);
-      vs.parseREXP(rexp);
+      vs.parseResult(rexp);
       return vs;
     }).collect(Collectors.toList());
   }

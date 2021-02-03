@@ -258,11 +258,15 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private List<Category> extractCategories(RServerResult attr) {
     if (colClasses.contains("labelled") || colClasses.contains("haven_labelled")
         || colClasses.contains("labelled_spss") || colClasses.contains("haven_labelled_spss")) {
-      RServerResult naValues = extractAttribute(attr, "na_values");
-      RServerResult naRange = extractAttribute(attr, "na_range");
-      return extractCategoriesFromLabels(extractAttribute(attr, "labels"), naValues, naRange);
+      return extractCategoriesFromLabels(extractAttribute(attr, "labels"),
+          extractAttribute(attr, "labels_names"),
+          extractAttribute(attr, "na_values"),
+          extractAttribute(attr, "na_range"));
     } else if (colClasses.contains("factor"))
-      return extractCategoriesFromLevels(extractAttribute(attr, "levels"));
+      return extractCategoriesFromLabels(extractAttribute(attr, "levels"),
+          extractAttribute(attr, "levels_names"),
+          extractAttribute(attr, "na_values"),
+          extractAttribute(attr, "na_range"));
     return Lists.newArrayList();
   }
 
@@ -274,12 +278,14 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
    * @param missingsRange Range of missings
    * @return
    */
-  private List<Category> extractCategoriesFromLabels(RServerResult labels, RServerResult missings, RServerResult missingsRange) {
+  private List<Category> extractCategoriesFromLabels(RServerResult labels, RServerResult labelsNames, RServerResult missings, RServerResult missingsRange) {
     List<Category> categories = Lists.newArrayList();
     if (labels == null) return categories;
     try {
       String[] catLabels = null;
-      if (labels.hasNames()) {
+      if (labelsNames != null) {
+        catLabels = labelsNames.asStrings();
+      } else if (labels.hasNames()) {
         catLabels = labels.getNames();
       }
       List<String> missingNames = Lists.newArrayList();
@@ -330,11 +336,6 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private String normalizeCategoryName(String name) {
     return (isNumeric() || isInteger() || isDecimal()) && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
-  }
-
-  private List<Category> extractCategoriesFromLevels(RServerResult levels) {
-    log.warn("Extracting '{}' categories factor levels not implemented yet", colName);
-    return Lists.newArrayList();
   }
 
   private RServerResult extractAttribute(RServerResult attr, String attrName) {

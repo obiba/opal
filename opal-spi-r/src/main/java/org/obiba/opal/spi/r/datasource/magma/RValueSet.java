@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.ValueSetBean;
+import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
 
 import javax.validation.constraints.NotNull;
@@ -37,7 +38,7 @@ class RValueSet extends ValueSetBean {
 
   public Map<Integer, List<Object>> getValuesByPosition() {
     if (columnValues == null) {
-      parseREXP(fetcher.getResult(getVariableEntity()));
+      parseResult(fetcher.getResult(getVariableEntity()));
     }
     return columnValues;
   }
@@ -45,42 +46,66 @@ class RValueSet extends ValueSetBean {
   /**
    * Parse the tibble to extract values that are related to the entity (could be multilines).
    *
-   * @param rexp
+   * @param result
    */
-  public void parseREXP(RServerResult rexp) {
+  public void parseResult(RServerResult result) {
     columnValues = Maps.newHashMap();
-    if (rexp.isList()) {
-      List<RServerResult> list = rexp.asList();
-      String[] ids = list.get(getIdPosition()).asStrings();
-      List<Integer> rowIdx = Lists.newArrayList();
-      int row = 0;
-      for (String id : ids) {
-        if (getRVariableEntity().equals(new RVariableEntity(getRValueTable().getEntityType(), id))) {
-          rowIdx.add(row);
-        }
-        row++;
-      }
+    if (result.isList()) {
+      List<RServerResult> list = result.asList();
 
-      for (int col = 0; col < list.size(); col++) {
-        if (getIdPosition() == col) continue;
-        columnValues.put(col, Lists.newArrayList());
-        RServerResult vector = list.get(col);
-        boolean[] nas = vector.isNA();
-        Object[] objectValues = asObjects(vector);
-        // #3303 force NA representation
-        for (int i = 0; i < nas.length; i++) {
-          if (nas[i]) objectValues[i] = null;
+      if (list.stream().anyMatch(RServerResult::isNamedList)) {
+        // results from rock are one JSON object per row
+        Map<String, Integer> colPositions = getRValueTable().getColumnPositions();
+        for (RServerResult rowResult : list) {
+          RNamedList<RServerResult> rowNamedResults = rowResult.asNamedList();
+          String id = rowNamedResults.get(getRValueTable().getIdColumn()).asStrings()[0];
+          if (getVariableEntity().getIdentifier().equals(id)) {
+            Map<String, Object> rowMap = asMapOfObjects(rowResult);
+            for (String colName : rowMap.keySet()) {
+              int colPos = colPositions.get(colName);
+              if (!columnValues.containsKey(colPos))
+                columnValues.put(colPos, Lists.newArrayList());
+              columnValues.get(colPos).add(rowMap.get(colName));
+            }
+          }
         }
-        for (int r = 0; r < objectValues.length; r++) {
-          if (rowIdx.contains(r)) {
-            columnValues.get(col).add(objectValues[r]);
+      } else {
+        // results from Rserve are column vectors
+        String[] ids = list.get(getIdPosition()).asStrings();
+        List<Integer> rowIdx = Lists.newArrayList();
+        int row = 0;
+        for (String id : ids) {
+          if (getRVariableEntity().equals(new RVariableEntity(getRValueTable().getEntityType(), id))) {
+            rowIdx.add(row);
+          }
+          row++;
+        }
+
+        for (int col = 0; col < list.size(); col++) {
+          if (getIdPosition() == col) continue;
+          columnValues.put(col, Lists.newArrayList());
+          RServerResult vector = list.get(col);
+          boolean[] nas = vector.isNA();
+          Object[] objectValues = asArrayOfObjects(vector);
+          // #3303 force NA representation
+          for (int i = 0; i < nas.length; i++) {
+            if (nas[i]) objectValues[i] = null;
+          }
+          for (int r = 0; r < objectValues.length; r++) {
+            if (rowIdx.contains(r)) {
+              columnValues.get(col).add(objectValues[r]);
+            }
           }
         }
       }
     }
   }
 
-  private Object[] asObjects(RServerResult vector) {
+  private Map<String, Object> asMapOfObjects(RServerResult vector) {
+    return (Map<String, Object>) vector.asNativeJavaObject();
+  }
+
+  private Object[] asArrayOfObjects(RServerResult vector) {
     Object payload = vector.asNativeJavaObject();
     int arrlength = Array.getLength(payload);
     Object[] outputArray = new Object[arrlength];
