@@ -32,6 +32,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +67,19 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public void assign(String symbol, String content) throws RServerException {
-    
+    String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_assign", rockSessionId));
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = createHeaders();
+    headers.setContentType(MediaType.valueOf("application/x-rscript"));
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+        .queryParam("s", symbol);
+
+    try {
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
+    } catch (RestClientException e) {
+      throw new RServerException("Eval failed", e);
+    }
   }
 
   @Override
@@ -104,17 +117,17 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     try {
       HttpHeaders headers = createHeaders();
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
       MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      body.add("file", new InputStreamResource(in));
-      body.add("path", fileName);
-      body.add("overwrite", true);
-
+      body.add("file", new MultiPartInputStreamResource(in, fileName));
       HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
       String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_upload", rockSessionId));
+      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+          .queryParam("path", fileName)
+          .queryParam("overwrite", true);
+
       RestTemplate restTemplate = new RestTemplate();
-      ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
+      ResponseEntity<String> response = restTemplate.postForEntity(builder.toUriString(), requestEntity, String.class);
       if (!response.getStatusCode().is2xxSuccessful()) {
         log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
         throw new RServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
@@ -238,5 +251,25 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       String authHeader = "Basic " + new String(encodedAuth);
       add("Authorization", authHeader);
     }};
+  }
+
+  private class MultiPartInputStreamResource extends InputStreamResource {
+
+    private final String fileName;
+
+    public MultiPartInputStreamResource(InputStream inputStream, String fileName) {
+      super(inputStream, fileName);
+      this.fileName = fileName;
+    }
+
+    @Override
+    public String getFilename() {
+      return fileName;
+    }
+
+    @Override
+    public long contentLength() throws IOException {
+      return -1; // we do not want to generally read the whole stream into memory ...
+    }
   }
 }
