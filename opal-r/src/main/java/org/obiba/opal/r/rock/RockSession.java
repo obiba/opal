@@ -32,7 +32,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -76,7 +75,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
     try {
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-      ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
+      restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
     } catch (RestClientException e) {
       throw new RServerException("Eval failed", e);
     }
@@ -156,6 +155,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
               throw new RRuntimeException("File download failed: " + response.getStatusCode().getReasonPhrase());
             } else {
               ByteStreams.copy(response.getBody(), out);
+              out.flush();
+              out.close();
             }
             return null;
           });
@@ -176,7 +177,6 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   @Override
   public void close() {
     if (isClosed()) return;
-    cleanDirectories();
     closeSession();
     closeRCommandsQueue();
   }
@@ -210,7 +210,6 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRServerResourceUrl("/r/sessions"), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       RockSessionInfo info = response.getBody();
       this.rockSessionId = info.getId();
-      initDirectories();
     } catch (RestClientException e) {
       throw new RServerException("Failure when opening a Rock R session", e);
     }
@@ -253,7 +252,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     }};
   }
 
-  private class MultiPartInputStreamResource extends InputStreamResource {
+  private static class MultiPartInputStreamResource extends InputStreamResource {
 
     private final String fileName;
 
@@ -268,7 +267,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     }
 
     @Override
-    public long contentLength() throws IOException {
+    public long contentLength() {
       return -1; // we do not want to generally read the whole stream into memory ...
     }
   }

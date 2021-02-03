@@ -14,6 +14,7 @@ import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.r.service.NoSuchRSessionException;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,10 @@ class RserveSession extends AbstractRServerSession {
   private final RserveConnection rConnection;
 
   private boolean closed = false;
+
+  private String originalWorkDir;
+
+  private String originalTempDir;
 
   /**
    * Build a R session reference from a R connection.
@@ -103,4 +108,51 @@ class RserveSession extends AbstractRServerSession {
     }
   }
 
+  private void initDirectories() {
+    try {
+      this.originalWorkDir = getRWorkDir();
+      this.originalTempDir = updateRTempDir();
+    } catch (Exception e) {
+      // ignore
+    }
+  }
+
+  protected void cleanDirectories() {
+    try {
+      cleanRWorkDir();
+      cleanRTempDir();
+    } catch (Exception e) {
+      // ignore
+    }
+  }
+
+  private String getRWorkDir() {
+    RScriptROperation rop = new RScriptROperation("base::getwd()", false);
+    execute(rop);
+    return rop.getResult().asStrings()[0];
+  }
+
+  private String updateRTempDir() {
+    RScriptROperation rop = new RScriptROperation("if (!require(unixtools)) { install.packages('unixtools', repos = 'http://www.rforge.net/') }", false);
+    execute(rop);
+    rop = new RScriptROperation("unixtools::set.tempdir(base::file.path(base::tempdir(), base::basename(base::getwd())))", false);
+    execute(rop);
+    rop = new RScriptROperation("base::dir.create(base::tempdir(), recursive = TRUE)", false);
+    execute(rop);
+    rop = new RScriptROperation("base::tempdir()", false);
+    execute(rop);
+    return rop.getResult().asStrings()[0];
+  }
+
+  private void cleanRWorkDir() {
+    if (Strings.isNullOrEmpty(originalWorkDir)) return;
+    RScriptROperation rop = new RScriptROperation(String.format("base::unlink('%s', recursive=TRUE)", originalWorkDir), false);
+    execute(rop);
+  }
+
+  private void cleanRTempDir() {
+    if (Strings.isNullOrEmpty(originalTempDir)) return;
+    RScriptROperation rop = new RScriptROperation(String.format("base::unlink('%s', recursive=TRUE)", originalTempDir), false);
+    execute(rop);
+  }
 }

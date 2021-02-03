@@ -30,6 +30,7 @@ import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
@@ -56,16 +57,25 @@ public class RockService implements RServerService {
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
-  private final Credentials managerCredentials;
+  private Credentials managerCredentials;
 
-  private final Credentials userCredentials;
+  private Credentials userCredentials;
+
+  @Value("${rock.manager.username}")
+  private String managerUsername;
+
+  @Value("${rock.manager.password}")
+  private String managerPassword;
+
+  @Value("${rock.user.username}")
+  private String userUsername;
+
+  @Value("${rock.user.password}")
+  private String userPassword;
 
   @Autowired
   public RockService(TransactionalThreadFactory transactionalThreadFactory) {
     this.transactionalThreadFactory = transactionalThreadFactory;
-    // TODO configurable credentials
-    this.managerCredentials = new UsernamePasswordCredentials("manager", "password");
-    this.userCredentials = new UsernamePasswordCredentials("user", "password");
   }
 
   public void setApp(App app) {
@@ -186,7 +196,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    return new RockSession(app, userCredentials, user, transactionalThreadFactory);
+    return new RockSession(app, getUserCredentials(), user, transactionalThreadFactory);
   }
 
   @Override
@@ -225,7 +235,7 @@ public class RockService implements RServerService {
 
   private HttpHeaders createHeaders() {
     return new HttpHeaders() {{
-      String auth = managerCredentials.getUserPrincipal().getName() + ":" + managerCredentials.getPassword();
+      String auth = getManagerCredentials().getUserPrincipal().getName() + ":" + getManagerCredentials().getPassword();
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
       String authHeader = "Basic " + new String(encodedAuth);
       add("Authorization", authHeader);
@@ -235,5 +245,17 @@ public class RockService implements RServerService {
   private void execute(String cmd) throws RServerException {
     RScriptROperation rop = new RScriptROperation(cmd, false);
     execute(rop);
+  }
+
+  public Credentials getManagerCredentials() {
+    if (managerCredentials == null)
+      managerCredentials = new UsernamePasswordCredentials(managerUsername, managerPassword);
+    return managerCredentials;
+  }
+
+  public Credentials getUserCredentials() {
+    if (userCredentials == null)
+      userCredentials = new UsernamePasswordCredentials(userUsername, userPassword);
+    return userCredentials;
   }
 }
