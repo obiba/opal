@@ -87,10 +87,13 @@ public class RServerManagerService implements Service {
           else
             rClusters.put(tag, new RServerCluster(tag));
           rClusters.get(tag).addRServerService(rServerService);
+          if (running)
+            rServerService.start();
         });
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
       }
+      informInitialized();
     }
   }
 
@@ -116,8 +119,7 @@ public class RServerManagerService implements Service {
     rClusters.values().forEach(RServerCluster::start);
     running = true;
     eventBus.post(new RServiceStartedEvent(getName()));
-    if (rserveService.isRunning() || rClusters.containsKey(DEFAULT_CLUSTER_NAME))
-      eventBus.post(new RServiceInitializedEvent(getName()));
+    informInitialized();
   }
 
   @Override
@@ -136,5 +138,10 @@ public class RServerManagerService implements Service {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return null;
+  }
+
+  private void informInitialized() {
+    if (rClusters.containsKey(DEFAULT_CLUSTER_NAME) || rserveService.isRunning())
+      eventBus.post(new RServiceInitializedEvent(getName()));
   }
 }

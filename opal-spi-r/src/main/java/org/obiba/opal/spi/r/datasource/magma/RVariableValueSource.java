@@ -256,9 +256,9 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private List<Category> extractCategories(RServerResult attr) {
-    if (colClasses.contains("labelled") || colClasses.contains("haven_labelled")
-        || colClasses.contains("labelled_spss") || colClasses.contains("haven_labelled_spss")) {
-      return extractCategoriesFromLabels(extractAttribute(attr, "labels"),
+    RServerResult labels = extractAttribute(attr, "labels");
+    if (labels != null) {
+      return extractCategoriesFromLabels(labels,
           extractAttribute(attr, "labels_names"),
           extractAttribute(attr, "na_values"),
           extractAttribute(attr, "na_range"));

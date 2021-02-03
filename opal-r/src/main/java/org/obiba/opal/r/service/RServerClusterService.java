@@ -42,6 +42,7 @@ public interface RServerClusterService extends RServerService {
 
   /**
    * Check that the R server associated to the App is running.
+   *
    * @param app
    * @return
    */

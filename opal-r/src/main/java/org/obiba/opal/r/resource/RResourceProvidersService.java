@@ -19,7 +19,7 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
-import org.obiba.opal.r.service.event.RServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
@@ -125,7 +125,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   //
 
   @Subscribe
-  public void onRServiceStarted(RServiceStartedEvent event) {
+  public void onRServiceStarted(RServiceInitializedEvent event) {
     finalizeServiceStart();
     loadResourceProviders();
   }
