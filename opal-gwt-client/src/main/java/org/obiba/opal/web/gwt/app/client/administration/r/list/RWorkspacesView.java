@@ -80,6 +80,7 @@ public class RWorkspacesView extends ViewWithUiHandlers<RWorkspacesUiHandlers> i
   public void renderRows(JsArray<RWorkspaceDto> rows) {
     pager.firstPage();
     dataProvider.setList(JsArrays.toList(rows));
+    dataProvider.refresh();
     pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 

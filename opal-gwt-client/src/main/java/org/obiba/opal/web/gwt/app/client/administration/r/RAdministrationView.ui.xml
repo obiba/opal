@@ -22,7 +22,7 @@
     </g:FlowPanel>
 
     <b:Heading size="4">
-      <ui:msg description="R server admin label">R Server</ui:msg>
+      <ui:msg description="R servers admin label">R Servers</ui:msg>
     </b:Heading>
 
     <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">

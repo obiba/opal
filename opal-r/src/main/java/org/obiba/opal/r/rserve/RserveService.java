@@ -138,7 +138,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Override
   public RServerSession newRServerSession(String user) {
     RServerConnection rConnection = newConnection();
-    RserveSession session = new RserveSession((RserveConnection) rConnection, transactionalThreadFactory, user);
+    RserveSession session = new RserveSession(getName(), (RserveConnection) rConnection, transactionalThreadFactory, user);
     sessions.add(session);
     return session;
   }

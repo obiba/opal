@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.r.service.NoSuchRSessionException;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
@@ -40,8 +41,8 @@ class RserveSession extends AbstractRServerSession {
    *
    * @param connection
    */
-  RserveSession(RserveConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
-    super(UUID.randomUUID().toString(), user, transactionalThreadFactory);
+  RserveSession(String serverName, RserveConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
+    super(RServerManagerService.DEFAULT_CLUSTER_NAME, serverName, UUID.randomUUID().toString(), user, transactionalThreadFactory);
     this.rConnection = connection;
     initDirectories();
   }

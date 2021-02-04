@@ -9,18 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
-import org.obiba.opal.web.gwt.datetime.client.FormatType;
-import org.obiba.opal.web.gwt.datetime.client.Moment;
-import org.obiba.opal.web.model.client.opal.r.RSessionDto;
-import org.obiba.opal.web.model.client.opal.r.RSessionStatus;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -37,13 +25,25 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.opal.r.RSessionDto;
+import org.obiba.opal.web.model.client.opal.r.RSessionStatus;
 
 /**
  *
  */
 public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> implements RSessionsPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, RSessionsView> {}
+  interface Binder extends UiBinder<Widget, RSessionsView> {
+  }
 
   @UiField
   InlineLabel noRSessions;
@@ -82,8 +82,9 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
 
   @Override
   public void renderRows(JsArray<RSessionDto> rows) {
-    pager.firstPage();
     dataProvider.setList(JsArrays.toList(rows));
+    pager.firstPage();
+    dataProvider.refresh();
     pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
@@ -113,6 +114,20 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
       }
     }, translations.idLabel());
 
+//    table.addColumn(new TextColumn<RSessionDto>() {
+//      @Override
+//      public String getValue(RSessionDto object) {
+//        return object.getCluster();
+//      }
+//    }, translations.clusterLabel());
+
+    table.addColumn(new TextColumn<RSessionDto>() {
+      @Override
+      public String getValue(RSessionDto object) {
+        return object.getServer();
+      }
+    }, translations.rServerLabel());
+
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override
       public String getValue(RSessionDto object) {
@@ -130,7 +145,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override
       public String getValue(RSessionDto object) {
-        if(!object.hasCreationDate()) return "-";
+        if (!object.hasCreationDate()) return "-";
         return Moment.create(object.getCreationDate()).format(FormatType.MONTH_NAME_TIME_SHORT);
       }
     }, translations.startLabel());
@@ -138,7 +153,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override
       public String getValue(RSessionDto object) {
-        if(!object.hasLastAccessDate()) return "-";
+        if (!object.hasLastAccessDate()) return "-";
         return Moment.create(object.getLastAccessDate()).fromNow();
       }
     }, translations.lastAccessLabel());
@@ -149,7 +164,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
 
       @Override
       public String[] allActions() {
-        return new String[] { RSessionsPresenter.TERMINATE_ACTION };
+        return new String[]{RSessionsPresenter.TERMINATE_ACTION};
       }
 
       @Override
@@ -162,7 +177,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     actionsColumn.setActionHandler(new ActionHandler<RSessionDto>() {
       @Override
       public void doAction(RSessionDto dto, String actionName) {
-        if(actionName != null && RSessionsPresenter.TERMINATE_ACTION.equals(actionName)) {
+        if (actionName != null && RSessionsPresenter.TERMINATE_ACTION.equals(actionName)) {
           getUiHandlers().onTerminate(dto);
         }
       }
@@ -174,22 +189,23 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
   private void addTablePager() {
     table.setPageSize(20);
     pager.setDisplay(table);
-    pager.setVisible(false);
   }
 
   private static class StatusColumn extends Column<RSessionDto, String> {
 
-    private StatusColumn() {super(new StatusImageCell());}
+    private StatusColumn() {
+      super(new StatusImageCell());
+    }
 
     @Override
     public String getValue(RSessionDto dto) {
       // Waiting
-      if(dto.getStatus().getName().equals(RSessionStatus.WAITING.getName())) {
+      if (dto.getStatus().getName().equals(RSessionStatus.WAITING.getName())) {
         return translations.statusMap().get(RSessionStatus.WAITING.getName()) + ":" +
             StatusImageCell.BULLET_GREEN;
       }
       // Busy
-      if(dto.getStatus().getName().equals(RSessionStatus.BUSY.getName())) {
+      if (dto.getStatus().getName().equals(RSessionStatus.BUSY.getName())) {
         return translations.statusMap().get(RSessionStatus.BUSY.getName()) + ":" +
             StatusImageCell.BULLET_ORANGE;
       }

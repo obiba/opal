@@ -53,6 +53,10 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private String executionContext = DEFAULT_CONTEXT;
 
+  private final String clusterName;
+
+  private final String serverName;
+
   /**
    * R commands to be processed.
    */
@@ -72,12 +76,14 @@ public abstract class AbstractRServerSession implements RServerSession {
    */
   private int commandId = 1;
 
-  protected AbstractRServerSession(String id, String user, TransactionalThreadFactory transactionalThreadFactory) {
+  protected AbstractRServerSession(String clusterName, String serverName, String id, String user, TransactionalThreadFactory transactionalThreadFactory) {
     this.id = id;
     this.user = user;
     this.transactionalThreadFactory = transactionalThreadFactory;
     this.created = new Date();
     this.timestamp = created;
+    this.clusterName = clusterName;
+    this.serverName = serverName;
   }
 
   //
@@ -122,6 +128,16 @@ public abstract class AbstractRServerSession implements RServerSession {
   @Override
   public String getExecutionContext() {
     return Strings.isNullOrEmpty(executionContext) ? DEFAULT_CONTEXT : executionContext;
+  }
+
+  @Override
+  public String getRServerClusterName() {
+    return clusterName;
+  }
+
+  @Override
+  public String getRServerServiceName() {
+    return serverName;
   }
 
   @Override

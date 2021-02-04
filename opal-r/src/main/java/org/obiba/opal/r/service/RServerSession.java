@@ -35,6 +35,10 @@ public interface RServerSession extends RASyncOperationTemplate {
 
   String getExecutionContext();
 
+  String getRServerClusterName();
+
+  String getRServerServiceName();
+
   /**
    * Check if the R session is not busy and has expired.
    *

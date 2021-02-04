@@ -79,6 +79,8 @@ public class Dtos {
         .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING) //
         .setLink(ub.build(rSession.getId()).toString()) //
         .setContext(rSession.getExecutionContext()) //
+        .setCluster(rSession.getRServerClusterName())
+        .setServer(rSession.getRServerServiceName())
         .build();
   }
 

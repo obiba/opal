@@ -53,6 +53,8 @@ public class RockService implements RServerService {
 
   private static final Logger log = LoggerFactory.getLogger(RockService.class);
 
+  private String clusterName;
+
   private App app;
 
   private final TransactionalThreadFactory transactionalThreadFactory;
@@ -76,6 +78,10 @@ public class RockService implements RServerService {
   @Autowired
   public RockService(TransactionalThreadFactory transactionalThreadFactory) {
     this.transactionalThreadFactory = transactionalThreadFactory;
+  }
+
+  public void setRServerClusterName(String clusterName) {
+    this.clusterName = clusterName;
   }
 
   public void setApp(App app) {
@@ -212,7 +218,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    return new RockSession(app, getUserCredentials(), user, transactionalThreadFactory);
+    return new RockSession(clusterName, app, getUserCredentials(), user, transactionalThreadFactory);
   }
 
   @Override

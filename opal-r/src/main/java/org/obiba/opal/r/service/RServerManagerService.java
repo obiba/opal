@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -43,7 +44,7 @@ public class RServerManagerService implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(RServerManagerService.class);
 
-  private static final String DEFAULT_CLUSTER_NAME = "default";
+  public static final String DEFAULT_CLUSTER_NAME = "default";
 
   private static final String ROCK_APP_TYPE = "rock";
 
@@ -86,16 +87,20 @@ public class RServerManagerService implements Service {
       RockService rServerService = applicationContext.getBean("rockRService", RockService.class);
       rServerService.setApp(event.getApp());
       try {
-        rServerService.getState().getTags().forEach(tag -> {
-          if (rClusters.containsKey(tag))
+        // R server can only be in one cluster
+        List<String> tags = rServerService.getState().getTags();
+        if (!tags.isEmpty()) {
+          String clusterName = tags.get(0);
+          if (rClusters.containsKey(clusterName))
             // ensure a service built on same app is not already registered in the cluster
-            rClusters.get(tag).removeRServerService(event.getApp());
+            rClusters.get(clusterName).removeRServerService(event.getApp());
           else
-            rClusters.put(tag, new RServerCluster(tag));
-          rClusters.get(tag).addRServerService(rServerService);
+            rClusters.put(clusterName, new RServerCluster(clusterName));
+          rClusters.get(clusterName).addRServerService(rServerService);
+          rServerService.setRServerClusterName(clusterName);
           if (running)
             rServerService.start();
-        });
+        }
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
       }
