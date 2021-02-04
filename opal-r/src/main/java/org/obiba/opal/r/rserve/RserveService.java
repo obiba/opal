@@ -63,6 +63,9 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Value("${org.obiba.opal.Rserve.encoding}")
   private String encoding;
 
+  @Value("${org.obiba.opal.r.repos}")
+  private String defaultRepos;
+
   @Autowired
   private TransactionalThreadFactory transactionalThreadFactory;
 
@@ -77,7 +80,17 @@ public class RserveService implements RServerService, ROperationTemplate {
    */
   @Override
   public synchronized void execute(ROperation rop) {
-    RServerSession rSession = newRServerSession(SecurityUtils.getSubject().getPrincipal().toString());
+    String user = "opal";
+    try {
+      Object principal = SecurityUtils.getSubject().getPrincipal();
+      if (principal != null) user = principal.toString();
+    } catch (Exception e) {
+      if (log.isDebugEnabled())
+        log.warn("Exception when retrieving subject", e);
+      else
+        log.warn("Exception when retrieving subject: {}", e.getMessage());
+    }
+    RServerSession rSession = newRServerSession(user);
     try {
       rSession.execute(rop);
     } finally {
@@ -130,7 +143,7 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Override
   public String getName() {
-    return "r";
+    return "_rserver";
   }
 
   @Override
@@ -174,12 +187,12 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Override
   public void ensureCRANPackage(String name) {
-    execute(String.format("if (!require(%s)) { install.packages('%s') }", name, name));
+    execute(String.format("if (!require(%s)) { install.packages('%s', repos=c('%s')) }", name, name, Joiner.on("','").join(getDefaultRepos())));
   }
 
   @Override
   public void installCRANPackage(String name) {
-    execute(String.format("install.packages('%s')", name));
+    execute(String.format("install.packages('%s', repos=c('%s'))", name, Joiner.on("','").join(getDefaultRepos())));
   }
 
   @Override
@@ -276,6 +289,10 @@ public class RserveService implements RServerService, ROperationTemplate {
   private void execute(String cmd) {
     RScriptROperation rop = new RScriptROperation(cmd, false);
     execute(rop);
+  }
+
+  private List<String> getDefaultRepos() {
+    return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
   }
 
 }

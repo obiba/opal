@@ -61,12 +61,14 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public void assign(String symbol, byte[] content) throws RServerException {
-
+    touch();
+    // TODO
   }
 
   @Override
   public void assign(String symbol, String content) throws RServerException {
-    String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_assign", rockSessionId));
+    touch();
+    String serverUrl = getRSessionResourceUrl("/_assign");
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = createHeaders();
     headers.setContentType(MediaType.valueOf("application/x-rscript"));
@@ -83,7 +85,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public RServerResult eval(String expr, boolean serialize) throws RServerException {
-    String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_eval", rockSessionId));
+    touch();
+    String serverUrl = getRSessionResourceUrl("/_eval");
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = createHeaders();
     headers.setContentType(MediaType.valueOf("application/x-rscript"));
@@ -113,6 +116,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public void writeFile(String fileName, InputStream in) throws RServerException {
+    touch();
     try {
       HttpHeaders headers = createHeaders();
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -120,7 +124,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       body.add("file", new MultiPartInputStreamResource(in, fileName));
       HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-      String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_upload", rockSessionId));
+      String serverUrl = getRSessionResourceUrl("/_upload");
       UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
           .queryParam("path", fileName)
           .queryParam("overwrite", true);
@@ -138,11 +142,12 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public void readFile(String fileName, OutputStream out) throws RServerException {
+    touch();
     try {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Collections.singletonList(MediaType.ALL));
 
-      String serverUrl = getRServerResourceUrl(String.format("/r/session/%s/_download", rockSessionId));
+      String serverUrl = getRSessionResourceUrl("/_download");
       UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
           .queryParam("path", fileName);
 
@@ -178,7 +183,6 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   public void close() {
     if (isClosed()) return;
     closeSession();
-    closeRCommandsQueue();
   }
 
   @Override
@@ -188,6 +192,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   @Override
   public synchronized void execute(ROperation rop) {
+    touch();
     lock.lock();
     setBusy(true);
     touch();
@@ -207,7 +212,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   private void openSession() throws RServerException {
     try {
       RestTemplate restTemplate = new RestTemplate();
-      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRServerResourceUrl("/r/sessions"), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
+      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionsResourceUrl(), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       RockSessionInfo info = response.getBody();
       this.rockSessionId = info.getId();
     } catch (RestClientException e) {
@@ -218,7 +223,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   private RockSessionInfo getSession() throws RServerException {
     try {
       RestTemplate restTemplate = new RestTemplate();
-      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRServerResourceUrl("/r/session/" + rockSessionId), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
+      ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionResourceUrl(""), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       return response.getBody();
     } catch (RestClientException e) {
       throw new RServerException("Failure when accessing a Rock R session", e);
@@ -228,7 +233,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   private void closeSession() {
     try {
       RestTemplate restTemplate = new RestTemplate();
-      restTemplate.exchange(getRServerResourceUrl("/r/session/" + rockSessionId), HttpMethod.DELETE, new HttpEntity<>(createHeaders()), Void.class);
+      restTemplate.exchange(getRSessionResourceUrl(""), HttpMethod.DELETE, new HttpEntity<>(createHeaders()), Void.class);
       this.rockSessionId = null;
     } catch (RestClientException e) {
       String msg = "Failure when closing the Rock R session {}";
@@ -239,8 +244,12 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     }
   }
 
-  private String getRServerResourceUrl(String path) {
-    return app.getServer() + path;
+  private String getRSessionsResourceUrl() {
+    return String.format("%s/r/sessions", app.getServer());
+  }
+
+  private String getRSessionResourceUrl(String path) {
+    return String.format("%s/r/session/%s%s", app.getServer(), rockSessionId, path);
   }
 
   private HttpHeaders createHeaders() {

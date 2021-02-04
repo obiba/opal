@@ -55,22 +55,16 @@ public class RServerManagerService implements Service {
   @Autowired
   private RserveService rserveService;
 
+  private boolean rserveServiceInDefaultCluster;
+
   private final Map<String, RServerCluster> rClusters = Maps.newConcurrentMap();
 
   private boolean running;
 
-  private RServerService defaultRServerService;
-
   public RServerService getDefaultRServer() {
-    if (defaultRServerService == null) {
-      if (rserveService.isRunning())
-        defaultRServerService = rserveService;
-      else if (rClusters.containsKey(DEFAULT_CLUSTER_NAME))
-        return rClusters.get(DEFAULT_CLUSTER_NAME);
-      else
-        throw new NoSuchServiceException("R server");
-    }
-    return rserveService;
+    if (rClusters.containsKey(getDefaultClusterName()))
+      return rClusters.get(getDefaultClusterName());
+    throw new NoSuchServiceException("R server (default)");
   }
 
   @Subscribe
@@ -93,7 +87,7 @@ public class RServerManagerService implements Service {
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
       }
-      informInitialized();
+      notifyInitialized();
     }
   }
 
@@ -115,16 +109,20 @@ public class RServerManagerService implements Service {
 
   @Override
   public void start() {
-    rserveService.start();
+    if (!rserveServiceInDefaultCluster && isRserveServiceAvailable()) {
+      if (!rClusters.containsKey(getDefaultClusterName()))
+        rClusters.put(getDefaultClusterName(), new RServerCluster(getDefaultClusterName()));
+      rClusters.get(getDefaultClusterName()).addRServerService(rserveService);
+      rserveServiceInDefaultCluster = true;
+    }
     rClusters.values().forEach(RServerCluster::start);
     running = true;
     eventBus.post(new RServiceStartedEvent(getName()));
-    informInitialized();
+    notifyInitialized();
   }
 
   @Override
   public void stop() {
-    rserveService.stop();
     rClusters.values().forEach(RServerCluster::stop);
     running = false;
     eventBus.post(new RServiceStoppedEvent(getName()));
@@ -140,8 +138,22 @@ public class RServerManagerService implements Service {
     return null;
   }
 
-  private void informInitialized() {
-    if (rClusters.containsKey(DEFAULT_CLUSTER_NAME) || rserveService.isRunning())
+  private boolean isRserveServiceAvailable() {
+    try {
+      rserveService.getState();
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private void notifyInitialized() {
+    if (rClusters.containsKey(getDefaultClusterName()))
       eventBus.post(new RServiceInitializedEvent(getName()));
+  }
+
+  private String getDefaultClusterName() {
+    // TODO make it configurable (live?)
+    return DEFAULT_CLUSTER_NAME;
   }
 }

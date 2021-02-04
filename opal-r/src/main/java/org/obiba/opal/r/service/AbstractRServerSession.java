@@ -37,7 +37,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractRServerSession.class);
 
-  private final TransactionalThreadFactory transactionalThreadFactory;
+  protected final TransactionalThreadFactory transactionalThreadFactory;
 
   protected final Lock lock = new ReentrantLock();
 

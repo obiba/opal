@@ -61,16 +61,16 @@ public class RockService implements RServerService {
 
   private Credentials userCredentials;
 
-  @Value("${rock.manager.username}")
+  @Value("${rock.defaults.manager.username}")
   private String managerUsername;
 
-  @Value("${rock.manager.password}")
+  @Value("${rock.defaults.manager.password}")
   private String managerPassword;
 
-  @Value("${rock.user.username}")
+  @Value("${rock.defaults.user.username}")
   private String userUsername;
 
-  @Value("${rock.user.password}")
+  @Value("${rock.defaults.user.password}")
   private String userPassword;
 
   @Autowired

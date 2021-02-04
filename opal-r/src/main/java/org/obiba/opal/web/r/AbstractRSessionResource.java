@@ -22,6 +22,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +113,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   public List<OpalR.RCommandDto> getRCommands() {
     ImmutableList.Builder<OpalR.RCommandDto> commands = ImmutableList.builder();
 
-    commands.addAll(Iterables.transform(getOpalRSession().getRCommands(), new Function<RCommand, OpalR.RCommandDto>() {
+    commands.addAll(Iterables.transform(getRServerSession().getRCommands(), new Function<RCommand, OpalR.RCommandDto>() {
       @Nullable
       @Override
       public OpalR.RCommandDto apply(@Nullable RCommand rCommand) {
@@ -125,9 +126,9 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public OpalR.RCommandDto getRCommand(String rid, boolean wait) {
-    RCommand rCommand = getOpalRSession().getRCommand(rid);
+    RCommand rCommand = getRServerSession().getRCommand(rid);
     if (!rCommand.isFinished() && wait) {
-      while (!getOpalRSession().getRCommand(rid).isFinished()) {
+      while (!getRServerSession().getRCommand(rid).isFinished()) {
         try {
           synchronized (rCommand) {
             rCommand.wait();
@@ -142,19 +143,19 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public Response removeRCommand(String rid) {
-    if (getOpalRSession().hasRCommand(rid)) {
-      getOpalRSession().removeRCommand(rid);
+    if (getRServerSession().hasRCommand(rid)) {
+      getRServerSession().removeRCommand(rid);
     }
     return Response.ok().build();
   }
 
   @Override
   public Response getRCommandResult(String rid, boolean remove, boolean wait) {
-    RCommand rCommand = getOpalRSession().getRCommand(rid);
+    RCommand rCommand = getRServerSession().getRCommand(rid);
     Response resp = Response.noContent().build();
     if (!rCommand.isFinished()) {
       if (wait) {
-        while (!getOpalRSession().getRCommand(rid).isFinished()) {
+        while (!getRServerSession().getRCommand(rid).isFinished()) {
           try {
             synchronized (rCommand) {
               rCommand.wait();
@@ -179,7 +180,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
         resp = Response.ok().entity(rop.getResult().asBytes()).build();
       }
     }
-    if (remove) getOpalRSession().removeRCommand(rCommand.getId());
+    if (remove) getRServerSession().removeRCommand(rCommand.getId());
     return resp;
   }
 
@@ -213,7 +214,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     return resource;
   }
 
-  protected RServerSession getOpalRSession() {
+  protected RServerSession getRServerSession() {
     return rSession;
   }
 

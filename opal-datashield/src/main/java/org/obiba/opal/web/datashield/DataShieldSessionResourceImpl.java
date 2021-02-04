@@ -57,10 +57,10 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
       ROperationWithResult operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
           DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
       if (async) {
-        String id = getOpalRSession().executeAsync(operation);
+        String id = getRServerSession().executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
       } else {
-        getOpalRSession().execute(operation);
+        getRServerSession().execute(operation);
         return Response.ok().entity(operation.getResult().asBytes()).build();
       }
     } catch (ParseException e) {
@@ -74,7 +74,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     DataShieldSymbolResource resource = applicationContext
         .getBean("dataShieldSymbolResource", DataShieldSymbolResource.class);
     resource.setName(name);
-    resource.setRServerSession(getOpalRSession());
+    resource.setRServerSession(getRServerSession());
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
     resource.setResourceReferenceService(getResourceReferenceService());

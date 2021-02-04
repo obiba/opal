@@ -44,13 +44,13 @@ public class RockState implements RServerState {
 
   @Override
   public int getRSessionsCount() {
-    if (info.getRServerStatus().getRSessionsCounts() != null) return 0;
+    if (info.getRServerStatus().getRSessionsCounts() == null) return 0;
     return (Integer) info.getRServerStatus().getRSessionsCounts().getAdditionalProperties().getOrDefault("total", 0);
   }
 
   @Override
   public int getBusyRSessionsCount() {
-    if (info.getRServerStatus().getRSessionsCounts() != null) return 0;
+    if (info.getRServerStatus().getRSessionsCounts() == null) return 0;
     return (Integer) info.getRServerStatus().getRSessionsCounts().getAdditionalProperties().getOrDefault("busy", 0);
   }
 }

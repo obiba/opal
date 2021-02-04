@@ -54,7 +54,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     this.rSession = rSession;
   }
 
-  protected RServerSession getRSession() {
+  protected RServerSession getRServerSession() {
     return rSession;
   }
 
