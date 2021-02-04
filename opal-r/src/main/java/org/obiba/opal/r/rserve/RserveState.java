@@ -11,6 +11,7 @@
 package org.obiba.opal.r.rserve;
 
 import com.google.common.collect.Lists;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerState;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class RserveState implements RServerState {
 
   @Override
   public String getName() {
-    return "_rserver";
+    return RserveService.RSERVE_NAME;
   }
 
   @Override

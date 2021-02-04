@@ -58,6 +58,16 @@ public class RServerCluster implements RServerClusterService {
     }
   }
 
+  public List<RServerService> getRServerServices() {
+    return rServerServices;
+  }
+
+  public RServerService getRServerService(String sname) {
+    Optional<RServerService> service = rServerServices.stream().filter(s -> s.getName().equals(sname)).findFirst();
+    if (service.isPresent()) return service.get();
+    throw new NoSuchElementException("No R server with name: " + sname + " in cluster " + name);
+  }
+
   //
   // R servers proxy
   //
@@ -192,6 +202,12 @@ public class RServerCluster implements RServerClusterService {
     }).collect(Collectors.toList()));
   }
 
+  @Override
+  public String[] getLog(Integer nbLines) {
+    // TODO merge from each server
+    return getNextRServerService().getLog(nbLines);
+  }
+
   //
   // Cluster methods
   //
@@ -240,12 +256,6 @@ public class RServerCluster implements RServerClusterService {
     throw new NoSuchElementException("No R server is available in cluster: " + name);
   }
 
-  private RServerService getRServerService(String sname) {
-    Optional<RServerService> service = rServerServices.stream().filter(s -> s.getName().equals(sname)).findFirst();
-    if (service.isPresent()) return service.get();
-    throw new NoSuchElementException("No R server with name: " + sname + " in cluster " + name);
-  }
-
   private void invokeAll(List<Callable<Void>> callables) {
     ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
     try {
@@ -254,4 +264,5 @@ public class RServerCluster implements RServerClusterService {
       log.error("Error while invoking all R servers", e);
     }
   }
+
 }

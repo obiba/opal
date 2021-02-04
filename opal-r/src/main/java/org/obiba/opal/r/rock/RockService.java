@@ -169,7 +169,7 @@ public class RockService implements RServerService {
   }
 
   @Override
-  public void installCRANPackage(String name) throws RServerException {
+  public void installCRANPackage(String name) {
     Map<String, String> params = Maps.newHashMap();
     params.put("name", name);
     params.put("manager", "cran");
@@ -177,7 +177,7 @@ public class RockService implements RServerService {
   }
 
   @Override
-  public void installGitHubPackage(String name, String ref) throws RServerException {
+  public void installGitHubPackage(String name, String ref) {
     Map<String, String> params = Maps.newHashMap();
     params.put("name", name);
     if (!Strings.isNullOrEmpty(ref))
@@ -187,11 +187,27 @@ public class RockService implements RServerService {
   }
 
   @Override
-  public void installBioconductorPackage(String name) throws RServerException {
+  public void installBioconductorPackage(String name) {
     Map<String, String> params = Maps.newHashMap();
     params.put("name", name);
     params.put("manager", "bioconductor");
     installPackage(params);
+  }
+
+  @Override
+  public String[] getLog(Integer nbLines) {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setAccept(Lists.newArrayList(MediaType.TEXT_PLAIN));
+      RestTemplate restTemplate = new RestTemplate();
+      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getRServerResourceUrl("/rserver/_log"))
+          .queryParam("limit", nbLines);
+      ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+      return response.getBody().split("\n");
+    } catch (RestClientException e) {
+      log.warn("Error while getting R server log", e);
+      return new String[0];
+    }
   }
 
   @Override

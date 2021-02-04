@@ -13,10 +13,15 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
+import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.r.cluster.RServerCluster;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.RServerState;
 import org.obiba.opal.spi.r.REvaluationRuntimeException;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.web.model.Apps;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.model.Ws;
 
@@ -24,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for building R related Dtos.
@@ -31,6 +37,36 @@ import java.util.Date;
 public class Dtos {
 
   private Dtos() {
+  }
+
+  public static OpalR.RServerClusterDto asDto(RServerCluster cluster) {
+    return OpalR.RServerClusterDto.newBuilder()
+        .setName(cluster.getName())
+        .addAllServers(cluster.getRServerServices().stream().map(Dtos::asDto).collect(Collectors.toList()))
+        .build();
+  }
+
+  public static OpalR.RServerDto asDto(RServerService server) {
+    RServerState state = server.getState();
+    OpalR.RServerDto.Builder builder = OpalR.RServerDto.newBuilder()
+        .setName(server.getName())
+        .setRunning(server.isRunning())
+        .setVersion(state.getVersion())
+        .addAllTags(state.getTags())
+        .setSessionCount(state.getRSessionsCount())
+        .setBusySessionCount(state.getBusyRSessionsCount());
+
+    App app = server.getApp();
+    if (app != null) {
+      builder.setApp(Apps.AppDto.newBuilder()
+          .setId(app.getId())
+          .setName(app.getName())
+          .setType(app.getType())
+          .setServer(app.getServer())
+          .build());
+    }
+
+    return builder.build();
   }
 
   public static OpalR.RSessionDto asDto(RServerSession rSession) {

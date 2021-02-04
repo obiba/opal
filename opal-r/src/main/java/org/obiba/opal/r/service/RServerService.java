@@ -105,4 +105,13 @@ public interface RServerService {
    * @param name
    */
   void installBioconductorPackage(String name) throws RServerException;
+
+  /**
+   * Get the tail of the log file.
+   *
+   * @return
+   * @param nbLines
+   */
+  String[] getLog(Integer nbLines);
+
 }

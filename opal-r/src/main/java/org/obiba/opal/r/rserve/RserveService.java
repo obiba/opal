@@ -43,6 +43,8 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(RserveService.class);
 
+  public static final String RSERVE_NAME = "rserve";
+
   public static final int DEFAULT_RSERVE_PORT = 6311;
 
   @Value("${org.obiba.rserver.port}")
@@ -143,7 +145,7 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Override
   public String getName() {
-    return "_rserver";
+    return RSERVE_NAME;
   }
 
   @Override
@@ -205,6 +207,18 @@ public class RserveService implements RServerService, ROperationTemplate {
   public void installBioconductorPackage(String name) {
     ensureCRANPackage("BiocManager");
     execute(String.format("BiocManager::install('%s', ask = FALSE)", name));
+  }
+
+  @Override
+  public String[] getLog(Integer nbLines) {
+    String cmd;
+    if (nbLines > 0)
+      cmd = String.format("tail(readLines(con = file('../../../logs/Rserve.log', 'r')), %s)", nbLines);
+    else
+      cmd = "readLines(con = file('../../../logs/Rserve.log', 'r'))";
+    RScriptROperation rop = new RScriptROperation(cmd, false);
+    execute(rop);
+    return rop.getResult().asStrings();
   }
 
   //

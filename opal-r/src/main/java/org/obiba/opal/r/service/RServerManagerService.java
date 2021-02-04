@@ -31,7 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Management of the R servers available.
@@ -65,6 +67,16 @@ public class RServerManagerService implements Service {
     if (rClusters.containsKey(getDefaultClusterName()))
       return rClusters.get(getDefaultClusterName());
     throw new NoSuchServiceException("R server (default)");
+  }
+
+  public Collection<RServerCluster> getRServerClusters() {
+    return rClusters.values();
+  }
+
+  public RServerCluster getRServerCluster(String name) {
+    if (rClusters.containsKey(name))
+      return rClusters.get(name);
+    throw new NoSuchElementException("No R server cluster with name: " + name);
   }
 
   @Subscribe
