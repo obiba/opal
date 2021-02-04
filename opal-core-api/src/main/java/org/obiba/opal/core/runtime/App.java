@@ -117,11 +117,18 @@ public class App implements HasUniqueProperties {
 
   @Override
   public String toString() {
-    return "App{" +
-        "id='" + id + '\'' +
-        ", name='" + name + '\'' +
-        ", type='" + type + '\'' +
-        ", server='" + server + '\'' +
-        '}';
+    if (id == null)
+      return "App{" +
+          "name='" + name + '\'' +
+          ", type='" + type + '\'' +
+          ", server='" + server + '\'' +
+          '}';
+    else
+      return "App{" +
+          "id='" + id + '\'' +
+          ", name='" + name + '\'' +
+          ", type='" + type + '\'' +
+          ", server='" + server + '\'' +
+          '}';
   }
 }

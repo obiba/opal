@@ -111,6 +111,7 @@ public class RServerManagerService implements Service {
   @Subscribe
   public synchronized void onAppUnregistered(AppUnregisteredEvent event) {
     if (ROCK_APP_TYPE.equals(event.getApp().getType())) {
+      log.info("Unregister R server: {}", event.getApp().toString());
       rClusters.values().forEach(cluster -> cluster.removeRServerService(event.getApp()));
       for (Map.Entry<String, RServerCluster> entry : rClusters.entrySet()) {
         if (entry.getValue().isEmpty())
