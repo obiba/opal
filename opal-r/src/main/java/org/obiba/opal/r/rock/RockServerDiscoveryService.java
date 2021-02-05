@@ -46,9 +46,12 @@ public class RockServerDiscoveryService {
   public void scanHosts() {
     if (hosts == null) return;
     for (String host : hosts) {
-
-      boolean found = discoverOrCheckHost(String.format("https://%s", host.trim()));
-      if (!found) discoverOrCheckHost(String.format("http://%s", host.trim()));
+      if (host.trim().toLowerCase().startsWith("http"))
+        discoverHost(host.trim());
+      else {
+        boolean found = discoverOrCheckHost(String.format("https://%s", host.trim()));
+        if (!found) discoverOrCheckHost(String.format("http://%s", host.trim()));
+      }
     }
   }
 

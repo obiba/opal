@@ -15,6 +15,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.event.AppRegisteredEvent;
+import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
@@ -103,6 +104,7 @@ public class RServerManagerService implements Service {
         }
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
+        eventBus.post(new AppRejectedEvent(event.getApp()));
       }
       notifyInitialized();
     }

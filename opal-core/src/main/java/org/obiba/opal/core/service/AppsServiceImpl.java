@@ -13,8 +13,10 @@ package org.obiba.opal.core.service;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.event.AppRegisteredEvent;
+import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.App;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,21 @@ public class AppsServiceImpl implements AppsService {
       } else {
         orientDbService.delete(app);
         eventBus.post(new AppUnregisteredEvent(app));
+      }
+    } finally {
+      registryLock.unlock();
+    }
+  }
+
+  @Subscribe
+  public synchronized void onAppRejected(AppRejectedEvent event) {
+    registryLock.lock();
+    try {
+      App app = event.getApp();
+      if (Strings.isNullOrEmpty(app.getId())) {
+        findApps(app).forEach(this::unregisterApp);
+      } else {
+        orientDbService.delete(app);
       }
     } finally {
       registryLock.unlock();
