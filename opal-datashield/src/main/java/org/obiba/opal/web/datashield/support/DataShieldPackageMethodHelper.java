@@ -12,7 +12,6 @@ package org.obiba.opal.web.datashield.support;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
@@ -22,7 +21,7 @@ import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.spi.r.*;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
@@ -33,16 +32,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class DataShieldPackageMethodHelper {
 
   private static final Logger log = LoggerFactory.getLogger(DataShieldPackageMethodHelper.class);
+
+  public static final String VERSION = "Version";
+
+  public static final String AGGREGATE_METHODS = "AggregateMethods";
+
+  public static final String ASSIGN_METHODS = "AssignMethods";
+
+  public static final String OPTIONS = "Options";
 
   /**
    * The DataShield's description file to be read from DataShield compliant packages.
@@ -58,17 +63,13 @@ public class DataShieldPackageMethodHelper {
   @Autowired
   private RPackageResourceHelper rPackageHelper;
 
+  @Autowired
+  protected RServerManagerService rServerManagerService;
+
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    Map<String, List<Opal.EntryDto>> dsPackages = getDataShieldPackagesProperties();
-    return rPackageHelper.getInstalledPackagesDtos().stream()
-        .map(dto -> {
-          if (dsPackages.containsKey(dto.getName())) {
-            return dto.toBuilder().addAllDescription(dsPackages.get(dto.getName())).build();
-          } else {
-            return dto;
-          }
-        })
-        .filter(this::isDataShieldPackage)
+    List<String> dsNames = rServerManagerService.getDefaultRServer().getInstalledDataSHIELDPackageNames();
+    return rServerManagerService.getDefaultRServer().getInstalledPackagesDtos().stream()
+        .filter(dto -> dsNames.contains(dto.getName()))
         .collect(Collectors.toList());
   }
 
@@ -109,16 +110,9 @@ public class DataShieldPackageMethodHelper {
   }
 
   public OpalR.RPackageDto getDatashieldPackage(final String name) {
-
-    return rPackageHelper.getInstalledPackagesDtos().stream()
-        .filter(dto -> dto != null && dto.getName().equals(name))
-        .map(dto -> {
-          DataShieldPackageROperation rop = new DataShieldPackageROperation(name);
-          RMatrix<String> matrix = rPackageHelper.execute(rop).getResult().asStringMatrix();
-          return dto.toBuilder().addAllDescription(getDataShieldPackagePropertiesDtos(matrix)).build();
-        })
-        .filter(this::isDataShieldPackage)
-        .findFirst().orElseThrow(() -> new NoSuchRPackageException(name));
+    if (rServerManagerService.getDefaultRServer().getInstalledDataSHIELDPackageNames().contains(name))
+      return rServerManagerService.getDefaultRServer().getInstalledPackageDto(name);
+    throw new NoSuchRPackageException(name);
   }
 
   public void deletePackage(String name) {
@@ -152,6 +146,13 @@ public class DataShieldPackageMethodHelper {
     return methodDtos;
   }
 
+  public void installDatashieldPackage(String name, String ref) {
+    if (Strings.isNullOrEmpty(ref))
+      rPackageHelper.installCRANPackage(name);
+    else
+      rPackageHelper.installGitHubPackage(name, ref);
+  }
+
   //
   // Private methods
   //
@@ -178,11 +179,10 @@ public class DataShieldPackageMethodHelper {
     List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
       String key = entry.getKey();
-      if (RPackageResourceHelper.OPTIONS.equals(key)) {
+      if (OPTIONS.equals(key)) {
         optionDtos.addAll(new DataShieldROptionsParser().parse(entry.getValue()));
       }
     }
-
     return optionDtos;
   }
 
@@ -193,9 +193,9 @@ public class DataShieldPackageMethodHelper {
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
       String key = entry.getKey();
-      if (RPackageResourceHelper.AGGREGATE_METHODS.equals(key)) {
+      if (AGGREGATE_METHODS.equals(key)) {
         aggregateMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
-      } else if (RPackageResourceHelper.ASSIGN_METHODS.equals(key)) {
+      } else if (ASSIGN_METHODS.equals(key)) {
         assignMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
       }
     }
@@ -205,93 +205,12 @@ public class DataShieldPackageMethodHelper {
 
   private String getPackageVersion(OpalR.RPackageDto packageDto) {
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
-      if (entry.getKey().equals(RPackageResourceHelper.VERSION)) {
+      if (entry.getKey().equals(VERSION)) {
         return entry.getValue();
       }
     }
     // will not happen in R
     return null;
-  }
-
-  private Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
-    Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
-    try {
-      DataShieldPackagesROperation rop = new DataShieldPackagesROperation();
-      RServerResult res = rPackageHelper.execute(rop).getResult();
-      RNamedList<RServerResult> dsList = res.asNamedList();
-      for (Map.Entry<String, RServerResult> entry : dsList.entrySet()) {
-        dsPackages.put(entry.getKey(), getDataShieldPackagePropertiesDtos(entry.getValue().asStringMatrix()));
-      }
-    } catch (Exception e) {
-      log.error("DataShield packages properties extraction failed", e);
-    }
-    return dsPackages;
-  }
-
-  private List<Opal.EntryDto> getDataShieldPackagePropertiesDtos(RMatrix<String> dsProperties) {
-    List<Opal.EntryDto> entries = Lists.newArrayList();
-    if (dsProperties.isEmpty()) return entries;
-    try {
-      String[] colNames = dsProperties.getColumnNames();
-      String[] values = dsProperties.iterateRows().iterator().next();
-      for (int i = 0; i < colNames.length; i++) {
-        Opal.EntryDto.Builder builder = Opal.EntryDto.newBuilder();
-        builder.setKey(colNames[i]);
-        builder.setValue(values[i]);
-        entries.add(builder.build());
-      }
-    } catch (Exception e) {
-      log.error("DataShield package properties extraction failed", e);
-    }
-    return entries;
-  }
-
-  private boolean isDataShieldPackage(@Nullable OpalR.RPackageDto input) {
-    if (input == null) return false;
-    // DataShield properties are declared in the DESCRIPTION file
-    for (Opal.EntryDto entry : input.getDescriptionList()) {
-      String key = entry.getKey();
-      if (RPackageResourceHelper.AGGREGATE_METHODS.equals(key) || RPackageResourceHelper.ASSIGN_METHODS.equals(key) || RPackageResourceHelper.OPTIONS.equals(key)) {
-        return !"NA".equals(entry.getValue());
-      }
-    }
-    return false;
-  }
-
-  public ROperationWithResult installDatashieldPackage(String name, String ref) {
-    return rPackageHelper.installPackage(name, ref, "datashield");
-  }
-
-  /**
-   * Result is a named list of matrices, where names are package names and matrices are the corresponding DATASHIELD file content.
-   */
-  private class DataShieldPackagesROperation extends AbstractROperationWithResult {
-
-    @Override
-    protected void doWithConnection() {
-      setResult(null);
-      eval(String.format("is.null(assign('x', lapply(installed.packages()[,1], function(p) { system.file('%s', package=p) })))", DATASHIELD_DESCRIPTION_FILE), false);
-      setResult(eval("lapply(x[lapply(x, nchar)>0], read.dcf)", false));
-    }
-  }
-
-  /**
-   * Result is the package's DATASHIELD file content as a matrix or NA.
-   */
-  private class DataShieldPackageROperation extends AbstractROperationWithResult {
-
-    private final String name;
-
-    private DataShieldPackageROperation(String name) {
-      this.name = name;
-    }
-
-    @Override
-    protected void doWithConnection() {
-      setResult(null);
-      eval(String.format("is.null(assign('x', system.file('%s', package='%s')))", DATASHIELD_DESCRIPTION_FILE, name), false);
-      setResult(eval("if(nchar(x)>0) read.dcf(x) else NA", false));
-    }
   }
 
 }

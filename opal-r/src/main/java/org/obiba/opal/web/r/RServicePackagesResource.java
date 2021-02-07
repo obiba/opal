@@ -10,9 +10,7 @@
 
 package org.obiba.opal.web.r;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,18 +43,7 @@ public class RServicePackagesResource {
   @PUT
   public Response updateAllPackages() {
     try {
-      // dump all R sessions
-      rPackageHelper.restartRServer();
-      String cmd = ".libPaths()";
-      ROperationWithResult rop = rPackageHelper.execute(cmd);
-      String libpath = rop.getResult().asStrings()[0];
-      cmd = "getwd()";
-      rop = rPackageHelper.execute(cmd);
-      log.info("getwd={}", rop.getResult().asStrings()[0]);
-      String repos = Joiner.on("','").join(rPackageHelper.getDefaultRepos());
-      cmd = String.format("update.packages(ask = FALSE, repos = c('%s'), instlib = '%s')", repos, libpath);
-      rPackageHelper.execute(cmd);
-      rPackageHelper.restartRServer();
+      rPackageHelper.updateAllCRANPackages();
     } catch (Exception e) {
       log.error("Failed at updating all R packages", e);
     }

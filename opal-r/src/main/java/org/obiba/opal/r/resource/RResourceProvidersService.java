@@ -19,6 +19,7 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
@@ -42,6 +43,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
+
+  @Autowired
+  private RServerManagerService rServerManagerService;
 
   private boolean running = false;
 
@@ -130,7 +134,8 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
     resourceProviders.clear();
     try {
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
-      RServerResult result = rPackageHelper.execute(rop).getResult();
+      rServerManagerService.getDefaultRServer().execute(rop);
+      RServerResult result = rop.getResult();
       if (result.isNamedList()) {
         RNamedList<RServerResult> pkgList = result.asNamedList();
         for (String name : pkgList.keySet()) {

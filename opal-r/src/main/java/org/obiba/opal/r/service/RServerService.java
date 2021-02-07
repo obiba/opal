@@ -71,11 +71,24 @@ public interface RServerService {
   List<OpalR.RPackageDto> getInstalledPackagesDtos();
 
   /**
+   * Get a signle R package description.
+   *
+   * @param name
+   * @return
+   */
+  OpalR.RPackageDto getInstalledPackageDto(String name);
+
+  /**
    * Remove package with provided name.
    *
    * @param name
    */
   void removePackage(String name) throws RServerException;
+
+  /**
+   * Extract DataSHIELD settings from installed packages.
+   */
+  List<String> getInstalledDataSHIELDPackageNames();
 
   /**
    * Install a R package from CRAN if not already installed.
@@ -107,10 +120,15 @@ public interface RServerService {
   void installBioconductorPackage(String name) throws RServerException;
 
   /**
+   * Try to update all CRAN packages.
+   */
+  void updateAllCRANPackages() throws RServerException;
+
+  /**
    * Get the tail of the log file.
    *
-   * @return
    * @param nbLines
+   * @return
    */
   String[] getLog(Integer nbLines);
 

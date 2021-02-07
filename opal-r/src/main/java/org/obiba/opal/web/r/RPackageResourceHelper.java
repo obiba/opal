@@ -9,23 +9,19 @@
  */
 package org.obiba.opal.web.r;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.spi.r.*;
+import org.obiba.opal.spi.r.RMatrix;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Helper class for R package management.
@@ -34,20 +30,6 @@ import java.util.stream.Collectors;
 public class RPackageResourceHelper {
 
   private static final Logger log = LoggerFactory.getLogger(RPackageResourceHelper.class);
-
-  public static final String VERSION = "Version";
-
-  public static final String AGGREGATE_METHODS = "AggregateMethods";
-
-  public static final String ASSIGN_METHODS = "AssignMethods";
-
-  public static final String OPTIONS = "Options";
-
-  private static final String[] defaultFields = new String[]{"Title", "Description", "Author", "Maintainer",
-      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS};
-
-  @Value("${org.obiba.opal.r.repos}")
-  private String defaultRepos;
 
   @Autowired
   protected RServerManagerService rServerManagerService;
@@ -122,60 +104,26 @@ public class RPackageResourceHelper {
     }
   }
 
-  /**
-   * Install a package from CRAN of no ref is specified, or from GitHub if a ref is specified.
-   *
-   * @param name
-   * @param ref
-   * @param defaultName When installing from GitHub, the default organization name.
-   * @return
-   */
-  public ROperationWithResult installPackage(String name, String ref, String defaultName) {
-    String cmd;
-    if (Strings.isNullOrEmpty(ref)) {
-      checkAlphanumeric(name);
-      cmd = getInstallPackagesCommand(name);
-    } else {
-      execute(getInstallRemotesPackageCommand());
-      if (name.contains("/")) {
-        String[] parts = name.split("/");
-        checkAlphanumeric(parts[0]);
-        checkAlphanumeric(parts[1]);
-        cmd = getInstallGitHubCommand(parts[1], parts[0], ref);
-      } else {
-        checkAlphanumeric(name);
-        cmd = getInstallGitHubCommand(name, defaultName, ref);
-      }
+  public void updateAllCRANPackages() {
+    try {
+      restartRServer();
+      rServerManagerService.getDefaultRServer().updateAllCRANPackages();
+      restartRServer();
+    } catch (Exception e) {
+      log.warn("Failed to update all the CRAN R packages", e);
     }
-    ROperationWithResult rval = execute(cmd);
-    restartRServer();
-    return rval;
   }
 
-  void restartRServer() {
+  //
+  // Private methods
+  //
+
+  private void restartRServer() {
     try {
       rServerManagerService.getDefaultRServer().stop();
       rServerManagerService.getDefaultRServer().start();
     } catch (Exception ex) {
       log.error("Error while restarting R server after package install: {}", ex.getMessage(), ex);
-    }
-  }
-
-  List<String> getDefaultRepos() {
-    return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
-  }
-
-  public ROperationWithResult execute(String rscript) {
-    RScriptROperation rop = new RScriptROperation(rscript, false);
-    return execute(rop);
-  }
-
-  public ROperationWithResult execute(ROperationWithResult rop) {
-    try {
-      rServerManagerService.getDefaultRServer().execute(rop);
-      return rop;
-    } catch (Exception e) {
-      throw new RRuntimeException(e);
     }
   }
 
@@ -188,21 +136,6 @@ public class RPackageResourceHelper {
     if (!name.matches("[a-zA-Z0-9/\\-\\\\.]+"))
       throw new IllegalArgumentException("Not a valid name: " + name);
   }
-
-  private String getInstallPackagesCommand(String name) {
-    String repos = Joiner.on("','").join(getDefaultRepos());
-    return "install.packages('" + name + "', repos=c('" + repos + "'), dependencies=TRUE)";
-  }
-
-  private String getInstallRemotesPackageCommand() {
-    return "if (!require('remotes', character.only=TRUE)) { " + getInstallPackagesCommand("remotes") + " }";
-  }
-
-
-  private String getInstallGitHubCommand(String name, String username, String ref) {
-    return String.format("remotes::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE)", username, name, ref);
-  }
-
 
   public static class StringsToRPackageDto implements Function<String[], OpalR.RPackageDto> {
 

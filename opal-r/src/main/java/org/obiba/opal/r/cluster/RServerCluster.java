@@ -143,6 +143,16 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
+  public OpalR.RPackageDto getInstalledPackageDto(String name) {
+    return getNextRServerService().getInstalledPackageDto(name);
+  }
+
+  @Override
+  public List<String> getInstalledDataSHIELDPackageNames() {
+    return getNextRServerService().getInstalledDataSHIELDPackageNames();
+  }
+
+  @Override
   public void removePackage(String name) {
     invokeAll(rServerServices.stream().map(service -> (Callable<Void>) () -> {
       try {
@@ -195,6 +205,18 @@ public class RServerCluster implements RServerClusterService {
     invokeAll(rServerServices.stream().map(service -> (Callable<Void>) () -> {
       try {
         service.installBioconductorPackage(name);
+      } catch (RServerException e) {
+        log.warn("Failed to install R package from Bioconductor: {}", name, e);
+      }
+      return null;
+    }).collect(Collectors.toList()));
+  }
+
+  @Override
+  public void updateAllCRANPackages() {
+    invokeAll(rServerServices.stream().map(service -> (Callable<Void>) () -> {
+      try {
+        service.updateAllCRANPackages();
       } catch (RServerException e) {
         log.warn("Failed to install R package from Bioconductor: {}", name, e);
       }

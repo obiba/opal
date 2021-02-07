@@ -17,15 +17,16 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.shiro.SecurityUtils;
+import org.json.JSONObject;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
-import org.obiba.opal.spi.r.ROperation;
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.spi.r.*;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -160,6 +162,54 @@ public class RockService implements RServerService {
   }
 
   @Override
+  public OpalR.RPackageDto getInstalledPackageDto(String name) {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<String> response =
+          restTemplate.exchange(getRServerResourceUrl("/rserver/package/" + name), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+      String jsonSource = response.getBody();
+      if (response.getStatusCode().is2xxSuccessful()) {
+        RockResult result = new RockResult(new JSONObject(jsonSource));
+        if (result.isNamedList()) {
+          RNamedList<RServerResult> namedList = result.asNamedList();
+          OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
+          for (String key : namedList.getNames()) {
+            if ("name".equals(key))
+              builder.setName(namedList.get(key).asStrings()[0]);
+            else
+              builder.addDescription(Opal.EntryDto.newBuilder().setKey(key).setValue(namedList.get(key).asStrings()[0]));
+          }
+          return builder.build();
+        }
+      }
+    } catch (Exception e) {
+      log.error("Error when reading installed package: " + name, e);
+    }
+    throw new NoSuchRPackageException(name);
+  }
+
+  @Override
+  public List<String> getInstalledDataSHIELDPackageNames() {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<String> response =
+          restTemplate.exchange(getRServerResourceUrl("/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+      String jsonSource = response.getBody();
+      if (response.getStatusCode().is2xxSuccessful()) {
+        RockResult result = new RockResult(new JSONObject(jsonSource));
+        return Lists.newArrayList(result.getNames());
+      }
+    } catch (Exception e) {
+      log.error("Error when reading installed DataSHIELD packages", e);
+    }
+    return Lists.newArrayList();
+  }
+
+  @Override
   public void removePackage(String name) {
     try {
       RestTemplate restTemplate = new RestTemplate();
@@ -198,6 +248,16 @@ public class RockService implements RServerService {
     params.put("name", name);
     params.put("manager", "bioconductor");
     installPackage(params);
+  }
+
+  @Override
+  public void updateAllCRANPackages() {
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.exchange(getRServerResourceUrl("/rserver/packages"), HttpMethod.PUT, new HttpEntity<>(createHeaders()), Void.class);
+    } catch (Exception e) {
+      log.error("Error when updating all packages", e);
+    }
   }
 
   @Override

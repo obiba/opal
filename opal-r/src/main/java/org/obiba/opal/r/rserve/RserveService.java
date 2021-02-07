@@ -20,6 +20,7 @@ import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -183,6 +184,19 @@ public class RserveService implements RServerService, ROperationTemplate {
   }
 
   @Override
+  public OpalR.RPackageDto getInstalledPackageDto(String name) {
+    return getInstalledPackagesDtos().stream().filter(dto -> dto.getName().equals(name))
+        .findFirst().orElseThrow(() -> new NoSuchRPackageException(name));
+  }
+
+  @Override
+  public List<String> getInstalledDataSHIELDPackageNames() {
+    DataSHIELDPackagesROperation rop = new DataSHIELDPackagesROperation();
+    execute(rop);
+    return Lists.newArrayList(rop.getResult().asStrings());
+  }
+
+  @Override
   public void removePackage(String name) {
     execute(String.format("remove.packages('%s')", name));
   }
@@ -207,6 +221,21 @@ public class RserveService implements RServerService, ROperationTemplate {
   public void installBioconductorPackage(String name) {
     ensureCRANPackage("BiocManager");
     execute(String.format("BiocManager::install('%s', ask = FALSE)", name));
+  }
+
+  @Override
+  public void updateAllCRANPackages() {
+    String cmd = ".libPaths()";
+    RScriptROperation rop = new RScriptROperation(cmd, false);
+    execute(rop);
+    String libpath = rop.getResult().asStrings()[0];
+    cmd = "getwd()";
+    rop = new RScriptROperation(cmd, false);
+    execute(cmd);
+    log.info("getwd={}", rop.getResult().asStrings()[0]);
+    String repos = Joiner.on("','").join(getDefaultRepos());
+    cmd = String.format("update.packages(ask = FALSE, repos = c('%s'), instlib = '%s')", repos, libpath);
+    execute(cmd);
   }
 
   @Override
@@ -307,6 +336,32 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   private List<String> getDefaultRepos() {
     return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
+  }
+
+  private class DataSHIELDPackagesROperation extends AbstractROperationWithResult {
+
+    public static final String AGGREGATE_METHODS = "AggregateMethods";
+
+    public static final String ASSIGN_METHODS = "AssignMethods";
+
+    public static final String OPTIONS = "Options";
+
+    @Override
+    protected void doWithConnection() {
+      setResult(null);
+      // DS fields
+      eval(String.format("base::assign('dsFields', c('%s'))", Joiner.on("','").join(AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS)));
+      // extract DS fields from DESCRIPTION files
+      eval("assign('pkgs', Map(function(p) { x <- as.list(p) ; x[names(x) %in% dsFields] }, " +
+          "         Filter(function(p) any(names(p) %in% dsFields), " +
+          "                lapply(installed.packages()[,1], function(p) as.data.frame(read.dcf(system.file('DESCRIPTION', package=p)))))))");
+      // extract DS fields from DATASHIELD files
+      eval("assign('x', lapply(installed.packages()[,1], function(p) system.file('DATASHIELD', package=p)))");
+      eval("assign('y', lapply(x[lapply(x, nchar)>0], function(f) as.list(as.data.frame(read.dcf(f)))))");
+      // merge and prepare DS field values as arrays of strings
+      eval("assign('pkgs', lapply(append(pkgs, y), function(p) lapply(p, function(pp)  gsub('^\\\\s+|\\\\s+$', '', gsub('\\n', '', unlist(strsplit(pp, ',')))))))");
+      setResult(eval("pkgs", false));
+    }
   }
 
 }
