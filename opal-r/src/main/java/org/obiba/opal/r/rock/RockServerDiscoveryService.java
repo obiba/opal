@@ -70,6 +70,8 @@ public class RockServerDiscoveryService {
       ResponseEntity<App> response = restTemplate.getForEntity(url + "/_info", App.class);
       if (response.getStatusCode().is2xxSuccessful()) {
         App app = response.getBody();
+        if (!app.hasServer())
+          app.setServer(url);
         log.debug("Discovered Rock R server: {}", app);
         appsService.registerApp(app);
         hostsToCheck.put(url, app);

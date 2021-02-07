@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.core.runtime;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +29,8 @@ public class App implements HasUniqueProperties {
   private String type;
 
   private String server;
+
+  private List<String> tags = Lists.newArrayList();
 
   public App() {
   }
@@ -80,6 +84,18 @@ public class App implements HasUniqueProperties {
 
   public void setServer(String server) {
     this.server = server;
+  }
+
+  public boolean hasServer() {
+    return !Strings.isNullOrEmpty(server);
+  }
+
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
   }
 
   @Override
