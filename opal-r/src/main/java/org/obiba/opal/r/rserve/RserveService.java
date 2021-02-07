@@ -193,7 +193,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   public List<String> getInstalledDataSHIELDPackageNames() {
     DataSHIELDPackagesROperation rop = new DataSHIELDPackagesROperation();
     execute(rop);
-    return Lists.newArrayList(rop.getResult().asStrings());
+    return Lists.newArrayList(rop.getResult().asNamedList().getNames());
   }
 
   @Override
