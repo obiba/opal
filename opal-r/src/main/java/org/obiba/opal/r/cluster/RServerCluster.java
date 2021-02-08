@@ -23,9 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class RServerCluster implements RServerClusterService {
@@ -158,7 +156,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.removePackage(name);
       } catch (RServerException e) {
-        log.warn("Failed to remove R package: {}", name, e);
+        log.warn("Failed to remove R package on {}: {}", service.getName(), name, e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -170,7 +168,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.ensureCRANPackage(name);
       } catch (RServerException e) {
-        log.warn("Failed to ensure R package is installed: {}", name, e);
+        log.warn("Failed to ensure R package is installed on {}: {}", service.getName(), name, e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -182,7 +180,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.installCRANPackage(name);
       } catch (RServerException e) {
-        log.warn("Failed to install R package from CRAN: {}", name, e);
+        log.warn("Failed to install R package from CRAN on {}: {}", service.getName(), name, e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -194,7 +192,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.installGitHubPackage(name, ref);
       } catch (RServerException e) {
-        log.warn("Failed to install R package from GitHub: {}", name, e);
+        log.warn("Failed to install R package from GitHub on {}: {}", service.getName(), name, e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -206,7 +204,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.installBioconductorPackage(name);
       } catch (RServerException e) {
-        log.warn("Failed to install R package from Bioconductor: {}", name, e);
+        log.warn("Failed to install R package from Bioconductor on {}: {}", service.getName(), name, e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -218,7 +216,7 @@ public class RServerCluster implements RServerClusterService {
       try {
         service.updateAllCRANPackages();
       } catch (RServerException e) {
-        log.warn("Failed to install R package from Bioconductor: {}", name, e);
+        log.warn("Failed to update all CRAN R packages on {}", service.getName(), e);
       }
       return null;
     }).collect(Collectors.toList()));
@@ -226,8 +224,32 @@ public class RServerCluster implements RServerClusterService {
 
   @Override
   public String[] getLog(Integer nbLines) {
-    // TODO merge from each server
-    return getNextRServerService().getLog(nbLines);
+    ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
+    try {
+      List<Future<List<String>>> futureLogs = executor.invokeAll(rServerServices.stream().map(service -> (Callable<List<String>>) () -> {
+        List<String> lines = Lists.newArrayList(String.format("[Info] %s R log start", service.getName()));
+        try {
+          lines.addAll(Arrays.asList(service.getLog(nbLines)));
+        } catch (Exception e) {
+          log.warn("Failed to retrieve R server log on {}", service.getName(), e);
+          lines.add("[Error] Failed to retrieve R server log on " + service.getName());
+        }
+        lines.add(String.format("[Info] %s R log end", service.getName()));
+        return lines;
+      }).collect(Collectors.toList()));
+      List<String> allLogs = Lists.newArrayList();
+      futureLogs.forEach(listFuture -> {
+        try {
+          allLogs.addAll(listFuture.get());
+        } catch (Exception e) {
+          // ignore
+        }
+      });
+      return allLogs.toArray(new String[0]);
+    } catch (InterruptedException e) {
+      log.error("Error while invoking all R servers", e);
+      return new String[] { "[Error] Failed to retrieve R server logs" };
+    }
   }
 
   //

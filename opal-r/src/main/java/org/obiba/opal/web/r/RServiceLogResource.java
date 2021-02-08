@@ -40,13 +40,7 @@ public class RServiceLogResource {
   @GET
   @Path("Rserve.log")
   public Response tailRserveLog(@QueryParam("n") @DefaultValue("10000") Integer nbLines) {
-    String cmd;
-    if (nbLines > 0)
-      cmd = String.format("tail(readLines(con = file('../../../logs/Rserve.log', 'r')), %s)", nbLines);
-    else
-      cmd = "readLines(con = file('../../../logs/Rserve.log', 'r'))";
-    RScriptROperation rop = execute(cmd);
-    String[] rlog = rop.getResult().asStrings();
+    String[] rlog = rServerManagerService.getDefaultRServer().getLog(nbLines);
     log.info("received {} lines", rlog.length);
     StreamingOutput stream = output -> {
       try (PrintWriter writer = new PrintWriter(output)) {
