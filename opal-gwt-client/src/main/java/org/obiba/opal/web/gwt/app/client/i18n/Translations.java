@@ -121,7 +121,9 @@ public interface Translations extends Constants {
       "CANCEL_PENDING", "Cancel Pending", //
       "CANCELED", "Cancelled", //
       "WAITING", "Waiting", //
-      "BUSY", "Busy" //
+      "BUSY", "Busy",
+      "RUNNING", "Running",
+      "STOPPED", "Stopped"
   })
   Map<String, String> statusMap();
 
@@ -1901,6 +1903,14 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
+
+  @Description("R Version label")
+  @DefaultStringValue("R Version")
+  String rVersionLabel();
+
+  @Description("R Sessions label")
+  @DefaultStringValue("R Sessions")
+  String rSessionsLabel();
 
   @Description("N item is selected label")
   @DefaultStringValue("{0} is selected.")

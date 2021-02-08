@@ -46,9 +46,8 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ServiceDto;
-import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
 import java.util.List;
@@ -115,7 +114,7 @@ public class RAdministrationPresenter
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
-        if(confirmation != null && event.getSource().equals(confirmation) && event.isConfirmed()) {
+        if (confirmation != null && event.getSource().equals(confirmation) && event.isConfirmed()) {
           confirmation.run();
           confirmation = null;
         }
@@ -140,20 +139,20 @@ public class RAdministrationPresenter
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(getView().getTestAuthorizer())
         .send();
 
-    refreshStatus();
+    refreshCluster();
     refreshPackages();
   }
 
-  private void refreshStatus() {
+  private void refreshCluster() {
     // stop start R service
-    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(UriBuilders.SERVICE_R.create().build()) //
-        .withCallback(new ResourceCallback<ServiceDto>() {
+    ResourceRequestBuilderFactory.<RServerClusterDto>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")) //
+        .withCallback(new ResourceCallback<RServerClusterDto>() {
           @Override
-          public void onResource(Response response, ServiceDto resource) {
+          public void onResource(Response response, RServerClusterDto resource) {
             if (response.getStatusCode() == SC_OK) {
-              getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
-                  ? Display.Status.Stoppable
-                  : Display.Status.Startable);
+              getView().renderCluster(resource);
+            } else {
+              getView().renderCluster(null);
             }
           }
         }) //
@@ -163,7 +162,7 @@ public class RAdministrationPresenter
   private void refreshPackages() {
     // Fetch all packages
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder() //
-        .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build()) //
+        .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build("default")) //
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {
@@ -178,11 +177,12 @@ public class RAdministrationPresenter
   public void start() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).put().withCallback(new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")).put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
         if (response.getStatusCode() == SC_OK) {
-          refreshStatus();
+          refreshCluster();
+          refreshPackages();
           resourceProvidersService.reset();
         } else {
           getView().setServiceStatus(Display.Status.Startable);
@@ -195,12 +195,12 @@ public class RAdministrationPresenter
   public void stop() {
     // Stop service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).delete()
+    getView().renderPackages(null);
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")).delete()
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().setServiceStatus(
-                response.getStatusCode() == SC_OK ? Display.Status.Startable : Display.Status.Stoppable);
+            refreshCluster();
           }
         }, SC_OK).send();
   }
@@ -213,12 +213,17 @@ public class RAdministrationPresenter
   }
 
   @Override
+  public void onRefreshCluster() {
+    refreshCluster();
+  }
+
+  @Override
   public void onRemovePackage(final RPackageDto rPackage) {
     confirmation = new Runnable() {
       @Override
       public void run() {
         ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
-            .forResource(UriBuilders.SERVICE_R_PACKAGE.create().build(rPackage.getName()))
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGE.create().build("default", rPackage.getName()))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -250,7 +255,7 @@ public class RAdministrationPresenter
       @Override
       public void run() {
         ResourceRequestBuilderFactory.newBuilder()
-            .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build())
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build("default"))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -343,6 +348,8 @@ public class RAdministrationPresenter
     HasAuthorization getPermissionsAuthorizer();
 
     HasAuthorization getTestAuthorizer();
+
+    void renderCluster(RServerClusterDto cluster);
 
     void renderPackages(List<RPackageDto> packages);
 

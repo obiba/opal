@@ -21,6 +21,8 @@ public interface RAdministrationUiHandlers extends UiHandlers {
 
   void test();
 
+  void onRefreshCluster();
+
   void onRemovePackage(RPackageDto rPackage);
 
   void onRefreshPackages();

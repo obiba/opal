@@ -56,7 +56,42 @@
             <ui:msg description="Download Rserve logs label">Download</ui:msg>
           </b:Button>
         </g:FlowPanel>
+
       </g:FlowPanel>
+
+      <g:Anchor>
+        <ui:msg description="R server instances label">Servers</ui:msg>
+      </g:Anchor>
+
+      <g:FlowPanel>
+
+        <b:Paragraph>
+          <ui:msg description="R servers text">
+            List of all the R servers in the cluster.
+          </ui:msg>
+        </b:Paragraph>
+
+        <g:FlowPanel>
+          <g:FlowPanel addStyleNames="pull-left">
+            <b:ButtonGroup>
+              <b:Button ui:field="refreshServers" icon="REFRESH">
+                <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
+          </g:FlowPanel>
+          <o:OpalSimplePager ui:field="serversPager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+          <b:Controls addStyleNames="pull-right small-indent">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="serversFilter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>
+        </g:FlowPanel>
+        <o:Table ui:field="serversTable" addStyleNames="small-top-margin" pageSize="20"/>
+
+      </g:FlowPanel>
+
+
+
       <g:Anchor>
         <ui:msg description="R server packages label">Packages</ui:msg>
       </g:Anchor>
@@ -81,50 +116,49 @@
               </b:DropdownButton>
             </b:ButtonGroup>
             <b:ButtonGroup>
-              <b:Button ui:field="refresh" icon="REFRESH">
+              <b:Button ui:field="refreshPackages" icon="REFRESH">
                 <ui:msg description="Refresh R packages label">Refresh</ui:msg>
               </b:Button>
             </b:ButtonGroup>
           </g:FlowPanel>
           <o:OpalSimplePager ui:field="packagesPager" location="RIGHT" addStyleNames="small-indent pull-right"/>
-          <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+          <b:Controls addStyleNames="pull-right small-indent">
             <b:InputAddOn prependIcon="FILTER">
-              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+              <o:TextBoxClearable ui:field="packagesFilter" addStyleNames="inline-block"/>
             </b:InputAddOn>
           </b:Controls>
         </g:FlowPanel>
-
         <o:Table ui:field="packagesTable" addStyleNames="small-top-margin" pageSize="20"/>
-
-      </g:FlowPanel>
-
-      <g:Anchor>
-        <ui:msg description="R sessions label">Sessions</ui:msg>
-      </g:Anchor>
-      <g:FlowPanel>
-        <b:Paragraph>
-          <ui:msg description="R sessions text">
-            R server activity monitoring: each R session is a computation unit started by R/DataSHIELD users or the report
-            framework. R sessions without activity for a while will be automatically terminated.
-          </ui:msg>
-        </b:Paragraph>
-        <g:SimplePanel ui:field="rSessions"/>
 
       </g:FlowPanel>
 
     </o:NavTabsPanel>
 
-    <b:Heading size="4">
-      <ui:msg description="R workspaces label">R Workspaces</ui:msg>
-    </b:Heading>
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="R sessions label">R Sessions</ui:msg>
+      </b:Heading>
+      <b:Paragraph>
+        <ui:msg description="R sessions text">
+          R server activity monitoring: each R session is a computation unit started by R/DataSHIELD users or the report
+          framework. R sessions without activity for a while will be automatically terminated.
+        </ui:msg>
+      </b:Paragraph>
+      <g:SimplePanel ui:field="rSessions"/>
+    </g:FlowPanel>
 
-    <b:Paragraph>
-      <ui:msg description="R workspaces text">
-        R workspaces storage: each saved R/DataSHIELD workspace contains the session's image and files (if any).
-        These can be restored any number of times on user demand.
-      </ui:msg>
-    </b:Paragraph>
-    <g:SimplePanel ui:field="rWorkspaces"/>
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="R workspaces label">R Workspaces</ui:msg>
+      </b:Heading>
+      <b:Paragraph>
+        <ui:msg description="R workspaces text">
+          R workspaces storage: each saved R/DataSHIELD workspace contains the session's image and files (if any).
+          These can be restored any number of times on user demand.
+        </ui:msg>
+      </b:Paragraph>
+      <g:SimplePanel ui:field="rWorkspaces"/>
+    </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">

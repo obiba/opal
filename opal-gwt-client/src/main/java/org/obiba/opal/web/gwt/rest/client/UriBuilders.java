@@ -1062,7 +1062,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "env");
-
     }
   },
 
@@ -1070,7 +1069,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("shell", "commands");
-
     }
   },
 
@@ -1078,23 +1076,27 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("service", "r");
-
     }
   },
 
-  SERVICE_R_PACKAGES {
+  SERVICE_R_CLUSTER {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("service", "r", "packages");
-
+      return UriBuilder.create().segment("service", "r", "cluster", "{}");
     }
   },
 
-  SERVICE_R_PACKAGE {
+  SERVICE_R_CLUSTER_PACKAGES {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("service", "r", "package", "{}");
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "packages");
+    }
+  },
 
+  SERVICE_R_CLUSTER_PACKAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "package", "{}");
     }
   },
 
@@ -1102,7 +1104,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "packages");
-
     }
   },
 
@@ -1110,7 +1111,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "options");
-
     }
   },
 
@@ -1118,7 +1118,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "option");
-
     }
   };
 
