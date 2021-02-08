@@ -49,11 +49,6 @@ public class DataShieldPackageMethodHelper {
 
   public static final String OPTIONS = "Options";
 
-  /**
-   * The DataShield's description file to be read from DataShield compliant packages.
-   */
-  private static final String DATASHIELD_DESCRIPTION_FILE = "DATASHIELD";
-
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;
 
@@ -123,7 +118,7 @@ public class DataShieldPackageMethodHelper {
     deletePackageMethods(pkg.getName(), DSMethodType.AGGREGATE);
     deletePackageMethods(pkg.getName(), DSMethodType.ASSIGN);
     getPackageROptions(pkg).forEach(opt -> configurationSupplier.get().removeOption(opt.getName()));
-    rPackageHelper.removePackage(pkg.getName());
+    rPackageHelper.removePackage(rServerManagerService.getDefaultRServer(), pkg.getName());
   }
 
   public static Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String packageName, String packageVersion,
@@ -148,9 +143,9 @@ public class DataShieldPackageMethodHelper {
 
   public void installDatashieldPackage(String name, String ref) {
     if (Strings.isNullOrEmpty(ref))
-      rPackageHelper.installCRANPackage(name);
+      rPackageHelper.installCRANPackage(rServerManagerService.getDefaultRServer(), name);
     else
-      rPackageHelper.installGitHubPackage(name, ref);
+      rPackageHelper.installGitHubPackage(rServerManagerService.getDefaultRServer(), name, ref);
   }
 
   //

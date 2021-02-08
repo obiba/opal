@@ -173,7 +173,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void finalizeServiceStart() {
     if (!ensureResourcerDone) {
       try {
-        rPackageHelper.ensureCRANPackage("resourcer");
+        rPackageHelper.ensureCRANPackage(rServerManagerService.getDefaultRServer(), "resourcer");
         ensureResourcerDone = true;
       } catch (Exception e) {
         log.error("Cannot ensure resourcer R package is installed", e);

@@ -10,13 +10,12 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
-import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.spi.r.RMatrix;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -31,17 +30,14 @@ public class RPackageResourceHelper {
 
   private static final Logger log = LoggerFactory.getLogger(RPackageResourceHelper.class);
 
-  @Autowired
-  protected RServerManagerService rServerManagerService;
-
-  public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    return rServerManagerService.getDefaultRServer().getInstalledPackagesDtos();
+  public List<OpalR.RPackageDto> getInstalledPackagesDtos(RServerService service) {
+    return service.getInstalledPackagesDtos();
   }
 
-  public void removePackage(String name) {
+  public void removePackage(RServerService service, String name) {
     checkAlphanumeric(name);
     try {
-      rServerManagerService.getDefaultRServer().removePackage(name);
+      service.removePackage(name);
     } catch (Exception e) {
       log.warn("Failed to remove the R package: {}", name, e);
     }
@@ -50,26 +46,45 @@ public class RPackageResourceHelper {
   /**
    * Try to load a R package and install it if not found.
    *
+   * @param service
    * @param name
    */
-  public void ensureCRANPackage(String name) {
+  public void ensureCRANPackage(RServerService service, String name) {
     checkAlphanumeric(name);
     try {
-      rServerManagerService.getDefaultRServer().ensureCRANPackage(name);
+      service.ensureCRANPackage(name);
     } catch (Exception e) {
       log.warn("Failed to install the R package from CRAN: {}", name, e);
     }
   }
 
   /**
+   * Install a R package from CRAN, GitHub or Bioconductor.
+   *
+   * @param service
+   * @param name
+   * @param ref
+   * @param manager
+   */
+  public void installPackage(RServerService service, String name, String ref, String manager) {
+    if (Strings.isNullOrEmpty(manager) || "cran".equalsIgnoreCase(manager))
+      installCRANPackage(service, name);
+    else if ("gh".equalsIgnoreCase(manager) || "github".equalsIgnoreCase(manager))
+      installGitHubPackage(service, name, ref);
+    else if ("bioc".equalsIgnoreCase(manager) || "bioconductor".equalsIgnoreCase(manager))
+      installBioconductorPackage(service, name);
+  }
+
+  /**
    * Install a R package from CRAN.
    *
+   * @param service
    * @param name
    */
-  public void installCRANPackage(String name) {
+  public void installCRANPackage(RServerService service, String name) {
     checkAlphanumeric(name);
     try {
-      rServerManagerService.getDefaultRServer().installCRANPackage(name);
+      service.installCRANPackage(name);
     } catch (Exception e) {
       log.warn("Failed to install the R package from CRAN: {}", name, e);
     }
@@ -78,13 +93,14 @@ public class RPackageResourceHelper {
   /**
    * Install a R package from GitHub.
    *
+   * @param service
    * @param name
    * @param ref
    */
-  public void installGitHubPackage(String name, String ref) {
+  public void installGitHubPackage(RServerService service, String name, String ref) {
     checkAlphanumeric(name);
     try {
-      rServerManagerService.getDefaultRServer().installGitHubPackage(name, ref);
+      service.installGitHubPackage(name, ref);
     } catch (Exception e) {
       log.warn("Failed to install the R package from GitHub: {}", name, e);
     }
@@ -93,22 +109,23 @@ public class RPackageResourceHelper {
   /**
    * Install a Bioconductor package.
    *
+   * @param service
    * @param name
    */
-  public void installBioconductorPackage(String name) {
+  public void installBioconductorPackage(RServerService service, String name) {
     checkAlphanumeric(name);
     try {
-      rServerManagerService.getDefaultRServer().installBioconductorPackage(name);
+      service.installBioconductorPackage(name);
     } catch (Exception e) {
       log.warn("Failed to install the R package from Bioconductor: {}", name, e);
     }
   }
 
-  public void updateAllCRANPackages() {
+  public void updateAllCRANPackages(RServerService service) {
     try {
-      restartRServer();
-      rServerManagerService.getDefaultRServer().updateAllCRANPackages();
-      restartRServer();
+      restartRServer(service);
+      service.updateAllCRANPackages();
+      restartRServer(service);
     } catch (Exception e) {
       log.warn("Failed to update all the CRAN R packages", e);
     }
@@ -118,10 +135,10 @@ public class RPackageResourceHelper {
   // Private methods
   //
 
-  private void restartRServer() {
+  private void restartRServer(RServerService service) {
     try {
-      rServerManagerService.getDefaultRServer().stop();
-      rServerManagerService.getDefaultRServer().start();
+      service.stop();
+      service.start();
     } catch (Exception ex) {
       log.error("Error while restarting R server after package install: {}", ex.getMessage(), ex);
     }

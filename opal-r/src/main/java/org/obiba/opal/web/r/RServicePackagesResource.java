@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.r;
 
-import com.google.common.base.Strings;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +25,9 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
+/**
+ * R package management of the default R server cluster.
+ */
 @Component
 @Scope("request")
 @Path("/service/r/packages")
@@ -35,15 +38,18 @@ public class RServicePackagesResource {
   @Autowired
   private RPackageResourceHelper rPackageHelper;
 
+  @Autowired
+  private RServerManagerService rServerManagerService;
+
   @GET
   public List<OpalR.RPackageDto> getPackages() {
-    return rPackageHelper.getInstalledPackagesDtos();
+    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getDefaultRServer());
   }
 
   @PUT
   public Response updateAllPackages() {
     try {
-      rPackageHelper.updateAllCRANPackages();
+      rPackageHelper.updateAllCRANPackages(rServerManagerService.getDefaultRServer());
     } catch (Exception e) {
       log.error("Failed at updating all R packages", e);
     }
@@ -53,13 +59,7 @@ public class RServicePackagesResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager) {
-    if (Strings.isNullOrEmpty(manager) || "cran".equalsIgnoreCase(manager))
-      rPackageHelper.installCRANPackage(name);
-    else if ("gh".equalsIgnoreCase(manager) || "github".equalsIgnoreCase(manager))
-      rPackageHelper.installGitHubPackage(name, ref);
-    else if ("bioc".equalsIgnoreCase(manager) || "bioconductor".equalsIgnoreCase(manager))
-      rPackageHelper.installBioconductorPackage(name);
-
+    rPackageHelper.installPackage(rServerManagerService.getDefaultRServer(), name, ref, manager);
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();
   }
