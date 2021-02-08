@@ -12,7 +12,6 @@ package org.obiba.opal.web.app;
 
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.web.model.Apps;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,6 @@ public class AppResource {
   }
 
   @DELETE
-  @NotAuthenticated
   public Response unregister() {
     try {
       appsService.unregisterApp(appsService.getApp(id));

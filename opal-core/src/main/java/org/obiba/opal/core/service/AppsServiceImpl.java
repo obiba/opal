@@ -14,12 +14,16 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.event.AppRegisteredEvent;
 import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.App;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -32,11 +36,16 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class AppsServiceImpl implements AppsService {
 
+  private static final Logger log = LoggerFactory.getLogger(AppsServiceImpl.class);
+
   @Autowired
   private OrientDbService orientDbService;
 
   @Autowired
   private EventBus eventBus;
+
+  @Value("${apps.token}")
+  private String token;
 
   private final Lock registryLock = new ReentrantLock();
 
@@ -102,6 +111,12 @@ public class AppsServiceImpl implements AppsService {
     App found = orientDbService.findUnique(new App(id));
     if (found != null) return found;
     throw new NoSuchElementException("No registered app with ID: " + id);
+  }
+
+  @Override
+  public void checkToken(String value) {
+    if (Strings.isNullOrEmpty(value) || !value.equals(token))
+      throw new UnauthorizedException("App registration operation not authorized");
   }
 
   @Override

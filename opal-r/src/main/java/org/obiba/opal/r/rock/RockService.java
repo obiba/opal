@@ -61,20 +61,28 @@ public class RockService implements RServerService {
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
+  private Credentials administratorCredentials;
+
   private Credentials managerCredentials;
 
   private Credentials userCredentials;
 
-  @Value("${rock.defaults.manager.username}")
+  @Value("${rock.default.administrator.username}")
+  private String administratorUsername;
+
+  @Value("${rock.default.administrator.password}")
+  private String administratorPassword;
+
+  @Value("${rock.default.manager.username}")
   private String managerUsername;
 
-  @Value("${rock.defaults.manager.password}")
+  @Value("${rock.default.manager.password}")
   private String managerPassword;
 
-  @Value("${rock.defaults.user.username}")
+  @Value("${rock.default.user.username}")
   private String userUsername;
 
-  @Value("${rock.defaults.user.password}")
+  @Value("${rock.default.user.password}")
   private String userPassword;
 
   @Autowired
@@ -329,13 +337,23 @@ public class RockService implements RServerService {
     execute(rop);
   }
 
+  public Credentials getAdministratorCredentials() {
+    if (administratorCredentials == null)
+      administratorCredentials = new UsernamePasswordCredentials(administratorUsername,administratorPassword);
+    return administratorCredentials;
+  }
+
   public Credentials getManagerCredentials() {
+    if (Strings.isNullOrEmpty(managerUsername))
+      return getAdministratorCredentials();
     if (managerCredentials == null)
       managerCredentials = new UsernamePasswordCredentials(managerUsername, managerPassword);
     return managerCredentials;
   }
 
   public Credentials getUserCredentials() {
+    if (Strings.isNullOrEmpty(userUsername))
+      return getAdministratorCredentials();
     if (userCredentials == null)
       userCredentials = new UsernamePasswordCredentials(userUsername, userPassword);
     return userCredentials;

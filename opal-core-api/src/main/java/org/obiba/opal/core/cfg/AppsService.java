@@ -17,41 +17,47 @@ import java.util.List;
 
 public interface AppsService extends SystemService {
 
-    /**
-     * Register an app. Send an event to inform app users.
-     *
-     * @param app
-     */
-    void registerApp(App app);
+  /**
+   * Register an app. Send an event to inform app users.
+   *
+   * @param app
+   */
+  void registerApp(App app);
 
-    /**
-     * Unregister an app. Send an event to inform app users.
-     *
-     * @param app
-     */
-    void unregisterApp(App app);
+  /**
+   * Unregister an app. Send an event to inform app users.
+   *
+   * @param app
+   */
+  void unregisterApp(App app);
 
-    /**
-     * Get the apps registered in the system.
-     *
-     * @return
-     */
-    List<App> getApps();
+  /**
+   * Get the apps registered in the system.
+   *
+   * @return
+   */
+  List<App> getApps();
 
-    /**
-     * Get apps of a type registered in the system.
-     *
-     * @param type
-     * @return
-     */
-    List<App> getApps(String type);
+  /**
+   * Get apps of a type registered in the system.
+   *
+   * @param type
+   * @return
+   */
+  List<App> getApps(String type);
 
-    /**
-     * Get the app from id.
-     *
-     * @param id
-     * @return
-     */
-    App getApp(String id);
+  /**
+   * Get the app from id.
+   *
+   * @param id
+   * @return
+   */
+  App getApp(String id);
 
+  /**
+   * Check self-registration token.
+   *
+   * @param value
+   */
+  void checkToken(String value);
 }

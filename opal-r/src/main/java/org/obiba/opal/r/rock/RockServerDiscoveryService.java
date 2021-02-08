@@ -70,6 +70,10 @@ public class RockServerDiscoveryService {
       ResponseEntity<App> response = restTemplate.getForEntity(url + "/_info", App.class);
       if (response.getStatusCode().is2xxSuccessful()) {
         App app = response.getBody();
+        if (!"rock".equals(app.getType())) {
+          log.debug("Not a Rock R server: {}", app);
+          return false;
+        }
         if (!app.hasServer())
           app.setServer(url);
         log.debug("Discovered Rock R server: {}", app);
