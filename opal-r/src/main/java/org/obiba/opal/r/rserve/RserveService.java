@@ -11,6 +11,7 @@ package org.obiba.opal.r.rserve;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
@@ -18,6 +19,8 @@ import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.NoSuchRPackageException;
@@ -72,6 +75,9 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Autowired
   private TransactionalThreadFactory transactionalThreadFactory;
 
+  @Autowired
+  private EventBus eventBus;
+
   private final List<RserveSession> sessions = Collections.synchronizedList(Lists.newArrayList());
 
   //
@@ -121,6 +127,7 @@ public class RserveService implements RServerService, ROperationTemplate {
     try {
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.put(getRServerResourceUrl(), null);
+      eventBus.post(new RServerServiceStartedEvent("default", getName()));
     } catch (RestClientException e) {
       log.warn("Error when starting legacy R server: " + e.getMessage());
     }
@@ -131,6 +138,7 @@ public class RserveService implements RServerService, ROperationTemplate {
     try {
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.delete(getRServerResourceUrl());
+      eventBus.post(new RServerServiceStoppedEvent("default", getName()));
     } catch (RestClientException e) {
       log.warn("Error when stopping legacy R server: " + e.getMessage());
     }

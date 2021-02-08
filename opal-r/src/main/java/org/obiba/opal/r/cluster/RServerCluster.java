@@ -11,6 +11,7 @@
 package org.obiba.opal.r.cluster;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
@@ -23,7 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class RServerCluster implements RServerClusterService {
@@ -34,7 +38,10 @@ public class RServerCluster implements RServerClusterService {
 
   private final List<RServerService> rServerServices = Collections.synchronizedList(Lists.newArrayList());
 
-  public RServerCluster(String name) {
+  private final EventBus eventBus;
+
+  public RServerCluster(String name, EventBus eventBus) {
+    this.eventBus = eventBus;
     this.name = name;
   }
 
@@ -248,7 +255,7 @@ public class RServerCluster implements RServerClusterService {
       return allLogs.toArray(new String[0]);
     } catch (InterruptedException e) {
       log.error("Error while invoking all R servers", e);
-      return new String[] { "[Error] Failed to retrieve R server logs" };
+      return new String[]{"[Error] Failed to retrieve R server logs"};
     }
   }
 

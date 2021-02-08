@@ -96,7 +96,7 @@ public class RServerManagerService implements Service {
             // ensure a service built on same app is not already registered in the cluster
             rClusters.get(clusterName).removeRServerService(event.getApp());
           else
-            rClusters.put(clusterName, new RServerCluster(clusterName));
+            rClusters.put(clusterName, new RServerCluster(clusterName, eventBus));
           rClusters.get(clusterName).addRServerService(rServerService);
           rServerService.setRServerClusterName(clusterName);
           if (running)
@@ -131,7 +131,7 @@ public class RServerManagerService implements Service {
   public void start() {
     if (!rserveServiceInDefaultCluster && isRserveServiceAvailable()) {
       if (!rClusters.containsKey(getDefaultClusterName()))
-        rClusters.put(getDefaultClusterName(), new RServerCluster(getDefaultClusterName()));
+        rClusters.put(getDefaultClusterName(), new RServerCluster(getDefaultClusterName(), eventBus));
       rClusters.get(getDefaultClusterName()).addRServerService(rserveService);
       rserveServiceInDefaultCluster = true;
     }

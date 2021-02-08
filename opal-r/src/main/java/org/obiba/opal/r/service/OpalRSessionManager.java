@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
@@ -34,6 +35,7 @@ import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Maps R Sessions with its invoking Opal user (through its Opal Session). Current R session of an Opal user is the last
@@ -69,6 +71,22 @@ public class OpalRSessionManager {
   public void onRServiceStopped(RServiceStoppedEvent event) {
     try {
       stop();
+    } catch (Exception e) {
+      log.warn("Error while stopping R session manager", e);
+    }
+  }
+
+  /**
+   * Terminate the R sessions that are related to a R server in a cluster.
+   *
+   * @param event
+   */
+  @Subscribe
+  public void onRServerServiceStopped(RServerServiceStoppedEvent event) {
+    try {
+      for (SubjectRSessions sessions : rSessionMap.values()) {
+        sessions.removeRSessions(event.getCluster(), event.getName());
+      }
     } catch (Exception e) {
       log.warn("Error while stopping R session manager", e);
     }
@@ -299,12 +317,28 @@ public class OpalRSessionManager {
     }
 
     void removeRSession(String rSessionId) {
-      RServerSession rSession = getRSession(rSessionId);
+      removeRSession(getRSession(rSessionId));
+    }
+
+    void removeRSession(RServerSession rSession) {
       try {
         rSession.close();
         rSessions.remove(rSession);
       } catch (Exception e) {
-        log.warn("Failed closing R session: {}", rSessionId, e);
+        log.warn("Failed closing R session: {}", rSession.getId(), e);
+      }
+    }
+
+    void removeRSessions(String clusterName, String serverName) {
+      List<RServerSession> sessionsToRemove = rSessions.stream()
+          .filter(s -> clusterName.equals(s.getRServerClusterName()) && serverName.equals(s.getRServerServiceName()))
+          .collect(Collectors.toList());
+      for (RServerSession rSession : sessionsToRemove) {
+        try {
+          removeRSession(rSession);
+        } catch (Exception e) {
+          log.warn("Failed closing R session: {}", rSession.getId(), e);
+        }
       }
     }
 

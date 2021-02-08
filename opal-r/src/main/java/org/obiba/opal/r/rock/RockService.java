@@ -13,6 +13,7 @@ package org.obiba.opal.r.rock;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -23,6 +24,8 @@ import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
@@ -61,6 +64,8 @@ public class RockService implements RServerService {
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
+  private final EventBus eventBus;
+
   private Credentials administratorCredentials;
 
   private Credentials managerCredentials;
@@ -86,8 +91,9 @@ public class RockService implements RServerService {
   private String userPassword;
 
   @Autowired
-  public RockService(TransactionalThreadFactory transactionalThreadFactory) {
+  public RockService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
     this.transactionalThreadFactory = transactionalThreadFactory;
+    this.eventBus = eventBus;
   }
 
   public void setRServerClusterName(String clusterName) {
@@ -108,6 +114,7 @@ public class RockService implements RServerService {
     try {
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.PUT, new HttpEntity<>(createHeaders()), Void.class);
+      eventBus.post(new RServerServiceStartedEvent(clusterName, getName()));
     } catch (RestClientException e) {
       log.warn("Error when starting R server: " + e.getMessage());
     }
@@ -118,6 +125,7 @@ public class RockService implements RServerService {
     try {
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.DELETE, new HttpEntity<>(createHeaders()), Void.class);
+      eventBus.post(new RServerServiceStoppedEvent(clusterName, getName()));
     } catch (RestClientException e) {
       log.warn("Error when stopping R server: " + e.getMessage());
     }
@@ -339,7 +347,7 @@ public class RockService implements RServerService {
 
   public Credentials getAdministratorCredentials() {
     if (administratorCredentials == null)
-      administratorCredentials = new UsernamePasswordCredentials(administratorUsername,administratorPassword);
+      administratorCredentials = new UsernamePasswordCredentials(administratorUsername, administratorPassword);
     return administratorCredentials;
   }
 
