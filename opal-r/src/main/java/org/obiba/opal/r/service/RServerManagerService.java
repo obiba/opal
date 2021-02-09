@@ -129,7 +129,7 @@ public class RServerManagerService implements Service {
 
   @Override
   public void start() {
-    if (!rserveServiceInDefaultCluster && isRserveServiceAvailable()) {
+    if (!rserveServiceInDefaultCluster && rserveService.isServiceAvailable()) {
       if (!rClusters.containsKey(getDefaultClusterName()))
         rClusters.put(getDefaultClusterName(), new RServerCluster(getDefaultClusterName(), eventBus));
       rClusters.get(getDefaultClusterName()).addRServerService(rserveService);
@@ -156,15 +156,6 @@ public class RServerManagerService implements Service {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return null;
-  }
-
-  private boolean isRserveServiceAvailable() {
-    try {
-      rserveService.getState();
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
   }
 
   private void notifyInitialized() {

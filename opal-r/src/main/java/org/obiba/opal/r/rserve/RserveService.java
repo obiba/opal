@@ -159,11 +159,15 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Override
   public RServerState getState() {
-    RestTemplate restTemplate = new RestTemplate();
-    RserveState state = restTemplate.getForObject(getRServerResourceUrl(), RserveState.class);
-    state.setRSessionCount(getSessions().size());
-    state.setBusyRSessionCount(getBusySessions().size());
-    return state;
+    try {
+      return getStateInternal();
+    } catch (Exception e) {
+      if (log.isDebugEnabled())
+        log.error("Cannot get legacy R server state", e);
+      else
+        log.error("Cannot get legacy R server state: {}", e.getMessage());
+      return new RserveState();
+    }
   }
 
   @Override
@@ -262,6 +266,14 @@ public class RserveService implements RServerService, ROperationTemplate {
   // Private methods
   //
 
+  private RserveState getStateInternal() {
+    RestTemplate restTemplate = new RestTemplate();
+    RserveState state = restTemplate.getForObject(getRServerResourceUrl(), RserveState.class);
+    state.setRSessionCount(getSessions().size());
+    state.setBusyRSessionCount(getBusySessions().size());
+    return state;
+  }
+
   private ROperationWithResult getInstalledPackages() {
     String fieldStr = Joiner.on("','").join(defaultFields);
     String cmd = "installed.packages(fields=c('" + fieldStr + "'))";
@@ -344,6 +356,16 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   private List<String> getDefaultRepos() {
     return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
+  }
+
+  public boolean isServiceAvailable() {
+    try  {
+      getStateInternal();
+      return true;
+    } catch (Exception e) {
+      // not functional
+      return false;
+    }
   }
 
   private class DataSHIELDPackagesROperation extends AbstractROperationWithResult {

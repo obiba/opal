@@ -301,6 +301,7 @@ public class RServerCluster implements RServerClusterService {
    */
   private RServerService getNextRServerService() {
     Optional<RServerState> state = rServerServices.stream().map(RServerService::getState)
+        .filter(RServerState::isRunning)
         .min(Comparator.comparingInt(RServerState::getRSessionsCount));
     if (state.isPresent())
       return getRServerService(state.get().getName());
