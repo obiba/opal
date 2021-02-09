@@ -37,12 +37,12 @@ public class RockServerDiscoveryService {
   @Autowired
   private AppsService appsService;
 
-  @Value("${rock.discovery.hosts}")
+  @Value("${apps.discovery.rock.hosts}")
   private String[] hosts;
 
   private final Map<String, App> hostsToCheck = Maps.newConcurrentMap();
 
-  @Scheduled(fixedDelayString = "${rock.discovery.interval:10000}")
+  @Scheduled(fixedDelayString = "${apps.discovery.interval:10000}")
   public void scanHosts() {
     if (hosts == null) return;
     for (String host : hosts) {
