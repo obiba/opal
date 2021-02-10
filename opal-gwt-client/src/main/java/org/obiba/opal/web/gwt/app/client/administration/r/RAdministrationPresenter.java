@@ -26,6 +26,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStoppedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -57,6 +58,8 @@ import static com.google.gwt.http.client.Response.*;
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
     implements RAdministrationUiHandlers {
+
+  private static final String DEFAULT_CULSTER = "default";
 
   private final RSessionsPresenter rSessionsPresenter;
 
@@ -144,8 +147,7 @@ public class RAdministrationPresenter
   }
 
   private void refreshCluster() {
-    // stop start R service
-    ResourceRequestBuilderFactory.<RServerClusterDto>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")) //
+    ResourceRequestBuilderFactory.<RServerClusterDto>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)) //
         .withCallback(new ResourceCallback<RServerClusterDto>() {
           @Override
           public void onResource(Response response, RServerClusterDto resource) {
@@ -155,14 +157,14 @@ public class RAdministrationPresenter
               getView().renderCluster(null);
             }
           }
-        }) //
+        })
         .get().send();
   }
 
   private void refreshPackages() {
     // Fetch all packages
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder() //
-        .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build("default")) //
+        .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build(DEFAULT_CULSTER)) //
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {
@@ -177,7 +179,7 @@ public class RAdministrationPresenter
   public void start() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")).put().withCallback(new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
         if (response.getStatusCode() == SC_OK) {
@@ -196,11 +198,12 @@ public class RAdministrationPresenter
     // Stop service
     getView().setServiceStatus(Display.Status.Pending);
     getView().renderPackages(null);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build("default")).delete()
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).delete()
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             refreshCluster();
+            fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, null));
           }
         }, SC_OK).send();
   }
@@ -223,7 +226,7 @@ public class RAdministrationPresenter
       @Override
       public void run() {
         ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
-            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGE.create().build("default", rPackage.getName()))
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGE.create().build(DEFAULT_CULSTER, rPackage.getName()))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -255,7 +258,7 @@ public class RAdministrationPresenter
       @Override
       public void run() {
         ResourceRequestBuilderFactory.newBuilder()
-            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build("default"))
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build(DEFAULT_CULSTER))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
