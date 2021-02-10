@@ -19,6 +19,10 @@ public interface RAdministrationUiHandlers extends UiHandlers {
 
   void stop();
 
+  void start(String server);
+
+  void stop(String server);
+
   void test();
 
   void onRefreshCluster();

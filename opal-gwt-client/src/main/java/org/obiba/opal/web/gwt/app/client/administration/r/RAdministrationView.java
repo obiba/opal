@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.r;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -54,6 +55,8 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   }
 
   private static final Translations translations = GWT.create(Translations.class);
+  public static final String START_ACTION = "Start";
+  public static final String STOP_ACTION = "Stop";
 
   @UiField
   Button startStopButton;
@@ -96,7 +99,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
   private List<RPackageDto> originalPackages;
 
-  private ActionsColumn<RPackageDto> actionsColumn;
+  private ActionsColumn<RServerDto> serversActionsColumn;
+
+  private ActionsColumn<RPackageDto> packagesActionsColumn;
 
   private final ListDataProvider<RServerDto> serversDataProvider = new ListDataProvider<RServerDto>();
 
@@ -292,6 +297,31 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
     serversTable.addColumn(new ServerURLColumn(), translations.urlLabel());
     serversTable.addColumn(new ServerStatusColumn(), translations.statusLabel());
 
+    serversTable.addColumn(serversActionsColumn = new ActionsColumn<RServerDto>(new ActionsProvider<RServerDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[]{START_ACTION, STOP_ACTION};
+      }
+
+      @Override
+      public String[] getActions(RServerDto value) {
+        return value.getRunning() ? new String[]{STOP_ACTION} : new String[]{START_ACTION};
+      }
+    }), translations.actionsLabel());
+
+    serversActionsColumn.setActionHandler(new ActionHandler<RServerDto>() {
+      @Override
+      public void doAction(RServerDto object, String actionName) {
+        if (START_ACTION.equals(actionName)) {
+          getUiHandlers().start(object.getName());
+        } else {
+          getUiHandlers().stop(object.getName());
+        }
+      }
+    });
+
+
     serversTable.setEmptyTableWidget(new Label(translations.noItems()));
     serversPager.setDisplay(serversTable);
     serversDataProvider.addDataDisplay(serversTable);
@@ -328,7 +358,8 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
         return getEntryDtoValue(object, "version");
       }
     }, translations.versionLabel());
-    packagesTable.addColumn(actionsColumn = new ActionsColumn<RPackageDto>(new ActionsProvider<RPackageDto>() {
+
+    packagesTable.addColumn(packagesActionsColumn = new ActionsColumn<RPackageDto>(new ActionsProvider<RPackageDto>() {
 
       @Override
       public String[] allActions() {
@@ -341,7 +372,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       }
     }), translations.actionsLabel());
 
-    actionsColumn.setActionHandler(new ActionHandler<RPackageDto>() {
+    packagesActionsColumn.setActionHandler(new ActionHandler<RPackageDto>() {
       @Override
       public void doAction(RPackageDto object, String actionName) {
         getUiHandlers().onRemovePackage(object);

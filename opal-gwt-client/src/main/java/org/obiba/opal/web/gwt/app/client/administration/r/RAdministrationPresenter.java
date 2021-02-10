@@ -179,18 +179,19 @@ public class RAdministrationPresenter
   public void start() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).put().withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if (response.getStatusCode() == SC_OK) {
-          refreshCluster();
-          refreshPackages();
-          resourceProvidersService.reset();
-        } else {
-          getView().setServiceStatus(Display.Status.Startable);
-        }
-      }
-    }, SC_OK).send();
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).put()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == SC_OK) {
+              refreshCluster();
+              refreshPackages();
+              resourceProvidersService.reset();
+            } else {
+              getView().setServiceStatus(Display.Status.Startable);
+            }
+          }
+        }, SC_OK).send();
   }
 
   @Override
@@ -204,6 +205,37 @@ public class RAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             refreshCluster();
             fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, null));
+          }
+        }, SC_OK).send();
+  }
+
+  @Override
+  public void start(String server) {
+    // Start service
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).put()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == SC_OK) {
+              refreshCluster();
+              refreshPackages();
+              resourceProvidersService.reset();
+            } else {
+              getView().setServiceStatus(Display.Status.Startable);
+            }
+          }
+        }, SC_OK).send();
+  }
+
+  @Override
+  public void stop(final String server) {
+    // Stop service
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).delete()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refreshCluster();
+            fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, server));
           }
         }, SC_OK).send();
   }

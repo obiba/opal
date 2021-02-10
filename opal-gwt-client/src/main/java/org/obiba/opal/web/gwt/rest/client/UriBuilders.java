@@ -1086,6 +1086,13 @@ public enum UriBuilders {
     }
   },
 
+  SERVICE_R_CLUSTER_SERVER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}");
+    }
+  },
+
   SERVICE_R_CLUSTER_PACKAGES {
     @Override
     public UriBuilder create() {
