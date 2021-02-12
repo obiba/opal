@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,11 +34,29 @@ public class AppsResource {
   private AppsService appsService;
 
   @GET
-  public Apps.AppsDto list(@QueryParam("type") String type) {
-    return Apps.AppsDto.newBuilder()
-        .addAllApps(appsService.getApps(type).stream()
-            .map(Dtos::asDto).collect(Collectors.toList()))
-        .build();
+  public List<Apps.AppDto> list(@QueryParam("type") String type) {
+    return appsService.getApps(type).stream()
+        .map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @GET
+  @Path("/config")
+  public Apps.AppsConfigDto getConfig() {
+    return Dtos.asDto(appsService.getAppsConfig());
+  }
+
+  @PUT
+  @Path("/config")
+  public Response updateConfig(Apps.AppsConfigDto configDto) {
+    appsService.updateAppsConfig(Dtos.fromDto(configDto));
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("/config")
+  public Response resetConfig() {
+    appsService.resetConfig();
+    return Response.ok().build();
   }
 
   /**

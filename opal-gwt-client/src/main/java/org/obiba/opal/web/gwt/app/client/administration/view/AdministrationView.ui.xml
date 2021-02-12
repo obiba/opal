@@ -270,6 +270,17 @@
                 </g:FlowPanel>
               </g:FlowPanel>
 
+              <g:FlowPanel ui:field="appsAuthorizable">
+                <o:OpalNavLink ui:field="appsPlace" icon="COG">
+                  <ui:msg description="Main Administration Apps title">Apps</ui:msg>
+                </o:OpalNavLink>
+                <g:FlowPanel>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Main Administration Apps help">Manage external applications providing services</ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
+              </g:FlowPanel>
+
               <g:FlowPanel ui:field="jvmAuthorizable">
                 <o:OpalNavLink ui:field="javaPlace" icon="COG">
                   <ui:msg description="Main Administration JVM title">Java Virtual Machine</ui:msg>

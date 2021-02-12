@@ -16,6 +16,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.Credentials;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
@@ -44,11 +45,11 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   private final App app;
 
-  private final Credentials credentials;
+  private final AppCredentials credentials;
 
   private String rockSessionId;
 
-  protected RockSession(String clusterName, App app, Credentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory) throws RServerException {
+  protected RockSession(String clusterName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory) throws RServerException {
     super(clusterName, app.getName(), UUID.randomUUID().toString(), user, transactionalThreadFactory);
     this.app = app;
     this.credentials = credentials;
@@ -254,7 +255,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   private HttpHeaders createHeaders() {
     return new HttpHeaders() {{
-      String auth = credentials.getUserPrincipal().getName() + ":" + credentials.getPassword();
+      String auth = credentials.getUser() + ":" + credentials.getPassword();
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
       String authHeader = "Basic " + new String(encodedAuth);
       add("Authorization", authHeader);

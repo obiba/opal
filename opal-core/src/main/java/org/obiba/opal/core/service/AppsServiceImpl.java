@@ -16,10 +16,15 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.opal.core.cfg.AppsService;
+import org.obiba.opal.core.domain.AppConfig;
+import org.obiba.opal.core.domain.AppCredentials;
+import org.obiba.opal.core.domain.AppsConfig;
+import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.event.AppRegisteredEvent;
 import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.web.model.Apps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +33,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.sql.Time;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,16 +42,25 @@ public class AppsServiceImpl implements AppsService {
 
   private static final Logger log = LoggerFactory.getLogger(AppsServiceImpl.class);
 
-  @Autowired
-  private OrientDbService orientDbService;
+  private final OrientDbService orientDbService;
 
-  @Autowired
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   @Value("${apps.token}")
-  private String token;
+  private String defaultToken;
+
+  @Value("${apps.discovery.rock.hosts}")
+  private String[] defaultRockHosts;
 
   private final Lock registryLock = new ReentrantLock();
+
+  private final Lock configLock = new ReentrantLock();
+
+  @Autowired
+  public AppsServiceImpl(OrientDbService orientDbService, EventBus eventBus) {
+    this.orientDbService = orientDbService;
+    this.eventBus = eventBus;
+  }
 
   @Override
   public void registerApp(App app) {
@@ -115,13 +128,50 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public void checkToken(String value) {
-    if (Strings.isNullOrEmpty(value) || !value.equals(token))
+    if (Strings.isNullOrEmpty(value) || !value.equals(defaultToken))
       throw new UnauthorizedException("App registration operation not authorized");
+  }
+
+  public AppsConfig getAppsConfig() {
+    AppsConfig found = orientDbService.findUnique(new AppsConfig());
+    return found == null ? getDefaultAppsConfig() : found;
+  }
+
+  @Override
+  public void updateAppsConfig(AppsConfig config) {
+    configLock.lock();
+    try {
+      saveAppsConfig(config);
+    } finally {
+      configLock.unlock();
+    }
+  }
+
+  @Override
+  public void resetConfig() {
+    configLock.lock();
+    try {
+      orientDbService.deleteAll(AppsConfig.class);
+    } finally {
+      configLock.unlock();
+    }
+  }
+
+  @Override
+  public RockAppConfig getRockAppConfig(App app) {
+    AppsConfig config = getAppsConfig();
+    for (RockAppConfig rockConfig : config.getRockAppConfigs()) {
+      if (app.getServer().equals(rockConfig.getHost())) {
+        return rockConfig;
+      }
+    }
+    return new RockAppConfig(app.getServer());
   }
 
   @Override
   @PostConstruct
   public void start() {
+    orientDbService.createUniqueIndex(AppsConfig.class);
     orientDbService.createUniqueIndex(App.class);
 
     new Timer().schedule(new TimerTask() {
@@ -146,6 +196,19 @@ public class AppsServiceImpl implements AppsService {
     return Lists.newArrayList(orientDbService.list(App.class,
         String.format("select from %s where name = ? and type = ? and server = ?", App.class.getSimpleName()),
         template.getName(), template.getType(), template.getServer()));
+  }
+
+  private void saveAppsConfig(AppsConfig config) {
+    orientDbService.save(config, config);
+  }
+
+  private AppsConfig getDefaultAppsConfig() {
+    AppsConfig config = new AppsConfig();
+    config.setToken(defaultToken);
+    for (String host : defaultRockHosts) {
+      config.addRockAppConfig(new RockAppConfig(host));
+    }
+    return config;
   }
 
 }

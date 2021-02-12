@@ -11,19 +11,23 @@
 package org.obiba.opal.r.rock;
 
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.cfg.AppsService;
+import org.obiba.opal.core.domain.AppConfig;
+import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Scan specified hosts periodically to discore Rock R server instances or to check
@@ -37,21 +41,20 @@ public class RockServerDiscoveryService {
   @Autowired
   private AppsService appsService;
 
-  @Value("${apps.discovery.rock.hosts}")
-  private String[] hosts;
-
   private final Map<String, App> hostsToCheck = Maps.newConcurrentMap();
 
   @Scheduled(fixedDelayString = "${apps.discovery.interval:10000}")
   public void scanHosts() {
-    if (hosts == null) return;
-    for (String host : hosts) {
-      if (host.trim().toLowerCase().startsWith("http"))
-        discoverHost(host.trim());
-      else {
-        boolean found = discoverOrCheckHost(String.format("https://%s", host.trim()));
-        if (!found) discoverOrCheckHost(String.format("http://%s", host.trim()));
-      }
+    List<String> hosts = appsService.getAppsConfig().getRockAppConfigs().stream()
+        .map(AppConfig::getHost).collect(Collectors.toList());
+    for (String host : hosts)
+      discoverOrCheckHost(host);
+  }
+  
+  @Subscribe
+  public synchronized void onAppUnregistered(AppUnregisteredEvent event) {
+    if ("rock".equals(event.getApp().getType())) {
+      hostsToCheck.remove(event.getApp().getServer());
     }
   }
 

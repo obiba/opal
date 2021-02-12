@@ -9,6 +9,19 @@ message AppDto {
   optional string server = 4;
 }
 
-message AppsDto {
-  repeated AppDto apps = 1;
+message AppsConfigDto {
+  required string token = 1;
+  repeated RockAppConfigDto rockConfigs = 2;
+}
+
+message RockAppConfigDto {
+  required string host = 1;
+  optional AppCredentialsDto administratorCredentials = 2;
+  optional AppCredentialsDto managerCredentials = 3;
+  optional AppCredentialsDto userCredentials = 4;
+}
+
+message AppCredentialsDto {
+  required string name = 1;
+  required string password = 2;
 }

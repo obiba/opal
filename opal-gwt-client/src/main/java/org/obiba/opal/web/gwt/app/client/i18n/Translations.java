@@ -1682,6 +1682,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Host label")
+  @DefaultStringValue("Host")
+  String hostLabel();
+
   @Description("Format label")
   @DefaultStringValue("Format")
   String formatLabel();
@@ -2112,6 +2116,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Plugins")
   String pagePluginsTitle();
 
+  @Description("Page Apps title")
+  @DefaultStringValue("Apps")
+  String pageAppsTitle();
+
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")
   String pageJVMTitle();
@@ -2183,6 +2191,10 @@ public interface Translations extends Constants {
   @Description("Add Token title")
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
+
+  @Description("Update Registration Token title")
+  @DefaultStringValue("Update Registration Token")
+  String updateTokenModalTitle();
 
   @Description("Add Resource title")
   @DefaultStringValue("Add Resource")
@@ -2583,6 +2595,14 @@ public interface Translations extends Constants {
   @Description("Update R Packages label")
   @DefaultStringValue("Update R Packages")
   String updateRPackages();
+
+  @Description("Remove App label")
+  @DefaultStringValue("Remove Application")
+  String removeApp();
+
+  @Description("Remove Rock Config label")
+  @DefaultStringValue("Remove Rock Discovery")
+  String removeRockConfig();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")

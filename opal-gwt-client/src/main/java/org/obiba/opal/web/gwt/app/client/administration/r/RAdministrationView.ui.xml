@@ -90,8 +90,6 @@
 
       </g:FlowPanel>
 
-
-
       <g:Anchor>
         <ui:msg description="R server packages label">Packages</ui:msg>
       </g:Anchor>

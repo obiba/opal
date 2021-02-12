@@ -888,11 +888,31 @@ public enum UriBuilders {
     }
   },
 
+  APPS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("apps");
+    }
+  },
+
+  APPS_CONFIG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("apps", "config");
+    }
+  },
+
+  APP {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("app", "{}");
+    }
+  },
+
   PLUGINS {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugins");
-
     }
   },
 
@@ -900,7 +920,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugins", "_available");
-
     }
   },
 

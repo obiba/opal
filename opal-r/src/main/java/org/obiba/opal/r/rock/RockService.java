@@ -15,10 +15,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.shiro.SecurityUtils;
 import org.json.JSONObject;
+import org.obiba.opal.core.cfg.AppsService;
+import org.obiba.opal.core.domain.AppCredentials;
+import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.RServerService;
@@ -66,11 +67,7 @@ public class RockService implements RServerService {
 
   private final EventBus eventBus;
 
-  private Credentials administratorCredentials;
-
-  private Credentials managerCredentials;
-
-  private Credentials userCredentials;
+  private final AppsService appsService;
 
   @Value("${rock.default.administrator.username}")
   private String administratorUsername;
@@ -91,9 +88,10 @@ public class RockService implements RServerService {
   private String userPassword;
 
   @Autowired
-  public RockService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
+  public RockService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, AppsService appsService) {
     this.transactionalThreadFactory = transactionalThreadFactory;
     this.eventBus = eventBus;
+    this.appsService = appsService;
   }
 
   public void setRServerClusterName(String clusterName) {
@@ -333,7 +331,7 @@ public class RockService implements RServerService {
 
   private HttpHeaders createHeaders() {
     return new HttpHeaders() {{
-      String auth = getManagerCredentials().getUserPrincipal().getName() + ":" + getManagerCredentials().getPassword();
+      String auth = getManagerCredentials().getUser() + ":" + getManagerCredentials().getPassword();
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
       String authHeader = "Basic " + new String(encodedAuth);
       add("Authorization", authHeader);
@@ -345,25 +343,38 @@ public class RockService implements RServerService {
     execute(rop);
   }
 
-  public Credentials getAdministratorCredentials() {
-    if (administratorCredentials == null)
-      administratorCredentials = new UsernamePasswordCredentials(administratorUsername, administratorPassword);
-    return administratorCredentials;
+  private AppCredentials getAdministratorCredentials() {
+    RockAppConfig config = appsService.getRockAppConfig(app);
+    if (config.hasAdministratorCredentials())
+      return config.getAdministratorCredentials();
+    return new AppCredentials(administratorUsername, administratorPassword);
   }
 
-  public Credentials getManagerCredentials() {
-    if (Strings.isNullOrEmpty(managerUsername))
-      return getAdministratorCredentials();
-    if (managerCredentials == null)
-      managerCredentials = new UsernamePasswordCredentials(managerUsername, managerPassword);
-    return managerCredentials;
+  /**
+   * Get manager credentials from config, else the default manager ones else the default administrator ones.
+   *
+   * @return
+   */
+  private AppCredentials getManagerCredentials() {
+    RockAppConfig config = appsService.getRockAppConfig(app);
+    if (config.hasManagerCredentials())
+      return config.getManagerCredentials();
+    if (!Strings.isNullOrEmpty(managerUsername))
+      return new AppCredentials(managerUsername, managerPassword);
+    return getAdministratorCredentials();
   }
 
-  public Credentials getUserCredentials() {
-    if (Strings.isNullOrEmpty(userUsername))
-      return getAdministratorCredentials();
-    if (userCredentials == null)
-      userCredentials = new UsernamePasswordCredentials(userUsername, userPassword);
-    return userCredentials;
+  /**
+   * Get user credentials from config, else the default user ones else the default administrator ones.
+   *
+   * @return
+   */
+  private AppCredentials getUserCredentials() {
+    RockAppConfig config = appsService.getRockAppConfig(app);
+    if (config.hasUserCredentials())
+      return config.getUserCredentials();
+    if (!Strings.isNullOrEmpty(userUsername))
+      return new AppCredentials(userUsername, userPassword);
+    return getAdministratorCredentials();
   }
 }

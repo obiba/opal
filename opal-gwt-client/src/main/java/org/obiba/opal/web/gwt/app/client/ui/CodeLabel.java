@@ -14,17 +14,17 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A label in a &lt;pre&gt; tag
+ * A label in a &lt;code&gt; tag
  */
-public class PreformattedLabel extends Widget implements HasText {
+public class CodeLabel extends Widget implements HasText {
 
   private String text;
 
-  public PreformattedLabel() {
+  public CodeLabel() {
     setElement(Document.get().createPreElement());
   }
 
-  public PreformattedLabel(String text) {
+  public CodeLabel(String text) {
     this();
     setText(text);
   }

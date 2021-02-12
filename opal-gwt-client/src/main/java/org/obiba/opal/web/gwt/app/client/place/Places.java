@@ -67,6 +67,8 @@ public final class Places {
 
   public static final String PLUGINS = "!plugins";
 
+  public static final String APPS = "!apps";
+
   private Places() {}
 
   public static final class Place extends com.google.gwt.place.shared.Place {

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.cfg;
 
+import org.obiba.opal.core.domain.AppsConfig;
+import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.service.SystemService;
 
@@ -60,4 +62,30 @@ public interface AppsService extends SystemService {
    * @param value
    */
   void checkToken(String value);
+
+  /**
+   * Get the apps management settings.
+   *
+   * @return
+   */
+  AppsConfig getAppsConfig();
+
+  /**
+   * Update the apps management settings.
+   *
+   * @param config
+   */
+  void updateAppsConfig(AppsConfig config);
+
+  /**
+   * Reset to default configuration.
+   */
+  void resetConfig();
+
+  /**
+   * Get the configuration corresponding to the Rock app.
+   *
+   * @param app
+   */
+  RockAppConfig getRockAppConfig(App app);
 }

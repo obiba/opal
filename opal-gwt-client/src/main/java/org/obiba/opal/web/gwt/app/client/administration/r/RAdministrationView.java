@@ -294,7 +294,13 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       }
     }, translations.rSessionsLabel());
 
-    serversTable.addColumn(new ServerURLColumn(), translations.urlLabel());
+    serversTable.addColumn(new URLColumn<RServerDto>() {
+
+      @Override
+      protected String getURL(RServerDto object) {
+        return object.hasApp() ? object.getApp().getServer() : "";
+      }
+    }, translations.urlLabel());
     serversTable.addColumn(new ServerStatusColumn(), translations.statusLabel());
 
     serversTable.addColumn(serversActionsColumn = new ActionsColumn<RServerDto>(new ActionsProvider<RServerDto>() {
@@ -320,7 +326,6 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
         }
       }
     });
-
 
     serversTable.setEmptyTableWidget(new Label(translations.noItems()));
     serversPager.setDisplay(serversTable);
@@ -394,30 +399,6 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       }
     }
     return "";
-  }
-
-
-  private class ServerURLColumn extends Column<RServerDto, String> {
-
-    public ServerURLColumn() {
-      super(new HTMLCell());
-    }
-
-    @Override
-    public String getValue(RServerDto object) {
-      if (object.hasApp()) {
-        String url = object.getApp().getServer();
-        String urlTxt = url.length() > 50 ? url.substring(0, 50) + " ..." : url;
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          return "<a href='" + url + "' target='_blank' title='" + url + "'>" + urlTxt + "</a>";
-        } else if (!urlTxt.equals(url)) {
-          return "<span title='" + url + "'>" + urlTxt + "</span>";
-        } else {
-          return url;
-        }
-      }
-      return "";
-    }
   }
 
   private static class ServerStatusColumn extends Column<RServerDto, String> {
