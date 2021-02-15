@@ -44,27 +44,15 @@ public abstract class AbstractROperation implements ROperation {
     }
   }
 
-  /*
-  protected void assign(String sym, byte[] ct, boolean serialized) {
-    try {
-      connection.assign(sym, ct);
-      if (serialized) assign(sym, eval(String.format("unserialize(%s)", sym), false));
-    } catch (RServerException e) {
-      log.warn("Failed assigning '{}' with: byte[{}]", sym, ct == null ? 0 : ct.length, e);
-      throw new RRuntimeException(e);
-    }
-  }
-  */
-
   /**
    * Assign raw data to a symbol in R.
    *
-   * @param sym
-   * @param ct
+   * @param sym symbol
+   * @param bct base64 encoded content
    */
-  protected void assign(String sym, byte[] ct) {
+  protected void assignData(String sym, String bct) {
     try {
-      connection.assign(sym, ct);
+      connection.assignData(sym, bct);
     } catch (RServerException e) {
       log.warn("Failed assigning '{}' with raw data", sym, e);
       throw new RRuntimeException(e);

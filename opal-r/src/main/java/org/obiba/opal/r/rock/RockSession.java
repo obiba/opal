@@ -12,8 +12,6 @@ package org.obiba.opal.r.rock;
 
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.auth.Credentials;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.domain.AppCredentials;
@@ -36,6 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -61,9 +60,21 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   //
 
   @Override
-  public void assign(String symbol, byte[] content) throws RServerException {
+  public void assignData(String symbol, String content) throws RServerException {
     touch();
-    // TODO
+    String serverUrl = getRSessionResourceUrl("/_assign");
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = createHeaders();
+    headers.setContentType(MediaType.valueOf("application/x-rdata"));
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+        .queryParam("s", symbol);
+
+    try {
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
+    } catch (RestClientException e) {
+      throw new RServerException("Assign R data failed", e);
+    }
   }
 
   @Override
@@ -80,7 +91,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
       restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
     } catch (RestClientException e) {
-      throw new RServerException("Eval failed", e);
+      throw new RServerException("Assign R expression failed", e);
     }
   }
 
@@ -111,7 +122,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
           return new RockResult(jsonSource);
       }
     } catch (RestClientException e) {
-      throw new RServerException("Eval failed", e);
+      throw new RServerException("Eval R expression failed", e);
     }
   }
 
@@ -256,7 +267,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   private HttpHeaders createHeaders() {
     return new HttpHeaders() {{
       String auth = credentials.getUser() + ":" + credentials.getPassword();
-      byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
+      byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
       String authHeader = "Basic " + new String(encodedAuth);
       add("Authorization", authHeader);
     }};

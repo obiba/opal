@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -46,9 +47,11 @@ class RserveConnection implements RServerConnection {
   }
 
   @Override
-  public void assign(String symbol, byte[] content) throws RServerException {
+  public void assignData(String symbol, String content) throws RServerException {
     try {
-      connection.assign(symbol, new REXPRaw(content));
+      byte[] rawContent = Base64.getDecoder().decode(content.replaceAll("\\n", "").replaceAll("\\r", ""));
+      connection.assign(symbol, new REXPRaw(rawContent));
+      connection.eval(String.format("is.null(base::assign('%s', value=unserialize(%s)))", symbol, symbol));
     } catch (RserveException e) {
       throw new RServerException(e);
     }

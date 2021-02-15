@@ -16,13 +16,13 @@ import java.io.OutputStream;
 public interface RServerConnection {
 
   /**
-   * Assign raw data to a symbol.
+   * Assign raw data base64 encoded to a symbol.
    *
    * @param symbol
    * @param content
    * @throws RServerException
    */
-  void assign(String symbol, byte[] content) throws RServerException;
+  void assignData(String symbol, String content) throws RServerException;
 
   /**
    * Assign string to a symbol.
