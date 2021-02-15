@@ -1105,13 +1105,6 @@ public enum UriBuilders {
     }
   },
 
-  SERVICE_R_CLUSTER_SERVER {
-    @Override
-    public UriBuilder create() {
-      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}");
-    }
-  },
-
   SERVICE_R_CLUSTER_PACKAGES {
     @Override
     public UriBuilder create() {
@@ -1123,6 +1116,27 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("service", "r", "cluster", "{}", "package", "{}");
+    }
+  },
+
+  SERVICE_R_CLUSTER_LOG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "_log");
+    }
+  },
+
+  SERVICE_R_CLUSTER_SERVER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}");
+    }
+  },
+
+  SERVICE_R_CLUSTER_SERVER_LOG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}", "_log");
     }
   },
 

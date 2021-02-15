@@ -176,7 +176,7 @@ public class RAdministrationPresenter
 
 
   @Override
-  public void start() {
+  public void onStart() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
     ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).put()
@@ -195,7 +195,7 @@ public class RAdministrationPresenter
   }
 
   @Override
-  public void stop() {
+  public void onStop() {
     // Stop service
     getView().setServiceStatus(Display.Status.Pending);
     getView().renderPackages(null);
@@ -210,7 +210,7 @@ public class RAdministrationPresenter
   }
 
   @Override
-  public void start(String server) {
+  public void onStart(String server) {
     // Start service
     ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).put()
         .withCallback(new ResponseCodeCallback() {
@@ -228,7 +228,7 @@ public class RAdministrationPresenter
   }
 
   @Override
-  public void stop(final String server) {
+  public void onStop(final String server) {
     // Stop service
     ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).delete()
         .withCallback(new ResponseCodeCallback() {
@@ -238,6 +238,11 @@ public class RAdministrationPresenter
             fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, server));
           }
         }, SC_OK).send();
+  }
+
+  @Override
+  public void onDownloadRserveLog(String server) {
+    fireEvent(new FileDownloadRequestEvent(UriBuilders.SERVICE_R_CLUSTER_SERVER_LOG.create().build(DEFAULT_CULSTER, server)));
   }
 
   @Override
@@ -308,7 +313,7 @@ public class RAdministrationPresenter
 
   @Override
   public void onDownloadRserveLog() {
-    fireEvent(new FileDownloadRequestEvent("/service/r/log/Rserve.log"));
+    fireEvent(new FileDownloadRequestEvent(UriBuilders.SERVICE_R_CLUSTER_LOG.create().build(DEFAULT_CULSTER)));
   }
 
   @Override

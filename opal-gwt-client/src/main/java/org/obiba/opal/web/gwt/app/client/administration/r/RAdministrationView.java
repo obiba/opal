@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.administration.r;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Joiner;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -55,8 +54,12 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   }
 
   private static final Translations translations = GWT.create(Translations.class);
+
   public static final String START_ACTION = "Start";
+
   public static final String STOP_ACTION = "Stop";
+
+  public static final String LOG_ACTION = "Log";
 
   @UiField
   Button startStopButton;
@@ -123,9 +126,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   @UiHandler("startStopButton")
   public void onStartStop(ClickEvent event) {
     if (Status.Startable.equals(status)) {
-      getUiHandlers().start();
+      getUiHandlers().onStart();
     } else {
-      getUiHandlers().stop();
+      getUiHandlers().onStop();
     }
   }
 
@@ -307,12 +310,12 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
       @Override
       public String[] allActions() {
-        return new String[]{START_ACTION, STOP_ACTION};
+        return new String[]{START_ACTION, STOP_ACTION, LOG_ACTION};
       }
 
       @Override
       public String[] getActions(RServerDto value) {
-        return value.getRunning() ? new String[]{STOP_ACTION} : new String[]{START_ACTION};
+        return value.getRunning() ? new String[]{STOP_ACTION, LOG_ACTION} : new String[]{START_ACTION, LOG_ACTION};
       }
     }), translations.actionsLabel());
 
@@ -320,10 +323,12 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       @Override
       public void doAction(RServerDto object, String actionName) {
         if (START_ACTION.equals(actionName)) {
-          getUiHandlers().start(object.getName());
-        } else {
-          getUiHandlers().stop(object.getName());
-        }
+          getUiHandlers().onStart(object.getName());
+        } else if (STOP_ACTION.equals(actionName)){
+          getUiHandlers().onStop(object.getName());
+        } else if (LOG_ACTION.equals(actionName)){
+        getUiHandlers().onDownloadRserveLog(object.getName());
+      }
       }
     });
 
