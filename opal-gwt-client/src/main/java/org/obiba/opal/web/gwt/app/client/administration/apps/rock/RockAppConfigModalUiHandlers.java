@@ -14,4 +14,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface RockAppConfigModalUiHandlers extends ModalUiHandlers {
   void onSave(String url);
+  void onSave(String url, String administratorUsername, String administratorPassword);
+  void onSave(String url, String managerUsername, String managerPassword, String userUsername, String userPassword);
 }

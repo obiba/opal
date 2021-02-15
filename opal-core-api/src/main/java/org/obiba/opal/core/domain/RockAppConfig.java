@@ -24,7 +24,7 @@ public class RockAppConfig extends AppConfig {
   }
 
   public boolean hasAdministratorCredentials() {
-    return managerCredentials != null;
+    return administratorCredentials != null;
   }
 
   public void setAdministratorCredentials(AppCredentials administrator) {

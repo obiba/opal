@@ -1097,6 +1097,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Attribute")
   String addAttribute();
 
+  @Description("Rock Default Credentials help")
+  @DefaultStringValue("Rock credentials are the default ones, as defined in the main Opal configuration file.")
+  String rockDefaultCredentialsHelp();
+
+  @Description("Rock Administrator Credentials help")
+  @DefaultStringValue("Rock credentials are the ones of a user with administrator role. It will be used both for managing the server (start/stop, R packages etc.) and for creating new R sessions.")
+  String rockAdministratorCredentialsHelp();
+
+  @Description("Rock Manager User Credentials help")
+  @DefaultStringValue("One Rock credentials for managing the server (start/stop, R packages etc.) and another one for creating new R sessions. Having both different user roles allows to restrict user privilegies in the R sessions.")
+  String rockManagerUserCredentialsHelp();
+
   @Description("Add Annotation help")
   @DefaultStringValue("Apply annotation to the variable by selecting a controlled vocabulary.")
   String addAnnotationHelp();

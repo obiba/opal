@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.apps;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -34,9 +33,6 @@ public class AppsTokenModalView extends ModalPopupViewWithUiHandlers<AppsTokenMo
 
   @UiField
   ControlGroup tokenGroup;
-
-  @UiField
-  Button cancelButton;
 
   @UiField
   TextBox tokenText;
