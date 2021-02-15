@@ -22,6 +22,9 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.apps.event.AppsTokenUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.administration.apps.event.RockAppConfigAddEvent;
+import org.obiba.opal.web.gwt.app.client.administration.apps.event.RockAppConfigUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.administration.apps.rock.RockAppConfigModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -55,12 +58,17 @@ public class AppsAdministrationPresenter extends ItemAdministrationPresenter<App
 
   private final ModalProvider<AppsTokenModalPresenter> appsTokenModalPresenterModalProvider;
 
+  private final ModalProvider<RockAppConfigModalPresenter> rockAppConfigModalPresenterModalProvider;
+
   @Inject
   public AppsAdministrationPresenter(EventBus eventBus, Display display, Proxy proxy,
-                                     DefaultBreadcrumbsBuilder breadcrumbsHelper, ModalProvider<AppsTokenModalPresenter> appsTokenModalPresenterModalProvider) {
+                                     DefaultBreadcrumbsBuilder breadcrumbsHelper,
+                                     ModalProvider<AppsTokenModalPresenter> appsTokenModalPresenterModalProvider,
+                                     ModalProvider<RockAppConfigModalPresenter> rockAppConfigModalPresenterModalProvider) {
     super(eventBus, display, proxy);
     this.appsTokenModalPresenterModalProvider = appsTokenModalPresenterModalProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
+    this.rockAppConfigModalPresenterModalProvider = rockAppConfigModalPresenterModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -88,6 +96,8 @@ public class AppsAdministrationPresenter extends ItemAdministrationPresenter<App
         onTokenUpdate(event.getToken());
       }
     });
+    addRegisteredHandler(RockAppConfigAddEvent.getType(), new RockAppConfigHandler());
+    addRegisteredHandler(RockAppConfigUpdateEvent.getType(), new RockAppConfigHandler());
   }
 
   @Override
@@ -189,21 +199,15 @@ public class AppsAdministrationPresenter extends ItemAdministrationPresenter<App
 
   @Override
   public void onRockConfigEdit(RockAppConfigDto rockConfig) {
-
+    RockAppConfigModalPresenter presenter = rockAppConfigModalPresenterModalProvider.create();
+    presenter.setConfig(rockConfig);
+    rockAppConfigModalPresenterModalProvider.show();
   }
 
   @Override
   public void onRockConfigAdd() {
-    RockAppConfigDto dto = RockAppConfigDto.create();
-    dto.setHost("https://rock-test.obiba.org");
-    JsArray<RockAppConfigDto> configs = JsArrays.create();
-    for (RockAppConfigDto config : JsArrays.toIterable(appsConfig.getRockConfigsArray()))
-      if (!config.getHost().equals(dto.getHost())) {
-        configs.push(config);
-      }
-    configs.push(dto);
-    appsConfig.setRockConfigsArray(configs);
-    doUpdate(appsConfig);
+    RockAppConfigModalPresenter presenter = rockAppConfigModalPresenterModalProvider.create();
+    rockAppConfigModalPresenterModalProvider.show();
   }
 
   private void doUpdate(AppsConfigDto config) {
@@ -233,6 +237,30 @@ public class AppsAdministrationPresenter extends ItemAdministrationPresenter<App
     void renderApps(JsArray<AppDto> apps);
 
     void renderAppsConfig(AppsConfigDto config);
+  }
+
+  private class RockAppConfigHandler implements RockAppConfigAddEvent.RockAppConfigAddHandler, RockAppConfigUpdateEvent.RockAppConfigUpdateHandler {
+
+    @Override
+    public void onRockAppConfigAdd(RockAppConfigAddEvent event) {
+      handleRockAppConfig(event.getConfig());
+    }
+
+    @Override
+    public void onRockAppConfigUpdate(RockAppConfigUpdateEvent event) {
+      handleRockAppConfig(event.getConfig());
+    }
+
+    private void handleRockAppConfig(RockAppConfigDto dto) {
+      JsArray<RockAppConfigDto> configs = JsArrays.create();
+      for (RockAppConfigDto config : JsArrays.toIterable(appsConfig.getRockConfigsArray()))
+        if (!config.getHost().equals(dto.getHost())) {
+          configs.push(config);
+        }
+      configs.push(dto);
+      appsConfig.setRockConfigsArray(configs);
+      doUpdate(appsConfig);
+    }
   }
 
 }

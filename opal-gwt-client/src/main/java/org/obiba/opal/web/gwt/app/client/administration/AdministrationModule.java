@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.administration.apps.AppsAdministrationP
 import org.obiba.opal.web.gwt.app.client.administration.apps.AppsAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.apps.AppsTokenModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.apps.AppsTokenModalView;
+import org.obiba.opal.web.gwt.app.client.administration.apps.rock.RockAppConfigModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.apps.rock.RockAppConfigModalView;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalView;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationPresenter;
@@ -117,6 +119,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         AppsAdministrationView.class, AppsAdministrationPresenter.Proxy.class);
     bindPresenterWidget(AppsTokenModalPresenter.class, AppsTokenModalPresenter.Display.class,
         AppsTokenModalView.class);
+    bindPresenterWidget(RockAppConfigModalPresenter.class, RockAppConfigModalPresenter.Display.class,
+        RockAppConfigModalView.class);
     bindPresenter(PluginsAdministrationPresenter.class, PluginsAdministrationPresenter.Display.class,
         PluginsAdministrationView.class, PluginsAdministrationPresenter.Proxy.class);
     bindPresenterWidget(PluginServiceConfigurationModalPresenter.class,

@@ -187,7 +187,7 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
       public void doAction(RockAppConfigDto object, String actionName) {
         if (ActionsColumn.REMOVE_ACTION.equals(actionName))
           getUiHandlers().onRockConfigRemove(object);
-        else
+        else if (ActionsColumn.EDIT_ACTION.equals(actionName))
           getUiHandlers().onRockConfigEdit(object);
       }
     });
