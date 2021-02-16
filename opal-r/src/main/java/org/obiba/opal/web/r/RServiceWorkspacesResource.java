@@ -55,13 +55,13 @@ public class RServiceWorkspacesResource {
                 .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user)) //
                 .filter(file -> isUserHomeFolderReadable(file.getName())) //
                 .forEach(userFolder -> {
-              File[] workspaces = userFolder.listFiles();
-              if (workspaces != null) {
-                ws.addAll(Lists.newArrayList(workspaces).stream().filter(File::isDirectory) //
-                    .map(folder -> Dtos.asDto(contextFile.getName(), userFolder.getName(), folder)) //
-                    .collect(Collectors.toList()));
-              }
-            });
+                  File[] workspaces = userFolder.listFiles();
+                  if (workspaces != null) {
+                    ws.addAll(Lists.newArrayList(workspaces).stream().filter(File::isDirectory) //
+                        .map(folder -> Dtos.asDto(contextFile.getName(), userFolder.getName(), folder)) //
+                        .collect(Collectors.toList()));
+                  }
+                });
           }
         });
     return ws;

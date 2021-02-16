@@ -9,22 +9,20 @@
  */
 package org.obiba.opal.web.magma.support;
 
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Strings;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.datasource.RDatasourceService;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
-import org.obiba.opal.spi.r.datasource.magma.RDatasource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.slf4j.Logger;
@@ -32,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
 
 /**
  * Plugin datasource is used as a transient datasource.
@@ -79,9 +77,9 @@ public class PluginDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     });
 
     if (datasourceService instanceof RDatasourceService) {
-      final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+      final RServerSession rSession = opalRSessionManager.newSubjectRSession();
       rSession.setExecutionContext("Import");
-      ((RDatasourceService)datasourceService).setRSessionHandler(new RSessionHandler() {
+      ((RDatasourceService) datasourceService).setRSessionHandler(new RSessionHandler() {
         @Override
         public ROperationTemplate getSession() {
           return rSession;

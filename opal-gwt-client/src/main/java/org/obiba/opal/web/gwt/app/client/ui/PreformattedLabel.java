@@ -10,12 +10,15 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A label in a &lt;pre&gt; tag
  */
-public class PreformattedLabel extends Widget {
+public class PreformattedLabel extends Widget implements HasText {
+
+  private String text;
 
   public PreformattedLabel() {
     setElement(Document.get().createPreElement());
@@ -26,7 +29,13 @@ public class PreformattedLabel extends Widget {
     setText(text);
   }
 
+  @Override
+  public String getText() {
+    return text;
+  }
+
   public void setText(String text) {
+    this.text = text;
     getElement().setInnerText(text);
   }
 

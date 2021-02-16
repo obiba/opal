@@ -12,8 +12,8 @@ package org.obiba.opal.web.magma.support;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.r.datasource.RDatasourceFactoryImpl;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.web.model.Magma;
@@ -41,7 +41,7 @@ public class RSessionDatasourceFactoryDtoParser extends AbstractDatasourceFactor
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     RDatasourceFactoryImpl factory = new RDatasourceFactoryImpl();
     Magma.RSessionDatasourceFactoryDto rDto = dto.getExtension(Magma.RSessionDatasourceFactoryDto.params);
-    OpalRSession rSession = opalRSessionManager.getRSession(rDto.getSession());
+    RServerSession rSession = opalRSessionManager.getRSession(rDto.getSession());
     rSession.setExecutionContext("Import");
     factory.setName(dto.getName());
     factory.setSymbol(rDto.getSymbol());

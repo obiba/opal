@@ -18,10 +18,11 @@ import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,10 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
-  private OpalRSession rSession;
+  private RServerSession rSession;
 
   @Override
-  public void setOpalRSession(OpalRSession rSession) {
+  public void setRServerSession(RServerSession rSession) {
     if (rSession.getExecutionContext().equals("DataSHIELD") && !getExecutionContext().equals(rSession.getExecutionContext()))
       throw new BadRequestException(String.format("Not a valid execution context '%s', expecting '%s'", rSession.getExecutionContext(), getExecutionContext()));
     this.rSession = rSession;
@@ -112,7 +113,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   public List<OpalR.RCommandDto> getRCommands() {
     ImmutableList.Builder<OpalR.RCommandDto> commands = ImmutableList.builder();
 
-    commands.addAll(Iterables.transform(getOpalRSession().getRCommands(), new Function<RCommand, OpalR.RCommandDto>() {
+    commands.addAll(Iterables.transform(getRServerSession().getRCommands(), new Function<RCommand, OpalR.RCommandDto>() {
       @Nullable
       @Override
       public OpalR.RCommandDto apply(@Nullable RCommand rCommand) {
@@ -125,9 +126,9 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public OpalR.RCommandDto getRCommand(String rid, boolean wait) {
-    RCommand rCommand = getOpalRSession().getRCommand(rid);
+    RCommand rCommand = getRServerSession().getRCommand(rid);
     if (!rCommand.isFinished() && wait) {
-      while (!getOpalRSession().getRCommand(rid).isFinished()) {
+      while (!getRServerSession().getRCommand(rid).isFinished()) {
         try {
           synchronized (rCommand) {
             rCommand.wait();
@@ -142,19 +143,19 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Override
   public Response removeRCommand(String rid) {
-    if (getOpalRSession().hasRCommand(rid)) {
-      getOpalRSession().removeRCommand(rid);
+    if (getRServerSession().hasRCommand(rid)) {
+      getRServerSession().removeRCommand(rid);
     }
     return Response.ok().build();
   }
 
   @Override
   public Response getRCommandResult(String rid, boolean remove, boolean wait) {
-    RCommand rCommand = getOpalRSession().getRCommand(rid);
+    RCommand rCommand = getRServerSession().getRCommand(rid);
     Response resp = Response.noContent().build();
     if (!rCommand.isFinished()) {
       if (wait) {
-        while (!getOpalRSession().getRCommand(rid).isFinished()) {
+        while (!getRServerSession().getRCommand(rid).isFinished()) {
           try {
             synchronized (rCommand) {
               rCommand.wait();
@@ -175,11 +176,11 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     Response resp = Response.noContent().build();
     if (rCommand.hasResult()) {
       ROperationWithResult rop = rCommand.asROperationWithResult();
-      if (rop.hasRawResult()) {
-        resp = Response.ok().entity(rop.getRawResult().asBytes()).build();
+      if (rop.hasResult() && rop.getResult().isRaw()) {
+        resp = Response.ok().entity(rop.getResult().asBytes()).build();
       }
     }
-    if (remove) getOpalRSession().removeRCommand(rCommand.getId());
+    if (remove) getRServerSession().removeRCommand(rCommand.getId());
     return resp;
   }
 
@@ -206,14 +207,14 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     OpalRSymbolResource resource = applicationContext
         .getBean("opalRSymbolResource", OpalRSymbolResource.class);
     resource.setName(name);
-    resource.setOpalRSession(rSession);
+    resource.setRServerSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
     resource.setResourceReferenceService(resourceReferenceService);
     return resource;
   }
 
-  protected OpalRSession getOpalRSession() {
+  protected RServerSession getRServerSession() {
     return rSession;
   }
 

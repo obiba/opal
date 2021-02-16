@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import org.rosuda.REngine.REXPRaw;
-
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -21,25 +18,24 @@ public class DataAssignROperation extends AbstractROperation {
 
   private final String symbol;
 
-  private final byte[] content;
+  private final String base64Content;
 
   public DataAssignROperation(String symbol, String base64Content) {
     this.symbol = symbol;
-    this.content = Base64.getDecoder().decode(base64Content.replaceAll("\\n", "").replaceAll("\\r", ""));
+    this.base64Content = base64Content;
   }
 
   @Override
   public void doWithConnection() {
-    if(symbol == null) return;
+    if (symbol == null) return;
     // write the byte array and unserialize it
-    assign(symbol, new REXPRaw(content));
-    eval(String.format("is.null(base::assign('%s', value=unserialize(%s)))", symbol, symbol), false);
+    assignData(symbol, base64Content);
   }
 
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(symbol).append(" <- byte[").append(content == null ? 0 : content.length).append("]\n");
+    buffer.append(symbol).append(" <- byte[").append(base64Content == null ? 0 : base64Content.length()).append("]");
     return buffer.toString();
   }
 }

@@ -23,7 +23,7 @@ public class RScriptROperation extends AbstractROperationWithResult {
   }
 
   public RScriptROperation(String script, boolean serialize) {
-    if(script == null) throw new IllegalArgumentException("R script cannot be null");
+    if (script == null) throw new IllegalArgumentException("R script cannot be null");
     this.script = script;
     this.serialize = serialize;
   }

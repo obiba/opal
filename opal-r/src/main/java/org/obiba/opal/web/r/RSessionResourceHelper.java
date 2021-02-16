@@ -34,20 +34,20 @@ class RSessionResourceHelper {
    * @return
    */
   static Response executeScript(ROperationTemplate ropTemplate, String script, boolean async) {
-    if(script == null) return Response.status(Status.BAD_REQUEST).build();
+    if (script == null) return Response.status(Status.BAD_REQUEST).build();
     return executeScript(ropTemplate, new RScriptROperation(script), async);
   }
 
   static Response executeScript(ROperationTemplate ropTemplate, ROperationWithResult rop, boolean async) {
-    if(async && ropTemplate instanceof RASyncOperationTemplate) {
-      String id = ((RASyncOperationTemplate)ropTemplate).executeAsync(rop);
+    if (async && ropTemplate instanceof RASyncOperationTemplate) {
+      String id = ((RASyncOperationTemplate) ropTemplate).executeAsync(rop);
       return Response.ok().entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
     } else {
       ropTemplate.execute(rop);
-      if(rop.hasResult() && rop.hasRawResult()) {
-        return Response.ok().entity(rop.getRawResult().asBytes()).build();
+      if (rop.hasResult() && rop.getResult().isRaw()) {
+        return Response.ok().entity(rop.getResult().asBytes()).build();
       }
-      log.error("R Script '{}' has result: {}, has raw result: {}", rop, rop.hasResult(), rop.hasRawResult());
+      log.error("R Script '{}' has result: {}, has raw result: {}", rop, rop.hasResult(), rop.hasResult() && rop.getResult().isRaw());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

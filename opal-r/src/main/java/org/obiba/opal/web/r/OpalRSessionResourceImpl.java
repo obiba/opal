@@ -40,19 +40,19 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
   @Override
   public Response execute(String script, boolean async, String body) {
     String rScript = script;
-    if(Strings.isNullOrEmpty(rScript)) {
+    if (Strings.isNullOrEmpty(rScript)) {
       rScript = body;
     }
-    return RSessionResourceHelper.executeScript(getOpalRSession(), rScript, async);
+    return RSessionResourceHelper.executeScript(getRServerSession(), rScript, async);
   }
 
   @Override
   public Response pushFile(String source, String destination) throws FileSystemException {
     if (Strings.isNullOrEmpty(source)) return Response.status(Response.Status.BAD_REQUEST) //
-      .entity("Source file is missing.").build();
+        .entity("Source file is missing.").build();
     // source file must exists and be accessible
     String sourcePath = source;
-    if (source.startsWith("~")) sourcePath = source.replaceFirst("~", "/home/" + getOpalRSession().getUser());
+    if (source.startsWith("~")) sourcePath = source.replaceFirst("~", "/home/" + getRServerSession().getUser());
     FileObject file = resolveFileInFileSystem(sourcePath);
     if (!file.exists() || !file.isReadable()) return Response.status(Response.Status.NOT_FOUND) //
         .entity("The file does not exist or is not readable: " + sourcePath).build();
@@ -62,11 +62,11 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
     if (!Strings.isNullOrEmpty(destination) &&
         (destination.startsWith("~") || destination.startsWith("/") || destination.startsWith("$")))
       return Response.status(Response.Status.BAD_REQUEST) //
-        .entity("Destination file must be relative to R workspace.").build();
+          .entity("Destination file must be relative to R workspace.").build();
     String dest = prepareDestinationInR(destination, file.getName().getBaseName());
     try {
       FileWriteROperation rop = new FileWriteROperation(dest, opalRuntime.getFileSystem().getLocalFile(file));
-      getOpalRSession().execute(rop);
+      getRServerSession().execute(rop);
     } catch (Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Cannot write file to R workspace: " + source).build();
     }
@@ -79,19 +79,22 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
         .entity("Source file is missing.").build();
     if (Strings.isNullOrEmpty(destination)) return Response.status(Response.Status.BAD_REQUEST) //
         .entity("Destination file or folder is missing.").build();
-    if (source.startsWith("~") || source.startsWith("/") || source.startsWith("$")) return Response.status(Response.Status.BAD_REQUEST) //
-        .entity("Source file must be relative to R workspace.").build();
+    if (source.startsWith("~") || source.startsWith("/") || source.startsWith("$"))
+      return Response.status(Response.Status.BAD_REQUEST) //
+          .entity("Source file must be relative to R workspace.").build();
     String sourceName = source;
     if (source.contains("/")) sourceName = source.substring(source.lastIndexOf("/") + 1);
     String destinationPath = destination;
-    if (destination.startsWith("~")) destinationPath = destination.replaceFirst("~", "/home/" + getOpalRSession().getUser());
+    if (destination.startsWith("~"))
+      destinationPath = destination.replaceFirst("~", "/home/" + getRServerSession().getUser());
     FileObject dest = resolveFileInFileSystem(destinationPath);
-    if ((dest.exists() && !dest.isWriteable()) || (!dest.exists() && !dest.getParent().isWriteable())) return Response.status(Response.Status.BAD_REQUEST) //
-        .entity("Destination file is not accessible for writing.").build();
+    if ((dest.exists() && !dest.isWriteable()) || (!dest.exists() && !dest.getParent().isWriteable()))
+      return Response.status(Response.Status.BAD_REQUEST) //
+          .entity("Destination file is not accessible for writing.").build();
     File file = prepareDestinationInOpal(dest, sourceName);
     try {
       FileReadROperation rop = new FileReadROperation(source, file);
-      getOpalRSession().execute(rop);
+      getRServerSession().execute(rop);
     } catch (Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Cannot read file from R workspace: " + source).build();
     }
@@ -115,7 +118,7 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
       // make sure destination directory exists
       String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
       RScriptROperation rop = new RScriptROperation(rscript, false);
-      getOpalRSession().execute(rop);
+      getRServerSession().execute(rop);
     }
     return destination;
   }

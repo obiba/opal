@@ -81,10 +81,10 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
           configSupplier.get().getEnvironment(DSMethodType.ASSIGN));
       if (async) {
-        String id = getRSession().executeAsync(rop);
+        String id = getRServerSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
       } else {
-        getRSession().execute(rop);
+        getRServerSession().execute(rop);
         return Response.created(getSymbolURI(uri)).build();
       }
     } catch (ParseException e) {

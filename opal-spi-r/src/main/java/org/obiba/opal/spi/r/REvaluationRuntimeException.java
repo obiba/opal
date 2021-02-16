@@ -10,12 +10,9 @@
 package org.obiba.opal.spi.r;
 
 import com.google.common.base.Joiner;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,31 +24,19 @@ public class REvaluationRuntimeException extends RuntimeException {
 
   private static final Logger log = LoggerFactory.getLogger(REvaluationRuntimeException.class);
 
-  private final REXP result;
+  private final List<String> rMessages;
 
-  public REvaluationRuntimeException(String msg, REXP result) {
+  public REvaluationRuntimeException(String msg, List<String> rMessages) {
     super(msg);
-    this.result = result;
-  }
-
-  public REXP getResult() {
-    return result;
+    this.rMessages = rMessages;
   }
 
   public List<String> getRMessages() {
-    String[] strs = null;
-    try {
-      if(result != null) strs = result.asStrings();
-    } catch(REXPMismatchException e) {
-      log.error("Not a REXP with strings", e);
-    }
-    if(strs == null) strs = new String[] { };
-
-    return Arrays.asList(strs);
+    return rMessages;
   }
 
   @Override
   public String getMessage() {
-    return super.getMessage() + " -> " + Joiner.on("; ").join(getRMessages());
+    return super.getMessage() + " -> " + Joiner.on("; ").join(rMessages);
   }
 }

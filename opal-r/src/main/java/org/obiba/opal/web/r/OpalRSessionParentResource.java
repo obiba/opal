@@ -38,7 +38,7 @@ public class OpalRSessionParentResource {
   @Path("/{id}")
   public RSessionResource getOpalRSessionResource(@PathParam("id") String id) {
     RSessionResource resource = applicationContext.getBean("opalRSessionResource", RSessionResource.class);
-    resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
+    resource.setRServerSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
 

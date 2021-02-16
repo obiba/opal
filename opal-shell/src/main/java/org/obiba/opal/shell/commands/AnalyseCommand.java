@@ -27,8 +27,8 @@ import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.shell.commands.options.AnalyseCommandOptions;
 import org.obiba.opal.spi.analysis.AnalysisService;
 import org.obiba.opal.spi.r.ROperationTemplate;
@@ -229,7 +229,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
   }
 
   private class RSessionHandlerImpl implements RSessionHandler, Closeable {
-    private final OpalRSession rSession;
+
+    private final RServerSession rSession;
 
     RSessionHandlerImpl() {
       rSession = opalRSessionManager.newSubjectRSession();

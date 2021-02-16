@@ -13,7 +13,7 @@ package org.obiba.opal.web.r;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
-import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.RServerSession;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -25,7 +25,7 @@ public interface RSymbolResource {
 
   void setName(String name);
 
-  void setOpalRSession(OpalRSession rSession);
+  void setRServerSession(RServerSession rSession);
 
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
 

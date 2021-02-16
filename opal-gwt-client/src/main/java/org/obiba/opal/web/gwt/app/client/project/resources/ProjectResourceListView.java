@@ -375,7 +375,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     }
   }
 
-  private class ResourceDescriptionColumn extends Column<ResourceReferenceDto, String> {
+  private static class ResourceDescriptionColumn extends Column<ResourceReferenceDto, String> {
 
     public ResourceDescriptionColumn() {
       super(new HTMLCell());
@@ -387,26 +387,11 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     }
   }
 
-  private class ResourceURLColumn extends Column<ResourceReferenceDto, String> {
-
-    public ResourceURLColumn() {
-      super(new HTMLCell());
-    }
+  private static class ResourceURLColumn extends URLColumn<ResourceReferenceDto> {
 
     @Override
-    public String getValue(ResourceReferenceDto object) {
-      if (object.hasResource() && object.getResource().hasUrl()) {
-        String url = object.getResource().getUrl();
-        String urlTxt = url.length() > 50 ? url.substring(0, 50) + " ..." : url;
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          return "<a href='" + url + "' target='_blank' title='" + url + "'>" + urlTxt + "</a>";
-        } else if (!urlTxt.equals(url)) {
-          return "<span title='" + url + "'>" + urlTxt + "</span>";
-        } else {
-          return url;
-        }
-      }
-      return "";
+    protected String getURL(ResourceReferenceDto object) {
+      return object.hasResource() && object.getResource().hasUrl() ? object.getResource().getUrl() : "";
     }
   }
 

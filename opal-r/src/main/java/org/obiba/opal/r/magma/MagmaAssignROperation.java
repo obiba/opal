@@ -14,8 +14,9 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.spi.r.AbstractROperation;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.Rserve.RConnection;
+import org.obiba.opal.spi.r.RRuntimeException;
+import org.obiba.opal.spi.r.RServerConnection;
+import org.obiba.opal.spi.r.RServerException;
 
 import javax.validation.constraints.NotNull;
 import java.io.InputStream;
@@ -100,16 +101,20 @@ public class MagmaAssignROperation extends AbstractROperation {
     converter.doAssign(symbol, path);
   }
 
-  RConnection getRConnection() {
+  RServerConnection getRConnection() {
     return getConnection();
   }
 
-  REXP doEval(String script) {
-    return eval(script, false);
+  void doEval(String script) {
+    eval(script, false);
   }
 
   void doWriteFile(String fileName, InputStream in) {
-    writeFile(fileName, in);
+    try {
+      writeFile(fileName, in);
+    } catch (RServerException e) {
+      throw new RRuntimeException(e);
+    }
   }
 
   IdentifiersTableService getIdentifiersTableService() {

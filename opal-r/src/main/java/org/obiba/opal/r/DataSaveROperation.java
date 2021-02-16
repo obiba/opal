@@ -12,8 +12,6 @@ package org.obiba.opal.r;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.spi.r.AbstractROperation;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPLogical;
 
 import java.util.List;
 
@@ -24,13 +22,13 @@ public class DataSaveROperation extends AbstractROperation {
 
   private enum WriteCmd {
 
-    SAS("haven::write_sas","sas7bdat"),
+    SAS("haven::write_sas", "sas7bdat"),
 
-    XPT("haven::write_xpt","xpt"),
+    XPT("haven::write_xpt", "xpt"),
 
-    DTA("haven::write_dta","dta"),
+    DTA("haven::write_dta", "dta"),
 
-    SAV("haven::write_sav","sav","zsav") {
+    SAV("haven::write_sav", "sav", "zsav") {
       @Override
       public String getCommand(String symbol, String path) {
         if (path.endsWith(".sav"))
@@ -40,7 +38,7 @@ public class DataSaveROperation extends AbstractROperation {
       }
     },
 
-    CSV("utils::write.table","csv","tsv") {
+    CSV("utils::write.table", "csv", "tsv") {
       @Override
       public String getCommand(String symbol, String path) {
         if (path.endsWith(".tsv"))
@@ -84,7 +82,7 @@ public class DataSaveROperation extends AbstractROperation {
 
   @Override
   public void doWithConnection() {
-    if(Strings.isNullOrEmpty(destination)) return;
+    if (Strings.isNullOrEmpty(destination)) return;
     // extract destination file
     WriteCmd writeCmd = WriteCmd.forPath(destination);
     String path = prepareDestinationInR();
@@ -94,12 +92,9 @@ public class DataSaveROperation extends AbstractROperation {
     ensurePackage("tibble");
     eval("library(tibble)", false);
     // ensure symbol refers to a tibble
-    REXP isTibble = eval(String.format("is.tibble(`%s`)", symbol), false);
-    if (isTibble.isLogical()) {
-      REXPLogical isTibbleLogical = (REXPLogical) isTibble;
-      if (isTibbleLogical.length() == 0 || !isTibbleLogical.isTRUE()[0]) throw new IllegalArgumentException(symbol + " is not a tibble.");
-    } else {
-      throw new IllegalArgumentException("Cannot determine if " + symbol + " is a tibble.");
+    boolean isTibble = eval(String.format("is.tibble(`%s`)", symbol), false).asLogical();
+    if (!isTibble) {
+      throw new IllegalArgumentException(symbol + " is not a tibble.");
     }
     eval(writeCmd.getCommand(symbol, path), false);
   }

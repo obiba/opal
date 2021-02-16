@@ -15,8 +15,9 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
-import org.obiba.opal.r.service.OpalRService;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,12 @@ public class ProjectResourceReferenceResource {
 
   private final ResourceReferenceService resourceReferenceService;
 
-  private final OpalRService opalRService;
+  private final RServerManagerService rServerManagerService;
 
   @Autowired
-  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, OpalRService opalRService) {
+  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, RServerManagerService rServerManagerService) {
     this.resourceReferenceService = resourceReferenceService;
-    this.opalRService = opalRService;
+    this.rServerManagerService = rServerManagerService;
   }
 
   @GET
@@ -67,9 +68,9 @@ public class ProjectResourceReferenceResource {
 
   @PUT
   @Path("_test")
-  public Response test(@PathParam("project") String project, @PathParam("name") String name) {
+  public Response test(@PathParam("project") String project, @PathParam("name") String name) throws RServerException {
     ROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
-    opalRService.execute(rop);
+    rServerManagerService.getDefaultRServer().execute(rop);
     return Response.ok().build();
   }
 

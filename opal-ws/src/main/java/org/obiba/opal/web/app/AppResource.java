@@ -12,7 +12,6 @@ package org.obiba.opal.web.app;
 
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.web.model.Apps;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,25 +24,28 @@ import javax.ws.rs.core.Response;
 
 @Component
 @Scope("request")
-@Path("/app/{name}")
+@Path("/app/{id}")
 public class AppResource {
 
-    @PathParam("name")
-    private String name;
+  @PathParam("id")
+  private String id;
 
-    @Autowired
-    private AppsService appsService;
+  @Autowired
+  private AppsService appsService;
 
-    @GET
-    public Apps.AppDto get() {
-        return Dtos.asDto(appsService.getApp(name));
+  @GET
+  public Apps.AppDto get() {
+    return Dtos.asDto(appsService.getApp(id));
+  }
+
+  @DELETE
+  public Response unregister() {
+    try {
+      appsService.unregisterApp(appsService.getApp(id));
+    } catch (Exception e) {
+      // ignore
     }
-
-    @DELETE
-    @NotAuthenticated
-    public Response disable() {
-        appsService.unregisterApp(name);
-        return Response.noContent().build();
-    }
+    return Response.noContent().build();
+  }
 
 }

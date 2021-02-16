@@ -8,19 +8,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.core.event;
+package org.obiba.opal.r.service;
 
-import org.obiba.opal.core.runtime.App;
+import java.util.List;
 
-public class AppUnregistered {
+public interface RServerState {
 
-    private final App app;
+  String getName();
 
-    public AppUnregistered(App app) {
-        this.app = app;
-    }
+  String getVersion();
 
-    public App getApp() {
-        return app;
-    }
+  boolean isRunning();
+
+  List<String> getTags();
+
+  int getRSessionsCount();
+
+  int getBusyRSessionsCount();
 }

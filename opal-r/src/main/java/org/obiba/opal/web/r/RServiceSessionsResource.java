@@ -11,8 +11,8 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.collect.Lists;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +33,7 @@ public class RServiceSessionsResource {
   @GET
   public List<OpalR.RSessionDto> getRSessionIds() {
     List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
-    for(OpalRSession rSession : opalRSessionManager.getRSessions()) {
+    for (RServerSession rSession : opalRSessionManager.getRSessions()) {
       rSessions.add(Dtos.asDto(rSession));
     }
     return rSessions;

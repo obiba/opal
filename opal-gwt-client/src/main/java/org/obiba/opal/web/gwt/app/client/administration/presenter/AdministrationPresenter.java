@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -27,10 +28,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
@@ -55,6 +53,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     HasAuthorization getJVMAuthorizer();
 
     HasAuthorization getPluginsAuthorizer();
+
+    HasAuthorization getAppsAuthorizer();
 
     HasAuthorization getDatabasesAuthorizer();
 
@@ -103,6 +103,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     void setJavaHistoryToken(String historyToken);
 
     void setPluginsHistoryToken(String historyToken);
+
+    void setAppsHistoryToken(String historyToken);
 
     void setServerHistoryToken(String historyToken);
 
@@ -169,6 +171,10 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
         .authorize(composeAuthorizer(getView().getPluginsAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.APPS.create().build()).get()
+        .authorize(composeAuthorizer(getView().getAppsAuthorizer())).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.IDENTIFIERS_TABLES.create().build()).get()
         .authorize(composeAuthorizer(getView().getIdentifiersAuthorizer())).send();
 
@@ -190,6 +196,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   protected void onReveal() {
     super.onReveal();
     authorize();
+    getView().showResourceProvidersAlert(false);
+    getView().showRServerAlert(false);
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(UriBuilders.DATABASES_FOR_STORAGE.create().build()) //
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
@@ -206,7 +214,15 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
             getView().showResourceProvidersAlert(resource.getProvidersCount() == 0);
             getView().showRServerAlert(!resource.getRServerRunning());
           }
-        }).get().send();
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().showResourceProvidersAlert(true);
+            getView().showRServerAlert(true);
+          }
+        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND)
+        .get().send();
 
   }
 
@@ -225,6 +241,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     getView().setReportsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.REPORT_TEMPLATES));
     getView().setJavaHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.JVM));
     getView().setPluginsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.PLUGINS));
+    getView().setAppsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.APPS));
     getView().setServerHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.SERVER));
     getView().setTaxonomiesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.TAXONOMIES));
   }

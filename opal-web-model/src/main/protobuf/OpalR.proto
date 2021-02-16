@@ -1,9 +1,26 @@
 import "Ws.proto";
 import "Opal.proto";
+import "Apps.proto";
 
 package OpalR;
 
 option java_package = "org.obiba.opal.web.model";
+
+message RServerClusterDto {
+  required string name = 1;
+  repeated RServerDto servers = 2;
+}
+
+message RServerDto {
+  required string name = 1;
+  required string version = 2;
+  required bool running = 3;
+  repeated string tags = 4;
+  required int32 sessionCount = 5;
+  required int32 busySessionCount = 6;
+  optional Apps.AppDto app = 7;
+}
+
 
 enum RSessionStatus {
   WAITING = 0;
@@ -18,6 +35,8 @@ message RSessionDto {
   required RSessionStatus status = 5;
   optional string link = 6;
   required string context = 7;
+  required string cluster = 8;
+  required string server = 9;
 }
 
 message RPackageDto {

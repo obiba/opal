@@ -888,11 +888,31 @@ public enum UriBuilders {
     }
   },
 
+  APPS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("apps");
+    }
+  },
+
+  APPS_CONFIG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("apps", "config");
+    }
+  },
+
+  APP {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("app", "{}");
+    }
+  },
+
   PLUGINS {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugins");
-
     }
   },
 
@@ -900,7 +920,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugins", "_available");
-
     }
   },
 
@@ -1062,7 +1081,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "env");
-
     }
   },
 
@@ -1070,7 +1088,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("shell", "commands");
-
     }
   },
 
@@ -1078,23 +1095,48 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("service", "r");
-
     }
   },
 
-  SERVICE_R_PACKAGES {
+  SERVICE_R_CLUSTER {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("service", "r", "packages");
-
+      return UriBuilder.create().segment("service", "r", "cluster", "{}");
     }
   },
 
-  SERVICE_R_PACKAGE {
+  SERVICE_R_CLUSTER_PACKAGES {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("service", "r", "package", "{}");
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "packages");
+    }
+  },
 
+  SERVICE_R_CLUSTER_PACKAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "package", "{}");
+    }
+  },
+
+  SERVICE_R_CLUSTER_LOG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "_log");
+    }
+  },
+
+  SERVICE_R_CLUSTER_SERVER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}");
+    }
+  },
+
+  SERVICE_R_CLUSTER_SERVER_LOG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "server", "{}", "_log");
     }
   },
 
@@ -1102,7 +1144,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "packages");
-
     }
   },
 
@@ -1110,7 +1151,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "options");
-
     }
   },
 
@@ -1118,7 +1158,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "option");
-
     }
   };
 

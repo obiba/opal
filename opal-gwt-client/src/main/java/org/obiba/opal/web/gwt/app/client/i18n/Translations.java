@@ -57,6 +57,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Context")
   String contextLabel();
 
+  @Description("Cluster label")
+  @DefaultStringValue("Cluster")
+  String clusterLabel();
+
+  @Description("R Server label")
+  @DefaultStringValue("R Server")
+  String rServerLabel();
+
   @Description("Type label")
   @DefaultStringValue("Type")
   String typeLabel();
@@ -113,7 +121,9 @@ public interface Translations extends Constants {
       "CANCEL_PENDING", "Cancel Pending", //
       "CANCELED", "Cancelled", //
       "WAITING", "Waiting", //
-      "BUSY", "Busy" //
+      "BUSY", "Busy",
+      "RUNNING", "Running",
+      "STOPPED", "Stopped"
   })
   Map<String, String> statusMap();
 
@@ -1087,6 +1097,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Attribute")
   String addAttribute();
 
+  @Description("Rock Default Credentials help")
+  @DefaultStringValue("Rock credentials are the default ones, as defined in the main Opal configuration file.")
+  String rockDefaultCredentialsHelp();
+
+  @Description("Rock Administrator Credentials help")
+  @DefaultStringValue("Rock credentials are the ones of a user with administrator role. It will be used both for managing the server (start/stop, R packages etc.) and for creating new R sessions.")
+  String rockAdministratorCredentialsHelp();
+
+  @Description("Rock Manager User Credentials help")
+  @DefaultStringValue("One Rock credentials for managing the server (start/stop, R packages etc.) and another one for creating new R sessions. Having both different user roles allows to restrict user privilegies in the R sessions.")
+  String rockManagerUserCredentialsHelp();
+
   @Description("Add Annotation help")
   @DefaultStringValue("Apply annotation to the variable by selecting a controlled vocabulary.")
   String addAnnotationHelp();
@@ -1672,6 +1694,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Host label")
+  @DefaultStringValue("Host")
+  String hostLabel();
+
   @Description("Format label")
   @DefaultStringValue("Format")
   String formatLabel();
@@ -1894,6 +1920,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Version")
   String versionLabel();
 
+  @Description("R Version label")
+  @DefaultStringValue("R Version")
+  String rVersionLabel();
+
+  @Description("R Sessions label")
+  @DefaultStringValue("R Sessions")
+  String rSessionsLabel();
+
   @Description("N item is selected label")
   @DefaultStringValue("{0} is selected.")
   String NItemSelected();
@@ -2094,6 +2128,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Plugins")
   String pagePluginsTitle();
 
+  @Description("Page Apps title")
+  @DefaultStringValue("Apps")
+  String pageAppsTitle();
+
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")
   String pageJVMTitle();
@@ -2165,6 +2203,10 @@ public interface Translations extends Constants {
   @Description("Add Token title")
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
+
+  @Description("Update Registration Token title")
+  @DefaultStringValue("Update Registration Token")
+  String updateTokenModalTitle();
 
   @Description("Add Resource title")
   @DefaultStringValue("Add Resource")
@@ -2565,6 +2607,14 @@ public interface Translations extends Constants {
   @Description("Update R Packages label")
   @DefaultStringValue("Update R Packages")
   String updateRPackages();
+
+  @Description("Remove App label")
+  @DefaultStringValue("Remove Application")
+  String removeApp();
+
+  @Description("Remove Rock Config label")
+  @DefaultStringValue("Remove Rock Discovery")
+  String removeRockConfig();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")

@@ -25,10 +25,10 @@ import org.obiba.opal.r.magma.util.IntegerRange;
 import org.obiba.opal.r.magma.util.NumberRange;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RServerConnection;
 import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
-import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +60,13 @@ public class RAssignDatasource extends CsvDatasource {
 
   private final String symbol;
 
-  private final RConnection rConnection;
+  private final RServerConnection rConnection;
 
   private final RSessionHandler rSessionHandler;
 
   private boolean withMissings = true;
 
-  public RAssignDatasource(String name, String symbol, RConnection rConnection) {
+  public RAssignDatasource(String name, String symbol, RServerConnection rConnection) {
     super(name);
     this.symbol = symbol;
     this.rConnection = rConnection;
@@ -128,7 +128,7 @@ public class RAssignDatasource extends CsvDatasource {
     return rConnection != null;
   }
 
-  private RConnection getRConnection() {
+  private RServerConnection getRConnection() {
     return rConnection;
   }
 

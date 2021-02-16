@@ -22,13 +22,13 @@ public class DataReadROperation extends AbstractROperation {
 
   private enum ReadCmd {
 
-    SAS("haven::read_sas","sas7bdat"),
+    SAS("haven::read_sas", "sas7bdat"),
 
-    XPT("haven::read_xpt","xpt"),
+    XPT("haven::read_xpt", "xpt"),
 
-    DTA("haven::read_dta","dta"),
+    DTA("haven::read_dta", "dta"),
 
-    SPSS("haven::read_spss","sav", "zsav", "por") {
+    SPSS("haven::read_spss", "sav", "zsav", "por") {
       @Override
       public String getCommand(DataReadROperation op) {
         return String.format("%s('%s', user_na = TRUE)", command, op.source);
@@ -47,7 +47,7 @@ public class DataReadROperation extends AbstractROperation {
     public String getCommand(DataReadROperation op) {
       return Strings.isNullOrEmpty(op.categorySource) ?
           String.format("%s('%s')", command, op.source) :
-          String.format("%s('%s', '%s')", command, op.source, op.categorySource) ;
+          String.format("%s('%s', '%s')", command, op.source, op.categorySource);
     }
 
     public static ReadCmd forPath(String path) {
@@ -74,7 +74,7 @@ public class DataReadROperation extends AbstractROperation {
 
   @Override
   public void doWithConnection() {
-    if(Strings.isNullOrEmpty(source)) return;
+    if (Strings.isNullOrEmpty(source)) return;
     // extract destination file
     ReadCmd readCmd = ReadCmd.forPath(source);
     // make sure haven is available

@@ -30,7 +30,7 @@ public class DoubleRange extends NumberRange {
   protected Number makeNumber(String valStr) {
     try {
       return Double.parseDouble(valStr);
-    } catch(NumberFormatException e) {
+    } catch (NumberFormatException e) {
       return null;
     }
   }

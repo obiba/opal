@@ -34,9 +34,9 @@ public class StringAssignROperation extends AbstractROperation {
 
   @Override
   public void doWithConnection() {
-    if(symbols == null) return;
-    for(Entry<String, List<String>> entry : symbols.entrySet()) {
-      for(String content : entry.getValue()) {
+    if (symbols == null) return;
+    for (Entry<String, List<String>> entry : symbols.entrySet()) {
+      for (String content : entry.getValue()) {
         assign(entry.getKey(), content);
       }
     }
@@ -45,8 +45,8 @@ public class StringAssignROperation extends AbstractROperation {
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();
-    for(Entry<String, List<String>> entry : symbols.entrySet()) {
-      for(String content : entry.getValue()) {
+    for (Entry<String, List<String>> entry : symbols.entrySet()) {
+      for (String content : entry.getValue()) {
         buffer.append(entry.getKey()).append(" <- ").append(content).append("\n");
       }
     }

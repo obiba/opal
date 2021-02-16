@@ -15,9 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityProvider;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REXPVector;
+import org.obiba.opal.spi.r.RServerResult;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -67,25 +65,22 @@ class RVariableEntityProvider implements VariableEntityProvider {
       entities = Lists.newArrayList();
       entitiesMap = Maps.newHashMap();
       initialiseIdColumn();
-      REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
-      boolean isNumeric = idVector.isNumeric();
-      if (idVector instanceof REXPVector) {
-        int length = ((REXPVector) idVector).length();
-        try {
-          if (isNumeric) {
-            for (double id : idVector.asDoubles()) {
-              registerEntity(new RVariableEntity(entityType, id));
-            }
-          } else {
-            for (String id : idVector.asStrings()) {
-              registerEntity(new RVariableEntity(entityType, id));
-            }
+      RServerResult idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
+      int length = idVector.length();
+      try {
+        if (idVector.isNumeric()) {
+          for (double id : idVector.asDoubles()) {
+            registerEntity(new RVariableEntity(entityType, id));
           }
-        } catch (REXPMismatchException e) {
-          // ignore
+        } else {
+          for (String id : idVector.asStrings()) {
+            registerEntity(new RVariableEntity(entityType, id));
+          }
         }
-        multilines = length > entities.size();
+      } catch (Exception e) {
+        // ignore
       }
+      multilines = length > entities.size();
     }
     return entities;
   }
@@ -113,10 +108,10 @@ class RVariableEntityProvider implements VariableEntityProvider {
 
   private void initialiseIdColumn() {
     if (Strings.isNullOrEmpty(idColumn)) {
-      REXPVector colnames = (REXPVector) valueTable.execute(String.format("colnames(`%s`)", valueTable.getSymbol()));
+      RServerResult colnames = valueTable.execute(String.format("colnames(`%s`)", valueTable.getSymbol()));
       try {
         idColumn = colnames.asStrings()[0];
-      } catch (REXPMismatchException e) {
+      } catch (Exception e) {
         idColumn = RDatasource.DEFAULT_ID_COLUMN_NAME;
       }
     }

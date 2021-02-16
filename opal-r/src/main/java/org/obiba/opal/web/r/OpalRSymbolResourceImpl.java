@@ -57,7 +57,7 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
       return Response.status(Response.Status.BAD_REQUEST) //
           .entity("Destination file must be relative to R workspace.").build();
     DataSaveROperation rop = new DataSaveROperation(getName(), destination);
-    getRSession().execute(rop);
+    getRServerSession().execute(rop);
     return Response.ok().build();
   }
 

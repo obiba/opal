@@ -15,11 +15,19 @@ import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 public interface RAdministrationUiHandlers extends UiHandlers {
 
-  void start();
+  void onStart();
 
-  void stop();
+  void onStop();
+
+  void onStart(String server);
+
+  void onStop(String server);
+
+  void onDownloadRserveLog(String server);
 
   void test();
+
+  void onRefreshCluster();
 
   void onRemovePackage(RPackageDto rPackage);
 

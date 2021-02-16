@@ -26,6 +26,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStoppedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -46,9 +47,8 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ServiceDto;
-import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
 import java.util.List;
@@ -58,6 +58,8 @@ import static com.google.gwt.http.client.Response.*;
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
     implements RAdministrationUiHandlers {
+
+  private static final String DEFAULT_CULSTER = "default";
 
   private final RSessionsPresenter rSessionsPresenter;
 
@@ -115,7 +117,7 @@ public class RAdministrationPresenter
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
-        if(confirmation != null && event.getSource().equals(confirmation) && event.isConfirmed()) {
+        if (confirmation != null && event.getSource().equals(confirmation) && event.isConfirmed()) {
           confirmation.run();
           confirmation = null;
         }
@@ -140,30 +142,29 @@ public class RAdministrationPresenter
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(getView().getTestAuthorizer())
         .send();
 
-    refreshStatus();
+    refreshCluster();
     refreshPackages();
   }
 
-  private void refreshStatus() {
-    // stop start R service
-    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(UriBuilders.SERVICE_R.create().build()) //
-        .withCallback(new ResourceCallback<ServiceDto>() {
+  private void refreshCluster() {
+    ResourceRequestBuilderFactory.<RServerClusterDto>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)) //
+        .withCallback(new ResourceCallback<RServerClusterDto>() {
           @Override
-          public void onResource(Response response, ServiceDto resource) {
+          public void onResource(Response response, RServerClusterDto resource) {
             if (response.getStatusCode() == SC_OK) {
-              getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
-                  ? Display.Status.Stoppable
-                  : Display.Status.Startable);
+              getView().renderCluster(resource);
+            } else {
+              getView().renderCluster(null);
             }
           }
-        }) //
+        })
         .get().send();
   }
 
   private void refreshPackages() {
     // Fetch all packages
     ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder() //
-        .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build()) //
+        .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build(DEFAULT_CULSTER)) //
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {
@@ -175,34 +176,73 @@ public class RAdministrationPresenter
 
 
   @Override
-  public void start() {
+  public void onStart() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).put().withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if (response.getStatusCode() == SC_OK) {
-          refreshStatus();
-          resourceProvidersService.reset();
-        } else {
-          getView().setServiceStatus(Display.Status.Startable);
-        }
-      }
-    }, SC_OK).send();
-  }
-
-  @Override
-  public void stop() {
-    // Stop service
-    getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).delete()
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).put()
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().setServiceStatus(
-                response.getStatusCode() == SC_OK ? Display.Status.Startable : Display.Status.Stoppable);
+            if (response.getStatusCode() == SC_OK) {
+              refreshCluster();
+              refreshPackages();
+              resourceProvidersService.reset();
+            } else {
+              getView().setServiceStatus(Display.Status.Startable);
+            }
           }
         }, SC_OK).send();
+  }
+
+  @Override
+  public void onStop() {
+    // Stop service
+    getView().setServiceStatus(Display.Status.Pending);
+    getView().renderPackages(null);
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER.create().build(DEFAULT_CULSTER)).delete()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refreshCluster();
+            fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, null));
+          }
+        }, SC_OK).send();
+  }
+
+  @Override
+  public void onStart(String server) {
+    // Start service
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).put()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == SC_OK) {
+              refreshCluster();
+              refreshPackages();
+              resourceProvidersService.reset();
+            } else {
+              getView().setServiceStatus(Display.Status.Startable);
+            }
+          }
+        }, SC_OK).send();
+  }
+
+  @Override
+  public void onStop(final String server) {
+    // Stop service
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTER_SERVER.create().build(DEFAULT_CULSTER, server)).delete()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refreshCluster();
+            fireEvent(new RServerStoppedEvent(DEFAULT_CULSTER, server));
+          }
+        }, SC_OK).send();
+  }
+
+  @Override
+  public void onDownloadRserveLog(String server) {
+    fireEvent(new FileDownloadRequestEvent(UriBuilders.SERVICE_R_CLUSTER_SERVER_LOG.create().build(DEFAULT_CULSTER, server)));
   }
 
   @Override
@@ -213,12 +253,17 @@ public class RAdministrationPresenter
   }
 
   @Override
+  public void onRefreshCluster() {
+    refreshCluster();
+  }
+
+  @Override
   public void onRemovePackage(final RPackageDto rPackage) {
     confirmation = new Runnable() {
       @Override
       public void run() {
         ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
-            .forResource(UriBuilders.SERVICE_R_PACKAGE.create().build(rPackage.getName()))
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGE.create().build(DEFAULT_CULSTER, rPackage.getName()))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -250,7 +295,7 @@ public class RAdministrationPresenter
       @Override
       public void run() {
         ResourceRequestBuilderFactory.newBuilder()
-            .forResource(UriBuilders.SERVICE_R_PACKAGES.create().build())
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build(DEFAULT_CULSTER))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
@@ -268,7 +313,7 @@ public class RAdministrationPresenter
 
   @Override
   public void onDownloadRserveLog() {
-    fireEvent(new FileDownloadRequestEvent("/service/r/log/Rserve.log"));
+    fireEvent(new FileDownloadRequestEvent(UriBuilders.SERVICE_R_CLUSTER_LOG.create().build(DEFAULT_CULSTER)));
   }
 
   @Override
@@ -343,6 +388,8 @@ public class RAdministrationPresenter
     HasAuthorization getPermissionsAuthorizer();
 
     HasAuthorization getTestAuthorizer();
+
+    void renderCluster(RServerClusterDto cluster);
 
     void renderPackages(List<RPackageDto> packages);
 

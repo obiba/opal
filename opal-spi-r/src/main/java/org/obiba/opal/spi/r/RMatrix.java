@@ -9,26 +9,20 @@
  */
 package org.obiba.opal.spi.r;
 
+import java.util.List;
+
 public interface RMatrix<T> {
 
-  int getColumnCount();
+  default boolean isEmpty() {
+    return getColumnNames().length == 0 || getRowNames().length == 0;
+  }
 
   String[] getColumnNames();
 
-  String getColumnName(int idx);
-
-  int getColumnIndex(String name);
-
-  int getRowCount();
-
   String[] getRowNames();
 
-  String getRowName(int idx);
+  List<T[]> iterateRows();
 
-  int getRowIndex(String name);
-
-  Iterable<T[]> iterateRows();
-
-  Iterable<T[]> iterateColumns();
+  List<T[]> iterateColumns();
 
 }

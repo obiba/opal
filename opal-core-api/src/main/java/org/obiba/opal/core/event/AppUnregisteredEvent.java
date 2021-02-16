@@ -12,11 +12,11 @@ package org.obiba.opal.core.event;
 
 import org.obiba.opal.core.runtime.App;
 
-public class AppRegistered {
+public class AppUnregisteredEvent {
 
     private final App app;
 
-    public AppRegistered(App app) {
+    public AppUnregisteredEvent(App app) {
         this.app = app;
     }
 

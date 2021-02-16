@@ -27,7 +27,11 @@ public class FileReadROperation extends AbstractROperation {
 
   @Override
   public void doWithConnection() {
-    readFile(fileName, destination);
+    try {
+      readFile(fileName, destination);
+    } catch (RServerException e) {
+      throw new RRuntimeException(e);
+    }
   }
 
   @Override

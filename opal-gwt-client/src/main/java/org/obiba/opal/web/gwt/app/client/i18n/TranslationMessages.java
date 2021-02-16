@@ -226,6 +226,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to update all the R packages to their latest version. It may take some time. If any error happens, look for possible reasons (system dependency missing, network connection failure etc.) by downloading the Rserve.log")
   String confirmUpdateRPackages();
 
+  @Description("Confirm unregister app label")
+  @DefaultMessage("Please confirm that you want to unregister the application {0}. Some system functionalities may be degraded.")
+  String confirmUnregisterApp(String name);
+
+  @Description("Confirm remove rock discovery label")
+  @DefaultMessage("Please confirm that you want to remove the discovery of the Rock R server located at &lt;{0}&gt;. Note that this will not affect any corresponding app that would have been already registered.")
+  String confirmRockConfigRemoval(String name);
+
   @Description("Vocabulary count label")
   @DefaultMessage("{0} vocabularies")
   @AlternateMessage({ "=0", "No vocabularies", "one", "1 vocabulary" })

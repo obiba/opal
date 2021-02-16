@@ -30,7 +30,7 @@ public class IntegerRange extends NumberRange {
   protected Number makeNumber(String valStr) {
     try {
       return Integer.parseInt(valStr);
-    } catch(NumberFormatException e) {
+    } catch (NumberFormatException e) {
       return null;
     }
   }

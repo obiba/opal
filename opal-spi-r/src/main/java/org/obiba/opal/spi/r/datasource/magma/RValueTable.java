@@ -11,19 +11,17 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.NullTimestamps;
-import org.obiba.opal.spi.r.REvaluationRuntimeException;
-import org.obiba.opal.spi.r.ROperationTemplate;
-import org.obiba.opal.spi.r.ROperationWithResult;
-import org.obiba.opal.spi.r.RScriptROperation;
-import org.rosuda.REngine.*;
+import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A value table based on a tibble.
@@ -37,6 +35,8 @@ public class RValueTable extends AbstractValueTable {
   private final String symbol;
 
   private int idPosition;
+
+  private Map<String, Integer> columnPositions = Maps.newHashMap();
 
   public RValueTable(@NotNull RDatasource datasource, @NotNull String name, @NotNull String symbol, String entityType, String idColumn) {
     super(datasource, name);
@@ -67,7 +67,7 @@ public class RValueTable extends AbstractValueTable {
   }
 
   boolean isMultilines() {
-    return ((RVariableEntityProvider)getVariableEntityProvider()).isMultilines();
+    return ((RVariableEntityProvider) getVariableEntityProvider()).isMultilines();
   }
 
   int getIdPosition() {
@@ -75,7 +75,7 @@ public class RValueTable extends AbstractValueTable {
   }
 
   String getIdColumn() {
-    return ((RVariableEntityProvider)getVariableEntityProvider()).getIdColumn();
+    return ((RVariableEntityProvider) getVariableEntityProvider()).getIdColumn();
   }
 
   //
@@ -83,31 +83,34 @@ public class RValueTable extends AbstractValueTable {
   //
 
   private void checkIsTibble() {
-    REXP isTibble = execute(String.format("is.tibble(`%s`)", getSymbol()));
-    if (isTibble.isLogical()) {
-      REXPLogical isTibbleLogical = (REXPLogical) isTibble;
-      if (isTibbleLogical.length() == 0 || !isTibbleLogical.isTRUE()[0]) throw new IllegalArgumentException(getSymbol() + " is not a tibble.");
-    } else {
-      throw new IllegalArgumentException("Cannot determine if " + getSymbol() + " is a tibble.");
+    boolean isTibble = executeLogical(String.format("is.tibble(`%s`)", getSymbol()));
+    if (!isTibble) {
+      throw new IllegalArgumentException(getSymbol() + " is not a tibble.");
     }
   }
 
   private void initialiseVariables() {
     String lambdaParam = "n";
     if (lambdaParam.equals(getSymbol())) lambdaParam = ".n";
-    REXPGenericVector columnDescs = (REXPGenericVector) execute(String.format("lapply(colnames(`%s`), function(%s) { list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attributes(`%s`[[%s]])) })",
-        getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
-    RList columns = columnDescs.asList();
+    RServerResult columnDescs = execute(String.format(
+        "lapply(colnames(`%s`), function(%s) { attrs <- attributes(`%s`[[%s]]) ; attrs$labels_names <- names(attrs$labels) ; list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attrs) })",
+        getSymbol(), lambdaParam, getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
+    List<RServerResult> columns = columnDescs.asList();
     try {
-      for (int i=0; i<columns.size(); i++) {
-        RList column = ((REXPGenericVector)columns.at(i)).asList();
-        String colname = column.at("name").asString();
-        if (!getIdColumn().equals(colname))
-          addVariableValueSource(new RVariableValueSource(this, column, i + 1));
-        else
-          idPosition = i + 1;
+      int i = 0;
+      for (RServerResult columnDesc : columns) {
+        RNamedList<RServerResult> column = columnDesc.asNamedList();
+        if (getIdColumn().equals(column.get("name").asStrings()[0])) {
+          idPosition = i++;
+          columnPositions.put(getIdColumn(), idPosition);
+        } else {
+          int pos = i++;
+          RVariableValueSource varSource = new RVariableValueSource(this, columnDesc, pos);
+          addVariableValueSource(varSource);
+          columnPositions.put(varSource.getName(), pos);
+        }
       }
-    } catch (REXPMismatchException e) {
+    } catch (Exception e) {
       // ignore
       log.error("Variable init failure for tibble {}", getSymbol(), e);
     }
@@ -118,11 +121,23 @@ public class RValueTable extends AbstractValueTable {
       setVariableEntityBatchSize(optimizedBatchSize);
   }
 
-  REXP execute(String script) {
+  RServerResult execute(String script) {
     return execute(new RScriptROperation(script, false));
   }
 
-  REXP execute(ROperationWithResult rop) {
+  boolean executeLogical(String script) {
+    return executeLogical(new RScriptROperation(script, false));
+  }
+
+  RServerResult execute(ROperationWithResult rop) {
+    return doExecute(rop).getResult();
+  }
+
+  boolean executeLogical(ROperationWithResult rop) {
+    return doExecute(rop).getResult().asLogical();
+  }
+
+  private ROperationWithResult doExecute(ROperationWithResult rop) {
     try {
       getRSession().execute(rop);
     } catch (REvaluationRuntimeException e) {
@@ -130,7 +145,7 @@ public class RValueTable extends AbstractValueTable {
       log.error("R operation failed: {}", rmsg, e);
       throw new MagmaRRuntimeException(rmsg);
     }
-    return rop.getResult();
+    return rop;
   }
 
   @Override
@@ -148,6 +163,10 @@ public class RValueTable extends AbstractValueTable {
 
   public RVariableEntity getRVariableEntity(VariableEntity entity) {
     if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
-    return ((RVariableEntityProvider)getVariableEntityProvider()).getRVariableEntity(entity);
+    return ((RVariableEntityProvider) getVariableEntityProvider()).getRVariableEntity(entity);
+  }
+
+  public Map<String, Integer> getColumnPositions() {
+    return columnPositions;
   }
 }

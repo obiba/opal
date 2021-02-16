@@ -24,10 +24,10 @@ public class REvaluationRuntimeExceptionMapper implements ExceptionMapper<REvalu
   @Override
   public Response toResponse(REvaluationRuntimeException exception) {
     return Response
-            .status(Status.BAD_REQUEST)
-            .type("application/x-protobuf+json")
-            .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, exception))
-            .build();
+        .status(Status.BAD_REQUEST)
+        .type("application/x-protobuf+json")
+        .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, exception))
+        .build();
   }
 
 }

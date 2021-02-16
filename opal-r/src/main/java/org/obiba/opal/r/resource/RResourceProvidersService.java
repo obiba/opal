@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -8,23 +8,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.service;
+package org.obiba.opal.r.resource;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import org.json.JSONObject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
-import org.obiba.opal.r.service.event.RServiceStartedEvent;
+import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
+import org.obiba.opal.spi.r.RNamedList;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.r.RPackageResourceHelper;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Component
@@ -47,11 +44,12 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   @Autowired
   private RPackageResourceHelper rPackageHelper;
 
+  @Autowired
+  private RServerManagerService rServerManagerService;
+
   private boolean running = false;
 
   private boolean ensureResourcerDone = false;
-
-  private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
   private Map<String, ResourceProvider> resourceProviders = Maps.newHashMap();
 
@@ -127,26 +125,22 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   //
 
   @Subscribe
-  public void onRServiceStarted(RServiceStartedEvent event) {
+  public void onRServiceStarted(RServiceInitializedEvent event) {
     finalizeServiceStart();
-    if (resourceProvidersTask != null) resourceProvidersTask.cancel(true);
-    resourceProvidersTask = asyncLoadResourceProviders();
-  }
-
-  private Future<Boolean> asyncLoadResourceProviders() {
-    return executorService.submit(this::loadResourceProviders);
+    loadResourceProviders();
   }
 
   private synchronized boolean loadResourceProviders() {
     resourceProviders.clear();
     try {
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
-      REXP result = rPackageHelper.execute(rop).getResult();
-      RList pkgList = result.asList();
-      if (pkgList.isNamed()) {
-        for (Object name : pkgList.names) {
-          REXP rexp = pkgList.at(name.toString());
-          resourceProviders.put(name.toString(), new RResourceProvider(name.toString(), rexp.asString()));
+      rServerManagerService.getDefaultRServer().execute(rop);
+      RServerResult result = rop.getResult();
+      if (result.isNamedList()) {
+        RNamedList<RServerResult> pkgList = result.asNamedList();
+        for (String name : pkgList.keySet()) {
+          RServerResult rexp = pkgList.get(name);
+          resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
         }
       }
       return true;
@@ -179,7 +173,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void finalizeServiceStart() {
     if (!ensureResourcerDone) {
       try {
-        rPackageHelper.ensureCRANPackage("resourcer");
+        rPackageHelper.ensureCRANPackage(rServerManagerService.getDefaultRServer(), "resourcer");
         ensureResourcerDone = true;
       } catch (Exception e) {
         log.error("Cannot ensure resourcer R package is installed", e);

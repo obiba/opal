@@ -12,7 +12,7 @@ package org.obiba.opal.spi.r.datasource.magma;
 
 
 import org.obiba.magma.VariableEntity;
-import org.rosuda.REngine.REXP;
+import org.obiba.opal.spi.r.RServerResult;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ class RValueSetFetcher {
     this.table = table;
   }
 
-  REXP getREXP(VariableEntity entity) {
+  RServerResult getResult(VariableEntity entity) {
     RVariableEntity re = table.getRVariableEntity(entity);
     String rid = re.getRIdentifier();
     if (!re.isNumeric()) rid = String.format("'%s'", rid);
@@ -37,7 +37,7 @@ class RValueSetFetcher {
     return table.execute(cmd);
   }
 
-  REXP getREXP(List<VariableEntity> entities) {
+  RServerResult getResult(List<VariableEntity> entities) {
     // to query R, we need the original R entity identifier
     String ids = entities.stream()
         .map(e -> {

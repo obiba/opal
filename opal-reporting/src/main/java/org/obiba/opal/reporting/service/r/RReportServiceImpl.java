@@ -14,14 +14,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.reporting.service.ReportException;
+import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.r.service.OpalRService;
-import org.obiba.opal.r.service.OpalRSession;
-import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.reporting.service.ReportException;
-import org.obiba.opal.reporting.service.ReportService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class RReportServiceImpl implements ReportService {
   private OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  private OpalRService opalRService;
+  private RServerManagerService rServerManagerService;
 
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput)
@@ -57,7 +57,7 @@ public class RReportServiceImpl implements ReportService {
     try {
       renderWithRServer(parameters, reportDesign, reportOutput);
       log.info("R report done");
-    } catch(IOException | REXPMismatchException e) {
+    } catch (IOException | REXPMismatchException e) {
       log.error("Unable to render R report", e);
       throw new ReportException(e);
     }
@@ -65,7 +65,7 @@ public class RReportServiceImpl implements ReportService {
 
   @Override
   public boolean isRunning() {
-    return opalRService.isRunning();
+    return rServerManagerService.getDefaultRServer().isRunning();
   }
 
   @Override
@@ -97,10 +97,10 @@ public class RReportServiceImpl implements ReportService {
     script.append("options(");
     boolean appended = false;
     // append other parameters as R options
-    if(parameters != null) {
-      for(Map.Entry<String, String> param : parameters.entrySet()) {
+    if (parameters != null) {
+      for (Map.Entry<String, String> param : parameters.entrySet()) {
         String value = param.getValue().trim();
-        if(appended) {
+        if (appended) {
           script.append(", ");
         }
         script.append(param.getKey().trim()).append("=").append(toOptionValue(value));
@@ -121,7 +121,7 @@ public class RReportServiceImpl implements ReportService {
 
   private void renderWithRServer(Map<String, String> parameters, String reportDesign, String reportOutput)
       throws IOException, REXPMismatchException {
-    OpalRSession rSession = null;
+    RServerSession rSession = null;
     try {
       prepareRServer();
       File reportDesignFile = new File(reportDesign);
@@ -132,23 +132,23 @@ public class RReportServiceImpl implements ReportService {
       String suffix = reportOutput.substring(reportOutput.lastIndexOf('.'));
       readFileFromR(rSession, reportDesignFile.getName().replace(".Rmd", suffix), reportOutput);
     } finally {
-      if(rSession != null) opalRSessionManager.removeSubjectRSession(rSession.getId());
+      if (rSession != null) opalRSessionManager.removeSubjectRSession(rSession.getId());
     }
   }
 
-  private void prepareRSession(OpalRSession rSession, Map<String, String> parameters, File reportDesignFile)
+  private void prepareRSession(RServerSession rSession, Map<String, String> parameters, File reportDesignFile)
       throws IOException {
     // copy all Rmd files to the work directory of the R server
     File[] files = reportDesignFile.getParentFile().listFiles(pathname -> pathname.getName().endsWith(".Rmd"));
     if (files != null) {
-      for(File file : files) {
+      for (File file : files) {
         writeFileToR(rSession, file);
       }
     }
     ensurePackage(rSession, "opalr");
     ensurePackage(rSession, "ggplot2");
     String options = buildOptions(parameters);
-    if(!Strings.isNullOrEmpty(options)) {
+    if (!Strings.isNullOrEmpty(options)) {
       execute(rSession, options);
     }
   }
@@ -157,27 +157,27 @@ public class RReportServiceImpl implements ReportService {
    * Prepare R server in another session, otherwise newly installed packages could fail loading.
    */
   private void prepareRServer() {
-    OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    RServerSession rSession = opalRSessionManager.newSubjectRSession();
     rSession.setExecutionContext("Report");
     ensurePackage(rSession, "opalr");
     ensurePackage(rSession, "ggplot2");
     opalRSessionManager.removeSubjectRSession(rSession.getId());
   }
 
-  private void ensurePackage(OpalRSession rSession, String packageName) {
+  private void ensurePackage(RServerSession rSession, String packageName) {
     String repos = StringUtils.collectionToDelimitedString(getDefaultRepos(), ",", "'", "'");
     String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c(%s), dependencies=TRUE) }",
         packageName, packageName, repos);
     execute(rSession, cmd);
   }
 
-  private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
+  private RScriptROperation runReport(RServerSession rSession, String reportDesign) {
     StringBuilder script = new StringBuilder();
     script.append("opalr::opal.report('").append(reportDesign).append("', progress=TRUE)");
     return execute(rSession, script.toString());
   }
 
-  private RScriptROperation execute(OpalRSession rSession, String rscript) {
+  private RScriptROperation execute(RServerSession rSession, String rscript) {
     log.debug(rscript);
     RScriptROperation rop = new RScriptROperation(rscript, false);
     rSession.execute(rop);
@@ -191,7 +191,7 @@ public class RReportServiceImpl implements ReportService {
    * @param file
    * @throws IOException
    */
-  private void writeFileToR(OpalRSession rSession, File file) throws IOException {
+  private void writeFileToR(RServerSession rSession, File file) throws IOException {
     FileWriteROperation rop = new FileWriteROperation(file.getName(), file);
     rSession.execute(rop);
   }
@@ -204,7 +204,7 @@ public class RReportServiceImpl implements ReportService {
    * @return
    * @throws REXPMismatchException
    */
-  private void readFileFromR(OpalRSession rSession, String name, String reportOutput) throws REXPMismatchException {
+  private void readFileFromR(RServerSession rSession, String name, String reportOutput) throws REXPMismatchException {
     FileReadROperation rop = new FileReadROperation(name, new File(reportOutput));
     rSession.execute(rop);
   }

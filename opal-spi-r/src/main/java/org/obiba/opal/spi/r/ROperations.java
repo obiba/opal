@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.spi.r;
 
-import org.rosuda.REngine.Rserve.RConnection;
-
 /**
  *
  */
@@ -21,7 +19,7 @@ public final class ROperations {
     private final static ROperation INSTANCE = new NoOpROperation();
 
     @Override
-    public void doWithConnection(RConnection connection) {
+    public void doWithConnection(RServerConnection connection) {
       // no-op
     }
   }
@@ -56,7 +54,7 @@ public final class ROperations {
       protected void doWithConnection() {
         String format = env == null ? "is.null(base::assign('%s', value={%s}))" : "is.null(base::assign('%s', value={%s}, envir=%s))";
         eval(String.format(format, name, script, env));
-        if(lock) {
+        if (lock) {
           eval(String.format("base::lockBinding('%s', %s)", name, env));
         }
       }

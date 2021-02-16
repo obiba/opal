@@ -51,7 +51,7 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
   }
 
   private void doInstallPackage(final String name, String ref, String manager) {
-    UriBuilder builder = UriBuilders.SERVICE_R_PACKAGES.create().query("name", name);
+    UriBuilder builder = UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().query("name", name);
     if (!Strings.isNullOrEmpty(ref)) {
       builder.query("ref", ref);
     }
@@ -60,7 +60,7 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
     }
     getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(builder.build()) //
+        .forResource(builder.build("default")) //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

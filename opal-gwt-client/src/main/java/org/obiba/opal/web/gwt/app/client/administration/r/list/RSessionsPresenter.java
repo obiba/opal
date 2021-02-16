@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStopped;
+import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStoppedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -55,6 +58,12 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
   protected void onBind() {
     super.onBind();
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
+    addRegisteredHandler(RServerStoppedEvent.getType(), new RServerStoppedEvent.RServerStoppedHandler() {
+      @Override
+      public void onRServerStopped(RServerStoppedEvent event) {
+        onRefresh();
+      }
+    });
   }
 
   @Override

@@ -11,8 +11,6 @@ package org.obiba.opal.spi.r;
 
 import org.json.JSONObject;
 import org.obiba.opal.spi.r.analysis.RAnalysis;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPRaw;
 import org.springframework.util.Assert;
 
 import java.util.NoSuchElementException;
@@ -23,7 +21,7 @@ import java.util.NoSuchElementException;
  */
 public abstract class AbstractROperationWithResult extends AbstractROperation implements ROperationWithResult {
 
-  private REXP result;
+  private RServerResult result;
 
   private boolean ignoreResult;
 
@@ -36,8 +34,8 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
   }
 
   @Override
-  public REXP getResult() {
-    if(!hasResult()) throw new NoSuchElementException();
+  public RServerResult getResult() {
+    if (!hasResult()) throw new NoSuchElementException();
     return result;
   }
 
@@ -46,29 +44,7 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
     return !isIgnoreResult() && result != null;
   }
 
-  @Override
-  public boolean hasRawResult() {
-    return !isIgnoreResult() && result != null && result.isRaw();
-  }
-
-  @Override
-  public REXPRaw getRawResult() {
-    if(!hasResult()) throw new NoSuchElementException();
-    if(!hasRawResult()) throw new NoSuchElementException();
-    return (REXPRaw) result;
-  }
-
-  @Override
-  protected REXP eval(String script) {
-    return result = super.eval(script);
-  }
-
-  @Override
-  protected REXP eval(String script, boolean serialize) {
-    return result = super.eval(script, serialize);
-  }
-
-  protected void setResult(REXP result) {
+  protected void setResult(RServerResult result) {
     this.result = result;
   }
 

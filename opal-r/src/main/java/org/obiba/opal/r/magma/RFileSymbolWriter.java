@@ -12,7 +12,6 @@ package org.obiba.opal.r.magma;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.r.DataSaveROperation;
-import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FolderReadROperation;
 import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
