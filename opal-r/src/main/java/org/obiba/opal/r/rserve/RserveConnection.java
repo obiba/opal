@@ -58,7 +58,7 @@ class RserveConnection implements RServerConnection {
   }
 
   @Override
-  public void assign(String symbol, String content) throws RServerException {
+  public void assignScript(String symbol, String content) throws RServerException {
     try {
       connection.assign(symbol, content);
     } catch (RserveException e) {

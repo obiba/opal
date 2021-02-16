@@ -31,7 +31,7 @@ public interface RServerConnection {
    * @param content
    * @throws RServerException
    */
-  void assign(String symbol, String content) throws RServerException;
+  void assignScript(String symbol, String content) throws RServerException;
 
   /**
    * Evaluate an expression and return the result object.

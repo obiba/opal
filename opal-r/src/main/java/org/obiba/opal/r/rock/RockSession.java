@@ -78,7 +78,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   }
 
   @Override
-  public void assign(String symbol, String content) throws RServerException {
+  public void assignScript(String symbol, String content) throws RServerException {
     touch();
     String serverUrl = getRSessionResourceUrl("/_assign");
     RestTemplate restTemplate = new RestTemplate();
@@ -98,6 +98,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   @Override
   public RServerResult eval(String expr, boolean serialize) throws RServerException {
     touch();
+    long start = System.currentTimeMillis();
     String serverUrl = getRSessionResourceUrl("/_eval");
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = createHeaders();
@@ -108,18 +109,22 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         // accept application/octet-stream
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
         ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
+        log.debug("eval: {}ms", System.currentTimeMillis()-start);
         return new RockResult(response.getBody());
       } else {
         // accept application/json
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), String.class);
         String jsonSource = response.getBody();
+        RServerResult rval;
         if (jsonSource.startsWith("["))
-          return new RockResult(new JSONArray(jsonSource));
+          rval = new RockResult(new JSONArray(jsonSource));
         else if (jsonSource.startsWith("{"))
-          return new RockResult(new JSONObject(jsonSource));
+          rval = new RockResult(new JSONObject(jsonSource));
         else
-          return new RockResult(jsonSource);
+          rval = new RockResult(jsonSource);
+        log.debug("eval: {}ms", System.currentTimeMillis()-start);
+        return rval;
       }
     } catch (RestClientException e) {
       throw new RServerException("Eval R expression failed", e);

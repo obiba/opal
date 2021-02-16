@@ -35,9 +35,9 @@ public abstract class AbstractROperation implements ROperation {
    * @param sym symbol
    * @param ct  content
    */
-  protected void assign(String sym, String ct) {
+  protected void assignScript(String sym, String ct) {
     try {
-      connection.assign(sym, ct);
+      connection.assignScript(sym, ct);
     } catch (RServerException e) {
       log.warn("Failed assigning '{}' with: {}", sym, ct, e);
       throw new RRuntimeException(e);

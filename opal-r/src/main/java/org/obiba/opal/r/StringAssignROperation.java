@@ -37,7 +37,7 @@ public class StringAssignROperation extends AbstractROperation {
     if (symbols == null) return;
     for (Entry<String, List<String>> entry : symbols.entrySet()) {
       for (String content : entry.getValue()) {
-        assign(entry.getKey(), content);
+        assignScript(entry.getKey(), content);
       }
     }
   }
