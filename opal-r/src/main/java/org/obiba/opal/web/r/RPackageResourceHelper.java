@@ -158,15 +158,23 @@ public class RPackageResourceHelper {
 
     private int current = 0;
 
+    private final String clusterName;
+
+    private final String rServerName;
+
     private final RMatrix<String> matrix;
 
-    public StringsToRPackageDto(RMatrix<String> matrix) {
+    public StringsToRPackageDto(String clusterName, String rServerName, RMatrix<String> matrix) {
+      this.clusterName = clusterName;
       this.matrix = matrix;
+      this.rServerName = rServerName;
     }
 
     @Override
     public OpalR.RPackageDto apply(@Nullable String[] input) {
-      OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
+      OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder()
+          .setCluster(clusterName)
+          .setRserver(rServerName);
       if (input != null) {
         for (int i = 0; i < input.length; i++) {
           if (!Strings.isNullOrEmpty(input[i]) && !"NA".equals(input[i])) {

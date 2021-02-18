@@ -167,7 +167,7 @@ public class RockService implements RServerService {
           restTemplate.exchange(getRServerResourceUrl("/rserver/packages"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockStringMatrix.class);
       RockStringMatrix matrix = response.getBody();
       pkgs = matrix.iterateRows().stream()
-          .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
+          .map(new RPackageResourceHelper.StringsToRPackageDto(clusterName, getName(), matrix))
           .collect(Collectors.toList());
     } catch (Exception e) {
       log.error("Error when reading installed packages", e);
@@ -188,7 +188,9 @@ public class RockService implements RServerService {
         RockResult result = new RockResult(new JSONObject(jsonSource));
         if (result.isNamedList()) {
           RNamedList<RServerResult> namedList = result.asNamedList();
-          OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
+          OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder()
+              .setCluster(clusterName)
+              .setRserver(getName());
           for (String key : namedList.getNames()) {
             if ("name".equals(key))
               builder.setName(namedList.get(key).asStrings()[0]);

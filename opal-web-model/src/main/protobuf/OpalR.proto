@@ -42,6 +42,8 @@ message RSessionDto {
 message RPackageDto {
   required string name = 1;
   repeated Opal.EntryDto description = 2;
+  required string cluster = 3;
+  required string rserver = 4;
 }
 
 message RCommandDto {

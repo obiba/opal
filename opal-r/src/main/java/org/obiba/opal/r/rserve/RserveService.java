@@ -15,10 +15,7 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
-import org.obiba.opal.r.service.AbstractRServerSession;
-import org.obiba.opal.r.service.RServerService;
-import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
@@ -187,7 +184,7 @@ public class RserveService implements RServerService, ROperationTemplate {
       ROperationWithResult rop = getInstalledPackages();
       RMatrix<String> matrix = rop.getResult().asStringMatrix();
       pkgs = matrix.iterateRows().stream()
-          .map(new RPackageResourceHelper.StringsToRPackageDto(matrix))
+          .map(new RPackageResourceHelper.StringsToRPackageDto(RServerManagerService.DEFAULT_CLUSTER_NAME, getName(), matrix))
           .collect(Collectors.toList());
     } catch (Exception e) {
       log.error("Error when reading installed packages", e);

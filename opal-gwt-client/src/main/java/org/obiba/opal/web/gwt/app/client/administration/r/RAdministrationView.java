@@ -273,7 +273,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
     if (originalPackages == null) return packages;
     List<String> tokens = FilterHelper.tokenize(text);
     for (RPackageDto pkg : originalPackages) {
-      String indexText = Joiner.on(" ").join(pkg.getName(), getEntryDtoValue(pkg, "title"));
+      String indexText = Joiner.on(" ").join(pkg.getName(), getEntryDtoValue(pkg, "title"), pkg.getRserver());
       if (FilterHelper.matches(indexText, tokens)) packages.add(pkg);
     }
     return packages;
@@ -373,6 +373,13 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
         return getEntryDtoValue(object, "version");
       }
     }, translations.versionLabel());
+
+    packagesTable.addColumn(new TextColumn<RPackageDto>() {
+      @Override
+      public String getValue(RPackageDto object) {
+        return object.getRserver();
+      }
+    }, translations.rServerLabel());
 
     packagesTable.addColumn(packagesActionsColumn = new ActionsColumn<RPackageDto>(new ActionsProvider<RPackageDto>() {
 

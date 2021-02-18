@@ -86,6 +86,11 @@ public class RServiceClusterResource extends AbstractRServiceResource {
     return Response.noContent().build();
   }
 
+  @GET
+  @Path("/packages/_check")
+  public List<OpalR.RPackageDto> checkPackages(@PathParam("cname") String clusterName) {
+    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServerCluster(clusterName));
+  }
 
   @GET
   @Path("/package/{pname}")

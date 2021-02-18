@@ -24,10 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class RServerCluster implements RServerClusterService {
@@ -144,7 +141,25 @@ public class RServerCluster implements RServerClusterService {
 
   @Override
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    return getNextRServerService().getInstalledPackagesDtos();
+    ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
+    try {
+      List<Future<List<OpalR.RPackageDto>>> futurePkgs = executor.invokeAll(rServerServices.stream()
+          .map(service -> (Callable<List<OpalR.RPackageDto>>) service::getInstalledPackagesDtos)
+          .collect(Collectors.toList()));
+      List<OpalR.RPackageDto> allPackages = Lists.newArrayList();
+      for (Future<List<OpalR.RPackageDto>> fPkgs : futurePkgs) {
+        try {
+          allPackages.addAll(fPkgs.get());
+        } catch (ExecutionException e) {
+          // ignore
+        }
+      }
+      allPackages.sort(Comparator.comparing(OpalR.RPackageDto::getName));
+      return allPackages;
+    } catch (InterruptedException e) {
+      log.error("Cannot retrieve all R packages", e);
+      return Lists.newArrayList();
+    }
   }
 
   @Override
