@@ -106,7 +106,7 @@
 
         <b:Paragraph>
           <ui:msg description="R server packages text">
-            List of all the R packages installed on the server. Removing or installing a R package applies to all R servers.
+            List of all the R packages installed on the R servers. Removing or installing an R package applies to all R servers.
           </ui:msg>
         </b:Paragraph>
 
