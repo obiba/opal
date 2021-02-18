@@ -72,7 +72,16 @@
         </b:Paragraph>
 
         <g:FlowPanel>
+
+        </g:FlowPanel>
+
+        <g:FlowPanel>
           <g:FlowPanel addStyleNames="pull-left">
+            <b:ButtonGroup>
+              <b:Button ui:field="manageRServers" icon="PENCIL" type="INFO">
+                <ui:msg description="R servers management label">Manage</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
             <b:ButtonGroup>
               <b:Button ui:field="refreshServers" icon="REFRESH">
                 <ui:msg description="Refresh R packages label">Refresh</ui:msg>

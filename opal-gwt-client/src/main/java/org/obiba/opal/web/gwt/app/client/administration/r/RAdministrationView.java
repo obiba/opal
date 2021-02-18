@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -100,6 +101,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   @UiField
   Table<RPackageDto> packagesTable;
 
+  @UiField
+  Button manageRServers;
+
   private List<RPackageDto> originalPackages;
 
   private ActionsColumn<RServerDto> serversActionsColumn;
@@ -121,6 +125,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
     initWidget(uiBinder.createAndBindUi(this));
     initServersTable();
     initPackagesTable();
+    manageRServers.setHref("#" + Places.ADMINISTRATION + "/" + Places.APPS);
   }
 
   @UiHandler("startStopButton")
