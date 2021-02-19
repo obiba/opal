@@ -163,7 +163,7 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
-  public OpalR.RPackageDto getInstalledPackageDto(String name) {
+  public List<OpalR.RPackageDto> getInstalledPackageDto(String name) {
     return getNextRServerService().getInstalledPackageDto(name);
   }
 

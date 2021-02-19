@@ -193,9 +193,13 @@ public class RserveService implements RServerService, ROperationTemplate {
   }
 
   @Override
-  public OpalR.RPackageDto getInstalledPackageDto(String name) {
-    return getInstalledPackagesDtos().stream().filter(dto -> dto.getName().equals(name))
-        .findFirst().orElseThrow(() -> new NoSuchRPackageException(name));
+  public List<OpalR.RPackageDto> getInstalledPackageDto(String name) {
+    List<OpalR.RPackageDto> pkgs = getInstalledPackagesDtos().stream()
+        .filter(dto -> dto.getName().equals(name))
+        .collect(Collectors.toList());
+    if (pkgs.isEmpty())
+      throw new NoSuchRPackageException(name);
+    return pkgs;
   }
 
   @Override

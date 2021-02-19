@@ -71,12 +71,12 @@ public interface RServerService {
   List<OpalR.RPackageDto> getInstalledPackagesDtos();
 
   /**
-   * Get a signle R package description.
+   * Get a single R package description. The same R package can be installed at different locations, different versions.
    *
    * @param name
    * @return
    */
-  OpalR.RPackageDto getInstalledPackageDto(String name);
+  List<OpalR.RPackageDto> getInstalledPackageDto(String name);
 
   /**
    * Remove package with provided name.

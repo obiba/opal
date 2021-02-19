@@ -176,7 +176,7 @@ public class RockService implements RServerService {
   }
 
   @Override
-  public OpalR.RPackageDto getInstalledPackageDto(String name) {
+  public List<OpalR.RPackageDto> getInstalledPackageDto(String name) {
     try {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -185,6 +185,7 @@ public class RockService implements RServerService {
           restTemplate.exchange(getRServerResourceUrl("/rserver/package/" + name), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       String jsonSource = response.getBody();
       if (response.getStatusCode().is2xxSuccessful()) {
+        List<OpalR.RPackageDto> pkgs = Lists.newArrayList();
         RockResult result = new RockResult(new JSONObject(jsonSource));
         if (result.isNamedList()) {
           RNamedList<RServerResult> namedList = result.asNamedList();
@@ -197,8 +198,9 @@ public class RockService implements RServerService {
             else
               builder.addDescription(Opal.EntryDto.newBuilder().setKey(key).setValue(namedList.get(key).asStrings()[0]));
           }
-          return builder.build();
+          pkgs.add(builder.build());
         }
+        return pkgs;
       }
     } catch (Exception e) {
       log.error("Error when reading installed package: " + name, e);

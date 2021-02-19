@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Manage a Datashield Package.
@@ -34,7 +35,7 @@ public class DataShieldPackageResource {
   private DataShieldPackageMethodHelper methodPublisherImpl;
 
   @GET
-  public OpalR.RPackageDto getPackage(@PathParam("name") String name) throws REXPMismatchException {
+  public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name) {
     return methodPublisherImpl.getPackage(name);
   }
 
@@ -46,7 +47,7 @@ public class DataShieldPackageResource {
    */
   @GET
   @Path("/methods")
-  public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name) throws REXPMismatchException {
+  public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name) {
     return methodPublisherImpl.getPackageMethods(name);
   }
 

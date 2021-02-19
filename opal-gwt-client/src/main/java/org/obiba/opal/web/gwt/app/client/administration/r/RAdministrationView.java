@@ -279,7 +279,6 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
     return packages;
   }
 
-
   private void initServersTable() {
     serversTable.addColumn(new TextColumn<RServerDto>() {
       @Override

@@ -10,26 +10,30 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
@@ -38,6 +42,9 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -64,11 +71,16 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
   Button deleteAllPackagesButton;
 
   @UiField
+  TextBoxClearable packagesFilter;
+
+  @UiField
   Table<RPackageDto> packagesTable;
 
-  private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
+  private final ListDataProvider<RPackageDto> packagesDataProvider = new ListDataProvider<RPackageDto>();
 
   private ActionsPackageRColumn<RPackageDto> actionsColumn;
+
+  private List<RPackageDto> originalPackages;
 
   @Inject
   public DataShieldPackageAdministrationView(Binder uiBinder, Translations translations) {
@@ -88,18 +100,29 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
     getUiHandlers().deleteAllPackages(packagesDataProvider.getList());
   }
 
+  @UiHandler("packagesFilter")
+  public void onPackagesFilterUpdate(KeyUpEvent event) {
+    renderDataShieldPackagesList(filterPackages(packagesFilter.getText()));
+  }
+
   @Override
   public HandlerRegistration addPackageHandler(ClickHandler handler) {
     return addPackageButton.addClickHandler(handler);
   }
 
   @Override
-  public void renderDataShieldPackagesRows(JsArray<RPackageDto> rows) {
+  public void renderDataShieldPackages(List<RPackageDto> packages) {
+    this.originalPackages = packages == null ? new ArrayList<RPackageDto>() : packages;
+    packagesFilter.setText("");
+    renderDataShieldPackagesList(packages);
+  }
+
+  private void renderDataShieldPackagesList(List<RPackageDto> packages) {
     packagesTable.hideLoadingIndicator();
-    packagesDataProvider.setArray(rows);
+    packagesDataProvider.setList(packages);
     packagesTable.setVisible(true);
     packagesDataProvider.refresh();
-    deleteAllPackagesButton.setEnabled(rows.length() > 0);
+    deleteAllPackagesButton.setEnabled(!packages.isEmpty());
   }
 
   @Override
@@ -113,6 +136,17 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
     packagesTable.setPageSize(PAGE_SIZE);
     packagesDataProvider.addDataDisplay(packagesTable);
     packagesTable.showLoadingIndicator(packagesDataProvider);
+  }
+
+  private List<RPackageDto> filterPackages(String text) {
+    List<RPackageDto> packages = Lists.newArrayList();
+    if (originalPackages == null) return packages;
+    List<String> tokens = FilterHelper.tokenize(text);
+    for (RPackageDto pkg : originalPackages) {
+      String indexText = Joiner.on(" ").join(pkg.getName(), getEntryDtoValue(pkg, "title"), pkg.getRserver());
+      if (FilterHelper.matches(indexText, tokens)) packages.add(pkg);
+    }
+    return packages;
   }
 
   private void addPackageTableColumns() {
@@ -136,6 +170,13 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
         return getEntryDtoValue(object, "version");
       }
     }, translations.versionLabel());
+
+    packagesTable.addColumn(new TextColumn<RPackageDto>() {
+      @Override
+      public String getValue(RPackageDto object) {
+        return object.getRserver();
+      }
+    }, translations.rServerLabel());
 
     actionsColumn = new ActionsPackageRColumn<RPackageDto>(
         new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,

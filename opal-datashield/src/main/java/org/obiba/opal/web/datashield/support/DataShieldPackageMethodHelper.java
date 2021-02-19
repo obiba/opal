@@ -68,7 +68,7 @@ public class DataShieldPackageMethodHelper {
         .collect(Collectors.toList());
   }
 
-  public OpalR.RPackageDto getPackage(String name) {
+  public List<OpalR.RPackageDto> getPackage(String name) {
     return getDatashieldPackage(name);
   }
 
@@ -77,10 +77,10 @@ public class DataShieldPackageMethodHelper {
   }
 
   public DataShield.DataShieldPackageMethodsDto publish(String name) {
-    OpalR.RPackageDto packageDto = getDatashieldPackage(name);
+    List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(name);
 
-    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDto);
-    final List<DataShield.DataShieldROptionDto> roptions = getPackageROptions(packageDto);
+    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
+    final List<DataShield.DataShieldROptionDto> roptions = getPackageROptions(packageDtos);
     configurationSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
 
@@ -104,21 +104,25 @@ public class DataShieldPackageMethodHelper {
     return methods;
   }
 
-  public OpalR.RPackageDto getDatashieldPackage(final String name) {
+  public List<OpalR.RPackageDto> getDatashieldPackage(final String name) {
     if (rServerManagerService.getDefaultRServer().getInstalledDataSHIELDPackageNames().contains(name))
       return rServerManagerService.getDefaultRServer().getInstalledPackageDto(name);
     throw new NoSuchRPackageException(name);
   }
 
   public void deletePackage(String name) {
-    deletePackage(getDatashieldPackage(name));
+    getDatashieldPackage(name).forEach(this::deletePackage);
   }
 
   public void deletePackage(OpalR.RPackageDto pkg) {
-    deletePackageMethods(pkg.getName(), DSMethodType.AGGREGATE);
-    deletePackageMethods(pkg.getName(), DSMethodType.ASSIGN);
-    getPackageROptions(pkg).forEach(opt -> configurationSupplier.get().removeOption(opt.getName()));
-    rPackageHelper.removePackage(rServerManagerService.getDefaultRServer(), pkg.getName());
+    try {
+      deletePackageMethods(pkg.getName(), DSMethodType.AGGREGATE);
+      deletePackageMethods(pkg.getName(), DSMethodType.ASSIGN);
+      getPackageROptions(pkg).forEach(opt -> configurationSupplier.get().removeOption(opt.getName()));
+      rPackageHelper.removePackage(rServerManagerService.getDefaultRServer(), pkg.getName());
+    } catch (Exception e) {
+      log.warn("Failed to delete an R package: {}", pkg.getName());
+    }
   }
 
   public static Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String packageName, String packageVersion,
@@ -170,6 +174,13 @@ public class DataShieldPackageMethodHelper {
     }
   }
 
+  private List<DataShield.DataShieldROptionDto> getPackageROptions(List<OpalR.RPackageDto> packageDtos) {
+    // TODO merge options
+    OpalR.RPackageDto packageDto = packageDtos.get(0);
+    return getPackageROptions(packageDto);
+  }
+
+
   private List<DataShield.DataShieldROptionDto> getPackageROptions(OpalR.RPackageDto packageDto) {
     List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
@@ -181,11 +192,17 @@ public class DataShieldPackageMethodHelper {
     return optionDtos;
   }
 
-  private DataShield.DataShieldPackageMethodsDto getPackageMethods(OpalR.RPackageDto packageDto) {
-    String version = getPackageVersion(packageDto);
+  private DataShield.DataShieldPackageMethodsDto getPackageMethods(List<OpalR.RPackageDto> packageDtos) {
+    // TODO merge methods
+    return getPackageMethods(packageDtos.get(0));
+  }
 
+
+  private DataShield.DataShieldPackageMethodsDto getPackageMethods(OpalR.RPackageDto packageDto) {
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
+
+    String version = getPackageVersion(packageDto);
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
       String key = entry.getKey();
       if (AGGREGATE_METHODS.equals(key)) {
@@ -194,7 +211,8 @@ public class DataShieldPackageMethodHelper {
         assignMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
       }
     }
-    return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(packageDto.getName()).addAllAggregate(aggregateMethodDtos)
+    return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(packageDto.getName())
+        .addAllAggregate(aggregateMethodDtos)
         .addAllAssign(assignMethodDtos).build();
   }
 

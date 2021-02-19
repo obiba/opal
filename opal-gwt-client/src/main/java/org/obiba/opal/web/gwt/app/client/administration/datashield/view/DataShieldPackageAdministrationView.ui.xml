@@ -17,6 +17,13 @@
     ui:generateLocales="default">
 
   <g:FlowPanel ui:field="packagesPanel">
+
+    <b:Paragraph>
+      <ui:msg description="R server packages text">
+        List of all the DataSHIELD R packages installed on the R servers. Removing or installing an R package applies to all R servers.
+      </ui:msg>
+    </b:Paragraph>
+
     <g:FlowPanel addStyleNames="small-bottom-margin">
       <b:ButtonGroup>
         <b:Button ui:field="addPackageButton" icon="PLUS" type="INFO" styleName="btn">
@@ -33,6 +40,11 @@
           <ui:msg description="Delete all DataShield Packages label">Delete all</ui:msg>
         </b:Button>
       </b:ButtonGroup>
+      <b:Controls addStyleNames="pull-right small-indent">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="packagesFilter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
     </g:FlowPanel>
 
     <o:Table ui:field="packagesTable"/>

@@ -206,7 +206,7 @@ public class DataShieldPackageAdministrationPresenter
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setAddPackageButtonEnabled(false);
-            getView().renderDataShieldPackagesRows(null);
+            getView().renderDataShieldPackages(null);
             getEventBus()
                 .fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
           }
@@ -216,7 +216,7 @@ public class DataShieldPackageAdministrationPresenter
           public void onResource(Response response, JsArray<RPackageDto> resource) {
             if (response.getStatusCode() == Response.SC_OK) {
               getView().setAddPackageButtonEnabled(true);
-              getView().renderDataShieldPackagesRows(JsArrays.toSafeArray(resource));
+              getView().renderDataShieldPackages(JsArrays.toList(resource));
             }
           }
         }).send();
@@ -305,7 +305,7 @@ public class DataShieldPackageAdministrationPresenter
 
   public interface Display extends View, HasUiHandlers<DataShieldPackageAdministrationUiHandlers> {
 
-    void renderDataShieldPackagesRows(JsArray<RPackageDto> rows);
+    void renderDataShieldPackages(List<RPackageDto> rows);
 
     HasActionHandler<RPackageDto> getDataShieldPackageActionsColumn();
 
