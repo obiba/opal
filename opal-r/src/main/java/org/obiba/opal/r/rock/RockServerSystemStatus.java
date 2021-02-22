@@ -19,7 +19,7 @@ import java.util.Map;
 @JsonPropertyOrder({
 
 })
-public class RockSessionsCounts {
+public class RockServerSystemStatus {
 
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();

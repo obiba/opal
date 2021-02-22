@@ -29,6 +29,10 @@ class RServerClusterState implements RServerState {
 
   private int busySessionsCount = 0;
 
+  private int systemCores = 0;
+
+  private int systemFreeMemory = 0;
+
   private final Set<String> tags = Sets.newHashSet();
 
   public RServerClusterState(String name) {
@@ -85,4 +89,21 @@ class RServerClusterState implements RServerState {
     return busySessionsCount;
   }
 
+  public void addSystemCores(int systemCores) {
+    this.systemCores = systemCores + Math.max(systemCores, 0);
+  }
+
+  @Override
+  public int getSystemCores() {
+    return systemCores;
+  }
+
+  public void addSystemFreeMemory(int systemFreeMemory) {
+    this.systemFreeMemory = systemFreeMemory + Math.max(systemFreeMemory, 0);
+  }
+
+  @Override
+  public int getSystemFreeMemory() {
+    return systemFreeMemory;
+  }
 }

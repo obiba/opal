@@ -1928,6 +1928,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("R Sessions")
   String rSessionsLabel();
 
+  @Description("System label")
+  @DefaultStringValue("System")
+  String systemLabel();
+
   @Description("N item is selected label")
   @DefaultStringValue("{0} is selected.")
   String NItemSelected();

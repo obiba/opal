@@ -85,4 +85,14 @@ public class RserveState implements RServerState {
   public int getBusyRSessionsCount() {
     return busyRSessionCount;
   }
+
+  @Override
+  public int getSystemCores() {
+    return 0;
+  }
+
+  @Override
+  public int getSystemFreeMemory() {
+    return 0;
+  }
 }

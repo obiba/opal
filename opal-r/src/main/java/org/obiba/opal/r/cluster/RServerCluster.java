@@ -115,6 +115,8 @@ public class RServerCluster implements RServerClusterService {
       state.addTags(s.getTags());
       state.addRSessionsCount(s.getRSessionsCount());
       state.addBusyRSessionsCount(s.getBusyRSessionsCount());
+      state.addSystemCores(s.getSystemCores());
+      state.addSystemFreeMemory(s.getSystemFreeMemory());
     });
     return state;
   }

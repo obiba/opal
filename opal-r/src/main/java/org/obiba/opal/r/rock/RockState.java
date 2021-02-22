@@ -44,13 +44,25 @@ public class RockState implements RServerState {
 
   @Override
   public int getRSessionsCount() {
-    if (info.getRServerStatus().getRSessionsCounts() == null) return 0;
-    return (Integer) info.getRServerStatus().getRSessionsCounts().getAdditionalProperties().getOrDefault("total", 0);
+    if (info.getRServerStatus().getRSessions() == null) return 0;
+    return (Integer) info.getRServerStatus().getRSessions().getAdditionalProperties().getOrDefault("total", 0);
   }
 
   @Override
   public int getBusyRSessionsCount() {
-    if (info.getRServerStatus().getRSessionsCounts() == null) return 0;
-    return (Integer) info.getRServerStatus().getRSessionsCounts().getAdditionalProperties().getOrDefault("busy", 0);
+    if (info.getRServerStatus().getRSessions() == null) return 0;
+    return (Integer) info.getRServerStatus().getRSessions().getAdditionalProperties().getOrDefault("busy", 0);
+  }
+
+  @Override
+  public int getSystemCores() {
+    if (info.getRServerStatus().getSystem() == null) return 0;
+    return (Integer) info.getRServerStatus().getSystem().getAdditionalProperties().getOrDefault("cores", 0);
+  }
+
+  @Override
+  public int getSystemFreeMemory() {
+    if (info.getRServerStatus().getSystem() == null) return 0;
+    return (Integer) info.getRServerStatus().getSystem().getAdditionalProperties().getOrDefault("freeMemory", 0);
   }
 }

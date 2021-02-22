@@ -25,4 +25,8 @@ public interface RServerState {
   int getRSessionsCount();
 
   int getBusyRSessionsCount();
+
+  int getSystemCores();
+
+  int getSystemFreeMemory();
 }

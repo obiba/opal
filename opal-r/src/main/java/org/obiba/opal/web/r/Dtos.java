@@ -54,7 +54,9 @@ public class Dtos {
         .setVersion(state.getVersion())
         .addAllTags(state.getTags())
         .setSessionCount(state.getRSessionsCount())
-        .setBusySessionCount(state.getBusyRSessionsCount());
+        .setBusySessionCount(state.getBusyRSessionsCount())
+        .setCores(state.getSystemCores())
+        .setFreeMemory(state.getSystemFreeMemory());
 
     App app = server.getApp();
     if (app != null) {

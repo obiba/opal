@@ -17,43 +17,12 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "running",
-    "rSessions",
-    "system"
+
 })
-public class RockServerStatus {
-
-  @JsonProperty("running")
-  private Boolean running = false;
-
-  @JsonProperty("rSessions")
-  private RockServerSessionsStatus rSessions;
-
-  @JsonProperty("system")
-  private RockServerSystemStatus system;
+public class RockServerSessionsStatus {
 
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-  @JsonProperty("running")
-  public Boolean getRunning() {
-    return running;
-  }
-
-  @JsonProperty("running")
-  public void setRunning(Boolean running) {
-    this.running = running;
-  }
-
-  @JsonProperty("rSessions")
-  public RockServerSessionsStatus getRSessions() {
-    return rSessions;
-  }
-
-  @JsonProperty("system")
-  public RockServerSystemStatus getSystem() {
-    return system;
-  }
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {

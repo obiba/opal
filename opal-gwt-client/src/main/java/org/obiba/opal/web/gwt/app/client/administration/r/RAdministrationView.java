@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
+import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -301,6 +302,15 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       }
     }, translations.rSessionsLabel());
 
+    serversTable.addColumn(new TextColumn<RServerDto>() {
+      @Override
+      public String getValue(RServerDto rServerDto) {
+        if (rServerDto.getCores() == 0)
+          return "?";
+        return rServerDto.getCores() + " cores, " + ValueRenderingHelper.getSizeInBytes(rServerDto.getFreeMemory()*1000) + " free memory";
+      }
+    }, translations.systemLabel());
+
     serversTable.addColumn(new URLColumn<RServerDto>() {
 
       @Override
@@ -308,6 +318,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
         return object.hasApp() ? object.getApp().getServer() : "";
       }
     }, translations.urlLabel());
+
     serversTable.addColumn(new ServerStatusColumn(), translations.statusLabel());
 
     serversTable.addColumn(serversActionsColumn = new ActionsColumn<RServerDto>(new ActionsProvider<RServerDto>() {

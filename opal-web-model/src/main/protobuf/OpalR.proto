@@ -18,9 +18,10 @@ message RServerDto {
   repeated string tags = 4;
   required int32 sessionCount = 5;
   required int32 busySessionCount = 6;
-  optional Apps.AppDto app = 7;
+  required int32 cores = 7;
+  required int32 freeMemory = 8;
+  optional Apps.AppDto app = 9;
 }
-
 
 enum RSessionStatus {
   WAITING = 0;
