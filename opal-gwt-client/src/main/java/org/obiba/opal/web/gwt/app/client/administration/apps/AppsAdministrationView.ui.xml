@@ -55,7 +55,7 @@
                                 target="_blank">Applications Administration
                     </a> documentation).
                     </ui:msg>
-                    <g:HTMLPanel addStyleNames="top-margin">
+                    <g:HTMLPanel addStyleNames="top-margin" ui:field="tokenPanel">
                         <code>
                             <g:InlineLabel ui:field="token"></g:InlineLabel>
                         </code>

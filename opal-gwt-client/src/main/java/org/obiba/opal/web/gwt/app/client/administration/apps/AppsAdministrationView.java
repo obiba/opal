@@ -10,16 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.apps;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -42,6 +40,9 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
   private static final String UNREGISTER_ACTION = "Unregister";
 
   private final Translations translations;
+
+  @UiField
+  Panel tokenPanel;
 
   @UiField
   HasText token;
@@ -104,6 +105,7 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
   @Override
   public void renderAppsConfig(AppsConfigDto config) {
     token.setText(config.getToken());
+    tokenPanel.setVisible(!Strings.isNullOrEmpty(config.getToken()));
     rockConfigsProvider.setArray(config.getRockConfigsArray());
   }
 
