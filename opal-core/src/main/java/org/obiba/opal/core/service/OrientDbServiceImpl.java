@@ -324,7 +324,8 @@ public class OrientDbServiceImpl implements OrientDbService {
 
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       for(ODocument document : documents) {
-        db.delete(document);
+        if (document != null)
+          db.delete(document);
       }
       for(HasUniqueProperties template : templates) {
         getIndex(db, template).remove(getKey(template));
