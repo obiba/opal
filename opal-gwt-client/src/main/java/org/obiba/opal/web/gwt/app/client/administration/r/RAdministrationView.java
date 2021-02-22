@@ -305,7 +305,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
     serversTable.addColumn(new TextColumn<RServerDto>() {
       @Override
       public String getValue(RServerDto rServerDto) {
-        if (rServerDto.getCores() == 0)
+        if (rServerDto.getCores() <= 0)
           return "?";
         return rServerDto.getCores() + " cores, " + ValueRenderingHelper.getSizeInBytes(rServerDto.getFreeMemory()*1000) + " free memory";
       }
