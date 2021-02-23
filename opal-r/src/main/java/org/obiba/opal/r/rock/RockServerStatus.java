@@ -12,28 +12,86 @@ package org.obiba.opal.r.rock;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "id",
+    "version",
+    "encoding",
+    "tags",
     "running",
-    "rSessions",
+    "sessions",
     "system"
 })
 public class RockServerStatus {
 
+  @JsonProperty("id")
+  private String id;
+
+  @JsonProperty("version")
+  private String version;
+
+  @JsonProperty("encoding")
+  private String encoding;
+
+  @JsonProperty("tags")
+  private List<String> tags = new ArrayList<String>();
+
   @JsonProperty("running")
   private Boolean running = false;
 
-  @JsonProperty("rSessions")
-  private RockServerSessionsStatus rSessions;
+  @JsonProperty("sessions")
+  private RockServerSessionsStatus sessions;
 
   @JsonProperty("system")
   private RockServerSystemStatus system;
 
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  @JsonProperty("version")
+  public String getVersion() {
+    return version;
+  }
+
+  @JsonProperty("version")
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @JsonProperty("encoding")
+  public String getEncoding() {
+    return encoding;
+  }
+
+  @JsonProperty("encoding")
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
+
+  @JsonProperty("tags")
+  public List<String> getTags() {
+    return tags;
+  }
+
+  @JsonProperty("tags")
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
 
   @JsonProperty("running")
   public Boolean getRunning() {
@@ -45,9 +103,9 @@ public class RockServerStatus {
     this.running = running;
   }
 
-  @JsonProperty("rSessions")
-  public RockServerSessionsStatus getRSessions() {
-    return rSessions;
+  @JsonProperty("sessions")
+  public RockServerSessionsStatus getSessions() {
+    return sessions;
   }
 
   @JsonProperty("system")

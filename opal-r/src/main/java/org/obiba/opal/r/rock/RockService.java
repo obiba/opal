@@ -143,8 +143,8 @@ public class RockService implements RServerService {
   @Override
   public RServerState getState() {
     RestTemplate restTemplate = new RestTemplate();
-    ResponseEntity<RockServerInfo> response =
-        restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerInfo.class);
+    ResponseEntity<RockServerStatus> response =
+        restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerStatus.class);
     return new RockState(response.getBody());
   }
 
