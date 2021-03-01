@@ -16,13 +16,17 @@ public class RScriptROperation extends AbstractROperationWithResult {
 
   private final String script;
 
-  private final boolean serialize;
+  private final RSerialize serialize;
 
   public RScriptROperation(String script) {
     this(script, true);
   }
 
   public RScriptROperation(String script, boolean serialize) {
+    this(script, serialize ? RSerialize.RAW : RSerialize.NATIVE);
+  }
+
+  public RScriptROperation(String script, RSerialize serialize) {
     if (script == null) throw new IllegalArgumentException("R script cannot be null");
     this.script = script;
     this.serialize = serialize;

@@ -96,7 +96,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   }
 
   @Override
-  public RServerResult eval(String expr, boolean serialize) throws RServerException {
+  public RServerResult eval(String expr, RSerialize serialize) throws RServerException {
     touch();
     long start = System.currentTimeMillis();
     String serverUrl = getRSessionResourceUrl("/_eval");
@@ -105,7 +105,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     headers.setContentType(MediaType.valueOf("application/x-rscript"));
 
     try {
-      if (serialize) {
+      if (RSerialize.RAW == serialize) {
         // accept application/octet-stream
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
         ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
@@ -116,13 +116,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), String.class);
         String jsonSource = response.getBody();
-        RServerResult rval;
-        if (jsonSource.startsWith("["))
-          rval = new RockResult(new JSONArray(jsonSource));
-        else if (jsonSource.startsWith("{"))
-          rval = new RockResult(new JSONObject(jsonSource));
-        else
-          rval = new RockResult(jsonSource);
+        RServerResult rval = new RockResult(jsonSource);
         log.debug("eval: {}ms", System.currentTimeMillis()-start);
         return rval;
       }

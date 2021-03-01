@@ -12,6 +12,7 @@ package org.obiba.opal.spi.r;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
 public interface RServerConnection {
 
@@ -41,7 +42,7 @@ public interface RServerConnection {
    * @return
    * @throws RServerException
    */
-  RServerResult eval(String expr, boolean serialize) throws RServerException;
+  RServerResult eval(String expr, RSerialize serialize) throws RServerException;
 
   /**
    * Write a file from the input stream.

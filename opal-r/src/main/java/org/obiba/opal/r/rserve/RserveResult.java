@@ -106,6 +106,11 @@ class RserveResult implements RServerResult {
   }
 
   @Override
+  public String asJSON() {
+    return asStrings()[0];
+  }
+
+  @Override
   public boolean isString() {
     return result.isString();
   }

@@ -12,19 +12,19 @@ package org.obiba.opal.datashield;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.r.expr.DSRScriptValidator;
 import org.obiba.datashield.r.expr.ParseException;
+import org.obiba.opal.spi.r.RSerialize;
 
 /**
  * Parses a restricted R script, executes it and stores the result.
  */
 public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROperation {
 
-  public RestrictedRScriptROperation(String script, DSEnvironment environment,
-      DSRScriptValidator validator) throws ParseException {
-    super(script, environment, validator);
-  }
+  private final RSerialize serialize;
 
-  public RestrictedRScriptROperation(String script, DSEnvironment environment) throws ParseException {
-    this(script, environment, new DSRScriptValidator());
+  public RestrictedRScriptROperation(String script, DSEnvironment environment,
+      DSRScriptValidator validator, RSerialize serialize) throws ParseException {
+    super(script, environment, validator);
+    this.serialize = serialize;
   }
 
   @Override
@@ -33,6 +33,6 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     setResult(null);
     String script = restricted();
     DataShieldLog.userLog("evaluating '{}'", script);
-    setResult(eval(script));
+    setResult(eval(script, serialize));
   }
 }

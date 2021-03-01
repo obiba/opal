@@ -19,6 +19,7 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.spi.r.ROperationWithResult;
+import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,21 +53,32 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   private DataExportService dataExportService;
 
   @Override
-  public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
+  public Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
+    return aggregate(async, body, RSerialize.RAW);
+  }
+
+  @Override
+  public Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
+    return aggregate(async, body, RSerialize.JSON);
+  }
+
+  private Response aggregate(boolean async, String body, RSerialize serialize) {
     try {
       ROperationWithResult operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
-          DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()));
+          DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()), serialize);
       if (async) {
         String id = getRServerSession().executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
+      } else if (serialize == RSerialize.RAW) {
+        getRServerSession().execute(operation);
+        return Response.ok().entity(operation.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
       } else {
         getRServerSession().execute(operation);
-        return Response.ok().entity(operation.getResult().asBytes()).build();
+        return Response.ok().entity(operation.getResult().asStrings()[0]).type(MediaType.APPLICATION_JSON).build();
       }
     } catch (ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
-
   }
 
   @Override

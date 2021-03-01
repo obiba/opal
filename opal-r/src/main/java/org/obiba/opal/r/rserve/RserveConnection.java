@@ -67,10 +67,12 @@ class RserveConnection implements RServerConnection {
   }
 
   @Override
-  public RServerResult eval(String expr, boolean serialize) throws RServerException {
+  public RServerResult eval(String expr, RSerialize serialize) throws RServerException {
     String cmd;
-    if (serialize) {
+    if (RSerialize.RAW == serialize) {
       cmd = String.format("try(serialize({%s}, NULL))", expr);
+    } else if (RSerialize.JSON == serialize) {
+      cmd = String.format("try(tryCatch(jsonlite::toJSON(%s, auto_unbox = T), error = function(e) { jsonlite::serializeJSON(%s) }))", expr, expr);
     } else {
       cmd = String.format("try(%s)", expr);
     }

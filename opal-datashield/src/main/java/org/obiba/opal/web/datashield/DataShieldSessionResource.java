@@ -25,6 +25,11 @@ public interface DataShieldSessionResource extends RSessionResource {
   @POST
   @Path("/aggregate")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body);
+  Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body);
+
+  @POST
+  @Path("/aggregate")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body);
 
 }

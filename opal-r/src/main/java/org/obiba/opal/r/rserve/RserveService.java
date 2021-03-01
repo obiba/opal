@@ -278,7 +278,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   private ROperationWithResult getInstalledPackages() {
     String fieldStr = Joiner.on("','").join(defaultFields);
     String cmd = "installed.packages(fields=c('" + fieldStr + "'))";
-    RScriptROperation rop = new RScriptROperation(cmd, false);
+    RScriptROperation rop = new RScriptROperation(cmd, RSerialize.NATIVE);
     execute(rop);
     return rop;
   }
@@ -391,7 +391,7 @@ public class RserveService implements RServerService, ROperationTemplate {
       eval("assign('y', lapply(x[lapply(x, nchar)>0], function(f) as.list(as.data.frame(read.dcf(f)))))");
       // merge and prepare DS field values as arrays of strings
       eval("assign('pkgs', lapply(append(pkgs, y), function(p) lapply(p, function(pp)  gsub('^\\\\s+|\\\\s+$', '', gsub('\\n', '', unlist(strsplit(pp, ',')))))))");
-      setResult(eval("pkgs", false));
+      setResult(eval("pkgs", RSerialize.NATIVE));
     }
   }
 

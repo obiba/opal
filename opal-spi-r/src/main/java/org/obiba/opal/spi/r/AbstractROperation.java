@@ -66,7 +66,18 @@ public abstract class AbstractROperation implements ROperation {
    * @return result serialized
    */
   protected RServerResult eval(String script) {
-    return eval(script, true);
+    return eval(script, RSerialize.RAW);
+  }
+
+  /**
+   * Safe evaluation of a R script with result serialized by R or not.
+   *
+   * @param script
+   * @param serialize
+   * @return
+   */
+  protected RServerResult eval(String script, boolean serialize) {
+    return eval(script, serialize ? RSerialize.RAW : RSerialize.NATIVE);
   }
 
   /**
@@ -76,7 +87,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param serialize
    * @return
    */
-  protected RServerResult eval(String script, boolean serialize) {
+  protected RServerResult eval(String script, RSerialize serialize) {
     if (script == null) throw new IllegalArgumentException("R script cannot be null");
     try {
       log.debug("evaluating: {}", script);
@@ -150,7 +161,7 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected void loadPackage(String packageName) {
     String cmd = String.format("library('%s')", packageName);
-    eval(cmd, false);
+    eval(cmd, RSerialize.NATIVE);
   }
 
   /**
@@ -163,7 +174,7 @@ public abstract class AbstractROperation implements ROperation {
     String repos = Joiner.on("','").join(getRepositories());
     String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('%s'), dependencies=TRUE) }",
         packageName, packageName, repos);
-    eval(cmd, false);
+    eval(cmd, RSerialize.NATIVE);
   }
 
   /**
@@ -178,7 +189,7 @@ public abstract class AbstractROperation implements ROperation {
     ensurePackage("remotes");
     String cmd = String.format("if (!require(%s)) { remotes::install_github('%s/%s', ref='%s', dependencies=TRUE, upgrade=TRUE) }",
         packageName, user, packageName, Strings.isNullOrEmpty(reference) ? "master" : reference);
-    eval(cmd, false);
+    eval(cmd, RSerialize.NATIVE);
   }
 
   /**

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.rock;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,16 +32,28 @@ class RockResult implements RServerResult {
 
   private Object nativeResult;
 
+  private String jsonResult;
+
   public RockResult(byte[] rawResult) {
     this.rawResult = rawResult;
   }
 
-  public RockResult(JSONArray jsonArray) {
-    this.listResult = toList(jsonArray);
+  public RockResult(String jsonSource) {
+    if (jsonSource.startsWith("["))
+      this.listResult = toList(new JSONArray(jsonSource));
+    else if (jsonSource.startsWith("{"))
+      this.namedListResult = new RockNamedList(new JSONObject(jsonSource));
+    this.jsonResult = jsonSource;
   }
 
-  public RockResult(JSONObject jsonObject) {
-    this.namedListResult = new RockNamedList(jsonObject);
+  public RockResult(JSONArray array) {
+    this.listResult = toList(array);
+    this.jsonResult = array.toString();
+  }
+
+  public RockResult(JSONObject object) {
+    this.namedListResult = new RockNamedList(object);
+    this.jsonResult = object.toString();
   }
 
   public RockResult(Object nativeResult) {
@@ -174,6 +187,13 @@ class RockResult implements RServerResult {
       }
       return rval;
     }
+    if (jsonResult != null) {
+      try {
+        return new Boolean[]{Boolean.parseBoolean(jsonResult)};
+      } catch (Exception e) {
+        return null;
+      }
+    }
     if (nativeResult != null) {
       try {
         return new Boolean[]{Boolean.parseBoolean(nativeResult.toString())};
@@ -185,8 +205,13 @@ class RockResult implements RServerResult {
   }
 
   @Override
+  public String asJSON() {
+    return jsonResult;
+  }
+
+  @Override
   public boolean isString() {
-    return isList() || isNamedList() || nativeResult != null;
+    return isList() || isNamedList() || jsonResult != null || nativeResult != null;
   }
 
   @Override
@@ -205,6 +230,13 @@ class RockResult implements RServerResult {
         rval[i++] = value.asStrings()[0];
       }
       return rval;
+    }
+    if (jsonResult != null) {
+      try {
+        return new String[]{jsonResult};
+      } catch (Exception e) {
+        return null;
+      }
     }
     if (nativeResult != null) {
       try {

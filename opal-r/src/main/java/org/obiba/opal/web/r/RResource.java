@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.spi.r.RServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,18 @@ public class RResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response query(@QueryParam("script") String script, String body) throws RServerException {
+  public Response executeBinary(@QueryParam("script") String script, String body) throws RServerException {
+    return execute(script, body, RSerialize.RAW);
+  }
+
+  @POST
+  @Path("/execute")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response executeJSON(@QueryParam("script") String script, String body) throws RServerException {
+    return execute(script, body, RSerialize.JSON);
+  }
+
+  public Response execute(String script, String body, RSerialize serialize) throws RServerException {
     String rScript = script;
     if (Strings.isNullOrEmpty(rScript)) {
       rScript = body;
@@ -57,10 +69,13 @@ public class RResource {
 
     if (Strings.isNullOrEmpty(rScript)) return Response.status(Status.BAD_REQUEST).build();
 
-    ROperationWithResult rop = new RScriptROperation(rScript);
+    ROperationWithResult rop = new RScriptROperation(rScript, serialize);
     rServerManagerService.getDefaultRServer().execute(rop);
-    if (rop.hasResult() && rop.getResult().isRaw()) {
-      return Response.ok().entity(rop.getResult().asBytes()).build();
+    if (rop.hasResult()) {
+      if (rop.getResult().isRaw())
+        return Response.ok().entity(rop.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
+      else
+        return Response.ok().entity(rop.getResult().asJSON()).type(MediaType.APPLICATION_JSON).build();
     } else {
       log.error("R Script '{}' has result: {}, has raw result: {}", rScript, rop.hasResult(), rop.hasResult() && rop.getResult().isRaw());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();

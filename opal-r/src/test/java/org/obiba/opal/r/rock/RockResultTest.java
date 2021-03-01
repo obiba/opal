@@ -11,8 +11,6 @@
 package org.obiba.opal.r.rock;
 
 import com.google.common.collect.Lists;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.spi.r.RNamedList;
@@ -39,11 +37,11 @@ public class RockResultTest {
     boolean value = result.asLogical();
     Assert.assertTrue(value);
 
-    result = new RockResult(new JSONArray("[true, false]"));
+    result = new RockResult("[true, false]");
     value = result.asLogical();
     Assert.assertTrue(value);
 
-    result = new RockResult(new JSONObject("{ value: true }"));
+    result = new RockResult("{ value: true }");
     value = result.asLogical();
     Assert.assertTrue(value);
 
@@ -69,9 +67,7 @@ public class RockResultTest {
 
   @Test
   public void jsonArrayStringsTest() {
-    String source = "[\"a\", \"b\", \"c\"]";
-    JSONArray array = new JSONArray(source);
-    RockResult result = new RockResult(array);
+    RockResult result = new RockResult("[\"a\", \"b\", \"c\"]");
     Assert.assertTrue(result.isString());
     String[] values = result.asStrings();
     Assert.assertEquals(3, values.length);
@@ -82,9 +78,7 @@ public class RockResultTest {
 
   @Test
   public void jsonArrayIntegersTest() {
-    String source = "[1, 2, 3]";
-    JSONArray array = new JSONArray(source);
-    RockResult result = new RockResult(array);
+    RockResult result = new RockResult("[1, 2, 3]");
     Assert.assertTrue(result.isInteger());
     int[] values = result.asIntegers();
     Assert.assertEquals(3, values.length);
@@ -95,9 +89,7 @@ public class RockResultTest {
 
   @Test
   public void jsonArrayNumericTest() {
-    String source = "[1.1, 2.2, 3.3]";
-    JSONArray array = new JSONArray(source);
-    RockResult result = new RockResult(array);
+    RockResult result = new RockResult("[1.1, 2.2, 3.3]");
     Assert.assertTrue(result.isNumeric());
     double[] values = result.asDoubles();
     Assert.assertEquals(3, values.length);
@@ -108,9 +100,7 @@ public class RockResultTest {
 
   @Test
   public void jsonObjectNamedListTest() {
-    String source = "{ string: \"a\", integer: 1, numeric: 2.2, list: [\"b\", \"c\"], object: { data: \"d\" } }";
-    JSONObject object = new JSONObject(source);
-    RockResult result = new RockResult(object);
+    RockResult result = new RockResult("{ string: \"a\", integer: 1, numeric: 2.2, list: [\"b\", \"c\"], object: { data: \"d\" } }");
     Assert.assertTrue(result.isNamedList());
     String[] names = result.getNames();
     Assert.assertEquals(5, names.length);
@@ -135,12 +125,10 @@ public class RockResultTest {
 
   @Test
   public void jsonObjectNativeObjectTest() {
-    String source = "{ string: \"a\", integer: 1, numeric: 2.2, list: [\"b\", \"c\"], object: { data: \"d\" } }";
-    JSONObject object = new JSONObject(source);
-    RockResult result = new RockResult(object);
+    RockResult result = new RockResult("{ string: \"a\", integer: 1, numeric: 2.2, list: [\"b\", \"c\"], object: { data: \"d\" } }");
     Object obj = result.asNativeJavaObject();
     Assert.assertTrue(obj instanceof Map);
-    Map<String, Object> map = (Map<String, Object>)obj;
+    Map<String, Object> map = (Map<String, Object>) obj;
     Assert.assertTrue(map.get("string") instanceof String);
     Assert.assertTrue(map.get("integer") instanceof Integer);
     Assert.assertTrue(map.get("numeric") instanceof Double);

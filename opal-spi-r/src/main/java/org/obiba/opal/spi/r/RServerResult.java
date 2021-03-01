@@ -70,6 +70,8 @@ public interface RServerResult {
    */
   boolean asLogical();
 
+  String asJSON();
+
   /**
    * Check if the evaluation result is an array of strings.
    *

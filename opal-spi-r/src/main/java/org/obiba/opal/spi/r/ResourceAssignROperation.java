@@ -46,7 +46,7 @@ public class ResourceAssignROperation extends AbstractROperation {
           credentials.getIdentity() == null ? "NULL" : "'" + credentials.getIdentity() + "'",
           credentials.getSecret() == null ? "NULL" : "'" + credentials.getSecret() + "'",
           resource.getFormat() == null ? "NULL" : "'" + resource.getFormat() + "'");
-      eval(String.format("is.null(base::assign('%s', %s))", symbol, script), false);
+      eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
     } catch (URISyntaxException e) {
       throw new RRuntimeException(e);
     }
