@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -150,7 +151,16 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   }
 
   @Override
-  public Response getRCommandResult(String rid, boolean remove, boolean wait) {
+  public Response getRCommandResultRaw(String rid, boolean remove, boolean wait) {
+    return getRCommandResult(rid, remove, wait, true);
+  }
+
+    @Override
+  public Response getRCommandResultJSON(String rid, boolean remove, boolean wait) {
+      return getRCommandResult(rid, remove, wait, false);
+  }
+
+  private Response getRCommandResult(String rid, boolean remove, boolean wait, boolean serialize) {
     RCommand rCommand = getRServerSession().getRCommand(rid);
     Response resp = Response.noContent().build();
     if (!rCommand.isFinished()) {
@@ -169,15 +179,18 @@ public abstract class AbstractRSessionResource implements RSessionResource {
       }
     }
 
-    return getFinishedRCommandResult(rCommand, remove);
+    return getFinishedRCommandResult(rCommand, remove, serialize);
   }
 
-  private Response getFinishedRCommandResult(RCommand rCommand, boolean remove) {
+  private Response getFinishedRCommandResult(RCommand rCommand, boolean remove, boolean serialize) {
     Response resp = Response.noContent().build();
     if (rCommand.hasResult()) {
       ROperationWithResult rop = rCommand.asROperationWithResult();
-      if (rop.hasResult() && rop.getResult().isRaw()) {
-        resp = Response.ok().entity(rop.getResult().asBytes()).build();
+      if (rop.hasResult()) {
+        if (rop.getResult().isRaw())
+          resp = Response.ok().entity(rop.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
+        else
+          resp = Response.ok().entity(rop.getResult().asJSON()).type(MediaType.APPLICATION_JSON).build();
       }
     }
     if (remove) getRServerSession().removeRCommand(rCommand.getId());

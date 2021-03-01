@@ -68,7 +68,14 @@ public interface RSessionResource {
   @GET
   @Path("/command/{rid}/result")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
+  Response getRCommandResultRaw(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
+                             @QueryParam("wait") @DefaultValue("false") boolean wait);
+
+
+  @GET
+  @Path("/command/{rid}/result")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response getRCommandResultJSON(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
                              @QueryParam("wait") @DefaultValue("false") boolean wait);
 
   @POST
