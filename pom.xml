@@ -88,7 +88,7 @@
     <logback.version>1.1.3</logback.version>
     <logstash-logback.version>4.5.1</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>2.1.2</magma.version>
+    <magma.version>2.2.0</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>2.2.5</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
@@ -99,7 +99,7 @@
     <newrelic.version>3.20.0</newrelic.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>1.14.3</obiba-commons.version>
+    <obiba-commons.version>1.15.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
@@ -117,13 +117,13 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.12</slf4j.version>
     <snakeyaml.version>1.16</snakeyaml.version>
-    <spring.version>4.3.19.RELEASE</spring.version>
+    <spring.version>4.3.30.RELEASE</spring.version>
     <spring-batch.version>3.0.10.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
     <xmlunit.version>1.6</xmlunit.version>
-    <xstream.version>1.4.8</xstream.version>
+    <xstream.version>1.4.15</xstream.version>
 
     <!-- maven plugins -->
     <bintray-maven-plugin.version>1.2.20180117184439</bintray-maven-plugin.version>
@@ -1824,7 +1824,7 @@
     <repository>
       <id>obiba-releases</id>
       <name>Obiba Maven Releases Repository</name>
-      <url>https://dl.bintray.com/obiba/maven</url>
+      <url>https://obiba.jfrog.io/obiba/libs-release</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -1847,12 +1847,12 @@
 
   <distributionManagement>
     <repository>
-      <id>obiba-bintray</id>
-      <url>https://api.bintray.com/obiba/maven/</url>
+      <id>obiba-release-local</id>
+      <url>https://obiba.jfrog.io/obiba/libs-release-local</url>
     </repository>
     <snapshotRepository>
-      <id>obiba-artifactory</id>
-      <url>https://obiba.jfrog.io/obiba/libs-snapshot</url>
+      <id>obiba-snapshot-local</id>
+      <url>https://obiba.jfrog.io/obiba/libs-snapshot-local</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -1887,45 +1887,5 @@
       <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
     </license>
   </licenses>
-
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <!-- Disable default deployer. -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-
-          <!-- Enable alternative deployer. -->
-          <plugin>
-            <groupId>com.carrotgarden.maven</groupId>
-            <artifactId>bintray-maven-plugin</artifactId>
-            <configuration>
-              <skip>false</skip>
-              <subject>obiba</subject>
-              <repository>maven</repository>
-              <serverId>obiba-bintray</serverId>
-              <packageVcsUrl>https://github.com/obiba/onyx</packageVcsUrl>
-              <performCleanup>false</performCleanup>
-            </configuration>
-            <executions>
-              <!-- Activate "bintray:deploy" during "deploy" -->
-              <execution>
-                <goals>
-                  <goal>deploy</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
