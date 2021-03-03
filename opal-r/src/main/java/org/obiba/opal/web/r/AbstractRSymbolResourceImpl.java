@@ -124,7 +124,12 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   @Override
   public Response rm() {
-    rSession.execute(new RScriptROperation("base::rm(" + name + ")"));
+    try {
+      rSession.execute(new RScriptROperation("base::rm(`" + name + "`)"));
+      rSession.execute(new RScriptROperation("base::gc()"));
+    } catch (Exception e) {
+      // ignore
+    }
     return Response.ok().build();
   }
 
