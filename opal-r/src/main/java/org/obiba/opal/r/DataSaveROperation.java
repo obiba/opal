@@ -96,7 +96,7 @@ public class DataSaveROperation extends AbstractROperation {
     if (!isTibble) {
       throw new IllegalArgumentException(symbol + " is not a tibble.");
     }
-    eval(writeCmd.getCommand(symbol, path), false);
+    eval(String.format("base::is.null(%s)", writeCmd.getCommand(symbol, path)), false);
   }
 
   private String prepareDestinationInR() {

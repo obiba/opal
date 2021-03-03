@@ -39,10 +39,14 @@ class RockResult implements RServerResult {
   }
 
   public RockResult(String jsonSource) {
-    if (jsonSource.startsWith("["))
-      this.listResult = toList(new JSONArray(jsonSource));
+    if (jsonSource.equals("{}"))
+      jsonResult = null;
     else if (jsonSource.startsWith("{"))
       this.namedListResult = new RockNamedList(new JSONObject(jsonSource));
+    else if (jsonSource.startsWith("["))
+      this.listResult = toList(new JSONArray(jsonSource));
+    else
+      this.listResult = toList(new JSONArray(String.format("[%s]", jsonSource)));
     this.jsonResult = jsonSource;
   }
 

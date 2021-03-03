@@ -48,7 +48,7 @@ public class FolderReadROperation extends AbstractROperation {
           readFile(fileName, new File(destination, fileName));
       }
     } catch (Exception e) {
-      throw new MagmaRRuntimeException("Unable to retrieve content of the R folde: " + folderName, e);
+      throw new MagmaRRuntimeException("Unable to retrieve content of the R folder: " + folderName, e);
     }
   }
 

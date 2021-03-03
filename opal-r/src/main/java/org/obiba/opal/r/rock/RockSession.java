@@ -116,6 +116,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), String.class);
         String jsonSource = response.getBody();
+        log.trace("R expr: {}", expr);
+        log.trace("JSON result: {}", jsonSource);
         RServerResult rval = new RockResult(jsonSource);
         log.debug("eval: {}ms", System.currentTimeMillis()-start);
         return rval;
