@@ -37,7 +37,11 @@ public interface RSymbolResource {
 
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response getSymbol();
+  Response getSymbolBinary();
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  Response getSymbolJSON();
 
   @PUT
   @Consumes(MediaType.TEXT_PLAIN)

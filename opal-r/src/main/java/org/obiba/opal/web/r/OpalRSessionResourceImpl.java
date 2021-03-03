@@ -17,6 +17,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RSerialize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * Handles web services on a particular R session of the invoking Opal user.
@@ -38,12 +40,21 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
   private OpalRuntime opalRuntime;
 
   @Override
-  public Response execute(String script, boolean async, String body) {
+  public Response executeBinary(String script, boolean async, String body) {
+    return execute(script, async, body, RSerialize.RAW);
+  }
+
+  @Override
+  public Response executeJSON(String script, boolean async, String body) {
+    return execute(script, async, body, RSerialize.JSON);
+  }
+
+  private Response execute(String script, boolean async, String body, RSerialize serialize) {
     String rScript = script;
     if (Strings.isNullOrEmpty(rScript)) {
       rScript = body;
     }
-    return RSessionResourceHelper.executeScript(getRServerSession(), rScript, async);
+    return RSessionResourceHelper.executeScript(getRServerSession(), rScript, async, serialize);
   }
 
   @Override

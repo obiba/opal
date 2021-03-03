@@ -22,6 +22,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
+import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
@@ -95,14 +96,19 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   }
 
   @Override
-  public Response ls() {
-    return RSessionResourceHelper.executeScript(rSession, "base::ls()");
+  public Response lsBinary() {
+    return RSessionResourceHelper.executeScript(rSession, "base::ls()", RSerialize.RAW);
+  }
+
+  @Override
+  public Response lsJSON() {
+    return RSessionResourceHelper.executeScript(rSession, "base::ls()", RSerialize.JSON);
   }
 
   @Override
   public Response assign(MultivaluedMap<String, String> symbols) {
     rSession.execute(new StringAssignROperation(symbols));
-    return ls();
+    return lsBinary();
   }
 
   @Override

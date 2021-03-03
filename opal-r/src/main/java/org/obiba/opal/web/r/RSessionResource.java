@@ -42,7 +42,12 @@ public interface RSessionResource {
   @GET
   @Path("/symbols")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response ls();
+  Response lsBinary();
+
+  @GET
+  @Path("/symbols")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response lsJSON();
 
   @POST
   @Path("/symbols")

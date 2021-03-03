@@ -18,6 +18,7 @@ import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RSerialize;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
@@ -79,8 +80,13 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public Response getSymbol() {
-    return RSessionResourceHelper.executeScript(rSession, name);
+  public Response getSymbolBinary() {
+    return RSessionResourceHelper.executeScript(rSession, name, RSerialize.RAW);
+  }
+
+  @Override
+  public Response getSymbolJSON() {
+    return RSessionResourceHelper.executeScript(rSession, name, RSerialize.JSON);
   }
 
   @Override

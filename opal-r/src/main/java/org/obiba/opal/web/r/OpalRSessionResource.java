@@ -21,8 +21,14 @@ public interface OpalRSessionResource extends RSessionResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response execute(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
+  Response executeBinary(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
                    String body);
+
+  @POST
+  @Path("/execute")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response executeJSON(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
+                         String body);
 
 
   /**

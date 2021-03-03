@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.r;
 
-import org.obiba.opal.spi.r.RASyncOperationTemplate;
-import org.obiba.opal.spi.r.ROperationTemplate;
-import org.obiba.opal.spi.r.ROperationWithResult;
-import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +30,9 @@ class RSessionResourceHelper {
    * @param script
    * @return
    */
-  static Response executeScript(ROperationTemplate ropTemplate, String script, boolean async) {
+  static Response executeScript(ROperationTemplate ropTemplate, String script, boolean async, RSerialize serialize) {
     if (script == null) return Response.status(Status.BAD_REQUEST).build();
-    return executeScript(ropTemplate, new RScriptROperation(script), async);
+    return executeScript(ropTemplate, new RScriptROperation(script, serialize), async);
   }
 
   static Response executeScript(ROperationTemplate ropTemplate, ROperationWithResult rop, boolean async) {
@@ -44,16 +41,19 @@ class RSessionResourceHelper {
       return Response.ok().entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
     } else {
       ropTemplate.execute(rop);
-      if (rop.hasResult() && rop.getResult().isRaw()) {
-        return Response.ok().entity(rop.getResult().asBytes()).build();
+      if (rop.hasResult()) {
+        if (rop.getResult().isRaw())
+          return Response.ok().entity(rop.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
+        else
+          return Response.ok().entity(rop.getResult().asJSON()).type(MediaType.APPLICATION_JSON).build();
       }
       log.error("R Script '{}' has result: {}, has raw result: {}", rop, rop.hasResult(), rop.hasResult() && rop.getResult().isRaw());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
-  static Response executeScript(ROperationTemplate ropTemplate, String script) {
-    return executeScript(ropTemplate, script, false);
+  static Response executeScript(ROperationTemplate ropTemplate, String script, RSerialize serialize) {
+    return executeScript(ropTemplate, script, false, serialize);
   }
 
 }
