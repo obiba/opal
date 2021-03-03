@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.r;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
@@ -18,7 +17,6 @@ import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
-import org.obiba.opal.spi.r.REvaluationRuntimeException;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.Apps;
@@ -99,19 +97,6 @@ public class Dtos {
         .setLastAccessDate(DateTimeType.get().valueOf(new Date(workspace.lastModified())).toString()) //
         .setContext(executionContext) //
         .setSize(size) //
-        .build();
-  }
-
-
-  public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,
-                                                  REvaluationRuntimeException exception) {
-    String message = exception.getMessage() + ": " + Joiner.on("; ").join(exception.getRMessages());
-
-    return Ws.ClientErrorDto.newBuilder()
-        .setStatus("RServerRuntimeError")
-        .setCode(status.getStatusCode())
-        .addArguments(message.replace("\n", "").replace("\r", ""))
-        .addExtension(OpalR.REvaluationRuntimeErrorDto.errors, OpalR.REvaluationRuntimeErrorDto.newBuilder().build())
         .build();
   }
 

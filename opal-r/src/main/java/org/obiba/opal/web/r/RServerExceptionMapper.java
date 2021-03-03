@@ -23,11 +23,18 @@ public class RServerExceptionMapper implements ExceptionMapper<RServerException>
 
   @Override
   public Response toResponse(RServerException exception) {
-    return Response
-        .status(Status.INTERNAL_SERVER_ERROR)
-        .type("application/x-protobuf+json")
-        .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
-        .build();
+    if (exception.isClientError())
+      return Response
+          .status(Status.BAD_REQUEST)
+          .type("application/x-protobuf+json")
+          .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, exception))
+          .build();
+    else
+      return Response
+          .status(Status.INTERNAL_SERVER_ERROR)
+          .type("application/x-protobuf+json")
+          .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
+          .build();
   }
 
 }

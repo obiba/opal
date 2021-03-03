@@ -53,7 +53,7 @@ class RserveConnection implements RServerConnection {
       connection.assign(symbol, new REXPRaw(rawContent));
       connection.eval(String.format("is.null(base::assign('%s', value=unserialize(%s)))", symbol, symbol));
     } catch (RserveException e) {
-      throw new RServerException(e);
+      throw new RserveServerException(e);
     }
   }
 
@@ -62,7 +62,7 @@ class RserveConnection implements RServerConnection {
     try {
       connection.assign(symbol, content);
     } catch (RserveException e) {
-      throw new RServerException(e);
+      throw new RserveServerException(e);
     }
   }
 
@@ -122,11 +122,11 @@ class RserveConnection implements RServerConnection {
       REXP rexp = connection.eval(expr);
       if (rexp.inherits("try-error")) {
         // Deal with an error
-        throw new REvaluationRuntimeException("Error while evaluating '" + expr + "'", getRMessages(rexp));
+        throw new RserveClientException("Error while evaluating '" + expr + "'", getRMessages(rexp));
       }
       return rexp;
     } catch (RserveException e) {
-      throw new RServerException(e);
+      throw new RserveServerException(e);
     }
   }
 

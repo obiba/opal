@@ -11,6 +11,7 @@
 package org.obiba.opal.r.rock;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -73,7 +75,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
       restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
     } catch (RestClientException e) {
-      throw new RServerException("Assign R data failed", e);
+      throw new RockServerException("Assign R data failed", e);
     }
   }
 
@@ -91,7 +93,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
       restTemplate.exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(content, headers), String.class);
     } catch (RestClientException e) {
-      throw new RServerException("Assign R expression failed", e);
+      throw new RockServerException("Assign R expression failed", e);
     }
   }
 
@@ -107,7 +109,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     try {
       if (RSerialize.RAW == serialize) {
         // accept application/octet-stream
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
+        headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
         ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
         log.debug("eval: {}ms", System.currentTimeMillis()-start);
         return new RockResult(response.getBody());
@@ -123,7 +125,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         return rval;
       }
     } catch (RestClientException e) {
-      throw new RServerException("Eval R expression failed", e);
+      throw new RockServerException("Error while evaluating '" + expr + "'", e);
     }
   }
 
@@ -146,10 +148,10 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       ResponseEntity<String> response = restTemplate.postForEntity(builder.toUriString(), requestEntity, String.class);
       if (!response.getStatusCode().is2xxSuccessful()) {
         log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
-        throw new RServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
+        throw new RockServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
       }
     } catch (RestClientException e) {
-      throw new RServerException("File upload failed", e);
+      throw new RockServerException("File upload failed", e);
     }
   }
 
@@ -179,7 +181,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
             return null;
           });
     } catch (RestClientException e) {
-      throw new RServerException("File download failed", e);
+      throw new RockServerException("File download failed", e);
     }
   }
 
@@ -229,7 +231,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       RockSessionInfo info = response.getBody();
       this.rockSessionId = info.getId();
     } catch (RestClientException e) {
-      throw new RServerException("Failure when opening a Rock R session", e);
+      throw new RockServerException("Failure when opening a Rock R session", e);
     }
   }
 
@@ -239,7 +241,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionResourceUrl(""), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       return response.getBody();
     } catch (RestClientException e) {
-      throw new RServerException("Failure when accessing a Rock R session", e);
+      throw new RockServerException("Failure when accessing a Rock R session", e);
     }
   }
 

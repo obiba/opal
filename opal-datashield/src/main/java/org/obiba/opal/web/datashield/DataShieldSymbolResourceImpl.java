@@ -72,8 +72,13 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   }
 
   @Override
-  public Response getSymbol() {
-    return Response.noContent().build();
+  public Response getSymbolBinary() {
+    return Response.status(Status.FORBIDDEN).build();
+  }
+
+  @Override
+  public Response getSymbolJSON() {
+    return Response.status(Status.FORBIDDEN).build();
   }
 
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {

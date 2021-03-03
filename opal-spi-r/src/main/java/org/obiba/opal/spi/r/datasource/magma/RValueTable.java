@@ -10,7 +10,6 @@
 
 package org.obiba.opal.spi.r.datasource.magma;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
@@ -140,10 +139,9 @@ public class RValueTable extends AbstractValueTable {
   private ROperationWithResult doExecute(ROperationWithResult rop) {
     try {
       getRSession().execute(rop);
-    } catch (REvaluationRuntimeException e) {
-      String rmsg = Joiner.on("; ").join(e.getRMessages());
-      log.error("R operation failed: {}", rmsg, e);
-      throw new MagmaRRuntimeException(rmsg);
+    } catch (Exception e) {
+      log.error("R operation failed: {}", e.getMessage(), e);
+      throw new MagmaRRuntimeException(e.getMessage());
     }
     return rop;
   }

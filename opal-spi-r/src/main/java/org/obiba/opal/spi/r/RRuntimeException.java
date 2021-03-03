@@ -24,4 +24,8 @@ public class RRuntimeException extends RuntimeException {
     super(cause.getMessage(), cause);
   }
 
+  public boolean isClientError() {
+    return (getCause() != null && getCause() instanceof RServerException && ((RServerException) getCause()).isClientError());
+  }
+
 }

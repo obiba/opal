@@ -66,12 +66,6 @@ message RWorkspaceDto {
   required int64 size = 5;
 }
 
-message REvaluationRuntimeErrorDto {
-  extend Ws.ClientErrorDto {
-    repeated REvaluationRuntimeErrorDto errors = 2000;
-  }
-}
-
 message RRuntimeErrorDto {
   extend Ws.ClientErrorDto {
     repeated RRuntimeErrorDto errors = 2001;

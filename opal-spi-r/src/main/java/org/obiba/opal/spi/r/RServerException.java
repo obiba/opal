@@ -10,7 +10,7 @@
 
 package org.obiba.opal.spi.r;
 
-public class RServerException extends Exception {
+public abstract class RServerException extends Exception {
 
     public RServerException(String msg) {
         super(msg);
@@ -23,4 +23,6 @@ public class RServerException extends Exception {
     public RServerException(Throwable throwable) {
         super(throwable);
     }
+
+    public abstract boolean isClientError();
 }
