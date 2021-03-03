@@ -305,7 +305,7 @@ locales:
 # Plugins
 #
 
-plugins: vcf-plugin search-plugin datasource-plugins analysis-plugins resource-plugins
+plugins: search-plugin datasource-plugins analysis-plugins
 
 vcf-plugin: jennite
 
@@ -322,9 +322,6 @@ datasource-plugins:
 
 analysis-plugins:
 	$(call install-plugin,opal-analysis-validate)
-
-resource-plugins:
-	$(call install-plugin,opal-resource-commons)
 
 plugin:
 	$(call install-plugin,${p})
