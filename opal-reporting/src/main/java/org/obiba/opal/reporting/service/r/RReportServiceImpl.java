@@ -15,8 +15,8 @@ import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.spi.r.FileReadROperation;
@@ -32,6 +32,9 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -136,15 +139,12 @@ public class RReportServiceImpl implements ReportService {
     }
   }
 
-  private void prepareRSession(RServerSession rSession, Map<String, String> parameters, File reportDesignFile)
-      throws IOException {
-    // copy all Rmd files to the work directory of the R server
-    File[] files = reportDesignFile.getParentFile().listFiles(pathname -> pathname.getName().endsWith(".Rmd"));
-    if (files != null) {
-      for (File file : files) {
-        writeFileToR(rSession, file);
-      }
-    }
+  private void prepareRSession(RServerSession rSession, Map<String, String> parameters, File reportDesignFile) throws IOException {
+    File parentFile = reportDesignFile.getParentFile();
+    Files.find(Paths.get(parentFile.getPath()),
+        Integer.MAX_VALUE,
+        (filePath, fileAttr) -> fileAttr.isRegularFile())
+        .forEach(path -> writeFileToR(rSession, parentFile, path));
     ensurePackage(rSession, "opalr");
     ensurePackage(rSession, "ggplot2");
     String options = buildOptions(parameters);
@@ -188,11 +188,13 @@ public class RReportServiceImpl implements ReportService {
    * Write file content to R side.
    *
    * @param rSession
-   * @param file
+   * @param parentFile
+   * @param path
    * @throws IOException
    */
-  private void writeFileToR(RServerSession rSession, File file) throws IOException {
-    FileWriteROperation rop = new FileWriteROperation(file.getName(), file);
+  private void writeFileToR(RServerSession rSession, File parentFile, Path path) {
+    String destination = path.toString().replaceFirst(parentFile.getPath() + "/", "");
+    FileWriteROperation rop = new FileWriteROperation(destination, path.toFile());
     rSession.execute(rop);
   }
 
@@ -204,12 +206,12 @@ public class RReportServiceImpl implements ReportService {
    * @return
    * @throws REXPMismatchException
    */
-  private void readFileFromR(RServerSession rSession, String name, String reportOutput) throws REXPMismatchException {
+  private void readFileFromR(RServerSession rSession, String name, String reportOutput) {
     FileReadROperation rop = new FileReadROperation(name, new File(reportOutput));
     rSession.execute(rop);
   }
 
   private List<String> getDefaultRepos() {
-    return Lists.newArrayList(defaultRepos.split(",")).stream().map(r -> r.trim()).collect(Collectors.toList());
+    return Lists.newArrayList(defaultRepos.split(",")).stream().map(String::trim).collect(Collectors.toList());
   }
 }
