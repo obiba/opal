@@ -157,6 +157,8 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
               return "RSPSSFileRequired";
             case RSTATA:
               return "RStataFileRequired";
+            case RDS:
+              return "RDSFileRequired";
           }
           return "";
         }
@@ -182,6 +184,8 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
             return path.endsWith(".sas7bdat");
           if (ImportFormat.RXPT.equals(importFormat))
             return path.endsWith(".xpt");
+          if (ImportFormat.RDS.equals(importFormat))
+            return path.endsWith(".rds");
           return path.endsWith(".dta");
         }
       };

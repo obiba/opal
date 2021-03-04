@@ -724,7 +724,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
       String ext = outputFile.getName().getExtension();
-      if ("sav".equals(ext) || "zsav".equals(ext) || "sas7bdat".equals(ext) || "dta".equals(ext) || "xpt".equals(ext)) {
+      if ("sav".equals(ext) || "zsav".equals(ext) || "sas7bdat".equals(ext) || "dta".equals(ext) || "xpt".equals(ext) || "rds".equals(ext)) {
         final RServerSession rSession = opalRSessionManager.newSubjectRSession();
         rSession.setExecutionContext("Export");
         RSessionHandler sessionHandler = new RSessionHandler() {

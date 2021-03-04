@@ -82,6 +82,14 @@
               </ui:msg>
             </b:HelpBlock>
           </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRDSHaven" visible="false">
+            <b:HelpBlock>
+              <ui:msg description="RHaven information">This format expects the file to be a valid RDS file
+                containing an R object of tibble class. This import procedure requires a functional R server with the
+                <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> package installed.
+              </ui:msg>
+            </b:HelpBlock>
+          </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpOpalRest" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="Opal REST Information">This format imports variable dictionaries and data from a

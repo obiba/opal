@@ -281,6 +281,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         case RSAS:
         case RXPT:
         case RSTATA:
+        case RDS:
           rHavenStepPresenter.setImportFormat(format);
           formatStepPresenter = rHavenStepPresenter;
           getView().setFormatStepDisplay(rHavenStepPresenter.getView());
@@ -318,6 +319,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case RSAS:
       case RXPT:
       case RSTATA:
+      case RDS:
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
       case FROM_PLUGIN:
@@ -417,6 +419,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           case RSAS:
           case RXPT:
           case RSTATA:
+          case RDS:
             entries = rHavenStepPresenter.getErrors().entrySet();
             break;
         }

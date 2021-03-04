@@ -135,6 +135,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     dataFormat.addItemToGroup(translations.rSASLabel(), ImportConfig.ImportFormat.RSAS.name());
     dataFormat.addItemToGroup(translations.rXPTLabel(), ImportConfig.ImportFormat.RXPT.name());
     dataFormat.addItemToGroup(translations.rStataLabel(), ImportConfig.ImportFormat.RSTATA.name());
+    dataFormat.addItemToGroup(translations.rDSLabel(), ImportConfig.ImportFormat.RDS.name());
     dataFormat.addGroup(translations.remoteServerBasedDatasources());
     dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
 
@@ -302,6 +303,8 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
       return fileSelection.getFile() + suffix + ".xpt";
     } else if(ImportConfig.ImportFormat.RSTATA.name().equals(getDataFormat())) {
       return fileSelection.getFile() + suffix + ".dta";
+    } else if(ImportConfig.ImportFormat.RDS.name().equals(getDataFormat())) {
+      return fileSelection.getFile() + suffix + ".rds";
     }
 
     return fileSelection.getFile() + suffix;

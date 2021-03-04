@@ -38,6 +38,8 @@ public class DataSaveROperation extends AbstractROperation {
       }
     },
 
+    RDS("base::saveRDS", "rds"),
+
     CSV("utils::write.table", "csv", "tsv") {
       @Override
       public String getCommand(String symbol, String path) {
@@ -64,7 +66,7 @@ public class DataSaveROperation extends AbstractROperation {
     public static WriteCmd forPath(String path) {
       for (WriteCmd cmd : WriteCmd.values()) {
         for (String extension : cmd.extensions) {
-          if (path.endsWith("." + extension)) return cmd;
+          if (path.toLowerCase().endsWith("." + extension)) return cmd;
         }
       }
       throw new IllegalArgumentException("Cannot find a R writer for file: " + path);

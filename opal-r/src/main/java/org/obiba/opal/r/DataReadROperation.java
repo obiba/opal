@@ -33,7 +33,9 @@ public class DataReadROperation extends AbstractROperation {
       public String getCommand(DataReadROperation op) {
         return String.format("%s('%s', user_na = TRUE)", command, op.source);
       }
-    };
+    },
+
+    RDS("base::readRDS", "rds");
 
     protected final String command;
 
@@ -53,7 +55,7 @@ public class DataReadROperation extends AbstractROperation {
     public static ReadCmd forPath(String path) {
       for (ReadCmd cmd : ReadCmd.values()) {
         for (String extension : cmd.extensions) {
-          if (path.endsWith("." + extension)) return cmd;
+          if (path.toLowerCase().endsWith("." + extension)) return cmd;
         }
       }
       throw new IllegalArgumentException("Cannot find a R reader for file: " + path);

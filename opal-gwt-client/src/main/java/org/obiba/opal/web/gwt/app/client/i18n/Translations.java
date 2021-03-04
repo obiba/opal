@@ -897,6 +897,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Data in Stata format are packaged in a file with suffix .dta.")
   String rStataHelp();
 
+  @Description("RDS label")
+  @DefaultStringValue("RDS (R)")
+  String rDSLabel();
+
+  @Description("RDS help")
+  @DefaultStringValue("Data in RDS format (serialized single R object) are packaged in a file with suffix .rds.")
+  String rDSHelp();
+
   @Description("Opal REST label")
   @DefaultStringValue("Opal")
   String opalRestLabel();

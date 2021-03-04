@@ -113,6 +113,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   FlowPanel helpRStataHaven;
 
   @UiField
+  FlowPanel helpRDSHaven;
+
+  @UiField
   FlowPanel helpOpalRest;
 
   @UiField
@@ -223,6 +226,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.rSASLabel(), ImportFormat.RSAS.name());
     formatChooser.addItemToGroup(translations.rXPTLabel(), ImportFormat.RXPT.name());
     formatChooser.addItemToGroup(translations.rStataLabel(), ImportFormat.RSTATA.name());
+    formatChooser.addItemToGroup(translations.rDSLabel(), ImportFormat.RDS.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
     formatChooser.addItemToGroup(translations.sqlLabel(), ImportFormat.JDBC.name());
@@ -439,6 +443,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
           break;
         case RSTATA:
           helpRStataHaven.setVisible(true);
+          break;
+        case RDS:
+          helpRDSHaven.setVisible(true);
           break;
       }
     }

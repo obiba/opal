@@ -26,7 +26,7 @@ public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, REST, JDBC, RSPSS, RZSPSS, RSAS, RXPT, RSTATA, FROM_PLUGIN
+    CSV, EXCEL, XML, REST, JDBC, RSPSS, RZSPSS, RSAS, RXPT, RSTATA, RDS, FROM_PLUGIN
 
   }
 
