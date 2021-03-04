@@ -9,10 +9,9 @@
  */
 package org.obiba.opal.core.security;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
 
 /**
  * Converts opal administration related resources permissions from opal domain to magma domain.
@@ -22,8 +21,8 @@ public class RPermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
-    for(Permission perm : Permission.values()) {
-      if(perm.toString().equals(action.toString())) {
+    for (Permission perm : Permission.values()) {
+      if (perm.toString().equals(action.toString())) {
         return true;
       }
     }
@@ -39,8 +38,8 @@ public class RPermissionConverter extends OpalPermissionConverter {
     R_USE {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/r/session", "*:GET/*"), //
-            toRest("/service/r/workspaces", "GET"), //
+        return Lists.newArrayList(toRest("/r/session", "*:GET/*"),
+            toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"));
       }
     };
