@@ -27,88 +27,76 @@
             </ui:msg>
         </b:Paragraph>
 
-        <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
-            <g:Anchor>
-                <ui:msg description="Apps list label">Apps</ui:msg>
-            </g:Anchor>
-            <g:FlowPanel>
-                <b:ButtonGroup>
-                    <b:Button ui:field="refresh" icon="REFRESH">
-                        <ui:msg description="Refresh apps label">Refresh</ui:msg>
-                    </b:Button>
-                </b:ButtonGroup>
-                <o:OpalSimplePager ui:field="appsPager" location="RIGHT" addStyleNames="small-indent pull-right"/>
-                <o:Table ui:field="appsTable" addStyleNames="small-top-margin" pageSize="20"/>
-            </g:FlowPanel>
+        <b:Heading size="4">
+            <ui:msg description="Apps registry label">Apps Registry</ui:msg>
+        </b:Heading>
+        <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+            <b:ButtonGroup>
+                <b:Button ui:field="refresh" icon="REFRESH">
+                    <ui:msg description="Refresh apps label">Refresh</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <o:OpalSimplePager ui:field="appsPager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+            <o:Table ui:field="appsTable" addStyleNames="small-top-margin" pageSize="20"/>
+        </g:FlowPanel>
 
-            <g:Anchor>
-                <ui:msg description="Apps config label">Configuration</ui:msg>
-            </g:Anchor>
-            <g:FlowPanel>
-                <b:Heading size="4">
-                    <ui:msg description="Apps self registration label">Self-registration</ui:msg>
-                </b:Heading>
-                <b:Paragraph>
-                    <ui:msg description="Apps config self-registration">
-                        To register itself, an application must provide the following registration token in its request
-                        (see <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-                                target="_blank">Applications Administration
-                    </a> documentation).
-                    </ui:msg>
-                    <g:HTMLPanel addStyleNames="top-margin" ui:field="tokenPanel">
-                        <code>
-                            <g:InlineLabel ui:field="token"></g:InlineLabel>
-                        </code>
-                    </g:HTMLPanel>
-                    <g:FlowPanel>
-                        <b:Button ui:field="editToken" type="INFO" icon="PENCIL" addStyleNames="large-top-margin">
-                            <ui:msg description="Edit label">Edit</ui:msg>
-                        </b:Button>
-                    </g:FlowPanel>
+        <b:Heading size="4">
+            <ui:msg description="Apps self registration label">Self-registration</ui:msg>
+        </b:Heading>
+        <b:Paragraph>
+            <ui:msg description="Apps config self-registration">
+                To register itself, an application must provide the following registration token in its request
+                (see <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+                        target="_blank">Applications Administration
+            </a> documentation).
+            </ui:msg>
+        </b:Paragraph>
+        <g:HTMLPanel addStyleNames="top-margin" ui:field="tokenPanel">
+            <code>
+                <g:InlineLabel ui:field="token"></g:InlineLabel>
+            </code>
+        </g:HTMLPanel>
+        <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+            <b:Button ui:field="editToken" type="INFO" icon="PENCIL" addStyleNames="large-top-margin">
+                <ui:msg description="Edit label">Edit</ui:msg>
+            </b:Button>
+        </g:FlowPanel>
 
-                </b:Paragraph>
+        <b:Heading size="4">
+            <ui:msg description="Apps discovery label">Discovery</ui:msg>
+        </b:Heading>
+        <b:Paragraph>
+            <ui:msg description="Apps discovery help">
+                Applications can be discovered at runtime (see <a
+                    href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+                    target="_blank">Applications Administration
+            </a> documentation).
+                When discovered, the application is automatically registered. Then periodical checks are
+                performed: if the application cannot be reached or reports to be dysfunctional, it is
+                automatically unregistered.
+            </ui:msg>
+        </b:Paragraph>
+        <b:Heading size="5">
+            <ui:msg description="Rock apps discovery label">Rock</ui:msg>
+        </b:Heading>
+        <b:Paragraph>
+            <ui:msg description="Rock apps discovery help">
+                <b>Rock</b>
+                is an R server with a REST API (see <a href="https://rockdoc.obiba.org/" target="_blank">
+                OBiBa/Rock
+            </a> project).
+                Adding more Rock apps instances allows to scale up the R analysis capacity.
+            </ui:msg>
+        </b:Paragraph>
 
-                <b:Heading size="4">
-                    <ui:msg description="Apps discovery label">Discovery</ui:msg>
-                </b:Heading>
-                <b:Paragraph>
-                    <ui:msg description="Apps discovery help">
-                        Applications can be discovered at runtime (see <a
-                            href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-                            target="_blank">Applications Administration
-                    </a> documentation).
-                        When discovered, the application is automatically registered. Then periodical checks are
-                        performed: if the application cannot be reached or reports to be dysfunctional, it is
-                        automatically unregistered.
-                    </ui:msg>
-                </b:Paragraph>
-                <b:Heading size="5">
-                    <ui:msg description="Rock apps discovery label">Rock</ui:msg>
-                </b:Heading>
-                <b:Paragraph>
-                    <ui:msg description="Rock apps discovery help">
-                        <b>Rock</b>
-                        is a R server with a REST API (see <a href="https://github.com/obiba/rock" target="_blank">
-                        OBiBa/Rock
-                    </a> project).
-                        Adding more Rock apps instances allows to scale up the R analysis capacity.
-                    </ui:msg>
-                </b:Paragraph>
-
-                <g:FlowPanel addStyleNames="small-bottom-margin">
-                    <b:ButtonGroup>
-                        <b:Button type="INFO" icon="PLUS" ui:field="addRockConfig">
-                            <ui:msg description="Add label">Add</ui:msg>
-                        </b:Button>
-                    </b:ButtonGroup>
-                </g:FlowPanel>
-                <o:Table ui:field="rockConfigsTable" pageSize="100"/>
-
-            </g:FlowPanel>
-
-
-        </o:NavTabsPanel>
-
+        <g:FlowPanel addStyleNames="small-bottom-margin">
+            <b:ButtonGroup>
+                <b:Button type="INFO" icon="PLUS" ui:field="addRockConfig">
+                    <ui:msg description="Add label">Add</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+        </g:FlowPanel>
+        <o:Table ui:field="rockConfigsTable" pageSize="100"/>
 
     </g:FlowPanel>
 
