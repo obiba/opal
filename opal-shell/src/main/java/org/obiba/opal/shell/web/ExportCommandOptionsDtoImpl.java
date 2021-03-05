@@ -115,6 +115,16 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public String getEntityIdNames() {
+    return dto.getEntityIdNames();
+  }
+
+  @Override
+  public boolean isEntityIdNames() {
+    return dto.hasEntityIdNames();
+  }
+
+  @Override
   public String getName() {
     return dto.getDestinationTableName();
   }

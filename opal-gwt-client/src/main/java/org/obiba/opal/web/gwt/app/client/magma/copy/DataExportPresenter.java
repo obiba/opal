@@ -247,17 +247,17 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   @Override
-  public void onSubmit(String dataFormat, String out, String idMapping) {
+  public void onSubmit(String dataFormat, String out, String idMapping, String idColumn) {
     getView().hideDialog();
 
     UriBuilder uriBuilder = UriBuilders.PROJECT_COMMANDS_EXPORT.create();
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasourceName)).post() //
         .withResourceBody(
-            ExportCommandOptionsDto.stringify(createExportCommandOptions(dataFormat, out, idMapping))) //
+            ExportCommandOptionsDto.stringify(createExportCommandOptions(dataFormat, out, idMapping, idColumn))) //
         .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(out)).send();
   }
 
-  private ExportCommandOptionsDto createExportCommandOptions(String dataFormat, String out, String idMapping) {
+  private ExportCommandOptionsDto createExportCommandOptions(String dataFormat, String out, String idMapping, String idColumn) {
     ExportCommandOptionsDto dto = ExportCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
@@ -272,6 +272,9 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     dto.setNonIncremental(true);
     dto.setNoVariables(false);
     dto.setCopyNullValues(true);
+    if (!Strings.isNullOrEmpty(idColumn)) {
+      dto.setEntityIdNames(idColumn);
+    }
     if(idMapping != null) {
       IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
       idConfig.setName(idMapping);

@@ -115,10 +115,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private Map<String, String> entityIdMap;
 
   @Value("${org.obiba.magma.entityIdNames}")
-  private String entityIdNames;
+  private String defaultEntityIdNames;
 
   @Value("${org.obiba.magma.entityIdName}")
-  private String entityIdName;
+  private String defaultEntityIdName;
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
@@ -220,10 +220,20 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private Map<String, String> getEntityIdMap() {
     if (entityIdMap == null) {
       entityIdMap = Maps.newHashMap();
+
+      String entityIdNames = null;
+      if (options.isEntityIdNames())
+        entityIdNames = options.getEntityIdNames();
+      if (Strings.isNullOrEmpty(entityIdNames))
+        entityIdNames = defaultEntityIdNames;
+
       if (!Strings.isNullOrEmpty(entityIdNames))
         Splitter.on(",").split(entityIdNames).forEach(token -> {
           String[] entry = token.trim().split("=");
-          if (entry.length == 2) entityIdMap.put(entry[0].trim(), entry[1].trim());
+          if (entry.length == 2)
+            entityIdMap.put(entry[0].trim(), entry[1].trim());
+          else
+            entityIdMap.put("Participant", token.trim());
         });
     }
     return entityIdMap;
@@ -350,6 +360,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       RExportDatasource ds = new RExportDatasource(rDatasourceFactory.create().getName(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
+      ds.setEntityIdName(getEntityIdMap().getOrDefault("Participant", defaultEntityIdName));
       return ds;
     } else {
       return datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters).create();
@@ -629,7 +640,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       CsvDatasource ds = new CsvDatasource(directory.getName());
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
-      ds.setEntityIdName(entityIdName);
+      ds.setEntityIdName(defaultEntityIdName);
       for (ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
         if (tableDir.exists() || tableDir.mkdir()) {
@@ -664,7 +675,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       CsvDatasource ds = new CsvDatasource(name);
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
-      ds.setEntityIdName(entityIdName);
+      ds.setEntityIdName(defaultEntityIdName);
       // one table only
       Set<ValueTable> tables = getValueTables();
       if (tables.size() > 1) {

@@ -51,6 +51,10 @@ public interface CopyCommandOptions extends HelpOption {
 
   boolean isOutFormat();
 
+  String getEntityIdNames();
+
+  boolean isEntityIdNames();
+
   //
   // Table transformation
   //

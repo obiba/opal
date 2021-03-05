@@ -9,14 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
-import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.*;
+
 import java.util.Date;
 
 import java.util.Map;
@@ -46,10 +46,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
@@ -88,6 +84,12 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @UiField
   Panel destinationFolder;
+
+  @UiField
+  Panel idGroup;
+
+  @UiField
+  TextBox idColumn;
 
   @UiField
   Panel destinationDatabase;
@@ -154,6 +156,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
         pluginsFormatContainer.clear();
 
         destinationFolder.setVisible(!fromPluginSource && fileBased);
+        idGroup.setVisible(fromPluginSource || fileBased);
         destinationDatabase.setVisible(!fromPluginSource && !fileBased);
         pluginsFormatContainer.setVisible(fromPluginSource);
 
@@ -201,11 +204,11 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
         }
       } else {
         JSONObject model = JsonSchemaGWT.getModel(pluginsFormatContainer);
-        getUiHandlers().onSubmit(getDataFormat(), model.toString(), getSelectedIdentifiersMapping());
+        getUiHandlers().onSubmit(getDataFormat(), model.toString(), getSelectedIdentifiersMapping(), idColumn.getText());
       }
     } else {
       getUiHandlers().onSubmit(getDataFormat(), isFileBasedDataFormat() ? getOutFile() : getSelectedDatabase(),
-          getSelectedIdentifiersMapping());
+          getSelectedIdentifiersMapping(), idColumn.getText());
     }
   }
 

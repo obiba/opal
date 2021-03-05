@@ -20,6 +20,7 @@ public interface DataExportUiHandlers extends ModalUiHandlers {
    * @param dataFormat
    * @param out Destination folder or database depending on the data format.
    * @param idMapping
+   * @param idColumn Entity ID column name.
    */
-  void onSubmit(String dataFormat, String out, String idMapping);
+  void onSubmit(String dataFormat, String out, String idMapping, String idColumn);
 }

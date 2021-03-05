@@ -76,6 +76,7 @@ message ExportCommandOptionsDto {
   optional Identifiers.IdentifiersMappingConfigDto idConfig = 11;
   optional string query = 12;
   optional bool multilines = 13 [default = true];
+  optional string entityIdNames = 14;
 }
 
 message ReportCommandOptionsDto {
