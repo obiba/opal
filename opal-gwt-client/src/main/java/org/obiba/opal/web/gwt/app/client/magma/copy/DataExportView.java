@@ -328,7 +328,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @Override
   public void setFileBaseName(String fileBaseName) {
-    this.fileBaseName = fileBaseName;
+    this.fileBaseName = fileBaseName.replaceAll("\\.", "_");
   }
 
   @Override
