@@ -124,6 +124,13 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
       }
     }, translations.typeLabel());
 
+    appsTable.addColumn(new TextColumn<AppDto>() {
+      @Override
+      public String getValue(AppDto dto) {
+        return dto.getCluster();
+      }
+    }, translations.clusterLabel());
+
     appsTable.addColumn(new URLColumn<AppDto>() {
 
       @Override
