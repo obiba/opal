@@ -108,16 +108,25 @@ public class RServerCluster implements RServerClusterService {
   @Override
   public RServerState getState() {
     RServerClusterState state = new RServerClusterState(getName());
-    rServerServices.stream().map(RServerService::getState).forEach(s -> {
-      state.setVersion(s.getVersion());
-      if (!state.isRunning())
-        state.setRunning(state.isRunning());
-      state.addTags(s.getTags());
-      state.addRSessionsCount(s.getRSessionsCount());
-      state.addBusyRSessionsCount(s.getBusyRSessionsCount());
-      state.addSystemCores(s.getSystemCores());
-      state.addSystemFreeMemory(s.getSystemFreeMemory());
-    });
+    rServerServices.stream()
+        .map(s -> {
+          try {
+            return s.getState();
+          } catch (RServerException e) {
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
+        .forEach(s -> {
+          state.setVersion(s.getVersion());
+          if (!state.isRunning())
+            state.setRunning(state.isRunning());
+          state.addTags(s.getTags());
+          state.addRSessionsCount(s.getRSessionsCount());
+          state.addBusyRSessionsCount(s.getBusyRSessionsCount());
+          state.addSystemCores(s.getSystemCores());
+          state.addSystemFreeMemory(s.getSystemFreeMemory());
+        });
     return state;
   }
 
@@ -303,8 +312,18 @@ public class RServerCluster implements RServerClusterService {
 
   @Override
   public RServerState getState(App app) {
-    return rServerServices.stream().filter(s -> s.isFor(app)).findFirst()
-        .map(RServerService::getState).orElse(null);
+    return rServerServices.stream()
+        .filter(s -> s.isFor(app))
+        .map(s -> {
+          try {
+            return s.getState();
+          } catch (RServerException e) {
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
   }
 
   //
@@ -317,7 +336,14 @@ public class RServerCluster implements RServerClusterService {
    * @return
    */
   private RServerService getNextRServerService() {
-    Optional<RServerState> state = rServerServices.stream().map(RServerService::getState)
+    Optional<RServerState> state = rServerServices.stream().map(s -> {
+      try {
+        return s.getState();
+      } catch (RServerException e) {
+        return null;
+      }
+    })
+        .filter(Objects::nonNull)
         .filter(RServerState::isRunning)
         .min(Comparator.comparingInt(RServerState::getRSessionsCount));
     if (state.isPresent())

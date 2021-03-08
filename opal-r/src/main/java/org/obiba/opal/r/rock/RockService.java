@@ -134,18 +134,23 @@ public class RockService implements RServerService {
     try {
       RServerState state = getState();
       return state.isRunning();
-    } catch (RestClientException e) {
+    } catch (RServerException e) {
       log.warn("Error when checking R server: " + e.getMessage());
     }
     return false;
   }
 
   @Override
-  public RServerState getState() {
-    RestTemplate restTemplate = new RestTemplate();
-    ResponseEntity<RockServerStatus> response =
-        restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerStatus.class);
-    return new RockState(response.getBody());
+  public RServerState getState() throws RServerException {
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity<RockServerStatus> response =
+          restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerStatus.class);
+      return new RockState(response.getBody());
+    } catch (RestClientException e) {
+      log.error("Error when reading R server state", e);
+      throw new RockServerException("R server state not accessible", e);
+    }
   }
 
   @Override

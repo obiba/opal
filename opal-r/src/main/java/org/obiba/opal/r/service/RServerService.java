@@ -36,7 +36,7 @@ public interface RServerService {
 
   boolean isRunning();
 
-  RServerState getState();
+  RServerState getState() throws RServerException;
 
   RServerSession newRServerSession(String user) throws RServerException;
 

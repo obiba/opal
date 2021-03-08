@@ -45,17 +45,27 @@ public class Dtos {
   }
 
   public static OpalR.RServerDto asDto(RServerService server) {
-    RServerState state = server.getState();
     OpalR.RServerDto.Builder builder = OpalR.RServerDto.newBuilder()
         .setName(server.getName())
-        .setCluster(state.getCluster())
-        .setRunning(server.isRunning())
-        .setVersion(state.getVersion())
-        .addAllTags(state.getTags())
-        .setSessionCount(state.getRSessionsCount())
-        .setBusySessionCount(state.getBusyRSessionsCount())
-        .setCores(state.getSystemCores())
-        .setFreeMemory(state.getSystemFreeMemory());
+        .setRunning(server.isRunning());
+
+    try {
+      RServerState state = server.getState();
+      builder.setCluster(state.getCluster())
+          .setVersion(state.getVersion())
+          .addAllTags(state.getTags())
+          .setSessionCount(state.getRSessionsCount())
+          .setBusySessionCount(state.getBusyRSessionsCount())
+          .setCores(state.getSystemCores())
+          .setFreeMemory(state.getSystemFreeMemory());
+    } catch (RServerException e) {
+      builder.setVersion("?")
+          .setCluster("?")
+          .setSessionCount(0)
+          .setBusySessionCount(0)
+          .setCores(0)
+          .setFreeMemory(0);
+    }
 
     App app = server.getApp();
     if (app != null) {
