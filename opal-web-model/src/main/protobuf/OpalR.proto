@@ -13,14 +13,15 @@ message RServerClusterDto {
 
 message RServerDto {
   required string name = 1;
-  required string version = 2;
-  required bool running = 3;
-  repeated string tags = 4;
-  required int32 sessionCount = 5;
-  required int32 busySessionCount = 6;
-  required int32 cores = 7;
-  required int32 freeMemory = 8;
-  optional Apps.AppDto app = 9;
+  required string cluster = 2;
+  required string version = 3;
+  required bool running = 4;
+  repeated string tags = 5;
+  required int32 sessionCount = 6;
+  required int32 busySessionCount = 7;
+  required int32 cores = 8;
+  required int32 freeMemory = 9;
+  optional Apps.AppDto app = 10;
 }
 
 enum RSessionStatus {

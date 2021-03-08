@@ -44,6 +44,11 @@ class RServerClusterState implements RServerState {
     return name;
   }
 
+  @Override
+  public String getCluster() {
+    return getName();
+  }
+
   public void setVersion(String version) {
     this.version = version;
   }

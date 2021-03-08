@@ -89,19 +89,16 @@ public class RServerManagerService implements Service {
       rServerService.setApp(event.getApp());
       try {
         // R server can only be in one cluster
-        List<String> tags = rServerService.getState().getTags();
-        if (!tags.isEmpty()) {
-          String clusterName = tags.get(0);
-          if (rClusters.containsKey(clusterName))
-            // ensure a service built on same app is not already registered in the cluster
-            rClusters.get(clusterName).removeRServerService(event.getApp());
-          else
-            rClusters.put(clusterName, new RServerCluster(clusterName, eventBus));
-          rClusters.get(clusterName).addRServerService(rServerService);
-          rServerService.setRServerClusterName(clusterName);
-          if (running)
-            rServerService.start();
-        }
+        String clusterName = rServerService.getState().getCluster();
+        if (rClusters.containsKey(clusterName))
+          // ensure a service built on same app is not already registered in the cluster
+          rClusters.get(clusterName).removeRServerService(event.getApp());
+        else
+          rClusters.put(clusterName, new RServerCluster(clusterName, eventBus));
+        rClusters.get(clusterName).addRServerService(rServerService);
+        rServerService.setRServerClusterName(clusterName);
+        if (running)
+          rServerService.start();
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
         eventBus.post(new AppRejectedEvent(event.getApp()));

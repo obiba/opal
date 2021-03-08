@@ -6,7 +6,8 @@ message AppDto {
   optional string id = 1;
   required string name = 2;
   required string type = 3;
-  optional string server = 4;
+  optional string cluster = 4;
+  optional string server = 5;
 }
 
 message AppsConfigDto {

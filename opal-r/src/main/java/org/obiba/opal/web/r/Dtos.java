@@ -48,6 +48,7 @@ public class Dtos {
     RServerState state = server.getState();
     OpalR.RServerDto.Builder builder = OpalR.RServerDto.newBuilder()
         .setName(server.getName())
+        .setCluster(state.getCluster())
         .setRunning(server.isRunning())
         .setVersion(state.getVersion())
         .addAllTags(state.getTags())

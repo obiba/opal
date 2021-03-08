@@ -54,6 +54,11 @@ public class RserveState implements RServerState {
   }
 
   @Override
+  public String getCluster() {
+    return "default";
+  }
+
+  @Override
   public String getVersion() {
     return "?";
   }

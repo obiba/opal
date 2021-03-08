@@ -26,6 +26,8 @@ public class App implements HasUniqueProperties {
 
   private String name;
 
+  private String cluster;
+
   private String type;
 
   private String server;
@@ -90,6 +92,18 @@ public class App implements HasUniqueProperties {
     return !Strings.isNullOrEmpty(server);
   }
 
+  public String getCluster() {
+    return cluster;
+  }
+
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
+  }
+
+  public boolean hasCluster() {
+    return !Strings.isNullOrEmpty(cluster);
+  }
+
   public List<String> getTags() {
     return tags;
   }
@@ -103,6 +117,7 @@ public class App implements HasUniqueProperties {
     int result = 1;
     result = ((result * 31) + ((this.name == null) ? 0 : this.name.hashCode()));
     result = ((result * 31) + ((this.type == null) ? 0 : this.type.hashCode()));
+    result = ((result * 31) + ((this.cluster == null) ? 0 : this.cluster.hashCode()));
     result = ((result * 31) + ((this.server == null) ? 0 : this.server.hashCode()));
     return result;
   }
@@ -118,6 +133,7 @@ public class App implements HasUniqueProperties {
     App rhs = ((App) other);
     return this.name.equals(rhs.name)
         && this.type.equals(rhs.type)
+        && this.cluster.equals(rhs.cluster)
         && this.server.equals(rhs.server);
   }
 
@@ -137,6 +153,7 @@ public class App implements HasUniqueProperties {
       return "App{" +
           "name='" + name + '\'' +
           ", type='" + type + '\'' +
+          ", cluster='" + cluster + '\'' +
           ", server='" + server + '\'' +
           '}';
     else
@@ -144,6 +161,7 @@ public class App implements HasUniqueProperties {
           "id='" + id + '\'' +
           ", name='" + name + '\'' +
           ", type='" + type + '\'' +
+          ", cluster='" + cluster + '\'' +
           ", server='" + server + '\'' +
           '}';
   }

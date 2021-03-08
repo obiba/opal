@@ -16,6 +16,8 @@ public interface RServerState {
 
   String getName();
 
+  String getCluster();
+
   String getVersion();
 
   boolean isRunning();

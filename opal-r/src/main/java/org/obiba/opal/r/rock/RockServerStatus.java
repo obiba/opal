@@ -20,6 +20,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "id",
+    "cluster",
     "version",
     "encoding",
     "tags",
@@ -31,6 +32,9 @@ public class RockServerStatus {
 
   @JsonProperty("id")
   private String id;
+
+  @JsonProperty("cluster")
+  private String cluster;
 
   @JsonProperty("version")
   private String version;
@@ -61,6 +65,16 @@ public class RockServerStatus {
   @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
+  }
+
+  @JsonProperty("cluster")
+  public String getCluster() {
+    return cluster;
+  }
+
+  @JsonProperty("cluster")
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
   }
 
   @JsonProperty("version")

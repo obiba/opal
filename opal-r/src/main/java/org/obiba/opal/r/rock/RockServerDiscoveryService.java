@@ -10,8 +10,11 @@
 
 package org.obiba.opal.r.rock;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
+import org.json.JSONObject;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.domain.AppConfig;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
@@ -70,15 +73,28 @@ public class RockServerDiscoveryService {
     log.debug("Trying {} ...", url);
     try {
       RestTemplate restTemplate = new RestTemplate();
-      ResponseEntity<App> response = restTemplate.getForEntity(url + "/_info", App.class);
+      ResponseEntity<String> response = restTemplate.getForEntity(url + "/_info", String.class);
       if (response.getStatusCode().is2xxSuccessful()) {
-        App app = response.getBody();
-        if (!"rock".equals(app.getType())) {
-          log.debug("Not a Rock R server: {}", app);
+        JSONObject jsonApp = new JSONObject(response.getBody());
+        if (!"rock".equals(jsonApp.getString("type"))) {
+          log.debug("Not a Rock R server: {}", jsonApp.toString(2));
           return false;
         }
-        if (!app.hasServer())
+        if (!jsonApp.has("id")) {
+          log.debug("Not a valid Rock R server: {}", jsonApp.toString(2));
+          return false;
+        }
+        App app = new App();
+        app.setName(jsonApp.getString("id"));
+        app.setCluster(jsonApp.getString("cluster"));
+        app.setType("rock");
+        String tags = jsonApp.getJSONArray("tags").join(",");
+        if (!Strings.isNullOrEmpty(tags))
+          app.setTags(Splitter.on(",").splitToList(tags));
+        if (!jsonApp.has("server"))
           app.setServer(url);
+        else
+          app.setServer(jsonApp.getString("server"));
         log.debug("Discovered Rock R server: {}", app);
         appsService.registerApp(app);
         hostsToCheck.put(url, app);

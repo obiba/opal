@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.app;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.AppConfig;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.AppsConfig;
@@ -24,9 +25,14 @@ public class Dtos {
   public static Apps.AppDto asDto(App app) {
     Apps.AppDto.Builder builder = Apps.AppDto.newBuilder()
         .setId(app.getId())
-        .setName(app.getName())
-        .setType(app.getType())
-        .setServer(app.getServer());
+        .setName(Strings.isNullOrEmpty(app.getName()) ? app.getId() : app.getName())
+        .setType(app.getType());
+
+    if (app.hasCluster())
+        builder.setCluster(app.getCluster());
+
+    if (app.hasServer())
+        builder.setServer(app.getServer());
     return builder.build();
   }
 

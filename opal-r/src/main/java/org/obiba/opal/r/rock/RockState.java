@@ -28,6 +28,11 @@ public class RockState implements RServerState {
   }
 
   @Override
+  public String getCluster() {
+    return info.getCluster();
+  }
+
+  @Override
   public String getVersion() {
     return info.getVersion();
   }
