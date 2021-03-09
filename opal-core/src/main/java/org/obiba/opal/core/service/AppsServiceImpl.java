@@ -128,7 +128,7 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public void checkToken(String value) {
-    if (Strings.isNullOrEmpty(value) || !value.equals(defaultToken))
+    if (Strings.isNullOrEmpty(value) || !value.equals(getAppsConfig().getToken()))
       throw new UnauthorizedException("App registration operation not authorized");
   }
 

@@ -8,6 +8,7 @@ message AppDto {
   required string type = 3;
   optional string cluster = 4;
   optional string server = 5;
+  repeated string tags = 6;
 }
 
 message AppsConfigDto {
