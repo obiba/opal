@@ -12,8 +12,10 @@ package org.obiba.opal.r.rock;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.domain.AppConfig;
@@ -88,9 +90,13 @@ public class RockServerDiscoveryService {
         app.setName(jsonApp.getString("id"));
         app.setCluster(jsonApp.getString("cluster"));
         app.setType("rock");
-        String tags = jsonApp.getJSONArray("tags").join(",");
-        if (!Strings.isNullOrEmpty(tags))
-          app.setTags(Splitter.on(",").splitToList(tags));
+        JSONArray tags = jsonApp.has("tags") ? jsonApp.getJSONArray("tags") : null;
+        if (tags != null && tags.length()>0) {
+          List<String> tagList = Lists.newArrayList();
+          for (int i = 0; i<tags.length(); i++)
+            tagList.add(tags.getString(i));
+          app.setTags(tagList);
+        }
         if (!jsonApp.has("server"))
           app.setServer(url);
         else

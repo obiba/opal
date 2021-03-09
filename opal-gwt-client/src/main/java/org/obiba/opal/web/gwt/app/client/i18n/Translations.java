@@ -61,6 +61,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Cluster")
   String clusterLabel();
 
+  @Description("Tags label")
+  @DefaultStringValue("Tags")
+  String tagsLabel();
+
   @Description("R Server label")
   @DefaultStringValue("R Server")
   String rServerLabel();

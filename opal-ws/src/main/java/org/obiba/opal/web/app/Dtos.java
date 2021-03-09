@@ -31,6 +31,8 @@ public class Dtos {
     if (app.hasCluster())
         builder.setCluster(app.getCluster());
 
+    builder.addAllTags(app.getTags());
+
     if (app.hasServer())
         builder.setServer(app.getServer());
     return builder.build();

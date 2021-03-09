@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.apps;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -22,6 +23,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -130,6 +132,13 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
         return dto.getCluster();
       }
     }, translations.clusterLabel());
+
+    appsTable.addColumn(new TextColumn<AppDto>() {
+      @Override
+      public String getValue(AppDto dto) {
+        return Joiner.on(", ").join(JsArrays.toList(dto.getTagsArray()));
+      }
+    }, translations.tagsLabel());
 
     appsTable.addColumn(new URLColumn<AppDto>() {
 
