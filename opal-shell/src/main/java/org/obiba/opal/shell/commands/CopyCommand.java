@@ -217,6 +217,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   // Private methods
   //
 
+  /**
+   * Map of entity ID names by entity type.
+   * @return
+   */
   private Map<String, String> getEntityIdMap() {
     if (entityIdMap == null) {
       entityIdMap = Maps.newHashMap();
@@ -237,6 +241,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         });
     }
     return entityIdMap;
+  }
+
+  public String getDefaultEntityIdName() {
+    if (options.isEntityIdNames() && !options.getEntityIdNames().contains("="))
+      return options.getEntityIdNames();
+    return defaultEntityIdName;
   }
 
   private String getTableNames() {
@@ -360,7 +370,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       RExportDatasource ds = new RExportDatasource(rDatasourceFactory.create().getName(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
-      ds.setEntityIdName(getEntityIdMap().getOrDefault("Participant", defaultEntityIdName));
+      ds.setEntityIdName(getDefaultEntityIdName());
       return ds;
     } else {
       return datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters).create();
@@ -640,7 +650,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       CsvDatasource ds = new CsvDatasource(directory.getName());
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
-      ds.setEntityIdName(defaultEntityIdName);
+      ds.setEntityIdName(getDefaultEntityIdName());
       for (ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
         if (tableDir.exists() || tableDir.mkdir()) {
@@ -675,7 +685,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       CsvDatasource ds = new CsvDatasource(name);
       ds.setMultilines(options.getMultilines());
       ds.setEntityIdNames(getEntityIdMap());
-      ds.setEntityIdName(defaultEntityIdName);
+      ds.setEntityIdName(getDefaultEntityIdName());
       // one table only
       Set<ValueTable> tables = getValueTables();
       if (tables.size() > 1) {
@@ -764,6 +774,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         RExportDatasource ds = new RExportDatasource(outputFile.getName().getBaseName(), sessionHandler, new RFileSymbolWriter(sessionHandler, outFiles));
         ds.setMultilines(options.getMultilines());
         ds.setEntityIdNames(getEntityIdMap());
+        ds.setEntityIdName(getDefaultEntityIdName());
         return ds;
       }
       return null;
