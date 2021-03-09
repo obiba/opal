@@ -68,7 +68,9 @@ public class Dtos {
     if (dto.hasId()) app.setId(dto.getId());
     app.setName(dto.getName());
     app.setType(dto.getType());
+    if (dto.hasCluster()) app.setCluster(dto.getCluster());
     if (dto.hasServer()) app.setServer(dto.getServer());
+    if (dto.getTagsCount()>0) app.setTags(dto.getTagsList());
     return app;
   }
 
