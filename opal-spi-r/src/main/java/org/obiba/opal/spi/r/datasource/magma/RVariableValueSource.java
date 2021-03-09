@@ -359,9 +359,9 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private Value getSingleValue(Object objValue) {
     if (isDate())
-      return getDateFromEpoch(objValue);
+      return getDateValue(objValue);
     else if (isDateTime())
-      return getDateTimeFromEpoch(objValue);
+      return getDateTimeValue(objValue);
     else if (isNumeric())
       return getNumeric(objValue);
     return getValueType().valueOf(objValue);
@@ -379,25 +379,32 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
    * @param objValue
    * @return
    */
-  private Value getDateFromEpoch(Object objValue) {
+  private Value getDateValue(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      Double dbl = (Double) objValue;
-      if (dbl.isNaN()) return getValueType().nullValue();
-      Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
-      return getValueType().valueOf(value);
+      if (objValue instanceof Double) {
+        Double dbl = (Double) objValue;
+        if (dbl.isNaN()) return getValueType().nullValue();
+        Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
+        return getValueType().valueOf(value);
+      } else
+        return getValueType().valueOf(objValue);
     } catch (Exception e) {
       return getValueType().nullValue();
     }
   }
 
-  private Value getDateTimeFromEpoch(Object objValue) {
+  private Value getDateTimeValue(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
+
     try {
-      Double dbl = (Double) objValue;
-      if (dbl.isNaN()) return getValueType().nullValue();
-      Date value = new Date(dbl.longValue() * 1000);
-      return getValueType().valueOf(value);
+      if (objValue instanceof Double) {
+        Double dbl = (Double) objValue;
+        if (dbl.isNaN()) return getValueType().nullValue();
+        Date value = new Date(dbl.longValue() * 1000);
+        return getValueType().valueOf(value);
+      } else
+        return getValueType().valueOf(objValue);
     } catch (Exception e) {
       return getValueType().nullValue();
     }
