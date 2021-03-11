@@ -19,6 +19,7 @@ import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,8 +180,8 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
-  public List<String> getInstalledDataSHIELDPackageNames() {
-    return getNextRServerService().getInstalledDataSHIELDPackageNames();
+  public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
+    return getNextRServerService().getDataShieldPackagesProperties();
   }
 
   @Override
