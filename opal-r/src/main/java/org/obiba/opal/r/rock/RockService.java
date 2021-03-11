@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.rock;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -214,7 +215,8 @@ public class RockService implements RServerService {
   }
 
   @Override
-  public List<String> getInstalledDataSHIELDPackageNames() {
+  public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
+    Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
     try {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -223,13 +225,15 @@ public class RockService implements RServerService {
           restTemplate.exchange(getRServerResourceUrl("/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       String jsonSource = response.getBody();
       if (response.getStatusCode().is2xxSuccessful()) {
-        RockResult result = new RockResult(new JSONObject(jsonSource));
-        return Lists.newArrayList(result.getNames());
+        RNamedList<RServerResult> results = new RockResult(new JSONObject(jsonSource)).asNamedList();
+        for (String name : results.getNames()) {
+          dsPackages.put(name, getDataShieldPackagePropertiesDtos(results.get(name).asNamedList()));
+        }
       }
     } catch (Exception e) {
       log.error("Error when reading installed DataSHIELD packages", e);
     }
-    return Lists.newArrayList();
+    return dsPackages;
   }
 
   @Override
@@ -318,6 +322,18 @@ public class RockService implements RServerService {
   //
   // Private methods
   //
+
+  private List<Opal.EntryDto> getDataShieldPackagePropertiesDtos(RNamedList<RServerResult> properties) {
+    List<Opal.EntryDto> entries = Lists.newArrayList();
+    if (properties == null) return entries;
+    for (String property : properties.getNames()) {
+      Opal.EntryDto.Builder builder = Opal.EntryDto.newBuilder();
+      builder.setKey(property);
+      builder.setValue(Joiner.on(",").join(properties.get(property).asStrings()));
+      entries.add(builder.build());
+    }
+    return entries;
+  }
 
   private void installPackage(Map<String, String> params) {
     try {

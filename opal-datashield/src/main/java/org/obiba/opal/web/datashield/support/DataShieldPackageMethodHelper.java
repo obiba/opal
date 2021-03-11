@@ -22,6 +22,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
@@ -34,6 +35,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -62,9 +65,12 @@ public class DataShieldPackageMethodHelper {
   protected RServerManagerService rServerManagerService;
 
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    List<String> dsNames = rServerManagerService.getDefaultRServer().getInstalledDataSHIELDPackageNames();
-    return rServerManagerService.getDefaultRServer().getInstalledPackagesDtos().stream()
+    RServerService server = rServerManagerService.getDefaultRServer();
+    Map<String, List<Opal.EntryDto>> dsPackages = server.getDataShieldPackagesProperties();
+    Set<String> dsNames = dsPackages.keySet();
+    return server.getInstalledPackagesDtos().stream()
         .filter(dto -> dsNames.contains(dto.getName()))
+        .map(dto -> dto.toBuilder().addAllDescription(dsPackages.get(dto.getName())).build())
         .collect(Collectors.toList());
   }
 
@@ -105,9 +111,9 @@ public class DataShieldPackageMethodHelper {
   }
 
   public List<OpalR.RPackageDto> getDatashieldPackage(final String name) {
-    if (rServerManagerService.getDefaultRServer().getInstalledDataSHIELDPackageNames().contains(name))
-      return rServerManagerService.getDefaultRServer().getInstalledPackageDto(name);
-    throw new NoSuchRPackageException(name);
+    return getInstalledPackagesDtos().stream()
+        .filter(dto -> name.equals(dto.getName()))
+        .collect(Collectors.toList());
   }
 
   public void deletePackage(String name) {

@@ -11,6 +11,7 @@ package org.obiba.opal.r.rserve;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
@@ -19,9 +20,12 @@ import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.obiba.opal.web.r.RPackageResourceHelper;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.RList;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
@@ -34,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -203,10 +208,19 @@ public class RserveService implements RServerService, ROperationTemplate {
   }
 
   @Override
-  public List<String> getInstalledDataSHIELDPackageNames() {
-    DataSHIELDPackagesROperation rop = new DataSHIELDPackagesROperation();
-    execute(rop);
-    return Lists.newArrayList(rop.getResult().asNamedList().getNames());
+  public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
+    Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
+    try {
+      DataSHIELDPackagesROperation rop = new DataSHIELDPackagesROperation();
+      execute(rop);
+      RNamedList<RServerResult> dsList = rop.getResult().asNamedList();
+        for (Object name : dsList.getNames()) {
+          dsPackages.put(name.toString(), getDataShieldPackagePropertiesDtos(dsList.get(name.toString()).asNamedList()));
+        }
+    } catch (Exception e) {
+      log.error("DataShield packages properties extraction failed", e);
+    }
+    return dsPackages;
   }
 
   @Override
@@ -266,6 +280,18 @@ public class RserveService implements RServerService, ROperationTemplate {
   //
   // Private methods
   //
+
+  private List<Opal.EntryDto> getDataShieldPackagePropertiesDtos(RNamedList<RServerResult> properties) {
+    List<Opal.EntryDto> entries = Lists.newArrayList();
+    if (properties == null) return entries;
+    for (String property : properties.getNames()) {
+      Opal.EntryDto.Builder builder = Opal.EntryDto.newBuilder();
+      builder.setKey(property);
+      builder.setValue(Joiner.on(",").join(properties.get(property).asStrings()));
+      entries.add(builder.build());
+    }
+    return entries;
+  }
 
   private RserveState getStateInternal() {
     RestTemplate restTemplate = new RestTemplate();

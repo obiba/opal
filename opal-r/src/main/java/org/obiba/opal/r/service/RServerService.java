@@ -13,9 +13,11 @@ package org.obiba.opal.r.service;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RServerService {
 
@@ -88,7 +90,7 @@ public interface RServerService {
   /**
    * Extract DataSHIELD settings from installed packages.
    */
-  List<String> getInstalledDataSHIELDPackageNames();
+  Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties();
 
   /**
    * Install a R package from CRAN if not already installed.
@@ -131,5 +133,4 @@ public interface RServerService {
    * @return
    */
   String[] getLog(Integer nbLines);
-
 }
