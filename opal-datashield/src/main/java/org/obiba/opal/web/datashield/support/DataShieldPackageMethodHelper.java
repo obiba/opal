@@ -70,7 +70,21 @@ public class DataShieldPackageMethodHelper {
     Set<String> dsNames = dsPackages.keySet();
     return server.getInstalledPackagesDtos().stream()
         .filter(dto -> dsNames.contains(dto.getName()))
-        .map(dto -> dto.toBuilder().addAllDescription(dsPackages.get(dto.getName())).build())
+        .map(dto -> {
+          OpalR.RPackageDto.Builder builder = dto.toBuilder();
+          for (Opal.EntryDto dsEntry : dsPackages.get(dto.getName())) {
+            boolean found = false;
+            for (Opal.EntryDto entry : builder.getDescriptionList()) {
+              if (entry.getKey().equals(dsEntry.getKey())) {
+                found = true;
+                break;
+              }
+            }
+            if (!found)
+              builder.addDescription(dsEntry);
+          }
+          return builder.build();
+        })
         .collect(Collectors.toList());
   }
 
