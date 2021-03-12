@@ -287,7 +287,7 @@ public class RserveService implements RServerService, ROperationTemplate {
     for (String property : properties.getNames()) {
       Opal.EntryDto.Builder builder = Opal.EntryDto.newBuilder();
       builder.setKey(property);
-      builder.setValue(Joiner.on(",").join(properties.get(property).asStrings()));
+      builder.setValue(Joiner.on(", ").join(properties.get(property).asStrings()));
       entries.add(builder.build());
     }
     return entries;
