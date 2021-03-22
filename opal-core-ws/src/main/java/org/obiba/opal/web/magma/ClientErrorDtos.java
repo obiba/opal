@@ -126,7 +126,8 @@ public class ClientErrorDtos {
         .setDefaultMessage(pe.getMessage()) //
         .setKey(pe.getKey());
     for(Object arg : pe.getParameters()) {
-      builder.addArguments(arg.toString());
+      if (arg != null)
+        builder.addArguments(arg.toString());
     }
     return builder;
   }
