@@ -125,9 +125,11 @@ public class DataShieldPackageMethodHelper {
   }
 
   public List<OpalR.RPackageDto> getDatashieldPackage(final String name) {
-    return getInstalledPackagesDtos().stream()
+    List<OpalR.RPackageDto> pkgs = getInstalledPackagesDtos().stream()
         .filter(dto -> name.equals(dto.getName()))
         .collect(Collectors.toList());
+    if (pkgs.isEmpty()) throw new NoSuchRPackageException(name);
+    return pkgs;
   }
 
   public void deletePackage(String name) {
