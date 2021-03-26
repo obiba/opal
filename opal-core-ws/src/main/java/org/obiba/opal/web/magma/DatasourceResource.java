@@ -29,6 +29,7 @@ import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
+import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -79,6 +80,9 @@ public class DatasourceResource {
 
   @Autowired
   private EventBus eventBus;
+
+  @Autowired
+  private SQLService sqlService;
 
   public void setName(String name) {
     this.name = name;
@@ -251,6 +255,15 @@ public class DatasourceResource {
       localeDtos.add(Dtos.asDto(locale, displayLocale == null ? null : new Locale(displayLocale)));
     }
     return localeDtos;
+  }
+
+  @POST
+  @Path("/_sql")
+  @Consumes(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response executeSQL(String query, @QueryParam("id") @DefaultValue("_id") String idName) {
+    return Response.ok().type(MediaType.APPLICATION_JSON_TYPE)
+        .entity(sqlService.execute(name, query, idName)).build();
   }
 
   Datasource getDatasource() {

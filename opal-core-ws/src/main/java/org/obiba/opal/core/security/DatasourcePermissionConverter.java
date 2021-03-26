@@ -41,6 +41,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args),
+            toRest("/datasource/{0}/_sql", "POST:GET", args),
             toRest("/identifiers/mappings", "GET"),
             toRest("/datasource-plugin", "GET:GET/GET"),
             toRest("/project/{0}", "GET:GET", args),
@@ -66,6 +67,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}/tables", "GET:GET", args),
+            toRest("/datasource/{0}/_sql", "POST:GET", args),
             toRest("/datasource/{0}/tables", "POST:GET", args),
             toRest("/datasource/{0}/tables", "DELETE", args),
             toRest("/datasource/{0}/views", "POST:GET", args),
@@ -91,6 +93,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}", "GET:GET/GET", args),
+            toRest("/datasource/{0}/_sql", "POST:GET", args),
             toRest("/project/{0}/commands/_analyse", "POST:GET", args),
             toRest("/project/{0}/commands/_export", "POST:GET", args),
             toRest("/project/{0}/commands/_copy", "POST:GET", args),
