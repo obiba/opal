@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.sql;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -19,6 +20,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -31,15 +33,19 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
 
   private final Translations translations;
 
+  private final RequestUrlBuilder urlBuilder;
+
   @Inject
-  public SQLPresenter(EventBus eventBus, Display view, Translations translations) {
+  public SQLPresenter(EventBus eventBus, Display view, Translations translations, RequestUrlBuilder urlBuilder) {
     super(eventBus, view);
     this.translations = translations;
+    this.urlBuilder = urlBuilder;
     getView().setUiHandlers(this);
   }
 
   public void initialize(DatasourceDto datasource) {
     this.datasource = datasource;
+    getView().setDatasource(datasource);
     getView().clear();
   }
 
@@ -76,6 +82,13 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
         .post().send();
   }
 
+  @Override
+  public void download() {
+    String url = urlBuilder.buildAbsoluteUrl(UriBuilders.DATASOURCE_SQL.create().build(datasource.getName()));
+    GWT.log(url);
+    getView().doDownload(url);
+  }
+
   public interface Display extends View, HasUiHandlers<SQLUiHandlers> {
 
     void clear();
@@ -87,5 +100,9 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
     void showError(String text);
 
     void endExecute();
+
+    void setDatasource(DatasourceDto datasource);
+
+    void doDownload(String url);
   }
 }

@@ -17,13 +17,12 @@ import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.support.MagmaEngineReferenceResolver;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.SQLException;
 import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
@@ -38,6 +37,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.ForbiddenException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -47,6 +47,8 @@ import java.util.Set;
 public class RSQLService implements Service, SQLService {
 
   private static final Logger log = LoggerFactory.getLogger(RSQLService.class);
+
+  private static final String R_WORK_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "R";
 
   private static final String EXECUTE_SQL_FUNC = ".execute.SQL";
 
@@ -74,49 +76,53 @@ public class RSQLService implements Service, SQLService {
   private Map<String, String> userRSessions = Maps.newHashMap();
 
   @Override
-  public String execute(String datasource, String query, String idName) {
+  public File executeToJSON(String datasource, String query, String idName) {
     if (!running) return null;
 
-    String user = getSubjectPrincipal();
-    RServerSession rSession = null;
-    if (userRSessions.containsKey(user))
-      try {
-        rSession = opalRSessionManager.getRSession(userRSessions.get(user));
-      } catch (NoSuchRSessionException e) {
-        // ignore
-      }
-    if (rSession != null) {
-      closeRSession(user);
-      rSession = null;
-    }
-    if (rSession == null) {
-      rSession = opalRSessionManager.newSubjectRSession();
-      rSession.setExecutionContext("SQL");
-      userRSessions.put(user, rSession.getId());
-      SQLExecutorROperation fop = new SQLExecutorROperation();
-      rSession.execute(fop);
-    }
-    Set<String> tables = SQLExtractor.extractTables(query);
-    Datasource ds = MagmaEngine.get().getDatasource(datasource);
-    for (String table : tables) {
-      if (!ds.hasValueTable(table))
-        throw new NoSuchValueTableException(datasource, table);
-      else
-        ensureTableValuesAccess(datasource, table);
-    }
-    for (String table : tables) {
-      MagmaAssignROperation mop = new MagmaAssignROperation(table, datasource + "." + table, null, true,
-          Strings.isNullOrEmpty(idName) ? "_id" : idName, null,
-          MagmaAssignROperation.RClass.DATA_FRAME, identifiersTableService, dataExportService);
-      rSession.execute(mop);
-    }
-    RScriptROperation rop = new RScriptROperation(String.format("%s('%s')", EXECUTE_SQL_FUNC, query), false);
-    rSession.execute(rop);
-    RServerResult result = rop.getResult();
+    RServerSession rSession = prepareRSession();
 
-    closeRSession(user);
+    try {
+      prepareEnvironment(datasource, query, idName, rSession);
 
-    return result.asStrings()[0];
+      // execute SQL
+      String rOutput = "out.json";
+      RScriptROperation rop = new RScriptROperation(String.format("%s.JSON('%s', '%s')", EXECUTE_SQL_FUNC, query, rOutput), false);
+      rSession.execute(rop);
+
+      File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
+      FileReadROperation frop = new FileReadROperation(rOutput, output);
+      rSession.execute(frop);
+      return output;
+    } catch (Exception e) {
+      throw new SQLException(e);
+    } finally {
+      closeRSession(rSession.getUser());
+    }
+  }
+
+  @Override
+  public File executeToCSV(String datasource, String query, String idName) {
+    if (!running) return null;
+
+    RServerSession rSession = prepareRSession();
+
+    try {
+      prepareEnvironment(datasource, query, idName, rSession);
+
+      // execute SQL
+      String rOutput = "out.csv";
+      RScriptROperation rop = new RScriptROperation(String.format("%s.CSV('%s', '%s')", EXECUTE_SQL_FUNC, query, rOutput), false);
+      rSession.execute(rop);
+
+      File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
+      FileReadROperation frop = new FileReadROperation(rOutput, output);
+      rSession.execute(frop);
+      return output;
+    } catch (Exception e) {
+      throw new SQLException(e);
+    }  finally {
+      closeRSession(rSession.getUser());
+    }
   }
 
   @Override
@@ -151,6 +157,46 @@ public class RSQLService implements Service, SQLService {
   // Private methods
   //
 
+  private RServerSession prepareRSession() {
+    String user = getSubjectPrincipal();
+    RServerSession rSession = null;
+    if (userRSessions.containsKey(user))
+      try {
+        rSession = opalRSessionManager.getRSession(userRSessions.get(user));
+      } catch (NoSuchRSessionException e) {
+        // ignore
+      }
+    if (rSession != null) closeRSession(user);
+
+    // start new R session
+    rSession = opalRSessionManager.newSubjectRSession();
+    rSession.setExecutionContext("SQL");
+    userRSessions.put(user, rSession.getId());
+    return rSession;
+  }
+
+  private void prepareEnvironment(String datasource, String query, String idName, RServerSession rSession) {
+    // load utility functions
+    SQLExecutorROperation fop = new SQLExecutorROperation();
+    rSession.execute(fop);
+
+    // assign tables
+    Set<String> tables = SQLExtractor.extractTables(query);
+    Datasource ds = MagmaEngine.get().getDatasource(datasource);
+    for (String table : tables) {
+      if (!ds.hasValueTable(table))
+        throw new NoSuchValueTableException(datasource, table);
+      else
+        ensureTableValuesAccess(datasource, table);
+    }
+    for (String table : tables) {
+      MagmaAssignROperation mop = new MagmaAssignROperation(table, datasource + "." + table, null, true,
+          Strings.isNullOrEmpty(idName) ? "_id" : idName, null,
+          MagmaAssignROperation.RClass.DATA_FRAME, identifiersTableService, dataExportService);
+      rSession.execute(mop);
+    }
+  }
+
   private void closeRSession(String user) {
     if (!userRSessions.containsKey(user)) return;
     opalRSessionManager.removeRSession(userRSessions.get(user));
@@ -182,7 +228,7 @@ public class RSQLService implements Service, SQLService {
   }
 
   private void ensureTableValuesAccess(String datasource, String table) {
-    if(!SecurityUtils.getSubject().isPermitted(String.format("rest:/datasource/%s/table/%s/valueSet:GET:GET/GET", datasource, table))) {
+    if (!SecurityUtils.getSubject().isPermitted(String.format("rest:/datasource/%s/table/%s/valueSet:GET:GET/GET", datasource, table))) {
       throw new InvalidRequestException("AccessDeniedToTableValues", table);
     }
   }

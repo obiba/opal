@@ -8,13 +8,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.sql;
+package org.obiba.opal.core.service;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+public class SQLException extends RuntimeException {
 
-public interface SQLUiHandlers extends UiHandlers {
+  public SQLException(String message) {
+    super(message);
+  }
 
-  void execute(String query);
-
-  void download();
+  public SQLException(Throwable throwable) {
+    super(throwable.getMessage(), throwable);
+  }
 }

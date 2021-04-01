@@ -10,19 +10,32 @@
 
 package org.obiba.opal.core.service;
 
+import java.io.File;
+
 /**
  * A service for executing SQL queries on a project's tables.
  */
 public interface SQLService extends SystemService {
 
   /**
-   * Execute a SQL query in the context of a datasource.
+   * Execute a SQL query in the context of a datasource and output result as a JSON object.
    *
    * @param datasource
    * @param query
    * @param idName
    * @return
    */
-  String execute(String datasource, String query, String idName);
+  File executeToJSON(String datasource, String query, String idName);
+
+  /**
+   * Execute a SQL query in the context of a datasource and dump output to a temporary
+   * CSV file.
+   *
+   * @param datasource
+   * @param query
+   * @param idName
+   * @return
+   */
+  File executeToCSV(String datasource, String query, String idName);
 
 }

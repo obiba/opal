@@ -13,6 +13,8 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.protobuf.format.JsonFormat;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -261,9 +263,32 @@ public class DatasourceResource {
   @Path("/_sql")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response executeSQL(String query, @QueryParam("id") @DefaultValue("_id") String idName) {
-    return Response.ok().type(MediaType.APPLICATION_JSON_TYPE)
-        .entity(sqlService.execute(name, query, idName)).build();
+  public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue("_id") String idName) {
+    final File output = sqlService.executeToJSON(name, query, idName);
+    StreamingOutput stream = os -> {
+      Files.copy(output.toPath(), os);
+      output.delete();
+    };
+
+    return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE)
+        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+//    return Response.ok().type(MediaType.APPLICATION_JSON_TYPE)
+//        .entity(sqlService.executeToJSON(name, query, idName)).build();
+  }
+
+  @POST
+  @Path("/_sql")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces("text/csv")
+  public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue("_id") String idName) {
+    final File output = sqlService.executeToCSV(name, query, idName);
+    StreamingOutput stream = os -> {
+      Files.copy(output.toPath(), os);
+      output.delete();
+    };
+
+    return Response.ok(stream, "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
   }
 
   Datasource getDatasource() {

@@ -11,13 +11,11 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:FlowPanel>
+  <g:FlowPanel ui:field="panel">
     <b:Paragraph>
       <ui:msg description="SQL information">
         SQL queries can be executed on one or more tables of the project. Permission to access the values of the considered
@@ -41,7 +39,7 @@
           </b:Button>
         </b:ButtonGroup>
         <b:ButtonGroup>
-          <b:Button icon="TRASH" ui:field="clear">
+          <b:Button icon="ERASER" ui:field="clear">
           </b:Button>
         </b:ButtonGroup>
         <g:Label ui:field="execTime" addStyleNames="small-top-margin help-block"/>
