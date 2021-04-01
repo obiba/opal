@@ -13,10 +13,10 @@ package org.obiba.opal.r.service;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.obiba.core.util.FileUtil;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.core.event.AppRegisteredEvent;
-import org.obiba.opal.core.event.AppRejectedEvent;
-import org.obiba.opal.core.event.AppUnregisteredEvent;
+import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.Service;
@@ -32,8 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -44,6 +44,8 @@ import java.util.NoSuchElementException;
 public class RServerManagerService implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(RServerManagerService.class);
+
+  private static final String R_CACHE_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "R" + File.separatorChar + "cache";
 
   public static final String DEFAULT_CLUSTER_NAME = "default";
 
@@ -119,6 +121,21 @@ public class RServerManagerService implements Service {
     }
   }
 
+  @Subscribe
+  public synchronized void onTableDeleted(ValueTableDeletedEvent event) {
+    evictTableCache(event.getValueTable());
+  }
+
+  @Subscribe
+  public synchronized void onTableUpdated(ValueTableUpdatedEvent event) {
+    evictTableCache(event.getValueTable());
+  }
+
+  @Subscribe
+  public synchronized void onTableRenamed(ValueTableRenamedEvent event) {
+    evictTableCache(event.getValueTable());
+  }
+
   @Override
   public boolean isRunning() {
     return running;
@@ -140,9 +157,15 @@ public class RServerManagerService implements Service {
 
   @Override
   public void stop() {
-    rClusters.values().forEach(RServerCluster::stop);
+    try {
+      rClusters.values().forEach(RServerCluster::stop);
+    } catch (Exception e) {
+      // ignore
+      log.debug("Failure when stopping R servers", e);
+    }
     running = false;
     eventBus.post(new RServiceStoppedEvent(getName()));
+    evictTableCaches();
   }
 
   @Override
@@ -153,6 +176,34 @@ public class RServerManagerService implements Service {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return null;
+  }
+
+  //
+  // Private methods
+  //
+
+  private void evictTableCaches() {
+    try {
+      File cacheDir = new File(R_CACHE_DIR);
+      FileUtil.delete(cacheDir);
+    } catch (Exception e) {
+      log.warn("Failure when evicting table caches", e);
+    }
+  }
+
+  private void evictTableCache(ValueTable table) {
+    try {
+      File cacheDir = new File(R_CACHE_DIR);
+      String tableCachePrefix = String.format("%s-%s-", table.getDatasource().getName(), table.getName());
+      File[] files = cacheDir.listFiles(file -> file.getName().startsWith(tableCachePrefix));
+      if (files != null) {
+        for (File file : files) {
+          file.delete();
+        }
+      }
+    } catch (Exception e) {
+      log.warn("Failure when evicting table cache: {}", table.getName(), e);
+    }
   }
 
   private void notifyInitialized() {
