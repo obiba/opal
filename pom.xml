@@ -28,6 +28,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
+    <antlr.version>4.7.1</antlr.version>
     <bouncycastle.version>1.46</bouncycastle.version>
     <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
@@ -153,6 +154,7 @@
   </properties>
 
   <modules>
+    <module>opal-sql</module>
     <module>opal-core-api</module>
     <module>opal-core</module>
     <module>opal-core-ws</module>
@@ -178,6 +180,11 @@
     <dependencies>
 
       <!-- Opal dependencies -->
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-sql</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-core-api</artifactId>
@@ -726,6 +733,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>${antlr.version}</version>
       </dependency>
 
       <!-- oidc dependencies -->
@@ -1548,6 +1561,22 @@
   <build>
     <pluginManagement>
       <plugins>
+
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>${antlr.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>antlr4</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <visitor>true</visitor>
+          </configuration>
+        </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

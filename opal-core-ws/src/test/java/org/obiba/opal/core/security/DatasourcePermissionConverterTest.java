@@ -21,6 +21,7 @@ public class DatasourcePermissionConverterTest
   public void testDatasourceAll() {
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_ALL,
         "rest:/datasource/patate:*:GET/*",
+        "rest:/datasource/patate/_sql:POST:GET",
         "rest:/identifiers/mappings:GET",
         "rest:/datasource-plugin:GET:GET/GET",
         "rest:/project/patate:GET:GET",
@@ -44,6 +45,7 @@ public class DatasourcePermissionConverterTest
   public void testDatasourceView() {
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_VIEW,
         "rest:/datasource/patate:GET:GET/GET",
+        "rest:/datasource/patate/_sql:POST:GET",
         "rest:/project/patate/commands/_analyse:POST:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
@@ -60,6 +62,7 @@ public class DatasourcePermissionConverterTest
   public void testCreateTable() {
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.TABLE_ADD,
         "rest:/datasource/patate/tables:GET:GET",
+        "rest:/datasource/patate/_sql:POST:GET",
         "rest:/datasource/patate/tables:POST:GET",
         "rest:/datasource/patate/tables:DELETE",
         "rest:/datasource/patate/views:POST:GET",

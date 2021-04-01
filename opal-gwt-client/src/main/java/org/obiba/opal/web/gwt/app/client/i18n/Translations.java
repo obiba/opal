@@ -756,7 +756,8 @@ public interface Translations extends Constants {
       "NameMustBeUnique", "Name must be unique.",
       "GHOrganizationIsRequired", "GitHub user or organization name is required",
       "ResourceAssignSuccess", "Resource assignment in R was successful.",
-      "ResourceAssignFailed", "Resource assignment in R has failed: "
+      "ResourceAssignFailed", "Resource assignment in R has failed: ",
+      "SQLError", "{0}"
   })
   Map<String, String> userMessageMap();
 
