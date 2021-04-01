@@ -55,7 +55,7 @@ import java.util.List;
 
 public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
 
-  private static final int PERMISSIONS_TAB_INDEX = 1;
+  private static final int PERMISSIONS_TAB_INDEX = 2;
 
   private static final int SORTABLE_COLUMN_NAME = 1;
 

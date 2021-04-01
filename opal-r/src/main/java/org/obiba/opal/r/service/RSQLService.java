@@ -93,7 +93,7 @@ public class RSQLService implements Service, SQLService {
       FileReadROperation frop = new FileReadROperation(rOutput, output);
       rSession.execute(frop);
       return output;
-    } catch (Exception e) {
+    } catch (RRuntimeException e) {
       throw new SQLException(e);
     } finally {
       closeRSession(rSession.getUser());
@@ -118,7 +118,7 @@ public class RSQLService implements Service, SQLService {
       FileReadROperation frop = new FileReadROperation(rOutput, output);
       rSession.execute(frop);
       return output;
-    } catch (Exception e) {
+    } catch (RRuntimeException e) {
       throw new SQLException(e);
     }  finally {
       closeRSession(rSession.getUser());

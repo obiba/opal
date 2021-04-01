@@ -36,7 +36,7 @@ public class SQLExceptionMapper extends ErrorDtoExceptionMapper<SQLException> {
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(SQLException exception) {
-    log.warn("SQL exception", exception);
+    log.debug("SQL exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "SQLError", exception);
   }
 
