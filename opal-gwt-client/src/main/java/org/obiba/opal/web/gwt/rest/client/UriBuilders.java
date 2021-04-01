@@ -208,6 +208,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_SQL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "_sql");
+    }
+  },
+
   DATASOURCE_LOCALES {
     @Override
     public UriBuilder create() {

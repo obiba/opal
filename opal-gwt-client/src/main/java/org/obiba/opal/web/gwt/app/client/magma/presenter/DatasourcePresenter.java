@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent.Handler;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.sql.SQLPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -66,6 +67,7 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter.Display.PERMISSIONS_SLOT;
 
 public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Display>
     implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler {
@@ -82,6 +84,10 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
+  private final Provider<SQLPresenter> sqlPresenterProvider;
+
+  private SQLPresenter sqlPresenter;
+
   private TranslationMessages translationMessages;
 
   private String datasourceName;
@@ -94,12 +100,14 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus,
-      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
-      ModalProvider<DataExportPresenter> dataExportModalProvider,
-      ModalProvider<ViewModalPresenter> createViewModalProvider,
-      ModalProvider<DataCopyPresenter> dataCopyModalProvider,
-      ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, TranslationMessages translationMessages) {
+                             ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
+                             ModalProvider<DataExportPresenter> dataExportModalProvider,
+                             ModalProvider<ViewModalPresenter> createViewModalProvider,
+                             ModalProvider<DataCopyPresenter> dataCopyModalProvider,
+                             ModalProvider<RestoreViewsModalPresenter> restoreViewsModalProvider,
+                             Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                             Provider<SQLPresenter> sqlPresenterProvider,
+                             TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
@@ -108,6 +116,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.restoreViewsModalProvider = restoreViewsModalProvider.setContainer(this);
+    this.sqlPresenterProvider = sqlPresenterProvider;
     getView().setUiHandlers(this);
   }
 
@@ -140,7 +149,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     // rely on 304
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
         .forResource(UriBuilders.DATASOURCE.create().build(datasourceName)) //
-        .withCallback(new InitResourceCallback()) //
+        .withCallback(new InitDatasourceCallback()) //
         .get().send();
   }
 
@@ -326,7 +335,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   // Interfaces and classes
   //
 
-  private class InitResourceCallback implements ResourceCallback<DatasourceDto> {
+  private class InitDatasourceCallback implements ResourceCallback<DatasourceDto> {
     @Override
     public void onResource(Response response, DatasourceDto resource) {
       datasource = resource;
@@ -334,6 +343,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
 
     private void displayDatasource(DatasourceDto datasourceDto) {
+      if (sqlPresenter == null) {
+        sqlPresenter = sqlPresenterProvider.get();
+        getView().setInSlot(Display.SQL_SLOT, sqlPresenter);
+      }
+      sqlPresenter.initialize(datasourceDto);
       getView().setDatasource(datasourceDto);
       updateTables();
       authorize();
@@ -507,8 +521,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
    */
   private final class PermissionsUpdate implements HasAuthorization {
 
-    private static final String PERMISSIONS_SLOT = "permissions";
-
     @Override
     public void unauthorized() {
 
@@ -529,6 +541,10 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   public interface Display extends View, HasUiHandlers<DatasourceUiHandlers> {
+
+    String SQL_SLOT = "sql";
+
+    String PERMISSIONS_SLOT = "permissions";
 
     void beforeRenderRows();
 

@@ -119,6 +119,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   TextBoxClearable filter;
 
   @UiField
+  Panel sqlPanel;
+
+  @UiField
   Panel permissionsPanel;
 
   @UiField
@@ -161,7 +164,10 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     permissionsPanel.clear();
-    if(content != null) {
+    if(SQL_SLOT.equals(slot) && content != null) {
+      sqlPanel.add(content.asWidget());
+    }
+    if(PERMISSIONS_SLOT.equals(slot) && content != null) {
       permissionsPanel.add(content.asWidget());
     }
   }

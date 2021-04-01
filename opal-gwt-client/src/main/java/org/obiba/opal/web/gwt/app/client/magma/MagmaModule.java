@@ -33,6 +33,8 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.sql.SQLPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.sql.SQLView;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
@@ -101,7 +103,7 @@ public class MagmaModule extends AbstractOpalModule {
         VariableTaxonomyModalView.class);
     bindPresenterWidget(AddVariablesModalPresenter.class, AddVariablesModalPresenter.Display.class,
         AddVariablesModalView.class);
-
+    bindPresenterWidget(SQLPresenter.class, SQLPresenter.Display.class, SQLView.class);
   }
 
   private void configureDatasource() {

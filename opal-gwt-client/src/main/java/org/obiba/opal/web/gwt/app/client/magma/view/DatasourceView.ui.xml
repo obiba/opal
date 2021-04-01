@@ -115,6 +115,10 @@
         <o:Table ui:field="table"/>
       </b:Tab>
 
+      <b:Tab heading="SQL">
+        <g:SimplePanel ui:field="sqlPanel"/>
+      </b:Tab>
+
       <b:Tab heading="Permissions">
         <g:SimplePanel ui:field="permissionsPanel"/>
       </b:Tab>
