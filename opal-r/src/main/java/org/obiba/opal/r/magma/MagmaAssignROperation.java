@@ -19,6 +19,7 @@ import org.obiba.opal.spi.r.RServerConnection;
 import org.obiba.opal.spi.r.RServerException;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -107,6 +108,13 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   void doEval(String script) {
     eval(script, false);
+  }
+  void doReadFile(String fileName, File destination) {
+    try {
+      readFile(fileName, destination);
+    } catch (RServerException e) {
+      throw new RRuntimeException(e);
+    }
   }
 
   void doWriteFile(String fileName, InputStream in) {
