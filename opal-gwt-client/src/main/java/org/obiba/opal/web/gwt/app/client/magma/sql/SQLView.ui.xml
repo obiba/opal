@@ -19,7 +19,8 @@
     <b:Paragraph>
       <ui:msg description="SQL information">
         SQL queries can be executed on one or more tables of the project. Permission to access the values of the considered
-        tables is required.
+        tables is required. See <a href="https://opaldoc.obiba.org/en/latest/web-user-guide/projects/tables.html#sql" target="_blank">SQL API documentation</a>
+        for a description of the SQL syntax and functions.
       </ui:msg>
     </b:Paragraph>
 

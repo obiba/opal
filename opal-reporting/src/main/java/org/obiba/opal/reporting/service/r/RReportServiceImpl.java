@@ -68,7 +68,11 @@ public class RReportServiceImpl implements ReportService {
 
   @Override
   public boolean isRunning() {
-    return rServerManagerService.getDefaultRServer().isRunning();
+    try {
+      return rServerManagerService.getDefaultRServer().isRunning();
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   @Override

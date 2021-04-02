@@ -17,6 +17,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.*;
@@ -148,7 +149,9 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
         table.addColumn(new TextColumn<JsArray<JavaScriptObject>>() {
           @Override
           public String getValue(JsArray<JavaScriptObject> row) {
-            return row.get(pos) != null ? row.get(pos).toString() : "";
+            JavaScriptObject val = row.get(pos);
+            String valStr = val + ""; // because 0 is considered == null but concatenate correctly
+            return val == null && "null".equals(valStr) ? "" : valStr;
           }
         }, result.getColumns().get(pos));
       }
