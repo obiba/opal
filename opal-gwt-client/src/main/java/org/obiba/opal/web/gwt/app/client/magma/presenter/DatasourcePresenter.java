@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ViewsRestoreSubmittedEvent.
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.sql.SQLPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -131,6 +132,14 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       @Override
       public void onViewsRestoreSubmitted(ViewsRestoreSubmittedEvent event) {
         initDatasource();
+      }
+    });
+    addRegisteredHandler(SQLQueryCreationEvent.getType(), new SQLQueryCreationEvent.SQLQueryCreationHandler() {
+      @Override
+      public void onSQLQueryCreation(SQLQueryCreationEvent event) {
+        getView().renderSQLQuery(event.getQuery());
+        initSQLPresenter();
+        sqlPresenter.showQuery(event.getQuery());
       }
     });
   }
@@ -331,6 +340,13 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     return FilterHelper.matches(name, FilterHelper.tokenize(filter));
   }
 
+  private void initSQLPresenter() {
+    if (sqlPresenter == null) {
+      sqlPresenter = sqlPresenterProvider.get();
+      getView().setInSlot(Display.SQL_SLOT, sqlPresenter);
+    }
+  }
+
   //
   // Interfaces and classes
   //
@@ -343,10 +359,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
 
     private void displayDatasource(DatasourceDto datasourceDto) {
-      if (sqlPresenter == null) {
-        sqlPresenter = sqlPresenterProvider.get();
-        getView().setInSlot(Display.SQL_SLOT, sqlPresenter);
-      }
+      initSQLPresenter();
       sqlPresenter.initialize(datasourceDto);
       getView().setDatasource(datasourceDto);
       updateTables();
@@ -573,5 +586,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     List<TableDto> getSelectedTables();
 
     List<TableDto> getAllTables();
+
+    void renderSQLQuery(String query);
   }
 }

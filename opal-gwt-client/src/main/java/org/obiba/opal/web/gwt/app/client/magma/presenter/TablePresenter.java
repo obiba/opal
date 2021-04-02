@@ -45,6 +45,7 @@ import org.obiba.opal.web.gwt.app.client.magma.copy.ViewCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.*;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter.Display.Slots;
+import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
@@ -547,6 +548,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onSearchVariables() {
     fireEvent(new SearchTableVariablesEvent(table.getDatasourceName(), table.getName(), null));
+  }
+
+  @Override
+  public void onSQLQuery() {
+    String name = table.getName();
+    if (name.contains("."))
+      name = "`" + name + "`";
+    fireEvent(new SQLQueryCreationEvent(table.getDatasourceName(), "SELECT * FROM " + name + " LIMIT 10"));
   }
 
   @Override

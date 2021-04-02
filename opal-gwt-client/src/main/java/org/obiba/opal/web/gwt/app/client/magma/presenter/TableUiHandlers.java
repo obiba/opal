@@ -75,4 +75,6 @@ public interface TableUiHandlers extends UiHandlers {
   void onVariablesFilterUpdate(String filter);
 
   void onDownloadAnalyses();
+
+  void onSQLQuery();
 }

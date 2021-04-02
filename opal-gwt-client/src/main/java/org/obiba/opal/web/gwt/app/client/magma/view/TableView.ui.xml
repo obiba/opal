@@ -21,6 +21,11 @@
 
     <g:FlowPanel addStyleNames="pull-right">
       <b:ButtonGroup>
+        <b:Button icon="GEARS" ui:field="sqlQuery">
+          <ui:msg description="Variables label">SQL</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
         <b:Button icon="SEARCH" ui:field="searchVariables">
           <ui:msg description="Variables label">Variables</ui:msg>
         </b:Button>

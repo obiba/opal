@@ -240,6 +240,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   IconAnchor analyseVariables;
 
+  @UiField
+  Button sqlQuery;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -527,6 +530,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onSearchVariables();
   }
 
+  @UiHandler("sqlQuery")
+  void onSQLQuery(ClickEvent event) {
+    getUiHandlers().onSQLQuery();
+  }
+
   @UiHandler("remove")
   void onRemove(ClickEvent event) {
     getUiHandlers().onRemove();
@@ -695,7 +703,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public HasAuthorization getValuesAuthorizer() {
-    return new TabPanelAuthorizer(tabPanel, VALUES_TAB_INDEX);
+    return new CompositeAuthorizer(new TabPanelAuthorizer(tabPanel, VALUES_TAB_INDEX), new WidgetAuthorizer(sqlQuery));
   }
 
   @Override

@@ -129,6 +129,14 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     query.setText("");
     refreshHistory();
     queryFilter.setText("");
+    queryPanel.selectTab(0);
+  }
+
+  @Override
+  public void showQuery(String queryStr) {
+    onClear(null);
+    query.setText(queryStr);
+    queryPanel.selectTab(0);
   }
 
   @Override

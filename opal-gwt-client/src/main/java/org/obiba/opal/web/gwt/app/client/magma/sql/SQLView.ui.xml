@@ -45,14 +45,15 @@
           </b:ButtonGroup>
           <g:Label ui:field="execTime" addStyleNames="small-top-margin help-block"/>
 
-          <b:Alert ui:field="errorAlert" close="false" visible="true" addStyleNames="alert-error top-margin">
-            <g:Label ui:field="errorMessage"/>
-          </b:Alert>
+          <g:FlowPanel>
+            <b:Alert ui:field="errorAlert" close="false" visible="true" addStyleNames="alert-error top-margin">
+              <g:Label ui:field="errorMessage"/>
+            </b:Alert>
 
-          <g:Image ui:field="execPending" url="image/loading.gif"/>
+            <g:Image ui:field="execPending" url="image/loading.gif"/>
 
-          <g:FlowPanel ui:field="resultPanel"/>
-
+            <g:FlowPanel ui:field="resultPanel"/>
+          </g:FlowPanel>
         </g:FlowPanel>
       </g:FlowPanel>
       <b:NavLink>

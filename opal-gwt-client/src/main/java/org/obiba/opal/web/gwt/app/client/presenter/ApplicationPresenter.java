@@ -49,9 +49,11 @@ import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
@@ -307,6 +309,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
         refreshApplicationName();
+      }
+    });
+
+    addRegisteredHandler(SQLQueryCreationEvent.getType(), new SQLQueryCreationEvent.SQLQueryCreationHandler() {
+      @Override
+      public void onSQLQueryCreation(SQLQueryCreationEvent event) {
+        placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(event.getProject()));
       }
     });
 

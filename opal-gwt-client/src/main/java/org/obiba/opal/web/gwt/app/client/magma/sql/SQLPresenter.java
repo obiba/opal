@@ -44,9 +44,14 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
   }
 
   public void initialize(DatasourceDto datasource) {
+    if (this.datasource != null && datasource.getName().equals(this.datasource.getName())) return;
     this.datasource = datasource;
     getView().setDatasource(datasource);
     getView().clear();
+  }
+
+  public void showQuery(String query) {
+    getView().showQuery(query);
   }
 
   @Override
@@ -90,6 +95,8 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
   }
 
   public interface Display extends View, HasUiHandlers<SQLUiHandlers> {
+
+    void showQuery(String query);
 
     void clear();
 

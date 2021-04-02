@@ -338,6 +338,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   }
 
   @Override
+  public void renderSQLQuery(String query) {
+    tabPanel.selectTab(1);
+  }
+
+  @Override
   public void setDatasource(DatasourceDto dto) {
     addBtn.setVisible(false);
     boolean isNull = "null".equals(dto.getType());
