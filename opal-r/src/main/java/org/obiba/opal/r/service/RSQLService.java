@@ -201,6 +201,7 @@ public class RSQLService implements Service, SQLService {
           MagmaAssignROperation.RClass.DATA_FRAME, identifiersTableService, dataExportService);
       rSession.execute(mop);
     }
+    queryStr = queryStr.replaceAll("'", "\\\\'");
     log.info("SQL query: {}", queryStr);
     return queryStr;
   }
