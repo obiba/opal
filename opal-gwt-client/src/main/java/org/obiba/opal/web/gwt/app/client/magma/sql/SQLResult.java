@@ -16,11 +16,13 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 
 public class SQLResult extends JavaScriptObject {
-  protected SQLResult() {}
+  protected SQLResult() {
+  }
 
-  // JSNI methods to get data.
   public final native String getError() /*-{ return this.error; }-*/;
+
   public final native JsArrayString getColumns() /*-{ return this.columns; }-*/;
+
   public final native JsArray<JsArray<JavaScriptObject>> getRows() /*-{ return this.rows; }-*/;
 
   public final boolean hasError() {

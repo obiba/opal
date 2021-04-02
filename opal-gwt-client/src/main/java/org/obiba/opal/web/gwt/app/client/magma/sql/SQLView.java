@@ -17,7 +17,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.*;
@@ -25,16 +25,27 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HTMLCell;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
+
+import java.util.List;
+import java.util.Locale;
 
 public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPresenter.Display {
 
@@ -70,6 +81,17 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   @UiField
   FlowPanel panel;
 
+  @UiField
+  Table<SQLQuery> queryTable;
+
+  @UiField
+  TextBoxClearable queryFilter;
+
+  @UiField
+  NavPillsPanel queryPanel;
+
+  private ListDataProvider<SQLQuery> queryProvider = new ListDataProvider<>();
+
   private FormPanel form;
 
   private NamedFrame frame;
@@ -79,6 +101,8 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   private long startTime;
 
   private DatasourceDto datasource;
+
+  private List<SQLQuery> queryList = Lists.newArrayList();
 
   @Inject
   public SQLView(Binder uiBinder, EventBus eventBus, Translations translations) {
@@ -96,12 +120,15 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
       }
     });
     initDownloadWidgets();
+    initQueryHistoryTable();
   }
 
   @Override
   public void setDatasource(DatasourceDto datasource) {
     this.datasource = datasource;
     query.setText("");
+    refreshHistory();
+    queryFilter.setText("");
   }
 
   @Override
@@ -200,10 +227,28 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     execute.setEnabled(true);
     clear.setEnabled(true);
     execPending.setVisible(false);
+    long time = System.currentTimeMillis() - startTime;
     if (!errorAlert.isVisible()) {
-      execTime.setText("(" + NumberFormat.getDecimalFormat().format((System.currentTimeMillis() - startTime)) + " ms)");
+      execTime.setText("(" + NumberFormat.getDecimalFormat().format(time) + " ms)");
       execTime.setVisible(true);
     }
+    SQLQuery q = new SQLQuery((queryProvider.getList().size() + 1) + "", datasource.getName(),
+        queryInput.getText(), errorAlert.isVisible(), time);
+    queryList.add(0, q);
+    queryFilter.setText("");
+    refreshHistory();
+  }
+
+  private void refreshHistory() {
+    List qList = Lists.newArrayList();
+    String filter = queryFilter.getText().trim().toLowerCase();
+    for (SQLQuery sq : queryList) {
+      if (sq.getDatasource().equals(datasource.getName()))
+        if (Strings.isNullOrEmpty(filter) || sq.getSql().toLowerCase().contains(filter))
+          qList.add(sq);
+    }
+    queryProvider.setList(qList);
+    queryProvider.refresh();
   }
 
   @Override
@@ -226,6 +271,11 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     clear();
   }
 
+  @UiHandler("queryFilter")
+  public void onQueryFilterUpdate(KeyUpEvent event) {
+    refreshHistory();
+  }
+
   private void initDownloadWidgets() {
     frame = new NamedFrame("frame");
     frame.setVisible(false);
@@ -236,5 +286,72 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     form.setVisible(false);
     panel.add(form);
     panel.add(frame);
+  }
+
+  private void initQueryHistoryTable() {
+    queryTable.addColumn(new TextColumn<SQLQuery>() {
+      @Override
+      public String getValue(SQLQuery sqlQuery) {
+        return sqlQuery.getId();
+      }
+    }, "#");
+    queryTable.addColumn(new SQLQueryColumn(), translations.queryLabel());
+    queryTable.addColumn(new TextColumn<SQLQuery>() {
+      @Override
+      public String getValue(SQLQuery sqlQuery) {
+        return NumberFormat.getDecimalFormat().format(sqlQuery.getTime()) + " ms";
+      }
+    }, translations.timeLabel());
+    SQLQueryActionsColumn actionsColumn = new SQLQueryActionsColumn();
+    actionsColumn.setActionHandler(new ActionHandler<SQLQuery>() {
+      @Override
+      public void doAction(SQLQuery sqlQuery, String actionName) {
+        if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
+          onClear(null);
+          query.setText(sqlQuery.getSql());
+        } else {
+          query.setText(sqlQuery.getSql());
+          onExecute(null);
+        }
+        queryPanel.selectTab(0);
+      }
+    });
+    queryTable.addColumn(actionsColumn, translations.actionsLabel());
+    queryTable.setColumnWidth(0, "40px");
+    queryProvider.addDataDisplay(queryTable);
+  }
+
+  private static class SQLQueryActionsColumn extends ActionsColumn<SQLQuery> {
+    public SQLQueryActionsColumn() {
+      super(new ActionsProvider<SQLQuery>() {
+        @Override
+        public String[] allActions() {
+          return new String[]{ActionsColumn.EDIT_ACTION, "Execute"};
+        }
+
+        @Override
+        public String[] getActions(SQLQuery value) {
+          if (value.isError())
+            return new String[]{ActionsColumn.EDIT_ACTION};
+          else
+            return allActions();
+        }
+      });
+    }
+  }
+
+  private class SQLQueryColumn extends Column<SQLQuery, String> {
+
+    public SQLQueryColumn() {
+      super(new HTMLCell());
+    }
+
+    @Override
+    public String getValue(SQLQuery sqlQuery) {
+      if (sqlQuery.isError())
+        return "<span style='color: red'>" + sqlQuery.getSql() + "</span>";
+      else
+        return sqlQuery.getSql();
+    }
   }
 }

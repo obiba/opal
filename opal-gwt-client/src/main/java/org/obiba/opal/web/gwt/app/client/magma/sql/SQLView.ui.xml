@@ -11,6 +11,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -24,38 +25,50 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:ControlGroup>
-      <b:ControlLabel for="query">
+    <o:NavPillsPanel ui:field="queryPanel">
+      <b:NavLink active="true">
         <ui:msg description="Query label">Query</ui:msg>
-      </b:ControlLabel>
-      <b:TextArea ui:field="query" visibleLines="5" addStyleNames="full-width"/>
-    </b:ControlGroup>
+      </b:NavLink>
+      <g:FlowPanel>
+        <b:ControlGroup>
+          <b:TextArea ui:field="query" visibleLines="5" addStyleNames="full-width"/>
+        </b:ControlGroup>
+        <g:FlowPanel addStyleNames="bottom-margin">
+          <b:ButtonGroup>
+            <b:Button icon="COG" ui:field="execute" type="INFO">
+              <ui:msg description="Execute query label">Execute</ui:msg>
+            </b:Button>
+          </b:ButtonGroup>
+          <b:ButtonGroup>
+            <b:Button icon="ERASER" ui:field="clear">
+            </b:Button>
+          </b:ButtonGroup>
+          <g:Label ui:field="execTime" addStyleNames="small-top-margin help-block"/>
 
-    <g:FlowPanel>
+          <b:Alert ui:field="errorAlert" close="false" visible="true" addStyleNames="alert-error top-margin">
+            <g:Label ui:field="errorMessage"/>
+          </b:Alert>
 
-      <g:FlowPanel addStyleNames="bottom-margin">
-        <b:ButtonGroup>
-          <b:Button icon="COG" ui:field="execute" type="INFO">
-            <ui:msg description="Execute query label">Execute</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-        <b:ButtonGroup>
-          <b:Button icon="ERASER" ui:field="clear">
-          </b:Button>
-        </b:ButtonGroup>
-        <g:Label ui:field="execTime" addStyleNames="small-top-margin help-block"/>
+          <g:Image ui:field="execPending" url="image/loading.gif"/>
+
+          <g:FlowPanel ui:field="resultPanel"/>
+
+        </g:FlowPanel>
       </g:FlowPanel>
-
-      <b:Alert ui:field="errorAlert" close="false" visible="true" addStyleNames="alert-error top-margin">
-        <g:Label ui:field="errorMessage"/>
-      </b:Alert>
-
-      <g:Image ui:field="execPending" url="image/loading.gif"/>
-
-      <g:FlowPanel ui:field="resultPanel"/>
-
-    </g:FlowPanel>
-
+      <b:NavLink>
+        <ui:msg description="History label">History</ui:msg>
+      </b:NavLink>
+      <g:FlowPanel>
+        <g:FlowPanel>
+          <b:Controls addStyleNames="pull-right">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="queryFilter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>
+        </g:FlowPanel>
+        <o:Table ui:field="queryTable" pageSize="100"/>
+      </g:FlowPanel>
+    </o:NavPillsPanel>
 
   </g:FlowPanel>
 

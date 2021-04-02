@@ -336,6 +336,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Query")
   String queryLabel();
 
+  @Description("Time label")
+  @DefaultStringValue("Time")
+  String timeLabel();
+
   @Description("Count label")
   @DefaultStringValue("Count")
   String countLabel();
