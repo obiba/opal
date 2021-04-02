@@ -77,6 +77,7 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
       try {
         magmaAssignROperation.getDataExportService().exportTablesToDatasource(null,
             Sets.newHashSet(table), ds, copier, false, null);
+        magmaAssignROperation.doEval(String.format("if (!exists('%s')) assign('%s', NULL)", getSymbol(), getSymbol()));
       } catch (InterruptedException e) {
         log.error("Interrupted while assigning table to R", e);
       } finally {

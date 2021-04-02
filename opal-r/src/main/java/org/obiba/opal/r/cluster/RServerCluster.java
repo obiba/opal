@@ -81,6 +81,8 @@ public class RServerCluster implements RServerClusterService {
   @Override
   public void start() {
     rServerServices.forEach(RServerService::start);
+    ensureCRANPackage("resourcer");
+    ensureCRANPackage("sqldf");
   }
 
   /**

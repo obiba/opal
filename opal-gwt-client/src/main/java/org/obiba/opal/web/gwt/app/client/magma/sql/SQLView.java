@@ -107,7 +107,10 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   public void clear() {
     query.setText("");
     if (datasource != null && datasource.getTableArray().length() > 0) {
-      query.setPlaceholder("SELECT * FROM " + datasource.getTableArray().get(0) + " LIMIT 10");
+      String table = datasource.getTableArray().get(0);
+      if (table.contains("."))
+        table = "`" + table + "`";
+      query.setPlaceholder("SELECT * FROM " + table + " LIMIT 10");
     } else {
       query.setPlaceholder("SELECT * FROM ? LIMIT 10");
     }

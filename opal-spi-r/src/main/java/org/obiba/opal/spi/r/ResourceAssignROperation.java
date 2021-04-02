@@ -37,7 +37,7 @@ public class ResourceAssignROperation extends AbstractROperation {
     Resource.Credentials credentials = resource.getCredentials();
 
     try {
-      ensureGitHubPackage("obiba", "resourcer", "master");
+      ensurePackage("resourcer");
       if (requiredPackages != null && !requiredPackages.isEmpty())
         requiredPackages.forEach(this::loadPackage);
       String script = String.format("resourcer::newResourceClient(resourcer::newResource(name='%s', url='%s', identity=%s, secret=%s, format=%s))",

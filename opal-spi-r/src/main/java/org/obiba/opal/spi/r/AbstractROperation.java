@@ -39,7 +39,10 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assignScript(sym, ct);
     } catch (RServerException e) {
-      log.warn("Failed assigning '{}' with: {}", sym, ct, e);
+      if (log.isDebugEnabled())
+        log.warn("Failed assigning '{}' with: {}", sym, ct, e);
+      else
+        log.warn("Failed assigning '{}' with: {}", sym, ct);
       throw new RRuntimeException(e);
     }
   }
@@ -54,7 +57,10 @@ public abstract class AbstractROperation implements ROperation {
     try {
       connection.assignData(sym, bct);
     } catch (RServerException e) {
-      log.warn("Failed assigning '{}' with raw data", sym, e);
+      if (log.isDebugEnabled())
+        log.warn("Failed assigning '{}' with raw data", sym, e);
+      else
+        log.warn("Failed assigning '{}' with raw data", sym);
       throw new RRuntimeException(e);
     }
   }
@@ -93,7 +99,10 @@ public abstract class AbstractROperation implements ROperation {
       log.debug("evaluating: {}", script);
       return connection.eval(script, serialize);
     } catch (RServerException e) {
-      log.warn("Failed evaluating: {}", script, e);
+      if (log.isDebugEnabled())
+        log.warn("Failed evaluating: {}", script, e);
+      else
+        log.warn("Failed evaluating: {}", script);
       throw new RRuntimeException(e);
     }
   }
@@ -108,7 +117,10 @@ public abstract class AbstractROperation implements ROperation {
     try {
       writeFile(fileName, new BufferedInputStream(new FileInputStream(in)));
     } catch (FileNotFoundException | RServerException e) {
-      log.warn("Failed creating file '{}' from file {}", fileName, in.getName(), e);
+      if (log.isDebugEnabled())
+        log.warn("Failed creating file '{}' from file {}", fileName, in.getName(), e);
+      else
+        log.warn("Failed creating file '{}' from file {}", fileName, in.getName());
       throw new RRuntimeException(e);
     }
   }
@@ -134,7 +146,10 @@ public abstract class AbstractROperation implements ROperation {
       if (!out.getParentFile().exists()) out.getParentFile().mkdirs();
       readFile(fileName, new BufferedOutputStream(new FileOutputStream(out)));
     } catch (FileNotFoundException e) {
-      log.warn("Failed creating file '{}' from '{}'", out, fileName, e);
+      if (log.isDebugEnabled())
+        log.warn("Failed creating file '{}' from '{}'", out, fileName, e);
+      else
+        log.warn("Failed creating file '{}' from '{}'", out, fileName);
       throw new RRuntimeException(e);
     }
   }

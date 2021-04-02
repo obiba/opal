@@ -67,7 +67,8 @@ public class ClientErrorDtos {
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RuntimeException e) {
-    if (!(e instanceof AuthenticationException)) log.warn(errorStatus, e);
+    if (!(e instanceof AuthenticationException))
+      log.debug(errorStatus, e);
     Throwable cause = getRootCause(e);
     return getErrorMessage(responseStatus, errorStatus)
         .addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage()).build();

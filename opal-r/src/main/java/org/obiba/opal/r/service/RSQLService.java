@@ -82,11 +82,11 @@ public class RSQLService implements Service, SQLService {
     RServerSession rSession = prepareRSession();
 
     try {
-      prepareEnvironment(datasource, query, idName, rSession);
+      String queryStr = prepareEnvironment(datasource, query, idName, rSession);
 
       // execute SQL
       String rOutput = "out.json";
-      RScriptROperation rop = new RScriptROperation(String.format("%s.JSON('%s', '%s')", EXECUTE_SQL_FUNC, query, rOutput), false);
+      RScriptROperation rop = new RScriptROperation(String.format("%s.JSON('%s', '%s')", EXECUTE_SQL_FUNC, queryStr, rOutput), false);
       rSession.execute(rop);
 
       File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
@@ -107,11 +107,11 @@ public class RSQLService implements Service, SQLService {
     RServerSession rSession = prepareRSession();
 
     try {
-      prepareEnvironment(datasource, query, idName, rSession);
+      String queryStr = prepareEnvironment(datasource, query, idName, rSession);
 
       // execute SQL
       String rOutput = "out.csv";
-      RScriptROperation rop = new RScriptROperation(String.format("%s.CSV('%s', '%s')", EXECUTE_SQL_FUNC, query, rOutput), false);
+      RScriptROperation rop = new RScriptROperation(String.format("%s.CSV('%s', '%s')", EXECUTE_SQL_FUNC, queryStr, rOutput), false);
       rSession.execute(rop);
 
       File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
@@ -175,7 +175,7 @@ public class RSQLService implements Service, SQLService {
     return rSession;
   }
 
-  private void prepareEnvironment(String datasource, String query, String idName, RServerSession rSession) {
+  private String prepareEnvironment(String datasource, String query, String idName, RServerSession rSession) {
     // load utility functions
     SQLExecutorROperation fop = new SQLExecutorROperation();
     rSession.execute(fop);
@@ -184,17 +184,35 @@ public class RSQLService implements Service, SQLService {
     Set<String> tables = SQLExtractor.extractTables(query);
     Datasource ds = MagmaEngine.get().getDatasource(datasource);
     for (String table : tables) {
-      if (!ds.hasValueTable(table))
-        throw new NoSuchValueTableException(datasource, table);
+      String tableName = extractTableName(table);
+      if (!ds.hasValueTable(tableName))
+        throw new NoSuchValueTableException(datasource, tableName);
       else
-        ensureTableValuesAccess(datasource, table);
+        ensureTableValuesAccess(datasource, tableName);
     }
+    String queryStr = query;
     for (String table : tables) {
-      MagmaAssignROperation mop = new MagmaAssignROperation(table, datasource + "." + table, null, true,
+      String tableName = extractTableName(table);
+      String tableSymbol = normalizeTableSymbol(tableName);
+      if (!table.equals(tableSymbol))
+        queryStr = queryStr.replaceAll(table, tableSymbol);
+      MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, datasource + "." + tableName, null, true,
           Strings.isNullOrEmpty(idName) ? "_id" : idName, null,
           MagmaAssignROperation.RClass.DATA_FRAME, identifiersTableService, dataExportService);
       rSession.execute(mop);
     }
+    log.info("SQL query: {}", queryStr);
+    return queryStr;
+  }
+
+  private String extractTableName(String table) {
+    if (table.startsWith("`") && table.endsWith("`"))
+      return table.replaceAll("`", "");
+    return table;
+  }
+
+  private String normalizeTableSymbol(String tableName) {
+    return tableName.replaceAll("\\.", "_");
   }
 
   private void closeRSession(String user) {
