@@ -9,23 +9,12 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +22,20 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriBuilder;
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -43,10 +45,13 @@ public class DatasourcesResource {
   @Autowired
   private ApplicationContext applicationContext;
 
+  @Autowired
+  private SQLService sqlService;
+
   @GET
   public List<Magma.DatasourceDto> getDatasources() {
     List<Magma.DatasourceDto> datasources = Lists.newArrayList();
-    for(Datasource from : MagmaEngine.get().getDatasources()) {
+    for (Datasource from : MagmaEngine.get().getDatasources()) {
       URI dsLink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
       Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dsLink.toString());
       datasources.add(ds.build());
@@ -59,7 +64,7 @@ public class DatasourcesResource {
   @Path("/tables")
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexed) {
     List<Magma.TableDto> tables = Lists.newArrayList();
-    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+    for (Datasource datasource : MagmaEngine.get().getDatasources()) {
       tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType, indexed));
     }
 
@@ -73,10 +78,10 @@ public class DatasourcesResource {
     Map<String, Integer> entityTypes = Maps.newHashMap();
     MagmaEngine.get().getDatasources()
         .forEach(ds -> ds.getValueTables().stream().map(ValueTable::getEntityType)
-        .forEach(et -> {
-          if (entityTypes.containsKey(et)) entityTypes.put(et, entityTypes.get(et) + 1);
-          else entityTypes.put(et, 1);
-        }));
+            .forEach(et -> {
+              if (entityTypes.containsKey(et)) entityTypes.put(et, entityTypes.get(et) + 1);
+              else entityTypes.put(et, 1);
+            }));
     return entityTypes.entrySet().stream()
         .map(et -> Magma.VariableEntitySummaryDto.newBuilder().setEntityType(et.getKey()).setTableCount(et.getValue()).build())
         .collect(Collectors.toList());
@@ -87,6 +92,36 @@ public class DatasourcesResource {
   public Response getDatasourcesCount() {
     return Response.ok().entity(String.valueOf(MagmaEngine.get().getDatasources().size())).build();
 
+  }
+
+  @POST
+  @Path("/_sql")
+  @Consumes(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
+    final File output = sqlService.executeToJSON(null, query, idName);
+    StreamingOutput stream = os -> {
+      Files.copy(output.toPath(), os);
+      output.delete();
+    };
+
+    return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE)
+        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+  }
+
+  @POST
+  @Path("/_sql")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces("text/csv")
+  public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
+    final File output = sqlService.executeToCSV(null, query, idName);
+    StreamingOutput stream = os -> {
+      Files.copy(output.toPath(), os);
+      output.delete();
+    };
+
+    return Response.ok(stream, "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
   }
 
   private DatasourceTablesResource getDatasourceTablesResource(Datasource datasource) {

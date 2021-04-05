@@ -12,14 +12,6 @@ package org.obiba.opal.web.magma;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.protobuf.format.JsonFormat;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -53,11 +45,14 @@ import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -123,11 +118,11 @@ public class DatasourceResource {
   @DELETE
   public Response removeDatasource() {
     Datasource ds;
-    if(MagmaEngine.get().hasTransientDatasource(name)) {
+    if (MagmaEngine.get().hasTransientDatasource(name)) {
       ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);
       viewManager.unregisterDatasource(name);
-    } else if(MagmaEngine.get().hasDatasource(name)) {
+    } else if (MagmaEngine.get().hasDatasource(name)) {
       throw new InvalidRequestException("DatasourceNotFound");
     } else {
       return Response.status(Status.NOT_FOUND)
@@ -170,13 +165,13 @@ public class DatasourceResource {
   @POST
   @Path("/views")
   public Response createView(ViewDto viewDto, @Context UriInfo uriInfo,
-      @Nullable @QueryParam("comment") String comment) {
+                             @Nullable @QueryParam("comment") String comment) {
 
-    if(!viewDto.hasName()) {
+    if (!viewDto.hasName()) {
       return Response.status(BAD_REQUEST).build();
     }
 
-    if(datasourceHasTable(viewDto.getName())) {
+    if (datasourceHasTable(viewDto.getName())) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
@@ -223,12 +218,12 @@ public class DatasourceResource {
 
   private AclAction getAction(ViewDto viewDto) {
     AclAction action = AclAction.TABLE_ALL;
-    if(!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
+    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
 
-    for(String tableName : viewDto.getFromList()) {
+    for (String tableName : viewDto.getFromList()) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       ValueTable table = resolver.resolveTable();
-      if(!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
+      if (!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
           "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) {
         action = AclAction.TABLE_EDIT;
         break;
@@ -253,7 +248,7 @@ public class DatasourceResource {
   @NoAuthorization
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     Collection<LocaleDto> localeDtos = new ArrayList<>();
-    for(Locale locale : getLocales()) {
+    for (Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale == null ? null : new Locale(displayLocale)));
     }
     return localeDtos;
@@ -263,7 +258,7 @@ public class DatasourceResource {
   @Path("/_sql")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue("_id") String idName) {
+  public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.executeToJSON(name, query, idName);
     StreamingOutput stream = os -> {
       Files.copy(output.toPath(), os);
@@ -272,15 +267,13 @@ public class DatasourceResource {
 
     return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE)
         .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
-//    return Response.ok().type(MediaType.APPLICATION_JSON_TYPE)
-//        .entity(sqlService.executeToJSON(name, query, idName)).build();
   }
 
   @POST
   @Path("/_sql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/csv")
-  public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue("_id") String idName) {
+  public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.executeToCSV(name, query, idName);
     StreamingOutput stream = os -> {
       Files.copy(output.toPath(), os);

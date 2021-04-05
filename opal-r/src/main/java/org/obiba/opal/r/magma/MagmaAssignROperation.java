@@ -31,6 +31,8 @@ public class MagmaAssignROperation extends AbstractROperation {
     DATA_FRAME, TIBBLE, TIBBLE_WITH_FACTORS, VECTOR
   }
 
+  private static final String DEFAULT_ID_COLUMN = "_id";
+
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
@@ -147,7 +149,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   String getIdColumnName() {
     // we need one for tibble assignment and will be removed in the case of a data frame
-    return withIdColumn() ? idColumnName : ".id";
+    return withIdColumn() ? idColumnName : DEFAULT_ID_COLUMN;
   }
 
   boolean withIdColumn() {

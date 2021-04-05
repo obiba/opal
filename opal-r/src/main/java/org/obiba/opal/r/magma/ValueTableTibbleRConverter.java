@@ -11,6 +11,7 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -23,10 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -97,8 +97,17 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
   }
 
   private File getTableRCache(ValueTable table) {
+    String parametersKey = magmaAssignROperation.getIdColumnName() + "-" +
+        magmaAssignROperation.withMissings() +  "-" +
+        magmaAssignROperation.getIdentifiersMapping();
+    try {
+      parametersKey = parametersKey + "-" + (magmaAssignROperation.hasVariableFilter() ?
+            URLEncoder.encode(magmaAssignROperation.getVariableFilter(), StandardCharsets.UTF_8.toString()) : "null");
+    } catch (Exception e) {
+      // ignore
+    }
     String cacheKey = table.getDatasource().getName() + "-" + table.getName() + "-" +
-        magmaAssignROperation.getIdColumnName() + "-" + magmaAssignROperation.withMissings() +  "-" +
+        parametersKey + "-" +
         ((Date)table.getTimestamps().getLastUpdate().getValue()).getTime();
     File tableCache = new File(R_CACHE_DIR, cacheKey + ".rds");
     return tableCache;

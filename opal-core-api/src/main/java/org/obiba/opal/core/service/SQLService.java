@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.service;
 
+import javax.annotation.Nullable;
 import java.io.File;
 
 /**
@@ -17,25 +18,27 @@ import java.io.File;
  */
 public interface SQLService extends SystemService {
 
+  String DEFAULT_ID_COLUMN = "_id";
+
   /**
    * Execute a SQL query in the context of a datasource and output result as a JSON object.
    *
-   * @param datasource
+   * @param datasource Datasource context, for table name resoltuion, can be null
    * @param query
    * @param idName
    * @return
    */
-  File executeToJSON(String datasource, String query, String idName);
+  File executeToJSON(@Nullable String datasource, String query, String idName);
 
   /**
    * Execute a SQL query in the context of a datasource and dump output to a temporary
    * CSV file.
    *
-   * @param datasource
+   * @param datasource Datasource context, for table name resoltuion, can be null
    * @param query
    * @param idName
    * @return
    */
-  File executeToCSV(String datasource, String query, String idName);
+  File executeToCSV(@Nullable String datasource, String query, String idName);
 
 }
