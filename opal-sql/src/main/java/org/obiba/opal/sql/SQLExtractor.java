@@ -18,19 +18,23 @@ import java.util.Set;
 
 public class SQLExtractor {
 
-  public static Set<String> extractTables(String sql) {
-    Set<String> tables = Sets.newLinkedHashSet();
-    SQLLexer lexer = new SQLLexer(CharStreams.fromString(sql));
-    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-    SQLParser parser = new SQLParser(tokenStream);
-    parser.parse().accept(new SQLParserBaseVisitor<Void>() {
-      @Override
-      public Void visitTable_name(SQLParser.Table_nameContext ctx) {
-        tables.add(ctx.getText());
-        return super.visitTable_name(ctx);
-      }
-    });
-    return tables;
+  public static Set<String> extractTables(String sql) throws SQLParserException {
+    try {
+      Set<String> tables = Sets.newLinkedHashSet();
+      SQLLexer lexer = new SQLLexer(CharStreams.fromString(sql));
+      CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+      SQLParser parser = new SQLParser(tokenStream);
+      parser.parse().accept(new SQLParserBaseVisitor<Void>() {
+        @Override
+        public Void visitTable_name(SQLParser.Table_nameContext ctx) {
+          tables.add(ctx.getText());
+          return super.visitTable_name(ctx);
+        }
+      });
+      return tables;
+    } catch (Exception e) {
+      throw new SQLParserException(e);
+    }
   }
 
 }

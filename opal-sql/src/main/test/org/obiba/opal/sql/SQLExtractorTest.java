@@ -19,7 +19,7 @@ import java.util.Set;
 public class SQLExtractorTest {
 
   @Test
-  public void testExtractTables() {
+  public void testExtractTables() throws SQLParserException {
     doExtractTables("select * from CNSIM1", "CNSIM1");
     doExtractTables("select * from CNSIM1 union all select * from CNSIM2", "CNSIM1 | CNSIM2");
     doExtractTables("select count(LAB_HDL) as hdl_count, avg(LAB_HDL) as hdl_avg, GENDER as gender " +
@@ -29,7 +29,7 @@ public class SQLExtractorTest {
     doExtractTables("select 1", "");
   }
 
-  private void doExtractTables(String sql, String expected) {
+  private void doExtractTables(String sql, String expected) throws SQLParserException {
     Set<String> tables = SQLExtractor.extractTables(sql);
     String names = Joiner.on(" | ").join(tables);
     System.out.println(names);

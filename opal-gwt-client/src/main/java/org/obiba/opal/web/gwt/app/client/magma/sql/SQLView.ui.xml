@@ -32,6 +32,9 @@
       <g:FlowPanel>
         <b:ControlGroup>
           <b:TextArea ui:field="query" visibleLines="5" addStyleNames="full-width"/>
+          <b:HelpBlock addStyleNames="pull-right">
+            <ui:msg description="SQL query help">Tip: use Ctrl+Enter to execute.</ui:msg>
+          </b:HelpBlock>
         </b:ControlGroup>
         <g:FlowPanel addStyleNames="bottom-margin">
           <b:ButtonGroup>

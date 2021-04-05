@@ -30,6 +30,7 @@ import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.sql.SQLExtractor;
+import org.obiba.opal.sql.SQLParserException;
 import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class RSQLService implements Service, SQLService {
       FileReadROperation frop = new FileReadROperation(rOutput, output);
       rSession.execute(frop);
       return output;
-    } catch (RRuntimeException e) {
+    } catch (RRuntimeException | SQLParserException e) {
       throw new SQLException(e);
     } finally {
       closeRSession(rSession.getId());
@@ -123,7 +124,7 @@ public class RSQLService implements Service, SQLService {
       FileReadROperation frop = new FileReadROperation(rOutput, output);
       rSession.execute(frop);
       return output;
-    } catch (RRuntimeException e) {
+    } catch (RRuntimeException | SQLParserException e) {
       throw new SQLException(e);
     } finally {
       closeRSession(rSession.getId());
@@ -170,7 +171,7 @@ public class RSQLService implements Service, SQLService {
     return rSession;
   }
 
-  private String prepareEnvironment(@Nullable String datasource, String query, String idName, RServerSession rSession) {
+  private String prepareEnvironment(@Nullable String datasource, String query, String idName, RServerSession rSession) throws SQLParserException {
     // load utility functions
     SQLExecutorROperation fop = new SQLExecutorROperation();
     rSession.execute(fop);

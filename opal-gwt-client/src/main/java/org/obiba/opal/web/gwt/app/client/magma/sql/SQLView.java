@@ -45,7 +45,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HTMLCell;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import java.util.List;
-import java.util.Locale;
 
 public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPresenter.Display {
 
@@ -82,7 +81,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   FlowPanel panel;
 
   @UiField
-  Table<SQLQuery> queryTable;
+  Table<SQLHistoryEntry> queryTable;
 
   @UiField
   TextBoxClearable queryFilter;
@@ -90,7 +89,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   @UiField
   NavPillsPanel queryPanel;
 
-  private ListDataProvider<SQLQuery> queryProvider = new ListDataProvider<>();
+  private ListDataProvider<SQLHistoryEntry> queryProvider = new ListDataProvider<>();
 
   private FormPanel form;
 
@@ -102,7 +101,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
 
   private DatasourceDto datasource;
 
-  private List<SQLQuery> queryList = Lists.newArrayList();
+  private List<SQLHistoryEntry> queryList = Lists.newArrayList();
 
   @Inject
   public SQLView(Binder uiBinder, EventBus eventBus, Translations translations) {
@@ -240,8 +239,8 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
       execTime.setText("(" + NumberFormat.getDecimalFormat().format(time) + " ms)");
       execTime.setVisible(true);
     }
-    SQLQuery q = new SQLQuery((queryProvider.getList().size() + 1) + "", datasource.getName(),
-        queryInput.getText(), errorAlert.isVisible(), time);
+    SQLHistoryEntry q = new SQLHistoryEntry((queryProvider.getList().size() + 1) + "", datasource.getName(),
+        queryInput.getText(), errorMessage.getText(), time);
     queryList.add(0, q);
     queryFilter.setText("");
     refreshHistory();
@@ -250,7 +249,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   private void refreshHistory() {
     List qList = Lists.newArrayList();
     String filter = queryFilter.getText().trim().toLowerCase();
-    for (SQLQuery sq : queryList) {
+    for (SQLHistoryEntry sq : queryList) {
       if (sq.getDatasource().equals(datasource.getName()))
         if (Strings.isNullOrEmpty(filter) || sq.getSql().toLowerCase().contains(filter))
           qList.add(sq);
@@ -297,28 +296,28 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   }
 
   private void initQueryHistoryTable() {
-    queryTable.addColumn(new TextColumn<SQLQuery>() {
+    queryTable.addColumn(new TextColumn<SQLHistoryEntry>() {
       @Override
-      public String getValue(SQLQuery sqlQuery) {
-        return sqlQuery.getId();
+      public String getValue(SQLHistoryEntry sqlHistoryEntry) {
+        return sqlHistoryEntry.getId();
       }
     }, "#");
     queryTable.addColumn(new SQLQueryColumn(), translations.queryLabel());
-    queryTable.addColumn(new TextColumn<SQLQuery>() {
+    queryTable.addColumn(new TextColumn<SQLHistoryEntry>() {
       @Override
-      public String getValue(SQLQuery sqlQuery) {
-        return NumberFormat.getDecimalFormat().format(sqlQuery.getTime()) + " ms";
+      public String getValue(SQLHistoryEntry sqlHistoryEntry) {
+        return NumberFormat.getDecimalFormat().format(sqlHistoryEntry.getTime()) + " ms";
       }
     }, translations.timeLabel());
     SQLQueryActionsColumn actionsColumn = new SQLQueryActionsColumn();
-    actionsColumn.setActionHandler(new ActionHandler<SQLQuery>() {
+    actionsColumn.setActionHandler(new ActionHandler<SQLHistoryEntry>() {
       @Override
-      public void doAction(SQLQuery sqlQuery, String actionName) {
+      public void doAction(SQLHistoryEntry sqlHistoryEntry, String actionName) {
         if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
           onClear(null);
-          query.setText(sqlQuery.getSql());
+          query.setText(sqlHistoryEntry.getSql());
         } else {
-          query.setText(sqlQuery.getSql());
+          query.setText(sqlHistoryEntry.getSql());
           onExecute(null);
         }
         queryPanel.selectTab(0);
@@ -329,16 +328,16 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     queryProvider.addDataDisplay(queryTable);
   }
 
-  private static class SQLQueryActionsColumn extends ActionsColumn<SQLQuery> {
+  private static class SQLQueryActionsColumn extends ActionsColumn<SQLHistoryEntry> {
     public SQLQueryActionsColumn() {
-      super(new ActionsProvider<SQLQuery>() {
+      super(new ActionsProvider<SQLHistoryEntry>() {
         @Override
         public String[] allActions() {
           return new String[]{ActionsColumn.EDIT_ACTION, "Execute"};
         }
 
         @Override
-        public String[] getActions(SQLQuery value) {
+        public String[] getActions(SQLHistoryEntry value) {
           if (value.isError())
             return new String[]{ActionsColumn.EDIT_ACTION};
           else
@@ -348,18 +347,18 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
     }
   }
 
-  private class SQLQueryColumn extends Column<SQLQuery, String> {
+  private class SQLQueryColumn extends Column<SQLHistoryEntry, String> {
 
     public SQLQueryColumn() {
       super(new HTMLCell());
     }
 
     @Override
-    public String getValue(SQLQuery sqlQuery) {
-      if (sqlQuery.isError())
-        return "<span style='color: red'>" + sqlQuery.getSql() + "</span>";
+    public String getValue(SQLHistoryEntry sqlHistoryEntry) {
+      if (sqlHistoryEntry.isError())
+        return "<span style=\"color: red\" title=\"" + sqlHistoryEntry.getSafeHtmlError() + "\">" + sqlHistoryEntry.getSql() + "</span>";
       else
-        return sqlQuery.getSql();
+        return sqlHistoryEntry.getSql();
     }
   }
 }

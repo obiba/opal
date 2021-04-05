@@ -10,7 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.sql;
 
-public class SQLQuery {
+import com.google.common.base.Strings;
+import com.google.gwt.safehtml.shared.HtmlSanitizer;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+
+public class SQLHistoryEntry {
 
   private final String id;
 
@@ -18,11 +23,11 @@ public class SQLQuery {
 
   private final String sql;
 
-  private final boolean error;
+  private final String error;
 
   private final long time;
 
-  public SQLQuery(String id, String datasource, String sql, boolean error, long time) {
+  public SQLHistoryEntry(String id, String datasource, String sql, String error, long time) {
     this.id = id;
     this.datasource = datasource;
     this.sql = sql;
@@ -43,10 +48,18 @@ public class SQLQuery {
   }
 
   public boolean isError() {
-    return error;
+    return !Strings.isNullOrEmpty(error);
   }
 
   public long getTime() {
     return time;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public String getSafeHtmlError() {
+    return SafeHtmlUtils.htmlEscape(error);
   }
 }
