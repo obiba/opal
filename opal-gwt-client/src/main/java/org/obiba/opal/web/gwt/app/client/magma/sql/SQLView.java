@@ -54,7 +54,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   private final Translations translations;
 
   @UiField
-  TextArea query;
+  TextArea queryText;
 
   @UiField
   Button execute;
@@ -107,10 +107,10 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   public SQLView(Binder uiBinder, EventBus eventBus, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    query.addKeyUpHandler(new KeyUpHandler() {
+    queryText.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent keyUpEvent) {
-        boolean empty = Strings.isNullOrEmpty(query.getText().trim());
+        boolean empty = Strings.isNullOrEmpty(queryText.getText().trim());
         execute.setEnabled(!empty);
         clear.setEnabled(!empty);
         if (!empty && keyUpEvent.isControlKeyDown() && keyUpEvent.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -125,7 +125,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   @Override
   public void setDatasource(DatasourceDto datasource) {
     this.datasource = datasource;
-    query.setText("");
+    queryText.setText("");
     refreshHistory();
     queryFilter.setText("");
     queryPanel.selectTab(0);
@@ -134,20 +134,20 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   @Override
   public void showQuery(String queryStr) {
     onClear(null);
-    query.setText(queryStr);
+    queryText.setText(queryStr);
     queryPanel.selectTab(0);
   }
 
   @Override
   public void clear() {
-    query.setText("");
+    queryText.setText("");
     if (datasource != null && datasource.getTableArray().length() > 0) {
       String table = datasource.getTableArray().get(0);
       if (table.contains("."))
         table = "`" + table + "`";
-      query.setPlaceholder("SELECT * FROM " + table + " LIMIT 10");
+      queryText.setPlaceholder("SELECT * FROM " + table + " LIMIT 10");
     } else {
-      query.setPlaceholder("SELECT * FROM ? LIMIT 10");
+      queryText.setPlaceholder("SELECT * FROM ? LIMIT 10");
     }
     execute.setEnabled(true);
     clear.setEnabled(false);
@@ -161,6 +161,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
 
   @Override
   public void startExecute() {
+    queryText.setEnabled(false);
     resultPanel.clear();
     errorAlert.setVisible(false);
     errorMessage.setText("");
@@ -231,6 +232,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
 
   @Override
   public void endExecute() {
+    queryText.setEnabled(true);
     execute.setEnabled(true);
     clear.setEnabled(true);
     execPending.setVisible(false);
@@ -267,7 +269,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
 
   @UiHandler("execute")
   void onExecute(ClickEvent event) {
-    String qStr = query.getText().trim();
+    String qStr = queryText.getText().trim();
     if (Strings.isNullOrEmpty(qStr)) return;
     getUiHandlers().execute(qStr);
     queryInput.setText(qStr);
@@ -315,9 +317,9 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
       public void doAction(SQLHistoryEntry sqlHistoryEntry, String actionName) {
         if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
           onClear(null);
-          query.setText(sqlHistoryEntry.getSql());
+          queryText.setText(sqlHistoryEntry.getSql());
         } else {
-          query.setText(sqlHistoryEntry.getSql());
+          queryText.setText(sqlHistoryEntry.getSql());
           onExecute(null);
         }
         queryPanel.selectTab(0);
