@@ -141,7 +141,7 @@ public class SQLView extends ViewWithUiHandlers<SQLUiHandlers> implements SQLPre
   @Override
   public void clear() {
     queryText.setText("");
-    if (datasource != null && datasource.getTableArray().length() > 0) {
+    if (datasource != null && datasource.getTableArray() != null && datasource.getTableArray().length() > 0) {
       String table = datasource.getTableArray().get(0);
       if (table.contains("."))
         table = "`" + table + "`";
