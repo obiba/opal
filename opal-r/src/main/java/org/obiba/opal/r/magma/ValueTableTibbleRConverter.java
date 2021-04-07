@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
@@ -28,6 +29,10 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * Base implementation of Magma R converters using file dumps to be transferred to R and read back by R.
@@ -84,13 +89,15 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
         Disposables.silentlyDispose(ds);
       }
 
-      try {
-        magmaAssignROperation.doEval(String.format("saveRDS(`%s`, '%s')", getSymbol(), tableCache.getName()));
-        magmaAssignROperation.doReadFile(tableCache.getName(), tableCache);
-        magmaAssignROperation.doEval(String.format("base::unlink('%s')", tableCache.getName()));
-      } catch (Exception e) {
-        log.warn("Table R cache failure", e);
-        tableCache.delete();
+      if (!tableCache.exists()) {
+        try {
+          magmaAssignROperation.doEval(String.format("saveRDS(`%s`, '%s')", getSymbol(), tableCache.getName()));
+          magmaAssignROperation.doReadFile(tableCache.getName(), tableCache);
+          magmaAssignROperation.doEval(String.format("base::unlink('%s')", tableCache.getName()));
+        } catch (Exception e) {
+          log.warn("Table R cache failure", e);
+          tableCache.delete();
+        }
       }
     }
     log.info("R assignment succeed in {}", stopwatch.stop());
@@ -106,11 +113,22 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
     } catch (Exception e) {
       // ignore
     }
+    // some users can see only some of the variables, then cache key should be aware of that
+    String varsKey = StreamSupport.stream(table.getVariables().spliterator(), false)
+        .map(Variable::getName)
+        .collect(Collectors.joining("|"));
+    parametersKey = parametersKey + "-" + varsKey;
     String cacheKey = table.getDatasource().getName() + "-" + table.getName() + "-" +
-        parametersKey + "-" +
+        getCRC32Checksum(parametersKey.getBytes()) + "-" +
         ((Date)table.getTimestamps().getLastUpdate().getValue()).getTime();
     File tableCache = new File(R_CACHE_DIR, cacheKey + ".rds");
     return tableCache;
+  }
+
+  public static long getCRC32Checksum(byte[] bytes) {
+    Checksum crc32 = new CRC32();
+    crc32.update(bytes, 0, bytes.length);
+    return crc32.getValue();
   }
 
 }
