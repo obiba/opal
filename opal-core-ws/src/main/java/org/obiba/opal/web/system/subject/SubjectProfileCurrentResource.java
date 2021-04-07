@@ -9,20 +9,6 @@
  */
 package org.obiba.opal.web.system.subject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.oidc.OIDCConfiguration;
@@ -31,6 +17,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.IDProvidersService;
+import org.obiba.opal.web.model.SQL;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
@@ -39,6 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.obiba.opal.web.model.Opal.BookmarkDto;
 
@@ -119,8 +113,19 @@ public class SubjectProfileCurrentResource {
     return resource.delete();
   }
 
+  @Path("/sql-history")
+  @GET
+  @NoAuthorization
+  public List<SQL.SQLExecutionDto> getSQLHistory(@QueryParam("datasource") String datasource,
+                                                 @QueryParam("offset") @DefaultValue("0") int offset,
+                                                 @QueryParam("limit") @DefaultValue("100") int limit) {
+    SQLHistoryResource resource = applicationContext.getBean(SQLHistoryResource.class);
+    resource.setSubject(getPrincipal());
+    return resource.getSQLHistory(datasource, offset, limit);
+  }
+
   private String getPrincipal() {
-    return (String)SecurityUtils.getSubject().getPrincipal();
+    return (String) SecurityUtils.getSubject().getPrincipal();
   }
 
   private List<String> decodeResources(Iterable<String> resourceIterator) throws UnsupportedEncodingException {

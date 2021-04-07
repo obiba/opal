@@ -35,7 +35,7 @@ public class SubjectProfileResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
-  
+
   @Autowired
   private SubjectProfileService subjectProfileService;
 
@@ -58,6 +58,13 @@ public class SubjectProfileResource {
   public BookmarksResource getBookmarks() {
     BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(principal);
+    return resource;
+  }
+
+  @Path("/sql-history")
+  public SQLHistoryResource getSQLHistory() {
+    SQLHistoryResource resource = applicationContext.getBean(SQLHistoryResource.class);
+    resource.setSubject(principal);
     return resource;
   }
 

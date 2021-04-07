@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.services;
+package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.sql.SQLExecution;
@@ -16,31 +16,32 @@ import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.web.model.SQL;
 import org.obiba.opal.web.sql.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Scope("request")
-@Path("/service/sql")
-public class SQLServiceResource {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class SQLHistoryResourceImpl implements SQLHistoryResource {
 
   @Autowired
   private SQLService sqlService;
 
-  @GET
-  @Path("/history")
-  public List<SQL.SQLExecutionDto> getHistory(@QueryParam("user") String user, @QueryParam("datasource") String datasource,
-                                              @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    if (Strings.isNullOrEmpty(user)) throw new BadRequestException("user parameter is missing");
-    List<SQLExecution> execs = Strings.isNullOrEmpty(datasource) ? sqlService.getSQLExecutions(user) :
-        "*".equals(datasource) ? sqlService.getSQLExecutions(user, null) : sqlService.getSQLExecutions(user, datasource);
+  private String subject;
+
+  @Override
+  public void setSubject(String subject) {
+    this.subject = subject;
+  }
+
+  @Override
+  public List<SQL.SQLExecutionDto> getSQLHistory(String datasource, int offset, int limit) {
+    List<SQLExecution> execs = Strings.isNullOrEmpty(datasource) ? sqlService.getSQLExecutions(subject) :
+        "*".equals(datasource) ? sqlService.getSQLExecutions(subject, null) : sqlService.getSQLExecutions(subject, datasource);
     return execs.subList(offset, Math.min(execs.size(), offset + limit)).stream()
         .map(Dtos::asDto).collect(Collectors.toList());
   }
-
-
 }
