@@ -99,7 +99,7 @@ public class DatasourcesResource {
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
   public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
-    final File output = sqlService.executeToJSON(null, query, idName);
+    final File output = sqlService.execute(null, query, idName, SQLService.Output.JSON);
     StreamingOutput stream = os -> {
       Files.copy(output.toPath(), os);
       output.delete();
@@ -114,13 +114,28 @@ public class DatasourcesResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/csv")
   public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
-    final File output = sqlService.executeToCSV(null, query, idName);
+    final File output = sqlService.execute(null, query, idName, SQLService.Output.CSV);
     StreamingOutput stream = os -> {
       Files.copy(output.toPath(), os);
       output.delete();
     };
 
     return Response.ok(stream, "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+  }
+
+  @POST
+  @Path("/_sql")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces("application/x-rdata")
+  public Response executeSQLToRDS(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
+    final File output = sqlService.execute(null, query, idName, SQLService.Output.RDS);
+    StreamingOutput stream = os -> {
+      Files.copy(output.toPath(), os);
+      output.delete();
+    };
+
+    return Response.ok(stream, "application/x-rdata")
         .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
   }
 

@@ -12,3 +12,8 @@
 .execute.SQL.CSV <- function(query, path = 'out.csv') {
     write.csv(sqldf::sqldf(query), file = path, row.names = FALSE, na = '')
 }
+
+# dump the output of the SQL query into a RDS file
+.execute.SQL.RDS <- function(query, path = 'out.rds') {
+    saveRDS(sqldf::sqldf(query), file = path)
+}

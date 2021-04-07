@@ -82,7 +82,7 @@ public class RSQLService implements Service, SQLService {
   private List<String> userRSessions = Collections.synchronizedList(Lists.newArrayList());
 
   @Override
-  public File executeToJSON(@Nullable String datasource, String query, String idName) {
+  public File execute(@Nullable String datasource, String query, String idName, Output output) {
     if (!running) return null;
 
     RServerSession rSession = prepareRSession();
@@ -91,39 +91,14 @@ public class RSQLService implements Service, SQLService {
       String queryStr = prepareEnvironment(datasource, query, idName, rSession);
 
       // execute SQL
-      String rOutput = "out.json";
-      RScriptROperation rop = new RScriptROperation(String.format("%s.JSON('%s', '%s')", EXECUTE_SQL_FUNC, queryStr, rOutput), false);
+      String rOutput = "out." + output.toString().toLowerCase();
+      RScriptROperation rop = new RScriptROperation(String.format("%s.%s('%s', '%s')", EXECUTE_SQL_FUNC, output.toString(), queryStr, rOutput), false);
       rSession.execute(rop);
 
-      File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
-      FileReadROperation frop = new FileReadROperation(rOutput, output);
+      File outputFile = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
+      FileReadROperation frop = new FileReadROperation(rOutput, outputFile);
       rSession.execute(frop);
-      return output;
-    } catch (RRuntimeException | SQLParserException e) {
-      throw new SQLException(e);
-    } finally {
-      closeRSession(rSession.getId());
-    }
-  }
-
-  @Override
-  public File executeToCSV(@Nullable String datasource, String query, String idName) {
-    if (!running) return null;
-
-    RServerSession rSession = prepareRSession();
-
-    try {
-      String queryStr = prepareEnvironment(datasource, query, idName, rSession);
-
-      // execute SQL
-      String rOutput = "out.csv";
-      RScriptROperation rop = new RScriptROperation(String.format("%s.CSV('%s', '%s')", EXECUTE_SQL_FUNC, queryStr, rOutput), false);
-      rSession.execute(rop);
-
-      File output = new File(R_WORK_DIR, rSession.getId() + "-" + rOutput);
-      FileReadROperation frop = new FileReadROperation(rOutput, output);
-      rSession.execute(frop);
-      return output;
+      return outputFile;
     } catch (RRuntimeException | SQLParserException e) {
       throw new SQLException(e);
     } finally {

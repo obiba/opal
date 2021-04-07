@@ -20,25 +20,17 @@ public interface SQLService extends SystemService {
 
   String DEFAULT_ID_COLUMN = "_id";
 
-  /**
-   * Execute a SQL query in the context of a datasource and output result as a JSON object.
-   *
-   * @param datasource Datasource context, for table name resoltuion, can be null
-   * @param query
-   * @param idName
-   * @return
-   */
-  File executeToJSON(@Nullable String datasource, String query, String idName);
+  enum Output { JSON, CSV, RDS }
 
   /**
-   * Execute a SQL query in the context of a datasource and dump output to a temporary
-   * CSV file.
+   * Execute a SQL query in the context of a datasource and output result in a temporary file.
    *
-   * @param datasource Datasource context, for table name resoltuion, can be null
+   * @param datasource Datasource context, for table name resolution, can be null
    * @param query
    * @param idName
+   * @param output
    * @return
    */
-  File executeToCSV(@Nullable String datasource, String query, String idName);
+  File execute(@Nullable String datasource, String query, String idName, Output output);
 
 }
