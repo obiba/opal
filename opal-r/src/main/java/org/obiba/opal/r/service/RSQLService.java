@@ -44,6 +44,7 @@ import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +177,7 @@ public class RSQLService implements Service, SQLService {
   private String extractFullTableName(Datasource datasource, String table) {
     String tableName = extractTableName(table);
 
-    // when no datasource context, FROM table names are fully qualified
+    // when no datasource context, FROM table names must be fully qualified
     if (datasource == null) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       // can throw datasource/table not found exceptions
@@ -185,12 +186,19 @@ public class RSQLService implements Service, SQLService {
       return tableName;
     }
 
-    // if there is a datasource context, FROM table names are relative to it
-    if (!datasource.hasValueTable(tableName))
-      throw new NoSuchValueTableException(datasource.getName(), tableName);
-    else
+    // if there is a datasource context, FROM table names can be relative to it
+    if (datasource.hasValueTable(tableName)) {
       ensureTableValuesAccess(datasource.getName(), tableName);
-    return datasource.getName() + "." + tableName;
+      return datasource.getName() + "." + tableName;
+    } else if (tableName.contains(".")) {
+      // second chance: try it as a fully qualified table name
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      // can throw datasource/table not found exceptions
+      resolver.resolveTable();
+      ensureTableValuesAccess(resolver.getDatasourceName(), resolver.getTableName());
+      return tableName;
+    } else
+      throw new NoSuchValueTableException(datasource.getName(), tableName);
   }
 
   /**
@@ -212,7 +220,8 @@ public class RSQLService implements Service, SQLService {
    * @return
    */
   private String normalizeTableSymbol(String fromTable) {
-    return extractTableName(fromTable).replaceAll("\\.", "_");
+    String fromTableN = Normalizer.normalize(extractTableName(fromTable), Normalizer.Form.NFKD);
+    return fromTableN.replaceAll("[^A-Za-z0-9]", "_");
   }
 
   private void closeRSession(String rSessionId) {
