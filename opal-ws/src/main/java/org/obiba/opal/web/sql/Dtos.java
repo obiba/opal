@@ -22,8 +22,8 @@ public class Dtos {
         .setId(exec.getId())
         .setUser(exec.getSubject())
         .setQuery(exec.getQuery())
-        .setStart(exec.getCreated().getTime())
-        .setEnd(exec.getEnded().getTime());
+        .setStart(exec.getStarted())
+        .setEnd(exec.getEnded());
     if (exec.hasDatasource())
       builder.setDatasource(exec.getDatasource());
     if (exec.hasError())

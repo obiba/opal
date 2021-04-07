@@ -35,9 +35,7 @@ public class SQLServiceResource {
   @Path("/history")
   public List<SQL.SQLExecutionDto> getHistory(@QueryParam("user") String user, @QueryParam("datasource") String datasource,
                                               @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
-    if (Strings.isNullOrEmpty(user)) throw new BadRequestException("user parameter is missing");
-    List<SQLExecution> execs = Strings.isNullOrEmpty(datasource) ? sqlService.getSQLExecutions(user) :
-        "*".equals(datasource) ? sqlService.getSQLExecutions(user, null) : sqlService.getSQLExecutions(user, datasource);
+    List<SQLExecution> execs = sqlService.getSQLExecutions(user, datasource);
     return execs.subList(offset, Math.min(execs.size(), offset + limit)).stream()
         .map(Dtos::asDto).collect(Collectors.toList());
   }

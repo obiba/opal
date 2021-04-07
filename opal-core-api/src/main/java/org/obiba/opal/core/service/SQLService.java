@@ -37,18 +37,10 @@ public interface SQLService extends SystemService {
   File execute(@Nullable String datasource, String query, String idName, Output output);
 
   /**
-   * Get all the queries from one subject.
-   *
-   * @param subject
-   * @return
-   */
-  List<SQLExecution> getSQLExecutions(String subject);
-
-  /**
    * Get all the queries from one subject in the context of a datasource (or without datasource context if the parameter is null).
    *
-   * @param subject
-   * @param datasource
+   * @param subject null or * means any subjects
+   * @param datasource null means any datasource context, * means only without datasource context else means with datasource context
    * @return
    */
   List<SQLExecution> getSQLExecutions(String subject, String datasource);

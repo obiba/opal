@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.system.subject;
 
-import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.sql.SQLExecution;
 import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.web.model.SQL;
@@ -39,8 +38,7 @@ public class SQLHistoryResourceImpl implements SQLHistoryResource {
 
   @Override
   public List<SQL.SQLExecutionDto> getSQLHistory(String datasource, int offset, int limit) {
-    List<SQLExecution> execs = Strings.isNullOrEmpty(datasource) ? sqlService.getSQLExecutions(subject) :
-        "*".equals(datasource) ? sqlService.getSQLExecutions(subject, null) : sqlService.getSQLExecutions(subject, datasource);
+    List<SQLExecution> execs = sqlService.getSQLExecutions(subject, datasource);
     return execs.subList(offset, Math.min(execs.size(), offset + limit)).stream()
         .map(Dtos::asDto).collect(Collectors.toList());
   }

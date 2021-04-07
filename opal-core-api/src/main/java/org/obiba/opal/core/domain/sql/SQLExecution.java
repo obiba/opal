@@ -23,9 +23,9 @@ public class SQLExecution implements HasUniqueProperties {
 
   private String id;
 
-  private Date created = new Date();
+  private long started = new Date().getTime();
 
-  private Date ended;
+  private long ended;
 
   private String subject;
 
@@ -45,19 +45,15 @@ public class SQLExecution implements HasUniqueProperties {
     this.id = id;
   }
 
-  public Date getCreated() {
-    return created;
+  public long getStarted() {
+    return started;
   }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
-
-  public Date getEnded() {
+  public long getEnded() {
     return ended;
   }
 
-  public void setEnded(Date ended) {
+  public void setEnded(long ended) {
     this.ended = ended;
   }
 
@@ -118,11 +114,11 @@ public class SQLExecution implements HasUniqueProperties {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     SQLExecution that = (SQLExecution) o;
-    return Objects.equal(id, that.id) && Objects.equal(created, that.created) && Objects.equal(ended, that.ended) && Objects.equal(subject, that.subject) && Objects.equal(datasource, that.datasource) && Objects.equal(query, that.query) && Objects.equal(error, that.error);
+    return Objects.equal(id, that.id) && Objects.equal(started, that.started) && Objects.equal(ended, that.ended) && Objects.equal(subject, that.subject) && Objects.equal(datasource, that.datasource) && Objects.equal(query, that.query) && Objects.equal(error, that.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id, created, ended, subject, datasource, query, error);
+    return Objects.hashCode(id, started, ended, subject, datasource, query, error);
   }
 }
