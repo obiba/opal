@@ -1,0 +1,13 @@
+package SQL;
+
+option java_package = "org.obiba.opal.web.model";
+
+message SQLExecutionDto {
+  required string id = 1;
+  required string user = 2;
+  required string query = 3;
+  optional string datasource = 4;
+  required int64 start = 5; // millis
+  required int64 end = 6;   // millis
+  optional string error = 7;
+}

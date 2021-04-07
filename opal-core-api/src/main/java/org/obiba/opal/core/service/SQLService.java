@@ -10,8 +10,11 @@
 
 package org.obiba.opal.core.service;
 
+import org.obiba.opal.core.domain.sql.SQLExecution;
+
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.List;
 
 /**
  * A service for executing SQL queries on a project's tables.
@@ -20,7 +23,7 @@ public interface SQLService extends SystemService {
 
   String DEFAULT_ID_COLUMN = "_id";
 
-  enum Output { JSON, CSV, RDS }
+  enum Output {JSON, CSV, RDS}
 
   /**
    * Execute a SQL query in the context of a datasource and output result in a temporary file.
@@ -32,5 +35,22 @@ public interface SQLService extends SystemService {
    * @return
    */
   File execute(@Nullable String datasource, String query, String idName, Output output);
+
+  /**
+   * Get all the queries from one subject.
+   *
+   * @param subject
+   * @return
+   */
+  List<SQLExecution> getSQLExecutions(String subject);
+
+  /**
+   * Get all the queries from one subject in the context of a datasource (or without datasource context if the parameter is null).
+   *
+   * @param subject
+   * @param datasource
+   * @return
+   */
+  List<SQLExecution> getSQLExecutions(String subject, String datasource);
 
 }

@@ -20,12 +20,10 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.domain.sql.SQLExecution;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.core.service.DataExportService;
-import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.core.service.SQLException;
-import org.obiba.opal.core.service.SQLService;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.*;
@@ -40,15 +38,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.Normalizer;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class RSQLService implements Service, SQLService {
@@ -60,6 +57,9 @@ public class RSQLService implements Service, SQLService {
   private static final String EXECUTE_SQL_FUNC = ".execute.SQL";
 
   private static final String EXECUTE_SQL_SCRIPT = EXECUTE_SQL_FUNC + ".R";
+
+  @Autowired
+  private OrientDbService orientDbService;
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
@@ -86,6 +86,11 @@ public class RSQLService implements Service, SQLService {
   public File execute(@Nullable String datasource, String query, String idName, Output output) {
     if (!running) return null;
 
+    SQLExecution sqlExec = new SQLExecution();
+    sqlExec.setDatasource(datasource);
+    sqlExec.setQuery(query);
+    sqlExec.setSubject(getSubjectPrincipal());
+
     RServerSession rSession = prepareRSession();
 
     try {
@@ -101,10 +106,28 @@ public class RSQLService implements Service, SQLService {
       rSession.execute(frop);
       return outputFile;
     } catch (RRuntimeException | SQLParserException e) {
+      sqlExec.setError(e.getMessage());
       throw new SQLException(e);
+    } catch (Exception e) {
+      sqlExec.setError(e.getMessage());
+      throw e;
     } finally {
+      saveSQLExecutionHistory(sqlExec);
       closeRSession(rSession.getId());
     }
+  }
+
+  @Override
+  public List<SQLExecution> getSQLExecutions(String subject) {
+    return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? order by created desc", subject));
+  }
+
+  @Override
+  public List<SQLExecution> getSQLExecutions(String subject, String datasource) {
+    if (Strings.isNullOrEmpty(datasource))
+      return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource is null order by created desc", subject));
+    else
+      return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource = ? order by created desc", subject, datasource));
   }
 
   @Override
@@ -113,12 +136,15 @@ public class RSQLService implements Service, SQLService {
   }
 
   @Override
+  @PostConstruct
   public void start() {
+    orientDbService.createUniqueIndex(SQLExecution.class);
     running = true;
     ensureSqldfDone = false;
   }
 
   @Override
+  @PreDestroy
   public void stop() {
     running = false;
     userRSessions.forEach(rSessionId -> opalRSessionManager.removeRSession(rSessionId));
@@ -139,8 +165,17 @@ public class RSQLService implements Service, SQLService {
   // Private methods
   //
 
+  private synchronized void saveSQLExecutionHistory(SQLExecution sqlExec) {
+    try {
+      sqlExec.setEnded(new Date());
+      sqlExec.setId("" + (orientDbService.count(SQLExecution.class) + 1));
+      orientDbService.save(sqlExec, sqlExec);
+    } catch (Exception e) {
+      log.error("Cannot save SQL execution history entry", e);
+    }
+  }
+
   private RServerSession prepareRSession() {
-    String user = getSubjectPrincipal();
     RServerSession rSession = opalRSessionManager.newSubjectRSession();
     rSession.setExecutionContext("SQL");
     userRSessions.add(rSession.getId());
