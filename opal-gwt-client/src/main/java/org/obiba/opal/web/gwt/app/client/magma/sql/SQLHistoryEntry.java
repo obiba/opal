@@ -11,8 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.sql;
 
 import com.google.common.base.Strings;
-import com.google.gwt.safehtml.shared.HtmlSanitizer;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 public class SQLHistoryEntry {
