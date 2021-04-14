@@ -392,6 +392,10 @@ public interface TranslationMessages extends Messages {
       "Please confirm that you want to remove the current report template from Opal configuration (report design and generated reports will not be affected).")
   String confirmDeleteReportTemplate();
 
+  @Description("Confirm remove a personal access token")
+  @DefaultMessage("Please confirm that you want to remove the personal access token \"{0}\".")
+  String confirmRemoveToken(String name);
+
   @Description(
       "Please confirm that you want to remove the current Taxonomy from Opal configuration message")
   @DefaultMessage(

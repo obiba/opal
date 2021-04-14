@@ -72,6 +72,13 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   CheckBox exportVCFCheck;
 
   @UiField
+  CheckBox createProjectCheck;
+  @UiField
+  CheckBox updateProjectCheck;
+  @UiField
+  CheckBox deleteProjectCheck;
+
+  @UiField
   CheckBox rCheck;
   @UiField
   CheckBox datashieldCheck;
@@ -108,16 +115,21 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     for (String p : tokenProjects.getValues()) {
       token.addProjects(p);
     }
-    if (importCheck.isChecked()) token.addCommands("import");
-    if (exportCheck.isChecked()) token.addCommands("export");
-    if (copyCheck.isChecked()) token.addCommands("copy");
-    if (analyseCheck.isChecked()) token.addCommands("analyse");
-    if (reportCheck.isChecked()) token.addCommands("report");
-    if (importVCFCheck.isChecked()) token.addCommands("import_vcf");
-    if (exportVCFCheck.isChecked()) token.addCommands("export_vcf");
-    token.setUseR(rCheck.isChecked());
-    token.setUseDatashield(datashieldCheck.isChecked());
-    token.setSysAdmin(sysAdminCheck.isChecked());
+    if (importCheck.getValue()) token.addCommands("import");
+    if (exportCheck.getValue()) token.addCommands("export");
+    if (copyCheck.getValue()) token.addCommands("copy");
+    if (analyseCheck.getValue()) token.addCommands("analyse");
+    if (reportCheck.getValue()) token.addCommands("report");
+    if (importVCFCheck.getValue()) token.addCommands("import_vcf");
+    if (exportVCFCheck.getValue()) token.addCommands("export_vcf");
+
+    token.setCreateProject(createProjectCheck.getValue() && tokenProjects.getValues().length == 0);
+    token.setUpdateProject(updateProjectCheck.getValue());
+    token.setDeleteProject(deleteProjectCheck.getValue());
+
+    token.setUseR(rCheck.getValue());
+    token.setUseDatashield(datashieldCheck.getValue());
+    token.setSysAdmin(sysAdminCheck.getValue());
     getUiHandlers().onCreateToken(token);
   }
 

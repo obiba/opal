@@ -53,6 +53,9 @@ public class Dtos {
     if (dto.hasToken()) token.setToken(dto.getToken());
     if (dto.getProjectsCount()>0) token.addAllProjects(dto.getProjectsList());
     if (dto.getCommandsCount()>0) token.addAllCommands(dto.getCommandsList());
+    token.setCreateProject(dto.hasCreateProject() && dto.getCreateProject());
+    token.setUpdateProject(dto.hasUpdateProject() && dto.getUpdateProject());
+    token.setDeleteProject(dto.hasDeleteProject() && dto.getDeleteProject());
     token.setUseR(dto.hasUseR() && dto.getUseR());
     token.setUseDatashield(dto.hasUseDatashield() && dto.getUseDatashield());
     token.setSystemAdmin(dto.hasSysAdmin() && dto.getSysAdmin());
@@ -89,6 +92,9 @@ public class Dtos {
         .setName(token.getName())
         .addAllProjects(token.getProjects())
         .addAllCommands(token.getCommands())
+        .setCreateProject(token.isCreateProject())
+        .setUpdateProject(token.isUpdateProject())
+        .setDeleteProject(token.isDeleteProject())
         .setUseR(token.isUseR())
         .setUseDatashield(token.isUseDatashield())
         .setSysAdmin(token.isSystemAdmin())

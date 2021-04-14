@@ -67,13 +67,15 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return isProjectCommandPermitted(principals, node);
 
     // cannot create a project using a token
-    if (node.equals("/projects") && EDIT_ACTIONS.contains(action)) return false;
+    if (node.equals("/projects") && EDIT_ACTIONS.contains(action))
+      return "POST".equals(action) && isCreateProjectPermitted(principals);
 
     if (node.startsWith("/project/") || node.startsWith("/datasource/"))
       return isProjectActionPermitted(principals, node, action);
 
     // cannot bypass projects to launch a command
     if (node.startsWith("/shell/commands") && EDIT_ACTIONS.contains(action)) return false;
+
 
     if (node.startsWith("/service/r/workspaces"))
       return isUsingRPermitted(principals) || isUsingDatashieldPermitted(principals);
@@ -104,7 +106,14 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if ("datasource".equals(elems[1]) && isTransientDatasource(project)) return true;
 
     // cannot modify datasource or project using a token
-    if (elems.length == 3 && EDIT_ACTIONS.contains(action)) return false;
+    if (elems.length == 3 && EDIT_ACTIONS.contains(action)) {
+      if ("datasource".equals(elems[1])) return false;
+      switch (action) {
+        case "PUT": return isUpdateProjectPermitted(principals);
+        case "DELETE": return isDeleteProjectPermitted(principals);
+      }
+      return false;
+    }
 
     Collection<String> projectRestrictions = getProjectRestrictions(principals);
     if (projectRestrictions.isEmpty()) return true;
@@ -152,6 +161,18 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       }
     }
     return projectCmds;
+  }
+
+  private boolean isCreateProjectPermitted(PrincipalCollection principals) {
+    return getToken(principals).isCreateProject();
+  }
+
+  private boolean isUpdateProjectPermitted(PrincipalCollection principals) {
+    return getToken(principals).isUpdateProject();
+  }
+
+  private boolean isDeleteProjectPermitted(PrincipalCollection principals) {
+    return getToken(principals).isDeleteProject();
   }
 
   private boolean isUsingRPermitted(PrincipalCollection principals) {

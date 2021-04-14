@@ -96,6 +96,28 @@
 
     <b:ControlGroup>
       <b:ControlLabel>
+        <ui:msg description="Token admin label">Project administration</ui:msg>
+      </b:ControlLabel>
+      <b:HelpBlock>
+        <ui:msg description="Token admin help">
+          Select the project administration operations that can be performed using the token. By default none is available.
+        </ui:msg>
+      </b:HelpBlock>
+      <b:Controls>
+        <b:CheckBox ui:field="createProjectCheck">
+          <ui:msg description="Token Create project label">Create (requires access to all projects)</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="updateProjectCheck">
+          <ui:msg description="Token Update project label">Update</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="deleteProjectCheck">
+          <ui:msg description="Token Delete project label">Delete</ui:msg>
+        </b:CheckBox>
+      </b:Controls>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
         <ui:msg description="Token services label">Services</ui:msg>
       </b:ControlLabel>
       <b:HelpBlock>

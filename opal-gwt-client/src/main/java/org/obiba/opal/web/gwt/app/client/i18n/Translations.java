@@ -2225,6 +2225,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
 
+  @Description("Remove Token title")
+  @DefaultStringValue("Remove Token")
+  String removeTokenModalTitle();
+
   @Description("Update Registration Token title")
   @DefaultStringValue("Update Registration Token")
   String updateTokenModalTitle();
@@ -2804,6 +2808,10 @@ public interface Translations extends Constants {
   @Description("Tasks label")
   @DefaultStringValue("Tasks")
   String tasks();
+
+  @Description("Administration label")
+  @DefaultStringValue("Administration")
+  String administrationLabel();
 
   @Description("Services label")
   @DefaultStringValue("Services")

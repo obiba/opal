@@ -53,6 +53,12 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private Set<String> commands;
 
+  private boolean createProject;
+
+  private boolean updateProject;
+
+  private boolean deleteProject;
+
   private boolean useR;
 
   private boolean useDatashield;
@@ -131,6 +137,30 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setCommands(Set<String> commands) {
     this.commands = commands;
+  }
+
+  public void setCreateProject(boolean createProject) {
+    this.createProject = createProject;
+  }
+
+  public boolean isCreateProject() {
+    return createProject;
+  }
+
+  public void setUpdateProject(boolean updateProject) {
+    this.updateProject = updateProject;
+  }
+
+  public boolean isUpdateProject() {
+    return updateProject;
+  }
+
+  public void setDeleteProject(boolean deleteProject) {
+    this.deleteProject = deleteProject;
+  }
+
+  public boolean isDeleteProject() {
+    return deleteProject;
   }
 
   public void setUseR(boolean useR) {

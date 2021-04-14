@@ -183,6 +183,16 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
       @Override
       public String getValue(SubjectTokenDto object) {
+        String admin = "";
+        if (object.getCreateProject()) admin = "Create";
+        if (object.getUpdateProject()) admin = admin.isEmpty() ? "Update" : admin + ", " + "Update";
+        if (object.getDeleteProject()) admin = admin.isEmpty() ? "Delete" : admin + ", " + "Delete";
+        return admin;
+      }
+    }, translations.administrationLabel());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+      @Override
+      public String getValue(SubjectTokenDto object) {
         String services = "";
         if (object.getUseR()) services = "R";
         if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
