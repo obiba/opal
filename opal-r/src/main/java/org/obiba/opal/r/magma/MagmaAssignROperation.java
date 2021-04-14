@@ -58,6 +58,10 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final RClass rClass;
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, String idColumnName) {
+    this(symbol, valueTable, dataExportService, idColumnName, RClass.TIBBLE);
+  }
+
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, String idColumnName, RClass rClass) {
     this.symbol = symbol;
     this.path = "";
     this.valueTable = valueTable;
@@ -67,7 +71,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.identifiersTableService = null;
     this.dataExportService = dataExportService;
     this.idColumnName = idColumnName;
-    this.rClass = RClass.TIBBLE;
+    this.rClass = rClass;
   }
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
@@ -111,6 +115,7 @@ public class MagmaAssignROperation extends AbstractROperation {
   void doEval(String script) {
     eval(script, false);
   }
+
   void doReadFile(String fileName, File destination) {
     try {
       readFile(fileName, destination);

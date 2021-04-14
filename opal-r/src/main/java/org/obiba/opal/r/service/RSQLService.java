@@ -18,6 +18,7 @@ import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.domain.sql.SQLExecution;
@@ -194,19 +195,20 @@ public class RSQLService implements Service, SQLService {
 
     // validate tables exist and their data are accessible
     Set<String> fromTables = SQLExtractor.extractTables(query);
-    Map<String, String> fromTableFullNameMap = Maps.newHashMap();
+    Map<String, ValueTable> fromTableFullNameMap = Maps.newHashMap();
     Datasource ds = Strings.isNullOrEmpty(datasource) ? null : MagmaEngine.get().getDatasource(datasource);
-    fromTables.forEach(fromTable -> fromTableFullNameMap.put(fromTable, extractFullTableName(ds, fromTable)));
+    fromTables.forEach(fromTable -> fromTableFullNameMap.put(fromTable, extractValueTable(ds, fromTable)));
 
     String queryStr = query;
     for (String fromTable : fromTables) {
-      String tableFullName = fromTableFullNameMap.get(fromTable);
+      ValueTable valueTable = fromTableFullNameMap.get(fromTable);
+      String tableFullName = valueTable.getTableReference();
       String tableSymbol = normalizeTableSymbol(fromTable);
       if (!fromTable.equals(tableSymbol))
         queryStr = queryStr.replaceAll(fromTable, tableSymbol);
-      MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, tableFullName, null, true,
-          Strings.isNullOrEmpty(idName) ? DEFAULT_ID_COLUMN : idName, null,
-          MagmaAssignROperation.RClass.DATA_FRAME, identifiersTableService, dataExportService);
+      MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, valueTable, dataExportService,
+          Strings.isNullOrEmpty(idName) ? DEFAULT_ID_COLUMN : idName,
+          MagmaAssignROperation.RClass.DATA_FRAME);
       rSession.execute(mop);
     }
     queryStr = queryStr.replaceAll("'", "\\\\'");
@@ -214,31 +216,32 @@ public class RSQLService implements Service, SQLService {
     return queryStr;
   }
 
-  private String extractFullTableName(Datasource datasource, String table) {
+  private ValueTable extractValueTable(Datasource datasource, String table) {
     String tableName = extractTableName(table);
+    ValueTable valueTable = null;
 
     // when no datasource context, FROM table names must be fully qualified
     if (datasource == null) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       // can throw datasource/table not found exceptions
-      resolver.resolveTable();
+      valueTable = resolver.resolveTable();
       ensureTableValuesAccess(resolver.getDatasourceName(), resolver.getTableName());
-      return tableName;
-    }
-
-    // if there is a datasource context, FROM table names can be relative to it
-    if (datasource.hasValueTable(tableName)) {
+    } else if (datasource.hasValueTable(tableName)) {
+      // if there is a datasource context, FROM table names can be relative to it
       ensureTableValuesAccess(datasource.getName(), tableName);
-      return datasource.getName() + "." + tableName;
+      valueTable = datasource.getValueTable(tableName);
     } else if (tableName.contains(".")) {
       // second chance: try it as a fully qualified table name
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       // can throw datasource/table not found exceptions
-      resolver.resolveTable();
+      valueTable = resolver.resolveTable();
       ensureTableValuesAccess(resolver.getDatasourceName(), resolver.getTableName());
-      return tableName;
     } else
       throw new NoSuchValueTableException(datasource.getName(), tableName);
+
+    if (valueTable.getValueSetCount() == 0)
+      throw new SQLException("Table " + tableName + " has no data.");
+    return valueTable;
   }
 
   /**
