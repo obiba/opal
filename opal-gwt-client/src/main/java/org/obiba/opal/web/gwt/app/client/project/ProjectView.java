@@ -10,11 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.project;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.*;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -22,6 +24,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -36,6 +39,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   interface Binder extends UiBinder<Widget, ProjectView> {
   }
+
+  private final PlaceManager placeManager;
 
   @UiField
   Breadcrumbs titleCrumbs;
@@ -65,13 +70,13 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Label datasourceStatusText;
 
   @UiField
-  Label tableCount;
+  Button tableCount;
 
   @UiField
-  Label variableCount;
+  Button variableCount;
 
   @UiField
-  Label resourceCount;
+  Button resourceCount;
 
   @UiField
   Panel tablesPanel;
@@ -102,7 +107,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   private final TranslationMessages translationMessages;
 
   @Inject
-  ProjectView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+  ProjectView(Binder uiBinder, PlaceManager placeManager, Translations translations, TranslationMessages translationMessages) {
+    this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
@@ -133,8 +139,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     description.setVisible(project.hasDescription());
     description.setText(project.hasDescription() ? project.getDescription() : "");
     tableCount.setText("-");
+    tableCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(project.getName())));
     variableCount.setText("-");
+    variableCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(project.getName())));
     resourceCount.setText("-");
+    resourceCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getResourcesPlace(project.getName())));
     setProjectStatus(project.getDatasourceStatus().getName());
   }
 
