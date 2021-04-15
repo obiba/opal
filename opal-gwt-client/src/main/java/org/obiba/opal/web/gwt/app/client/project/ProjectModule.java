@@ -24,8 +24,6 @@ import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
 import org.obiba.opal.web.gwt.app.client.project.resources.*;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 
 /**
  *

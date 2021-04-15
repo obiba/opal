@@ -9,14 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.permissions;
 
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.DeleteAllConfirmationModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.UpdateResourcePermissionModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.view.AddResourcePermissionModalView;
-import org.obiba.opal.web.gwt.app.client.permissions.view.DeleteAllConfirmationModalView;
-import org.obiba.opal.web.gwt.app.client.permissions.view.ResourcePermissionsView;
-import org.obiba.opal.web.gwt.app.client.permissions.view.UpdateResourcePermissionModalView;
 import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsView;
 

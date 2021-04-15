@@ -14,8 +14,8 @@ import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairDisplay;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairModalSavedHandler;
+import org.obiba.opal.web.gwt.app.client.keystore.KeyPairDisplay;
+import org.obiba.opal.web.gwt.app.client.keystore.KeyPairModalSavedHandler;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 

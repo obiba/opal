@@ -35,14 +35,14 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.VariablePropertiesModalP
 import org.obiba.opal.web.gwt.app.client.magma.variable.VariableTaxonomyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;

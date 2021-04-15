@@ -51,7 +51,7 @@ import org.obiba.opal.web.gwt.app.client.magma.table.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.ViewWhereModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.*;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;

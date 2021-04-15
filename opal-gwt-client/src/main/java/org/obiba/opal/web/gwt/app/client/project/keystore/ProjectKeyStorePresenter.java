@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.keystore;
 
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.EncryptionKeysPresenter;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.inject.Inject;

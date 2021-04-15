@@ -14,9 +14,9 @@ import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.Gener
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.ImportKeyPairModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.CreateKeyPairModalPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.ImportKeyPairModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;

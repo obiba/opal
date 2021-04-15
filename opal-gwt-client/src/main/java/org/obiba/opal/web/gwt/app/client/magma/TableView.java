@@ -798,6 +798,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
     addVariablesButton.setVisible(dto.hasViewLink());
     tableAddVariableGroup.setVisible(!addVariablesButton.isVisible());
+    sqlQuery.setEnabled(!dto.hasValueSetCount() || dto.getValueSetCount() > 0);
 
     copyDataBtn.setVisible(!tableDto.hasViewLink());
     copyViewBtn.setVisible(tableDto.hasViewLink());

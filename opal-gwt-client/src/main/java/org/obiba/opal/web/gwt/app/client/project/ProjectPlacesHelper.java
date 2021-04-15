@@ -11,11 +11,9 @@
 package org.obiba.opal.web.gwt.app.client.project;
 
 import com.google.common.base.Joiner;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.search.entities.SearchEntitiesPresenter;

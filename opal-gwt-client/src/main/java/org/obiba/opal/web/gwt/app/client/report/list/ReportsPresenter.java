@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPres
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
-import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;

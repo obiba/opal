@@ -55,7 +55,7 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;

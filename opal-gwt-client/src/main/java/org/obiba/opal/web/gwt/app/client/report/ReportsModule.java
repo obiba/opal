@@ -15,8 +15,6 @@ import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPres
 import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalView;
 import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.list.ReportsView;
-import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 

@@ -32,7 +32,7 @@ import org.obiba.opal.web.gwt.app.client.magma.sql.SQLPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.table.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.ViewModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
