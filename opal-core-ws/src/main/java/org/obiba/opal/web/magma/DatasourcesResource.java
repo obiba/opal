@@ -125,7 +125,7 @@ public class DatasourcesResource {
   }
 
   @POST
-  @Path("/_sql")
+  @Path("/_rsql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("application/x-rdata")
   public Response executeSQLToRDS(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {

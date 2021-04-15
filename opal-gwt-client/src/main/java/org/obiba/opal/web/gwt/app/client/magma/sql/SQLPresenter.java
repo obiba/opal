@@ -90,7 +90,6 @@ public class SQLPresenter extends PresenterWidget<SQLPresenter.Display> implemen
   @Override
   public void download() {
     String url = urlBuilder.buildAbsoluteUrl(UriBuilders.DATASOURCE_SQL.create().build(datasource.getName()));
-    GWT.log(url);
     getView().doDownload(url);
   }
 
