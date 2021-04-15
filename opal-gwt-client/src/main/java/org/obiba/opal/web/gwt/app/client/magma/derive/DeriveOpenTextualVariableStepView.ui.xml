@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.derive"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <o:WizardStep ui:field="methodStep">
+      <g:FlowPanel>
+        <b:RadioButton ui:field="auto" name="method">
+          <ui:msg description="Automatically label">Automatically</ui:msg>
+        </b:RadioButton>
+        <b:HelpBlock addStyleNames="small-top-margin indent">
+          <ui:msg description="Automatically description label">Similar distinct values will be grouped together.
+          </ui:msg>
+        </b:HelpBlock>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <b:RadioButton ui:field="manual" name="method">
+          <ui:msg description="Manually label">Manually</ui:msg>
+        </b:RadioButton>
+        <b:HelpBlock addStyleNames="small-top-margin indent">
+          <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
+        </b:HelpBlock>
+      </g:FlowPanel>
+    </o:WizardStep>
+    <o:WizardStep ui:field="mapStep">
+      <g:FlowPanel>
+        <o:CollapsiblePanel ui:field="addPanel" addStyleNames="table-half-width">
+
+          <b:Well>
+            <b:FluidRow>
+
+              <b:Column size="4">
+                <g:Label>
+                  <ui:msg description="Original Value label">Original Value</ui:msg>
+                </g:Label>
+              </b:Column>
+
+              <b:Column size="4">
+                <g:Label>
+                  <ui:msg description="New Value label">New Value</ui:msg>
+                </g:Label>
+              </b:Column>
+
+            </b:FluidRow>
+            <b:FluidRow>
+
+              <b:Column size="4">
+                <g:SuggestBox ui:field="value" addStyleNames="width-4em"/>
+              </b:Column>
+
+              <b:Column size="4">
+                <g:TextBox ui:field="newValue" addStyleNames="width-4em"/>
+              </b:Column>
+
+              <b:Column size="4">
+                <g:Button ui:field="addButton" styleName="btn btn-info"/>
+              </b:Column>
+
+            </b:FluidRow>
+          </b:Well>
+        </o:CollapsiblePanel>
+
+        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
+      </g:FlowPanel>
+
+    </o:WizardStep>
+  </g:FlowPanel>
+</ui:UiBinder>

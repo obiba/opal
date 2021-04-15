@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.AttributeDto;

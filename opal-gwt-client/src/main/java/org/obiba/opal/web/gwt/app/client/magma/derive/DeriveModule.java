@@ -11,26 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.derive;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveBooleanVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCategoricalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveConclusionPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCustomVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveFromVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveNumericalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveOpenTextualVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveTemporalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveBooleanVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveCategoricalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveConclusionView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveCustomVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveFromVariableView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveNumericalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveOpenTextualVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveTemporalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveVariableView;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
+import org.obiba.opal.web.gwt.app.client.magma.CodingViewModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.CodingViewModalView;
 
 public class DeriveModule extends AbstractOpalModule {
 

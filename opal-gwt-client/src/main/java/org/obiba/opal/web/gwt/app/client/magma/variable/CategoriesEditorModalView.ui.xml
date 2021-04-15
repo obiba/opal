@@ -1,0 +1,94 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:c="urn:import:org.obiba.opal.web.gwt.app.client.magma"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+
+    <b:Form type="INLINE">
+      <b:ControlGroup ui:field="nameGroup">
+        <b:ControlLabel>
+          <ui:msg description="Name label">Name</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:InputAddOn>
+            <b:TextBox ui:field="addCategoryName"/>
+            <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
+              <ui:msg description="Add label">Add</ui:msg>
+            </b:Button>
+          </b:InputAddOn>
+          <b:HelpBlock>
+            <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
+            </ui:msg>
+          </b:HelpBlock>
+        </b:Controls>
+      </b:ControlGroup>
+    </b:Form>
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="small-top-margin">
+      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+
+        <g:FlowPanel addStyleNames="pull-left">
+          <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Remove category label">Remove</ui:msg>
+          </b2:IconAnchor>
+
+          <b2:IconAnchor ui:field="moveUpLink" icon="ARROW_UP" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Move up label">Move up</ui:msg>
+          </b2:IconAnchor>
+
+          <b2:IconAnchor ui:field="moveDownLink" icon="ARROW_DOWN" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Move down label">Move down</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+          <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
+          <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+              addStyleNames="inline small-indent">
+            <ui:msg description="Clear label">Clear</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+      </b:Alert>
+      <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+        <g:Label>
+          <ui:msg description="Select categories tips label">Select categories to move up/down or remove.</ui:msg>
+        </g:Label>
+      </b:Alert>
+    </g:FlowPanel>
+
+    <c:CategoryEditableTable ui:field="table"/>
+
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Save label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="closeButton">
+        <ui:msg description="Cancel label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>

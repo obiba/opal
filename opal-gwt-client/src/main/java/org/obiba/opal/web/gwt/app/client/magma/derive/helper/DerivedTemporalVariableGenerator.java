@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.TemporalVariableDerivationHelper.GroupMethod;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 /**

@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.magma;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variablestoview.view.VariablesToViewView;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.VariablesToViewView;
 
 /**
  * Bind concrete implementations to interfaces within the Create View wizard.

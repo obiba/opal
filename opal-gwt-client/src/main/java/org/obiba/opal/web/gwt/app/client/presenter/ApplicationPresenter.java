@@ -48,9 +48,9 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEv
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
-import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
+import org.obiba.opal.web.gwt.app.client.magma.variable.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
@@ -70,7 +70,6 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

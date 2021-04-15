@@ -19,8 +19,8 @@ import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 

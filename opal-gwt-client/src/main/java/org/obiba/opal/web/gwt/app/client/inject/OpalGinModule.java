@@ -9,20 +9,20 @@
  */
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.view.DatasourceSelectorView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ScriptEvaluationView;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEditorView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEvaluationPopupView;
-import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValueMapPopupView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValueSequencePopupView;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.DatasourceSelectorView;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ScriptEvaluationView;
+import org.obiba.opal.web.gwt.app.client.magma.ScriptEditorPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.ScriptEditorView;
+import org.obiba.opal.web.gwt.app.client.magma.ScriptEvaluationPopupView;
+import org.obiba.opal.web.gwt.app.client.magma.SummaryTabView;
+import org.obiba.opal.web.gwt.app.client.magma.ValueMapPopupView;
+import org.obiba.opal.web.gwt.app.client.magma.ValueSequencePopupView;
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
 import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
 import org.obiba.opal.web.gwt.app.client.place.Places;

@@ -1,0 +1,57 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.magma.datasource"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+
+    <b:ControlGroup ui:field="selectFileGroup">
+      <b:ControlLabel>
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </b:ControlLabel>
+      <o:OpalSimplePanel ui:field="selectFilePanel"/>
+      <b:HelpBlock>
+        <ui:msg description="CSV File Description label">Data in "delimiter separated values" format are in a text file (.csv or .tsv). The file can be compressed
+        in a zip file (.zip).</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup ui:field="tableGroup">
+      <b:ControlLabel>
+        <ui:msg description="Destination table label">Destination Table</ui:msg>
+      </b:ControlLabel>
+      <o:EditableListBox ui:field="tableListBox"/>
+      <b:HelpBlock>
+        <ui:msg description="Destination Table Name help label">Select an existing table or provide a name for a new
+          table
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+    <b:ControlGroup ui:field="entityTypeGroup">
+      <b:ControlLabel>
+        <ui:msg description="Entity type label">Entity Type</ui:msg>
+      </b:ControlLabel>
+      <o:EditableListBox ui:field="entityTypeListBox"/>
+      <b:HelpBlock>
+        <ui:msg description="Destination Entity Type help label">Specify what these data relate to (Participant,
+          Instrument, Area etc.)
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+    <w:CsvOptionsView ui:field="csvOptions"/>
+  </g:FlowPanel>
+
+</ui:UiBinder>

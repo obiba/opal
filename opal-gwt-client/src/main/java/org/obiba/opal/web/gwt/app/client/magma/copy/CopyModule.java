@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RestoreViewsModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.view.RestoreViewsModalView;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.RestoreViewsModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.RestoreViewsModalView;
 
 /**
  * Bind concrete implementations to interfaces within the export wizard.

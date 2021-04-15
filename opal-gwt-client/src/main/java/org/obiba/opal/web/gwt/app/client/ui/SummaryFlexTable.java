@@ -11,18 +11,15 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Collection;
-import java.util.Map;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
+import org.obiba.opal.web.gwt.app.client.magma.SummaryTabView;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;

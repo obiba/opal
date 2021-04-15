@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 /**

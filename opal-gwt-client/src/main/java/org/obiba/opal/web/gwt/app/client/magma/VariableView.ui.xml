@@ -1,0 +1,262 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+  <g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="pull-right">
+      <b:DropdownButton text="Derive" icon="COG" ui:field="deriveBtn">
+        <b:NavLink ui:field="addToView">
+          <ui:msg description="Add variable to view label">Add variable to view...</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="categorizeToAnother">
+          <ui:msg description="Categorize this to another label">Categorize this variable to another...</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="categorizeToThis">
+          <ui:msg description="Categorize another to this label">Categorize another variable to this...</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="deriveCustom">
+          <ui:msg description="Custom derivation label">Custom derivation...</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="SHOPPING_CART" ui:field="addToCart">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" ui:field="remove" addStyleNames="btn-danger">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="CHEVRON_UP" ui:field="previous">
+        </b:Button>
+        <b:Button icon="CHEVRON_DOWN" ui:field="next">
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
+
+    <b:TabPanel tabPosition="above" ui:field="tabPanel">
+      <b:Tab heading="Dictionary" active="true">
+        <b:Heading size="4" addStyleNames="inline-block large-top-margin">
+          <ui:msg description="Properties label">Properties</ui:msg>
+        </b:Heading>
+        <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editProperties">
+        </b2:IconAnchor>
+        <b:FluidRow>
+          <b:Column size="6">
+            <o:PropertiesTable keyStyleNames="span2">
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Name label">Name</ui:msg>
+                </g:Label>
+                <g:Label ui:field="name"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Entity type label">Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="entityType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Value Type label">Value Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="valueType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Repeatable label">Repeatable</ui:msg>
+                </g:Label>
+                <g:Label ui:field="repeatable"/>
+              </o:PropertyPanel>
+
+            </o:PropertiesTable>
+          </b:Column>
+          <b:Column size="6">
+            <o:PropertiesTable keyStyleNames="span3">
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Unit label">Unit</ui:msg>
+                </g:Label>
+                <g:Label ui:field="unit"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Referenced Entity Type label">Referenced Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="refEntityType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Mime Type label">Mime Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="mimeType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Occurrence Group label">Occurrence Group</ui:msg>
+                </g:Label>
+                <g:Label ui:field="occurrenceGroup"/>
+              </o:PropertyPanel>
+
+            </o:PropertiesTable>
+          </b:Column>
+        </b:FluidRow>
+
+        <b:Heading size="4">
+          <ui:msg description="Categories label">Categories</ui:msg>
+        </b:Heading>
+        <g:FlowPanel addStyleNames="clearfix">
+          <b:Button type="INFO" icon="PENCIL" ui:field="editCategories" addStyleNames="pull-left">
+            <ui:msg description="Edit Categories label">Edit Categories</ui:msg>
+          </b:Button>
+          <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
+          <o2:CategoriesTable ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
+        </g:FlowPanel>
+
+        <b:Heading size="4">
+          <ui:msg description="Attributes label">Attributes</ui:msg>
+        </b:Heading>
+
+        <b:TabPanel tabPosition="above" ui:field="attributesTabPanel">
+          <b:Tab heading="Standard" active="true">
+            <b:FluidRow>
+              <b:Column size="6">
+                <b:Heading size="5" addStyleNames="inline-block">
+                  <ui:msg description="Label label">Label</ui:msg>
+                </b:Heading>
+                <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editLabel">
+                </b2:IconAnchor>
+                <o:NamedAttributePanel ui:field="labelPanel" name="label"/>
+              </b:Column>
+              <b:Column size="6">
+                <b:Heading size="5" addStyleNames="inline-block top-margin">
+                  <ui:msg description="Description label">Description</ui:msg>
+                </b:Heading>
+                <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editDescription">
+                </b2:IconAnchor>
+                <o:NamedAttributePanel ui:field="descriptionPanel" name="description"/>
+              </b:Column>
+            </b:FluidRow>
+            <b:Heading size="5">
+              <ui:msg description="Annotations label">Annotations</ui:msg>
+            </b:Heading>
+            <b:DropdownButton type="INFO" icon="PENCIL" ui:field="editAnnotation" addStyleNames="right-indent xxlarge-bottom-margin">
+              <b:NavLink icon="TAG" ui:field="applyAnnotation">
+                <ui:msg description="Apply Annotation button label">Apply annotation...</ui:msg>
+              </b:NavLink>
+              <b:NavLink icon="ERASER" ui:field="deleteAnnotation">
+                <ui:msg description="Remove Annotation button label">Remove annotation...
+                </ui:msg>
+              </b:NavLink>
+            </b:DropdownButton>
+            <b2:IconAnchor ui:field="searchSimilar" icon="SEARCH" addStyleNames="inline" visible="false">
+              <ui:msg description="Search similar variables label">Search similar variables</ui:msg>
+            </b2:IconAnchor>
+            <g:SimplePanel ui:field="annotationPanel"/>
+          </b:Tab>
+          <b:Tab heading="Raw">
+            <b:Button type="INFO" icon="PLUS" ui:field="addAttribute" addStyleNames="bottom-margin">
+              <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
+            </b:Button>
+            <g:FlowPanel ui:field="attributesPanel" addStyleNames="xxlarge-bottom-margin"/>
+          </b:Tab>
+        </b:TabPanel>
+      </b:Tab>
+
+      <b:Tab heading="Script" ui:field="scriptTab">
+        <g:FlowPanel ui:field="scriptHeaderPanel">
+          <g:FlowPanel addStyleNames="clearfix">
+            <b:NavLink icon="CHEVRON_LEFT" addStyleNames="pull-left" ui:field="backToScript">
+              <ui:msg description="Script label">Script</ui:msg>
+            </b:NavLink>
+            <g:FlowPanel ui:field="scriptControls" addStyleNames="pull-right">
+              <b:ButtonGroup>
+                <b:Button icon="EDIT" ui:field="editScript">
+                  <ui:msg description="Edit label">Edit</ui:msg>
+                </b:Button>
+              </b:ButtonGroup>
+              <b:ButtonGroup>
+                <b:Button icon="LIST_OL" ui:field="historyScript">
+                  <ui:msg description="History label">History</ui:msg>
+                </b:Button>
+              </b:ButtonGroup>
+            </g:FlowPanel>
+          </g:FlowPanel>
+        </g:FlowPanel>
+
+        <o:TabDeckPanel ui:field="scriptNavPanel" animationEnabled="false" addStyleNames="top-margin">
+          <g:FlowPanel>
+            <g:FlowPanel>
+              <b:CodeBlock ui:field="script"/>
+            </g:FlowPanel>
+          </g:FlowPanel>
+
+          <g:FlowPanel>
+            <g:FlowPanel addStyleNames="clearfix">
+              <b:Heading size="4" addStyleNames="pull-left">
+                <ui:msg description="Script Edition label">Script Edition</ui:msg>
+              </b:Heading>
+              <g:FlowPanel addStyleNames="pull-right form-inline">
+                <b:TextBox addStyleNames="span3" ui:field="comment"/>
+                <b:Button type="PRIMARY" addStyleNames="small-dual-indent" ui:field="saveScript">
+                  <ui:msg description="Save label">Save</ui:msg>
+                </b:Button>
+                <b:Button ui:field="cancelEditScript">
+                  <ui:msg description="Cancel label">Cancel</ui:msg>
+                </b:Button>
+              </g:FlowPanel>
+            </g:FlowPanel>
+            <g:SimplePanel ui:field="scriptEditor"/>
+          </g:FlowPanel>
+
+          <g:FlowPanel>
+            <g:FlowPanel ui:field="historyPanel">
+            </g:FlowPanel>
+          </g:FlowPanel>
+
+        </o:TabDeckPanel>
+
+      </b:Tab>
+
+      <b:Tab heading="Summary">
+        <g:SimplePanel ui:field="summaryPanel"/>
+      </b:Tab>
+
+      <b:Tab heading="Values">
+        <g:SimplePanel ui:field="values"/>
+      </b:Tab>
+
+      <b:Tab heading="Permissions">
+        <g:SimplePanel ui:field="permissionsPanel"/>
+      </b:Tab>
+
+    </b:TabPanel>
+
+  </g:FlowPanel>
+
+</ui:UiBinder>

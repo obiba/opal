@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.Range;
