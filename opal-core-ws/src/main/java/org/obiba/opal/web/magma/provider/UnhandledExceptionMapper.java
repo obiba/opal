@@ -9,18 +9,16 @@
  */
 package org.obiba.opal.web.magma.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-
+import com.google.protobuf.GeneratedMessage;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 @Component
@@ -37,8 +35,11 @@ public class UnhandledExceptionMapper extends ErrorDtoExceptionMapper<Exception>
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(Exception exception) {
     log.error("Unhandled exception", exception);
-    return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException", exception.getClass().getSimpleName(),
-        exception.getMessage()).build();
+    Throwable cause = exception;
+    while (cause.getCause() != null)
+      cause = cause.getCause();
+    return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException",
+        cause.getClass().getSimpleName(), cause.getMessage()).build();
   }
 
 }

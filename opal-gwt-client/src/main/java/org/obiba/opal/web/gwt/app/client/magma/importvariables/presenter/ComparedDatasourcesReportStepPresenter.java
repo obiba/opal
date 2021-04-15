@@ -9,30 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
-import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.TableCompareDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -42,6 +18,18 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.*;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
@@ -62,17 +50,17 @@ public class ComparedDatasourcesReportStepPresenter
   }
 
   public Request compare(String sourceDatasourceName,
-      @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
-      DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
-      DatasourceDto datasourceResource) {
+                         @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
+                         DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
+                         DatasourceDto datasourceResource) {
     return compare(sourceDatasourceName, targetDatasourceName, datasourceCreatedCallback, factory, datasourceResource,
         false);
   }
 
   public Request compare(String sourceDatasourceName,
-      @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
-      DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
-      DatasourceDto datasourceResource, boolean merge) {
+                         @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
+                         DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
+                         DatasourceDto datasourceResource, boolean merge) {
     this.targetDatasourceName = targetDatasourceName;
     getView().clearDisplay();
     authorizedComparedTables = JsArrays.create();
@@ -109,24 +97,24 @@ public class ComparedDatasourcesReportStepPresenter
             return selectedTableNames.contains(input.getCompared().getName());
           }
         });
-    for(TableCompareDto tableCompareDto : filteredTables) {
+    for (TableCompareDto tableCompareDto : filteredTables) {
       addUpdateVariablesResourceRequest(conclusionStepPresenter, tableCompareDto);
     }
   }
 
   @SuppressWarnings("unchecked")
   private void addUpdateVariablesResourceRequest(ConclusionStepPresenter conclusionStepPresenter,
-      TableCompareDto tableCompareDto) {
+                                                 TableCompareDto tableCompareDto) {
     JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
     JsArray<VariableDto> modifiedVariables = JsArrays.toSafeArray(tableCompareDto.getModifiedVariablesArray());
 
     JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
     JsArrays.pushAll(variablesToStringify, newVariables);
-    if(!getView().ignoreAllModifications()) {
+    if (!getView().ignoreAllModifications()) {
       JsArrays.pushAll(variablesToStringify, modifiedVariables);
     }
 
-    if(variablesToStringify.length() > 0) {
+    if (variablesToStringify.length() > 0) {
       conclusionStepPresenter.setTargetDatasourceName(targetDatasourceName);
       conclusionStepPresenter.addResourceRequest(tableCompareDto.getCompared().getName(),
           "/datasource/" + targetDatasourceName + "/table/" + tableCompareDto.getCompared().getName(),
@@ -135,16 +123,16 @@ public class ComparedDatasourcesReportStepPresenter
   }
 
   ResourceRequestBuilder<? extends JavaScriptObject> createResourceRequestBuilder(TableCompareDto tableCompareDto,
-      JsArray<VariableDto> variables) {
+                                                                                  JsArray<VariableDto> variables) {
     TableDto compared = tableCompareDto.getCompared();
-    if(!tableCompareDto.hasWithTable()) {
+    if (!tableCompareDto.hasWithTable()) {
       // new table
       TableDto newTableDto = TableDto.create();
       newTableDto.setName(compared.getName());
       newTableDto.setEntityType(compared.getEntityType());
       newTableDto.setVariablesArray(variables);
-      UriBuilder ub = UriBuilder.create().segment("datasource", targetDatasourceName, "tables");
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
+      UriBuilder ub = UriBuilders.DATASOURCE_TABLES.create();
+      return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build(targetDatasourceName))
           .withResourceBody(stringify(newTableDto));
     }
 
@@ -185,7 +173,7 @@ public class ComparedDatasourcesReportStepPresenter
     private final DatasourceDto datasourceResource;
 
     private DatasourceCompareResourceCallback(DatasourceCreatedCallback datasourceCreatedCallback,
-        DatasourceFactoryDto factory, DatasourceDto datasourceResource) {
+                                              DatasourceFactoryDto factory, DatasourceDto datasourceResource) {
       this.datasourceCreatedCallback = datasourceCreatedCallback;
       this.factory = factory;
       this.datasourceResource = datasourceResource;
@@ -196,24 +184,24 @@ public class ComparedDatasourcesReportStepPresenter
       Set<TableCompareDto> comparedTables = sortComparedTables(
           JsArrays.toSafeArray(resource.getTableComparisonsArray()));
       conflictsExist = false;
-      for(TableCompareDto tableComparison : comparedTables) {
+      for (TableCompareDto tableComparison : comparedTables) {
         ComparisonResult comparisonResult = getTableComparisonResult(tableComparison);
         addTableCompareTab(tableComparison, comparisonResult);
-        if(comparisonResult == ComparisonResult.CONFLICT) {
+        if (comparisonResult == ComparisonResult.CONFLICT) {
           conflictsExist = true;
-        } else if(tableComparison.getModifiedVariablesArray() != null) {
+        } else if (tableComparison.getModifiedVariablesArray() != null) {
           modificationsExist = true;
         }
       }
       getView().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
-      if(datasourceCreatedCallback != null) {
+      if (datasourceCreatedCallback != null) {
         datasourceCreatedCallback.onSuccess(factory, datasourceResource);
       }
     }
 
     private void addTableCompareTab(TableCompareDto tableCompareDto, ComparisonResult comparisonResult) {
       TableDto comparedTableDto = tableCompareDto.getCompared();
-      if(tableCompareDto.hasWithTable()) {
+      if (tableCompareDto.hasWithTable()) {
         UriBuilder ub = UriBuilder.create()
             .segment("datasource", targetDatasourceName, "table", comparedTableDto.getName(), "variables");
         ResourceAuthorizationRequestBuilderFactory.newBuilder()//
@@ -228,16 +216,16 @@ public class ComparedDatasourcesReportStepPresenter
     }
 
     private ComparisonResult getTableComparisonResult(TableCompareDto tableComparison) {
-      if(JsArrays.toSafeArray(tableComparison.getConflictsArray()).length() > 0 //
+      if (JsArrays.toSafeArray(tableComparison.getConflictsArray()).length() > 0 //
           || JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() +
           JsArrays.toSafeArray(tableComparison.getUnmodifiedVariablesArray()).length() +
           JsArrays.toSafeArray(tableComparison.getNewVariablesArray()).length() == 0) {
         return ComparisonResult.CONFLICT;
       }
-      if(!tableComparison.hasWithTable()) {
+      if (!tableComparison.hasWithTable()) {
         return ComparisonResult.CREATION;
       }
-      if(JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() > 0 ||
+      if (JsArrays.toSafeArray(tableComparison.getModifiedVariablesArray()).length() > 0 ||
           JsArrays.toSafeArray(tableComparison.getNewVariablesArray()).length() > 0) {
         return ComparisonResult.MODIFICATION;
       }
@@ -251,7 +239,7 @@ public class ComparedDatasourcesReportStepPresenter
           return table1.getCompared().getName().compareTo(table2.getCompared().getName());
         }
       });
-      for(int i = 0; i < comparedTables.length(); i++) {
+      for (int i = 0; i < comparedTables.length(); i++) {
         tree.add(comparedTables.get(i));
       }
       return tree;

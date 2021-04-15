@@ -10,15 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.base.Joiner;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 
-import com.google.gwt.core.client.GWT;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class NotificationMessageBuilder {
 
@@ -40,10 +39,16 @@ public final class NotificationMessageBuilder {
 
   private List<String> getMessages() {
     List<String> translatedMessages = new ArrayList<String>();
-    for(String message : notificationEvent.getMessages()) {
-      if(translations.userMessageMap().containsKey(message)) {
-        String msg = TranslationsUtils
-            .replaceArguments(translations.userMessageMap().get(message), notificationEvent.getMessageArgs());
+    for (String message : notificationEvent.getMessages()) {
+      if (translations.userMessageMap().containsKey(message)) {
+        String msg;
+        if ("UnhandledException".equals(message)) {
+          msg = TranslationsUtils
+              .replaceArguments(translations.userMessageMap().get(message), Joiner.on("\n").join(notificationEvent.getMessageArgs()));
+        } else {
+          msg = TranslationsUtils
+              .replaceArguments(translations.userMessageMap().get(message), notificationEvent.getMessageArgs());
+        }
         translatedMessages.add(msg);
       } else {
         translatedMessages.add(message);

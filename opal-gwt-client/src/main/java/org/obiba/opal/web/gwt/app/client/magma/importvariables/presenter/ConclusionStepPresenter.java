@@ -9,23 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter.ResourceClickHandler;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.view.ResourceRequestView;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -34,6 +20,19 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter.ResourceClickHandler;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.view.ResourceRequestView;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPresenter.Display> {
   //
@@ -49,6 +48,8 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
    * Number of resource requests completed (successfully or with an error).
    */
   private int resourceRequestsCompleted;
+
+  private int resourceRequestsFailed;
 
   private String targetDatasourceName;
 
@@ -73,12 +74,13 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
   public void clearResourceRequests() {
     resourceRequests.clear();
     resourceRequestsCompleted = 0;
+    resourceRequestsFailed = 0;
 
     getView().clearResourceRequests();
   }
 
   public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink,
-      ResourceRequestBuilder<T> requestBuilder) {
+                                                              ResourceRequestBuilder<T> requestBuilder) {
     ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(),
         getEventBus(), requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getView().setResourceName(resourceName);
@@ -95,7 +97,7 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
   }
 
   public void sendResourceRequests() {
-    for(ResourceRequestPresenter<? extends JavaScriptObject> r : resourceRequests) {
+    for (ResourceRequestPresenter<? extends JavaScriptObject> r : resourceRequests) {
       r.sendRequest();
     }
   }
@@ -120,8 +122,24 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
     @Override
     public void onResponseCode(Request request, Response response) {
       resourceRequestsCompleted++;
+      GWT.log(request.toString() + " -> " + response.getStatusCode());
+      if (response.getStatusCode() >= 300) {
+        resourceRequestsFailed++;
+        if (response.getText() != null && !response.getText().isEmpty()) {
+          try {
+            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+            fireEvent(NotificationEvent.newBuilder().error(errorDto).build());
+          } catch (Exception e) {
+            // Should never get here!
+            fireEvent(NotificationEvent.newBuilder().error("Internal Error").build());
+          }
+        } else {
+          fireEvent(NotificationEvent.newBuilder().error("Unknown Error").build());
+        }
 
-      if(resourceRequestsCompleted == resourceRequests.size()) {
+      }
+
+      if (resourceRequestsCompleted == resourceRequests.size()) {
         // TODO enable finish getView().setReturnButtonEnabled(true);
         // OPAL-927: Refresh target datasource.
         refreshTargetDatasource();
