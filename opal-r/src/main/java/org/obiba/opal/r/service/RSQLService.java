@@ -214,7 +214,6 @@ public class RSQLService implements Service, SQLService {
     String queryStr = query;
     for (String fromTable : fromTables) {
       ValueTable valueTable = fromTableFullNameMap.get(fromTable);
-      String tableFullName = valueTable.getTableReference();
       String tableSymbol = normalizeTableSymbol(fromTable);
       if (!fromTable.equals(tableSymbol))
         queryStr = queryStr.replaceAll(fromTable, tableSymbol);
