@@ -119,23 +119,6 @@ public class RSQLService implements Service, SQLService {
 
   @Override
   public List<SQLExecution> getSQLExecutions(String subject, String datasource) {
-    /*
-     if (Strings.isNullOrEmpty(subject) || "*".equals(subject)) {
-      if (Strings.isNullOrEmpty(datasource))
-        return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " order by created desc"));
-      else if ("*".equals(datasource))
-        return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where datasource is null order by created desc"));
-      else
-        return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where datasource = ? order by created desc", datasource));
-    }
-    if (Strings.isNullOrEmpty(datasource))
-      return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? order by created desc", subject));
-    else if ("*".equals(datasource))
-      return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource is null order by created desc", subject));
-    else
-      return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource = ? order by created desc", subject, datasource));
-
-     */
     List<SQLExecution> sqlExecs = Lists.newArrayList();
     try (BufferedReader br = new BufferedReader(new FileReader(systemLogService.getSQLLogFile()))) {
       for(String line; (line = br.readLine()) != null; ) {
