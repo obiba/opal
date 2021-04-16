@@ -20,4 +20,5 @@ public interface JVMUiHandlers extends UiHandlers {
 
   void onDownloadRestLogs();
 
+  void onDownloadSQLLogs();
 }

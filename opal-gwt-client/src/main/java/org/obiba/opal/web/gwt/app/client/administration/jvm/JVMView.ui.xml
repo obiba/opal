@@ -42,6 +42,9 @@
         <b:NavLink ui:field="downloadRestLogs">
           <ui:msg description="Web services logs label">Web services logs</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="downloadSQLLogs">
+          <ui:msg description="SQL logs label">SQL logs</ui:msg>
+        </b:NavLink>
       </b:DropdownButton>
     </g:FlowPanel>
 

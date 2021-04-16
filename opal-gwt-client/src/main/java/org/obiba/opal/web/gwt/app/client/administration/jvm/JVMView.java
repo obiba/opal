@@ -222,6 +222,11 @@ public class JVMView extends ViewWithUiHandlers<JVMUiHandlers> implements JVMPre
     getUiHandlers().onDownloadRestLogs();
   }
 
+  @UiHandler("downloadSQLLogs")
+  void onDownloadSQLLogs(ClickEvent event) {
+    getUiHandlers().onDownloadSQLLogs();
+  }
+
   private void updateGcChart(OpalStatus status, double timestamp) {// Garbage collectors
     JsArray<OpalStatus.GarbageCollectorUsage> gcs = JsArrays.toSafeArray(status.getGcsArray());
 

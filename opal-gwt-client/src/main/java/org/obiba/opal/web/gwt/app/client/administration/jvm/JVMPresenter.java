@@ -150,6 +150,11 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
     fireEvent(new FileDownloadRequestEvent("/system/log/rest.log"));
   }
 
+  @Override
+  public void onDownloadSQLLogs() {
+    fireEvent(new FileDownloadRequestEvent("/system/log/sql.log"));
+  }
+
   private final class ListEnvironmentAuthorization implements HasAuthorization {
 
     @Override
