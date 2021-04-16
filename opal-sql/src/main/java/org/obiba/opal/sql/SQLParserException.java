@@ -10,7 +10,11 @@
 
 package org.obiba.opal.sql;
 
-public class SQLParserException extends Exception {
+public class SQLParserException extends RuntimeException {
+
+  public SQLParserException(String message) {
+    super(message);
+  }
 
   public SQLParserException(Throwable throwable) {
     super(throwable.getMessage(), throwable);

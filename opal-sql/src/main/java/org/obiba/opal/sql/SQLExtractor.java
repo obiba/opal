@@ -26,11 +26,52 @@ public class SQLExtractor {
       SQLParser parser = new SQLParser(tokenStream);
       parser.parse().accept(new SQLParserBaseVisitor<Void>() {
         @Override
+        public Void visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx) {
+          throw new SQLParserException("CREATE TABLE statement not supported");
+        }
+
+        @Override
+        public Void visitCreate_view_stmt(SQLParser.Create_view_stmtContext ctx) {
+          throw new SQLParserException("CREATE VIEW statement not supported");
+        }
+
+        @Override
+        public Void visitCreate_virtual_table_stmt(SQLParser.Create_virtual_table_stmtContext ctx) {
+          throw new SQLParserException("CREATE VIRTUAL TABLE statement not supported");
+        }
+
+        @Override
+        public Void visitDrop_stmt(SQLParser.Drop_stmtContext ctx) {
+          throw new SQLParserException("DROP statement not supported");
+        }
+
+        @Override
+        public Void visitAlter_table_stmt(SQLParser.Alter_table_stmtContext ctx) {
+          throw new SQLParserException("ALTER TABLE statement not supported");
+        }
+
+        @Override
+        public Void visitInsert_stmt(SQLParser.Insert_stmtContext ctx) {
+          throw new SQLParserException("INSERT statement not supported");
+        }
+
+        @Override
+        public Void visitDelete_stmt(SQLParser.Delete_stmtContext ctx) {
+          throw new SQLParserException("DELETE statement not supported");
+        }
+
+        @Override
+        public Void visitUpdate_stmt(SQLParser.Update_stmtContext ctx) {
+          throw new SQLParserException("UPDATE statement not supported");
+        }
+
+        @Override
         public Void visitTable_name(SQLParser.Table_nameContext ctx) {
           tables.add(ctx.getText());
           return super.visitTable_name(ctx);
         }
       });
+
       return tables;
     } catch (Exception e) {
       throw new SQLParserException(e);
