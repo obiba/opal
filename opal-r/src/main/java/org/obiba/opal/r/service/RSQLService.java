@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.SecurityUtils;
+import org.json.JSONObject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
@@ -42,9 +43,7 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.ForbiddenException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
 
@@ -60,7 +59,7 @@ public class RSQLService implements Service, SQLService {
   private static final String EXECUTE_SQL_SCRIPT = EXECUTE_SQL_FUNC + ".R";
 
   @Autowired
-  private OrientDbService orientDbService;
+  private SystemLogService systemLogService;
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
@@ -90,7 +89,7 @@ public class RSQLService implements Service, SQLService {
     SQLExecution sqlExec = new SQLExecution();
     sqlExec.setDatasource(datasource);
     sqlExec.setQuery(query);
-    sqlExec.setSubject(getSubjectPrincipal());
+    sqlExec.setUser(getSubjectPrincipal());
 
     RServerSession rSession = prepareRSession();
 
@@ -120,7 +119,8 @@ public class RSQLService implements Service, SQLService {
 
   @Override
   public List<SQLExecution> getSQLExecutions(String subject, String datasource) {
-    if (Strings.isNullOrEmpty(subject) || "*".equals(subject)) {
+    /*
+     if (Strings.isNullOrEmpty(subject) || "*".equals(subject)) {
       if (Strings.isNullOrEmpty(datasource))
         return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " order by created desc"));
       else if ("*".equals(datasource))
@@ -134,6 +134,37 @@ public class RSQLService implements Service, SQLService {
       return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource is null order by created desc", subject));
     else
       return Lists.newArrayList(orientDbService.list(SQLExecution.class, "select from " + SQLExecution.class.getSimpleName() + " where subject = ? and datasource = ? order by created desc", subject, datasource));
+
+     */
+    List<SQLExecution> sqlExecs = Lists.newArrayList();
+    try (BufferedReader br = new BufferedReader(new FileReader(systemLogService.getSQLLogFile()))) {
+      for(String line; (line = br.readLine()) != null; ) {
+        JSONObject exec = new JSONObject(line);
+        boolean included = true;
+        if (!Strings.isNullOrEmpty(subject) && !"*".equals(subject))
+          included = exec.getString("user").equals(subject);
+        if (!Strings.isNullOrEmpty(datasource)) {
+          if ("*".equals(datasource))
+            included = included && !exec.has("datasource");
+          else
+            included = included && (exec.has("datasource") && datasource.equals(exec.getString("datasource")));
+        }
+        if (included) {
+          SQLExecution sqlExec = new SQLExecution();
+          sqlExec.setUser(exec.getString("user"));
+          sqlExec.setDatasource(exec.has("datasource") ? exec.getString("datasource") : null);
+          sqlExec.setError(exec.has("error") ? exec.getString("error") : null);
+          sqlExec.setQuery(exec.getString("query"));
+          sqlExec.setEnded(exec.getLong("ended"));
+          sqlExec.setStarted(exec.getLong("started"));
+          sqlExecs.add(sqlExec);
+        }
+      }
+    } catch (IOException e) {
+      log.error("Cannot read SQL log file: {}", systemLogService.getSQLLogFile(), e);
+    }
+    sqlExecs.sort((exec1, exec2) -> (int) (exec2.getEnded() - exec1.getEnded()));
+    return sqlExecs;
   }
 
   @Override
@@ -144,7 +175,6 @@ public class RSQLService implements Service, SQLService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueIndex(SQLExecution.class);
     running = true;
     ensureSqldfDone = false;
   }
@@ -174,8 +204,7 @@ public class RSQLService implements Service, SQLService {
   private synchronized void saveSQLExecutionHistory(SQLExecution sqlExec) {
     try {
       sqlExec.setEnded(new Date().getTime());
-      sqlExec.setId("" + (orientDbService.count(SQLExecution.class) + 1));
-      orientDbService.save(sqlExec, sqlExec);
+      SQLLog.log("{}", new JSONObject(sqlExec));
     } catch (Exception e) {
       log.error("Cannot save SQL execution history entry", e);
     }
@@ -212,7 +241,7 @@ public class RSQLService implements Service, SQLService {
       rSession.execute(mop);
     }
     queryStr = queryStr.replaceAll("'", "\\\\'");
-    log.info("SQL query: {}", queryStr);
+    log.debug("SQL query to execute: {}", queryStr);
     return queryStr;
   }
 

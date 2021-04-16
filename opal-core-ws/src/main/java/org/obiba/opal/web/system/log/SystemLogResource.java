@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.log;
 
+import org.obiba.opal.core.service.SystemLogService;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,13 @@ public class SystemLogResource {
   @AuthenticatedByCookie
   public Response getRestLog() {
     return getLog(systemLogService.getRestLogFile());
+  }
+
+  @GET
+  @Path("sql.log")
+  @AuthenticatedByCookie
+  public Response getSQLLog() {
+    return getLog(systemLogService.getSQLLogFile());
   }
 
   private Response getLog(File file) {

@@ -93,12 +93,33 @@
     </encoder-->
   </appender>
 
+  <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${OPAL_LOG}/sql.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${OPAL_LOG}/rest-%i.log</fileNamePattern>
+      <maxIndex>10</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>10MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>%message%n</pattern>
+    </encoder>
+  </appender>
+
   <logger name="datashield" additivity="false" level="info">
     <appender-ref ref="datashield"/>
   </logger>
 
   <logger name="org.obiba.opal.web.security.AuditInterceptor" additivity="false" level="info">
     <appender-ref ref="rest"/>
+  </logger>
+
+  <logger name="sql" additivity="false" level="info">
+    <appender-ref ref="sql"/>
   </logger>
 
   <root level="info">

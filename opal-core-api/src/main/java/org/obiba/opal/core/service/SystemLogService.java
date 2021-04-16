@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 OBiBa. All rights reserved.
+ * Copyright (c) 2021 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.log;
+package org.obiba.opal.core.service;
 
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Lists;
@@ -36,6 +36,8 @@ public class SystemLogService {
 
   private static final String REST_LOG_FILE = "rest.log";
 
+  private static final String SQL_LOG_FILE = "sql.log";
+
   private TailBroadcaster opalLogBroadcaster;
 
   @PostConstruct
@@ -57,6 +59,10 @@ public class SystemLogService {
 
   public File getRestLogFile() {
     return new File(logsDir, REST_LOG_FILE);
+  }
+
+  public File getSQLLogFile() {
+    return new File(logsDir, SQL_LOG_FILE);
   }
 
   public void subscribeOpalLog(TailerListener tailer) {

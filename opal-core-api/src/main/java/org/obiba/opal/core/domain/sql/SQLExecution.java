@@ -12,22 +12,17 @@ package org.obiba.opal.core.domain.sql;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import javax.annotation.Nullable;
 import java.util.Date;
-import java.util.List;
 
-public class SQLExecution implements HasUniqueProperties {
-
-  private String id;
+public class SQLExecution {
 
   private long started = new Date().getTime();
 
   private long ended;
 
-  private String subject;
+  private String user;
 
   @Nullable
   private String datasource;
@@ -37,16 +32,12 @@ public class SQLExecution implements HasUniqueProperties {
   @Nullable
   private String error;
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public long getStarted() {
     return started;
+  }
+
+  public void setStarted(long started) {
+    this.started = started;
   }
 
   public long getEnded() {
@@ -57,12 +48,12 @@ public class SQLExecution implements HasUniqueProperties {
     this.ended = ended;
   }
 
-  public String getSubject() {
-    return subject;
+  public String getUser() {
+    return user;
   }
 
-  public void setSubject(String subject) {
-    this.subject = subject;
+  public void setUser(String user) {
+    this.user = user;
   }
 
   public boolean hasDatasource() {
@@ -100,25 +91,27 @@ public class SQLExecution implements HasUniqueProperties {
   }
 
   @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     SQLExecution that = (SQLExecution) o;
-    return Objects.equal(id, that.id) && Objects.equal(started, that.started) && Objects.equal(ended, that.ended) && Objects.equal(subject, that.subject) && Objects.equal(datasource, that.datasource) && Objects.equal(query, that.query) && Objects.equal(error, that.error);
+    return Objects.equal(started, that.started) && Objects.equal(ended, that.ended) && Objects.equal(user, that.user) && Objects.equal(datasource, that.datasource) && Objects.equal(query, that.query) && Objects.equal(error, that.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id, started, ended, subject, datasource, query, error);
+    return Objects.hashCode(started, ended, user, datasource, query, error);
+  }
+
+  @Override
+  public String toString() {
+    return "SQLExecution{" +
+        "started=" + started +
+        ", ended=" + ended +
+        ", user='" + user + '\'' +
+        ", datasource='" + datasource + '\'' +
+        ", query='" + query + '\'' +
+        ", error='" + error + '\'' +
+        '}';
   }
 }

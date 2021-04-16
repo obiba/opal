@@ -19,8 +19,7 @@ public class Dtos {
 
   public static SQL.SQLExecutionDto asDto(SQLExecution exec) {
     SQL.SQLExecutionDto.Builder builder = SQL.SQLExecutionDto.newBuilder()
-        .setId(exec.getId())
-        .setUser(exec.getSubject())
+        .setUser(exec.getUser())
         .setQuery(exec.getQuery())
         .setStart(exec.getStarted())
         .setEnd(exec.getEnded());
