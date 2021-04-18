@@ -83,6 +83,8 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   @UiField
   CheckBox datashieldCheck;
   @UiField
+  CheckBox sqlCheck;
+  @UiField
   CheckBox sysAdminCheck;
 
   private String tokenValue;
@@ -129,6 +131,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
 
     token.setUseR(rCheck.getValue());
     token.setUseDatashield(datashieldCheck.getValue());
+    token.setUseSQL(sqlCheck.getValue());
     token.setSysAdmin(sysAdminCheck.getValue());
     getUiHandlers().onCreateToken(token);
   }

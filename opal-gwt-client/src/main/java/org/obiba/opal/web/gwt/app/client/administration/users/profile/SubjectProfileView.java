@@ -35,7 +35,6 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
 import java.util.ArrayList;
@@ -86,7 +85,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     this.translationMessages = translationMessages;
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    configTokensTable();
+    initTokensTable();
   }
 
   @Override
@@ -142,7 +141,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     }
   }
 
-  private void configTokensTable() {
+  private void initTokensTable() {
     tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
 
       @Override
@@ -196,6 +195,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         String services = "";
         if (object.getUseR()) services = "R";
         if (object.getUseDatashield()) services = services.isEmpty() ? "DataSHIELD" : services + ", " + "DataSHIELD";
+        if (object.getUseSQL()) services = services.isEmpty() ? "SQL" : services + ", " + "SQL";
         if (object.getSysAdmin()) {
           String sysAdmin = translations.pageAdministrationTitle();
           services = services.isEmpty() ? sysAdmin : services + ", " + sysAdmin;

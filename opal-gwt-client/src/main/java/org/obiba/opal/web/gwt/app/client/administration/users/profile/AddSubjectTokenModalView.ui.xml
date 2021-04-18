@@ -132,6 +132,9 @@
         <b:CheckBox ui:field="datashieldCheck">
           <ui:msg description="Token datashield label">Use DataSHIELD</ui:msg>
         </b:CheckBox>
+        <b:CheckBox ui:field="sqlCheck">
+          <ui:msg description="Token sql label">Use SQL</ui:msg>
+        </b:CheckBox>
         <b:CheckBox ui:field="sysAdminCheck">
           <ui:msg description="Token sys admin label">Administrate system</ui:msg>
         </b:CheckBox>

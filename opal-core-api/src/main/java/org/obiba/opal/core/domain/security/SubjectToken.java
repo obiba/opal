@@ -63,6 +63,8 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private boolean useDatashield;
 
+  private boolean useSQL;
+
   private boolean systemAdmin;
 
   public SubjectToken() {
@@ -177,6 +179,14 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public boolean isUseDatashield() {
     return useDatashield;
+  }
+
+  public void setUseSQL(boolean useSQL) {
+    this.useSQL = useSQL;
+  }
+
+  public boolean isUseSQL() {
+    return useSQL;
   }
 
   public void setSystemAdmin(boolean systemAdmin) {

@@ -58,6 +58,7 @@ public class Dtos {
     token.setDeleteProject(dto.hasDeleteProject() && dto.getDeleteProject());
     token.setUseR(dto.hasUseR() && dto.getUseR());
     token.setUseDatashield(dto.hasUseDatashield() && dto.getUseDatashield());
+    token.setUseSQL(dto.hasUseSQL() && dto.getUseSQL());
     token.setSystemAdmin(dto.hasSysAdmin() && dto.getSysAdmin());
     return token;
   }
@@ -97,6 +98,7 @@ public class Dtos {
         .setDeleteProject(token.isDeleteProject())
         .setUseR(token.isUseR())
         .setUseDatashield(token.isUseDatashield())
+        .setUseSQL(token.isUseSQL())
         .setSysAdmin(token.isSystemAdmin())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));

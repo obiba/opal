@@ -66,6 +66,9 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (projectCmdPattern.matcher(node).matches())
       return isProjectCommandPermitted(principals, node);
 
+    if (node.equals("/datasources/_sql") || node.equals("/datasources/_rsql"))
+      return isUsingSQLPermitted(principals);
+
     // cannot create a project using a token
     if (node.equals("/projects") && EDIT_ACTIONS.contains(action))
       return "POST".equals(action) && isCreateProjectPermitted(principals);
@@ -75,7 +78,6 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
     // cannot bypass projects to launch a command
     if (node.startsWith("/shell/commands") && EDIT_ACTIONS.contains(action)) return false;
-
 
     if (node.startsWith("/service/r/workspaces"))
       return isUsingRPermitted(principals) || isUsingDatashieldPermitted(principals);
@@ -105,9 +107,18 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
     if ("datasource".equals(elems[1]) && isTransientDatasource(project)) return true;
 
-    // cannot modify datasource or project using a token
+    boolean projectAccessible;
+    Collection<String> projectRestrictions = getProjectRestrictions(principals);
+    if (projectRestrictions.isEmpty())
+      projectAccessible = true;
+    else
+      projectAccessible = projectRestrictions.contains(project);
+    if (!projectAccessible) return false;
+
     if (elems.length == 3 && EDIT_ACTIONS.contains(action)) {
+      // cannot modify datasource directly
       if ("datasource".equals(elems[1])) return false;
+      // may modify/delete a project
       switch (action) {
         case "PUT": return isUpdateProjectPermitted(principals);
         case "DELETE": return isDeleteProjectPermitted(principals);
@@ -115,10 +126,10 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return false;
     }
 
-    Collection<String> projectRestrictions = getProjectRestrictions(principals);
-    if (projectRestrictions.isEmpty()) return true;
+    if (elems.length == 4 && "datasource".equals(elems[1]) && ("_sql".equals(elems[3]) || "_rsql".equals(elems[3])))
+      return isUsingSQLPermitted(principals);
 
-    return projectRestrictions.contains(project);
+    return true;
   }
 
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
@@ -181,6 +192,10 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private boolean isUsingDatashieldPermitted(PrincipalCollection principals) {
     return getToken(principals).isUseDatashield();
+  }
+
+  private boolean isUsingSQLPermitted(PrincipalCollection principals) {
+    return getToken(principals).isUseSQL();
   }
 
   private boolean isSystemAdministrationPermitted(PrincipalCollection principals, String node) {
