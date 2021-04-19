@@ -265,7 +265,8 @@ public class OpalJettyServer {
   }
 
   private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
-    return createFileHandler("file://" + resolveOpalDistPath() + directory);
+    String path = resolveOpalDistPath();
+    return createFileHandler("file://" + (path.startsWith("/") ? path : "/" + path) + directory);
   }
 
   private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
@@ -286,7 +287,8 @@ public class OpalJettyServer {
     if (!file.exists() && !file.mkdirs()) {
       throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
     }
-    return createFileHandler("file://" + filePath);
+    String path = file.toPath().toRealPath().toString();
+    return createFileHandler("file://" + (path.startsWith("/") ? path : "/" + path));
   }
 
   /**
