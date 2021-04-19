@@ -45,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Properties;
 
@@ -265,8 +266,7 @@ public class OpalJettyServer {
   }
 
   private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
-    String path = resolveOpalDistPath();
-    return createFileHandler("file://" + (path.startsWith("/") ? path : "/" + path) + directory);
+    return createFileHandler(resolveOpalDistURI() + directory);
   }
 
   private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
@@ -287,8 +287,7 @@ public class OpalJettyServer {
     if (!file.exists() && !file.mkdirs()) {
       throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
     }
-    String path = file.toPath().toRealPath().toString();
-    return createFileHandler("file://" + (path.startsWith("/") ? path : "/" + path));
+    return createFileHandler(normalizeFileURI(file.toPath().toRealPath().toUri().toString()));
   }
 
   /**
@@ -297,8 +296,16 @@ public class OpalJettyServer {
    * @return
    * @throws IOException
    */
-  private String resolveOpalDistPath() throws IOException {
-    return new File(System.getProperty("OPAL_DIST")).toPath().toRealPath().toString();
+  private String resolveOpalDistURI() throws IOException {
+    String uri = new File(System.getProperty("OPAL_DIST")).toPath().toRealPath().toUri().toString();
+    return normalizeFileURI(uri);
+  }
+
+  private String normalizeFileURI(String uri) {
+    if (uri.startsWith("file:///")) return uri;
+    if (uri.startsWith("file://")) return uri.replaceFirst("file://", "file:///");
+    if (uri.startsWith("file:/")) return uri.replaceFirst("file:/", "file:///");
+    return "file:///" + uri;
   }
 
   // https://issues.jboss.org/browse/RESTEASY-1012
