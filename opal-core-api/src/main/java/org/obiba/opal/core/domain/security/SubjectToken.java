@@ -53,6 +53,8 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   private Set<String> commands;
 
+  private String access;
+
   private boolean createProject;
 
   private boolean updateProject;
@@ -127,6 +129,14 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
 
   public void setProjects(Set<String> projects) {
     this.projects = projects;
+  }
+
+  public String getAccess() {
+    return access;
+  }
+
+  public void setAccess(String access) {
+    this.access = access;
   }
 
   public Set<String> getCommands() {
@@ -209,5 +219,4 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
     SubjectToken other = (SubjectToken) obj;
     return Objects.equal(principal, other.principal) && Objects.equal(token, other.token) && Objects.equal(name, other.name);
   }
-
 }

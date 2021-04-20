@@ -155,7 +155,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
       @Override
       public String getValue(SubjectTokenDto object) {
         String projects = "";
-        if (object.getProjectsCount()>0) {
+        if (object.getProjectsCount() > 0) {
           projects = Joiner.on(", ").join(JsArrays.toList(object.getProjectsArray()));
         } else {
           projects = "[" + translations.allProjectsLabel().toLowerCase() + "]";
@@ -168,8 +168,17 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
       @Override
       public String getValue(SubjectTokenDto object) {
+        return object.getAccess() == null ? "" :
+            translations.tokenAccessMap().get(object.getAccess().getName());
+      }
+
+    }, translations.dataLabel());
+    tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
+
+      @Override
+      public String getValue(SubjectTokenDto object) {
         String tasks = "";
-        if (object.getCommandsCount()>0) {
+        if (object.getCommandsCount() > 0) {
           for (String cmd : JsArrays.toList(object.getCommandsArray())) {
             String cmdLbl = translations.tokenTasksMap().get(cmd);
             tasks = tasks.isEmpty() ? cmdLbl : tasks + ", " + cmdLbl;
@@ -178,7 +187,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         return tasks;
       }
 
-    }, translations.tasks());
+    }, translations.tasksLabel());
     tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
       @Override
       public String getValue(SubjectTokenDto object) {

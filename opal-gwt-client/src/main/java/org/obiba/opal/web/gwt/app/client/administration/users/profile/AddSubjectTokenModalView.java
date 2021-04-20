@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -24,6 +25,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -57,6 +59,9 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   Chooser tokenProjects;
 
   @UiField
+  Chooser tokenProjectData;
+
+  @UiField
   CheckBox importCheck;
   @UiField
   CheckBox exportCheck;
@@ -70,6 +75,10 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   CheckBox importVCFCheck;
   @UiField
   CheckBox exportVCFCheck;
+  @UiField
+  CheckBox backupCheck;
+  @UiField
+  CheckBox restoreCheck;
 
   @UiField
   CheckBox createProjectCheck;
@@ -102,8 +111,61 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
       }
     });
     tokenProjects.setPlaceholderTextMultiple(translations.selectSomeProjects());
+    tokenProjects.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent chosenChangeEvent) {
+        enableCheckBox(createProjectCheck, tokenProjects.getValues().length == 0);
+      }
+    });
+    tokenProjectData.addItem("Default", "");
+    tokenProjectData.addItem(translations.tokenAccessMap().get(SubjectTokenDto.AccessType.READ.getName()), SubjectTokenDto.AccessType.READ.getName());
+    tokenProjectData.addItem(translations.tokenAccessMap().get(SubjectTokenDto.AccessType.READ_NO_VALUES.getName()), SubjectTokenDto.AccessType.READ_NO_VALUES.getName());
+    tokenProjectData.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent chosenChangeEvent) {
+        String selection = tokenProjectData.getSelectedValue();
+        if (SubjectTokenDto.AccessType.READ.getName().equals(selection)) {
+          enableCheckBox(importCheck, false);
+          enableCheckBox(exportCheck, true);
+          enableCheckBox(copyCheck, false);
+          enableCheckBox(importVCFCheck, false);
+          enableCheckBox(exportVCFCheck, true);
+          enableCheckBox(restoreCheck, false);
+          enableCheckBox(backupCheck, true);
+          enableCheckBox(rCheck, true);
+          enableCheckBox(sqlCheck, true);
+          enableCheckBox(sysAdminCheck, false);
+        } else if (SubjectTokenDto.AccessType.READ_NO_VALUES.getName().equals(selection)) {
+          enableCheckBox(importCheck, false);
+          enableCheckBox(exportCheck, false);
+          enableCheckBox(copyCheck, false);
+          enableCheckBox(importVCFCheck, false);
+          enableCheckBox(exportVCFCheck, false);
+          enableCheckBox(restoreCheck, false);
+          enableCheckBox(backupCheck, false);
+          enableCheckBox(rCheck, false);
+          enableCheckBox(sqlCheck, false);
+          enableCheckBox(sysAdminCheck, false);
+        } else {
+          enableCheckBox(importCheck, true);
+          enableCheckBox(exportCheck, true);
+          enableCheckBox(copyCheck, true);
+          enableCheckBox(importVCFCheck, true);
+          enableCheckBox(exportVCFCheck, true);
+          enableCheckBox(restoreCheck, true);
+          enableCheckBox(backupCheck, true);
+          enableCheckBox(rCheck, true);
+          enableCheckBox(sqlCheck, true);
+          enableCheckBox(sysAdminCheck, true);
+        }
+      }
+    });
   }
 
+  private void enableCheckBox(CheckBox check, boolean enable) {
+    check.setEnabled(enable);
+    if (!enable) check.setValue(false);
+  }
   @UiHandler("cancelButton")
   public void onCancelButton(ClickEvent event) {
     dialog.hide();
@@ -117,6 +179,13 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     for (String p : tokenProjects.getValues()) {
       token.addProjects(p);
     }
+
+    String selection = tokenProjectData.getSelectedValue();
+    if (SubjectTokenDto.AccessType.READ.getName().equals(selection))
+      token.setAccess(SubjectTokenDto.AccessType.READ);
+    else if (SubjectTokenDto.AccessType.READ_NO_VALUES.getName().equals(selection))
+      token.setAccess(SubjectTokenDto.AccessType.READ_NO_VALUES);
+
     if (importCheck.getValue()) token.addCommands("import");
     if (exportCheck.getValue()) token.addCommands("export");
     if (copyCheck.getValue()) token.addCommands("copy");
@@ -124,6 +193,8 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     if (reportCheck.getValue()) token.addCommands("report");
     if (importVCFCheck.getValue()) token.addCommands("import_vcf");
     if (exportVCFCheck.getValue()) token.addCommands("export_vcf");
+    if (backupCheck.getValue()) token.addCommands("backup");
+    if (restoreCheck.getValue()) token.addCommands("restore");
 
     token.setCreateProject(createProjectCheck.getValue() && tokenProjects.getValues().length == 0);
     token.setUpdateProject(updateProjectCheck.getValue());

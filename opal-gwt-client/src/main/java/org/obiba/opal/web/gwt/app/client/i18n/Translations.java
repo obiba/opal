@@ -1333,6 +1333,13 @@ public interface Translations extends Constants {
   })
   Map<String, String> valueTypeMap();
 
+  @Description("Token Data Access map")
+  @DefaultStringMapValue({
+      "READ", "Read only",
+      "READ_NO_VALUES", "Read only, without individual-level data"
+  })
+  Map<String, String> tokenAccessMap();
+
   @Description("Token Tasks map")
   @DefaultStringMapValue({
       "import", "Import",
@@ -1341,7 +1348,9 @@ public interface Translations extends Constants {
       "report", "Report",
       "analyse", "Analyse",
       "import_vcf", "Import VCF",
-      "export_vcf", "Export VCF"
+      "export_vcf", "Export VCF",
+      "backup", "Backup",
+      "restore", "Restore"
   })
   Map<String, String> tokenTasksMap();
 
@@ -2805,9 +2814,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add User")
   String addUser();
 
+  @Description("Data label")
+  @DefaultStringValue("Data")
+  String dataLabel();
+
   @Description("Tasks label")
   @DefaultStringValue("Tasks")
-  String tasks();
+  String tasksLabel();
 
   @Description("Administration label")
   @DefaultStringValue("Administration")

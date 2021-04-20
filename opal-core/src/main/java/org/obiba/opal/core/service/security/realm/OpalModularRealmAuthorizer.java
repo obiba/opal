@@ -18,14 +18,17 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.obiba.opal.core.service.SubjectTokenService;
+import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A authorizer that applies a posteriori restrictions to permissions granted to a {@link SubjectToken}.
@@ -34,7 +37,13 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private static final Logger log = LoggerFactory.getLogger(OpalModularRealmAuthorizer.class);
 
-  private static final Collection<String> EDIT_ACTIONS = Sets.newHashSet("PUT", "DELETE", "POST");
+  private static final Collection<String> EDIT_METHODS = Sets.newHashSet("PUT", "DELETE", "POST");
+
+  private static final Collection<String> SQL_ACTIONS = Sets.newHashSet("_sql", "_rsql");
+
+  private static final Collection<String> READ_NO_VALUES_COMMANDS = Sets.newHashSet("analyse", "report");
+
+  private static final Collection<String> READ_COMMANDS = Sets.newHashSet("export", "export_vcf", "analyse", "report", "backup");
 
   private final SubjectTokenService subjectTokenService;
 
@@ -70,14 +79,14 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return isUsingSQLPermitted(principals);
 
     // cannot create a project using a token
-    if (node.equals("/projects") && EDIT_ACTIONS.contains(action))
+    if (node.equals("/projects") && EDIT_METHODS.contains(action))
       return "POST".equals(action) && isCreateProjectPermitted(principals);
 
     if (node.startsWith("/project/") || node.startsWith("/datasource/"))
       return isProjectActionPermitted(principals, node, action);
 
     // cannot bypass projects to launch a command
-    if (node.startsWith("/shell/commands") && EDIT_ACTIONS.contains(action)) return false;
+    if (node.startsWith("/shell/commands") && EDIT_METHODS.contains(action)) return false;
 
     if (node.startsWith("/service/r/workspaces"))
       return isUsingRPermitted(principals) || isUsingDatashieldPermitted(principals);
@@ -92,7 +101,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
         || node.startsWith("/datashield/option") || node.startsWith("/datashield/package")
         || node.startsWith("/service")
         || node.startsWith("/identifiers/mapping")
-        || node.startsWith("/plugin")) && EDIT_ACTIONS.contains(action))
+        || node.startsWith("/plugin")) && EDIT_METHODS.contains(action))
       return isSystemAdministrationPermitted(principals, node);
 
     return true;
@@ -115,7 +124,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       projectAccessible = projectRestrictions.contains(project);
     if (!projectAccessible) return false;
 
-    if (elems.length == 3 && EDIT_ACTIONS.contains(action)) {
+    if (elems.length == 3 && EDIT_METHODS.contains(action)) {
       // cannot modify datasource directly
       if ("datasource".equals(elems[1])) return false;
       // may modify/delete a project
@@ -126,8 +135,14 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return false;
     }
 
-    if (elems.length == 4 && "datasource".equals(elems[1]) && ("_sql".equals(elems[3]) || "_rsql".equals(elems[3])))
+    if (elems.length == 4 && "datasource".equals(elems[1]) && SQL_ACTIONS.contains(elems[3]))
       return isUsingSQLPermitted(principals);
+
+    if ((isReadNoValues(principals) || isRead(principals)) && EDIT_METHODS.contains(action))
+      return false;
+
+    if (isReadNoValues(principals) && "datasource".equals(elems[1]) && (node.endsWith("/valueSets") || node.contains("/valueSet/")))
+      return false;
 
     return true;
   }
@@ -135,7 +150,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
     Collection<String> projectRestrictions = getProjectRestrictions(principals);
     if (projectRestrictions.isEmpty()) {
-      for (String cmd : getToken(principals).getCommands()) {
+      for (String cmd : getFilteredCommands(principals)) {
         if (node.endsWith("/commands/_" + cmd)) return true;
       }
       return false;
@@ -161,17 +176,41 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     return getToken(principals).getProjects();
   }
 
+  private boolean isReadNoValues(PrincipalCollection principals) {
+    return Opal.SubjectTokenDto.AccessType.READ_NO_VALUES.name().equals(getToken(principals).getAccess());
+  }
+
+  private boolean isRead(PrincipalCollection principals) {
+    return Opal.SubjectTokenDto.AccessType.READ.name().equals(getToken(principals).getAccess());
+  }
+
   private List<String> getProjectCommands(PrincipalCollection principals) {
     List<String> projectCmds = Lists.newArrayList();
     SubjectToken token = getToken(principals);
-    if (token.getCommands().isEmpty()) return projectCmds;
-
+    Set<String> commands = getFilteredCommands(principals);
     for (String project : token.getProjects()) {
-      for (String cmd : token.getCommands()) {
+      for (String cmd : commands) {
         projectCmds.add("/project/" + project + "/commands/_" + cmd);
       }
     }
     return projectCmds;
+  }
+
+  /**
+   * Get selected commands, modulo read access restriction (if defined).
+   *
+   * @param principals
+   * @return
+   */
+  private Set<String> getFilteredCommands(PrincipalCollection principals) {
+    SubjectToken token = getToken(principals);
+    boolean readNoValues = isReadNoValues(principals);
+    boolean read = isRead(principals);
+    return token.getCommands().stream()
+        .filter(cmd -> (!readNoValues && !read) // can read/write
+            || (readNoValues && READ_NO_VALUES_COMMANDS.contains(cmd))  // can read without values, not write
+            || (read && READ_COMMANDS.contains(cmd))) // can read, not write
+        .collect(Collectors.toSet());
   }
 
   private boolean isCreateProjectPermitted(PrincipalCollection principals) {
@@ -187,7 +226,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isUsingRPermitted(PrincipalCollection principals) {
-    return getToken(principals).isUseR();
+    return getToken(principals).isUseR() && !isReadNoValues(principals);
   }
 
   private boolean isUsingDatashieldPermitted(PrincipalCollection principals) {
@@ -195,7 +234,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isUsingSQLPermitted(PrincipalCollection principals) {
-    return getToken(principals).isUseSQL();
+    return getToken(principals).isUseSQL() && !isReadNoValues(principals);
   }
 
   private boolean isSystemAdministrationPermitted(PrincipalCollection principals, String node) {
@@ -203,9 +242,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (sysAdmin) return true;
 
     // pattern for managing own settings
-    if (node.contains("/_current")) return true;
-
-    return false;
+    return node.contains("/_current");
   }
 
   private SubjectToken getToken(PrincipalCollection principals) {

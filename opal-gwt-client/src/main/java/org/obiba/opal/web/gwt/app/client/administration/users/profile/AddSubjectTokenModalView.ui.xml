@@ -56,6 +56,20 @@
 
     <b:ControlGroup>
       <b:ControlLabel>
+        <ui:msg description="Token project data label">Project data</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:Chooser ui:field="tokenProjectData" width="500px"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Token project data help">
+          Data access can be limited to read operations. Limiting data access affects which project tasks can be performed and which services can be used.
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:ControlLabel>
         <ui:msg description="Token tasks label">Project tasks</ui:msg>
       </b:ControlLabel>
       <b:HelpBlock>
@@ -75,11 +89,17 @@
             <b:CheckBox ui:field="copyCheck">
               <ui:msg description="Token copy task label">Copy</ui:msg>
             </b:CheckBox>
-            <b:CheckBox ui:field="reportCheck">
-              <ui:msg description="Token report task label">Report</ui:msg>
+            <b:CheckBox ui:field="backupCheck">
+              <ui:msg description="Token backup task label">Backup</ui:msg>
+            </b:CheckBox>
+            <b:CheckBox ui:field="restoreCheck">
+              <ui:msg description="Token restore task label">Restore</ui:msg>
             </b:CheckBox>
           </b:Column>
           <b:Column size="2">
+            <b:CheckBox ui:field="reportCheck">
+              <ui:msg description="Token report task label">Report</ui:msg>
+            </b:CheckBox>
             <b:CheckBox ui:field="analyseCheck">
               <ui:msg description="Token analyse task label">Analyse</ui:msg>
             </b:CheckBox>

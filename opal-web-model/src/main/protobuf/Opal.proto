@@ -262,6 +262,10 @@ message SubjectProfileDto {
 }
 
 message SubjectTokenDto {
+  enum AccessType {
+    READ_NO_VALUES = 0;
+    READ = 1;
+  }
   optional string principal = 1;
   optional string token = 2;
   required string name = 3;
@@ -276,6 +280,7 @@ message SubjectTokenDto {
   optional bool createProject = 12 [default = false];
   optional bool updateProject = 13 [default = false];
   optional bool deleteProject = 14 [default = false];
+  optional AccessType access = 15;
 }
 
 message LinkDto {

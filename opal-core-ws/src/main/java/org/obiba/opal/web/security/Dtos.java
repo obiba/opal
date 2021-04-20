@@ -53,6 +53,7 @@ public class Dtos {
     if (dto.hasToken()) token.setToken(dto.getToken());
     if (dto.getProjectsCount()>0) token.addAllProjects(dto.getProjectsList());
     if (dto.getCommandsCount()>0) token.addAllCommands(dto.getCommandsList());
+    if (dto.hasAccess()) token.setAccess(dto.getAccess().name());
     token.setCreateProject(dto.hasCreateProject() && dto.getCreateProject());
     token.setUpdateProject(dto.hasUpdateProject() && dto.getUpdateProject());
     token.setDeleteProject(dto.hasDeleteProject() && dto.getDeleteProject());
@@ -102,6 +103,9 @@ public class Dtos {
         .setSysAdmin(token.isSystemAdmin())
         .setCreated(ISO_8601.format(token.getCreated()))
         .setLastUpdate(ISO_8601.format(token.getUpdated()));
+
+    if (!Strings.isNullOrEmpty(token.getAccess()))
+        builder.setAccess(Opal.SubjectTokenDto.AccessType.valueOf(token.getAccess()));
 
     return builder.build();
   }

@@ -96,7 +96,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     exploreProjectsLink.setText(translations.exploreVariables());
     searchLink.setText(translations.pageSearchTitle());
     exploreFilesLink.setText(translations.manageFiles());
-    tasksLink.setText(translations.tasks());
+    tasksLink.setText(translations.tasksLabel());
     reportsLink.setText(translations.runReports());
     identifiersLink.setText(translations.manageParticipantIdentifiers());
     myprofileLink.setText(translations.myProfile());
