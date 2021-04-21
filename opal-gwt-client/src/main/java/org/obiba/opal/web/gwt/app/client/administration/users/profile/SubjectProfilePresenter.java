@@ -151,21 +151,31 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
   public void onAddDataSHIELDToken() {
     AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
     presenter.setTokenNames(tokenNames);
-    presenter.initDataSHIELD();
+    presenter.initDataSHIELD(generateName("datashield"));
   }
 
   @Override
   public void onAddRToken() {
     AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
     presenter.setTokenNames(tokenNames);
-    presenter.initR();
+    presenter.initR(generateName("r"));
   }
 
   @Override
   public void onAddSQLToken() {
     AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
     presenter.setTokenNames(tokenNames);
-    presenter.initSQL();
+    presenter.initSQL(generateName("sql"));
+  }
+
+  private String generateName(String prefix) {
+    int i = 1;
+    String name = prefix + "-" + i;
+    while (tokenNames.contains(name)) {
+      i++;
+      name = prefix + "-" + i;
+    }
+    return name;
   }
 
   @Override

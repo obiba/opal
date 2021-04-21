@@ -252,7 +252,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   }
 
   @Override
-  public void setPurpose(Purpose purpose) {
+  public void setPurpose(Purpose purpose, String name) {
     hideAdditionalGroups();
     switch (purpose) {
       case DATASHIELD:
@@ -279,6 +279,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
         sqlCheck.setValue(true);
         break;
     }
+    nameText.setText(name);
     onProjectDataChanged();
   }
 

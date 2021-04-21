@@ -105,16 +105,16 @@ public class AddSubjectTokenModalPresenter extends ModalPresenterWidget<AddSubje
     this.tokenNames = tokenNames;
   }
 
-  public void initDataSHIELD() {
-    getView().setPurpose(Display.Purpose.DATASHIELD);
+  public void initDataSHIELD(String name) {
+    getView().setPurpose(Display.Purpose.DATASHIELD, name);
   }
 
-  public void initR() {
-    getView().setPurpose(Display.Purpose.R);
+  public void initR(String name) {
+    getView().setPurpose(Display.Purpose.R, name);
   }
 
-  public void initSQL() {
-    getView().setPurpose(Display.Purpose.SQL);
+  public void initSQL(String name) {
+    getView().setPurpose(Display.Purpose.SQL, name);
   }
 
   public interface Display extends PopupView, HasUiHandlers<AddSubjectTokenModalUiHandlers> {
@@ -123,7 +123,7 @@ public class AddSubjectTokenModalPresenter extends ModalPresenterWidget<AddSubje
 
     void setProjects(List<ProjectDto> projects);
 
-    void setPurpose(Purpose purpose);
+    void setPurpose(Purpose purpose, String name);
 
     void hideDialog();
 
