@@ -47,6 +47,7 @@ import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsP
 import org.obiba.opal.web.gwt.app.client.project.resources.ProjectResourcesPresenter;
 import org.obiba.opal.web.gwt.app.client.project.resources.event.ResourceSelectionChangedEvent;
 import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
@@ -300,6 +301,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
     }
     placeManager.updateHistory(builder.build(), true);
+  }
+
+  @Override
+  public void onSearchVariables() {
+    fireEvent(new SearchDatasourceVariablesEvent(projectName));
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")

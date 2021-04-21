@@ -17,4 +17,6 @@ public interface ProjectUiHandlers extends UiHandlers {
   void onProjectsSelection(String tag);
 
   void onTabSelected(int index);
+
+  void onSearchVariables();
 }

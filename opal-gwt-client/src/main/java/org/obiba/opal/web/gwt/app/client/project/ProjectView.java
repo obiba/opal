@@ -28,6 +28,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -141,7 +142,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     tableCount.setText("-");
     tableCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(project.getName())));
     variableCount.setText("-");
-    variableCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(project.getName())));
+    //variableCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(project.getName())));
     resourceCount.setText("-");
     resourceCount.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getResourcesPlace(project.getName())));
     setProjectStatus(project.getDatasourceStatus().getName());
@@ -255,6 +256,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     getUiHandlers().onTabSelected(tabPanel.getSelectedTab());
   }
 
+  @UiHandler("variableCount")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables();
+  }
 
   @Override
   @SuppressWarnings({"PMD.NcssMethodCount", "IfStatementWithTooManyBranches", "OverlyLongMethod"})
