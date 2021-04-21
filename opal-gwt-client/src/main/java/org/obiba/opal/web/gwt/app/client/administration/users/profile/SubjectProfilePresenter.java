@@ -148,6 +148,27 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
   }
 
   @Override
+  public void onAddDataSHIELDToken() {
+    AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
+    presenter.setTokenNames(tokenNames);
+    presenter.initDataSHIELD();
+  }
+
+  @Override
+  public void onAddRToken() {
+    AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
+    presenter.setTokenNames(tokenNames);
+    presenter.initR();
+  }
+
+  @Override
+  public void onAddSQLToken() {
+    AddSubjectTokenModalPresenter presenter = addTokenModalProvider.get();
+    presenter.setTokenNames(tokenNames);
+    presenter.initSQL();
+  }
+
+  @Override
   public void onRemoveToken(final SubjectTokenDto token) {
     confirmation = new Runnable() {
       @Override

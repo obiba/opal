@@ -10,10 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.Form;
-import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.github.gwtbootstrap.client.ui.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,6 +35,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
@@ -62,9 +61,6 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @UiField
   FlowPanel bookmarks;
-
-  @UiField
-  Button addToken;
 
   @UiField
   OpalSimplePager tokensPager;
@@ -115,6 +111,12 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @Override
   public void renderTokens(List<SubjectTokenDto> tokens) {
+    Collections.sort(tokens, new Comparator<SubjectTokenDto>() {
+      @Override
+      public int compare(SubjectTokenDto s1, SubjectTokenDto s2) {
+        return s1.getName().compareTo(s2.getName());
+      }
+    });
     tokensDataProvider.setList(tokens);
     tokensPager.firstPage();
     tokensDataProvider.refresh();
@@ -131,6 +133,21 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   @UiHandler("addToken")
   public void onAddToken(ClickEvent event) {
     getUiHandlers().onAddToken();
+  }
+
+  @UiHandler("addDSToken")
+  public void onAddDSToken(ClickEvent event) {
+    getUiHandlers().onAddDataSHIELDToken();
+  }
+
+  @UiHandler("addRToken")
+  public void onAddRToken(ClickEvent event) {
+    getUiHandlers().onAddRToken();
+  }
+
+  @UiHandler("addSQLToken")
+  public void onAddSQLToken(ClickEvent event) {
+    getUiHandlers().onAddSQLToken();
   }
 
   @Override
@@ -172,7 +189,7 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
             translations.tokenAccessMap().get(object.getAccess().getName());
       }
 
-    }, translations.dataLabel());
+    }, translations.dataAccessLabel());
     tokensTable.addColumn(new TextColumn<SubjectTokenDto>() {
 
       @Override

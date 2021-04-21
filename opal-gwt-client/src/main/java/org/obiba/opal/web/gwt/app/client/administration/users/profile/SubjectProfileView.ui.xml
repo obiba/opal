@@ -66,9 +66,22 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:Button ui:field="addToken" type="INFO" icon="PLUS" addStyleNames="btn">
-      <ui:msg description="Add Access Token Button label">Add Access Token</ui:msg>
-    </b:Button>
+    <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
+                      text="Add Access Token"
+                      addStyleNames="small-top-margin small-right-indent">
+      <b:NavLink ui:field="addDSToken">
+        <ui:msg description="Add DS token label">Add DataSHIELD Token...</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="addRToken">
+        <ui:msg description="Add R token label">Add R Token...</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="addSQLToken">
+        <ui:msg description="Add SQL token label">Add SQL Token...</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="addToken">
+        <ui:msg description="Add custom token label">Add Custom Token...</ui:msg>
+      </b:NavLink>
+    </b:DropdownButton>
 
     <o:OpalSimplePager ui:field="tokensPager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="tokensTable" addStyleNames="small-top-margin"/>

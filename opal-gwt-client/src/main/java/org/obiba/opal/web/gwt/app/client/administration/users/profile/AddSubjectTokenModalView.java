@@ -44,9 +44,6 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   Modal dialog;
 
   @UiField
-  Button cancelButton;
-
-  @UiField
   ControlGroup nameGroup;
 
   @UiField
@@ -59,8 +56,12 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   Chooser tokenProjects;
 
   @UiField
+  ControlGroup dataGroup;
+  @UiField
   Chooser tokenProjectData;
 
+  @UiField
+  ControlGroup tasksGroup;
   @UiField
   CheckBox importCheck;
   @UiField
@@ -81,12 +82,16 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   CheckBox restoreCheck;
 
   @UiField
+  ControlGroup adminGroup;
+  @UiField
   CheckBox createProjectCheck;
   @UiField
   CheckBox updateProjectCheck;
   @UiField
   CheckBox deleteProjectCheck;
 
+  @UiField
+  ControlGroup servicesGroup;
   @UiField
   CheckBox rCheck;
   @UiField
@@ -96,12 +101,15 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
   @UiField
   CheckBox sysAdminCheck;
 
+  private final Translations translations;
+
   private String tokenValue;
 
   @Inject
   public AddSubjectTokenModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
+    this.translations = translations;
     dialog.setTitle(translations.addTokenModalTitle());
     tokenText.setStyleName("password-vertical-align");
     tokenText.addKeyUpHandler(new KeyUpHandler() {
@@ -123,43 +131,47 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     tokenProjectData.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
       public void onChange(ChosenChangeEvent chosenChangeEvent) {
-        String selection = tokenProjectData.getSelectedValue();
-        if (SubjectTokenDto.AccessType.READ.getName().equals(selection)) {
-          enableCheckBox(importCheck, false);
-          enableCheckBox(exportCheck, true);
-          enableCheckBox(copyCheck, false);
-          enableCheckBox(importVCFCheck, false);
-          enableCheckBox(exportVCFCheck, true);
-          enableCheckBox(restoreCheck, false);
-          enableCheckBox(backupCheck, true);
-          enableCheckBox(rCheck, true);
-          enableCheckBox(sqlCheck, true);
-          enableCheckBox(sysAdminCheck, false);
-        } else if (SubjectTokenDto.AccessType.READ_NO_VALUES.getName().equals(selection)) {
-          enableCheckBox(importCheck, false);
-          enableCheckBox(exportCheck, false);
-          enableCheckBox(copyCheck, false);
-          enableCheckBox(importVCFCheck, false);
-          enableCheckBox(exportVCFCheck, false);
-          enableCheckBox(restoreCheck, false);
-          enableCheckBox(backupCheck, false);
-          enableCheckBox(rCheck, false);
-          enableCheckBox(sqlCheck, false);
-          enableCheckBox(sysAdminCheck, false);
-        } else {
-          enableCheckBox(importCheck, true);
-          enableCheckBox(exportCheck, true);
-          enableCheckBox(copyCheck, true);
-          enableCheckBox(importVCFCheck, true);
-          enableCheckBox(exportVCFCheck, true);
-          enableCheckBox(restoreCheck, true);
-          enableCheckBox(backupCheck, true);
-          enableCheckBox(rCheck, true);
-          enableCheckBox(sqlCheck, true);
-          enableCheckBox(sysAdminCheck, true);
-        }
+        onProjectDataChanged();
       }
     });
+  }
+
+  private void onProjectDataChanged() {
+    String selection = tokenProjectData.getSelectedValue();
+    if (SubjectTokenDto.AccessType.READ.getName().equals(selection)) {
+      enableCheckBox(importCheck, false);
+      enableCheckBox(exportCheck, true);
+      enableCheckBox(copyCheck, false);
+      enableCheckBox(importVCFCheck, false);
+      enableCheckBox(exportVCFCheck, true);
+      enableCheckBox(restoreCheck, false);
+      enableCheckBox(backupCheck, true);
+      enableCheckBox(rCheck, true);
+      enableCheckBox(sqlCheck, true);
+      enableCheckBox(sysAdminCheck, false);
+    } else if (SubjectTokenDto.AccessType.READ_NO_VALUES.getName().equals(selection)) {
+      enableCheckBox(importCheck, false);
+      enableCheckBox(exportCheck, false);
+      enableCheckBox(copyCheck, false);
+      enableCheckBox(importVCFCheck, false);
+      enableCheckBox(exportVCFCheck, false);
+      enableCheckBox(restoreCheck, false);
+      enableCheckBox(backupCheck, false);
+      enableCheckBox(rCheck, false);
+      enableCheckBox(sqlCheck, false);
+      enableCheckBox(sysAdminCheck, false);
+    } else {
+      enableCheckBox(importCheck, true);
+      enableCheckBox(exportCheck, true);
+      enableCheckBox(copyCheck, true);
+      enableCheckBox(importVCFCheck, true);
+      enableCheckBox(exportVCFCheck, true);
+      enableCheckBox(restoreCheck, true);
+      enableCheckBox(backupCheck, true);
+      enableCheckBox(rCheck, true);
+      enableCheckBox(sqlCheck, true);
+      enableCheckBox(sysAdminCheck, true);
+    }
   }
 
   private void enableCheckBox(CheckBox check, boolean enable) {
@@ -237,6 +249,44 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
     for(ProjectDto project : projects) {
       this.tokenProjects.addItem(project.getName());
     }
+  }
+
+  @Override
+  public void setPurpose(Purpose purpose) {
+    hideAdditionalGroups();
+    switch (purpose) {
+      case DATASHIELD:
+        dialog.setTitle(translations.addDataSHIELDTokenModalTitle());
+        tokenProjectData.setSelectedValue(SubjectTokenDto.AccessType.READ_NO_VALUES.getName());
+        datashieldCheck.setValue(true);
+        break;
+      case R:
+        dialog.setTitle(translations.addRTokenModalTitle());
+        dataGroup.setVisible(true);
+        rCheck.setValue(true);
+        copyCheck.setVisible(false);
+        backupCheck.setVisible(false);
+        restoreCheck.setVisible(false);
+        reportCheck.setVisible(false);
+        analyseCheck.setVisible(false);
+        importVCFCheck.setVisible(false);
+        exportVCFCheck.setVisible(false);
+        tasksGroup.setVisible(true);
+        break;
+      case SQL:
+        dialog.setTitle(translations.addSQLTokenModalTitle());
+        tokenProjectData.setSelectedValue(SubjectTokenDto.AccessType.READ.getName());
+        sqlCheck.setValue(true);
+        break;
+    }
+    onProjectDataChanged();
+  }
+
+  private void hideAdditionalGroups() {
+    dataGroup.setVisible(false);
+    tasksGroup.setVisible(false);
+    adminGroup.setVisible(false);
+    servicesGroup.setVisible(false);
   }
 
   private static native boolean copyToClipboard() /*-{

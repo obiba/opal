@@ -105,9 +105,25 @@ public class AddSubjectTokenModalPresenter extends ModalPresenterWidget<AddSubje
     this.tokenNames = tokenNames;
   }
 
+  public void initDataSHIELD() {
+    getView().setPurpose(Display.Purpose.DATASHIELD);
+  }
+
+  public void initR() {
+    getView().setPurpose(Display.Purpose.R);
+  }
+
+  public void initSQL() {
+    getView().setPurpose(Display.Purpose.SQL);
+  }
+
   public interface Display extends PopupView, HasUiHandlers<AddSubjectTokenModalUiHandlers> {
 
+    enum Purpose { DATASHIELD, R, SQL }
+
     void setProjects(List<ProjectDto> projects);
+
+    void setPurpose(Purpose purpose);
 
     void hideDialog();
 

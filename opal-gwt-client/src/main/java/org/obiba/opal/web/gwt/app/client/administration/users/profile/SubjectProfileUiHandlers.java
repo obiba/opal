@@ -19,6 +19,12 @@ public interface SubjectProfileUiHandlers extends UiHandlers {
 
   void onAddToken();
 
+  void onAddDataSHIELDToken();
+
+  void onAddRToken();
+
+  void onAddSQLToken();
+
   void onRemoveToken(SubjectTokenDto token);
 
 }

@@ -2234,6 +2234,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Token")
   String addTokenModalTitle();
 
+  @Description("Add DataSHIELD Token title")
+  @DefaultStringValue("Add DataSHIELD Token")
+  String addDataSHIELDTokenModalTitle();
+
+  @Description("Add R Token title")
+  @DefaultStringValue("Add R Token")
+  String addRTokenModalTitle();
+
+  @Description("Add SQL Token title")
+  @DefaultStringValue("Add SQL Token")
+  String addSQLTokenModalTitle();
+
   @Description("Remove Token title")
   @DefaultStringValue("Remove Token")
   String removeTokenModalTitle();
@@ -2814,9 +2826,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add User")
   String addUser();
 
-  @Description("Data label")
-  @DefaultStringValue("Data")
-  String dataLabel();
+  @Description("Data acess label")
+  @DefaultStringValue("Data access")
+  String dataAccessLabel();
 
   @Description("Tasks label")
   @DefaultStringValue("Tasks")
