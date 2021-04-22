@@ -271,6 +271,7 @@ public class AddSubjectTokenModalView extends ModalPopupViewWithUiHandlers<AddSu
         analyseCheck.setVisible(false);
         importVCFCheck.setVisible(false);
         exportVCFCheck.setVisible(false);
+        exportCheck.setValue(true);
         tasksGroup.setVisible(true);
         break;
       case SQL:
