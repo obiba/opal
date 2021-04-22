@@ -31,7 +31,6 @@ import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.sql.SQLExtractor;
 import org.obiba.opal.sql.SQLParserException;
-import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,9 +59,6 @@ public class RSQLService implements Service, SQLService {
 
   @Autowired
   private SystemLogService systemLogService;
-
-  @Autowired
-  private RPackageResourceHelper rPackageHelper;
 
   @Autowired
   private RServerManagerService rServerManagerService;
@@ -121,7 +117,7 @@ public class RSQLService implements Service, SQLService {
   public List<SQLExecution> getSQLExecutions(String subject, String datasource) {
     List<SQLExecution> sqlExecs = Lists.newArrayList();
     try (BufferedReader br = new BufferedReader(new FileReader(systemLogService.getSQLLogFile()))) {
-      for(String line; (line = br.readLine()) != null; ) {
+      for (String line; (line = br.readLine()) != null; ) {
         JSONObject exec = new JSONObject(line);
         boolean included = true;
         if (!Strings.isNullOrEmpty(subject) && !"*".equals(subject))
@@ -294,7 +290,7 @@ public class RSQLService implements Service, SQLService {
   private void finalizeServiceStart() {
     if (!ensureSqldfDone) {
       try {
-        rPackageHelper.ensureCRANPackage(rServerManagerService.getDefaultRServer(), "sqldf");
+        rServerManagerService.getDefaultRServer().ensureCRANPackage("sqldf");
         ensureSqldfDone = true;
       } catch (Exception e) {
         log.error("Cannot ensure sqldf R package is installed", e);
