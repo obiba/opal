@@ -104,6 +104,10 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
         || node.startsWith("/plugin")) && EDIT_METHODS.contains(action))
       return isSystemAdministrationPermitted(principals, node);
 
+    if (node.startsWith("/files/projects")) {
+      return isProjectFilesPermitted(principals, node);
+    }
+
     return true;
   }
 
@@ -145,6 +149,24 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return false;
 
     return true;
+  }
+
+  private boolean isProjectFilesPermitted(PrincipalCollection principals, String node) {
+    String[] elems = node.split("/");
+    if (elems.length < 4) return true;
+
+    String project = elems[3];
+    log.trace(" Token project files ={}", project);
+
+    boolean projectAccessible;
+    Collection<String> projectRestrictions = getProjectRestrictions(principals);
+    if (projectRestrictions.isEmpty())
+      projectAccessible = true;
+    else
+      projectAccessible = projectRestrictions.contains(project);
+    if (!projectAccessible) return false;
+
+    return !isReadNoValues(principals) && !isRead(principals);
   }
 
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
