@@ -2254,6 +2254,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Update Registration Token")
   String updateTokenModalTitle();
 
+  @Description("Add Service Discovery title")
+  @DefaultStringValue("Add Service Discovery")
+  String addServiceDiscoveryTitle();
+
   @Description("Add Resource title")
   @DefaultStringValue("Add Resource")
   String addResourceModalTitle();

@@ -104,7 +104,7 @@ public class RockAppConfigModalView extends ModalPopupViewWithUiHandlers<RockApp
   protected RockAppConfigModalView(EventBus eventBus, Binder binder, final Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
-    dialog.setTitle(translations.updateTokenModalTitle());
+    dialog.setTitle(translations.addServiceDiscoveryTitle());
     credentialsType.addItem("Default", CREDENTIALS_DEFAULT);
     credentialsType.addItem("Administrator", CREDENTIALS_ADMINISTRATOR);
     credentialsType.addItem("Manager and User", CREDENTIALS_MANAGER_USER);
