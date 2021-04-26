@@ -44,7 +44,7 @@
                   <ui:msg description="Number of tables label">Number of tables</ui:msg>
                 </g:Label>
                 <g:FlowPanel addStyleNames="top-margin">
-                  <b:Button ui:field="tableCount" type="INFO" size="LARGE"/>
+                  <b:Button ui:field="tableCount" type="INFO" icon="EYE_OPEN"/>
                 </g:FlowPanel>
               </b:Well>
             </b:Column>
@@ -55,7 +55,7 @@
                   <ui:msg description="Number of variables label">Number of variables</ui:msg>
                 </g:Label>
                 <g:FlowPanel addStyleNames="top-margin">
-                  <b:Button ui:field="variableCount" type="INFO" size="LARGE"/>
+                  <b:Button ui:field="variableCount" type="INFO" icon="SEARCH"/>
                 </g:FlowPanel>
               </b:Well>
             </b:Column>
@@ -66,7 +66,7 @@
                   <ui:msg description="Number of resources label">Number of resources</ui:msg>
                 </g:Label>
                 <g:FlowPanel addStyleNames="top-margin">
-                  <b:Button ui:field="resourceCount" type="INFO" size="LARGE"/>
+                  <b:Button ui:field="resourceCount" type="INFO" icon="EYE_OPEN"/>
                 </g:FlowPanel>
               </b:Well>
             </b:Column>
