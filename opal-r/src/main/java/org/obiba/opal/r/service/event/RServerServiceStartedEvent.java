@@ -10,11 +10,18 @@
 
 package org.obiba.opal.r.service.event;
 
+import com.google.common.base.Strings;
+
 public class RServerServiceStartedEvent {
 
   private final String cluster;
 
   private final String name;
+
+  public RServerServiceStartedEvent(String cluster) {
+    this.cluster = cluster;
+    this.name = null;
+  }
 
   public RServerServiceStartedEvent(String cluster, String name) {
     this.cluster = cluster;
@@ -27,5 +34,9 @@ public class RServerServiceStartedEvent {
 
   public String getName() {
     return name;
+  }
+
+  public boolean hasName() {
+    return !Strings.isNullOrEmpty(name);
   }
 }

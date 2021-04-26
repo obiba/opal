@@ -10,33 +10,22 @@
 
 package org.obiba.opal.r.service.event;
 
-import com.google.common.base.Strings;
-
-public class RServerServiceStoppedEvent {
+public class RPackageInstalledEvent {
 
   private final String cluster;
 
-  private final String name;
+  private final String packageName;
 
-  public RServerServiceStoppedEvent(String cluster) {
+  public RPackageInstalledEvent(String cluster, String packageName) {
     this.cluster = cluster;
-    this.name = null;
-  }
-
-  public RServerServiceStoppedEvent(String cluster, String name) {
-    this.cluster = cluster;
-    this.name = name;
+    this.packageName = packageName;
   }
 
   public String getCluster() {
     return cluster;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public boolean hasName() {
-    return !Strings.isNullOrEmpty(name);
+  public String getPackageName() {
+    return packageName;
   }
 }

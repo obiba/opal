@@ -20,6 +20,9 @@ import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.event.RPackageInstalledEvent;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
@@ -32,7 +35,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 @Component
 public class RResourceProvidersService implements Service, ResourceProvidersService {
@@ -51,9 +53,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   private boolean ensureResourcerDone = false;
 
-  private Map<String, ResourceProvider> resourceProviders = Maps.newHashMap();
+  private final Map<String, ResourceProvider> resourceProviders = Maps.newHashMap();
 
-  private Future<Boolean> resourceProvidersTask;
+  private final Object resourceProvidersTask = new Object();
 
   //
   // Service methods
@@ -125,28 +127,53 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   //
 
   @Subscribe
-  public void onRServiceStarted(RServiceInitializedEvent event) {
+  public void onRServiceInitialized(RServiceInitializedEvent event) {
     finalizeServiceStart();
     loadResourceProviders();
   }
 
-  private synchronized boolean loadResourceProviders() {
-    resourceProviders.clear();
-    try {
-      ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
-      rServerManagerService.getDefaultRServer().execute(rop);
-      RServerResult result = rop.getResult();
-      if (result.isNamedList()) {
-        RNamedList<RServerResult> pkgList = result.asNamedList();
-        for (String name : pkgList.keySet()) {
-          RServerResult rexp = pkgList.get(name);
-          resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
-        }
+  @Subscribe
+  public void onRServiceStarted(RServerServiceStartedEvent event) {
+    if (!event.hasName()) { // only when a cluster is started
+      finalizeServiceStart();
+      loadResourceProviders();
+    }
+  }
+
+  @Subscribe
+  public void onRServiceStopped(RServerServiceStoppedEvent event) {
+    if (!event.hasName()) { // only when a cluster is stopped
+      synchronized (resourceProvidersTask) {
+        resourceProviders.clear();
       }
-      return true;
-    } catch (Exception e) {
-      log.error("Resource packages discovery failed", e);
-      return false;
+    }
+  }
+
+  @Subscribe
+  public void onRPackageInstalled(RPackageInstalledEvent event) {
+    synchronized (resourceProvidersTask) {
+      resourceProviders.clear();
+      loadResourceProviders();
+    }
+  }
+
+  private void loadResourceProviders() {
+    synchronized (resourceProvidersTask) {
+      resourceProviders.clear();
+      try {
+        ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
+        rServerManagerService.getDefaultRServer().execute(rop);
+        RServerResult result = rop.getResult();
+        if (result.isNamedList()) {
+          RNamedList<RServerResult> pkgList = result.asNamedList();
+          for (String name : pkgList.keySet()) {
+            RServerResult rexp = pkgList.get(name);
+            resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
+          }
+        }
+      } catch (Exception e) {
+        log.error("Resource packages discovery failed", e);
+      }
     }
   }
 
@@ -156,15 +183,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
    * @return
    */
   public synchronized Map<String, ResourceProvider> getResourceProvidersMap() {
-    if (resourceProvidersTask != null && !resourceProvidersTask.isDone()) {
-      try {
-        resourceProvidersTask.get();
-        resourceProvidersTask = null;
-      } catch (Exception e) {
-        log.error("Failed at waiting for the resource providers discovery task to complete", e);
-      }
+    synchronized (resourceProvidersTask) {
+      return resourceProviders;
     }
-    return resourceProviders;
   }
 
   /**

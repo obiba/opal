@@ -241,7 +241,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Override
   public void installGitHubPackage(String name, String ref) {
     ensureCRANPackage("remotes");
-    execute(String.format("remotes::install_github('%s', ref='%s', upgrade=TRUE)", name, ref));
+    execute(String.format("remotes::install_github('%s', ref='%s', upgrade=FALSE)", name, ref));
   }
 
   @Override

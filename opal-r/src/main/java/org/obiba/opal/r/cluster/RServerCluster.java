@@ -17,6 +17,9 @@ import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.event.RPackageInstalledEvent;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.Opal;
@@ -83,6 +86,7 @@ public class RServerCluster implements RServerClusterService {
     rServerServices.forEach(RServerService::start);
     ensureCRANPackage("resourcer");
     ensureCRANPackage("sqldf");
+    eventBus.post(new RServerServiceStartedEvent(getName()));
   }
 
   /**
@@ -91,6 +95,7 @@ public class RServerCluster implements RServerClusterService {
   @Override
   public void stop() {
     rServerServices.forEach(RServerService::stop);
+    eventBus.post(new RServerServiceStoppedEvent(getName()));
   }
 
   /**
@@ -220,6 +225,7 @@ public class RServerCluster implements RServerClusterService {
       }
       return null;
     }).collect(Collectors.toList()));
+    eventBus.post(new RPackageInstalledEvent(getName(), name));
   }
 
   @Override
@@ -232,6 +238,7 @@ public class RServerCluster implements RServerClusterService {
       }
       return null;
     }).collect(Collectors.toList()));
+    eventBus.post(new RPackageInstalledEvent(getName(), name));
   }
 
   @Override
@@ -244,6 +251,7 @@ public class RServerCluster implements RServerClusterService {
       }
       return null;
     }).collect(Collectors.toList()));
+    eventBus.post(new RPackageInstalledEvent(getName(), name));
   }
 
   @Override
