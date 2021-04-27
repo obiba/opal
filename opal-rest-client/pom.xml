@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.1.0</version>
+    <version>4.1-SNAPSHOT</version>
   </parent>
   <artifactId>opal-rest-client</artifactId>
   <name>opal-rest-client</name>
