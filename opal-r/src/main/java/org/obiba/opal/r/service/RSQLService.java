@@ -57,6 +57,8 @@ public class RSQLService implements Service, SQLService {
 
   private static final String EXECUTE_SQL_SCRIPT = EXECUTE_SQL_FUNC + ".R";
 
+  private static final int SQLITE_MAX_COLUMN = 2000;
+
   @Autowired
   private SystemLogService systemLogService;
 
@@ -210,6 +212,8 @@ public class RSQLService implements Service, SQLService {
     String queryStr = query;
     for (String fromTable : fromTables) {
       ValueTable valueTable = fromTableFullNameMap.get(fromTable);
+      if (valueTable.getVariableCount() >= SQLITE_MAX_COLUMN)
+        throw new SQLException("Table " + fromTable + " has too much variables (limit is " + (SQLITE_MAX_COLUMN - 1) + ")");
       String tableSymbol = normalizeTableSymbol(fromTable);
       if (!fromTable.equals(tableSymbol))
         queryStr = queryStr.replaceAll(fromTable, tableSymbol);
