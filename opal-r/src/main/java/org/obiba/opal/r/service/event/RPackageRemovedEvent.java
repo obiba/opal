@@ -10,20 +10,13 @@
 
 package org.obiba.opal.r.service.event;
 
-import com.google.common.base.Strings;
-
-public class RPackageInstalledEvent {
+public class RPackageRemovedEvent {
 
   private final String cluster;
 
   private final String packageName;
 
-  public RPackageInstalledEvent(String cluster) {
-    this.cluster = cluster;
-    this.packageName = null;
-  }
-
-  public RPackageInstalledEvent(String cluster, String packageName) {
+  public RPackageRemovedEvent(String cluster, String packageName) {
     this.cluster = cluster;
     this.packageName = packageName;
   }
@@ -34,9 +27,5 @@ public class RPackageInstalledEvent {
 
   public String getPackageName() {
     return packageName;
-  }
-
-  public boolean hasPackageName() {
-    return !Strings.isNullOrEmpty(packageName);
   }
 }

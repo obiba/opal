@@ -20,10 +20,7 @@ import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.r.service.event.RPackageInstalledEvent;
-import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
-import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
-import org.obiba.opal.r.service.event.RServiceInitializedEvent;
+import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
@@ -157,6 +154,14 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
     }
   }
 
+  @Subscribe
+  public void onRPackageRemoved(RPackageRemovedEvent event) {
+    synchronized (resourceProvidersTask) {
+      resourceProviders.clear();
+      loadResourceProviders();
+    }
+  }
+
   private void loadResourceProviders() {
     synchronized (resourceProvidersTask) {
       resourceProviders.clear();
@@ -194,7 +199,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void finalizeServiceStart() {
     if (!ensureResourcerDone) {
       try {
-        rPackageHelper.ensureCRANPackage(rServerManagerService.getDefaultRServer(), "resourcer");
+        rServerManagerService.getDefaultRServer().ensureCRANPackage("resourcer");
         ensureResourcerDone = true;
       } catch (Exception e) {
         log.error("Cannot ensure resourcer R package is installed", e);

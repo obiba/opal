@@ -18,6 +18,7 @@ import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
 import org.obiba.opal.r.service.event.RPackageInstalledEvent;
+import org.obiba.opal.r.service.event.RPackageRemovedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.ROperation;
@@ -201,6 +202,7 @@ public class RServerCluster implements RServerClusterService {
       }
       return null;
     }).collect(Collectors.toList()));
+    eventBus.post(new RPackageRemovedEvent(getName(), name));
   }
 
   @Override
@@ -264,6 +266,7 @@ public class RServerCluster implements RServerClusterService {
       }
       return null;
     }).collect(Collectors.toList()));
+    eventBus.post(new RPackageInstalledEvent(getName()));
   }
 
   @Override
