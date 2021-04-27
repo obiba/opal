@@ -13,8 +13,10 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface RequestCyclePostProcess {
 
-  void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response);
+  void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response);
 
 }

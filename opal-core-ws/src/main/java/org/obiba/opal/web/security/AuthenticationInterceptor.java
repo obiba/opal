@@ -12,6 +12,7 @@ package org.obiba.opal.web.security;
 import java.lang.annotation.Annotation;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -69,7 +70,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   }
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     // Set the cookie if the user is still authenticated
     if(isUserAuthenticated()) {
       Session session = SecurityUtils.getSubject().getSession();

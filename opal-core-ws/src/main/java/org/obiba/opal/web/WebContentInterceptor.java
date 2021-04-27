@@ -16,6 +16,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 
@@ -26,7 +27,7 @@ import java.util.Collections;
 public class WebContentInterceptor implements RequestCyclePostProcess {
 
     @Override
-    public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+    public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
         try {
             MultivaluedMap<String, Object> map = response.getHeaders();
             //making sure IE doesn't cache: https://support.microsoft.com/en-us/kb/234067

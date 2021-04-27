@@ -9,15 +9,6 @@
  */
 package org.obiba.opal.web.ws.intercept;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
@@ -32,6 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Provider
@@ -49,7 +48,7 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
 
   @Autowired
   public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses,
-      Set<RequestCyclePostProcess> postProcesses) {
+                                 Set<RequestCyclePostProcess> postProcesses) {
     requestAttributesProvider = provider;
     this.preProcesses = new ArrayList<>(preProcesses);
     this.postProcesses = new ArrayList<>(postProcesses);
@@ -62,9 +61,9 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
       throws Failure, WebApplicationException {
     new RequestCycle(request, method);
 
-    for(RequestCyclePreProcess p : preProcesses) {
+    for (RequestCyclePreProcess p : preProcesses) {
       Response r = p.preProcess(request, method);
-      if(r != null) {
+      if (r != null) {
         return r instanceof ServerResponse
             ? (ServerResponse) r
             : new ServerResponse((BuiltResponse) Response.fromResponse(r).build());
@@ -77,9 +76,9 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   @Override
   public void postProcess(ServerResponse response) {
     RequestCycle cycle = getCurrentCycle();
-    if(cycle != null) {
-      for(RequestCyclePostProcess p : postProcesses) {
-        p.postProcess(cycle.request, cycle.resourceMethod, response);
+    if (cycle != null) {
+      for (RequestCyclePostProcess p : postProcesses) {
+        p.postProcess(requestAttributesProvider.currentRequestAttributes().getRequest(), cycle.request, cycle.resourceMethod, response);
       }
     }
   }

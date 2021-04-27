@@ -10,13 +10,7 @@
 
 package org.obiba.opal.web.security;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-
+import com.google.common.base.Strings;
 import org.apache.http.HttpStatus;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -30,7 +24,10 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
+import java.net.URI;
 
 @Component
 public class AuditInterceptor implements RequestCyclePostProcess {
@@ -39,63 +36,93 @@ public class AuditInterceptor implements RequestCyclePostProcess {
 
   private static final String LOG_FORMAT = "{}";
 
+  private static final String[] VALID_IP_HEADER_CANDIDATES = {
+      "X-Forwarded-For",
+      "Proxy-Client-IP",
+      "WL-Proxy-Client-IP",
+      "HTTP_X_FORWARDED_FOR",
+      "HTTP_X_FORWARDED",
+      "HTTP_X_CLUSTER_CLIENT_IP",
+      "HTTP_CLIENT_IP",
+      "HTTP_FORWARDED_FOR",
+      "HTTP_FORWARDED",
+      "HTTP_VIA",
+      "REMOTE_ADDR"};
+
   @Autowired
   private OpalUserProvider opalUserProvider;
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
-    logServerError(request, response);
-    logClientError(request, response);
-    logInfo(request, response);
+  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+    logServerError(servletRequest, request, response);
+    logClientError(servletRequest, request, response);
+    logInfo(servletRequest, request, response);
   }
 
-  private String getArguments(HttpRequest request, ServerResponse response) {
+  private String getArguments(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
     MDC.put("username", opalUserProvider.getUsername());
     MDC.put("status", response.getStatus() + "");
     MDC.put("method", request.getHttpMethod());
+    MDC.put("ip", getClientIP(servletRequest, request));
 
-    // TODO get the remote IP
     StringBuilder sb = new StringBuilder(request.getUri().getPath(true));
-    MultivaluedMap<String, String> params =  request.getUri().getQueryParameters();
+    MultivaluedMap<String, String> params = request.getUri().getQueryParameters();
     if (!params.isEmpty()) {
-      sb.append(" queryParams:").append(params.toString());
+      sb.append(" queryParams:").append(params);
     }
 
     return sb.toString();
   }
 
-  private void logServerError(HttpRequest request, ServerResponse response) {
-    if(!log.isErrorEnabled()) return;
-    if(response.getStatus() < HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
+  private String getClientIP(HttpServletRequest servletRequest, HttpRequest request) {
+    String ip = "";
 
-    log.error(LOG_FORMAT, getArguments(request, response));
+    for (String ipHeader : VALID_IP_HEADER_CANDIDATES) {
+      ip = request.getHttpHeaders().getRequestHeaders().keySet().stream()
+          .filter(ipHeader::equalsIgnoreCase)
+          .map(h -> request.getHttpHeaders().getHeaderString(h))
+          .findFirst().orElse("");
+      if (!Strings.isNullOrEmpty(ip)) break;
+    }
+
+    if (Strings.isNullOrEmpty(ip))
+      ip = servletRequest.getRemoteAddr();
+
+    return ip;
   }
 
-  private void logClientError(HttpRequest request, ServerResponse response) {
-    if(!log.isWarnEnabled()) return;
-    if(response.getStatus() < HttpStatus.SC_BAD_REQUEST) return;
-    if(response.getStatus() >= HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
+  private void logServerError(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+    if (!log.isErrorEnabled()) return;
+    if (response.getStatus() < HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
 
-    log.warn(LOG_FORMAT, getArguments(request, response));
+    log.error(LOG_FORMAT, getArguments(servletRequest, request, response));
   }
 
-  private void logInfo(HttpRequest request, ServerResponse response) {
-    if(!log.isInfoEnabled()) return;
-    if(response.getStatus() >= HttpStatus.SC_BAD_REQUEST) return;
+  private void logClientError(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+    if (!log.isWarnEnabled()) return;
+    if (response.getStatus() < HttpStatus.SC_BAD_REQUEST) return;
+    if (response.getStatus() >= HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
+
+    log.warn(LOG_FORMAT, getArguments(servletRequest, request, response));
+  }
+
+  private void logInfo(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+    if (!log.isInfoEnabled()) return;
+    if (response.getStatus() >= HttpStatus.SC_BAD_REQUEST) return;
 
     boolean logged = false;
-    if(response.getStatus() == HttpStatus.SC_CREATED) {
+    if (response.getStatus() == HttpStatus.SC_CREATED) {
       URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
-      if(resourceUri != null) {
+      if (resourceUri != null) {
         String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
         MDC.put("created", path);
-        log.info(LOG_FORMAT, getArguments(request, response));
+        log.info(LOG_FORMAT, getArguments(servletRequest, request, response));
         logged = true;
       }
     }
 
-    if(!logged) {
-      log.info(LOG_FORMAT, getArguments(request, response));
+    if (!logged) {
+      log.info(LOG_FORMAT, getArguments(servletRequest, request, response));
     }
   }
 

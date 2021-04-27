@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
@@ -91,7 +92,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   }
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     if(GET.equals(request.getHttpMethod()) || OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && !allowed.isEmpty()) {
