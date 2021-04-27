@@ -1,7 +1,7 @@
 ##
 ## Makefile for Opal developers
 ##
-version=4.1-SNAPSHOT
+version=4.2-SNAPSHOT
 magma_version=2.2-SNAPSHOT
 commons_version=1.15-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
