@@ -395,8 +395,9 @@ public class RAssignDatasource extends CsvDatasource {
           value = cat.getName().toUpperCase();
         else
           value = "'" + normalize(cat.getName()) + "'";
+        boolean isInteger = IntegerType.get().equals(variable.getValueType());
         if (!cat.isMissing() || withMissings) // obiba/opal#3541
-          labelledCat.add(String.format("'%s'=%s", label, value));
+          labelledCat.add(String.format("'%s'=%s%s", label, value, isInteger ? "L" : ""));
       }
       return labelledCat;
     }
