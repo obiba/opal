@@ -127,7 +127,6 @@
     <xstream.version>1.4.16</xstream.version>
 
     <!-- maven plugins -->
-    <bintray-maven-plugin.version>1.2.20180117184439</bintray-maven-plugin.version>
     <github-release-plugin.version>1.2.0</github-release-plugin.version>
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
@@ -1796,11 +1795,6 @@
           <version>${rpm-maven-plugin.version}</version>
         </plugin>
 
-        <plugin>
-          <groupId>com.carrotgarden.maven</groupId>
-          <artifactId>bintray-maven-plugin</artifactId>
-          <version>${bintray-maven-plugin.version}</version>
-        </plugin>
       </plugins>
 
     </pluginManagement>
