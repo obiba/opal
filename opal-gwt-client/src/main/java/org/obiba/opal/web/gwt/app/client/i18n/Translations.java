@@ -2286,6 +2286,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Create Folder")
   String createFolderModalTitle();
 
+  @Description("Unzip Modal title")
+  @DefaultStringValue("Unzip")
+  String unzipModalTitle();
+
   @Description("Upload File Modal title")
   @DefaultStringValue("Upload File")
   String uploadFileModalTitle();

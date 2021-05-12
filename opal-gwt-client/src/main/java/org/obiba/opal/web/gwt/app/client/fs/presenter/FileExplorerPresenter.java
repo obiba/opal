@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.UnzipRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
@@ -66,6 +67,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider;
 
+  private final ModalProvider<UnzipModalPresenter> unzipModalPresenterModalProvider;
+
   private Runnable actionRequiringConfirmation;
 
   private List<FileDto> checkedFiles;
@@ -81,7 +84,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
       ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages,
       ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider,
-      ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider) {
+      ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider,
+      ModalProvider<UnzipModalPresenter> unzipModalPresenterModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
@@ -91,6 +95,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
     this.encryptDownloadModalProvider = encryptDownloadModalProvider.setContainer(this);
     this.renameModalPresenterModalProvider = renameModalPresenterModalProvider.setContainer(this);
+    this.unzipModalPresenterModalProvider = unzipModalPresenterModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -200,6 +205,38 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
             .send();
       }
     });
+
+    addRegisteredHandler(UnzipRequestEvent.getType(), new UnzipRequestEvent.UnzipRequestHandler() {
+      @Override
+      public void onUnzipRequest(UnzipRequestEvent event) {
+        final String password = event.getPassword();
+
+        String requestUrl = "/files/_unzip" + event.getArchive();
+
+        UriBuilder uriBuilder = UriBuilder.create().fromPath(requestUrl);
+        uriBuilder.query("destination", event.getDestination());
+
+        if (password != null && password.trim().length() > 1) {
+          uriBuilder.query("key", password);
+        }
+
+        ResponseCodeCallback responseCodeCallback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() != Response.SC_OK) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            } else {
+              getEventBus().fireEvent(new FolderRefreshEvent(getCurrentFolder()));
+            }
+          }
+        };
+
+        ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
+            .withCallback(Response.SC_OK, responseCodeCallback)
+            .send();
+      }
+    });
   }
 
   private FileDto getCurrentFolder() {
@@ -213,11 +250,13 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       updateCheckedFilesCutAuthorization();
       updateCheckedFilesRenameAuthorization();
       updateCheckedFilesDeleteAuthorization();
+      updateCheckedFileUnzipAuthorization();
     } else {
       getView().getFileDownloadAuthorizer().unauthorized();
       getView().getFileDeleteAuthorizer().unauthorized();
       getView().getFileCopyAuthorizer().unauthorized();
       getView().getFileCutAuthorizer().unauthorized();
+      getView().getFileUnzipAuthorizer().unauthorized();
     }
   }
 
@@ -330,6 +369,16 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       getView().getFileDeleteAuthorizer().authorized();
     } else {
       getView().getFileDeleteAuthorizer().unauthorized();
+    }
+  }
+
+  private void updateCheckedFileUnzipAuthorization() {
+    if (!hasCheckedFiles()) return;
+
+    if (checkedFiles.size() > 1 || !checkedFiles.get(0).getName().toLowerCase().endsWith(".zip")) {
+      getView().getFileUnzipAuthorizer().unauthorized();
+    } else {
+      getView().getFileUnzipAuthorizer().authorized();
     }
   }
 
@@ -447,6 +496,12 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         .send();
   }
 
+  @Override
+  public void onUnzip() {
+    if(!hasCheckedFiles() || checkedFiles.size() > 1) return;
+    unzipModalPresenterModalProvider.get().initialize(getCurrentFolder(), checkedFiles.get(0));
+  }
+
   private boolean hasCheckedFiles() {
     return checkedFiles != null && !checkedFiles.isEmpty();
   }
@@ -462,6 +517,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     HasAuthorization getFileUploadAuthorizer();
 
     HasAuthorization getFileDownloadAuthorizer();
+
+    HasAuthorization getFileUnzipAuthorizer();
 
     HasAuthorization getFileRenameAuthorizer();
 
