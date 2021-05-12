@@ -457,6 +457,33 @@ public class FilesResource {
     return Response.ok(new JSONArray(names).toString()).build();
   }
 
+  @POST
+  @Path("/_unzip/{path:.*}")
+  public Response unzipArchive(@PathParam("path") String archivePath, @QueryParam("destination") String destinationPath, @QueryParam("key") String archiveKey) throws IOException {
+    if (Strings.isNullOrEmpty(archivePath) || !archivePath.toLowerCase().endsWith(".zip") || Strings.isNullOrEmpty(destinationPath)) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity("No destination path or valid archive file (ZIP) has been submitted. Please make sure that you are submitting them with your request.")
+          .build();
+    }
+
+    FileObject archive = resolveFileInFileSystem(archivePath);
+    FileObject destination = resolveFileInFileSystem(destinationPath);
+
+    if (!destination.exists() || !destination.getType().equals(FileType.FOLDER)) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
+    }
+
+    if (archive.exists() && archive.getType().equals(FileType.FILE)) {
+      if (Strings.isNullOrEmpty(archiveKey)) {
+        org.obiba.core.util.FileUtil.unzip(opalRuntime.getFileSystem().getLocalFile(archive), opalRuntime.getFileSystem().getLocalFile(destination));
+      } else {
+        org.obiba.core.util.FileUtil.unzip(opalRuntime.getFileSystem().getLocalFile(archive), opalRuntime.getFileSystem().getLocalFile(destination), archiveKey);
+      }
+    }
+
+    return Response.ok(destinationPath).build();
+  }
+
   //
   // private methods
   //

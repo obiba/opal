@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.RenameModalPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.UnzipModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.EncryptDownloadModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.fs.view.FileSelectorView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
 import org.obiba.opal.web.gwt.app.client.fs.view.RenameModalView;
+import org.obiba.opal.web.gwt.app.client.fs.view.UnzipModalView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -49,6 +51,7 @@ public class FileSystemModule extends AbstractPresenterModule {
         EncryptDownloadModalView.class);
     bindPresenterWidget(RenameModalPresenter.class, RenameModalPresenter.Display.class,
         RenameModalView.class);
+    bindPresenterWidget(UnzipModalPresenter.class, UnzipModalPresenter.Display.class, UnzipModalView.class);
     bindPresenterWidget(FileUploadModalPresenter.class, FileUploadModalPresenter.Display.class,
         FileUploadModalView.class);
     bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);

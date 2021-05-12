@@ -53,6 +53,9 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   Button download;
 
   @UiField
+  Button unzip;
+
+  @UiField
   Button copy;
 
   @UiField
@@ -107,6 +110,11 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   }
 
   @Override
+  public HasAuthorization getFileUnzipAuthorizer() {
+    return new WidgetAuthorizer(false, unzip);
+  }
+
+  @Override
   public HasAuthorization getFileRenameAuthorizer() {
     return new WidgetAuthorizer(false, rename);
   }
@@ -150,6 +158,11 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @UiHandler("download")
   void onDownload(ClickEvent event) {
     getUiHandlers().onDownload();
+  }
+
+  @UiHandler("unzip")
+  void onUnzip(ClickEvent event) {
+    getUiHandlers().onUnzip();
   }
 
   @UiHandler("rename")

@@ -30,4 +30,6 @@ public interface FileExplorerUiHandlers extends UiHandlers {
 
   void onPaste();
 
+  void onUnzip();
+
 }
