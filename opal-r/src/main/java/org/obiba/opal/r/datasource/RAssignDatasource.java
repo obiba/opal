@@ -226,6 +226,7 @@ public class RAssignDatasource extends CsvDatasource {
     private void doReadCSVFile() {
       log.debug("Reading the CSV file into a tibble");
       ensurePackage("readr");
+      ensurePackage("labelled");
       eval(String.format("base::source('%s')", COLS_FILE_NAME));
       eval(String.format("base::is.null(base::assign('%s', readr::read_csv('%s', col_types = .cols)))", getSymbol(tableName), DATA_FILE_NAME));
       eval("base::rm(.cols)");
@@ -321,8 +322,6 @@ public class RAssignDatasource extends CsvDatasource {
     private void writeVariableAttributes(Variable variable) {
       // attributes
       List<String> attributesList = Lists.newArrayList();
-      String baseClassCall = String.format("base::class(`%s`[['%s']])", getSymbol(tableName), variable.getName());
-      attributesList.add(String.format("class = %s", baseClassCall));
       for (Map.Entry<String, String> entry : asAttributesMap(variable).entrySet()) {
         String name = entry.getKey();
         String value = entry.getValue();
@@ -337,6 +336,7 @@ public class RAssignDatasource extends CsvDatasource {
         }
       }
       // attributes from categories
+      String labels = null;
       if (variable.hasCategories()) {
         List<Category> missingCats = Lists.newArrayList();
         for (Category cat : variable.getCategories()) {
@@ -345,8 +345,6 @@ public class RAssignDatasource extends CsvDatasource {
           }
         }
         if (!missingCats.isEmpty()) {
-          attributesList.add(String.format("class = c(%s, '%s')", baseClassCall,
-              Joiner.on("', '").join("haven_labelled_spss", "haven_labelled")));
           NumberRange naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).collect(Collectors.toList()));
           if (naRange != null && naRange.hasRange()) {
             attributesList.add(String.format("na_range = c(%s)",
@@ -361,11 +359,8 @@ public class RAssignDatasource extends CsvDatasource {
             attributesList.add(String.format("na_values = c(%s)",
                 Joiner.on(", ").join(getLabelledCategories(variable, missingCats))));
           }
-        } else {
-          attributesList.add(String.format("class = c(%s, 'haven_labelled')", baseClassCall));
         }
-        attributesList.add(String.format("labels = c(%s)",
-            Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories()))));
+        labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
       }
       attributesList.add(String.format("'opal.value_type' = '%s'", variable.getValueType().getName()));
       attributesList.add(String.format("'opal.entity_type' = '%s'", variable.getEntityType()));
@@ -382,6 +377,9 @@ public class RAssignDatasource extends CsvDatasource {
       attributesList.add(String.format("'opal.nature' = '%s'", VariableNature.getNature(variable).name()));
       attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
           getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
+      if (!Strings.isNullOrEmpty(labels)) {
+        attributesWriter.println(String.format("labelled::val_labels(`%s`[['%s']]) <- %s", getSymbol(tableName), variable.getName(), labels));
+      }
     }
 
     private List<String> getLabelledCategories(Variable variable, Collection<Category> categories) {
