@@ -157,7 +157,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean isDecimal() {
-    return colTypes.contains("dbl");
+    return colClasses.contains("double") || colTypes.contains("dbl");
   }
 
   private boolean isBoolean() {
