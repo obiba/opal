@@ -362,6 +362,11 @@ public class RAssignDatasource extends CsvDatasource {
         }
         labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
       }
+      // apply labelled first (as it overrides attributes)
+      if (!Strings.isNullOrEmpty(labels)) {
+        attributesWriter.println(String.format("labelled::val_labels(`%s`[['%s']]) <- %s", getSymbol(tableName), variable.getName(), labels));
+      }
+      // append additional attributes
       attributesList.add(String.format("'opal.value_type' = '%s'", variable.getValueType().getName()));
       attributesList.add(String.format("'opal.entity_type' = '%s'", variable.getEntityType()));
       if (!Strings.isNullOrEmpty(variable.getUnit()))
@@ -375,11 +380,8 @@ public class RAssignDatasource extends CsvDatasource {
         attributesList.add(String.format("'opal.occurrence_group' = '%s'", variable.getOccurrenceGroup()));
       attributesList.add(String.format("'opal.index' = %d", variable.getIndex()));
       attributesList.add(String.format("'opal.nature' = '%s'", VariableNature.getNature(variable).name()));
-      attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- list(%s)",
-          getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
-      if (!Strings.isNullOrEmpty(labels)) {
-        attributesWriter.println(String.format("labelled::val_labels(`%s`[['%s']]) <- %s", getSymbol(tableName), variable.getName(), labels));
-      }
+      attributesWriter.println(String.format("base::attributes(`%s`[['%s']]) <- append(base::attributes(`%s`[['%s']]), list(%s))",
+          getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName(), Joiner.on(", ").join(attributesList)));
     }
 
     private List<String> getLabelledCategories(Variable variable, Collection<Category> categories) {
