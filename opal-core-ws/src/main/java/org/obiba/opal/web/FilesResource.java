@@ -385,6 +385,13 @@ public class FilesResource {
     }
   }
 
+  @POST
+  @Path("/{path:.*}")
+  @Consumes("application/json")
+  public Response processFile(@PathParam("path") String archivePath, @QueryParam("action") @DefaultValue("unzip") String action, @QueryParam("destination") String destinationPath, @QueryParam("key") String archiveKey, @Context UriInfo uriInfo) throws IOException {
+    return unzipArchive(archivePath, destinationPath, archiveKey, uriInfo);
+  }
+
   @Nullable
   private Response validateFolder(FileObject folder, String path) throws IOException {
     if (folder == null || !folder.exists()) {
@@ -457,45 +464,53 @@ public class FilesResource {
     return Response.ok(new JSONArray(names).toString()).build();
   }
 
-  @POST
-  @Path("/_unzip/{path:.*}")
-  public Response unzipArchive(@PathParam("path") String archivePath, @QueryParam("destination") String destinationPath, @QueryParam("key") String archiveKey) throws IOException {
-    if (Strings.isNullOrEmpty(archivePath) || !archivePath.toLowerCase().endsWith(".zip") || Strings.isNullOrEmpty(destinationPath)) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity("No destination path or valid archive file (ZIP) has been submitted. Please make sure that you are submitting them with your request.")
-          .build();
-    }
+  private Response unzipArchive(String archivePath, String destinationPath, String archiveKey, UriInfo uriInfo) throws IOException {
+    if (Strings.isNullOrEmpty(archivePath) || !archivePath.toLowerCase().endsWith(".zip"))
+      throw new BadRequestException("Missing or invalid archive file (.zip).");
+    if (Strings.isNullOrEmpty(destinationPath))
+      throw new BadRequestException("Destination path is missing.");
 
     FileObject archive = resolveFileInFileSystem(archivePath);
     FileObject destination = resolveFileInFileSystem(destinationPath);
 
-    if (destination.exists() && !destination.getType().equals(FileType.FOLDER)) {
-      return Response.status(Status.BAD_REQUEST).entity("Destination path is a regular file.").build();
-    } else if (!destination.exists()) {
-      destination.createFolder();
-      if (!destination.exists())
-        return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
-    }
+    if (!archive.exists())
+      throw new BadRequestException("Archive file is missing.");
+    else if (!archive.isReadable())
+      throw new ForbiddenException("Archive is not readable.");
+    else if (!archive.getType().equals(FileType.FILE))
+      throw new BadRequestException("Archive file is not a regular file.");
 
-    if (archive.exists() && archive.getType().equals(FileType.FILE)) {
-      File archiveFile = opalRuntime.getFileSystem().getLocalFile(archive);
-      String archiveBasename = archiveFile.getName().replace(".zip", "");
-      File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(destination), archiveBasename);
-      int inc = 1;
-      while (destinationFolder.exists()) {
-        destinationFolder = new File(destinationFolder.getParentFile(), archiveBasename + "-" + inc);
-        inc++;
+    if (destination.exists()) {
+      if (!destination.getType().equals(FileType.FOLDER))
+        throw new BadRequestException("Destination is not a folder.");
+    } else if (!destination.exists() && destination.getParent().isWriteable()) {
+      try {
+        destination.createFolder();
+      } catch (FileSystemException e) {
+        throw new InternalServerErrorException("Destination folder cannot be created.");
       }
-      if (Strings.isNullOrEmpty(archiveKey)) {
-        org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder);
-      } else {
-        org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder, archiveKey);
-      }
-    } else {
-      return Response.status(Status.NOT_FOUND).entity("No archive file found.").build();
     }
+    if (!destination.isWriteable())
+      throw new ForbiddenException("Destination folder is not writable.");
 
-    return Response.ok(destinationPath).build();
+    File archiveFile = opalRuntime.getFileSystem().getLocalFile(archive);
+    String archiveBasename = archiveFile.getName().replace(".zip", "");
+    File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(destination), archiveBasename);
+    int inc = 1;
+    while (destinationFolder.exists()) {
+      destinationFolder = new File(destinationFolder.getParentFile(), archiveBasename + "-" + inc);
+      inc++;
+    }
+    if (Strings.isNullOrEmpty(archiveKey))
+      org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder);
+    else
+      org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder, archiveKey);
+
+    Opal.FileDto dto = getBaseFolderBuilder(destination.getChild(destinationFolder.getName())).build();
+    URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(destinationPath).path(destinationFolder.getName()).build();
+    return Response.created(folderUri)//
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
+        .entity(dto).build();
   }
 
   //

@@ -761,7 +761,8 @@ public interface Translations extends Constants {
       "GHOrganizationIsRequired", "GitHub user or organization name is required",
       "ResourceAssignSuccess", "Resource assignment in R was successful.",
       "ResourceAssignFailed", "Resource assignment in R has failed: ",
-      "SQLError", "{0}"
+      "SQLError", "{0}",
+      "FolderCreated", "Folder created: {0}"
   })
   Map<String, String> userMessageMap();
 

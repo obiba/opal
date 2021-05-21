@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.UnzipRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -59,6 +60,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final TranslationMessages translationMessages;
 
+  private final Translations translations;
+
   private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
 
   private final ModalProvider<CreateFolderModalPresenter> createFolderModalProvider;
@@ -80,16 +83,17 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
-      FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
-      ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
-      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages,
-      ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider,
-      ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider,
-      ModalProvider<UnzipModalPresenter> unzipModalPresenterModalProvider) {
+                               FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
+                               Translations translations, ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
+                               ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages,
+                               ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider,
+                               ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider,
+                               ModalProvider<UnzipModalPresenter> unzipModalPresenterModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
+    this.translations = translations;
     this.translationMessages = translationMessages;
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
@@ -211,9 +215,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       public void onUnzipRequest(UnzipRequestEvent event) {
         final String password = event.getPassword();
 
-        String requestUrl = "/files/_unzip" + event.getArchive();
+        String requestUrl = "/files" + event.getArchive();
 
         UriBuilder uriBuilder = UriBuilder.create().fromPath(requestUrl);
+        uriBuilder.query("action", "unzip");
         uriBuilder.query("destination", event.getDestination());
 
         if (password != null && password.trim().length() > 1) {
@@ -224,16 +229,19 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() != Response.SC_OK) {
+            if(response.getStatusCode() != Response.SC_CREATED) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             } else {
+              FileDto created = FileDto.parse(response.getText());
+              getEventBus().fireEvent(NotificationEvent.newBuilder()
+                  .success(translations.userMessageMap().get("FolderCreated").replace("{0}", created.getPath())).build());
               getEventBus().fireEvent(new FolderRefreshEvent(getCurrentFolder()));
             }
           }
         };
 
         ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
-            .withCallback(Response.SC_OK, responseCodeCallback)
+            .withCallback(Response.SC_CREATED, responseCodeCallback)
             .send();
       }
     });
