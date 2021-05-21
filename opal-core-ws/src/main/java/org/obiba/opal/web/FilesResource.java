@@ -469,16 +469,30 @@ public class FilesResource {
     FileObject archive = resolveFileInFileSystem(archivePath);
     FileObject destination = resolveFileInFileSystem(destinationPath);
 
-    if (!destination.exists() || !destination.getType().equals(FileType.FOLDER)) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
+    if (destination.exists() && !destination.getType().equals(FileType.FOLDER)) {
+      return Response.status(Status.BAD_REQUEST).entity("Destination path is a regular file.").build();
+    } else if (!destination.exists()) {
+      destination.createFolder();
+      if (!destination.exists())
+        return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
     }
 
     if (archive.exists() && archive.getType().equals(FileType.FILE)) {
-      if (Strings.isNullOrEmpty(archiveKey)) {
-        org.obiba.core.util.FileUtil.unzip(opalRuntime.getFileSystem().getLocalFile(archive), opalRuntime.getFileSystem().getLocalFile(destination));
-      } else {
-        org.obiba.core.util.FileUtil.unzip(opalRuntime.getFileSystem().getLocalFile(archive), opalRuntime.getFileSystem().getLocalFile(destination), archiveKey);
+      File archiveFile = opalRuntime.getFileSystem().getLocalFile(archive);
+      String archiveBasename = archiveFile.getName().replace(".zip", "");
+      File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(destination), archiveBasename);
+      int inc = 1;
+      while (destinationFolder.exists()) {
+        destinationFolder = new File(destinationFolder.getParentFile(), archiveBasename + "-" + inc);
+        inc++;
       }
+      if (Strings.isNullOrEmpty(archiveKey)) {
+        org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder);
+      } else {
+        org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder, archiveKey);
+      }
+    } else {
+      return Response.status(Status.NOT_FOUND).entity("No archive file found.").build();
     }
 
     return Response.ok(destinationPath).build();

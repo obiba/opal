@@ -34,8 +34,8 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button ui:field="unzip">
-          <ui:msg description="Unzip label">Unzip</ui:msg>
+        <b:Button icon="ARCHIVE" ui:field="unzip">
+          <ui:msg description="Extract label">Extract</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>

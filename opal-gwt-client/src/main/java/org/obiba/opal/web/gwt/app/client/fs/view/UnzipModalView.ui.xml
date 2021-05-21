@@ -14,6 +14,9 @@
       <b:Controls>
         <o:OpalSimplePanel ui:field="filePanel"/>
       </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Unzip destination help">The archive will be extracted in the selected folder.</ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="passwordGroup">
@@ -24,11 +27,14 @@
         <b:PasswordTextBox name="encryptPassword" ui:field="password" visibleLength="16"/>
         <b:Button icon="EYE_OPEN" ui:field="viewPasswordButton"></b:Button>
       </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Archive password help">Password to decrypt the archive. Leave empty if not applicable.</ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ModalFooter>
       <b:Button ui:field="unzip" type="PRIMARY">
-        <ui:msg description="Unzip label">Unzip</ui:msg>
+        <ui:msg description="Unzip label">Extract</ui:msg>
       </b:Button>
       <b:Button ui:field="cancelButton">
         <ui:msg description="Cancel button label">Cancel</ui:msg>
