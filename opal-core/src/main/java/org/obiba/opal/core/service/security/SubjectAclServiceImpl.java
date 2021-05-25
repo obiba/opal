@@ -9,12 +9,13 @@
  */
 package org.obiba.opal.core.service.security;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -34,7 +35,10 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -167,7 +171,6 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     Assert.notNull(permission, "permission cannot be null");
     HasUniqueProperties acl = new SubjectAcl(domain, node, subject, permission);
     orientDbService.save(acl, acl);
-    notifyListeners(subject);
   }
 
   @Override
@@ -195,12 +198,8 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
       @Override
       public Iterable<String> getPermissions() {
-        return Iterables.transform(find(domain, node, subject), new Function<SubjectAcl, String>() {
-          @Override
-          public String apply(SubjectAcl from) {
-            return from.getPermission();
-          }
-        });
+        return StreamSupport.stream(find(domain, node, subject).spliterator(), false)
+            .map(SubjectAcl::getPermission).collect(Collectors.toList());
       }
     };
   }
@@ -301,7 +300,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     Set<String> users = Sets.newHashSet();
     Set<String> groups = Sets.newHashSet();
     // populate with the users who logged in
-    for (SubjectProfile profile : getProfiles()){
+    for (SubjectProfile profile : getProfiles()) {
       users.add(profile.getPrincipal());
       groups.addAll(profile.getGroups());
     }
@@ -331,11 +330,8 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
   @Override
   public Iterable<Permissions> getSubjectPermissions(final Subject subject) {
-    return Iterables.transform(find(subject), new Function<SubjectAcl, Permissions>() {
-
-      @Override
-      public Permissions apply(final SubjectAcl from) {
-        return new Permissions() {
+    return StreamSupport.stream(find(subject).spliterator(), false)
+        .map(from -> new Permissions() {
 
           @Override
           public Subject getSubject() {
@@ -354,18 +350,10 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return Iterables
-                .transform(find(from.getDomain(), getNode(), from.getSubject()), new Function<SubjectAcl, String>() {
-                  @Override
-                  public String apply(SubjectAcl from) {
-                    return from.getPermission();
-                  }
-                });
+            return StreamSupport.stream(find(from.getDomain(), getNode(), from.getSubject()).spliterator(), false)
+                .map(SubjectAcl::getPermission).collect(Collectors.toList());
           }
-        };
-      }
-
-    });
+        }).collect(Collectors.toList());
   }
 
   @Override
