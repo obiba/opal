@@ -21,17 +21,17 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class DataShieldMethodConverterRegistry {
+public class DSMethodConverterRegistry {
 
-  private final Set<DataShieldMethodConverter> converters;
+  private final Set<DSMethodConverter> converters;
 
   @Autowired
-  public DataShieldMethodConverterRegistry(Set<DataShieldMethodConverter> converters) {
+  public DSMethodConverterRegistry(Set<DSMethodConverter> converters) {
     this.converters = converters;
   }
 
   public DataShieldMethod parse(DataShieldMethodDto dto) {
-    for(DataShieldMethodConverter converter : converters) {
+    for(DSMethodConverter converter : converters) {
       if(converter.canParse(dto)) {
         return converter.parse(dto);
       }
@@ -40,7 +40,7 @@ public class DataShieldMethodConverterRegistry {
   }
 
   public DataShieldMethodDto asDto(DSMethod method) {
-    for(DataShieldMethodConverter converter : converters) {
+    for(DSMethodConverter converter : converters) {
       if(converter.accept(method)) {
         return converter.asDto(method);
       }

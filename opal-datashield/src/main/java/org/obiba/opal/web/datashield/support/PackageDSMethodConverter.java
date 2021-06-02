@@ -10,8 +10,9 @@
 package org.obiba.opal.web.datashield.support;
 
 import org.obiba.datashield.core.DSMethod;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
-import org.obiba.opal.datashield.RFunctionDataShieldMethod;
+import org.obiba.opal.datashield.PackageDSMethod;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 import org.obiba.opal.web.model.DataShield.RFunctionDataShieldMethodDto;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethodConverter {
+public class PackageDSMethodConverter extends AbstractDSMethodConverter {
 
   @Override
   public boolean canParse(DataShieldMethodDto dto) {
@@ -31,18 +32,17 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
   @Override
   public DataShieldMethod parse(DataShieldMethodDto dto) {
     DataShield.RFunctionDataShieldMethodDto funcDto = dto.getExtension(RFunctionDataShieldMethodDto.method);
-    return funcDto.hasRPackage() ? new RFunctionDataShieldMethod(dto.getName(), funcDto.getFunc(),
-        funcDto.getRPackage(), funcDto.getVersion()) : new RFunctionDataShieldMethod(dto.getName(), funcDto.getFunc());
+    return new PackageDSMethod(dto.getName(), funcDto.getFunc(), funcDto.getRPackage(), funcDto.getVersion());
   }
 
   @Override
   public boolean accept(DSMethod method) {
-    return method instanceof RFunctionDataShieldMethod;
+    return method.hasPackage();
   }
 
   @Override
   public DataShieldMethodDto asDto(DSMethod method) {
-    RFunctionDataShieldMethod rFunctionMethod = (RFunctionDataShieldMethod) method;
+    DefaultDSMethod rFunctionMethod = (DefaultDSMethod) method;
     RFunctionDataShieldMethodDto.Builder builder = DataShield.RFunctionDataShieldMethodDto.newBuilder()
         .setFunc(rFunctionMethod.getFunction());
     if(rFunctionMethod.hasPackage()) {

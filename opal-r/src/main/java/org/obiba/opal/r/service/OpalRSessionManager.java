@@ -179,7 +179,17 @@ public class OpalRSessionManager {
    * @return R session
    */
   public RServerSession newSubjectRSession() {
-    return addRSession(getSubjectPrincipal());
+    return newSubjectRSession(null);
+  }
+
+  /**
+   * Creates a new R connection in the provided profile, stores the corresponding R session.
+   *
+   * @param profile
+   * @return R session
+   */
+  public RServerSession newSubjectRSession(String profile) {
+    return addRSession(getSubjectPrincipal(), profile);
   }
 
   /**
@@ -258,10 +268,10 @@ public class OpalRSessionManager {
     }
   }
 
-  private RServerSession addRSession(String principal) {
+  private RServerSession addRSession(String principal, String profile) {
     try {
       SubjectRSessions rSessions = getRSessions(principal);
-      RServerSession rSession = rServerManagerService.getDefaultRServer().newRServerSession(principal);
+      RServerSession rSession = rServerManagerService.getRServer(profile).newRServerSession(principal);
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {

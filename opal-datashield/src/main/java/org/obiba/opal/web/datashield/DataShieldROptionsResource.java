@@ -18,6 +18,8 @@ import org.obiba.opal.web.model.DataShield;
 
 public interface DataShieldROptionsResource {
 
+  void setProfile(String profile);
+
   @GET
   List<DataShield.DataShieldROptionDto> getDataShieldROptions();
 

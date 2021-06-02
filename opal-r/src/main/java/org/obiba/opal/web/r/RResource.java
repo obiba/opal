@@ -50,18 +50,18 @@ public class RResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public Response executeBinary(@QueryParam("script") String script, String body) throws RServerException {
-    return execute(script, body, RSerialize.RAW);
+  public Response executeBinary(@QueryParam("script") String script, @QueryParam("profile") String profile, String body) throws RServerException {
+    return execute(profile, script, body, RSerialize.RAW);
   }
 
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response executeJSON(@QueryParam("script") String script, String body) throws RServerException {
-    return execute(script, body, RSerialize.JSON);
+  public Response executeJSON(@QueryParam("script") String script, @QueryParam("profile") String profile, String body) throws RServerException {
+    return execute(profile, script, body, RSerialize.JSON);
   }
 
-  public Response execute(String script, String body, RSerialize serialize) throws RServerException {
+  public Response execute(String profile, String script, String body, RSerialize serialize) throws RServerException {
     String rScript = script;
     if (Strings.isNullOrEmpty(rScript)) {
       rScript = body;
@@ -70,7 +70,7 @@ public class RResource {
     if (Strings.isNullOrEmpty(rScript)) return Response.status(Status.BAD_REQUEST).build();
 
     ROperationWithResult rop = new RScriptROperation(rScript, serialize);
-    rServerManagerService.getDefaultRServer().execute(rop);
+    rServerManagerService.getRServer(profile).execute(rop);
     if (rop.hasResult()) {
       if (rop.getResult().isRaw())
         return Response.ok().entity(rop.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();

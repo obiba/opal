@@ -32,7 +32,7 @@ public interface RSessionsResource {
   Response removeRSessions();
 
   @POST
-  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore);
+  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile);
 
   @Autowired
   void setOpalRSessionManager(OpalRSessionManager opalRSessionManager);

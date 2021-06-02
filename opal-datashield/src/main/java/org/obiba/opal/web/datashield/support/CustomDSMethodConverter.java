@@ -10,7 +10,8 @@
 package org.obiba.opal.web.datashield.support;
 
 import org.obiba.datashield.core.DSMethod;
-import org.obiba.opal.datashield.CustomRScriptMethod;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
+import org.obiba.opal.datashield.CustomDSMethod;
 import org.obiba.opal.datashield.DataShieldMethod;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class CustomRScriptMethodConverter extends AbstractDataShieldMethodConverter {
+public class CustomDSMethodConverter extends AbstractDSMethodConverter {
 
   @Override
   public boolean canParse(DataShieldMethodDto dto) {
@@ -30,19 +31,19 @@ public class CustomRScriptMethodConverter extends AbstractDataShieldMethodConver
 
   @Override
   public DataShieldMethod parse(DataShieldMethodDto dto) {
-    return new CustomRScriptMethod(dto.getName(), dto.getExtension(RScriptDataShieldMethodDto.method).getScript());
+    return new CustomDSMethod(dto.getName(), dto.getExtension(RScriptDataShieldMethodDto.method).getScript());
   }
 
   @Override
   public boolean accept(DSMethod method) {
-    return method instanceof CustomRScriptMethod;
+    return !method.hasPackage();
   }
 
   @Override
   public DataShieldMethodDto asDto(DSMethod method) {
-    CustomRScriptMethod rScriptMethod = (CustomRScriptMethod) method;
+    DefaultDSMethod rScriptMethod = (DefaultDSMethod) method;
     DataShield.RScriptDataShieldMethodDto methodDto = DataShield.RScriptDataShieldMethodDto.newBuilder()
-        .setScript(rScriptMethod.getScript()).build();
+        .setScript(rScriptMethod.getFunction()).build();
     return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RScriptDataShieldMethodDto.method, methodDto)
         .build();
   }

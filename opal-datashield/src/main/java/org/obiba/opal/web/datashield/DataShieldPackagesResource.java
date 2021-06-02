@@ -11,7 +11,6 @@ package org.obiba.opal.web.datashield;
 
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.OpalR;
-import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,33 +34,33 @@ public class DataShieldPackagesResource {
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
 
   @GET
-  public List<OpalR.RPackageDto> getPackages() {
-    return dsPackageMethodeHelper.getInstalledPackagesDtos();
+  public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
+    return dsPackageMethodeHelper.getInstalledPackagesDtos(profile);
   }
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-                                 @QueryParam("ref") String ref) throws REXPMismatchException {
-    dsPackageMethodeHelper.installDatashieldPackage(name, ref);
+                                 @QueryParam("ref") String ref, @QueryParam("profile") String profile) {
+    dsPackageMethodeHelper.installDatashieldPackage(profile, name, ref);
 
     // install or re-install all known datashield package methods
-    List<OpalR.RPackageDto> pkgs = getPackages();
+    List<OpalR.RPackageDto> pkgs = getPackages(profile);
     for (OpalR.RPackageDto pkg : pkgs) {
-      dsPackageMethodeHelper.publish(pkg.getName());
+      dsPackageMethodeHelper.publish(profile, pkg.getName());
     }
     // make sure last is the one we install (check it is a "datashield" package first)
-    if (getPackages().stream().anyMatch(p -> p.getName().equals(name)))
-      dsPackageMethodeHelper.publish(name);
+    if (getPackages(profile).stream().anyMatch(p -> p.getName().equals(name)))
+      dsPackageMethodeHelper.publish(profile, name);
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
   }
 
   @DELETE
-  public Response deletePackages() {
+  public Response deletePackages(@QueryParam("profile") String profile) {
     try {
-      for (OpalR.RPackageDto pkg : getPackages()) {
-        dsPackageMethodeHelper.deletePackage(pkg);
+      for (OpalR.RPackageDto pkg : getPackages(profile)) {
+        dsPackageMethodeHelper.deletePackage(profile, pkg);
       }
     } catch (Exception e) {
       // ignored

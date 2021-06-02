@@ -10,18 +10,18 @@
 
 package org.obiba.opal.web.datashield;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
+import org.obiba.opal.datashield.cfg.DatashieldConfig;
+import org.obiba.opal.datashield.cfg.DatashieldConfigService;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 @Component
 @Transactional
@@ -29,32 +29,35 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/datashield/option")
 public class DataShieldROptionResourceImpl implements DataShieldROptionResource {
 
-  private DatashieldConfigurationSupplier configurationSupplier;
+  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
 
   @Autowired
-  public void setConfigurationSupplier(DatashieldConfigurationSupplier configurationSupplier) {
-    this.configurationSupplier = configurationSupplier;
+  private DatashieldConfigService datashieldConfigService;
+
+  @Override
+  public void setProfile(String profile) {
+    this.profile = profile;
   }
 
   @Override
   public Response deleteDataShieldROption(final @QueryParam("name") String name) {
-    configurationSupplier
-        .modify(config -> config.removeOption(name));
-
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    config.removeOption(name);
+    datashieldConfigService.saveConfiguration(config);
     return Response.ok().build();
   }
 
   @Override
   public Response addOrUpdateDataShieldROption(final DataShield.DataShieldROptionDto dto) {
-    configurationSupplier
-        .modify(config -> config.addOrUpdateOption(dto.getName(), dto.getValue()));
-
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    config.addOrUpdateOption(dto.getName(), dto.getValue());
+    datashieldConfigService.saveConfiguration(config);
     return Response.ok().build();
   }
 
   @Override
   public Response getDataShieldROption(final @QueryParam("name") String name) {
-    DatashieldConfiguration config = configurationSupplier.get();
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
 
     if (config.hasOption(name)) {
       DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)

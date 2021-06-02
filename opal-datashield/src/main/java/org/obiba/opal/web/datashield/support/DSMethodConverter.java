@@ -16,8 +16,30 @@ import org.obiba.opal.web.model.DataShield.DataShieldMethodDto;
 /**
  *
  */
-public abstract class AbstractDataShieldMethodConverter implements DataShieldMethodConverter {
-  protected DataShieldMethodDto.Builder getDataShieldMethodDtoBuilder(DSMethod method) {
-    return DataShieldMethodDto.newBuilder().setName(method.getName());
-  }
+public interface DSMethodConverter {
+
+  /**
+   * @param dto
+   * @return
+   */
+  boolean canParse(DataShieldMethodDto dto);
+
+  /**
+   * @param dto
+   * @return
+   */
+  DataShieldMethod parse(DataShieldMethodDto dto);
+
+  /**
+   * @param method
+   * @return
+   */
+  boolean accept(DSMethod method);
+
+  /**
+   * @param method
+   * @return
+   */
+  DataShieldMethodDto asDto(DSMethod method);
+
 }

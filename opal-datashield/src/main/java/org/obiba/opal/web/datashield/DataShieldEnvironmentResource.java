@@ -27,6 +27,8 @@ import org.obiba.opal.web.model.DataShield;
 
 public interface DataShieldEnvironmentResource {
 
+  void setProfile(String profile);
+
   void setMethodType(DSMethodType methodType);
 
   @GET

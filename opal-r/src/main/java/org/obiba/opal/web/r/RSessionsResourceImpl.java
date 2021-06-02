@@ -59,8 +59,8 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   @Override
-  public Response newRSession(UriInfo info, String restore) {
-    RServerSession rSession = opalRSessionManager.newSubjectRSession();
+  public Response newRSession(UriInfo info, String restore, String profile) {
+    RServerSession rSession = opalRSessionManager.newSubjectRSession(profile);
     onNewRSession(rSession);
     if (!Strings.isNullOrEmpty(restore)) {
       opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);

@@ -14,6 +14,7 @@ import org.obiba.datashield.core.impl.PackagedFunctionDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
+@Deprecated
 public class RFunctionDataShieldMethod extends PackagedFunctionDSMethod implements DataShieldMethod {
 
   @Deprecated

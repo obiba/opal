@@ -131,6 +131,12 @@ public abstract class AbstractRServerSession implements RServerSession {
   }
 
   @Override
+  public String getProfile() {
+    // for now profile name and cluster name are the same
+    return getRServerClusterName();
+  }
+
+  @Override
   public String getRServerClusterName() {
     return clusterName;
   }

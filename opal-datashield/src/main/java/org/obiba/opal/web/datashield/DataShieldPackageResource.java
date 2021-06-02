@@ -12,7 +12,6 @@ package org.obiba.opal.web.datashield;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.OpalR;
-import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,8 +34,8 @@ public class DataShieldPackageResource {
   private DataShieldPackageMethodHelper methodPublisherImpl;
 
   @GET
-  public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name) {
-    return methodPublisherImpl.getPackage(name);
+  public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    return methodPublisherImpl.getPackage(profile, name);
   }
 
   /**
@@ -47,8 +46,8 @@ public class DataShieldPackageResource {
    */
   @GET
   @Path("/methods")
-  public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name) {
-    return methodPublisherImpl.getPackageMethods(name);
+  public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    return methodPublisherImpl.getPackageMethods(profile, name);
   }
 
   /**
@@ -59,8 +58,8 @@ public class DataShieldPackageResource {
    */
   @PUT
   @Path("methods")
-  public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name) throws REXPMismatchException {
-    return methodPublisherImpl.publish(name);
+  public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    return methodPublisherImpl.publish(profile, name);
   }
 
   /**
@@ -69,9 +68,9 @@ public class DataShieldPackageResource {
    * @return
    */
   @DELETE
-  public Response deletePackage(@PathParam("name") String name) {
+  public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     try {
-      methodPublisherImpl.deletePackage(name);
+      methodPublisherImpl.deletePackage(profile, name);
     } catch (Exception e) {
       // ignored
     }

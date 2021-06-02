@@ -10,20 +10,19 @@
 
 package org.obiba.opal.web.datashield;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.Path;
-
 import org.obiba.datashield.core.DSOption;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
+import org.obiba.opal.datashield.cfg.DatashieldConfig;
+import org.obiba.opal.datashield.cfg.DatashieldConfigService;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Transactional
@@ -31,19 +30,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/datashield/options")
 public class DataShieldROptionsResourceImpl implements DataShieldROptionsResource {
 
-  private DatashieldConfigurationSupplier configurationSupplier;
+  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
 
   @Autowired
-  public void setConfigurationSupplier(DatashieldConfigurationSupplier configurationSupplier) {
-    this.configurationSupplier = configurationSupplier;
+  private DatashieldConfigService datashieldConfigService;
+
+  @Override
+  public void setProfile(String profile) {
+    this.profile = profile;
   }
 
   @Override
   public List<DataShield.DataShieldROptionDto> getDataShieldROptions() {
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
-    DatashieldConfiguration config = configurationSupplier.get();
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
 
-    for(DSOption entry : config.getOptions()) {
+    for (DSOption entry : config.getOptions()) {
       options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getName())//
           .setValue(entry.getValue()).build());
     }

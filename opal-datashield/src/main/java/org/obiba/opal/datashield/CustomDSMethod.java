@@ -10,24 +10,24 @@
 package org.obiba.opal.datashield;
 
 import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.ScriptDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
-@Deprecated
-public class CustomRScriptMethod extends ScriptDSMethod implements DataShieldMethod {
+public class CustomDSMethod extends DefaultDSMethod implements DataShieldMethod {
 
-  public CustomRScriptMethod() {
+  public CustomDSMethod() {
 
   }
 
-  public CustomRScriptMethod(String name, String script) {
+  public CustomDSMethod(String name, String script) {
     super(name, script);
   }
 
   @Override
   public ROperation assign(DSMethodType env) {
-    return ROperations.assign(getName(), getScript(), env.symbol(), true);
+    return ROperations.assign(getName(), getFunction(), env.symbol(), true);
   }
 
 }

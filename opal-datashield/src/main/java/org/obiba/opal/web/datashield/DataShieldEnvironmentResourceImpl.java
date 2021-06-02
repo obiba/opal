@@ -10,14 +10,15 @@
 package org.obiba.opal.web.datashield;
 
 import com.google.common.collect.Lists;
+import org.obiba.datashield.core.DSConfiguration;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
-import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
+import org.obiba.opal.datashield.cfg.DatashieldConfig;
+import org.obiba.opal.datashield.cfg.DatashieldConfigService;
+import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.web.datashield.support.DSMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -38,31 +39,30 @@ import java.util.List;
 @Transactional
 public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentResource {
 
+  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
+
   private DSMethodType methodType;
 
-  private DatashieldConfigurationSupplier configurationSupplier;
+  @Autowired
+  private DatashieldConfigService datashieldConfigService;
 
-  private DataShieldMethodConverterRegistry methodConverterRegistry;
+  @Autowired
+  private DSMethodConverterRegistry methodConverterRegistry;
+
+  @Override
+  public void setProfile(String profile) {
+    this.profile = profile;
+  }
 
   @Override
   public void setMethodType(DSMethodType methodType) {
     this.methodType = methodType;
   }
 
-  @Autowired
-  public void setConfigurationSupplier(DatashieldConfigurationSupplier configurationSupplier) {
-    this.configurationSupplier = configurationSupplier;
-  }
-
-  @Autowired
-  public void setMethodConverterRegistry(DataShieldMethodConverterRegistry methodConverterRegistry) {
-    this.methodConverterRegistry = methodConverterRegistry;
-  }
-
   @Override
   public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
     List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
-    for(DSMethod method : listMethods()) {
+    for (DSMethod method : listMethods()) {
       dtos.add(methodConverterRegistry.asDto(method));
     }
     sortByName(dtos);
@@ -71,33 +71,21 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
   @Override
   public Response deleteDataShieldMethods() {
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        for(DSMethod method : getEnvironment(config).getMethods()) {
-          getEnvironment(config).removeMethod(method.getName());
-        }
-      }
-
-    });
-
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    for (DSMethod method : getEnvironment(config).getMethods()) {
+      getEnvironment(config).removeMethod(method.getName());
+    }
+    datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("deleted all methods from type {}.", methodType);
     return Response.ok().build();
   }
 
   @Override
   public Response createDataShieldMethod(UriInfo uri, final DataShield.DataShieldMethodDto dto) {
-    DatashieldConfiguration config = getDatashieldConfiguration();
-    if(getEnvironment(config).hasMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
-      }
-    });
+    DatashieldConfig config = getDatashieldConfiguration();
+    if (getEnvironment(config).hasMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
+    getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
+    datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), methodType);
     UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
         .path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
@@ -111,34 +99,20 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
   @Override
   public Response updateDataShieldMethod(String name, final DataShield.DataShieldMethodDto dto) {
-    if(!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-
-    DatashieldConfiguration config = getDatashieldConfiguration();
-    if(!getEnvironment(config).hasMethod(name)) return Response.status(Status.NOT_FOUND).build();
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
-      }
-    });
-
+    if (!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
+    DatashieldConfig config = getDatashieldConfiguration();
+    if (!getEnvironment(config).hasMethod(name)) return Response.status(Status.NOT_FOUND).build();
+    getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
+    datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("modified method '{}' in type {}.", name, methodType);
-
     return Response.ok().build();
   }
 
   @Override
   public Response deleteDataShieldMethod(final String name) {
-
-    configurationSupplier.modify(new ExtensionConfigModificationTask<DatashieldConfiguration>() {
-
-      @Override
-      public void doWithConfig(DatashieldConfiguration config) {
-        getEnvironment(config).removeMethod(name);
-      }
-    });
+    DatashieldConfig config = getDatashieldConfiguration();
+    getEnvironment(config).removeMethod(name);
+    datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("deleted method '{}' from type {}.", name, methodType);
     return Response.ok().build();
   }
@@ -147,8 +121,8 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     return getEnvironment().getMethods();
   }
 
-  private DatashieldConfiguration getDatashieldConfiguration() {
-    return configurationSupplier.get();
+  private DatashieldConfig getDatashieldConfiguration() {
+    return datashieldConfigService.getConfiguration(profile);
   }
 
   private void sortByName(List<DataShield.DataShieldMethodDto> dtos) {
@@ -167,7 +141,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     return getEnvironment(getDatashieldConfiguration());
   }
 
-  private DSEnvironment getEnvironment(DatashieldConfiguration config) {
+  private DSEnvironment getEnvironment(DSConfiguration config) {
     return config.getEnvironment(methodType);
   }
 
