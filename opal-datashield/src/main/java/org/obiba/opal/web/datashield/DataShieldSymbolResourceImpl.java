@@ -14,6 +14,7 @@ import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
+import org.obiba.opal.datashield.cfg.DatashieldConfigService;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.spi.r.ROperation;
@@ -36,7 +37,7 @@ import javax.ws.rs.core.UriInfo;
 public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl implements DataShieldSymbolResource {
 
   @Autowired
-  private Supplier<DatashieldConfiguration> configSupplier;
+  private DatashieldConfigService datashieldConfigService;
 
   @Value("#{new Boolean('${org.obiba.opal.datashield.useTibble}')}")
   private boolean useTibble;
@@ -84,7 +85,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
     try {
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-          configSupplier.get().getEnvironment(DSMethodType.ASSIGN));
+          datashieldConfigService.getConfiguration(getRServerSession().getProfile()).getEnvironment(DSMethodType.ASSIGN));
       if (async) {
         String id = getRServerSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();

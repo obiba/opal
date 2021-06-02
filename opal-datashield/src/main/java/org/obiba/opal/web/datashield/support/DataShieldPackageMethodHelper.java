@@ -12,7 +12,6 @@ package org.obiba.opal.web.datashield.support;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.core.NoSuchDSMethodException;
@@ -22,6 +21,7 @@ import org.obiba.opal.datashield.cfg.DatashieldConfig;
 import org.obiba.opal.datashield.cfg.DatashieldConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerService;
+import org.obiba.opal.web.datashield.Dtos;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class DataShieldPackageMethodHelper {
@@ -53,9 +54,6 @@ public class DataShieldPackageMethodHelper {
 
   @Autowired
   private DatashieldConfigService datashieldConfigService;
-
-  @Autowired
-  private DSMethodConverterRegistry methodConverterRegistry;
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
@@ -97,24 +95,27 @@ public class DataShieldPackageMethodHelper {
 
   public DataShield.DataShieldPackageMethodsDto publish(String profile, String name) {
     List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
-
     final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
-    final List<DataShield.DataShieldROptionDto> roptions = getPackageROptions(packageDtos);
+
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
-    addMethods(config.getEnvironment(DSMethodType.AGGREGATE), methods.getAggregateList());
-    addMethods(config.getEnvironment(DSMethodType.ASSIGN), methods.getAssignList());
-    config.addOptions(roptions);
+    addMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList());
+    addMethods(config, DSMethodType.ASSIGN, methods.getAssignList());
+    addOptions(config, getPackageROptions(packageDtos));
     datashieldConfigService.saveConfiguration(config);
+
+    DataShieldLog.adminLog("Package '{}' config added.", name);
+
     return methods;
   }
 
-  private void addMethods(DSEnvironment env, Iterable<DataShield.DataShieldMethodDto> envMethods) {
-    for (DataShield.DataShieldMethodDto method : envMethods) {
-      if (env.hasMethod(method.getName())) {
-        env.removeMethod(method.getName());
-      }
-      env.addOrUpdate(methodConverterRegistry.parse(method));
-    }
+  private void addMethods(DatashieldConfig config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
+    config.addOrUpdateMethods(type, StreamSupport.stream(envMethods.spliterator(), false)
+        .map(m -> (DSMethod) Dtos.fromDto(m))
+        .collect(Collectors.toList()));
+  }
+
+  private void addOptions(DatashieldConfig config, List<DataShield.DataShieldROptionDto> roptions) {
+    roptions.forEach(opt -> config.addOrUpdateOption(opt.getName(), opt.getValue()));
   }
 
   public List<OpalR.RPackageDto> getDatashieldPackage(String profile, final String name) {

@@ -11,18 +11,29 @@
 package org.obiba.opal.datashield.cfg;
 
 import com.google.common.collect.Lists;
-import org.obiba.datashield.core.DSConfiguration;
-import org.obiba.datashield.core.impl.DefaultDSConfiguration;
+import com.google.common.collect.Maps;
+import org.obiba.datashield.core.*;
+import org.obiba.datashield.core.impl.DefaultDSEnvironment;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
+import org.obiba.datashield.core.impl.DefaultDSOption;
 import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.web.model.DataShield;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
-public class DatashieldConfig extends DefaultDSConfiguration implements DSConfiguration, HasUniqueProperties {
+public class DatashieldConfig implements DSConfiguration, HasUniqueProperties {
 
   private String profile;
 
-  public DatashieldConfig() {}
+  private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
+
+  private final Map<String, String> options = Maps.newHashMap();
+
+  public DatashieldConfig() {
+  }
 
   public DatashieldConfig(String profile) {
     this.profile = profile;
@@ -36,9 +47,47 @@ public class DatashieldConfig extends DefaultDSConfiguration implements DSConfig
     this.profile = profile;
   }
 
-  public void addOptions(Iterable<DataShield.DataShieldROptionDto> optionsList) {
-    for (DataShield.DataShieldROptionDto option : optionsList) {
-      addOption(option.getName(), option.getValue(), false);
+  @Override
+  public synchronized DSEnvironment getEnvironment(DSMethodType type) {
+    if (!environments.containsKey(type))
+      environments.put(type, new ArrayList<>());
+    
+    return new DefaultDSEnvironment(type, environments.get(type));
+  }
+
+  @Override
+  public Iterable<DSOption> getOptions() {
+    return this.options.keySet().stream().map(k -> new DefaultDSOption(k, this.options.get(k))).collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean hasOption(String name) {
+    return this.options.containsKey(name);
+  }
+
+  @Override
+  public boolean hasOptions() {
+    return !this.options.isEmpty();
+  }
+
+  @Override
+  public DSOption getOption(String name) {
+    if (this.options.containsKey(name)) {
+      return new DefaultDSOption(name, this.options.get(name));
+    } else {
+      throw new NoSuchElementException(name + " option does not exists");
+    }
+  }
+
+  @Override
+  public void addOrUpdateOption(String name, String value) {
+    this.addOption(name, value, true);
+  }
+
+  @Override
+  public void removeOption(String name) {
+    if (this.hasOption(name)) {
+      this.options.remove(name);
     }
   }
 
@@ -50,5 +99,15 @@ public class DatashieldConfig extends DefaultDSConfiguration implements DSConfig
   @Override
   public List<Object> getUniqueValues() {
     return Lists.newArrayList(profile);
+  }
+
+  //
+  // Private methods
+  //
+
+  private void addOption(String name, String value, boolean overwrite) {
+    if (overwrite || !this.hasOption(name)) {
+      this.options.put(name, value);
+    }
   }
 }

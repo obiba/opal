@@ -18,7 +18,6 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfig;
 import org.obiba.opal.datashield.cfg.DatashieldConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.web.datashield.support.DSMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -46,9 +45,6 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   @Autowired
   private DatashieldConfigService datashieldConfigService;
 
-  @Autowired
-  private DSMethodConverterRegistry methodConverterRegistry;
-
   @Override
   public void setProfile(String profile) {
     this.profile = profile;
@@ -63,7 +59,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
     List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
     for (DSMethod method : listMethods()) {
-      dtos.add(methodConverterRegistry.asDto(method));
+      dtos.add(Dtos.asDto(method));
     }
     sortByName(dtos);
     return dtos;
@@ -84,7 +80,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   public Response createDataShieldMethod(UriInfo uri, final DataShield.DataShieldMethodDto dto) {
     DatashieldConfig config = getDatashieldConfiguration();
     if (getEnvironment(config).hasMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-    getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
+    getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
     datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), methodType);
     UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
@@ -94,7 +90,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
   @Override
   public Response getDataShieldMethod(String name) {
-    return Response.ok().entity(methodConverterRegistry.asDto(getEnvironment().getMethod(name))).build();
+    return Response.ok().entity(Dtos.asDto(getEnvironment().getMethod(name))).build();
   }
 
   @Override
@@ -102,7 +98,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     if (!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
     DatashieldConfig config = getDatashieldConfiguration();
     if (!getEnvironment(config).hasMethod(name)) return Response.status(Status.NOT_FOUND).build();
-    getEnvironment(config).addOrUpdate(methodConverterRegistry.parse(dto));
+    getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
     datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("modified method '{}' in type {}.", name, methodType);
     return Response.ok().build();

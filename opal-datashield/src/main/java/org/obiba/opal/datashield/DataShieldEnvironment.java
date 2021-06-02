@@ -12,9 +12,11 @@ package org.obiba.opal.datashield;
 import com.google.common.collect.ImmutableList;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.core.impl.DefaultDSEnvironment;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DataShieldEnvironment extends DefaultDSEnvironment {
@@ -28,6 +30,10 @@ public class DataShieldEnvironment extends DefaultDSEnvironment {
 
   public DataShieldEnvironment(DSMethodType type) {
     super(type);
+  }
+
+  public DataShieldEnvironment(DSMethodType type, List<DefaultDSMethod> methods) {
+    super(type, methods);
   }
 
   public void setEnvironment(DSMethodType environment) {
@@ -53,15 +59,22 @@ public class DataShieldEnvironment extends DefaultDSEnvironment {
    * @return a sequence of {@code ROperation} that will create a protected R environment for executing methods defined.
    */
   public Iterable<ROperation> prepareOps() {
+    String envSymbol = getMethodType().symbol();
+    List<ROperation> rops = getMethods().stream()
+        .filter(m -> !m.hasPackage())
+        .map(m ->  ROperations.assign(m.getName(), ((DefaultDSMethod)m).getFunction(), envSymbol, true))
+        .collect(Collectors.toList());
+    if (rops.isEmpty())
+      return rops;
+
     return ImmutableList.<ROperation>builder()//
-        .add(ROperations.eval(String.format("base::rm(%s)", getMethodType().symbol()), null))
+        .add(ROperations.eval(String.format("base::rm(%s)", envSymbol), null))
         .add(ROperations.assign(getMethodType().symbol(), "base::new.env()"))
-        .addAll(getMethods().stream().map(input -> ((DataShieldMethod) input).assign(getMethodType())).collect(Collectors.toList()))//
-            // Protect the contents of the environment
+        .addAll(rops)
+        // Protect the contents of the environment
         .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", getMethodType().symbol()), null))//
-            // Protect the contents of the environment
-        .add(
-            ROperations.eval(String.format("base::lockBinding('%s', base::environment())", getMethodType().symbol()), null))
+        // Protect the contents of the environment
+        .add(ROperations.eval(String.format("base::lockBinding('%s', base::environment())", getMethodType().symbol()), null))
         .build();
   }
 
