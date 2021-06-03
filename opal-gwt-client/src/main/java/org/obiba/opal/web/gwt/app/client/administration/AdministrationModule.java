@@ -57,10 +57,7 @@ import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresent
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalView;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsView;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesView;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.*;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
@@ -177,6 +174,7 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureR() {
     bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class,
         RAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(RClusterPresenter.class, RClusterPresenter.Display.class, RClusterView.class);
     bindPresenterWidget(RSessionsPresenter.class, RSessionsPresenter.Display.class, RSessionsView.class);
     bindPresenterWidget(RWorkspacesPresenter.class, RWorkspacesPresenter.Display.class, RWorkspacesView.class);
     bindPresenterWidget(RPackageInstallModalPresenter.class, RPackageInstallModalPresenter.Display.class,

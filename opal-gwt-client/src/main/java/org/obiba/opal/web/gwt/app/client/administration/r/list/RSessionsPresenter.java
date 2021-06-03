@@ -9,8 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
-import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
-import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStopped;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.r.event.RServerStoppedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -23,23 +29,12 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
-
-import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
-import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
-import static com.google.gwt.http.client.Response.SC_OK;
+import static com.google.gwt.http.client.Response.*;
 
 /**
  *
  */
-public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Display> implements  RSessionsUiHandlers {
+public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Display> implements RSessionsUiHandlers {
 
   public static final String TERMINATE_ACTION = "Terminate";
 
@@ -99,7 +94,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
           @Override
           public void onResponseCode(Request request, Response response) {
             fireEvent(ConfirmationTerminatedEvent.create());
-            if(response.getStatusCode() == SC_OK) {
+            if (response.getStatusCode() == SC_OK) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().info("rSessionTerminated").build());
             } else {
               String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
@@ -136,7 +131,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+      if (actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;

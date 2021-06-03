@@ -114,12 +114,12 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
       }
     }, translations.idLabel());
 
-//    table.addColumn(new TextColumn<RSessionDto>() {
-//      @Override
-//      public String getValue(RSessionDto object) {
-//        return object.getCluster();
-//      }
-//    }, translations.clusterLabel());
+    table.addColumn(new TextColumn<RSessionDto>() {
+      @Override
+      public String getValue(RSessionDto object) {
+        return object.getCluster();
+      }
+    }, translations.clusterLabel());
 
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override
