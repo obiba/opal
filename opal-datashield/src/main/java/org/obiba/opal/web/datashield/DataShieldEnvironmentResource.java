@@ -12,12 +12,7 @@ package org.obiba.opal.web.datashield;
 
 import java.util.List;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -27,31 +22,29 @@ import org.obiba.opal.web.model.DataShield;
 
 public interface DataShieldEnvironmentResource {
 
-  void setProfile(String profile);
-
   void setMethodType(DSMethodType methodType);
 
   @GET
   @Path("/methods")
-  List<DataShield.DataShieldMethodDto> getDataShieldMethods();
+  List<DataShield.DataShieldMethodDto> getDataShieldMethods(@QueryParam("profile") String profile);
 
   @DELETE
   @Path("/methods")
-  Response deleteDataShieldMethods();
+  Response deleteDataShieldMethods(@QueryParam("profile") String profile);
 
   @POST
   @Path("/methods")
-  Response createDataShieldMethod(@Context UriInfo uri, DataShield.DataShieldMethodDto dto);
+  Response createDataShieldMethod(@Context UriInfo uri, @QueryParam("profile") String profile, DataShield.DataShieldMethodDto dto);
 
   @GET
   @Path("/method/{name}")
-  Response getDataShieldMethod(@PathParam("name") String name);
+  Response getDataShieldMethod(@PathParam("name") String name, @QueryParam("profile") String profile);
 
   @PUT
   @Path("/method/{name}")
-  Response updateDataShieldMethod(@PathParam("name") String name, DataShield.DataShieldMethodDto dto);
+  Response updateDataShieldMethod(@PathParam("name") String name, @QueryParam("profile") String profile, DataShield.DataShieldMethodDto dto);
 
   @DELETE
   @Path("/method/{name}")
-  Response deleteDataShieldMethod(@PathParam("name") String name);
+  Response deleteDataShieldMethod(@PathParam("name") String name, @QueryParam("profile") String profile);
 }

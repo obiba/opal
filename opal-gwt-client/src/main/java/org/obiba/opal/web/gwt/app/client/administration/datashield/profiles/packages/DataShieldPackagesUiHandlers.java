@@ -8,14 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import java.util.List;
 
-public interface DataShieldPackageAdministrationUiHandlers extends UiHandlers {
+public interface DataShieldPackagesUiHandlers extends UiHandlers {
 
   void onRefresh();
 

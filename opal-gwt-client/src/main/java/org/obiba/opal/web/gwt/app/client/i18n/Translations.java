@@ -118,13 +118,13 @@ public interface Translations extends Constants {
   String statusLabel();
 
   @Description("Status map")
-  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
-      "IN_PROGRESS", "In Progress", //
-      "SUCCEEDED", "Succeeded", //
-      "FAILED", "Failed", //
-      "CANCEL_PENDING", "Cancel Pending", //
-      "CANCELED", "Cancelled", //
-      "WAITING", "Waiting", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started",
+      "IN_PROGRESS", "In Progress",
+      "SUCCEEDED", "Succeeded",
+      "FAILED", "Failed",
+      "CANCEL_PENDING", "Cancel Pending",
+      "CANCELED", "Cancelled",
+      "WAITING", "Waiting",
       "BUSY", "Busy",
       "RUNNING", "Running",
       "STOPPED", "Stopped"
@@ -136,39 +136,40 @@ public interface Translations extends Constants {
   String actionsLabel();
 
   @Description("Action map")
-  @DefaultStringMapValue({ "Log", "Log", //
-      "Cancel", "Cancel", //
-      "Remove Index", "Remove Index",//
-      "Edit", "Edit", //
-      "Copy", "Copy", //
-      "Test", "Test", //
-      "Certificate", "Certificate", //
-      "Download", "Download", //
-      "DownloadCertificate", "Download Certificate", //
-      "Index now", "Index now", //
-      "Install", "Install", // //
-      "Reinstate", "Reinstate", //
-      "Clear", "Clear",//
-      "View", "View",//
-      "Remove", "Remove",//
-      "Run", "Run",//
-      "View", "View",//
-      "Duplicate", "Duplicate",//
-      "Delete", "Delete",//
-      "PublishMethods", "Publish methods", //
-      "Permissions", "Permissions", //
-      "CommitDiff", "Diff", //
-      "DiffWithCurrent", "Diff with current",//
-      "Restore", "Restore",//
-      "Enable", "Enable",//
-      "Disable", "Disable",//
-      "Generate identifiers", "Generate identifiers",//
-      "MoveUp", "Move up",//
-      "MoveDown", "Move down",//
-      "Search", "Search",//
-      "Download identifiers", "Download identifiers",//
-      "Unregister", "Unregister", //
-      "Terminate", "Terminate", //
+  @DefaultStringMapValue({ "Log", "Log",
+      "Cancel", "Cancel",
+      "Remove Index", "Remove Index",
+      "Edit", "Edit",
+      "Copy", "Copy",
+      "Test", "Test",
+      "Certificate", "Certificate",
+      "Download", "Download",
+      "DownloadCertificate", "Download Certificate",
+      "Index now", "Index now",
+      "Install", "Install",
+      "Reinstate", "Reinstate",
+      "Clear", "Clear",
+      "View", "View",
+      "Remove", "Remove",
+      "Run", "Run",
+      "View", "View",
+      "Duplicate", "Duplicate",
+      "Delete", "Delete",
+      "PublishMethods", "Publish methods",
+      "UnPublishMethods", "Unpublish methods",
+      "Permissions", "Permissions",
+      "CommitDiff", "Diff",
+      "DiffWithCurrent", "Diff with current",
+      "Restore", "Restore",
+      "Enable", "Enable",
+      "Disable", "Disable",
+      "Generate identifiers", "Generate identifiers",
+      "MoveUp", "Move up",
+      "MoveDown", "Move down",
+      "Search", "Search",
+      "Download identifiers", "Download identifiers",
+      "Unregister", "Unregister",
+      "Terminate", "Terminate",
       "Statistics", "Statistics",
       "Restart", "Restart",
       "Configure", "Configure"
@@ -176,49 +177,49 @@ public interface Translations extends Constants {
   Map<String, String> actionMap();
 
   @Description("Permission map")
-  @DefaultStringMapValue({ //
-      "SYSTEM_ALL", "Administrate", //
-      "PROJECT_ADD", "Add project", //
+  @DefaultStringMapValue({
+      "SYSTEM_ALL", "Administrate",
+      "PROJECT_ADD", "Add project",
 
-      "PROJECT_ALL", "Administrate", //
+      "PROJECT_ALL", "Administrate",
 
-      "VCF_STORE_VIEW", "View VCF files statistics", //
-      "VCF_STORE_VALUES", "View VCF files data and statistics", //
-      "VCF_STORE_ALL", "Administrate VCF Store", //
+      "VCF_STORE_VIEW", "View VCF files statistics",
+      "VCF_STORE_VALUES", "View VCF files data and statistics",
+      "VCF_STORE_ALL", "Administrate VCF Store",
 
-      "DATASOURCE_ALL", "Administrate", //
-      "TABLE_ADD", "Add table", //
-      "DATASOURCE_VIEW", "View dictionary and values of all tables", //
+      "DATASOURCE_ALL", "Administrate",
+      "TABLE_ADD", "Add table",
+      "DATASOURCE_VIEW", "View dictionary and values of all tables",
 
-      "TABLE_ALL", "Administrate", //
-      "TABLE_READ", "View dictionary and summary", //
-      "TABLE_VALUES", "View dictionary and values", //
-      "TABLE_EDIT", "Edit dictionary and view summary", //
-      "TABLE_VALUES_EDIT", "Edit dictionary and view values", //
+      "TABLE_ALL", "Administrate",
+      "TABLE_READ", "View dictionary and summary",
+      "TABLE_VALUES", "View dictionary and values",
+      "TABLE_EDIT", "Edit dictionary and view summary",
+      "TABLE_VALUES_EDIT", "Edit dictionary and view values",
 
-      "VARIABLE_READ", "View dictionary and summary", //
+      "VARIABLE_READ", "View dictionary and summary",
 
-      "RESOURCES_ALL", "Administrate", //
-      "RESOURCES_VIEW", "View any resource (no credentials)", //
+      "RESOURCES_ALL", "Administrate",
+      "RESOURCES_VIEW", "View any resource (no credentials)",
 
-      "RESOURCE_ALL", "Administrate", //
-      "RESOURCE_VIEW", "View resource (no credentials)", //
+      "RESOURCE_ALL", "Administrate",
+      "RESOURCE_VIEW", "View resource (no credentials)",
 
-      "DATABASES_ALL", "Administrate", //
-      "R_USE", "Use", //
-      "DATASHIELD_ALL", "Administrate", //
-      "DATASHIELD_USE", "Use", //
-      "REPORT_TEMPLATE_ALL", "Administrate", //
+      "DATABASES_ALL", "Administrate",
+      "R_USE", "Use",
+      "DATASHIELD_ALL", "Administrate",
+      "DATASHIELD_USE", "Use",
+      "REPORT_TEMPLATE_ALL", "Administrate",
       "REPORT_TEMPLATE_READ", "View reports" })
   Map<String, String> permissionMap();
 
   @Description("Permission Node Name format map")
-  @Constants.DefaultStringMapValue({ //
-      "PROJECT", "Project",//
-      "DATASOURCE", "Tables",//
-      "TABLE", "Table",//
-      "VARIABLE", "Variable",//
-      "REPORT_TEMPLATE", "Report",//
+  @Constants.DefaultStringMapValue({
+      "PROJECT", "Project",
+      "DATASOURCE", "Tables",
+      "TABLE", "Table",
+      "VARIABLE", "Variable",
+      "REPORT_TEMPLATE", "Report",
       "VCF_STORE", "VCF Store",
       "RESOURCE", "Resource",
       "RESOURCES", "Resources"
@@ -230,49 +231,49 @@ public interface Translations extends Constants {
   String userResourcePermissionLabel();
 
   @Description("Permission explanation map")
-  @DefaultStringMapValue({ //
-      "SYSTEM_ALL.help", "Full access to the system.", //
+  @DefaultStringMapValue({
+      "SYSTEM_ALL.help", "Full access to the system.",
 
-      "PROJECT_ADD.help", "Add new projects and therefore can import/export data in the context of the project.", //
-      "PROJECT_ALL.help", "Full access to project settings and data.", //
+      "PROJECT_ADD.help", "Add new projects and therefore can import/export data in the context of the project.",
+      "PROJECT_ALL.help", "Full access to project settings and data.",
 
-      "VCF_STORE_VIEW.help", "View VCF files and statistics.", //
-      "VCF_STORE_VALUES.help", "Export VCF files and view statistics.", //
-      "VCF_STORE_ALL.help", "Import/Export VCF files, view statistics and set samples-participants mapping table.", //
+      "VCF_STORE_VIEW.help", "View VCF files and statistics.",
+      "VCF_STORE_VALUES.help", "Export VCF files and view statistics.",
+      "VCF_STORE_ALL.help", "Import/Export VCF files, view statistics and set samples-participants mapping table.",
 
-      "DATASOURCE_ALL.help", "Full access to project tables, including individual values.", //
-      "TABLE_ADD.help", "Add tables or views.", //
-      "DATASOURCE_VIEW.help", "Read access to project tables, including individual values.", //
+      "DATASOURCE_ALL.help", "Full access to project tables, including individual values.",
+      "TABLE_ADD.help", "Add tables or views.",
+      "DATASOURCE_VIEW.help", "Read access to project tables, including individual values.",
 
-      "TABLE_ALL.help", "Full access to the table, including edition of the dictionary and individual values.", //
-      "TABLE_READ.help", "View dictionary and summaries (no access to individual values).", //
-      "TABLE_VALUES.help", "View dictionary with access to individual values.", //
-      "TABLE_EDIT.help", "Edit dictionary and view values summary (no access to individual values).", //
-      "TABLE_VALUES_EDIT.help", "Edit dictionary and view individual values.", //
+      "TABLE_ALL.help", "Full access to the table, including edition of the dictionary and individual values.",
+      "TABLE_READ.help", "View dictionary and summaries (no access to individual values).",
+      "TABLE_VALUES.help", "View dictionary with access to individual values.",
+      "TABLE_EDIT.help", "Edit dictionary and view values summary (no access to individual values).",
+      "TABLE_VALUES_EDIT.help", "Edit dictionary and view individual values.",
 
-      "VARIABLE_READ.help", "View variable description and values summary (no access to individual values).", //
+      "VARIABLE_READ.help", "View variable description and values summary (no access to individual values).",
 
-      "RESOURCES_ALL.help", "Full access to project resources.", //
-      "RESOURCES_VIEW.help", "View any resource without having access to the associated credentials (DataSHIELD compliant permission).", //
+      "RESOURCES_ALL.help", "Full access to project resources.",
+      "RESOURCES_VIEW.help", "View any resource without having access to the associated credentials (DataSHIELD compliant permission).",
 
-      "RESOURCE_ALL.help", "Full access to the resource.", //
-      "RESOURCE_VIEW.help", "View resource without having access to the associated credentials (DataSHIELD compliant permission).", //
+      "RESOURCE_ALL.help", "Full access to the resource.",
+      "RESOURCE_VIEW.help", "View resource without having access to the associated credentials (DataSHIELD compliant permission).",
 
-      "DATABASES_ALL.help", "Administrate databases.", //
-      "R_USE.help", "Use R services: can push accessible data to R and can execute ANY R commands on them.", //
-      "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.", //
+      "DATABASES_ALL.help", "Administrate databases.",
+      "R_USE.help", "Use R services: can push accessible data to R and can execute ANY R commands on them.",
+      "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.",
       "DATASHIELD_USE.help",
-      "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.", //
-      "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).", //
+      "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.",
+      "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).",
       "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();
 
   @Description("Table Comparison Result map")
-  @DefaultStringMapValue({ "CREATION", "Table to be created", //
-      "MODIFICATION", "Table to be modified", //
-      "CONFLICT", "Conflicting table modifications", //
-      "SAME", "No table modifications", //
-      "FORBIDDEN", "Table modifications not permitted" //
+  @DefaultStringMapValue({ "CREATION", "Table to be created",
+      "MODIFICATION", "Table to be modified",
+      "CONFLICT", "Conflicting table modifications",
+      "SAME", "No table modifications",
+      "FORBIDDEN", "Table modifications not permitted"
   })
   Map<String, String> comparisonResultMap();
 
@@ -401,320 +402,320 @@ public interface Translations extends Constants {
   String noDescriptionInfo();
 
   @Description("User message map")
-  @DefaultStringMapValue({ //
-      "VariableNameNotUnique", "The specified variable name already exists.", //
-      "jobCancelled", "Job cancelled.", //
-      "jobDeleted", "Job removed.", //
-      "rSessionTerminated", "R session terminated.", //
-      "rWorkspaceRemoved", "R workspace removed.", //
-      "completedJobsDeleted", "All completed jobs removed.", //
-      "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
-      "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
-      "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", //
-      "DeleteCommand_NotFound", "Job could not be removed (not found).", //
+  @DefaultStringMapValue({
+      "VariableNameNotUnique", "The specified variable name already exists.",
+      "jobCancelled", "Job cancelled.",
+      "jobDeleted", "Job removed.",
+      "rSessionTerminated", "R session terminated.",
+      "rWorkspaceRemoved", "R workspace removed.",
+      "completedJobsDeleted", "All completed jobs removed.",
+      "SetCommandStatus_NotFound", "Job could not be cancelled (not found).",
+      "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.",
+      "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.",
+      "DeleteCommand_NotFound", "Job could not be removed (not found).",
       "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be removed at this time.",
       //
       "cannotCreateFolderPathAlreadyExist",
-      "Could not create the folder, a folder or a file exist with that name at the specified path.", //
+      "Could not create the folder, a folder or a file exist with that name at the specified path.",
       "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.",
       //
-      "cannotCreateFolderUnexpectedError", "There was an unexpected error while creating the folder.", //
-      "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be removed.", //
-      "cannotDeleteReadOnlyFile", "Could not remove the  file or folder because it is read-only.", //
-      "couldNotDeleteFileError", "There was an error while deleting the file or folder.", //
-      "datasourceMustBeSelected", "You must select a datasource.", //
-      "fileReadError", "The file could not be read.", //
-      "ViewNameRequired", "You must provide a name for the view.", //
-      "TableAlreadyExists", "A table with the same name already exists.", //
-      "ViewAlreadyExists", "A view with the same name already exists.", //
-      "TableSelectionRequired", "You must select at least one table.", //
-      "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.", //
-      "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.", //
-      "DatasourceNameRequired", "You must provide a name for the project.", //
-      "DatasourceAlreadyExistsWithThisName", "A project already exists with this name.", //
-      "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid", //
-      "Invalid Excel file suffix: .xls or .xlsx are expected.", //
+      "cannotCreateFolderUnexpectedError", "There was an unexpected error while creating the folder.",
+      "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be removed.",
+      "cannotDeleteReadOnlyFile", "Could not remove the  file or folder because it is read-only.",
+      "couldNotDeleteFileError", "There was an error while deleting the file or folder.",
+      "datasourceMustBeSelected", "You must select a datasource.",
+      "fileReadError", "The file could not be read.",
+      "ViewNameRequired", "You must provide a name for the view.",
+      "TableAlreadyExists", "A table with the same name already exists.",
+      "ViewAlreadyExists", "A view with the same name already exists.",
+      "TableSelectionRequired", "You must select at least one table.",
+      "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.",
+      "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.",
+      "DatasourceNameRequired", "You must provide a name for the project.",
+      "DatasourceAlreadyExistsWithThisName", "A project already exists with this name.",
+      "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid",
+      "Invalid Excel file suffix: .xls or .xlsx are expected.",
       "ViewMustBeAttachedToExistingOrNewDatasource",
-      "The view must be attached to either an existing project or a new one.", //
-      "DuplicateDatasourceName", "The project name is already in use. Please choose another.", //
-      "UnknownError", "An unknown error has occurred.", //
-      "InternalError", "An internal error has occurred. Please contact technical support.", //
+      "The view must be attached to either an existing project or a new one.",
+      "DuplicateDatasourceName", "The project name is already in use. Please choose another.",
+      "UnknownError", "An unknown error has occurred.",
+      "InternalError", "An internal error has occurred. Please contact technical support.",
       "UnhandledException",
       "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
       "ProjectMomentarilyNotReloadable", "Project [{0}]'s command call is blocked momentarily.",
       //
-      "DatasourceNameDisallowedChars", "Project names cannot contain colon or period characters.", //
-      "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
-      "CSVFileRequired", "A CSV file is required.", //
-      "VCFFileRequired", "A VCF/BCF (optionally compressed) file is required.", //
-      "VCFParticipantSampleVariablesIdentical", "Participant ID variable and Sample Role variable cannot have identical names.", //
-      "XMLFileRequired", "An XML file is required.", //
-      "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
-      "ZipFileRequired", "A Zip file is required.", //
-      "SpssFileRequired", "A SPSS file is required.", //
-      "RSPSSFileRequired", "A SPSS file is required.", //
-      "RSASFileRequired", "A SAS file is required.", //
-      "RXPTFileRequired", "A SAS Transport file is required.", //
-      "RStataFileRequired", "A Stata file is required.", //
-      "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
-      "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and xml.",//
-      "ReportTemplateWasNotFound", "The specified report template could not be found.",//
-      "ReportJobStarted", "Report task has been launched.  You can follow its progress in the task list.",//
-      "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
-      "RReportDesignFileIsRequired", "A R Markdown file must be selected (.Rmd).",//
-      "CronExpressionIsRequired", "A schedule expression must be specified.",//
-      "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
-      "ReportTemplateNameIsRequired", "A name is required for the report template.",//
-      "OccurrenceGroupIsRequired", "An Occurrence Group must be specified for Repeatable variables.",//
-      "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
-      "ScriptIsRequired", "A script is required.",//
-      "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
-      "JavaScriptException", "Error in script: {0}",//
-      "MagmaRuntimeException", "{0}",//
-      "MagmaRRuntimeException", "R error: {0}",//
-      "ValuesEvaluationError", "Error when evaluating values: {0}",//
+      "DatasourceNameDisallowedChars", "Project names cannot contain colon or period characters.",
+      "ViewNameDisallowedChars", "View names cannot contain colon or period characters.",
+      "CSVFileRequired", "A CSV file is required.",
+      "VCFFileRequired", "A VCF/BCF (optionally compressed) file is required.",
+      "VCFParticipantSampleVariablesIdentical", "Participant ID variable and Sample Role variable cannot have identical names.",
+      "XMLFileRequired", "An XML file is required.",
+      "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.",
+      "ZipFileRequired", "A Zip file is required.",
+      "SpssFileRequired", "A SPSS file is required.",
+      "RSPSSFileRequired", "A SPSS file is required.",
+      "RSASFileRequired", "A SAS file is required.",
+      "RXPTFileRequired", "A SAS Transport file is required.",
+      "RStataFileRequired", "A Stata file is required.",
+      "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",
+      "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and xml.",
+      "ReportTemplateWasNotFound", "The specified report template could not be found.",
+      "ReportJobStarted", "Report task has been launched.  You can follow its progress in the task list.",
+      "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",
+      "RReportDesignFileIsRequired", "A R Markdown file must be selected (.Rmd).",
+      "CronExpressionIsRequired", "A schedule expression must be specified.",
+      "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",
+      "ReportTemplateNameIsRequired", "A name is required for the report template.",
+      "OccurrenceGroupIsRequired", "An Occurrence Group must be specified for Repeatable variables.",
+      "NewVariableNameIsRequired", "A name is required for the new variable to be created.",
+      "ScriptIsRequired", "A script is required.",
+      "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",
+      "JavaScriptException", "Error in script: {0}",
+      "MagmaRuntimeException", "{0}",
+      "MagmaRRuntimeException", "R error: {0}",
+      "ValuesEvaluationError", "Error when evaluating values: {0}",
       "CopyFromVariableNameIsRequired",
-      "You must enter the name of a variable from which the new variable will be created from.",//
+      "You must enter the name of a variable from which the new variable will be created from.",
       "cannotSwitchTabBecauseOfUnsavedChanges",
-      "You have unsaved changes. You need to press Save Changes before you can select another tab.",//
-      "UrlRequired", "You must provide the database's URL.",//
-      "OpalUsernameRequired", "You must indicate the user name.",//
-      "OpalPasswordRequired", "You must indicate the password.", //
-      "OpalTokenRequired", "You must indicate the personal access token.", //
+      "You have unsaved changes. You need to press Save Changes before you can select another tab.",
+      "UrlRequired", "You must provide the database's URL.",
+      "OpalUsernameRequired", "You must indicate the user name.",
+      "OpalPasswordRequired", "You must indicate the password.",
+      "OpalTokenRequired", "You must indicate the personal access token.",
       "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables",
-      "You must indicate whether meta-data tables are to be used or not.",//
-      "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",//
+      "You must indicate whether meta-data tables are to be used or not.",
+      "RowMustBePositiveInteger", "Row must be a positive integer (greater than or equal to 1).",
       "SpecificCharsetNotIndicated",
-      "You have selected to use a specific character set but have not indicated which one.",//
-      "NoDataFileSelected", "You must select a data file.",//
-      "NoDataToCopy", "No data to copy to the current destination.",//
-      "DataCopyNewNameRequired", "New table name is required when copying within same datasource.",//
-      "DataCopyNewNameAlreadyExists", "Table name already exists.",//
-      "NoFileSelected", "You must select a file.",//
-      "CharsetNotAvailable", "The character set you have specified is not available.",//
-      "FieldSeparatorRequired", "The field separator is required.",//
-      "QuoteSeparatorRequired", "The quote separator is required.",//
-      "NotIgnoredConflicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
-      "NoVariablesToBeImported", "No variables are to be imported.",//
-      "DataImportFailed", "The data importation has failed: {0}",//
-      "KeyPairAliasIsRequired", "Name is required",//
-      "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
-      "KeyPairKeySizeIsRequired", "Size is required.",//
-      "KeyPairKeySizeNumeric", "Size must be a valid integer.",//
-      "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
-      "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",//
-      "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",//
-      "KeyPairOrganizationNameIsRequired", "Organization Name is required.",//
-      "KeyPairCityNameIsRequired", "City or Locality Name is required.",//
-      "KeyPairStateNameIsRequired", "State or Province Name is required.",//
-      "KeyPairCountryCodeIsRequired", "Country Code is required.",//
-      "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",//
-      "DestinationFileIsMissing", "Destination File is required.", //
-      "ExportDataMissingTables", "At least one table is required.",//
-      "ExportDataDuplicateTableNames", "At least two tables have the name '{0}'. Export cannot be completed.",//
-      "IdentifiersGenerationCompleted", "Identifiers generation completed.",//
-      "NoIdentifiersGenerated", "No Identifiers generated.",//
-      "IdentifiersGenerationFailed", "Identifiers generation has failed.",//
-      "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",//
-      "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",//
-      "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
-      "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
-      "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",//
-      "DataShieldROptionNameIsRequired", "Option name is required.",//
-      "DataShieldROptionInvalidName", "Option name is invalid. Options names are composed of one or many words separated by a '.' or a '_' and cannot start with a non-alphabetical character.",//
-      "DataShieldROptionValueIsRequired", "Option value is required.",//
-      "DataShieldMethodNameIsRequired", "A name is required.",//
-      "DataShieldRScriptIsRequired", "A R script is required.",//
-      "DataShieldRFunctionIsRequired", "A R function is required.",//
-      "DataShieldPackageNameIsRequired", "A name is required.",//
-      "RIsAlive", "R server is alive.",//
-      "RConnectionFailed", "Connection with R server failed.", //
-      "UnauthorizedOperation", "You are not allowed to perform this operation.",//
-      "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
-      "DatesRangeInvalid", "Date range is invalid. Please make sure 'From' date precedes 'To' date.",//
-      "SelectDerivationMethod", "Select a derivation method.",//
-      "ReportTemplateAlreadyExists", "Report Template already exists.",//
-      "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
-      "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
-      "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
-      "DatasourceReadFailed", "The datasource cannot be read: {0}.",//
-      "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
-      "NoSuchProject", "No such project '{0}'.",//
-      "NoSuchVCFSamplesMapping", "No such VCF sample mapping '{0}'.",//
-      "VCFFileImportTask", "Import task has been launched.  You can follow its progress in the task list.",//
-      "VCFFileExportTask", "Export task has been launched.  You can follow its progress in the task list.",//
-      "NoSuchDatabase", "No such database '{0}'.",//
-      "SubjectPrincipalNotFound", "No such subject principal '{0}'.",//
-      "SubjectProfileNotFound", "No profile for subject '{0}'.",//
-      "IdentifiersDatabaseNotFound", "Identifiers database not found.",//
-      "NoSuchIdentifiersMapping", "No such identifiers mapping '{0}'.",//
-      "NoSuchDatasource", "No such datasource '{0}'.",//
-      "NoSuchVariable", "No such variable '{0}'.",//
-      "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'.",//
-      "NoSuchValueTable", "No such table '{0}'.",//
-      "NoSuchEntity", "No such entity '{0}' of type '{1}'.",//
-      "NoSuchEntityInTable", "No such entity '{0}' of type '{1}' in table '{2}'.",//
-      "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'.",//
-      "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'.",//
-      "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
-      "DestinationTableRequired", "The destination table is required.",//
-      "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
-      "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
-      "DestinationTableCannotBeView", "The destination table cannot be a view.",//
-      "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}.",//
+      "You have selected to use a specific character set but have not indicated which one.",
+      "NoDataFileSelected", "You must select a data file.",
+      "NoDataToCopy", "No data to copy to the current destination.",
+      "DataCopyNewNameRequired", "New table name is required when copying within same datasource.",
+      "DataCopyNewNameAlreadyExists", "Table name already exists.",
+      "NoFileSelected", "You must select a file.",
+      "CharsetNotAvailable", "The character set you have specified is not available.",
+      "FieldSeparatorRequired", "The field separator is required.",
+      "QuoteSeparatorRequired", "The quote separator is required.",
+      "NotIgnoredConflicts", "Some conflicts were detected. Ignore modifications before applying changes.",
+      "NoVariablesToBeImported", "No variables are to be imported.",
+      "DataImportFailed", "The data importation has failed: {0}",
+      "KeyPairAliasIsRequired", "Name is required",
+      "KeyPairAlgorithmIsRequired", "Algorithm is required.",
+      "KeyPairKeySizeIsRequired", "Size is required.",
+      "KeyPairKeySizeNumeric", "Size must be a valid integer.",
+      "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.",
+      "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",
+      "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",
+      "KeyPairOrganizationNameIsRequired", "Organization Name is required.",
+      "KeyPairCityNameIsRequired", "City or Locality Name is required.",
+      "KeyPairStateNameIsRequired", "State or Province Name is required.",
+      "KeyPairCountryCodeIsRequired", "Country Code is required.",
+      "KeyPairPublicKeyPEMIsRequired", "Public Key in PEM format is required.",
+      "DestinationFileIsMissing", "Destination File is required.",
+      "ExportDataMissingTables", "At least one table is required.",
+      "ExportDataDuplicateTableNames", "At least two tables have the name '{0}'. Export cannot be completed.",
+      "IdentifiersGenerationCompleted", "Identifiers generation completed.",
+      "NoIdentifiersGenerated", "No Identifiers generated.",
+      "IdentifiersGenerationFailed", "Identifiers generation has failed.",
+      "IdentifiersGenerationPending", "An Identifiers generation task is currently running.",
+      "MappedUnitsCannotBeIdentified", "Units to be mapped cannot be identified.",
+      "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",
+      "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",
+      "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",
+      "DataShieldROptionNameIsRequired", "Option name is required.",
+      "DataShieldROptionInvalidName", "Option name is invalid. Options names are composed of one or many words separated by a '.' or a '_' and cannot start with a non-alphabetical character.",
+      "DataShieldROptionValueIsRequired", "Option value is required.",
+      "DataShieldMethodNameIsRequired", "A name is required.",
+      "DataShieldRScriptIsRequired", "A R script is required.",
+      "DataShieldRFunctionIsRequired", "A R function is required.",
+      "DataShieldPackageNameIsRequired", "A name is required.",
+      "RIsAlive", "R server is alive.",
+      "RConnectionFailed", "Connection with R server failed.",
+      "UnauthorizedOperation", "You are not allowed to perform this operation.",
+      "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",
+      "DatesRangeInvalid", "Date range is invalid. Please make sure 'From' date precedes 'To' date.",
+      "SelectDerivationMethod", "Select a derivation method.",
+      "ReportTemplateAlreadyExists", "Report Template already exists.",
+      "CouldNotCreateReportTemplate", "Could not create the Report Template.",
+      "ReportTemplateCannotBeFound", "The Report Template cannot be found.",
+      "DatasourceCreationFailed", "The datasource creation has failed: {0}",
+      "DatasourceReadFailed", "The datasource cannot be read: {0}.",
+      "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",
+      "NoSuchProject", "No such project '{0}'.",
+      "NoSuchVCFSamplesMapping", "No such VCF sample mapping '{0}'.",
+      "VCFFileImportTask", "Import task has been launched.  You can follow its progress in the task list.",
+      "VCFFileExportTask", "Export task has been launched.  You can follow its progress in the task list.",
+      "NoSuchDatabase", "No such database '{0}'.",
+      "SubjectPrincipalNotFound", "No such subject principal '{0}'.",
+      "SubjectProfileNotFound", "No profile for subject '{0}'.",
+      "IdentifiersDatabaseNotFound", "Identifiers database not found.",
+      "NoSuchIdentifiersMapping", "No such identifiers mapping '{0}'.",
+      "NoSuchDatasource", "No such datasource '{0}'.",
+      "NoSuchVariable", "No such variable '{0}'.",
+      "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'.",
+      "NoSuchValueTable", "No such table '{0}'.",
+      "NoSuchEntity", "No such entity '{0}' of type '{1}'.",
+      "NoSuchEntityInTable", "No such entity '{0}' of type '{1}' in table '{2}'.",
+      "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'.",
+      "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'.",
+      "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",
+      "DestinationTableRequired", "The destination table is required.",
+      "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",
+      "DestinationTableEntityTypeRequired", "The destination table entity type is required.",
+      "DestinationTableCannotBeView", "The destination table cannot be a view.",
+      "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}.",
       "DataExportationProcessLaunched",
-      "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}.",//
-      "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}.",//
-      "DatabaseAlreadyExists", "A database with this name already exists.",//
-      "DatabaseConnectionOk", "{0}: Connection successful.",//
-      "DatabaseConnectionFailed", "Failed to connect to database.",//
-      "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",//
-      "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable.",//
-      "CannotFindDatabase", "Cannot find database named {0}.",//
-      "NameIsRequired", "A name is required.",//
-      "NameIsUnique", "A name must be unique.",//
+      "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}.",
+      "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}.",
+      "DatabaseAlreadyExists", "A database with this name already exists.",
+      "DatabaseConnectionOk", "{0}: Connection successful.",
+      "DatabaseConnectionFailed", "Failed to connect to database.",
+      "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",
+      "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable.",
+      "CannotFindDatabase", "Cannot find database named {0}.",
+      "NameIsRequired", "A name is required.",
+      "NameIsUnique", "A name must be unique.",
       "NameIsValidFileName", "Name cannot contain the following characters: <code># % &amp; { } \\ &lt; &gt; * ? / $ ! ' \" : @</code>",
-      "EntityTypeIsRequired", "An entity type is required.",//
-      "IdentifiersAreRequired", "Some identifiers are required.",//
-      "SystemIdentifiersAreRequired", "Some system identifiers are required.",//
-      "IdentifiersAreMissing", "Some identifiers are missing.",//
-      "SystemIdentifiersAreMissing", "Some system identifiers are missing.",//
-      "DriverIsRequired", "A driver is required.",//
-      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Tabular SQL schema.",//
-      "DatabaseUsageIsRequired", "Database usage is required.",//
-      "SQLSchemaIsRequired", "SQL schema is required.",//
-      "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
-      "JdbcDatabaseIsRequired", "Jdbc database is required.",//
-      "UrlIsRequired", "A url is required.",//
-      "UsernameIsRequired", "A username is required.",//
-      "SubjectCredentialNameIsRequired", "A name is required.",//
-      "TableSelectionIsRequired", "At least one table must be selected.",//
-      "IdentifiersImportationCompleted", "Identifiers importation completed.",//
-      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
-      "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
-      "OldPasswordIsRequired", "Old password is required.",//
-      "OldPasswordMismatch", "Your old password is invalid.",//
-      "PasswordNotChanged", "You must choose a different password than your current password.",//
-      "NameIsRequired", "A name is required.",//
-      "PasswordIsRequired", "A password is required.",//
-      "InvalidCertificate", "The certificate is not valid.",//
-      "CertificateIsRequired", "A certificate is required.",//
-      "UsageIsRequired", "Database usage is required.",//
-      "SqlSchemaIsRequired", "Database SQL schema is required.",//
-      "JdbcTableSettingsNotValid", "Table SQL name is required.", //
-      "JdbcTableSettingsFactoriesNotValid", "Table SQL name and partition column are required.", //
-      "OpalURLIsRequired", "Opal address is required.",//
-      "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
-      "TableSelectionIsRequired", "At least one table must be selected.",//
-      "IdentifiersImportationCompleted", "Identifiers importation completed.",//
-      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "DataWriteNotAuthorized", "You are not allowed to write in project: {0}.",//
-      "TableWriteNotAuthorized", "You are not allowed to write in table: {0}.{1}.",//
-      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
-      "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}.",//
-      "NoVariablesFound", "Failed to retrieve the list of variables",//
-      "NoVariableValuesFound", "Failed to retrieve the list of variable values.",//
-      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}.",//
+      "EntityTypeIsRequired", "An entity type is required.",
+      "IdentifiersAreRequired", "Some identifiers are required.",
+      "SystemIdentifiersAreRequired", "Some system identifiers are required.",
+      "IdentifiersAreMissing", "Some identifiers are missing.",
+      "SystemIdentifiersAreMissing", "Some system identifiers are missing.",
+      "DriverIsRequired", "A driver is required.",
+      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Tabular SQL schema.",
+      "DatabaseUsageIsRequired", "Database usage is required.",
+      "SQLSchemaIsRequired", "SQL schema is required.",
+      "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",
+      "JdbcDatabaseIsRequired", "Jdbc database is required.",
+      "UrlIsRequired", "A url is required.",
+      "UsernameIsRequired", "A username is required.",
+      "SubjectCredentialNameIsRequired", "A name is required.",
+      "TableSelectionIsRequired", "At least one table must be selected.",
+      "IdentifiersImportationCompleted", "Identifiers importation completed.",
+      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",
+      "IndexClearSelectAtLeastOne", "Select at least one index to clear.",
+      "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",
+      "OldPasswordIsRequired", "Old password is required.",
+      "OldPasswordMismatch", "Your old password is invalid.",
+      "PasswordNotChanged", "You must choose a different password than your current password.",
+      "NameIsRequired", "A name is required.",
+      "PasswordIsRequired", "A password is required.",
+      "InvalidCertificate", "The certificate is not valid.",
+      "CertificateIsRequired", "A certificate is required.",
+      "UsageIsRequired", "Database usage is required.",
+      "SqlSchemaIsRequired", "Database SQL schema is required.",
+      "JdbcTableSettingsNotValid", "Table SQL name is required.",
+      "JdbcTableSettingsFactoriesNotValid", "Table SQL name and partition column are required.",
+      "OpalURLIsRequired", "Opal address is required.",
+      "RemoteDatasourceIsRequired", "Remote datasource name is required.",
+      "TableSelectionIsRequired", "At least one table must be selected.",
+      "IdentifiersImportationCompleted", "Identifiers importation completed.",
+      "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",
+      "DataWriteNotAuthorized", "You are not allowed to write in project: {0}.",
+      "TableWriteNotAuthorized", "You are not allowed to write in table: {0}.{1}.",
+      "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",
+      "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}.",
+      "NoVariablesFound", "Failed to retrieve the list of variables",
+      "NoVariableValuesFound", "Failed to retrieve the list of variable values.",
+      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}.",
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}.",
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
-      "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
-      "InvalidCharacterSetName", "Invalid character set '{0}'. Please choose a valid character set from the list.",//
-      "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
-      "CopyVariableCurrentView", "The view cannot be the current view. Please select another destination view.",//
-      "CopyVariableNameRequired", "Variable name cannot be empty.",//
-      "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
-      "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
-      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}.",//
-      "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove.",//
-      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
-      "NoTableIndexed", "No table values have been indexed.",//
-      "NotIndexedTable", "The table values need to be indexed: {0}",//
-      "CriteriaLimitReached", "Search is limited to {0} criterion.",//
-      "MalformedSearchQuery", "Malformed search query.",//
-      "CannotMixVariableEntityTypes", "Variables with different entity types cannot be mixed.", //
-      "UserStatusChangedOk", "User {0} has been successfully {1}.",//
-      "UserUpdatedOk", "User {0} has been successfully updated.",//
-      "UserCreatedOk", "User {0} has been successfully added.",//
-      "UserDeletedOk", "User {0} has been successfully removed.", //
-      "UserAlreadyExists", "User name already exists.", //
-      "PasswordLengthMin", "Password must contain at least {0} characters.",//
-      "PasswordsMustMatch", "Passwords do not match.",//
-      "GroupDeletedOk", "Group {0} has been successfully removed.", //
-      "GroupAlreadyExists", "Group already exists.", //
-      "ProjectNameRequired", "Project name is required.", //
-      "ProjectNameMustBeUnique", "A project already exists with this name.",//
-      "ProjectCreationFailed", "The datasource creation has failed: {0}.", //
-      "FileNotFound", "File not found: {0}.",//
+      "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",
+      "InvalidCharacterSetName", "Invalid character set '{0}'. Please choose a valid character set from the list.",
+      "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",
+      "CopyVariableCurrentView", "The view cannot be the current view. Please select another destination view.",
+      "CopyVariableNameRequired", "Variable name cannot be empty.",
+      "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",
+      "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",
+      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}.",
+      "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove.",
+      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",
+      "NoTableIndexed", "No table values have been indexed.",
+      "NotIndexedTable", "The table values need to be indexed: {0}",
+      "CriteriaLimitReached", "Search is limited to {0} criterion.",
+      "MalformedSearchQuery", "Malformed search query.",
+      "CannotMixVariableEntityTypes", "Variables with different entity types cannot be mixed.",
+      "UserStatusChangedOk", "User {0} has been successfully {1}.",
+      "UserUpdatedOk", "User {0} has been successfully updated.",
+      "UserCreatedOk", "User {0} has been successfully added.",
+      "UserDeletedOk", "User {0} has been successfully removed.",
+      "UserAlreadyExists", "User name already exists.",
+      "PasswordLengthMin", "Password must contain at least {0} characters.",
+      "PasswordsMustMatch", "Passwords do not match.",
+      "GroupDeletedOk", "Group {0} has been successfully removed.",
+      "GroupAlreadyExists", "Group already exists.",
+      "ProjectNameRequired", "Project name is required.",
+      "ProjectNameMustBeUnique", "A project already exists with this name.",
+      "ProjectCreationFailed", "The datasource creation has failed: {0}.",
+      "FileNotFound", "File not found: {0}.",
       "InvalidViewBackupFile", "The backup file does not contain a valid view: {0}.",
       "RestoredViewsCount", "{0} view(s) restored.",
-      "FileNotAccessible", "File not accessible: {0}.",//
-      "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}.", //
-      "DatabaseAlreadyExists", "Database named {0} already exists.", //
-      "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
-      "VcsOperationFailed", "Failed to retrieve revision information. Please contact technical support.", //
-      "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
-      "PostInstallNotCompleted", "Post-install configuration not completed.",//
-      "TermNameMustBeUnique", "Term name must be unique.",//
-      "VocabularyNameMustBeUnique", "Vocabulary name must be unique.",//
-      "DeleteTableSelectAtLeastOne", "Select at least one table to remove.",//
-      "XMLOrExcelFileRequired", "An Excel or an XML file is required.",//
-      "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
-      "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
+      "FileNotAccessible", "File not accessible: {0}.",
+      "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}.",
+      "DatabaseAlreadyExists", "Database named {0} already exists.",
+      "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.",
+      "VcsOperationFailed", "Failed to retrieve revision information. Please contact technical support.",
+      "GeneralConfigSaved", "Opal general configuration was successfully saved.",
+      "PostInstallNotCompleted", "Post-install configuration not completed.",
+      "TermNameMustBeUnique", "Term name must be unique.",
+      "VocabularyNameMustBeUnique", "Vocabulary name must be unique.",
+      "DeleteTableSelectAtLeastOne", "Select at least one table to remove.",
+      "XMLOrExcelFileRequired", "An Excel or an XML file is required.",
+      "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",
+      "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
-      "DuplicateSubjectProfile", "A user profile is already registered with the same name.",//
-      "AttributeNameIsRequired", "An attribute name is required.",//
-      "AttributeValueIsRequired", "At least one value is required.",//
-      "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
-      "AttributeConflictExists", "Setting to this namespace would conflict with an existing attribute.",//
-      "PermissionRequired", "You must select a at most one permission type.",//
-      "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
-      "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//
-      "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",//
+      "DuplicateSubjectProfile", "A user profile is already registered with the same name.",
+      "AttributeNameIsRequired", "An attribute name is required.",
+      "AttributeValueIsRequired", "At least one value is required.",
+      "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",
+      "AttributeConflictExists", "Setting to this namespace would conflict with an existing attribute.",
+      "PermissionRequired", "You must select a at most one permission type.",
+      "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",
+      "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",
+      "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",
       "InvalidKeypair", "Failed to create key pair. Please make sure to provide a valid algorithm name and size.",
-      "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name.",//
+      "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name.",
       "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information.",
-      "DerivedVariableNameRequired", "Derived variable name is required.",//
-      "DestinationViewNameRequired", "Destination View Name Required label.",//
-      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",//
-      "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters.",//
-      "DefaultCharSetIsRequired", "A default character set is required.",//
-      "LanguageIsRequired", "At least one language is required.",//
+      "DerivedVariableNameRequired", "Derived variable name is required.",
+      "DestinationViewNameRequired", "Destination View Name Required label.",
+      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",
+      "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters.",
+      "DefaultCharSetIsRequired", "A default character set is required.",
+      "LanguageIsRequired", "At least one language is required.",
       "NameHasInvalidCharacters",
       "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
       "NameHasInvalidCharactersNoSpace",
       "Name contains invalid characters. Characters must be alphanumeric, hyphen or underscore.",
       "UnsupportedEncoding",
-      "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.", //
-      "SearchQueryIsInvalid", "Search query is invalid : {0}.",//
-      "ClusterNameIsRequired", "Cluster name is required.",//
-      "ShardsIsRequired", "Shards number is required.",//
-      "ReplicasIsRequired", "Replicas number is required.", "FolderNameIsRequired", "You must specify a folder name.",//
-      "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
-      "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",//
+      "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.",
+      "SearchQueryIsInvalid", "Search query is invalid : {0}.",
+      "ClusterNameIsRequired", "Cluster name is required.",
+      "ShardsIsRequired", "Shards number is required.",
+      "ReplicasIsRequired", "Replicas number is required.", "FolderNameIsRequired", "You must specify a folder name.",
+      "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",
+      "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",
       "CannotCopySelectedTablesWithinProject",
       "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",
 //
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
-      "tables within the same project. Copy each table individually or create a new project.",//
-      "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
-      "TaxonomyGitUserRequired", "Github user or organization name is required.", //
-      "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
-      "TaxonomyGitDownloadKeyRequired", "A download key is required.", //
+      "tables within the same project. Copy each table individually or create a new project.",
+      "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",
+      "TaxonomyGitUserRequired", "Github user or organization name is required.",
+      "TaxonomyGitRepositoryRequired", "Github repository name is required.",
+      "TaxonomyGitDownloadKeyRequired", "A download key is required.",
       "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import related information is correct.",
       "TaxonomyTagsImportFailed", "Failed to retrieve taxonomy released versions. Please contact technical support.",
-      "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.", //
-      "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
+      "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.",
+      "TaxonomyNotFound", "No such taxonomy with name: {0}.",
       "TaxonomyNameAlreadyExists", "A taxonomy with the same name already exists.",
-      "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
-      "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
-      "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
-      "IllegalArgument", "{0}", //
-      "NotFound", "Resource not found.", //
-      "Forbidden", "Operation not allowed.", //
-      "FileAlreadyExists", "File '{0}' already exists.", //
-      "FolderAlreadyExists", "Folder '{0}' already exists.", //
+      "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.",
+      "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.",
+      "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.",
+      "IllegalArgument", "{0}",
+      "NotFound", "Resource not found.",
+      "Forbidden", "Operation not allowed.",
+      "FileAlreadyExists", "File '{0}' already exists.",
+      "FolderAlreadyExists", "Folder '{0}' already exists.",
       "ForbiddenPage", "You are not authorized to access to the content of this page.",
       "ParticipantIdVariableIsRequired", "Participant ID variable name is required.",
       "SampleRoleVariableIsRequired", "Sample Role variable name is required.",
@@ -924,30 +925,30 @@ public interface Translations extends Constants {
   String errorLabel();
 
   @Description("Datasource parsing error map")
-  @DefaultStringMapValue({ //
-      "CategoryNameRequired", "[{0}:{1}] Category name required: table '{2}', variable '{3}'", //
-      "CategoryVariableNameRequired", "[{0}:{1}] Category variable name required: table '{2}'", //
-      "DuplicateCategoryName", "[{0}:{1}] Duplicate category name: table '{2}', variable '{3}', category '{4}'", //
-      "DuplicateColumns", "[{0}:{1}] Duplicate columns: table '{2}', column '{3}'", //
-      "DuplicateVariableName", "[{0}:{1}] Duplicate variable name: table '{2}', variable '{3}'", //
-      "TableDefinitionErrors", "Table definition errors", //
-      "UnexpectedErrorInCategory", "[{0}:{1}] Unexpected error in category definition: table '{2}', variable '{3}'", //
-      "UnexpectedErrorInVariable", "[{0}:{1}] Unexpected error in variable definition: table '{2}'", //
-      "UnidentifiedVariableName", "[{0}:{1}] Unidentified variable name: table '{2}', variable '{3}'", //
-      "UnknownValueType", "[{0}:{1}] Unknown value type: table '{2}', variable '{3}', type '{4}'", //
-      "VariableCategoriesDefinitionErrors", "Variable categories definition errors", //
-      "VariableNameCannotContainColon", "[{0}:{1}] Variable name cannot contain colon: table '{2}', variable '{3}'", //
-      "VariableNameRequired", "[{0}:{1}] Variable name required: table '{2}'", //
-      "CsvInitialisationError", "Error occurred initialising csv datasource", //
-      "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", //
-      "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", //
-      "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
-      "CsvUnableToGetVariableValueForEntity", "Unable to get value for entity {0} and variable {1}", //
-      "CsvCannotCreateWriter", "Cannot create writer", //
-      "CsvCannotSetVariableHeader", "Cannot set variables header", //
-      "CsvCannotObtainWriter", "Cannot get csv writer", //
-      "CsvCannotObtainReader", "Cannot get csv reader", //
-      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
+  @DefaultStringMapValue({
+      "CategoryNameRequired", "[{0}:{1}] Category name required: table '{2}', variable '{3}'",
+      "CategoryVariableNameRequired", "[{0}:{1}] Category variable name required: table '{2}'",
+      "DuplicateCategoryName", "[{0}:{1}] Duplicate category name: table '{2}', variable '{3}', category '{4}'",
+      "DuplicateColumns", "[{0}:{1}] Duplicate columns: table '{2}', column '{3}'",
+      "DuplicateVariableName", "[{0}:{1}] Duplicate variable name: table '{2}', variable '{3}'",
+      "TableDefinitionErrors", "Table definition errors",
+      "UnexpectedErrorInCategory", "[{0}:{1}] Unexpected error in category definition: table '{2}', variable '{3}'",
+      "UnexpectedErrorInVariable", "[{0}:{1}] Unexpected error in variable definition: table '{2}'",
+      "UnidentifiedVariableName", "[{0}:{1}] Unidentified variable name: table '{2}', variable '{3}'",
+      "UnknownValueType", "[{0}:{1}] Unknown value type: table '{2}', variable '{3}', type '{4}'",
+      "VariableCategoriesDefinitionErrors", "Variable categories definition errors",
+      "VariableNameCannotContainColon", "[{0}:{1}] Variable name cannot contain colon: table '{2}', variable '{3}'",
+      "VariableNameRequired", "[{0}:{1}] Variable name required: table '{2}'",
+      "CsvInitialisationError", "Error occurred initialising csv datasource",
+      "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'",
+      "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.",
+      "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.",
+      "CsvUnableToGetVariableValueForEntity", "Unable to get value for entity {0} and variable {1}",
+      "CsvCannotCreateWriter", "Cannot create writer",
+      "CsvCannotSetVariableHeader", "Cannot set variables header",
+      "CsvCannotObtainWriter", "Cannot get csv writer",
+      "CsvCannotObtainReader", "Cannot get csv reader",
+      "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",
       "InvalidCharsetCharacter",
       "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
 //
@@ -955,9 +956,9 @@ public interface Translations extends Constants {
       "File contains invalid characters at variable row '{0}' for category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
 //
       "SpssFailedToLoadMetadata",
-      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",
       "SpssFailedToLoadData",
-      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",
       "SpssDuplicateEntity",
       "Duplicate entity identifier '{0}' at data row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
       "SpssFailedToCreateVariable",
@@ -969,8 +970,8 @@ public interface Translations extends Constants {
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
-  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value types: {0} / {1}", //
-      "IncompatibleEntityType", "Incompatible entity types: {0} / {1}", //
+  @DefaultStringMapValue({ "IncompatibleValueType", "Incompatible value types: {0} / {1}",
+      "IncompatibleEntityType", "Incompatible entity types: {0} / {1}",
       "CsvVariableMissing",
       "Variable name exists in csv data file, but no Variable associated with this name exists in the destination table" })
   Map<String, String> datasourceComparisonErrorMap();
@@ -1253,12 +1254,12 @@ public interface Translations extends Constants {
   String updateViewSuccess();
 
   @Description("Datasource Type map")
-  @DefaultStringMapValue({ "mongodb", "MongoDB", //
-      "hibernate", "Opal SQL", //
-      "jdbc", "Tabular SQL", //
-      "fs", "XML", //
-      "csv", "CSV", //
-      "excel", "Excel", //
+  @DefaultStringMapValue({ "mongodb", "MongoDB",
+      "hibernate", "Opal SQL",
+      "jdbc", "Tabular SQL",
+      "fs", "XML",
+      "csv", "CSV",
+      "excel", "Excel",
       "null", "None" })
   Map<String, String> datasourceTypeMap();
 
@@ -1315,22 +1316,22 @@ public interface Translations extends Constants {
   String installRPackage();
 
   @Description("Value Type map")
-  @DefaultStringMapValue({ "TEXTUAL", "Textual", //
-      "text.type", "text",//
-      "NUMERICAL", "Numerical", //
-      "integer.type", "integer",//
-      "decimal.type", "decimal",//
-      "TEMPORAL", "Temporal",//
-      "date.type", "date",//
-      "datetime.type", "datetime",//
-      "GEOSPATIAL", "Geospatial",//
-      "point.type", "point",//
-      "linestring.type", "linestring",//
-      "polygon.type", "polygon",//
-      "OTHER", "Other",//
-      "binary.type", "binary",//
-      "boolean.type", "boolean",//
-      "locale.type", "locale"//
+  @DefaultStringMapValue({ "TEXTUAL", "Textual",
+      "text.type", "text",
+      "NUMERICAL", "Numerical",
+      "integer.type", "integer",
+      "decimal.type", "decimal",
+      "TEMPORAL", "Temporal",
+      "date.type", "date",
+      "datetime.type", "datetime",
+      "GEOSPATIAL", "Geospatial",
+      "point.type", "point",
+      "linestring.type", "linestring",
+      "polygon.type", "polygon",
+      "OTHER", "Other",
+      "binary.type", "binary",
+      "boolean.type", "boolean",
+      "locale.type", "locale"
   })
   Map<String, String> valueTypeMap();
 
@@ -1356,12 +1357,12 @@ public interface Translations extends Constants {
   Map<String, String> tokenTasksMap();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "USER", "User", //
+  @DefaultStringMapValue({ "USER", "User",
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 
   @Description("Add Subject Permission map")
-  @DefaultStringMapValue({ "USER.title", "Add User Permission", //
+  @DefaultStringMapValue({ "USER.title", "Add User Permission",
       "GROUP.title", "Add Group Permission" })
   Map<String, String> addSubjectPermissionMap();
 
@@ -1449,107 +1450,107 @@ public interface Translations extends Constants {
   String recodeCustomDeriveStepTitle();
 
   @Description("Time map")
-  @DefaultStringMapValue({ //
-      "Hour", "Hour", //
-      "Monday", "Monday", //
-      "Tuesday", "Tuesday", //
-      "Wednesday", "Wednesday", //
-      "Thursday", "Thursday", //
-      "Friday", "Friday", //
-      "Saturday", "Saturday", //
-      "Sunday", "Sunday", //
-      "MONDAY", "Monday", //
-      "TUESDAY", "Tuesday", //
-      "WEDNESDAY", "Wednesday", //
-      "THURSDAY", "Thursday", //
-      "FRIDAY", "Friday", //
-      "SATURDAY", "Saturday", //
-      "SUNDAY", "Sunday", //
-      "January", "January", //
-      "February", "February", //
-      "March", "March", //
-      "April", "April", //
-      "May", "May", //
-      "June", "June", //
-      "July", "July", //
-      "August", "August", //
-      "September", "September", //
-      "October", "October", //
-      "November", "November", //
-      "December", "December", //
-      "Second", "Second", //
-      "Minute", "Minute", //
-      "Hour", "Hour", //
-      "Day", "Day", //
-      "Week", "Week", //
-      "Month", "Month", //
-      "Quarter", "Quarter", //
-      "Semester", "Semester", //
-      "Year", "Year", //
-      "Lustrum", "Lustrum", //
-      "Decade", "Decade", //
-      "Century", "Century", //
-      "Millenium", "Millenium", //
-      "Era", "Era" //
+  @DefaultStringMapValue({
+      "Hour", "Hour",
+      "Monday", "Monday",
+      "Tuesday", "Tuesday",
+      "Wednesday", "Wednesday",
+      "Thursday", "Thursday",
+      "Friday", "Friday",
+      "Saturday", "Saturday",
+      "Sunday", "Sunday",
+      "MONDAY", "Monday",
+      "TUESDAY", "Tuesday",
+      "WEDNESDAY", "Wednesday",
+      "THURSDAY", "Thursday",
+      "FRIDAY", "Friday",
+      "SATURDAY", "Saturday",
+      "SUNDAY", "Sunday",
+      "January", "January",
+      "February", "February",
+      "March", "March",
+      "April", "April",
+      "May", "May",
+      "June", "June",
+      "July", "July",
+      "August", "August",
+      "September", "September",
+      "October", "October",
+      "November", "November",
+      "December", "December",
+      "Second", "Second",
+      "Minute", "Minute",
+      "Hour", "Hour",
+      "Day", "Day",
+      "Week", "Week",
+      "Month", "Month",
+      "Quarter", "Quarter",
+      "Semester", "Semester",
+      "Year", "Year",
+      "Lustrum", "Lustrum",
+      "Decade", "Decade",
+      "Century", "Century",
+      "Millenium", "Millenium",
+      "Era", "Era"
   })
   Map<String, String> timeMap();
 
   @Description("Time Group map")
-  @DefaultStringMapValue({ //
-      "HOUR_OF_DAY", "Hour of Day", //
-      "DAY_OF_WEEK", "Day of Week", //
-      "DAY_OF_MONTH", "Day of Month", //
-      "DAY_OF_YEAR", "Day of Year", //
-      "WEEK_OF_MONTH", "Week of Month", //
-      "WEEK_OF_YEAR", "Week of Year", //
-      "MONTH", "Month", //
-      "MONTH_OF_YEAR", "Month of Year", //
-      "QUARTER_OF_YEAR", "Quarter of Year", //
-      "QUARTER", "Quarter", //
-      "SEMESTER_OF_YEAR", "Semester of Year", //
-      "SEMESTER", "Semester", //
-      "YEAR", "Year", //
-      "LUSTRUM", "Lustrum (5 years period)", //
-      "DECADE", "Decade (10 years period)", //
-      "CENTURY", "Century" //
+  @DefaultStringMapValue({
+      "HOUR_OF_DAY", "Hour of Day",
+      "DAY_OF_WEEK", "Day of Week",
+      "DAY_OF_MONTH", "Day of Month",
+      "DAY_OF_YEAR", "Day of Year",
+      "WEEK_OF_MONTH", "Week of Month",
+      "WEEK_OF_YEAR", "Week of Year",
+      "MONTH", "Month",
+      "MONTH_OF_YEAR", "Month of Year",
+      "QUARTER_OF_YEAR", "Quarter of Year",
+      "QUARTER", "Quarter",
+      "SEMESTER_OF_YEAR", "Semester of Year",
+      "SEMESTER", "Semester",
+      "YEAR", "Year",
+      "LUSTRUM", "Lustrum (5 years period)",
+      "DECADE", "Decade (10 years period)",
+      "CENTURY", "Century"
   })
   Map<String, String> timeGroupMap();
 
   @Description("DataSHIELD Labels")
-  @DefaultStringMapValue({ //
-      "Aggregate", "Aggregate",//
-      "Assign", "Assign" //
+  @DefaultStringMapValue({
+      "Aggregate", "Aggregate",
+      "Assign", "Assign"
   })
   Map<String, String> dataShieldLabelsMap();
 
   @Description("Files Folders selection")
-  @DefaultStringMapValue({ "FILE", "file", //
-      "FOLDER", "folder", //
-      "FILE_OR_FOLDER", "file or folder" //
+  @DefaultStringMapValue({ "FILE", "file",
+      "FOLDER", "folder",
+      "FILE_OR_FOLDER", "file or folder"
   })
   Map<String, String> fileFolderTypeMap();
 
   @Description("Project Tab Names")
-  @DefaultStringMapValue({ "HOME", "Home", //
-      "DASHBOARD", "Dashboard", //
-      "TABLES", "Tables", //
-      "RESOURCES", "Resources", //
-      "FILES", "Files", //
-      "GENOTYPES", "Genotypes", //
-      "VISUALISATION", "Data visualization", //
-      "REPORTS", "Reports", //
-      "TASKS", "Tasks", //
-      "PERMISSIONS", "Permissions", //
-      "PERMISSIONS", "Permissions", //
-      "KEYSTORE", "Data Exchange", //
-      "ADMINISTRATION", "Administration" //
+  @DefaultStringMapValue({ "HOME", "Home",
+      "DASHBOARD", "Dashboard",
+      "TABLES", "Tables",
+      "RESOURCES", "Resources",
+      "FILES", "Files",
+      "GENOTYPES", "Genotypes",
+      "VISUALISATION", "Data visualization",
+      "REPORTS", "Reports",
+      "TASKS", "Tasks",
+      "PERMISSIONS", "Permissions",
+      "PERMISSIONS", "Permissions",
+      "KEYSTORE", "Data Exchange",
+      "ADMINISTRATION", "Administration"
   })
   Map<String, String> projectTabNameMap();
 
   @Description("Bookmark Type name")
-  @DefaultStringMapValue({ "PROJECT", "Project", //
-      "TABLE", "Table", //
-      "VARIABLE", "Variable" //
+  @DefaultStringMapValue({ "PROJECT", "Project",
+      "TABLE", "Table",
+      "VARIABLE", "Variable"
   })
   Map<String, String> bookmarkTypeMap();
 
@@ -1652,12 +1653,12 @@ public interface Translations extends Constants {
   String analysisResultHistoryLabel();
 
   @Description("Analysis Status map")
-  @DefaultStringMapValue({ "NOT_STARTED", "Not Started", //
-    "IN_PROGRESS", "In Progress", //
-    "PASSED", "Passed", //
-    "FAILED", "Failed", //
-    "ERROR", "Error", //
-    "IGNORED", "Ignored", //
+  @DefaultStringMapValue({ "NOT_STARTED", "Not Started",
+    "IN_PROGRESS", "In Progress",
+    "PASSED", "Passed",
+    "FAILED", "Failed",
+    "ERROR", "Error",
+    "IGNORED", "Ignored",
   })
   Map<String, String> analysisStatusMap();
 
@@ -1946,6 +1947,10 @@ public interface Translations extends Constants {
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
+
+  @Description("R Code label")
+  @DefaultStringValue("Code")
+  String rCodeLabel();
 
   @Description("R Version label")
   @DefaultStringValue("R Version")
@@ -2324,9 +2329,9 @@ public interface Translations extends Constants {
   String noVcsCommitHistoryAvailable();
 
   @Description("VCS Commit Info Labels")
-  @DefaultStringMapValue({ "id", "ID",//
-      "Author", "Author",//
-      "Date", "Date",//
+  @DefaultStringMapValue({ "id", "ID",
+      "Author", "Author",
+      "Date", "Date",
       "Comment", "Comment" })
   Map<String, String> commitInfoMap();
 
@@ -2363,31 +2368,31 @@ public interface Translations extends Constants {
   String projectLoadingText();
 
   @Description("Project Datasource Status Descriptions")
-  @DefaultStringMapValue({ "READY", "Ready",//
-      "BUSY", "Busy: database has write commands that are pending or being processed.",//
-      "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",//
+  @DefaultStringMapValue({ "READY", "Ready",
+      "BUSY", "Busy: database has write commands that are pending or being processed.",
+      "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",
       "NONE", "No associated database, data cannot be imported, only views can be defined." })
   Map<String, String> datasourceStatusDescriptionsMap();
 
   @Description("JVM Labels")
-  @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//
-      "JAVA_VERSION", "Java Version", //
-      "VM_NAME", "VM Name", //
-      "VM_VENDOR", "VM Vendor", //
-      "VM_VERSION", "VM Version", //
-      "MEM_HEAP", "Memory Heap", //
-      "MEGABYTES", "MegaBytes (Mb)", //
-      "COMMITTED", "Committed", //
-      "USED", "Used", //
-      "MEM_NON_HEAP", "Memory Non-Heap", //
-      "THREADS", "Threads", //
-      "COUNT", "Count", //
-      "PEAK", "Peak", //
-      "CURRENT", "Current", //
-      "GC_DELTA", "Garbage Collectors (delta)", //
-      "DELTA", "Delta", //
-      "TIME_MS", "Time (ms)", //
-      "GC_COUNT", "GC Count" //
+  @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",
+      "JAVA_VERSION", "Java Version",
+      "VM_NAME", "VM Name",
+      "VM_VENDOR", "VM Vendor",
+      "VM_VERSION", "VM Version",
+      "MEM_HEAP", "Memory Heap",
+      "MEGABYTES", "MegaBytes (Mb)",
+      "COMMITTED", "Committed",
+      "USED", "Used",
+      "MEM_NON_HEAP", "Memory Non-Heap",
+      "THREADS", "Threads",
+      "COUNT", "Count",
+      "PEAK", "Peak",
+      "CURRENT", "Current",
+      "GC_DELTA", "Garbage Collectors (delta)",
+      "DELTA", "Delta",
+      "TIME_MS", "Time (ms)",
+      "GC_COUNT", "GC Count"
   })
   Map<String, String> jvmMap();
 
@@ -2396,51 +2401,51 @@ public interface Translations extends Constants {
   String selectLanguages();
 
   @Description("Locale Labels")
-  @DefaultStringMapValue({//
-      "ar", "Arabic",//
-      "be", "Belarusian", //
-      "bg", "Bulgarian", //
-      "ca", "Catalan", //
-      "cs", "Czech", //
-      "da", "Danish", //
-      "de", "German", //
-      "el", "Greek", //
-      "en", "English", //
-      "es", "Spanish", //
-      "et", "Estonian", //
-      "fi", "Finnish", //
-      "fr", "French", //
-      "ga", "Irish", //
-      "hi", "Hindi", //
-      "hr", "Croatian", //
-      "hu", "Hungarian", //
-      "in", "Indonesian", //
-      "is", "Icelandic", //
-      "it", "Italian", //
-      "iw", "Hebrew", //
-      "ja", "Japanese", //
-      "ko", "Korean", //
-      "lt", "Lithuanian", //
-      "lv", "Latvian", //
-      "mk", "Macedonian", //
-      "ms", "Malay", //
-      "mt", "Maltese", //
-      "nl", "Dutch", //
-      "no", "Norwegian", //
-      "pl", "Polish", //
-      "pt", "Portuguese", //
-      "ro", "Romanian", //
-      "ru", "Russian", //
-      "sk", "Slovak", //
-      "sl", "Slovenian", //
-      "sq", "Albanian", //
-      "sr", "Serbian", //
-      "sv", "Swedish", //
-      "th", "Thai", //
-      "tr", "Turkish", //
-      "uk", "Ukrainian", //
-      "vi", "Vietnamese", //
-      "zh", "Chinese"//
+  @DefaultStringMapValue({
+      "ar", "Arabic",
+      "be", "Belarusian",
+      "bg", "Bulgarian",
+      "ca", "Catalan",
+      "cs", "Czech",
+      "da", "Danish",
+      "de", "German",
+      "el", "Greek",
+      "en", "English",
+      "es", "Spanish",
+      "et", "Estonian",
+      "fi", "Finnish",
+      "fr", "French",
+      "ga", "Irish",
+      "hi", "Hindi",
+      "hr", "Croatian",
+      "hu", "Hungarian",
+      "in", "Indonesian",
+      "is", "Icelandic",
+      "it", "Italian",
+      "iw", "Hebrew",
+      "ja", "Japanese",
+      "ko", "Korean",
+      "lt", "Lithuanian",
+      "lv", "Latvian",
+      "mk", "Macedonian",
+      "ms", "Malay",
+      "mt", "Maltese",
+      "nl", "Dutch",
+      "no", "Norwegian",
+      "pl", "Polish",
+      "pt", "Portuguese",
+      "ro", "Romanian",
+      "ru", "Russian",
+      "sk", "Slovak",
+      "sl", "Slovenian",
+      "sq", "Albanian",
+      "sr", "Serbian",
+      "sv", "Swedish",
+      "th", "Thai",
+      "tr", "Turkish",
+      "uk", "Ukrainian",
+      "vi", "Vietnamese",
+      "zh", "Chinese"
   })
   Map<String, String> localeMap();
 
@@ -2577,7 +2582,7 @@ public interface Translations extends Constants {
   String details();
 
   @Description("Collapsible Headings")
-  @DefaultStringMapValue({ "ADVANCED_OPTIONS", "Advanced Options",//
+  @DefaultStringMapValue({ "ADVANCED_OPTIONS", "Advanced Options",
       "DETAILS", "Details" })
   Map<String, String> collapsibleMap();
 
@@ -2606,30 +2611,30 @@ public interface Translations extends Constants {
   String opalDefaultIdentifiersLabel();
 
   @Description("Criterion Filters Labels")
-  @DefaultStringMapValue({//
-      "all", "All",//
-      "any", "Any",//
-      "empty", "Empty",//
-      "not_empty", "Not empty",//
-      "min", "Min",//
-      "max", "Max", //
-      "values", "Values", //
-      "matches", "Matches", //
-      "select_operator", "Select an operator...",//
-      "in", "In", //
-      "not_in", "Not in",//
-      "none", "None",//
-      "select", "Select",//
-      "range", "Range", //
-      "values", "Values", //
-      "custom_match_query", "Custom match query",//
-      "like", "Like", //
-      "not_like", "Not like",//
-      "wildcards_help", "Use the * wildcard character<br/>to replace one or more characters.",//
-      "from", "From",//
-      "to", "To",//
-      "date", "Date",//
-      "select", "Select...",//
+  @DefaultStringMapValue({
+      "all", "All",
+      "any", "Any",
+      "empty", "Empty",
+      "not_empty", "Not empty",
+      "min", "Min",
+      "max", "Max",
+      "values", "Values",
+      "matches", "Matches",
+      "select_operator", "Select an operator...",
+      "in", "In",
+      "not_in", "Not in",
+      "none", "None",
+      "select", "Select",
+      "range", "Range",
+      "values", "Values",
+      "custom_match_query", "Custom match query",
+      "like", "Like",
+      "not_like", "Not like",
+      "wildcards_help", "Use the * wildcard character<br/>to replace one or more characters.",
+      "from", "From",
+      "to", "To",
+      "date", "Date",
+      "select", "Select...",
       "entity_identifier", "Entity identifier",
       "filter", "Filter..."
   })

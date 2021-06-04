@@ -7,17 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.view.client.ListDataProvider;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -32,7 +30,6 @@ import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -53,11 +50,11 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOV
 /**
  *
  */
-public class DataShieldAdministrationView extends ViewImpl implements DataShieldAdministrationPresenter.Display {
+public class DataShieldMethodsConfigView extends ViewImpl implements DataShieldMethodsConfigPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
 
-  interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {}
+  interface Binder extends UiBinder<Widget, DataShieldMethodsConfigView> {}
 
   private final Translations translations;
 
@@ -89,7 +86,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   private List<DataShieldMethodDto> originalMethods;
 
   @Inject
-  public DataShieldAdministrationView(Binder uiBinder, Translations translations) {
+  public DataShieldMethodsConfigView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
@@ -120,7 +117,12 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
       RFunctionDataShieldMethodDto dto = (RFunctionDataShieldMethodDto) method
           .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
       String packageName = dto == null ? "" : dto.getRPackage();
-      if (FilterHelper.matches(Joiner.on(" ").join(method.getName(), packageName), tokens)) methods.add(method);
+      String code = "";
+      if (dto != null)
+        code = dto.getFunc();
+      else
+        code = ((RScriptDataShieldMethodDto) method.getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method)).getScript();
+      if (FilterHelper.matches(Joiner.on(" ").join(method.getName(), packageName, code), tokens)) methods.add(method);
     }
     return methods;
   }
@@ -162,6 +164,20 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
             : translations.rFunctionLabel();
       }
     }, translations.typeLabel());
+
+    methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
+      @Override
+      public String getValue(DataShieldMethodDto object) {
+        RFunctionDataShieldMethodDto fdto = (RFunctionDataShieldMethodDto) object
+            .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
+        if (fdto != null)
+          return fdto.getFunc();
+        RScriptDataShieldMethodDto sdto = (RScriptDataShieldMethodDto) object
+            .getExtension(RScriptDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
+        return sdto == null ? "" : sdto.getScript();
+      }
+    }, translations.rCodeLabel());
+
 
     methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
       @Override
@@ -213,7 +229,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   @Override
   public void setEnvironment(String env) {
-    if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+    if(DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
       assignMethods.setVisible(true);
       aggregateMethods.setVisible(false);
     } else {

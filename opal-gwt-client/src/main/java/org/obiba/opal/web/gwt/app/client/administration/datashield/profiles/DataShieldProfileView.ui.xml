@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+    <g:FlowPanel>
+
+        <b:Heading size="5">
+            <ui:msg description="Packages label">Packages</ui:msg>
+        </b:Heading>
+        <g:SimplePanel ui:field="packages"/>
+
+        <b:Heading size="5">
+            <ui:msg description="Settings label">Settings</ui:msg>
+        </b:Heading>
+
+        <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
+
+            <g:Anchor>
+                <ui:msg description="Aggregate label">Aggregate</ui:msg>
+            </g:Anchor>
+
+            <g:SimplePanel ui:field="aggregatePanel"/>
+
+            <g:Anchor>
+                <ui:msg description="Assign label">Assign</ui:msg>
+            </g:Anchor>
+
+            <g:SimplePanel ui:field="assignPanel"/>
+
+            <g:Anchor>
+                <ui:msg description="Options label">Options</ui:msg>
+            </g:Anchor>
+
+            <g:SimplePanel ui:field="optionsPanel"/>
+        </o:NavTabsPanel>
+
+    </g:FlowPanel>
+</ui:UiBinder>

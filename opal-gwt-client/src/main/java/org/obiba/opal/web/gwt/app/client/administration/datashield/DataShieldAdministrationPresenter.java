@@ -7,92 +7,87 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield;
 
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
-import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
-public class DataShieldConfigPresenter
-    extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy>
-    implements DataShieldConfigUiHandlers {
+import static com.google.gwt.http.client.Response.SC_OK;
+
+public class DataShieldAdministrationPresenter
+    extends ItemAdministrationPresenter<DataShieldAdministrationPresenter.Display, DataShieldAdministrationPresenter.Proxy>
+    implements DataShieldAdministrationUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.DATASHIELD)
-  public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
+  public interface Proxy extends ProxyPlace<DataShieldAdministrationPresenter> {
+  }
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<DataShieldConfigUiHandlers> {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<DataShieldAdministrationUiHandlers> {
 
     HasAuthorization getPermissionsAuthorizer();
 
+    void clearProfiles();
+
   }
+
+  private final Provider<DataShieldProfilePresenter> profilePresenterProvider;
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
-  public static final Object PackageSlot = new Object();
-
-  public static final Object AggregateEnvironmentSlot = new Object();
-
-  public static final Object AssignEnvironmentSlot = new Object();
+  public static final Object ConfigSlot = new Object();
 
   public static final Object PermissionSlot = new Object();
 
-  public static final Object OptionsSlot = new Object();
-
-  private final DataShieldPackageAdministrationPresenter packagePresenter;
-
-  private final DataShieldAdministrationPresenter aggregatePresenter;
-
-  private final DataShieldAdministrationPresenter assignPresenter;
-
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
-
-  private final DataShieldROptionsPresenter dataShieldROptionsPresenter;
 
   private static final String DATASHIELD_NAME = "DataSHIELD";
 
   @Inject
-  public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      Provider<DataShieldAdministrationPresenter> adminPresenterProvider,
-      Provider<DataShieldROptionsPresenter> dataShieldROptionsProvider,
-      DataShieldPackageAdministrationPresenter packagePresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public DataShieldAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+                                           Provider<DataShieldProfilePresenter> profilePresenterProvider,
+                                           Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                           DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     getView().setUiHandlers(this);
+    this.profilePresenterProvider = profilePresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
-    this.packagePresenter = packagePresenter;
-    dataShieldROptionsPresenter = dataShieldROptionsProvider.get();
-    aggregatePresenter = adminPresenterProvider.get();
-    assignPresenter = adminPresenterProvider.get();
-    aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
-    assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
     this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    aggregatePresenter.authorize(event.getHasAuthorization());
+
   }
 
   @Override
@@ -108,6 +103,22 @@ public class DataShieldConfigPresenter
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+
+    getView().clearProfiles();
+    ResourceRequestBuilderFactory.<JsArray<RServerClusterDto>>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTERS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<RServerClusterDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<RServerClusterDto> resource) {
+            if (response.getStatusCode() == SC_OK) {
+              for (RServerClusterDto cluster : JsArrays.toIterable(resource)) {
+                DataShieldProfilePresenter presenter = profilePresenterProvider.get();
+                presenter.setCluster(cluster);
+                setInSlot(cluster.getName(), presenter);
+              }
+            }
+          }
+        })
+        .get().send();
   }
 
   @Override
@@ -117,22 +128,12 @@ public class DataShieldConfigPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    // TODO: Need to test both environments
-    aggregatePresenter.authorize(authorizer);
   }
 
   @Override
   @TitleFunction
   public String getTitle() {
     return translations.pageDataShieldTitle();
-  }
-
-  @Override
-  protected void onBind() {
-    addToSlot(PackageSlot, packagePresenter);
-    setInSlot(OptionsSlot, dataShieldROptionsPresenter);
-    addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
-    addToSlot(AssignEnvironmentSlot, assignPresenter);
   }
 
   private final class PermissionsUpdate implements HasAuthorization {

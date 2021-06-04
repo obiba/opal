@@ -8,12 +8,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;

@@ -30,18 +30,11 @@ import java.util.List;
 @Path("/datashield/options")
 public class DataShieldROptionsResourceImpl implements DataShieldROptionsResource {
 
-  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
-
   @Autowired
   private DatashieldConfigService datashieldConfigService;
 
   @Override
-  public void setProfile(String profile) {
-    this.profile = profile;
-  }
-
-  @Override
-  public List<DataShield.DataShieldROptionDto> getDataShieldROptions() {
+  public List<DataShield.DataShieldROptionDto> getDataShieldROptions(String profile) {
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
 

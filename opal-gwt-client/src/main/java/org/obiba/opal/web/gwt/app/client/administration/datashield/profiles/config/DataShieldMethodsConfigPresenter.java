@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -41,31 +42,34 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
-public class DataShieldAdministrationPresenter extends PresenterWidget<DataShieldAdministrationPresenter.Display> {
+public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShieldMethodsConfigPresenter.Display> {
 
   private String env;
 
   private Runnable removeMethodConfirmation;
 
-  private final ModalProvider<DataShieldMethodPresenter> datashieldModalProvider;
+  private final ModalProvider<DataShieldMethodModalPresenter> datashieldModalProvider;
 
   private TranslationMessages translationMessages;
 
+  private RServerClusterDto cluster;
+
   @Inject
-  public DataShieldAdministrationPresenter(Display display, EventBus eventBus,
-                                           ModalProvider<DataShieldMethodPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
+  public DataShieldMethodsConfigPresenter(Display display, EventBus eventBus,
+                                          ModalProvider<DataShieldMethodModalPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.datashieldModalProvider = datashieldModalProvider.setContainer(this);
   }
 
-  void setEnvironment(String env) {
+  public void setEnvironment(String env) {
     this.env = env;
     getView().setEnvironment(env);
   }
@@ -90,7 +94,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
       @Override
       public void onClick(ClickEvent event) {
-        DataShieldMethodPresenter presenter = datashieldModalProvider.get();
+        DataShieldMethodModalPresenter presenter = datashieldModalProvider.get();
         if (!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
         presenter.createNewMethod();
       }
@@ -147,16 +151,16 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
     authorizeAddMethod(getView().getAddMethodAuthorizer());
   }
 
-  private String environment() {
-    return UriBuilder.create().segment("datashield", "env", "{env}").build(env);
-  }
-
   private String methods() {
-    return environment() + "/methods";
+    return UriBuilder.create().segment("datashield", "env", "{env}", "methods")
+        .query("profile", cluster.getName())
+        .build(env);
   }
 
   private String method(String method) {
-    return environment() + UriBuilder.create().segment("method", "{method}").build(method);
+    return UriBuilder.create().segment("datashield", "env", "{env}", "method", "{method}")
+        .query("profile", cluster.getName())
+        .build(env, method);
   }
 
   private void authorizeMethods(HasAuthorization authorizer) {
@@ -194,7 +198,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
         @Override
         public void authorized() {
-          DataShieldMethodPresenter presenter = datashieldModalProvider.get();
+          DataShieldMethodModalPresenter presenter = datashieldModalProvider.get();
           presenter.setEnvironement(env);
           presenter.updateMethod(dto);
         }
@@ -210,7 +214,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
               deleteDataShieldMethod(dto);
             }
           };
-          if (DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+          if (DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
             getEventBus().fireEvent(ConfirmationRequiredEvent
                 .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAssignMethod(),
                     translationMessages.confirmDeleteDataShieldAssignMethod()));
@@ -245,6 +249,10 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         .withCallback(Response.SC_OK, callbackHandler) //
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  public void setCluster(RServerClusterDto cluster) {
+    this.cluster = cluster;
   }
 
   //

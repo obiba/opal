@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.r.list;
+package org.obiba.opal.web.gwt.app.client.administration.r.profiles;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;

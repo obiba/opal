@@ -7,17 +7,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
 import com.google.gwt.user.client.ui.HasText;
@@ -25,9 +30,10 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalPresenter.Display.FormField.NAME;
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalPresenter.Display.FormField.VALUE;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Display.FormField.NAME;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Display.FormField.VALUE;
 
 public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataShieldROptionModalPresenter.Display>
     implements DataShieldROptionModalUiHandlers {
@@ -35,6 +41,8 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
   private Mode dialogMode;
 
   private MethodValidationHandler validatorHandler;
+
+  private RServerClusterDto cluster;
 
   public enum Mode {
     CREATE, UPDATE
@@ -53,13 +61,26 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
     DataShieldROptionDto dto = DataShieldROptionDto.create();
     dto.setName(getView().getName().getText());
     dto.setValue(getView().getValue().getText());
-    fireEvent(new DataShieldROptionCreatedEvent(dto));
+    ResourceRequestBuilderFactory.newBuilder()//
+        .forResource(UriBuilders.DATASHIELD_ROPTION.create()
+            .query("profile", cluster.getName()).build())//
+        .withResourceBody(DataShieldROptionDto.stringify(dto))//
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(new DataShieldROptionCreatedEvent(null));
+          }
+        }).post().send();
     getView().hideDialog();
   }
 
   @Override
   public void cancel() {
     getView().hideDialog();
+  }
+
+  public void setCluster(RServerClusterDto cluster) {
+    this.cluster = cluster;
   }
 
   public void setOption(DataShieldROptionDto optionDto) {

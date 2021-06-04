@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
@@ -20,10 +20,10 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class DataShieldPackagePresenter extends ModalPresenterWidget<DataShieldPackagePresenter.Display> {
+public class DataShieldPackageModalPresenter extends ModalPresenterWidget<DataShieldPackageModalPresenter.Display> {
 
   @Inject
-  public DataShieldPackagePresenter(Display display, EventBus eventBus) {
+  public DataShieldPackageModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }

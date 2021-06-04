@@ -38,17 +38,10 @@ import java.util.List;
 @Transactional
 public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentResource {
 
-  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
-
   private DSMethodType methodType;
 
   @Autowired
   private DatashieldConfigService datashieldConfigService;
-
-  @Override
-  public void setProfile(String profile) {
-    this.profile = profile;
-  }
 
   @Override
   public void setMethodType(DSMethodType methodType) {
@@ -56,9 +49,9 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   }
 
   @Override
-  public List<DataShield.DataShieldMethodDto> getDataShieldMethods() {
+  public List<DataShield.DataShieldMethodDto> getDataShieldMethods(String profile) {
     List<DataShield.DataShieldMethodDto> dtos = Lists.newArrayList();
-    for (DSMethod method : listMethods()) {
+    for (DSMethod method : listMethods(profile)) {
       dtos.add(Dtos.asDto(method));
     }
     sortByName(dtos);
@@ -66,7 +59,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   }
 
   @Override
-  public Response deleteDataShieldMethods() {
+  public Response deleteDataShieldMethods(String profile) {
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
     for (DSMethod method : getEnvironment(config).getMethods()) {
       getEnvironment(config).removeMethod(method.getName());
@@ -77,8 +70,8 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   }
 
   @Override
-  public Response createDataShieldMethod(UriInfo uri, final DataShield.DataShieldMethodDto dto) {
-    DatashieldConfig config = getDatashieldConfiguration();
+  public Response createDataShieldMethod(UriInfo uri, String profile, final DataShield.DataShieldMethodDto dto) {
+    DatashieldConfig config = getDatashieldConfiguration(profile);
     if (getEnvironment(config).hasMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
     getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
     datashieldConfigService.saveConfiguration(config);
@@ -89,14 +82,14 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   }
 
   @Override
-  public Response getDataShieldMethod(String name) {
-    return Response.ok().entity(Dtos.asDto(getEnvironment().getMethod(name))).build();
+  public Response getDataShieldMethod(String name, String profile) {
+    return Response.ok().entity(Dtos.asDto(getEnvironment(profile).getMethod(name))).build();
   }
 
   @Override
-  public Response updateDataShieldMethod(String name, final DataShield.DataShieldMethodDto dto) {
+  public Response updateDataShieldMethod(String name, String profile, final DataShield.DataShieldMethodDto dto) {
     if (!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-    DatashieldConfig config = getDatashieldConfiguration();
+    DatashieldConfig config = getDatashieldConfiguration(profile);
     if (!getEnvironment(config).hasMethod(name)) return Response.status(Status.NOT_FOUND).build();
     getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
     datashieldConfigService.saveConfiguration(config);
@@ -105,19 +98,19 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   }
 
   @Override
-  public Response deleteDataShieldMethod(final String name) {
-    DatashieldConfig config = getDatashieldConfiguration();
+  public Response deleteDataShieldMethod(final String name, String profile) {
+    DatashieldConfig config = getDatashieldConfiguration(profile);
     getEnvironment(config).removeMethod(name);
     datashieldConfigService.saveConfiguration(config);
     DataShieldLog.adminLog("deleted method '{}' from type {}.", name, methodType);
     return Response.ok().build();
   }
 
-  private Iterable<DSMethod> listMethods() {
-    return getEnvironment().getMethods();
+  private Iterable<DSMethod> listMethods(String profile) {
+    return getEnvironment(profile).getMethods();
   }
 
-  private DatashieldConfig getDatashieldConfiguration() {
+  private DatashieldConfig getDatashieldConfiguration(String profile) {
     return datashieldConfigService.getConfiguration(profile);
   }
 
@@ -133,8 +126,8 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     });
   }
 
-  private DSEnvironment getEnvironment() {
-    return getEnvironment(getDatashieldConfiguration());
+  private DSEnvironment getEnvironment(String profile) {
+    return getEnvironment(getDatashieldConfiguration(profile));
   }
 
   private DSEnvironment getEnvironment(DSConfiguration config) {

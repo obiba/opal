@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Joiner;
@@ -27,8 +27,6 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
@@ -49,12 +47,12 @@ import java.util.List;
 /**
  *
  */
-public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<DataShieldPackageAdministrationUiHandlers>
-    implements DataShieldPackageAdministrationPresenter.Display {
+public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackagesUiHandlers>
+    implements DataShieldPackagesPresenter.Display {
 
   private static final int PAGE_SIZE = 10;
 
-  interface Binder extends UiBinder<Widget, DataShieldPackageAdministrationView> {
+  interface Binder extends UiBinder<Widget, DataShieldPackagesView> {
   }
 
   private final Translations translations;
@@ -83,7 +81,7 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
   private List<RPackageDto> originalPackages;
 
   @Inject
-  public DataShieldPackageAdministrationView(Binder uiBinder, Translations translations) {
+  public DataShieldPackagesView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initPackagesTable();
@@ -132,7 +130,6 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
 
   private void initPackagesTable() {
     addPackageTableColumns();
-
     packagesTable.setPageSize(PAGE_SIZE);
     packagesDataProvider.addDataDisplay(packagesTable);
     packagesTable.showLoadingIndicator(packagesDataProvider);
@@ -180,7 +177,7 @@ public class DataShieldPackageAdministrationView extends ViewWithUiHandlers<Data
 
     actionsColumn = new ActionsPackageRColumn<RPackageDto>(
         new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,
-            ActionsPackageRColumn.PUBLISH_ACTION));
+            ActionsPackageRColumn.PUBLISH_ACTION, ActionsPackageRColumn.UNPUBLISH_ACTION));
     packagesTable.addColumn(actionsColumn, translations.actionsLabel());
   }
 

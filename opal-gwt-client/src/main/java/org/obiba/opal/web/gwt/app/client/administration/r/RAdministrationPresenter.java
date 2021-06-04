@@ -24,7 +24,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RClusterPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;

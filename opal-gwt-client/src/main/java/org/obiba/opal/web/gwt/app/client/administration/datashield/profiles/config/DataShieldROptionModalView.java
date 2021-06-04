@@ -7,10 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -28,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldROptionModalPresenter.Mode;
+import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Mode;
 
 /**
  *

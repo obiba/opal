@@ -148,6 +148,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Publish Package Methods")
   String publishDataShieldMethods();
 
+  @Description("UnPublish Package Methods label")
+  @DefaultMessage("Unpublish Package Methods")
+  String unPublishDataShieldMethods();
+
   @Description("Unregister Database label")
   @DefaultMessage("Unregister Database")
   String unregisterDatabase();
@@ -511,6 +515,10 @@ public interface TranslationMessages extends Messages {
   @Description("Please confirm that you want to publish this package methods message")
   @DefaultMessage("Please confirm that you want to publish this package methods.")
   String confirmPublishDataShieldMethods();
+
+  @Description("Please confirm that you want to unpublish this package methods message")
+  @DefaultMessage("Please confirm that you want to unpublish this package methods.")
+  String confirmUnPublishDataShieldMethods();
 
   @Description("Please confirm that you want to unregister this database message")
   @DefaultMessage("Please confirm that you want to unregister this database.")

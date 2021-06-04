@@ -7,12 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.MethodType;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.MethodType;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -38,9 +37,9 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  *
  */
-public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShieldMethodUiHandlers> implements Display {
+public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<DataShieldMethodModalUiHandlers> implements Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldMethodView> {}
+  interface Binder extends UiBinder<Widget, DataShieldMethodModalView> {}
 
   @UiField
   Modal dialog;
@@ -76,7 +75,7 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
   //
 
   @Inject
-  public DataShieldMethodView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public DataShieldMethodModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));

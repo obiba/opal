@@ -45,7 +45,7 @@ public class DataShieldPackageResource {
    * @throws org.rosuda.REngine.REXPMismatchException
    */
   @GET
-  @Path("/methods")
+  @Path("methods")
   public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return methodPublisherImpl.getPackageMethods(profile, name);
   }
@@ -60,6 +60,20 @@ public class DataShieldPackageResource {
   @Path("methods")
   public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return methodPublisherImpl.publish(profile, name);
+  }
+
+  /**
+   * Delete all methods of the package.
+   *
+   * @param name
+   * @param profile
+   * @return
+   */
+  @DELETE
+  @Path("methods")
+  public Response deletePackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    methodPublisherImpl.unpublish(profile, name);
+    return Response.noContent().build();
   }
 
   /**

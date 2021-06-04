@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -36,8 +36,8 @@ import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMethodPresenter.Display>
-    implements DataShieldMethodUiHandlers {
+public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShieldMethodModalPresenter.Display>
+    implements DataShieldMethodModalUiHandlers {
 
   private Mode dialogMode;
 
@@ -54,7 +54,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
   private MethodValidationHandler methodValidationHandler;
 
   @Inject
-  public DataShieldMethodPresenter(Display display, EventBus eventBus) {
+  public DataShieldMethodModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }
@@ -252,7 +252,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     }
   }
 
-  public interface Display extends PopupView, HasUiHandlers<DataShieldMethodUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<DataShieldMethodModalUiHandlers> {
 
     void hideDialog();
 

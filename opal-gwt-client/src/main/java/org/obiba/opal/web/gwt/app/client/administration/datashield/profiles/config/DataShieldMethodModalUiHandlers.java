@@ -8,12 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface DataShieldConfigUiHandlers extends UiHandlers {
-
-  void onDownloadLogs();
-
+public interface DataShieldMethodModalUiHandlers extends ModalUiHandlers {
+  void save();
+  void cancel();
 }

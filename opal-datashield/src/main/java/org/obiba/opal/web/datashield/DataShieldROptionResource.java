@@ -21,15 +21,13 @@ import org.obiba.opal.web.model.DataShield;
 
 public interface DataShieldROptionResource {
 
-  void setProfile(String profile);
-
   @DELETE
-  Response deleteDataShieldROption(@QueryParam("name") String name);
+  Response deleteDataShieldROption(@QueryParam("name") String name, @QueryParam("profile") String profile);
 
   @POST
   @PUT
-  Response addOrUpdateDataShieldROption(DataShield.DataShieldROptionDto dto);
+  Response addOrUpdateDataShieldROption(@QueryParam("profile") String profile, DataShield.DataShieldROptionDto dto);
 
   @GET
-  Response getDataShieldROption(@QueryParam("name") String name);
+  Response getDataShieldROption(@QueryParam("name") String name, @QueryParam("profile") String profile);
 }

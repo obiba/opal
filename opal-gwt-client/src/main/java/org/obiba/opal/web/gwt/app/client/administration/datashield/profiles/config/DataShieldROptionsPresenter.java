@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
     implements DataShieldROptionsUiHandlers {
 
   private final ModalProvider<DataShieldROptionModalPresenter> modalProvider;
+
+  private RServerClusterDto cluster;
 
   public interface Display extends View, HasUiHandlers<DataShieldROptionsUiHandlers> {
     void initialize(List<DataShieldROptionDto> options);
@@ -49,24 +52,28 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
     getView().setUiHandlers(this);
   }
 
+  public void setCluster(RServerClusterDto cluster) {
+    this.cluster = cluster;
+  }
+
   @Override
   protected void onBind() {
     super.onBind();
-    addHandler(DataShieldPackageCreatedEvent.getType(),
+    addRegisteredHandler(DataShieldPackageCreatedEvent.getType(),
         new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
             refresh();
           }
         });
-    addHandler(DataShieldPackageUpdatedEvent.getType(),
+    addRegisteredHandler(DataShieldPackageUpdatedEvent.getType(),
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
             refresh();
           }
         });
-    addHandler(DataShieldPackageRemovedEvent.getType(),
+    addRegisteredHandler(DataShieldPackageRemovedEvent.getType(),
         new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
 
           @Override
@@ -75,23 +82,11 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
           }
         });
 
-    addHandler(DataShieldROptionCreatedEvent.getType(),
+    addRegisteredHandler(DataShieldROptionCreatedEvent.getType(),
         new DataShieldROptionCreatedEvent.DataShieldROptionCreatedHandler() {
           @Override
           public void onDataShieldROptionCreated(DataShieldROptionCreatedEvent event) {
-            addOrUpdate(event.getOptionDto());
-          }
-
-          private void addOrUpdate(DataShieldROptionDto optionDto) {
-            ResourceRequestBuilderFactory.newBuilder()//
-                .forResource(UriBuilders.DATASHIELD_ROPTION.create().build())//
-                .withResourceBody(DataShieldROptionDto.stringify(optionDto))//
-                .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-                  @Override
-                  public void onResponseCode(Request request, Response response) {
-                    refresh();
-                  }
-                }).post().send();
+            refresh();
           }
 
         });
@@ -99,8 +94,10 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Override
   public void removeOption(DataShieldROptionDto optionDto) {
-    ResourceRequestBuilderFactory.newBuilder()//
-        .forResource(UriBuilders.DATASHIELD_ROPTION.create().query("name", optionDto.getName()).build())//
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.DATASHIELD_ROPTION.create()
+            .query("name", optionDto.getName())
+            .query("profile", cluster.getName()).build())
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -111,24 +108,30 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Override
   public void addOption() {
-    modalProvider.get();
+    modalProvider.get().setCluster(cluster);
   }
 
   @Override
   public void editOption(DataShieldROptionDto optionDto) {
-    modalProvider.get().setOption(optionDto);
+    DataShieldROptionModalPresenter presenter = modalProvider.get();
+    presenter.setCluster(cluster);
+    presenter.setOption(optionDto);
   }
 
   @Override
   protected void onReveal() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_ROPTION.create().build()).post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.DATASHIELD_ROPTION.create()
+            .query("profile", cluster.getName()).build())
+        .post()
         .authorize(getView().addROptionsAuthorizer()).send();
     refresh();
   }
 
   private void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<DataShieldROptionDto>>newBuilder()//
-        .forResource(UriBuilders.DATASHIELD_ROPTIONS.create().build())
+    ResourceRequestBuilderFactory.<JsArray<DataShieldROptionDto>>newBuilder()
+        .forResource(UriBuilders.DATASHIELD_ROPTIONS.create()
+            .query("profile", cluster.getName()).build())
         .withCallback(new ResourceCallback<JsArray<DataShieldROptionDto>>() {
 
           @Override

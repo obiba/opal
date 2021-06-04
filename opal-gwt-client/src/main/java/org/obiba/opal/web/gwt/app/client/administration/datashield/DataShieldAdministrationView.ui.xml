@@ -21,30 +21,19 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Heading size="4">
-        <ui:msg description="Packages label">Packages</ui:msg>
-      </b:Heading>
-      <g:SimplePanel ui:field="packages"></g:SimplePanel>
-    </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="DataSHIELD Profiles label">Profiles</ui:msg>
+    </b:Heading>
 
-    <g:FlowPanel>
-      <b:Heading size="4">
-        <ui:msg description="Options label">Options</ui:msg>
-      </b:Heading>
-      <g:SimplePanel ui:field="options"></g:SimplePanel>
-    </g:FlowPanel>
+    <b:Paragraph>
+      <ui:msg description="R Servers information">
+        A cluster of R servers constitutes a DataSHIELD profile: DataSHIELD packages and settings are the same for all
+        the R servers in a cluster. DataSHIELD end-user can select which profile to use.
+        See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
+      </ui:msg>
+    </b:Paragraph>
 
-    <g:FlowPanel>
-      <b:Heading size="4">
-        <ui:msg description="Methods label">Methods</ui:msg>
-      </b:Heading>
-      <b:Paragraph>
-
-      </b:Paragraph>
-    </g:FlowPanel>
-
-    <o:NavPillsPanel ui:field="environments"/>
+    <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">

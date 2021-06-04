@@ -29,18 +29,11 @@ import javax.ws.rs.core.Response;
 @Path("/datashield/option")
 public class DataShieldROptionResourceImpl implements DataShieldROptionResource {
 
-  private String profile = RServerManagerService.DEFAULT_CLUSTER_NAME;
-
   @Autowired
   private DatashieldConfigService datashieldConfigService;
 
   @Override
-  public void setProfile(String profile) {
-    this.profile = profile;
-  }
-
-  @Override
-  public Response deleteDataShieldROption(final @QueryParam("name") String name) {
+  public Response deleteDataShieldROption(String name, String profile) {
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
     config.removeOption(name);
     datashieldConfigService.saveConfiguration(config);
@@ -48,7 +41,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   }
 
   @Override
-  public Response addOrUpdateDataShieldROption(final DataShield.DataShieldROptionDto dto) {
+  public Response addOrUpdateDataShieldROption(String profile, final DataShield.DataShieldROptionDto dto) {
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
     config.addOrUpdateOption(dto.getName(), dto.getValue());
     datashieldConfigService.saveConfiguration(config);
@@ -56,7 +49,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   }
 
   @Override
-  public Response getDataShieldROption(final @QueryParam("name") String name) {
+  public Response getDataShieldROption(String name, String profile) {
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
 
     if (config.hasOption(name)) {

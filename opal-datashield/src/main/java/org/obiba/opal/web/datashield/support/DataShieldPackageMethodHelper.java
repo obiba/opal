@@ -12,9 +12,11 @@ package org.obiba.opal.web.datashield.support;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.core.NoSuchDSMethodException;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.PackagedFunctionDSMethod;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfig;
@@ -93,6 +95,13 @@ public class DataShieldPackageMethodHelper {
     return getPackageMethods(getDatashieldPackage(profile, name));
   }
 
+  /**
+   * Get the package settings and push them to the config.
+   *
+   * @param profile
+   * @param name Package name
+   * @return
+   */
   public DataShield.DataShieldPackageMethodsDto publish(String profile, String name) {
     List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
     final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
@@ -108,14 +117,17 @@ public class DataShieldPackageMethodHelper {
     return methods;
   }
 
-  private void addMethods(DatashieldConfig config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
-    config.addOrUpdateMethods(type, StreamSupport.stream(envMethods.spliterator(), false)
-        .map(m -> (DSMethod) Dtos.fromDto(m))
-        .collect(Collectors.toList()));
-  }
-
-  private void addOptions(DatashieldConfig config, List<DataShield.DataShieldROptionDto> roptions) {
-    roptions.forEach(opt -> config.addOrUpdateOption(opt.getName(), opt.getValue()));
+  /**
+   * Remove all the methods associated to the package.
+   *
+   * @param profile
+   * @param name Package name
+   */
+  public void unpublish(String profile, String name) {
+    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    removeMethods(config, DSMethodType.AGGREGATE, name);
+    removeMethods(config, DSMethodType.ASSIGN, name);
+    datashieldConfigService.saveConfiguration(config);
   }
 
   public List<OpalR.RPackageDto> getDatashieldPackage(String profile, final String name) {
@@ -176,6 +188,24 @@ public class DataShieldPackageMethodHelper {
   // Private methods
   //
 
+  private void removeMethods(DatashieldConfig config, DSMethodType type, String name) {
+    DSEnvironment env = config.getEnvironment(type);
+    List<DSMethod> methodsToRemove = env.getMethods().stream()
+        .filter(m -> m.hasPackage() && ((DefaultDSMethod)m).getPackage().equals(name))
+        .collect(Collectors.toList());
+    methodsToRemove.forEach(m -> env.removeMethod(m.getName()));
+  }
+
+  private void addMethods(DatashieldConfig config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
+    config.addOrUpdateMethods(type, StreamSupport.stream(envMethods.spliterator(), false)
+        .map(m -> (DSMethod) Dtos.fromDto(m))
+        .collect(Collectors.toList()));
+  }
+
+  private void addOptions(DatashieldConfig config, List<DataShield.DataShieldROptionDto> roptions) {
+    roptions.forEach(opt -> config.addOrUpdateOption(opt.getName(), opt.getValue()));
+  }
+
   // delete package methods as they are configured, not as they are declared (to handle overlaps)
   private void deletePackageMethods(String profile, String name, DSMethodType type) {
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
@@ -204,7 +234,6 @@ public class DataShieldPackageMethodHelper {
     return getPackageROptions(packageDto);
   }
 
-
   private List<DataShield.DataShieldROptionDto> getPackageROptions(OpalR.RPackageDto packageDto) {
     List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
     for (Opal.EntryDto entry : packageDto.getDescriptionList()) {
@@ -220,7 +249,6 @@ public class DataShieldPackageMethodHelper {
     // TODO merge methods
     return getPackageMethods(packageDtos.get(0));
   }
-
 
   private DataShield.DataShieldPackageMethodsDto getPackageMethods(OpalR.RPackageDto packageDto) {
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();

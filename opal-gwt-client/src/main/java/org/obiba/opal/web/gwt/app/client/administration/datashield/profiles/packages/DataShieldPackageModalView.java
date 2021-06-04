@@ -7,9 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -30,10 +29,10 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  *
  */
-public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
-    implements DataShieldPackagePresenter.Display {
+public class DataShieldPackageModalView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
+    implements DataShieldPackageModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldPackageView> {}
+  interface Binder extends UiBinder<Widget, DataShieldPackageModalView> {}
 
   private static final int DIALOG_HEIGHT = 400;
 
@@ -48,7 +47,7 @@ public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiH
   private final Translations translations;
 
   @Inject
-  public DataShieldPackageView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public DataShieldPackageModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
