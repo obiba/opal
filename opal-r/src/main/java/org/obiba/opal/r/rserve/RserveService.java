@@ -24,18 +24,19 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.obiba.opal.web.r.RPackageResourceHelper;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.RList;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -214,9 +215,9 @@ public class RserveService implements RServerService, ROperationTemplate {
       DataSHIELDPackagesROperation rop = new DataSHIELDPackagesROperation();
       execute(rop);
       RNamedList<RServerResult> dsList = rop.getResult().asNamedList();
-        for (Object name : dsList.getNames()) {
-          dsPackages.put(name.toString(), getDataShieldPackagePropertiesDtos(dsList.get(name.toString()).asNamedList()));
-        }
+      for (Object name : dsList.getNames()) {
+        dsPackages.put(name.toString(), getDataShieldPackagePropertiesDtos(dsList.get(name.toString()).asNamedList()));
+      }
     } catch (Exception e) {
       log.error("DataShield packages properties extraction failed", e);
     }
@@ -386,7 +387,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   }
 
   public boolean isServiceAvailable() {
-    try  {
+    try {
       getStateInternal();
       return true;
     } catch (Exception e) {
@@ -395,29 +396,20 @@ public class RserveService implements RServerService, ROperationTemplate {
     }
   }
 
-  private class DataSHIELDPackagesROperation extends AbstractROperationWithResult {
+  private static class DataSHIELDPackagesROperation extends AbstractROperationWithResult {
 
-    public static final String AGGREGATE_METHODS = "AggregateMethods";
-
-    public static final String ASSIGN_METHODS = "AssignMethods";
-
-    public static final String OPTIONS = "Options";
+    private static final String DATASHIELD_FIND_SCRIPT = ".datashield.find.R";
 
     @Override
     protected void doWithConnection() {
       setResult(null);
-      // DS fields
-      eval(String.format("base::assign('dsFields', c('%s'))", Joiner.on("','").join(AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS)));
-      // extract DS fields from DESCRIPTION files
-      eval("assign('pkgs', Map(function(p) { x <- as.list(p) ; x[names(x) %in% dsFields] }, " +
-          "         Filter(function(p) any(names(p) %in% dsFields), " +
-          "                lapply(installed.packages()[,1], function(p) as.data.frame(read.dcf(system.file('DESCRIPTION', package=p)), stringsAsFactors = FALSE)))))");
-      // extract DS fields from DATASHIELD files
-      eval("assign('x', lapply(installed.packages()[,1], function(p) system.file('DATASHIELD', package=p)))");
-      eval("assign('y', lapply(x[lapply(x, nchar)>0], function(f) as.list(as.data.frame(read.dcf(f), stringsAsFactors = FALSE))))");
-      // merge and prepare DS field values as arrays of strings
-      eval("assign('pkgs', lapply(append(pkgs, y), function(p) lapply(p, function(pp)  gsub('^\\\\s+|\\\\s+$', '', gsub('\\n', '', unlist(strsplit(pp, ',')))))))");
-      setResult(eval("pkgs", RSerialize.NATIVE));
+      try (InputStream is = new ClassPathResource(DATASHIELD_FIND_SCRIPT).getInputStream();) {
+        writeFile(DATASHIELD_FIND_SCRIPT, is);
+        eval(String.format("base::source('%s')", DATASHIELD_FIND_SCRIPT));
+      } catch (IOException | RServerException e) {
+        throw new RRuntimeException(e);
+      }
+      setResult(eval(".datashield.find()", RSerialize.NATIVE));
     }
   }
 
