@@ -29,7 +29,8 @@
       <ui:msg description="R Servers information">
         R servers are grouped by clusters. In each cluster all the R servers are considered to be interchangeable, i.e.
         a load balancer can select one or the other on R session creation. On the other hand, R servers from different
-        clusters are expected to be different (packages installed, DataSHIELD settings etc.).
+        clusters are expected to be different (packages installed, R version etc.).
+        See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
       </ui:msg>
     </b:Paragraph>
 

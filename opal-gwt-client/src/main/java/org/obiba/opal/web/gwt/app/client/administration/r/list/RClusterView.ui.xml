@@ -18,35 +18,42 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Paragraph>
-        <ui:msg description="R server text">
-          Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
-          server will destroy all current client connections.
-        </ui:msg>
-      </b:Paragraph>
-      <g:FlowPanel addStyleNames="large-bottom-margin">
-        <b:ButtonGroup>
-          <b:Button ui:field="startStopButton" type="INVERSE">
-            Start/Stop
-          </b:Button>
-        </b:ButtonGroup>
-        <b:ButtonGroup>
-          <b:Button ui:field="rTestButton" type="SUCCESS">
-            <ui:msg description="R server test label">Test connection with R</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-      </g:FlowPanel>
-      <g:FlowPanel addStyleNames="large-bottom-margin">
-        <b:Paragraph>
-          <ui:msg description="Rserve logs description">R server activity logs can be downloaded in their raw form.</ui:msg>
-        </b:Paragraph>
-        <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
-          <ui:msg description="Download Rserve logs label">Download</ui:msg>
-        </b:Button>
-      </g:FlowPanel>
 
-    </g:FlowPanel>
+    <b:FluidRow>
+      <b:Column size="6">
+        <g:FlowPanel>
+          <b:Paragraph>
+            <ui:msg description="R server text">
+              Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
+              server will destroy all current client connections.
+            </ui:msg>
+          </b:Paragraph>
+          <g:FlowPanel addStyleNames="large-bottom-margin">
+            <b:ButtonGroup>
+              <b:Button ui:field="startStopButton" type="INVERSE">
+                Start/Stop
+              </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+              <b:Button ui:field="rTestButton" type="SUCCESS">
+                <ui:msg description="R server test label">Test connection with R</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
+          </g:FlowPanel>
+        </g:FlowPanel>
+      </b:Column>
+      <b:Column size="6">
+        <g:FlowPanel addStyleNames="large-bottom-margin">
+          <b:Paragraph>
+            <ui:msg description="Rserve logs description">R server activity logs can be downloaded in their raw form.</ui:msg>
+          </b:Paragraph>
+          <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
+            <ui:msg description="Download Rserve logs label">Download</ui:msg>
+          </b:Button>
+        </g:FlowPanel>
+      </b:Column>
+    </b:FluidRow>
+
 
     <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
 
