@@ -18,15 +18,23 @@
 
     <g:FlowPanel>
 
-        <b:Heading size="5">
-            <ui:msg description="Packages label">Packages</ui:msg>
-        </b:Heading>
-        <g:SimplePanel ui:field="packages"/>
+        <g:FlowPanel addStyleNames="large-bottom-margin">
+            <b:Paragraph>
+                <ui:msg description="DS Profile reload description">Reset the DataSHIELD profile as it was originally defined by the DataSHIELD packages description.</ui:msg>
+            </b:Paragraph>
+            <b:Button ui:field="resetProfile" icon="REFRESH" type="INFO">
+                <ui:msg description="DS Profile reset label">Reset Profile</ui:msg>
+            </b:Button>
+        </g:FlowPanel>
 
         <b:Heading size="5">
-            <ui:msg description="Settings label">Settings</ui:msg>
+            <ui:msg description="DS Options label">Options</ui:msg>
         </b:Heading>
+        <g:SimplePanel ui:field="optionsPanel"/>
 
+        <b:Heading size="5">
+            <ui:msg description="DS Methods label">Methods</ui:msg>
+        </b:Heading>
         <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
 
             <g:Anchor>
@@ -41,11 +49,6 @@
 
             <g:SimplePanel ui:field="assignPanel"/>
 
-            <g:Anchor>
-                <ui:msg description="Options label">Options</ui:msg>
-            </g:Anchor>
-
-            <g:SimplePanel ui:field="optionsPanel"/>
         </o:NavTabsPanel>
 
     </g:FlowPanel>

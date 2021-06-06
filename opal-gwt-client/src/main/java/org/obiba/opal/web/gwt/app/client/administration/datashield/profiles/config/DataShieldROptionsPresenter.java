@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -24,12 +25,16 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROptionsPresenter.Display>
     implements DataShieldROptionsUiHandlers {
@@ -39,7 +44,10 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
   private RServerClusterDto cluster;
 
   public interface Display extends View, HasUiHandlers<DataShieldROptionsUiHandlers> {
+
     void initialize(List<DataShieldROptionDto> options);
+
+    void setOptionActionHandler(ActionHandler<DataShieldROptionDto> handler);
 
     HasAuthorization addROptionsAuthorizer();
   }
@@ -59,18 +67,34 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
   @Override
   protected void onBind() {
     super.onBind();
+    getView().setOptionActionHandler(new ActionHandler<DataShieldROptionDto>() {
+      @Override
+      public void doAction(DataShieldROptionDto optionDto, String actionName) {
+        switch (actionName) {
+          case REMOVE_ACTION:
+            removeOption(optionDto);
+            break;
+          case EDIT_ACTION:
+            editOption(optionDto);
+            break;
+        }
+      }
+
+    });
     addRegisteredHandler(DataShieldPackageCreatedEvent.getType(),
         new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
-            refresh();
+            if (cluster.getName().equals(event.getProfile()))
+              refresh();
           }
         });
     addRegisteredHandler(DataShieldPackageUpdatedEvent.getType(),
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
-            refresh();
+            if (cluster.getName().equals(event.getProfile()))
+              refresh();
           }
         });
     addRegisteredHandler(DataShieldPackageRemovedEvent.getType(),
@@ -78,22 +102,32 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
-            refresh();
+            if (cluster.getName().equals(event.getProfile()))
+              refresh();
           }
         });
-
     addRegisteredHandler(DataShieldROptionCreatedEvent.getType(),
         new DataShieldROptionCreatedEvent.DataShieldROptionCreatedHandler() {
           @Override
           public void onDataShieldROptionCreated(DataShieldROptionCreatedEvent event) {
-            refresh();
+            if (cluster.getName().equals(event.getProfile()))
+              refresh();
           }
-
         });
   }
 
   @Override
-  public void removeOption(DataShieldROptionDto optionDto) {
+  public void addOption() {
+    modalProvider.get().setCluster(cluster);
+  }
+
+  private void editOption(DataShieldROptionDto optionDto) {
+    DataShieldROptionModalPresenter presenter = modalProvider.get();
+    presenter.setCluster(cluster);
+    presenter.setOption(optionDto);
+  }
+
+  private void removeOption(DataShieldROptionDto optionDto) {
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.DATASHIELD_ROPTION.create()
             .query("name", optionDto.getName())
@@ -104,18 +138,6 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
             refresh();
           }
         }).delete().send();
-  }
-
-  @Override
-  public void addOption() {
-    modalProvider.get().setCluster(cluster);
-  }
-
-  @Override
-  public void editOption(DataShieldROptionDto optionDto) {
-    DataShieldROptionModalPresenter presenter = modalProvider.get();
-    presenter.setCluster(cluster);
-    presenter.setOption(optionDto);
   }
 
   @Override

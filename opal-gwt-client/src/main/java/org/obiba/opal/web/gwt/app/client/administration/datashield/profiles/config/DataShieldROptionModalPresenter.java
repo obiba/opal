@@ -9,11 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -24,13 +26,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
-
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Display.FormField.NAME;
 import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Display.FormField.VALUE;
@@ -57,8 +56,8 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
   @Override
   public void save() {
     getView().clearErrors();
-    if(!validatorHandler.validate()) return;
-    DataShieldROptionDto dto = DataShieldROptionDto.create();
+    if (!validatorHandler.validate()) return;
+    final DataShieldROptionDto dto = DataShieldROptionDto.create();
     dto.setName(getView().getName().getText());
     dto.setValue(getView().getValue().getText());
     ResourceRequestBuilderFactory.newBuilder()//
@@ -68,9 +67,10 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            fireEvent(new DataShieldROptionCreatedEvent(null));
+            fireEvent(new DataShieldROptionCreatedEvent(cluster.getName(), dto));
           }
-        }).post().send();
+        })
+        .post().send();
     getView().hideDialog();
   }
 
@@ -102,7 +102,8 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
 
   private final class MethodValidationHandler extends ViewValidationHandler {
 
-    private MethodValidationHandler() {}
+    private MethodValidationHandler() {
+    }
 
     private Set<FieldValidator> validators;
 

@@ -22,9 +22,9 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackagesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
@@ -56,15 +56,15 @@ public class DataShieldAdministrationPresenter
 
     HasAuthorization getPermissionsAuthorizer();
 
-    void clearProfiles();
+    void clearClusters();
 
   }
+
+  private final Provider<DataShieldPackagesPresenter> packagesPresenterProvider;
 
   private final Provider<DataShieldProfilePresenter> profilePresenterProvider;
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
-
-  public static final Object ConfigSlot = new Object();
 
   public static final Object PermissionSlot = new Object();
 
@@ -74,11 +74,13 @@ public class DataShieldAdministrationPresenter
 
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+                                           Provider<DataShieldPackagesPresenter> packagesPresenterProvider,
                                            Provider<DataShieldProfilePresenter> profilePresenterProvider,
                                            Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
                                            DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     getView().setUiHandlers(this);
+    this.packagesPresenterProvider = packagesPresenterProvider;
     this.profilePresenterProvider = profilePresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
@@ -104,16 +106,20 @@ public class DataShieldAdministrationPresenter
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
-    getView().clearProfiles();
+    getView().clearClusters();
     ResourceRequestBuilderFactory.<JsArray<RServerClusterDto>>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTERS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<RServerClusterDto>>() {
           @Override
           public void onResource(Response response, JsArray<RServerClusterDto> resource) {
             if (response.getStatusCode() == SC_OK) {
               for (RServerClusterDto cluster : JsArrays.toIterable(resource)) {
-                DataShieldProfilePresenter presenter = profilePresenterProvider.get();
-                presenter.setCluster(cluster);
-                setInSlot(cluster.getName(), presenter);
+                DataShieldPackagesPresenter packagesPresenter = packagesPresenterProvider.get();
+                packagesPresenter.setCluster(cluster);
+                addToSlot(new PackagesSlot(cluster), packagesPresenter);
+                // for now there is only one profile per cluster
+                DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
+                profilePesenter.setCluster(cluster);
+                addToSlot(new ProfilesSlot(cluster), profilePesenter);
               }
             }
           }
@@ -160,5 +166,31 @@ public class DataShieldAdministrationPresenter
     String ASSIGN = "assign";
 
     String AGGREGATE = "aggregate";
+  }
+
+  public class PackagesSlot {
+    private final RServerClusterDto cluster;
+
+    public PackagesSlot(RServerClusterDto cluster) {
+      this.cluster = cluster;
+    }
+
+    @Override
+    public String toString() {
+      return cluster.getName();
+    }
+  }
+
+  public class ProfilesSlot {
+    private final RServerClusterDto cluster;
+
+    public ProfilesSlot(RServerClusterDto cluster) {
+      this.cluster = cluster;
+    }
+
+    @Override
+    public String toString() {
+      return cluster.getName();
+    }
   }
 }

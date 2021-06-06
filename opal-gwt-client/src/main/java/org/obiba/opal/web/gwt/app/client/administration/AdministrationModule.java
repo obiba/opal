@@ -35,7 +35,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdm
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.*;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages.*;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.*;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.*;
@@ -193,8 +193,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(DataShieldProfilePresenter.class, DataShieldProfilePresenter.Display.class, DataShieldProfileView.class);
     bindPresenterWidget(DataShieldPackagesPresenter.class,
         DataShieldPackagesPresenter.Display.class, DataShieldPackagesView.class);
-    bindPresenterWidget(DataShieldMethodsConfigPresenter.class, DataShieldMethodsConfigPresenter.Display.class,
-        DataShieldMethodsConfigView.class);
+    bindPresenterWidget(DataShieldMethodsPresenter.class, DataShieldMethodsPresenter.Display.class,
+        DataShieldMethodsView.class);
     bindPresenterWidget(DataShieldPackageInstallModalPresenter.class, DataShieldPackageInstallModalPresenter.Display.class,
         DataShieldPackageInstallModalView.class);
     bindPresenterWidget(DataShieldPackageModalPresenter.class, DataShieldPackageModalPresenter.Display.class,

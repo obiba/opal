@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;

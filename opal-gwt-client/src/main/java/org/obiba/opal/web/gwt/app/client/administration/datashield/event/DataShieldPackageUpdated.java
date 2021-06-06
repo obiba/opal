@@ -16,6 +16,8 @@ import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 @GenEvent
 public class DataShieldPackageUpdated {
 
+  String profile;
+
   RPackageDto dto;
 
 }

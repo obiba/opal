@@ -14,5 +14,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface DataShieldProfileUiHandlers extends UiHandlers {
 
+  void onReset();
 
 }

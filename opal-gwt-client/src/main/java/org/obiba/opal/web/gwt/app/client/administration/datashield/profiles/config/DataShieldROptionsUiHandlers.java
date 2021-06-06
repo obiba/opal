@@ -19,7 +19,4 @@ public interface DataShieldROptionsUiHandlers extends UiHandlers {
 
   void addOption();
 
-  void removeOption(DataShieldROptionDto optionDto);
-
-  void editOption(DataShieldROptionDto optionDto);
 }

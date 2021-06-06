@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
@@ -108,7 +108,8 @@ public class DataShieldPackagesPresenter
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
-            updateDataShieldPackages();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldPackages();
           }
         });
     addRegisteredHandler(DataShieldPackageCreatedEvent.getType(),
@@ -116,7 +117,8 @@ public class DataShieldPackagesPresenter
 
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
-            updateDataShieldPackages();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldPackages();
           }
         });
 
@@ -139,16 +141,18 @@ public class DataShieldPackagesPresenter
     removePackagesConfirmation = new Runnable() {
       @Override
       public void run() {
-        ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGES.create().query("profile", cluster.getName()).build())
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(UriBuilders.DATASHIELD_PACKAGES.create().query("profile", cluster.getName()).build())
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
                 fireEvent(ConfirmationTerminatedEvent.create());
                 updateDataShieldPackages();
-                fireEvent(new DataShieldPackageRemovedEvent(null));
+                fireEvent(new DataShieldPackageRemovedEvent(cluster.getName(), null));
               }
             }, Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR)
-            .delete().send();
+            .delete()
+            .send();
       }
     };
     fireEvent(ConfirmationRequiredEvent
@@ -241,8 +245,8 @@ public class DataShieldPackagesPresenter
         public void authorized() {
           publishMethodsConfirmation = new PublishMethodsRunnable(dto);
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishMethodsConfirmation, translationMessages.publishDataShieldMethods(),
-                  translationMessages.confirmPublishDataShieldMethods()));
+              .createWithMessages(publishMethodsConfirmation, translationMessages.publishDataShieldSettings(),
+                  translationMessages.confirmPublishDataShieldSettings()));
         }
       });
     } else if (actionName.equals(ActionsPackageRColumn.UNPUBLISH_ACTION)) {
@@ -252,8 +256,8 @@ public class DataShieldPackagesPresenter
         public void authorized() {
           publishMethodsConfirmation = new UnPublishMethodsRunnable(dto);
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishMethodsConfirmation, translationMessages.unPublishDataShieldMethods(),
-                  translationMessages.confirmUnPublishDataShieldMethods()));
+              .createWithMessages(publishMethodsConfirmation, translationMessages.unPublishDataShieldSettings(),
+                  translationMessages.confirmUnPublishDataShieldSettings()));
         }
       });
 
@@ -365,7 +369,7 @@ public class DataShieldPackagesPresenter
           fireEvent(ConfirmationTerminatedEvent.create());
           if (response.getStatusCode() == Response.SC_OK) {
             updateDataShieldPackages();
-            fireEvent(new DataShieldPackageRemovedEvent(dto));
+            fireEvent(new DataShieldPackageRemovedEvent(cluster.getName(), dto));
           } else {
             fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
@@ -399,7 +403,7 @@ public class DataShieldPackagesPresenter
             public void onResource(Response response, DataShieldPackageMethodsDto resource) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if (response.getStatusCode() == Response.SC_OK) {
-                fireEvent(new DataShieldPackageUpdatedEvent(dto));
+                fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
@@ -428,7 +432,7 @@ public class DataShieldPackagesPresenter
             public void onResponseCode(Request request, Response response) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if (response.getStatusCode() == Response.SC_NO_CONTENT) {
-                fireEvent(new DataShieldPackageUpdatedEvent(dto));
+                fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }

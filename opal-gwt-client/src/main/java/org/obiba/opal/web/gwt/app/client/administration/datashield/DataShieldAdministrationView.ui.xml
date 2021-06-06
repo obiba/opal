@@ -22,11 +22,11 @@
     </g:FlowPanel>
 
     <b:Heading size="4">
-      <ui:msg description="DataSHIELD Profiles label">Profiles</ui:msg>
+      <ui:msg description="DS Packages label">Packages</ui:msg>
     </b:Heading>
 
     <b:Paragraph>
-      <ui:msg description="R Servers information">
+      <ui:msg description="DS Packages information">
         A cluster of R servers constitutes a DataSHIELD profile: DataSHIELD packages and settings are the same for all
         the R servers in a cluster. DataSHIELD end-user can select which profile to use.
         See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
@@ -35,11 +35,25 @@
 
     <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
+    <b:Heading size="4">
+      <ui:msg description="DS Profiles label">Profiles</ui:msg>
+    </b:Heading>
+
+    <b:Paragraph>
+      <ui:msg description="DS Profiles information">
+        A cluster of R servers constitutes a DataSHIELD profile: DataSHIELD packages and settings are the same for all
+        the R servers in a cluster. DataSHIELD end-user can select which profile to use.
+        See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
+      </ui:msg>
+    </b:Paragraph>
+
+    <b:TabPanel tabPosition="left" ui:field="profileTabs"/>
+
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
-      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
+      <g:SimplePanel ui:field="permissions"/>
     </g:FlowPanel>
 
     <b:Heading size="4">

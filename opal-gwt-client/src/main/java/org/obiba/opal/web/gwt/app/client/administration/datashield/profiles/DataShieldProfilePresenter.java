@@ -9,15 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
+import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsConfigPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages.DataShieldPackagesPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
@@ -40,47 +40,48 @@ public class DataShieldProfilePresenter
 
   public static final Object OptionsSlot = new Object();
 
-  private final DataShieldPackagesPresenter packagePresenter;
+  private final Provider<DataShieldMethodsPresenter> methodsPresenterProvider;
 
-  private final DataShieldMethodsConfigPresenter aggregatePresenter;
-
-  private final DataShieldMethodsConfigPresenter assignPresenter;
-
-  private final DataShieldROptionsPresenter optionsPresenter;
+  private final Provider<DataShieldROptionsPresenter> optionsProvider;
 
   private RServerClusterDto cluster;
 
   @Inject
   public DataShieldProfilePresenter(Display display, EventBus eventBus,
                                     Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-                                    Provider<DataShieldMethodsConfigPresenter> adminPresenterProvider,
-                                    Provider<DataShieldROptionsPresenter> optionsProvider,
-                                    DataShieldPackagesPresenter packagePresenter) {
+                                    Provider<DataShieldMethodsPresenter> methodsPresenterProvider,
+                                    Provider<DataShieldROptionsPresenter> optionsProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    this.methodsPresenterProvider = methodsPresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
-    this.packagePresenter = packagePresenter;
-    this.optionsPresenter = optionsProvider.get();
-    this.aggregatePresenter = adminPresenterProvider.get();
-    this.aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
-    this.assignPresenter = adminPresenterProvider.get();
-    this.assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
+    this.optionsProvider = optionsProvider;
+  }
+
+  @Override
+  public void onReset() {
+    // TODO
   }
 
   public void setCluster(RServerClusterDto cluster) {
     this.cluster = cluster;
-    packagePresenter.setCluster(cluster);
-    aggregatePresenter.setCluster(cluster);
+    DataShieldMethodsPresenter assignPresenter = methodsPresenterProvider.get();
+    assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
     assignPresenter.setCluster(cluster);
+    addToSlot(AssignEnvironmentSlot, assignPresenter);
+
+    DataShieldMethodsPresenter aggregatePresenter = methodsPresenterProvider.get();
+    aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
+    aggregatePresenter.setCluster(cluster);
+    addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
+
+    DataShieldROptionsPresenter optionsPresenter = optionsProvider.get();
     optionsPresenter.setCluster(cluster);
+    addToSlot(OptionsSlot, optionsPresenter);
   }
 
   @Override
   protected void onBind() {
-    addToSlot(PackageSlot, packagePresenter);
-    setInSlot(OptionsSlot, optionsPresenter);
-    addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
-    addToSlot(AssignEnvironmentSlot, assignPresenter);
   }
 
   public interface DataShieldEnvironment {

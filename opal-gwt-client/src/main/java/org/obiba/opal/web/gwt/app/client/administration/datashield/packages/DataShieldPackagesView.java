@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Joiner;

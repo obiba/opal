@@ -144,13 +144,13 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove all Packages")
   String removeAllDataShieldPackages();
 
-  @Description("Publish Package Methods label")
-  @DefaultMessage("Publish Package Methods")
-  String publishDataShieldMethods();
+  @Description("Publish Package Settings label")
+  @DefaultMessage("Publish Package Settings")
+  String publishDataShieldSettings();
 
-  @Description("UnPublish Package Methods label")
-  @DefaultMessage("Unpublish Package Methods")
-  String unPublishDataShieldMethods();
+  @Description("UnPublish Package Settings label")
+  @DefaultMessage("Unpublish Package Settings")
+  String unPublishDataShieldSettings();
 
   @Description("Unregister Database label")
   @DefaultMessage("Unregister Database")
@@ -504,21 +504,21 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove this aggregating method.")
   String confirmDeleteDataShieldAggregateMethod();
 
-  @Description("Please confirm that you want to remove this package and all its methods message")
+  @Description("Please confirm that you want to remove this package and all its methods and options message")
   @DefaultMessage("Please confirm that you want to remove this package and all its methods and options.")
   String confirmDeleteDataShieldPackage();
 
-  @Description("Please confirm that you want to remove all the packages and all their methods message")
+  @Description("Please confirm that you want to remove all the packages and all their methods and options message")
   @DefaultMessage("Please confirm that you want to remove all the packages and the associated methods and options.")
   String confirmDeleteAllDataShieldPackages();
 
-  @Description("Please confirm that you want to publish this package methods message")
-  @DefaultMessage("Please confirm that you want to publish this package methods.")
-  String confirmPublishDataShieldMethods();
+  @Description("Please confirm that you want to publish this package methods and options message")
+  @DefaultMessage("Please confirm that you want to publish this package methods and options.")
+  String confirmPublishDataShieldSettings();
 
-  @Description("Please confirm that you want to unpublish this package methods message")
-  @DefaultMessage("Please confirm that you want to unpublish this package methods.")
-  String confirmUnPublishDataShieldMethods();
+  @Description("Please confirm that you want to unpublish this package methods and options message")
+  @DefaultMessage("Please confirm that you want to unpublish this package methods and options.")
+  String confirmUnPublishDataShieldSettings();
 
   @Description("Please confirm that you want to unregister this database message")
   @DefaultMessage("Please confirm that you want to unregister this database.")

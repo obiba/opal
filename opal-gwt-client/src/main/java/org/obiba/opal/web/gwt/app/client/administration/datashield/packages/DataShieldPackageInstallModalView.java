@@ -7,10 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages.DataShieldPackageInstallModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackageInstallModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;

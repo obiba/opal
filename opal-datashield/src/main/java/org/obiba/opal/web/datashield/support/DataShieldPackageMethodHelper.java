@@ -124,9 +124,13 @@ public class DataShieldPackageMethodHelper {
    * @param name Package name
    */
   public void unpublish(String profile, String name) {
+    List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
+    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
+
     DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
-    removeMethods(config, DSMethodType.AGGREGATE, name);
-    removeMethods(config, DSMethodType.ASSIGN, name);
+    removeMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList());
+    removeMethods(config, DSMethodType.ASSIGN, methods.getAssignList());
+    removeOptions(config, getPackageROptions(packageDtos));
     datashieldConfigService.saveConfiguration(config);
   }
 
@@ -144,11 +148,11 @@ public class DataShieldPackageMethodHelper {
 
   public void deletePackage(String profile, OpalR.RPackageDto pkg) {
     try {
-      deletePackageMethods(profile, pkg.getName(), DSMethodType.AGGREGATE);
-      deletePackageMethods(profile, pkg.getName(), DSMethodType.ASSIGN);
-
       DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
-      getPackageROptions(pkg).forEach(opt -> config.removeOption(opt.getName()));
+      DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(pkg);
+      removeMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList());
+      removeMethods(config, DSMethodType.ASSIGN, methods.getAssignList());
+      removeOptions(config, getPackageROptions(pkg));
       datashieldConfigService.saveConfiguration(config);
 
       rPackageHelper.removePackage(rServerManagerService.getRServer(profile), pkg.getName());
@@ -188,12 +192,13 @@ public class DataShieldPackageMethodHelper {
   // Private methods
   //
 
-  private void removeMethods(DatashieldConfig config, DSMethodType type, String name) {
+  private void removeMethods(DatashieldConfig config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
     DSEnvironment env = config.getEnvironment(type);
-    List<DSMethod> methodsToRemove = env.getMethods().stream()
-        .filter(m -> m.hasPackage() && ((DefaultDSMethod)m).getPackage().equals(name))
-        .collect(Collectors.toList());
-    methodsToRemove.forEach(m -> env.removeMethod(m.getName()));
+    envMethods.forEach(m -> env.removeMethod(m.getName()));
+  }
+
+  private void removeOptions(DatashieldConfig config, List<DataShield.DataShieldROptionDto> roptions) {
+    roptions.forEach(opt -> config.removeOption(opt.getName()));
   }
 
   private void addMethods(DatashieldConfig config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {

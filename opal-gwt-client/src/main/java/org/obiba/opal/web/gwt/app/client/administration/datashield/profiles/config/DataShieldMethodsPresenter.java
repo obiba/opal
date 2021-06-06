@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,24 +49,24 @@ import java.util.List;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
-public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShieldMethodsConfigPresenter.Display> {
+public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethodsPresenter.Display> {
 
   private String env;
 
   private Runnable removeMethodConfirmation;
 
-  private final ModalProvider<DataShieldMethodModalPresenter> datashieldModalProvider;
+  private final ModalProvider<DataShieldMethodModalPresenter> methodModalProvider;
 
   private TranslationMessages translationMessages;
 
   private RServerClusterDto cluster;
 
   @Inject
-  public DataShieldMethodsConfigPresenter(Display display, EventBus eventBus,
-                                          ModalProvider<DataShieldMethodModalPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
+  public DataShieldMethodsPresenter(Display display, EventBus eventBus,
+                                    ModalProvider<DataShieldMethodModalPresenter> methodModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
-    this.datashieldModalProvider = datashieldModalProvider.setContainer(this);
+    this.methodModalProvider = methodModalProvider.setContainer(this);
   }
 
   public void setEnvironment(String env) {
@@ -81,7 +81,7 @@ public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShield
   }
 
   private void addEventHandlers() {
-    getView().getDataShieldMethodActionsColumn().setActionHandler(new ActionHandler<DataShieldMethodDto>() {
+    getView().setMethodActionHandler(new ActionHandler<DataShieldMethodDto>() {
       @Override
       public void doAction(DataShieldMethodDto dto, String actionName) {
         if (actionName != null) {
@@ -89,17 +89,17 @@ public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShield
         }
       }
     });
-    addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
     registerHandler(getView().addMethodHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        DataShieldMethodModalPresenter presenter = datashieldModalProvider.get();
-        if (!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
+        DataShieldMethodModalPresenter presenter = methodModalProvider.get();
+        presenter.initialize(cluster, env);
         presenter.createNewMethod();
       }
     }));
-    addHandler(DataShieldMethodCreatedEvent.getType(),
+    addRegisteredHandler(DataShieldMethodCreatedEvent.getType(),
         new DataShieldMethodCreatedEvent.DataShieldMethodCreatedHandler() {
 
           @Override
@@ -107,23 +107,24 @@ public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShield
             updateDataShieldMethods();
           }
         });
-    addHandler(DataShieldMethodUpdatedEvent.getType(),
+    addRegisteredHandler(DataShieldMethodUpdatedEvent.getType(),
         new DataShieldMethodUpdatedEvent.DataShieldMethodUpdatedHandler() {
 
           @Override
           public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
-            updateDataShieldMethods();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldMethods();
           }
 
         });
-    addHandler(DataShieldPackageRemovedEvent.getType(),
+    addRegisteredHandler(DataShieldPackageRemovedEvent.getType(),
         new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
             updateDataShieldMethods();
           }
         });
-    addHandler(DataShieldPackageUpdatedEvent.getType(),
+    addRegisteredHandler(DataShieldPackageUpdatedEvent.getType(),
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
@@ -198,8 +199,8 @@ public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShield
 
         @Override
         public void authorized() {
-          DataShieldMethodModalPresenter presenter = datashieldModalProvider.get();
-          presenter.setEnvironement(env);
+          DataShieldMethodModalPresenter presenter = methodModalProvider.get();
+          presenter.initialize(cluster, env);
           presenter.updateMethod(dto);
         }
       });
@@ -296,7 +297,7 @@ public class DataShieldMethodsConfigPresenter extends PresenterWidget<DataShield
 
     void showDataShieldMethods(List<DataShieldMethodDto> rows);
 
-    HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
+    void setMethodActionHandler(ActionHandler<DataShieldMethodDto> handler);
 
     HandlerRegistration addMethodHandler(ClickHandler handler);
 

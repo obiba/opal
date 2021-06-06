@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
@@ -29,9 +31,6 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  Panel packages;
-
-  @UiField
   SimplePanel aggregatePanel;
 
   @UiField
@@ -50,23 +49,18 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
     if(slot == DataShieldProfilePresenter.AggregateEnvironmentSlot) {
       aggregatePanel.clear();
       aggregatePanel.setWidget(content.asWidget());
-    }
-    if(slot == DataShieldProfilePresenter.AssignEnvironmentSlot) {
+    } else if(slot == DataShieldProfilePresenter.AssignEnvironmentSlot) {
       assignPanel.clear();
       assignPanel.setWidget(content.asWidget());
-    }
-    if(slot == DataShieldProfilePresenter.PackageSlot) {
-      packages.clear();
-      packages.add(content);
+    } else if(slot == DataShieldProfilePresenter.OptionsSlot) {
+      optionsPanel.clear();
+      optionsPanel.setWidget(content.asWidget());
     }
   }
 
-  @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    if(slot == DataShieldProfilePresenter.OptionsSlot) {
-      optionsPanel.clear();
-      optionsPanel.add(content);
-    }
+  @UiHandler("resetProfile")
+  void onDownloadLogs(ClickEvent event) {
+    getUiHandlers().onReset();
   }
 
 }

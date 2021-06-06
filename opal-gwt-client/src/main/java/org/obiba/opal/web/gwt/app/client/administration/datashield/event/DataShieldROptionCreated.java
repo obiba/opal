@@ -17,5 +17,9 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
 
 @GenEvent
 public class DataShieldROptionCreated {
+
+  String profile;
+
   DataShieldROptionDto optionDto;
+
 }

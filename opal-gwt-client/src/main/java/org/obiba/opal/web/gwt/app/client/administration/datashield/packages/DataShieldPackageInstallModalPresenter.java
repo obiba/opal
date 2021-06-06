@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.packages;
+package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -189,8 +189,8 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if (response.getStatusCode() == Response.SC_CREATED) {
-        getEventBus().fireEvent(new DataShieldPackageCreatedEvent(dto));
-        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
+        getEventBus().fireEvent(new DataShieldPackageCreatedEvent(cluster.getName(), dto));
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(cluster.getName()));
       } else if (response.getStatusCode() == Response.SC_NOT_FOUND) {
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("RPackageInstalledButNotFound").build());
       } else {

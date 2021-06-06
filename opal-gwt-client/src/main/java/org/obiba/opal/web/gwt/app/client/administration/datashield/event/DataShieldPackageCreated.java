@@ -17,6 +17,8 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
 @GenEvent
 public class DataShieldPackageCreated {
 
+  String profile;
+
   RPackageDto dto;
 
 }

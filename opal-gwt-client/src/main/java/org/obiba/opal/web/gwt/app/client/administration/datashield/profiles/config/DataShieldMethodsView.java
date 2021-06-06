@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -50,11 +51,11 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOV
 /**
  *
  */
-public class DataShieldMethodsConfigView extends ViewImpl implements DataShieldMethodsConfigPresenter.Display {
+public class DataShieldMethodsView extends ViewImpl implements DataShieldMethodsPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
 
-  interface Binder extends UiBinder<Widget, DataShieldMethodsConfigView> {}
+  interface Binder extends UiBinder<Widget, DataShieldMethodsView> {}
 
   private final Translations translations;
 
@@ -86,7 +87,7 @@ public class DataShieldMethodsConfigView extends ViewImpl implements DataShieldM
   private List<DataShieldMethodDto> originalMethods;
 
   @Inject
-  public DataShieldMethodsConfigView(Binder uiBinder, Translations translations) {
+  public DataShieldMethodsView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
@@ -135,8 +136,8 @@ public class DataShieldMethodsConfigView extends ViewImpl implements DataShieldM
   }
 
   @Override
-  public HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn() {
-    return actionsColumn;
+  public void setMethodActionHandler(ActionHandler<DataShieldMethodDto> handler) {
+    actionsColumn.setActionHandler(handler);
   }
 
   private void initMethodsTable() {

@@ -15,9 +15,9 @@ public class ActionsPackageRColumn<T> extends Column<T, T> implements HasActionH
 
   public static final String REMOVE_ACTION = "Remove";
 
-  public static final String PUBLISH_ACTION = "PublishMethods";
+  public static final String PUBLISH_ACTION = "Publish";
 
-  public static final String UNPUBLISH_ACTION = "UnPublishMethods";
+  public static final String UNPUBLISH_ACTION = "UnPublish";
 
   public ActionsPackageRColumn(String... actions) {
     this(new ConstantActionsProvider<T>(actions));

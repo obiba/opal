@@ -16,22 +16,28 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldAdministrationUiHandlers> implements DataShieldAdministrationPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {}
+  interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {
+  }
 
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   TabPanel clusterTabs;
+
+  @UiField
+  TabPanel profileTabs;
 
   @UiField
   Panel permissionsPanel;
@@ -49,20 +55,26 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
 
   @Override
   public void addToSlot(Object slot, IsWidget content) {
-    clusterTabs.clear();
-  }
-
-  @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    if(slot == DataShieldAdministrationPresenter.PermissionSlot) {
-      permissions.clear();
-      permissions.add(content);
-    } else {
+    if (slot instanceof DataShieldAdministrationPresenter.PackagesSlot) {
       Tab tab = new Tab();
       tab.setHeading(slot.toString());
       tab.add(content.asWidget());
       clusterTabs.add(tab);
       clusterTabs.selectTab(0);
+    } else if (slot instanceof DataShieldAdministrationPresenter.ProfilesSlot) {
+      Tab tab = new Tab();
+      tab.setHeading(slot.toString());
+      tab.add(content.asWidget());
+      profileTabs.add(tab);
+      profileTabs.selectTab(0);
+    }
+  }
+
+  @Override
+  public void setInSlot(Object slot, IsWidget content) {
+    if (slot == DataShieldAdministrationPresenter.PermissionSlot) {
+      permissions.clear();
+      permissions.add(content);
     }
   }
 
@@ -72,8 +84,9 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   }
 
   @Override
-  public void clearProfiles() {
-
+  public void clearClusters() {
+    clusterTabs.clear();
+    profileTabs.clear();
   }
 
   @Override

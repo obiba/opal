@@ -10,8 +10,18 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import java.util.List;
-
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CellTable;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -21,19 +31,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CellTable;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
@@ -41,7 +39,8 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOV
 public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROptionsUiHandlers>
     implements DataShieldROptionsPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldROptionsView> {}
+  interface Binder extends UiBinder<Widget, DataShieldROptionsView> {
+  }
 
   @UiField
   CellTable<DataShieldROptionDto> table;
@@ -53,6 +52,8 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
   Button addOptionButton;
 
   private final ListDataProvider<DataShieldROptionDto> dataProvider = new ListDataProvider<>();
+
+  private ActionsColumn<DataShieldROptionDto> actionsColumn;
 
   @Inject
   public DataShieldROptionsView(Binder uiBinder, Translations translations) {
@@ -84,56 +85,26 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
 
   private void initTable(Translations translations) {
     table.setVisibleRange(0, 10);
-    table.addColumn(Columns.NAME, translations.nameLabel());
-    table.addColumn(Columns.VALUE, translations.valueLabel());
-    table.addColumn(Columns.ACTIONS, translations.actionsLabel());
-    table.setEmptyTableWidget(new Label(translations.noOptionsLabel()));
-
-    registerActionsHandlers();
-    dataProvider.addDataDisplay(table);
-    pager.setDisplay(table);
-  }
-
-  private void registerActionsHandlers() {
-    Columns.ACTIONS.setActionHandler(new ActionHandler<DataShieldROptionDto>() {
-      @Override
-      public void doAction(DataShieldROptionDto optionDto, String actionName) {
-        switch(actionName) {
-          case REMOVE_ACTION:
-            getUiHandlers().removeOption(optionDto);
-            break;
-          case EDIT_ACTION:
-            getUiHandlers().editOption(optionDto);
-            break;
-        }
-      }
-    });
-  }
-
-  private static final class Columns {
-
-    static final Column<DataShieldROptionDto, String> NAME = new TextColumn<DataShieldROptionDto>() {
+    table.addColumn(new TextColumn<DataShieldROptionDto>() {
 
       @Override
       public String getValue(DataShieldROptionDto optionDto) {
         return optionDto.getName();
       }
-    };
-
-    static final Column<DataShieldROptionDto, String> VALUE = new TextColumn<DataShieldROptionDto>() {
+    }, translations.nameLabel());
+    table.addColumn(new TextColumn<DataShieldROptionDto>() {
 
       @Override
       public String getValue(DataShieldROptionDto optionDto) {
         return optionDto.getValue();
       }
-    };
-
-    static final ActionsColumn<DataShieldROptionDto> ACTIONS = new ActionsColumn<>(
+    }, translations.valueLabel());
+    table.addColumn(actionsColumn = new ActionsColumn<>(
         new ActionsProvider<DataShieldROptionDto>() {
 
           @Override
           public String[] allActions() {
-            return new String[] { EDIT_ACTION, REMOVE_ACTION };
+            return new String[]{EDIT_ACTION, REMOVE_ACTION};
           }
 
           @Override
@@ -141,9 +112,16 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
             return allActions();
           }
 
-        });
+        }), translations.actionsLabel());
+    table.setEmptyTableWidget(new Label(translations.noOptionsLabel()));
 
+    dataProvider.addDataDisplay(table);
+    pager.setDisplay(table);
   }
 
+  @Override
+  public void setOptionActionHandler(ActionHandler<DataShieldROptionDto> handler) {
+    actionsColumn.setActionHandler(handler);
+  }
 
 }

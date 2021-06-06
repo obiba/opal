@@ -32,6 +32,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -49,9 +50,11 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
     RSCRIPT, RFUNCTION
   }
 
-  private String environement;
+  private String environment;
 
   private MethodValidationHandler methodValidationHandler;
+
+  private RServerClusterDto cluster;
 
   @Inject
   public DataShieldMethodModalPresenter(Display display, EventBus eventBus) {
@@ -73,8 +76,9 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
     getView().hideDialog();
   }
 
-  public void setEnvironement(String environement) {
-    this.environement = environement;
+  public void initialize(RServerClusterDto cluster, String environment) {
+    this.cluster = cluster;
+    this.environment = environment;
   }
 
   @Override
@@ -133,11 +137,13 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
   }
 
   private String method(String method) {
-    return UriBuilder.create().segment("datashield", "env", environement, "method", "{method}").build(method);
+    return UriBuilder.create().segment("datashield", "env", environment, "method", "{method}")
+        .query("profile", cluster.getName()).build(method);
   }
 
   private String methods() {
-    return UriBuilder.create().segment("datashield", "env", environement, "methods").build();
+    return UriBuilder.create().segment("datashield", "env", environment, "methods")
+        .query("profile", cluster.getName()).build();
   }
 
   private void updateMethod() {
@@ -245,9 +251,9 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if (response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(cluster.getName()));
       } else if (response.getStatusCode() == Response.SC_CREATED) {
-        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
+        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(cluster.getName(), dto));
       }
     }
   }
