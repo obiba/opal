@@ -22,10 +22,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.*;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -65,6 +62,8 @@ public class DataShieldPackagesPresenter
   private Runnable removePackagesConfirmation;
 
   private RServerClusterDto cluster;
+
+  private List<RPackageDto> packages;
 
   @Inject
   public DataShieldPackagesPresenter(Display display, EventBus eventBus,
@@ -121,6 +120,14 @@ public class DataShieldPackagesPresenter
               updateDataShieldPackages();
           }
         });
+    addRegisteredHandler(DataShieldProfileResetEvent.getType(), new DataShieldProfileResetEvent.DataShieldProfileResetHandler() {
+      @Override
+      public void onDataShieldProfileReset(DataShieldProfileResetEvent event) {
+        if (event.getProfile().equals(cluster.getName()) && packages != null)
+          for (RPackageDto pkg : packages)
+            new PublishMethodsRunnable(pkg).run();
+      }
+    });
 
     FieldUpdater<RPackageDto, String> updater = new PackageNameFieldUpdater();
     getView().setPackageNameFieldUpdater(updater);
@@ -222,6 +229,7 @@ public class DataShieldPackagesPresenter
           public void onResponseCode(Request request, Response response) {
             getView().setAddPackageButtonEnabled(false);
             getView().renderDataShieldPackages(null);
+            packages = null;
             getEventBus()
                 .fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
           }
@@ -231,7 +239,8 @@ public class DataShieldPackagesPresenter
           public void onResource(Response response, JsArray<RPackageDto> resource) {
             if (response.getStatusCode() == Response.SC_OK) {
               getView().setAddPackageButtonEnabled(true);
-              getView().renderDataShieldPackages(JsArrays.toList(resource));
+              packages = JsArrays.toList(resource);
+              getView().renderDataShieldPackages(packages);
             }
           }
         }).send();

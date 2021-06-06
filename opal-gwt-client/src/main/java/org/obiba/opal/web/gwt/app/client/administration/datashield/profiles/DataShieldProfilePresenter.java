@@ -16,6 +16,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileResetEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
@@ -60,7 +61,7 @@ public class DataShieldProfilePresenter
 
   @Override
   public void onReset() {
-    // TODO
+    fireEvent(new DataShieldProfileResetEvent(cluster.getName()));
   }
 
   public void setCluster(RServerClusterDto cluster) {
