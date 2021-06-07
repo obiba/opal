@@ -56,6 +56,34 @@ public class DataShieldPackagesResource {
     return Response.created(ub.build(name)).build();
   }
 
+  /**
+   * Append DataSHIELD package settings to the profile configuration as a bulk operation.
+   *
+   * @param names
+   * @param profile
+   * @return
+   */
+  @PUT
+  @Path("_publish")
+  public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
+    names.forEach(name -> dsPackageMethodeHelper.publish(profile, name));
+    return Response.ok().build();
+  }
+
+  /**
+   * Remove package DataSHIELD settings from profile configuration as a bulk operation.
+   *
+   * @param names
+   * @param profile
+   * @return
+   */
+  @DELETE
+  @Path("_publish")
+  public Response deletePackageSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
+    names.forEach(name -> dsPackageMethodeHelper.unpublish(profile, name));
+    return Response.noContent().build();
+  }
+
   @DELETE
   public Response deletePackages(@QueryParam("profile") String profile) {
     try {

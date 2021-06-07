@@ -126,18 +126,22 @@ public class DataShieldPackagesPresenter
       @Override
       public void onDataShieldProfileReset(DataShieldProfileResetEvent event) {
         if (event.getProfile().equals(cluster.getName()) && packages != null) {
-          for (final RPackageDto pkg : packages) {
-            ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
-                .forResource(packageRMethods(pkg.getName()))
-                .put()
-                .withCallback(new ResponseCodeCallback() {
-                  @Override
-                  public void onResponseCode(Request request, Response response) {
-                    fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), pkg));
-                  }
-                }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
-          }
-          fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
+          UriBuilder builder = UriBuilders.DATASHIELD_PACKAGES_PUBLISH.create();
+          for (final RPackageDto pkg : packages)
+            builder.query("name", pkg.getName());
+          builder.query("profile", cluster.getName());
+
+          ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+              .forResource(builder.build())
+              .put()
+              .withCallback(new ResponseCodeCallback() {
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
+                  fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), null));
+                }
+              }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
+
         }
       }
     });
@@ -195,13 +199,13 @@ public class DataShieldPackagesPresenter
   }
 
   private String packageR(String packageR) {
-    return UriBuilder.create().segment("datashield", "package", "{package}")
+    return UriBuilders.DATASHIELD_PACKAGE.create()
         .query("profile", cluster.getName())
         .build(packageR);
   }
 
   private String packageRMethods(String packageR) {
-    return UriBuilder.create().segment("datashield", "package", "{package}", "methods")
+    return UriBuilders.DATASHIELD_PACKAGE_METHODS.create()
         .query("profile", cluster.getName())
         .build(packageR);
   }

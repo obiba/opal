@@ -1168,6 +1168,27 @@ public enum UriBuilders {
     }
   },
 
+  DATASHIELD_PACKAGES_PUBLISH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "packages", "_publish");
+    }
+  },
+
+  DATASHIELD_PACKAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "package", "{}");
+    }
+  },
+
+  DATASHIELD_PACKAGE_METHODS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "package", "{}", "methods");
+    }
+  },
+
   DATASHIELD_ROPTIONS {
     @Override
     public UriBuilder create() {

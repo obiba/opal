@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,7 +34,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -104,7 +102,8 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
-            updateDataShieldMethods();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldMethods();
           }
         });
     addRegisteredHandler(DataShieldMethodUpdatedEvent.getType(),
@@ -121,14 +120,16 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
         new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
-            updateDataShieldMethods();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldMethods();
           }
         });
     addRegisteredHandler(DataShieldPackageUpdatedEvent.getType(),
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
-            updateDataShieldMethods();
+            if (cluster.getName().equals(event.getProfile()))
+              updateDataShieldMethods();
           }
         });
   }
