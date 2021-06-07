@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
+import com.google.common.collect.Sets;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -44,6 +45,7 @@ import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.google.gwt.http.client.Response.*;
 
@@ -132,8 +134,11 @@ public class DataShieldPackagesPresenter
             @Override
             public void run() {
               UriBuilder builder = UriBuilders.DATASHIELD_PACKAGES_PUBLISH.create();
+              Set<String> pkgNames = Sets.newHashSet();
               for (final RPackageDto pkg : packages)
-                builder.query("name", pkg.getName());
+                pkgNames.add(pkg.getName());
+              for (String name : pkgNames)
+                builder.query("name", name);
               builder.query("profile", cluster.getName());
 
               ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
@@ -150,7 +155,7 @@ public class DataShieldPackagesPresenter
             }
           };
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishPackageConfirmation, translationMessages.publishAllDataShieldSettings(),
+              .createWithMessages(publishPackagesConfirmation, translationMessages.publishAllDataShieldSettings(),
                   translationMessages.confirmPublishAllDataShieldSettings(cluster.getName())));
         }
       }
@@ -340,19 +345,19 @@ public class DataShieldPackagesPresenter
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if (removePackageConfirmation != null && event.getSource().equals(removePackageConfirmation) &&
+      if (event.getSource().equals(removePackageConfirmation) &&
           event.isConfirmed()) {
         removePackageConfirmation.run();
         removePackageConfirmation = null;
-      } else if (publishPackageConfirmation != null && event.getSource().equals(publishPackageConfirmation) &&
+      } else if (event.getSource().equals(publishPackageConfirmation) &&
           event.isConfirmed()) {
         publishPackageConfirmation.run();
         publishPackageConfirmation = null;
-      } else if (removePackagesConfirmation != null && event.getSource().equals(removePackagesConfirmation) &&
+      } else if (event.getSource().equals(removePackagesConfirmation) &&
           event.isConfirmed()) {
         removePackagesConfirmation.run();
         removePackagesConfirmation = null;
-      } else if (publishPackagesConfirmation != null && event.getSource().equals(publishPackagesConfirmation) && event.isConfirmed()) {
+      } else if (event.getSource().equals(publishPackagesConfirmation) && event.isConfirmed()) {
         publishPackagesConfirmation.run();
         publishPackagesConfirmation = null;
       }

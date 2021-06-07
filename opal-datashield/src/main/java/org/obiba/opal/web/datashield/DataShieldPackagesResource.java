@@ -66,7 +66,7 @@ public class DataShieldPackagesResource {
   @PUT
   @Path("_publish")
   public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
-    names.forEach(name -> dsPackageMethodeHelper.publish(profile, name));
+    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profile, name));
     return Response.ok().build();
   }
 
