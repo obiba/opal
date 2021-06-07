@@ -51,10 +51,6 @@ public class DataShieldPackagesPresenter
     extends PresenterWidget<DataShieldPackagesPresenter.Display>
     implements DataShieldPackagesUiHandlers {
 
-  private Runnable removePackageConfirmation;
-
-  private Runnable publishMethodsConfirmation;
-
   private final ModalProvider<DataShieldPackageInstallModalPresenter> packageInstallModalPresenterProvider;
 
   private final ModalProvider<DataShieldPackageModalPresenter> packageModalPresenterProvider;
@@ -62,6 +58,12 @@ public class DataShieldPackagesPresenter
   private TranslationMessages translationMessages;
 
   private Runnable removePackagesConfirmation;
+
+  private Runnable removePackageConfirmation;
+
+  private Runnable publishPackageConfirmation;
+
+  private Runnable publishPackagesConfirmation;
 
   private RServerClusterDto cluster;
 
@@ -125,23 +127,31 @@ public class DataShieldPackagesPresenter
     addRegisteredHandler(DataShieldProfileResetEvent.getType(), new DataShieldProfileResetEvent.DataShieldProfileResetHandler() {
       @Override
       public void onDataShieldProfileReset(DataShieldProfileResetEvent event) {
-        if (event.getProfile().equals(cluster.getName()) && packages != null) {
-          UriBuilder builder = UriBuilders.DATASHIELD_PACKAGES_PUBLISH.create();
-          for (final RPackageDto pkg : packages)
-            builder.query("name", pkg.getName());
-          builder.query("profile", cluster.getName());
+        if (event.getProfile().equals(cluster.getName()) && packages != null && !packages.isEmpty()) {
+          publishPackagesConfirmation = new Runnable() {
+            @Override
+            public void run() {
+              UriBuilder builder = UriBuilders.DATASHIELD_PACKAGES_PUBLISH.create();
+              for (final RPackageDto pkg : packages)
+                builder.query("name", pkg.getName());
+              builder.query("profile", cluster.getName());
 
-          ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
-              .forResource(builder.build())
-              .put()
-              .withCallback(new ResponseCodeCallback() {
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
-                  fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), null));
-                }
-              }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
-
+              ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+                  .forResource(builder.build())
+                  .put()
+                  .withCallback(new ResponseCodeCallback() {
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
+                      fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), null));
+                      fireEvent(ConfirmationTerminatedEvent.create());
+                    }
+                  }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
+            }
+          };
+          fireEvent(ConfirmationRequiredEvent
+              .createWithMessages(publishPackageConfirmation, translationMessages.publishAllDataShieldSettings(),
+                  translationMessages.confirmPublishAllDataShieldSettings(cluster.getName())));
         }
       }
     });
@@ -269,10 +279,10 @@ public class DataShieldPackagesPresenter
 
         @Override
         public void authorized() {
-          publishMethodsConfirmation = new PublishMethodsRunnable(dto);
+          publishPackageConfirmation = new PublishMethodsRunnable(dto);
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishMethodsConfirmation, translationMessages.publishDataShieldSettings(),
-                  translationMessages.confirmPublishDataShieldSettings()));
+              .createWithMessages(publishPackageConfirmation, translationMessages.publishDataShieldSettings(),
+                  translationMessages.confirmPublishDataShieldSettings(dto.getName(), cluster.getName())));
         }
       });
     } else if (actionName.equals(ActionsPackageRColumn.UNPUBLISH_ACTION)) {
@@ -280,10 +290,10 @@ public class DataShieldPackagesPresenter
 
         @Override
         public void authorized() {
-          publishMethodsConfirmation = new UnPublishMethodsRunnable(dto);
+          publishPackageConfirmation = new UnPublishMethodsRunnable(dto);
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishMethodsConfirmation, translationMessages.unPublishDataShieldSettings(),
-                  translationMessages.confirmUnPublishDataShieldSettings()));
+              .createWithMessages(publishPackageConfirmation, translationMessages.unPublishDataShieldSettings(),
+                  translationMessages.confirmUnPublishDataShieldSettings(dto.getName(), cluster.getName())));
         }
       });
 
@@ -334,14 +344,17 @@ public class DataShieldPackagesPresenter
           event.isConfirmed()) {
         removePackageConfirmation.run();
         removePackageConfirmation = null;
-      } else if (publishMethodsConfirmation != null && event.getSource().equals(publishMethodsConfirmation) &&
+      } else if (publishPackageConfirmation != null && event.getSource().equals(publishPackageConfirmation) &&
           event.isConfirmed()) {
-        publishMethodsConfirmation.run();
-        publishMethodsConfirmation = null;
+        publishPackageConfirmation.run();
+        publishPackageConfirmation = null;
       } else if (removePackagesConfirmation != null && event.getSource().equals(removePackagesConfirmation) &&
           event.isConfirmed()) {
         removePackagesConfirmation.run();
         removePackagesConfirmation = null;
+      } else if (publishPackagesConfirmation != null && event.getSource().equals(publishPackagesConfirmation) && event.isConfirmed()) {
+        publishPackagesConfirmation.run();
+        publishPackagesConfirmation = null;
       }
     }
   }

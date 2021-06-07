@@ -148,6 +148,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Publish Package Settings")
   String publishDataShieldSettings();
 
+  @Description("Publish Packages Settings label")
+  @DefaultMessage("Reset Settings")
+  String publishAllDataShieldSettings();
+
   @Description("UnPublish Package Settings label")
   @DefaultMessage("Unpublish Package Settings")
   String unPublishDataShieldSettings();
@@ -513,12 +517,16 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteAllDataShieldPackages();
 
   @Description("Please confirm that you want to publish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to publish this package methods and options.")
-  String confirmPublishDataShieldSettings();
+  @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profile <b>{1}</b>.")
+  String confirmPublishDataShieldSettings(String name, String profile);
+
+  @Description("Please confirm that you want to publish all packages methods and options message")
+  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Custom settings will not be modified.")
+  String confirmPublishAllDataShieldSettings(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to unpublish this package methods and options.")
-  String confirmUnPublishDataShieldSettings();
+  @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profile <b>{1}</b>.")
+  String confirmUnPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to unregister this database message")
   @DefaultMessage("Please confirm that you want to unregister this database.")
