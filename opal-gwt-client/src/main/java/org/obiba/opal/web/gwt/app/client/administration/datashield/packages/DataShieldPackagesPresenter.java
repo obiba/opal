@@ -45,6 +45,8 @@ import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
 
+import static com.google.gwt.http.client.Response.*;
+
 public class DataShieldPackagesPresenter
     extends PresenterWidget<DataShieldPackagesPresenter.Display>
     implements DataShieldPackagesUiHandlers {
@@ -123,9 +125,20 @@ public class DataShieldPackagesPresenter
     addRegisteredHandler(DataShieldProfileResetEvent.getType(), new DataShieldProfileResetEvent.DataShieldProfileResetHandler() {
       @Override
       public void onDataShieldProfileReset(DataShieldProfileResetEvent event) {
-        if (event.getProfile().equals(cluster.getName()) && packages != null)
-          for (RPackageDto pkg : packages)
-            new PublishMethodsRunnable(pkg).run();
+        if (event.getProfile().equals(cluster.getName()) && packages != null) {
+          for (final RPackageDto pkg : packages) {
+            ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+                .forResource(packageRMethods(pkg.getName()))
+                .put()
+                .withCallback(new ResponseCodeCallback() {
+                  @Override
+                  public void onResponseCode(Request request, Response response) {
+                    fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), pkg));
+                  }
+                }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
+          }
+          fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
+        }
       }
     });
 
@@ -157,7 +170,7 @@ public class DataShieldPackagesPresenter
                 updateDataShieldPackages();
                 fireEvent(new DataShieldPackageRemovedEvent(cluster.getName(), null));
               }
-            }, Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR)
+            }, SC_OK, Response.SC_NO_CONTENT, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR)
             .delete()
             .send();
       }
@@ -237,7 +250,7 @@ public class DataShieldPackagesPresenter
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {
-            if (response.getStatusCode() == Response.SC_OK) {
+            if (response.getStatusCode() == SC_OK) {
               getView().setAddPackageButtonEnabled(true);
               packages = JsArrays.toList(resource);
               getView().renderDataShieldPackages(packages);
@@ -376,7 +389,7 @@ public class DataShieldPackagesPresenter
         @Override
         public void onResponseCode(Request request, Response response) {
           fireEvent(ConfirmationTerminatedEvent.create());
-          if (response.getStatusCode() == Response.SC_OK) {
+          if (response.getStatusCode() == SC_OK) {
             updateDataShieldPackages();
             fireEvent(new DataShieldPackageRemovedEvent(cluster.getName(), dto));
           } else {
@@ -387,7 +400,7 @@ public class DataShieldPackagesPresenter
       };
 
       ResourceRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete() //
-          .withCallback(Response.SC_OK, callbackHandler) //
+          .withCallback(SC_OK, callbackHandler) //
           .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
           .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
@@ -411,7 +424,7 @@ public class DataShieldPackagesPresenter
             @Override
             public void onResource(Response response, DataShieldPackageMethodsDto resource) {
               fireEvent(ConfirmationTerminatedEvent.create());
-              if (response.getStatusCode() == Response.SC_OK) {
+              if (response.getStatusCode() == SC_OK) {
                 fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());

@@ -59,8 +59,8 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   }
 
   @UiHandler("resetProfile")
-  void onDownloadLogs(ClickEvent event) {
-    getUiHandlers().onReset();
+  void onProfileReset(ClickEvent event) {
+    getUiHandlers().onProfileReset();
   }
 
 }

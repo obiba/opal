@@ -696,9 +696,7 @@ public interface Translations extends Constants {
       "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",
       "CannotCopySelectedTablesWithinProject",
       "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",
-//
-      "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
-      "tables within the same project. Copy each table individually or create a new project.",
+      "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",
       "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",
       "TaxonomyGitUserRequired", "Github user or organization name is required.",
       "TaxonomyGitRepositoryRequired", "Github repository name is required.",
@@ -763,7 +761,8 @@ public interface Translations extends Constants {
       "ResourceAssignSuccess", "Resource assignment in R was successful.",
       "ResourceAssignFailed", "Resource assignment in R has failed: ",
       "SQLError", "{0}",
-      "FolderCreated", "Folder created: {0}"
+      "FolderCreated", "Folder created: {0}",
+      "DataShieldProfileReset", "DataSHIELD profile {0} reinitialized."
   })
   Map<String, String> userMessageMap();
 

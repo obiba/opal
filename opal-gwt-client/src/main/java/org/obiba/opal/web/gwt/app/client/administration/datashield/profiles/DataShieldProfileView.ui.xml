@@ -27,14 +27,6 @@
             </b:Button>
         </g:FlowPanel>
 
-        <b:Heading size="5">
-            <ui:msg description="DS Options label">Options</ui:msg>
-        </b:Heading>
-        <g:SimplePanel ui:field="optionsPanel"/>
-
-        <b:Heading size="5">
-            <ui:msg description="DS Methods label">Methods</ui:msg>
-        </b:Heading>
         <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
 
             <g:Anchor>
@@ -48,6 +40,12 @@
             </g:Anchor>
 
             <g:SimplePanel ui:field="assignPanel"/>
+
+            <g:Anchor>
+                <ui:msg description="DS Options label">Options</ui:msg>
+            </g:Anchor>
+
+            <g:SimplePanel ui:field="optionsPanel"/>
 
         </o:NavTabsPanel>
 

@@ -19,6 +19,12 @@
   <g:FlowPanel>
 
     <g:FlowPanel addStyleNames="small-bottom-margin">
+      <b:Paragraph>
+        <ui:msg description="DS Options information">
+          The R options are applied at DataSHIELD R session creation and affect the behavior of some of the DataSHIELD methods.
+        </ui:msg>
+      </b:Paragraph>
+
       <b:Button ui:field="addOptionButton" icon="PLUS" type="INFO">
         <ui:msg description="Add R Option label">Add R Option</ui:msg>
       </b:Button>

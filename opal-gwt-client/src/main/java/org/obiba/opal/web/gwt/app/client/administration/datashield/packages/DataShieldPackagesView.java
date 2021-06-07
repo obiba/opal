@@ -9,10 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,6 +47,8 @@ import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -74,6 +80,9 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
   @UiField
   Table<RPackageDto> packagesTable;
 
+  @UiField
+  Alert inconsistencyNotice;
+
   private final ListDataProvider<RPackageDto> packagesDataProvider = new ListDataProvider<RPackageDto>();
 
   private ActionsPackageRColumn<RPackageDto> actionsColumn;
@@ -89,6 +98,7 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
 
   @UiHandler("refresh")
   public void onRefresh(ClickEvent event) {
+    inconsistencyNotice.setVisible(false);
     packagesTable.showLoadingIndicator(packagesDataProvider);
     getUiHandlers().onRefresh();
   }
@@ -111,6 +121,23 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
   @Override
   public void renderDataShieldPackages(List<RPackageDto> packages) {
     this.originalPackages = packages == null ? new ArrayList<RPackageDto>() : packages;
+
+    Set<String> rServerNames = Sets.newHashSet();
+    Map<String, Integer> pkgCounts = Maps.newHashMap();
+    for (RPackageDto pkg : packages) {
+      rServerNames.add(pkg.getRserver());
+      String key = pkg.getName() + ":" + getEntryDtoValue(pkg, "version");
+      if (pkgCounts.containsKey(key))
+        pkgCounts.put(key, pkgCounts.get(key) +1);
+      else
+        pkgCounts.put(key, 1);
+    }
+    GWT.log("R servers " + rServerNames.size());
+    for (Map.Entry<String, Integer> pkgCount : pkgCounts.entrySet()) {
+      if (pkgCount.getValue() != rServerNames.size())
+        inconsistencyNotice.setVisible(true);
+    }
+
     packagesFilter.setText("");
     renderDataShieldPackagesList(packages);
   }

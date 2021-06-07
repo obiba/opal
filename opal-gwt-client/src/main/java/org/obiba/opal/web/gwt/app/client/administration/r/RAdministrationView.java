@@ -14,10 +14,7 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
@@ -32,6 +29,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
   interface Binder extends UiBinder<Widget, RAdministrationView> {
   }
+
+  @UiField
+  Image clusterLoading;
 
   @UiField
   TabPanel clusterTabs;
@@ -63,6 +63,8 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   @Override
   public void clearClusters() {
     clusterTabs.clear();
+    clusterTabs.setVisible(false);
+    clusterLoading.setVisible(true);
   }
 
   @Override
@@ -82,6 +84,8 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       tab.add(content.asWidget());
       clusterTabs.add(tab);
       clusterTabs.selectTab(0);
+      clusterTabs.setVisible(true);
+      clusterLoading.setVisible(false);
     }
   }
 

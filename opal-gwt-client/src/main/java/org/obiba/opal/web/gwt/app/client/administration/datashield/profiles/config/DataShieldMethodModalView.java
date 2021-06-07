@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
+import com.github.gwtbootstrap.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.MethodType;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Mode;
@@ -17,10 +18,6 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.TextArea;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,10 +57,16 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
   ControlLabel scriptLabel;
 
   @UiField
+  ControlGroup scriptGroup;
+
+  @UiField
   TextArea script;
 
   @UiField
   ControlLabel functionLabel;
+
+  @UiField
+  ControlGroup functionGroup;
 
   @UiField
   TextBox function;
@@ -86,7 +89,7 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
     dialog.hide();
     typeList.addItem(translations.rFunctionLabel(), MethodType.RFUNCTION.toString());
     typeList.addItem(translations.rScriptLabel(), MethodType.RSCRIPT.toString());
-    script.setVisible(false);
+    scriptGroup.setVisible(false);
     typeList.setSelectedIndex(0);
     typeList.addChangeHandler(new ChangeHandler() {
 
@@ -95,12 +98,15 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
         updateForm(getType());
       }
     });
+    script.setPlaceholder("function(x) {\n  # do something with x \n}");
+    script.setVisibleLines(6);
+    script.setWidth("500px");
   }
 
   private void updateForm(MethodType type) {
-    script.setVisible(type == MethodType.RSCRIPT);
+    scriptGroup.setVisible(type == MethodType.RSCRIPT);
     scriptLabel.setVisible(type == MethodType.RSCRIPT);
-    function.setVisible(type == MethodType.RFUNCTION);
+    functionGroup.setVisible(type == MethodType.RFUNCTION);
     functionLabel.setVisible(type == MethodType.RFUNCTION);
   }
 

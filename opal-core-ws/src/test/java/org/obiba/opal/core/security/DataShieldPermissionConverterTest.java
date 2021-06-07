@@ -36,6 +36,7 @@ public class DataShieldPermissionConverterTest extends OpalPermissionConverterTe
         "rest:/service/r:GET",
         "rest:/service/r:PUT",
         "rest:/service/r:DELETE",
+        "rest:/service/r/clusters:GET",
         "rest:/service/r/sessions:GET",
         "rest:/service/r/workspaces:GET",
         "rest:/service/r/workspaces:DELETE",

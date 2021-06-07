@@ -47,6 +47,7 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
             toRest("/service/r", "GET"),
             toRest("/service/r", "PUT"),
             toRest("/service/r", "DELETE"),
+            toRest("/service/r/clusters", "GET"),
             toRest("/service/r/sessions", "GET"),
             toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"),

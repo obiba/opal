@@ -16,10 +16,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -34,7 +31,13 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
+  Image clusterLoading;
+
+  @UiField
   TabPanel clusterTabs;
+
+  @UiField
+  Image profileLoading;
 
   @UiField
   TabPanel profileTabs;
@@ -61,12 +64,16 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
       tab.add(content.asWidget());
       clusterTabs.add(tab);
       clusterTabs.selectTab(0);
+      clusterTabs.setVisible(true);
+      clusterLoading.setVisible(false);
     } else if (slot instanceof DataShieldAdministrationPresenter.ProfilesSlot) {
       Tab tab = new Tab();
       tab.setHeading(slot.toString());
       tab.add(content.asWidget());
       profileTabs.add(tab);
       profileTabs.selectTab(0);
+      profileTabs.setVisible(true);
+      profileLoading.setVisible(false);
     }
   }
 
@@ -86,7 +93,11 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   @Override
   public void clearClusters() {
     clusterTabs.clear();
+    clusterTabs.setVisible(false);
+    clusterLoading.setVisible(true);
     profileTabs.clear();
+    profileTabs.setVisible(false);
+    profileLoading.setVisible(true);
   }
 
   @Override

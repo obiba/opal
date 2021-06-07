@@ -34,6 +34,7 @@
       </ui:msg>
     </b:Paragraph>
 
+    <g:Image ui:field="clusterLoading" url="image/loading.gif"/>
     <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
     <g:FlowPanel>

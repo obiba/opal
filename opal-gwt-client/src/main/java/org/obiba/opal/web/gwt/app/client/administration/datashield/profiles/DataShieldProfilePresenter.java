@@ -60,7 +60,7 @@ public class DataShieldProfilePresenter
   }
 
   @Override
-  public void onReset() {
+  public void onProfileReset() {
     fireEvent(new DataShieldProfileResetEvent(cluster.getName()));
   }
 

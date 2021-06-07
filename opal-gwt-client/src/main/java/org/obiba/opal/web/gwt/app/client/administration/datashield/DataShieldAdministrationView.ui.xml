@@ -27,12 +27,13 @@
 
     <b:Paragraph>
       <ui:msg description="DS Packages information">
-        A cluster of R servers constitutes a DataSHIELD profile: DataSHIELD packages and settings are the same for all
-        the R servers in a cluster. DataSHIELD end-user can select which profile to use.
+        DataSHIELD R servers are grouped by clusters. In each cluster all the R servers are considered to be interchangeable, i.e.
+        a load balancer can select one or the other on DataSHIELD session creation.
         See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
       </ui:msg>
     </b:Paragraph>
 
+    <g:Image ui:field="clusterLoading" url="image/loading.gif"/>
     <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
     <b:Heading size="4">
@@ -41,12 +42,13 @@
 
     <b:Paragraph>
       <ui:msg description="DS Profiles information">
-        A cluster of R servers constitutes a DataSHIELD profile: DataSHIELD packages and settings are the same for all
-        the R servers in a cluster. DataSHIELD end-user can select which profile to use.
+        A cluster of R servers constitutes a DataSHIELD profile: the methods and options are extracted from the installed DataSHIELD
+        packages settings and can be amended.
         See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server documentation</a>.
       </ui:msg>
     </b:Paragraph>
 
+    <g:Image ui:field="profileLoading" url="image/loading.gif"/>
     <b:TabPanel tabPosition="left" ui:field="profileTabs"/>
 
     <g:FlowPanel ui:field="permissionsPanel">
