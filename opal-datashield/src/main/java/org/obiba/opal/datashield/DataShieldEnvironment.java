@@ -62,7 +62,7 @@ public class DataShieldEnvironment extends DefaultDSEnvironment {
     String envSymbol = getMethodType().symbol();
     List<ROperation> rops = getMethods().stream()
         .filter(m -> !m.hasPackage())
-        .map(m ->  ROperations.assign(m.getName(), ((DefaultDSMethod)m).getFunction(), envSymbol, true))
+        .map(m -> ROperations.assign(m.getName(), ((DefaultDSMethod) m).getFunction(), envSymbol, true))
         .collect(Collectors.toList());
     if (rops.isEmpty())
       return rops;

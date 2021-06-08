@@ -22,7 +22,8 @@ public class DataShieldLog {
 
   private static final Logger userLog = LoggerFactory.getLogger("datashield.user");
 
-  private DataShieldLog() {}
+  private DataShieldLog() {
+  }
 
   public static final void adminLog(String format, Object... arguments) {
     log(adminLog, format, arguments);

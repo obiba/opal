@@ -13,6 +13,7 @@ import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.spi.r.ROperation;
@@ -83,7 +84,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
     try {
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-          datashieldProfileService.getProfile(getRServerSession().getProfile()).getEnvironment(DSMethodType.ASSIGN));
+          ((DatashieldProfile) getRServerSession().getProfile()).getEnvironment(DSMethodType.ASSIGN));
       if (async) {
         String id = getRServerSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();

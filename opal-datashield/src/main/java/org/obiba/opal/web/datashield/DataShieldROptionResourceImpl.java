@@ -32,7 +32,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
   @Override
   public Response deleteDataShieldROption(String name, String profile) {
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = getDataShieldProfile(profile);
     config.removeOption(name);
     datashieldProfileService.saveProfile(config);
     return Response.ok().build();
@@ -40,7 +40,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
   @Override
   public Response addOrUpdateDataShieldROption(String profile, final DataShield.DataShieldROptionDto dto) {
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = getDataShieldProfile(profile);
     config.addOrUpdateOption(dto.getName(), dto.getValue());
     datashieldProfileService.saveProfile(config);
     return Response.ok().build();
@@ -48,7 +48,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
   @Override
   public Response getDataShieldROption(String name, String profile) {
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = getDataShieldProfile(profile);
 
     if (config.hasOption(name)) {
       DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)
@@ -58,5 +58,9 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
     }
 
     return Response.status(Response.Status.NOT_FOUND).build();
+  }
+
+  private DatashieldProfile getDataShieldProfile(String profileName) {
+    return datashieldProfileService.getProfile(profileName);
   }
 }

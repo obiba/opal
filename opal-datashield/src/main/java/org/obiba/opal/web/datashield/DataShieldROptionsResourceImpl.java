@@ -35,7 +35,7 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
   @Override
   public List<DataShield.DataShieldROptionDto> getDataShieldROptions(String profile) {
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = getDataShieldProfile(profile);
 
     for (DSOption entry : config.getOptions()) {
       options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getName())//
@@ -43,5 +43,9 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
     }
 
     return options;
+  }
+
+  private DatashieldProfile getDataShieldProfile(String profileName) {
+    return datashieldProfileService.getProfile(profileName);
   }
 }

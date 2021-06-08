@@ -33,7 +33,7 @@ public class DataShieldProfilesResource {
 
   @GET
   public List<DataShield.DataShieldProfileDto> getProfiles() {
-    return StreamSupport.stream(datashieldProfileService.getProfiles().spliterator(), false)
+    return datashieldProfileService.getProfiles().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
   }

@@ -83,14 +83,15 @@ public class Dtos {
   public static OpalR.RSessionDto asDto(RServerSession rSession) {
     UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class)
         .path(OpalRSessionParentResource.class, "getOpalRSessionResource");
-    return OpalR.RSessionDto.newBuilder().setId(rSession.getId()) //
-        .setUser(rSession.getUser()) //
-        .setCreationDate(DateTimeType.get().valueOf(rSession.getCreated()).toString()) //
-        .setLastAccessDate(DateTimeType.get().valueOf(rSession.getTimestamp()).toString()) //
-        .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING) //
-        .setLink(ub.build(rSession.getId()).toString()) //
-        .setContext(rSession.getExecutionContext()) //
-        .setCluster(rSession.getRServerClusterName())
+    return OpalR.RSessionDto.newBuilder().setId(rSession.getId())
+        .setUser(rSession.getUser())
+        .setCreationDate(DateTimeType.get().valueOf(rSession.getCreated()).toString())
+        .setLastAccessDate(DateTimeType.get().valueOf(rSession.getTimestamp()).toString())
+        .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING)
+        .setLink(ub.build(rSession.getId()).toString())
+        .setContext(rSession.getExecutionContext())
+        .setProfile(rSession.getProfile().getName())
+        .setCluster(rSession.getProfile().getCluster())
         .setServer(rSession.getRServerServiceName())
         .build();
   }
@@ -102,12 +103,12 @@ public class Dtos {
     } catch (Exception e) {
       // may happen if folder is written/deleted while iterating content
     }
-    return OpalR.RWorkspaceDto.newBuilder() //
-        .setName(workspace.getName()) //
-        .setUser(user) //
-        .setLastAccessDate(DateTimeType.get().valueOf(new Date(workspace.lastModified())).toString()) //
-        .setContext(executionContext) //
-        .setSize(size) //
+    return OpalR.RWorkspaceDto.newBuilder()
+        .setName(workspace.getName())
+        .setUser(user)
+        .setLastAccessDate(DateTimeType.get().valueOf(new Date(workspace.lastModified())).toString())
+        .setContext(executionContext)
+        .setSize(size)
         .build();
   }
 

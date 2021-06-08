@@ -189,7 +189,7 @@ public class OpalRSessionManager {
    * @param profile
    * @return R session
    */
-  public RServerSession newSubjectRSession(String profile) {
+  public RServerSession newSubjectRSession(RServerProfile profile) {
     return addRSession(getSubjectPrincipal(), profile);
   }
 
@@ -269,15 +269,10 @@ public class OpalRSessionManager {
     }
   }
 
-  private RServerSession addRSession(String principal, String profile) {
+  private RServerSession addRSession(String principal, RServerProfile profile) {
     try {
       SubjectRSessions rSessions = getRSessions(principal);
-      String cluster = profile;
-      if (!Strings.isNullOrEmpty(profile) && profile.contains(".")) {
-        String[] tokens = profile.split("\\.");
-        cluster = tokens[0];
-      }
-      RServerSession rSession = rServerManagerService.getRServer(cluster).newRServerSession(principal);
+      RServerSession rSession = rServerManagerService.getRServer(profile.getCluster()).newRServerSession(principal);
       rSession.setProfile(profile);
       rSessions.addRSession(rSession);
       return rSession;
@@ -348,7 +343,7 @@ public class OpalRSessionManager {
 
     void removeRSessions(String clusterName, String serverName) {
       List<RServerSession> sessionsToRemove = rSessions.stream()
-          .filter(s -> clusterName.equals(s.getRServerClusterName()) && serverName.equals(s.getRServerServiceName()))
+          .filter(s -> clusterName.equals(s.getProfile().getCluster()) && serverName.equals(s.getRServerServiceName()))
           .collect(Collectors.toList());
       for (RServerSession rSession : sessionsToRemove) {
         try {

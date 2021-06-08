@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,9 +51,6 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
   CellTable<RSessionDto> table;
 
   @UiField
-  Button refreshButton;
-
-  @UiField
   OpalSimplePager pager;
 
   ListDataProvider<RSessionDto> dataProvider;
@@ -63,7 +59,6 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
 
   private ActionsColumn<RSessionDto> actionsColumn;
 
-  private final PlaceManager placeManager;
 
   //
   // Constructors
@@ -71,7 +66,6 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
 
   @Inject
   public RSessionsView(Binder uiBinder, PlaceManager placeManager) {
-    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
@@ -113,6 +107,13 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
         return String.valueOf(object.getId());
       }
     }, translations.idLabel());
+
+    table.addColumn(new TextColumn<RSessionDto>() {
+      @Override
+      public String getValue(RSessionDto object) {
+        return object.getProfile();
+      }
+    }, translations.profileLabel());
 
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override

@@ -20,6 +20,7 @@ import org.obiba.datashield.core.impl.DefaultDSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.DefaultDSOption;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.r.service.RServerProfile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +28,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-public class DatashieldProfile implements DSConfiguration, HasUniqueProperties {
+public class DatashieldProfile implements RServerProfile, DSConfiguration, HasUniqueProperties {
 
   private String name;
 
-  private boolean enabled = true;
+  private String cluster;
+
+  private boolean enabled = false;
 
   private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
 
@@ -42,8 +45,10 @@ public class DatashieldProfile implements DSConfiguration, HasUniqueProperties {
 
   public DatashieldProfile(String name) {
     this.name = name;
+    this.cluster = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -60,12 +65,13 @@ public class DatashieldProfile implements DSConfiguration, HasUniqueProperties {
     this.enabled = enabled;
   }
 
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
+  }
+
+  @Override
   public String getCluster() {
-    if (name.contains(".")) {
-      String[] tokens = name.split("\\.");
-      return tokens[0];
-    }
-    return name;
+    return cluster;
   }
 
   @Override

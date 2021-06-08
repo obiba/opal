@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.OpalR;
@@ -31,11 +33,14 @@ import java.util.List;
 public class DataShieldPackageResource {
 
   @Autowired
+  private DatashieldProfileService datashieldProfileService;
+
+  @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
 
   @GET
   public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    return dsPackageMethodeHelper.getPackage(profile, name);
+    return dsPackageMethodeHelper.getPackage(getDataShieldProfile(profile), name);
   }
 
   /**
@@ -46,7 +51,7 @@ public class DataShieldPackageResource {
   @GET
   @Path("methods")
   public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    return dsPackageMethodeHelper.getPackageMethods(profile, name);
+    return dsPackageMethodeHelper.getPackageMethods(getDataShieldProfile(profile), name);
   }
 
   /**
@@ -58,7 +63,7 @@ public class DataShieldPackageResource {
   @Path("methods")
   @Deprecated
   public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    return dsPackageMethodeHelper.publish(profile, name);
+    return dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name);
   }
 
   /**
@@ -71,7 +76,7 @@ public class DataShieldPackageResource {
   @PUT
   @Path("_publish")
   public Response publishPackageSettings(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.publish(profile, name);
+    dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name);
     return Response.ok().build();
   }
 
@@ -86,7 +91,7 @@ public class DataShieldPackageResource {
   @Path("methods")
   @Deprecated
   public Response deletePackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.unpublish(profile, name);
+    dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name);
     return Response.noContent().build();
   }
 
@@ -100,7 +105,7 @@ public class DataShieldPackageResource {
   @DELETE
   @Path("_publish")
   public Response deletePackageSettings(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.unpublish(profile, name);
+    dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name);
     return Response.noContent().build();
   }
 
@@ -112,11 +117,15 @@ public class DataShieldPackageResource {
   @DELETE
   public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     try {
-      dsPackageMethodeHelper.deletePackage(profile, name);
+      dsPackageMethodeHelper.deletePackage(getDataShieldProfile(profile), name);
     } catch (Exception e) {
       // ignored
     }
     return Response.ok().build();
+  }
+
+  private DatashieldProfile getDataShieldProfile(String profileName) {
+    return datashieldProfileService.getProfile(profileName);
   }
 
 }

@@ -13,6 +13,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
@@ -58,17 +59,21 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return super.removeRSessions();
   }
 
-  protected void onNewRSession(RServerSession rSession) {
-    rSession.setExecutionContext(DS_CONTEXT);
-    DatashieldProfile profile = datashieldProfileService.getProfile(rSession.getProfile());
+  @Override
+  protected RServerProfile createProfile(String profileName) {
+    DatashieldProfile profile = datashieldProfileService.getProfile(profileName);
     if (!profile.isEnabled()) {
-      String message = datashieldProfileService.hasProfile(rSession.getProfile()) ?
+      String message = datashieldProfileService.hasProfile(profileName) ?
           "DataSHIELD profile is not enabled" : "DataSHIELD profile does not exist";
-      opalRSessionManager.removeRSession(rSession.getId());
-      throw new IllegalArgumentException(message + ": " + rSession.getProfile());
+      throw new IllegalArgumentException(message + ": " + profile.getName());
     }
     // TODO check profile permissions
+    return profile;
+  }
 
+  protected void onNewRSession(RServerSession rSession) {
+    rSession.setExecutionContext(DS_CONTEXT);
+    DatashieldProfile profile = (DatashieldProfile) rSession.getProfile();
     if (profile.hasOptions()) {
       rSession.execute(
           new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));

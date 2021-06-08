@@ -11,29 +11,39 @@
 package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
+import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 @Component
 public class DatashieldProfileService implements SystemService {
 
   private static final Logger log = LoggerFactory.getLogger(DatashieldProfileService.class);
 
+  private final RServerManagerService rServerManagerService;
+
   private final OrientDbService orientDbService;
 
   private final Lock lock = new ReentrantLock();
 
-  public DatashieldProfileService(OrientDbService orientDbService) {
+  @Autowired
+  public DatashieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService) {
+    this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
   }
 
@@ -42,8 +52,24 @@ public class DatashieldProfileService implements SystemService {
    *
    * @return
    */
-  public Iterable<DatashieldProfile> getProfiles() {
-    return orientDbService.list(DatashieldProfile.class);
+  public List<DatashieldProfile> getProfiles() {
+    List<DatashieldProfile> profiles = Lists.newArrayList(orientDbService.list(DatashieldProfile.class));
+    Set<String> primaryProfileNames = profiles.stream()
+        .filter(p -> p.getName().equals(p.getCluster()))
+        .map(DatashieldProfile::getName)
+        .collect(Collectors.toSet());
+    rServerManagerService.getRServerClusters().stream()
+        .map(RServerCluster::getName)
+        .filter(c -> !primaryProfileNames.contains(c))
+        .forEach(c -> {
+          DatashieldProfile p = new DatashieldProfile(c);
+          saveProfile(p);
+          profiles.add(p);
+        });
+
+    profiles.sort(Comparator.comparing(DatashieldProfile::getName));
+
+    return profiles;
   }
 
   /**

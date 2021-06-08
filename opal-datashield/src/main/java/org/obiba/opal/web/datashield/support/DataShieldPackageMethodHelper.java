@@ -22,6 +22,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.web.datashield.Dtos;
 import org.obiba.opal.web.model.DataShield;
@@ -63,8 +64,8 @@ public class DataShieldPackageMethodHelper {
   @Autowired
   protected RServerManagerService rServerManagerService;
 
-  public List<OpalR.RPackageDto> getInstalledPackagesDtos(String profile) {
-    RServerService server = rServerManagerService.getRServer(profile);
+  public List<OpalR.RPackageDto> getInstalledPackagesDtos(RServerProfile profile) {
+    RServerService server = rServerManagerService.getRServer(profile.getCluster());
     Map<String, List<Opal.EntryDto>> dsPackages = server.getDataShieldPackagesProperties();
     Set<String> dsNames = dsPackages.keySet();
     return server.getInstalledPackagesDtos().stream()
@@ -87,11 +88,11 @@ public class DataShieldPackageMethodHelper {
         .collect(Collectors.toList());
   }
 
-  public List<OpalR.RPackageDto> getPackage(String profile, String name) {
+  public List<OpalR.RPackageDto> getPackage(RServerProfile profile, String name) {
     return getDatashieldPackage(profile, name);
   }
 
-  public DataShield.DataShieldPackageMethodsDto getPackageMethods(String profile, String name) {
+  public DataShield.DataShieldPackageMethodsDto getPackageMethods(RServerProfile profile, String name) {
     return getPackageMethods(getDatashieldPackage(profile, name));
   }
 
@@ -102,11 +103,11 @@ public class DataShieldPackageMethodHelper {
    * @param name    Package name
    * @return
    */
-  public DataShield.DataShieldPackageMethodsDto publish(String profile, String name) {
+  public DataShield.DataShieldPackageMethodsDto publish(RServerProfile profile, String name) {
     List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
     final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
 
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = (DatashieldProfile) profile;
     removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
         .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
         .map(DSMethod::getName)
@@ -131,7 +132,7 @@ public class DataShieldPackageMethodHelper {
    * @param profile
    * @param name    Package name
    */
-  public void unpublish(String profile, String name) {
+  public void unpublish(RServerProfile profile, String name) {
     List<OpalR.RPackageDto> packageDtos = null;
     try {
       packageDtos = getDatashieldPackage(profile, name);
@@ -139,7 +140,7 @@ public class DataShieldPackageMethodHelper {
       // ignore
     }
 
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DatashieldProfile config = (DatashieldProfile) profile;
     removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
         .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
         .map(DSMethod::getName)
@@ -154,7 +155,7 @@ public class DataShieldPackageMethodHelper {
     datashieldProfileService.saveProfile(config);
   }
 
-  public List<OpalR.RPackageDto> getDatashieldPackage(String profile, final String name) {
+  public List<OpalR.RPackageDto> getDatashieldPackage(RServerProfile profile, final String name) {
     List<OpalR.RPackageDto> pkgs = getInstalledPackagesDtos(profile).stream()
         .filter(dto -> name.equals(dto.getName()))
         .collect(Collectors.toList());
@@ -162,22 +163,21 @@ public class DataShieldPackageMethodHelper {
     return pkgs;
   }
 
-  public void deletePackage(String profile, String name) {
-    getDatashieldPackage(profile, name).forEach(pkg -> deletePackage(profile, pkg));
+  public void deletePackage(RServerProfile profile, String name) {
+    getDatashieldPackage(profile, name).forEach(pkg -> deletePackage((DatashieldProfile) profile, pkg));
   }
 
-  public void deletePackage(String profile, OpalR.RPackageDto pkg) {
+  public void deletePackage(DatashieldProfile profile, OpalR.RPackageDto pkg) {
     try {
-      DatashieldProfile config = datashieldProfileService.getProfile(profile);
       DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(pkg);
-      removeMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList().stream()
+      removeMethods(profile, DSMethodType.AGGREGATE, methods.getAggregateList().stream()
           .map(DataShield.DataShieldMethodDto::getName).collect(Collectors.toList()));
-      removeMethods(config, DSMethodType.ASSIGN, methods.getAssignList().stream()
+      removeMethods(profile, DSMethodType.ASSIGN, methods.getAssignList().stream()
           .map(DataShield.DataShieldMethodDto::getName).collect(Collectors.toList()));
-      removeOptions(config, getPackageROptions(pkg));
-      datashieldProfileService.saveProfile(config);
+      removeOptions(profile, getPackageROptions(pkg));
+      datashieldProfileService.saveProfile(profile);
 
-      rPackageHelper.removePackage(rServerManagerService.getRServer(profile), pkg.getName());
+      rPackageHelper.removePackage(rServerManagerService.getRServer(profile.getCluster()), pkg.getName());
     } catch (Exception e) {
       log.warn("Failed to delete an R package: {}", pkg.getName());
     }
@@ -203,11 +203,11 @@ public class DataShieldPackageMethodHelper {
     return methodDtos;
   }
 
-  public void installDatashieldPackage(String profile, String name, String ref) {
+  public void installDatashieldPackage(RServerProfile profile, String name, String ref) {
     if (Strings.isNullOrEmpty(ref))
-      rPackageHelper.installCRANPackage(rServerManagerService.getRServer(profile), name);
+      rPackageHelper.installCRANPackage(rServerManagerService.getRServer(profile.getCluster()), name);
     else
-      rPackageHelper.installGitHubPackage(rServerManagerService.getRServer(profile), name, ref);
+      rPackageHelper.installGitHubPackage(rServerManagerService.getRServer(profile.getCluster()), name, ref);
   }
 
   //

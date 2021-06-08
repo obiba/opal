@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,26 +33,30 @@ import java.util.List;
 public class DataShieldPackagesResource {
 
   @Autowired
+  private DatashieldProfileService datashieldProfileService;
+
+  @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
 
   @GET
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
-    return dsPackageMethodeHelper.getInstalledPackagesDtos(profile);
+    return dsPackageMethodeHelper.getInstalledPackagesDtos(getDataShieldProfile(profile));
   }
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.installDatashieldPackage(profile, name, ref);
+    DatashieldProfile dsProfile = getDataShieldProfile(profile);
+    dsPackageMethodeHelper.installDatashieldPackage(dsProfile, name, ref);
 
     // install or re-install all known datashield package methods
     List<OpalR.RPackageDto> pkgs = getPackages(profile);
     for (OpalR.RPackageDto pkg : pkgs) {
-      dsPackageMethodeHelper.publish(profile, pkg.getName());
+      dsPackageMethodeHelper.publish(dsProfile, pkg.getName());
     }
     // make sure last is the one we install (check it is a "datashield" package first)
     if (getPackages(profile).stream().anyMatch(p -> p.getName().equals(name)))
-      dsPackageMethodeHelper.publish(profile, name);
+      dsPackageMethodeHelper.publish(dsProfile, name);
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
@@ -66,7 +72,7 @@ public class DataShieldPackagesResource {
   @PUT
   @Path("_publish")
   public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
-    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profile, name));
+    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name));
     return Response.ok().build();
   }
 
@@ -80,7 +86,7 @@ public class DataShieldPackagesResource {
   @DELETE
   @Path("_publish")
   public Response deletePackageSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
-    names.forEach(name -> dsPackageMethodeHelper.unpublish(profile, name));
+    names.forEach(name -> dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name));
     return Response.noContent().build();
   }
 
@@ -88,7 +94,7 @@ public class DataShieldPackagesResource {
   public Response deletePackages(@QueryParam("profile") String profile) {
     try {
       for (OpalR.RPackageDto pkg : getPackages(profile)) {
-        dsPackageMethodeHelper.deletePackage(profile, pkg);
+        dsPackageMethodeHelper.deletePackage(getDataShieldProfile(profile), pkg);
       }
     } catch (Exception e) {
       // ignored
@@ -96,4 +102,7 @@ public class DataShieldPackagesResource {
     return Response.ok().build();
   }
 
+  private DatashieldProfile getDataShieldProfile(String profileName) {
+    return datashieldProfileService.getProfile(profileName);
+  }
 }

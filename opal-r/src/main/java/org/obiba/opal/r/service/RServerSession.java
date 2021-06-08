@@ -35,11 +35,9 @@ public interface RServerSession extends RASyncOperationTemplate {
 
   String getExecutionContext();
 
-  void setProfile(String profile);
+  void setProfile(RServerProfile profile);
 
-  String getProfile();
-
-  String getRServerClusterName();
+  RServerProfile getProfile();
 
   String getRServerServiceName();
 

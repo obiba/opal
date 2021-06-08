@@ -17,6 +17,7 @@ import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperationWithResult;
@@ -67,7 +68,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     try {
       RServerSession rSession = getRServerSession();
       ROperationWithResult operation = new RestrictedRScriptROperation(body,
-          datashieldProfileService.getProfile(rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
+          ((DatashieldProfile) rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
           DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()), serialize);
       if (async) {
         String id = rSession.executeAsync(operation);

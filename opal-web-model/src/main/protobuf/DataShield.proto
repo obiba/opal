@@ -6,8 +6,8 @@ option java_package = "org.obiba.opal.web.model";
 
 message DataShieldProfileDto {
   required string name = 1;
-  required bool enabled = 2;
-  optional string cluster = 3;
+  required string cluster = 2;
+  required bool enabled = 3;
 }
 
 message DataShieldMethodDto {

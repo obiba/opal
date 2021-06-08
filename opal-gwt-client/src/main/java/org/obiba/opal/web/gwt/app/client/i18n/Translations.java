@@ -57,6 +57,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Context")
   String contextLabel();
 
+  @Description("Profile label")
+  @DefaultStringValue("Profile")
+  String profileLabel();
+
   @Description("Cluster label")
   @DefaultStringValue("Cluster")
   String clusterLabel();
