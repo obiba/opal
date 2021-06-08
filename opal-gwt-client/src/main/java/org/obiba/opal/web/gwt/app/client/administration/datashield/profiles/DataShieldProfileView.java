@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Icon;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
@@ -18,17 +21,26 @@ import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileUiHandlers> implements DataShieldProfilePresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataShieldProfileView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  Icon statusIcon;
+
+  @UiField
+  InlineLabel statusLabel;
+
+  @UiField
+  Button enableProfile;
+
+  @UiField
+  Button disableProfile;
 
   @UiField
   SimplePanel aggregatePanel;
@@ -42,6 +54,23 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   @Inject
   public DataShieldProfileView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  @Override
+  public void renderProfile(DataShieldProfileDto profile) {
+    if (profile.getEnabled()) {
+      statusIcon.removeStyleName("status-error");
+      statusIcon.addStyleName("status-success");
+      statusLabel.setText(translations.dataShieldProfileEnabledLabel());
+      enableProfile.setVisible(false);
+      disableProfile.setVisible(true);
+    } else {
+      statusIcon.removeStyleName("status-success");
+      statusIcon.addStyleName("status-error");
+      statusLabel.setText(translations.dataShieldProfileDisabledLabel());
+      enableProfile.setVisible(true);
+      disableProfile.setVisible(false);
+    }
   }
 
   @Override
@@ -61,6 +90,16 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   @UiHandler("resetProfile")
   void onProfileReset(ClickEvent event) {
     getUiHandlers().onProfileReset();
+  }
+
+  @UiHandler("enableProfile")
+  void onProfileEnable(ClickEvent event) {
+    getUiHandlers().onProfileEnable(true);
+  }
+
+  @UiHandler("disableProfile")
+  void onProfileDisable(ClickEvent event) {
+    getUiHandlers().onProfileEnable(false);
   }
 
 }

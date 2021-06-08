@@ -30,9 +30,9 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
-import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
 
   private MethodValidationHandler methodValidationHandler;
 
-  private RServerClusterDto cluster;
+  private DataShieldProfileDto profile;
 
   @Inject
   public DataShieldMethodModalPresenter(Display display, EventBus eventBus) {
@@ -76,8 +76,8 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
     getView().hideDialog();
   }
 
-  public void initialize(RServerClusterDto cluster, String environment) {
-    this.cluster = cluster;
+  public void initialize(DataShieldProfileDto profile, String environment) {
+    this.profile = profile;
     this.environment = environment;
   }
 
@@ -138,12 +138,12 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
 
   private String method(String method) {
     return UriBuilder.create().segment("datashield", "env", environment, "method", "{method}")
-        .query("profile", cluster.getName()).build(method);
+        .query("profile", profile.getName()).build(method);
   }
 
   private String methods() {
     return UriBuilder.create().segment("datashield", "env", environment, "methods")
-        .query("profile", cluster.getName()).build();
+        .query("profile", profile.getName()).build();
   }
 
   private void updateMethod() {
@@ -251,9 +251,9 @@ public class DataShieldMethodModalPresenter extends ModalPresenterWidget<DataShi
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
       if (response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(cluster.getName()));
+        getEventBus().fireEvent(new DataShieldMethodUpdatedEvent(profile.getName()));
       } else if (response.getStatusCode() == Response.SC_CREATED) {
-        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(cluster.getName(), dto));
+        getEventBus().fireEvent(new DataShieldMethodCreatedEvent(profile.getName(), dto));
       }
     }
   }

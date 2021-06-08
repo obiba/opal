@@ -13,6 +13,7 @@ package org.obiba.opal.web.datashield;
 import com.google.common.base.Strings;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.web.model.DataShield;
 
 /**
@@ -23,13 +24,20 @@ public class Dtos {
   private Dtos() {
   }
 
+  public static DataShield.DataShieldProfileDto asDto(DatashieldProfile profile) {
+    return DataShield.DataShieldProfileDto.newBuilder()
+        .setName(profile.getName())
+        .setCluster(profile.getCluster())
+        .setEnabled(profile.isEnabled()).build();
+  }
+
   public static DefaultDSMethod fromDto(DataShield.DataShieldMethodDto dto) {
     if (dto.hasExtension(DataShield.RFunctionDataShieldMethodDto.method)) {
       DataShield.RFunctionDataShieldMethodDto funcDto = dto.getExtension(DataShield.RFunctionDataShieldMethodDto.method);
       String pkg = funcDto.getRPackage();
       if (Strings.isNullOrEmpty(funcDto.getRPackage())) {
         String[] funcTokens = funcDto.getFunc().split("::");
-        if (funcTokens.length>1)
+        if (funcTokens.length > 1)
           pkg = funcTokens[0];
       }
       return new DefaultDSMethod(dto.getName(), funcDto.getFunc(), pkg, funcDto.getVersion());

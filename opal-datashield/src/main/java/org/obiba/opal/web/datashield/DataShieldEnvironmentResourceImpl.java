@@ -15,9 +15,8 @@ import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldConfig;
-import org.obiba.opal.datashield.cfg.DatashieldConfigService;
-import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -41,7 +40,7 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   private DSMethodType methodType;
 
   @Autowired
-  private DatashieldConfigService datashieldConfigService;
+  private DatashieldProfileService datashieldProfileService;
 
   @Override
   public void setMethodType(DSMethodType methodType) {
@@ -60,21 +59,21 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
   @Override
   public Response deleteDataShieldMethods(String profile) {
-    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    DatashieldProfile config = datashieldProfileService.getProfile(profile);
     for (DSMethod method : getEnvironment(config).getMethods()) {
       getEnvironment(config).removeMethod(method.getName());
     }
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     DataShieldLog.adminLog("deleted all methods from type {}.", methodType);
     return Response.ok().build();
   }
 
   @Override
   public Response createDataShieldMethod(UriInfo uri, String profile, final DataShield.DataShieldMethodDto dto) {
-    DatashieldConfig config = getDatashieldConfiguration(profile);
+    DatashieldProfile config = getDatashieldConfiguration(profile);
     if (getEnvironment(config).hasMethod(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
     getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     DataShieldLog.adminLog("added method '{}' to environment {}.", dto.getName(), methodType);
     UriBuilder ub = UriBuilder.fromUri(uri.getRequestUri().resolve(""))
         .path(DataShieldEnvironmentResource.class, "getDataShieldMethod");
@@ -89,19 +88,19 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
   @Override
   public Response updateDataShieldMethod(String name, String profile, final DataShield.DataShieldMethodDto dto) {
     if (!name.equals(dto.getName())) return Response.status(Status.BAD_REQUEST).build();
-    DatashieldConfig config = getDatashieldConfiguration(profile);
+    DatashieldProfile config = getDatashieldConfiguration(profile);
     if (!getEnvironment(config).hasMethod(name)) return Response.status(Status.NOT_FOUND).build();
     getEnvironment(config).addOrUpdate(Dtos.fromDto(dto));
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     DataShieldLog.adminLog("modified method '{}' in type {}.", name, methodType);
     return Response.ok().build();
   }
 
   @Override
   public Response deleteDataShieldMethod(final String name, String profile) {
-    DatashieldConfig config = getDatashieldConfiguration(profile);
+    DatashieldProfile config = getDatashieldConfiguration(profile);
     getEnvironment(config).removeMethod(name);
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     DataShieldLog.adminLog("deleted method '{}' from type {}.", name, methodType);
     return Response.ok().build();
   }
@@ -110,8 +109,8 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     return getEnvironment(profile).getMethods();
   }
 
-  private DatashieldConfig getDatashieldConfiguration(String profile) {
-    return datashieldConfigService.getConfiguration(profile);
+  private DatashieldProfile getDatashieldConfiguration(String profile) {
+    return datashieldProfileService.getProfile(profile);
   }
 
   private void sortByName(List<DataShield.DataShieldMethodDto> dtos) {

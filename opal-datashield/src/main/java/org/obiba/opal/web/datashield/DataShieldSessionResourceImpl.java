@@ -17,7 +17,7 @@ import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
-import org.obiba.opal.datashield.cfg.DatashieldConfigService;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response.Status;
 public class DataShieldSessionResourceImpl extends AbstractRSessionResource implements DataShieldSessionResource {
 
   @Autowired
-  private DatashieldConfigService datashieldConfigService;
+  private DatashieldProfileService datashieldProfileService;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -67,7 +67,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     try {
       RServerSession rSession = getRServerSession();
       ROperationWithResult operation = new RestrictedRScriptROperation(body,
-          datashieldConfigService.getConfiguration(rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
+          datashieldProfileService.getProfile(rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
           DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()), serialize);
       if (async) {
         String id = rSession.executeAsync(operation);

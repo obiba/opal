@@ -16,4 +16,6 @@ public interface DataShieldProfileUiHandlers extends UiHandlers {
 
   void onProfileReset();
 
+  void onProfileEnable(boolean enabled);
+
 }

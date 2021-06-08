@@ -1286,6 +1286,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add DataSHIELD Package")
   String addDataShieldPackage();
 
+  @Description("DS profile enabled label")
+  @DefaultStringValue("Profile is ready for use.")
+  String dataShieldProfileEnabledLabel();
+
+  @Description("DS profile disabled label")
+  @DefaultStringValue("Profile is not available for use.")
+  String dataShieldProfileDisabledLabel();
+
   @Description("Add DataShield method label")
   @DefaultStringValue("Add Method")
   String addDataShieldMethod();

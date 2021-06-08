@@ -19,12 +19,31 @@
     <g:FlowPanel>
 
         <b:Heading size="5">
+            <ui:msg description="DS Status label">Status</ui:msg>
+        </b:Heading>
+
+        <g:FlowPanel addStyleNames="large-bottom-margin">
+            <g:FlowPanel addStyleNames="bottom-margin">
+                <b:Icon ui:field="statusIcon" type="CIRCLE" size="LARGE" addStyleNames="status-success"/>
+                <g:InlineLabel ui:field="statusLabel" addStyleNames="small-indent"/>
+            </g:FlowPanel>
+            <b:Button ui:field="enableProfile" type="DEFAULT" visible="false">
+                <ui:msg description="DS Profile enable label">Enable</ui:msg>
+            </b:Button>
+            <b:Button ui:field="disableProfile" type="DEFAULT" visible="false">
+                <ui:msg description="DS Profile disable label">Disable</ui:msg>
+            </b:Button>
+        </g:FlowPanel>
+
+        <b:Heading size="5">
             <ui:msg description="DS Settings label">Settings</ui:msg>
         </b:Heading>
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
             <b:Paragraph>
-                <ui:msg description="DS Profile reload description">Reset the DataSHIELD profile settings as they were originally defined by the installed DataSHIELD packages description.</ui:msg>
+                <ui:msg description="DS Profile reload description">Reset the DataSHIELD profile settings as they were
+                    originally defined by the installed DataSHIELD packages description.
+                </ui:msg>
             </b:Paragraph>
             <b:Button ui:field="resetProfile" icon="REFRESH" type="INFO">
                 <ui:msg description="DS Profile reset label">Reset</ui:msg>

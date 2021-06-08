@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
@@ -41,7 +42,7 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
 
   private MethodValidationHandler validatorHandler;
 
-  private RServerClusterDto cluster;
+  private DataShieldProfileDto profile;
 
   public enum Mode {
     CREATE, UPDATE
@@ -62,12 +63,12 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
     dto.setValue(getView().getValue().getText());
     ResourceRequestBuilderFactory.newBuilder()//
         .forResource(UriBuilders.DATASHIELD_ROPTION.create()
-            .query("profile", cluster.getName()).build())//
+            .query("profile", profile.getName()).build())//
         .withResourceBody(DataShieldROptionDto.stringify(dto))//
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            fireEvent(new DataShieldROptionCreatedEvent(cluster.getName(), dto));
+            fireEvent(new DataShieldROptionCreatedEvent(profile.getName(), dto));
           }
         })
         .post().send();
@@ -79,8 +80,8 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
     getView().hideDialog();
   }
 
-  public void setCluster(RServerClusterDto cluster) {
-    this.cluster = cluster;
+  public void setProfile(DataShieldProfileDto profile) {
+    this.profile = profile;
   }
 
   public void setOption(DataShieldROptionDto optionDto) {

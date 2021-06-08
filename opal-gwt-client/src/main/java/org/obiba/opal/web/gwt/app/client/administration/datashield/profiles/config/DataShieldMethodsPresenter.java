@@ -40,7 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
   private TranslationMessages translationMessages;
 
-  private RServerClusterDto cluster;
+  private DataShieldProfileDto profile;
 
   @Inject
   public DataShieldMethodsPresenter(Display display, EventBus eventBus,
@@ -93,7 +93,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
       @Override
       public void onClick(ClickEvent event) {
         DataShieldMethodModalPresenter presenter = methodModalProvider.get();
-        presenter.initialize(cluster, env);
+        presenter.initialize(profile, env);
         presenter.createNewMethod();
       }
     }));
@@ -102,7 +102,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getName().equals(event.getProfile()))
               updateDataShieldMethods();
           }
         });
@@ -111,7 +111,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
           @Override
           public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getName().equals(event.getProfile()))
               updateDataShieldMethods();
           }
 
@@ -120,7 +120,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
         new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getCluster().equals(event.getCluster()))
               updateDataShieldMethods();
           }
         });
@@ -128,7 +128,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getCluster().equals(event.getCluster()))
               updateDataShieldMethods();
           }
         });
@@ -155,13 +155,13 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
   private String methods() {
     return UriBuilder.create().segment("datashield", "env", "{env}", "methods")
-        .query("profile", cluster.getName())
+        .query("profile", profile.getName())
         .build(env);
   }
 
   private String method(String method) {
     return UriBuilder.create().segment("datashield", "env", "{env}", "method", "{method}")
-        .query("profile", cluster.getName())
+        .query("profile", profile.getName())
         .build(env, method);
   }
 
@@ -201,7 +201,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
         @Override
         public void authorized() {
           DataShieldMethodModalPresenter presenter = methodModalProvider.get();
-          presenter.initialize(cluster, env);
+          presenter.initialize(profile, env);
           presenter.updateMethod(dto);
         }
       });
@@ -253,8 +253,8 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
-  public void setCluster(RServerClusterDto cluster) {
-    this.cluster = cluster;
+  public void setProfile(DataShieldProfileDto profile) {
+    this.profile = profile;
   }
 
   //

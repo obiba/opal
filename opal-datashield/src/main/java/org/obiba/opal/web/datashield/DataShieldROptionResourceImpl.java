@@ -10,9 +10,8 @@
 
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldConfig;
-import org.obiba.opal.datashield.cfg.DatashieldConfigService;
-import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Component
@@ -30,27 +28,27 @@ import javax.ws.rs.core.Response;
 public class DataShieldROptionResourceImpl implements DataShieldROptionResource {
 
   @Autowired
-  private DatashieldConfigService datashieldConfigService;
+  private DatashieldProfileService datashieldProfileService;
 
   @Override
   public Response deleteDataShieldROption(String name, String profile) {
-    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    DatashieldProfile config = datashieldProfileService.getProfile(profile);
     config.removeOption(name);
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     return Response.ok().build();
   }
 
   @Override
   public Response addOrUpdateDataShieldROption(String profile, final DataShield.DataShieldROptionDto dto) {
-    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    DatashieldProfile config = datashieldProfileService.getProfile(profile);
     config.addOrUpdateOption(dto.getName(), dto.getValue());
-    datashieldConfigService.saveConfiguration(config);
+    datashieldProfileService.saveProfile(config);
     return Response.ok().build();
   }
 
   @Override
   public Response getDataShieldROption(String name, String profile) {
-    DatashieldConfig config = datashieldConfigService.getConfiguration(profile);
+    DatashieldProfile config = datashieldProfileService.getProfile(profile);
 
     if (config.hasOption(name)) {
       DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)

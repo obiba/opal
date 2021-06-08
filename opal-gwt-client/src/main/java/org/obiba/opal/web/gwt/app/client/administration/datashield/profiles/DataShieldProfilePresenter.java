@@ -9,7 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -20,16 +21,17 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
-import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.datashield.DataShieldPackageMethodsDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class DataShieldProfilePresenter
     extends PresenterWidget<DataShieldProfilePresenter.Display>
     implements DataShieldProfileUiHandlers {
-
-  public interface Display extends View, HasUiHandlers<DataShieldProfileUiHandlers> {
-
-
-  }
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
@@ -45,7 +47,7 @@ public class DataShieldProfilePresenter
 
   private final Provider<DataShieldROptionsPresenter> optionsProvider;
 
-  private RServerClusterDto cluster;
+  private DataShieldProfileDto profile;
 
   @Inject
   public DataShieldProfilePresenter(Display display, EventBus eventBus,
@@ -61,24 +63,56 @@ public class DataShieldProfilePresenter
 
   @Override
   public void onProfileReset() {
-    fireEvent(new DataShieldProfileResetEvent(cluster.getName()));
+    fireEvent(new DataShieldProfileResetEvent(profile));
   }
 
-  public void setCluster(RServerClusterDto cluster) {
-    this.cluster = cluster;
+  public void setProfile(DataShieldProfileDto profile) {
+    this.profile = profile;
     DataShieldMethodsPresenter assignPresenter = methodsPresenterProvider.get();
     assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
-    assignPresenter.setCluster(cluster);
+    assignPresenter.setProfile(profile);
     addToSlot(AssignEnvironmentSlot, assignPresenter);
 
     DataShieldMethodsPresenter aggregatePresenter = methodsPresenterProvider.get();
     aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
-    aggregatePresenter.setCluster(cluster);
+    aggregatePresenter.setProfile(profile);
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
 
     DataShieldROptionsPresenter optionsPresenter = optionsProvider.get();
-    optionsPresenter.setCluster(cluster);
+    optionsPresenter.setProfile(profile);
     addToSlot(OptionsSlot, optionsPresenter);
+    getView().renderProfile(profile);
+  }
+
+  @Override
+  public void onProfileEnable(boolean enabled) {
+    if (enabled) {
+      ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+          .forResource(UriBuilders.DATASHIELD_PROFILE_ENABLE.create().build(profile.getName()))
+          .put()
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if (response.getStatusCode() == SC_OK) {
+                profile.setEnabled(true);
+              }
+              getView().renderProfile(profile);
+            }
+          }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
+    } else {
+      ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
+          .forResource(UriBuilders.DATASHIELD_PROFILE_ENABLE.create().build(profile.getName()))
+          .delete()
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if (response.getStatusCode() == SC_OK) {
+                profile.setEnabled(false);
+              }
+              getView().renderProfile(profile);
+            }
+          }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
+    }
   }
 
   @Override
@@ -90,5 +124,10 @@ public class DataShieldProfilePresenter
     String ASSIGN = "assign";
 
     String AGGREGATE = "aggregate";
+  }
+
+  public interface Display extends View, HasUiHandlers<DataShieldProfileUiHandlers> {
+
+    void renderProfile(DataShieldProfileDto profile);
   }
 }

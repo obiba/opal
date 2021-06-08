@@ -122,14 +122,14 @@ public class DataShieldPackagesPresenter
 
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (cluster.getName().equals(event.getCluster()))
               updateDataShieldPackages();
           }
         });
     addRegisteredHandler(DataShieldProfileResetEvent.getType(), new DataShieldProfileResetEvent.DataShieldProfileResetHandler() {
       @Override
-      public void onDataShieldProfileReset(DataShieldProfileResetEvent event) {
-        if (event.getProfile().equals(cluster.getName()) && packages != null && !packages.isEmpty()) {
+      public void onDataShieldProfileReset(final DataShieldProfileResetEvent event) {
+        if (event.getProfile().getCluster().equals(cluster.getName()) && packages != null && !packages.isEmpty()) {
           publishPackagesConfirmation = new Runnable() {
             @Override
             public void run() {
@@ -139,7 +139,7 @@ public class DataShieldPackagesPresenter
                 pkgNames.add(pkg.getName());
               for (String name : pkgNames)
                 builder.query("name", name);
-              builder.query("profile", cluster.getName());
+              builder.query("profile", event.getProfile().getName());
 
               ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
                   .forResource(builder.build())
@@ -147,8 +147,8 @@ public class DataShieldPackagesPresenter
                   .withCallback(new ResponseCodeCallback() {
                     @Override
                     public void onResponseCode(Request request, Response response) {
-                      fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(cluster.getName()).build());
-                      fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), null));
+                      fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(event.getProfile().getName()).build());
+                      fireEvent(new DataShieldPackageUpdatedEvent(event.getProfile().getName(), null));
                       fireEvent(ConfirmationTerminatedEvent.create());
                     }
                   }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();

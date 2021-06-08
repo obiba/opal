@@ -1161,6 +1161,27 @@ public enum UriBuilders {
     }
   },
 
+  DATASHIELD_PROFILES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profiles");
+    }
+  },
+
+  DATASHIELD_PROFILE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}");
+    }
+  },
+
+  DATASHIELD_PROFILE_ENABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}", "_enable");
+    }
+  },
+
   DATASHIELD_PACKAGES {
     @Override
     public UriBuilder create() {

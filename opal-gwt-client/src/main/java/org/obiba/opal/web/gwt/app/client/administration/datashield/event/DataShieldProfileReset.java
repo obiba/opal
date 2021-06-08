@@ -12,10 +12,11 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.event;
 
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 @GenEvent
 public class DataShieldProfileReset {
 
-  String profile;
+  DataShieldProfileDto profile;
 
 }

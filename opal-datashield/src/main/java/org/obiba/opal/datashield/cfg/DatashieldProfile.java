@@ -12,7 +12,10 @@ package org.obiba.opal.datashield.cfg;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.obiba.datashield.core.*;
+import org.obiba.datashield.core.DSConfiguration;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.DSOption;
 import org.obiba.datashield.core.impl.DefaultDSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.DefaultDSOption;
@@ -24,34 +27,52 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-public class DatashieldConfig implements DSConfiguration, HasUniqueProperties {
+public class DatashieldProfile implements DSConfiguration, HasUniqueProperties {
 
-  private String profile;
+  private String name;
+
+  private boolean enabled = true;
 
   private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
 
   private final Map<String, String> options = Maps.newHashMap();
 
-  public DatashieldConfig() {
+  public DatashieldProfile() {
   }
 
-  public DatashieldConfig(String profile) {
-    this.profile = profile;
+  public DatashieldProfile(String name) {
+    this.name = name;
   }
 
-  public String getProfile() {
-    return profile;
+  public String getName() {
+    return name;
   }
 
-  public void setProfile(String profile) {
-    this.profile = profile;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public String getCluster() {
+    if (name.contains(".")) {
+      String[] tokens = name.split("\\.");
+      return tokens[0];
+    }
+    return name;
   }
 
   @Override
   public synchronized DSEnvironment getEnvironment(DSMethodType type) {
     if (!environments.containsKey(type))
       environments.put(type, new ArrayList<>());
-    
+
     return new DefaultDSEnvironment(type, environments.get(type));
   }
 
@@ -93,12 +114,12 @@ public class DatashieldConfig implements DSConfiguration, HasUniqueProperties {
 
   @Override
   public List<String> getUniqueProperties() {
-    return Lists.newArrayList("profile");
+    return Lists.newArrayList("name");
   }
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.newArrayList(profile);
+    return Lists.newArrayList(name);
   }
 
   //

@@ -11,8 +11,8 @@ package org.obiba.opal.web.datashield;
 
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldConfig;
-import org.obiba.opal.datashield.cfg.DatashieldConfigService;
+import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   static final String DS_CONTEXT = "DataSHIELD";
 
   @Autowired
-  private DatashieldConfigService datashieldConfigService;
+  private DatashieldProfileService datashieldProfileService;
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -59,10 +60,18 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
-    DatashieldConfig config = datashieldConfigService.getConfiguration(rSession.getProfile());
-    if (config.hasOptions()) {
+    DatashieldProfile profile = datashieldProfileService.getProfile(rSession.getProfile());
+    if (!profile.isEnabled()) {
+      String message = datashieldProfileService.hasProfile(rSession.getProfile()) ?
+          "DataSHIELD profile is not enabled" : "DataSHIELD profile does not exist";
+      opalRSessionManager.removeRSession(rSession.getId());
+      throw new IllegalArgumentException(message + ": " + rSession.getProfile());
+    }
+    // TODO check profile permissions
+
+    if (profile.hasOptions()) {
       rSession.execute(
-          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
+          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
     }
     rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", configurationService.getOpalConfiguration().getSeed())));
     DataShieldLog.userLog("created a datashield session {}", rSession.getId());

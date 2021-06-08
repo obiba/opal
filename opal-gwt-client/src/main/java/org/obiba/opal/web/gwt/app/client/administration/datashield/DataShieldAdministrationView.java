@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield;
 
 import com.github.gwtbootstrap.client.ui.Tab;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,6 +23,7 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldAdministrationUiHandlers> implements DataShieldAdministrationPresenter.Display {
 
@@ -69,6 +71,9 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
     } else if (slot instanceof DataShieldAdministrationPresenter.ProfilesSlot) {
       Tab tab = new Tab();
       tab.setHeading(slot.toString());
+      DataShieldProfileDto profile = ((DataShieldAdministrationPresenter.ProfilesSlot)slot).getProfile();
+      if (profile.getName().equals(profile.getCluster()))
+        tab.setIcon(IconType.PUSHPIN);
       tab.add(content.asWidget());
       profileTabs.add(tab);
       profileTabs.selectTab(0);

@@ -39,6 +39,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import static com.google.gwt.http.client.Response.SC_OK;
@@ -116,15 +117,26 @@ public class DataShieldAdministrationPresenter
                 DataShieldPackagesPresenter packagesPresenter = packagesPresenterProvider.get();
                 packagesPresenter.setCluster(cluster);
                 addToSlot(new PackagesSlot(cluster), packagesPresenter);
-                // for now there is only one profile per cluster
-                DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
-                profilePesenter.setCluster(cluster);
-                addToSlot(new ProfilesSlot(cluster), profilePesenter);
               }
             }
           }
         })
         .get().send();
+    ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
+            if (response.getStatusCode() == SC_OK) {
+              for (DataShieldProfileDto profile : JsArrays.toIterable(resource)) {
+                DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
+                profilePesenter.setProfile(profile);
+                addToSlot(new ProfilesSlot(profile), profilePesenter);
+              }
+            }
+          }
+        })
+        .get().send();
+
   }
 
   @Override
@@ -161,13 +173,6 @@ public class DataShieldAdministrationPresenter
     }
   }
 
-  public interface DataShieldEnvironment {
-
-    String ASSIGN = "assign";
-
-    String AGGREGATE = "aggregate";
-  }
-
   public class PackagesSlot {
     private final RServerClusterDto cluster;
 
@@ -182,15 +187,19 @@ public class DataShieldAdministrationPresenter
   }
 
   public class ProfilesSlot {
-    private final RServerClusterDto cluster;
+    private final DataShieldProfileDto profile;
 
-    public ProfilesSlot(RServerClusterDto cluster) {
-      this.cluster = cluster;
+    public ProfilesSlot(DataShieldProfileDto profile) {
+      this.profile = profile;
+    }
+
+    public DataShieldProfileDto getProfile() {
+      return profile;
     }
 
     @Override
     public String toString() {
-      return cluster.getName();
+      return profile.getName();
     }
   }
 }

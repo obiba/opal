@@ -124,7 +124,7 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
 
     Set<String> rServerNames = Sets.newHashSet();
     Map<String, Integer> pkgCounts = Maps.newHashMap();
-    for (RPackageDto pkg : packages) {
+    for (RPackageDto pkg : originalPackages) {
       rServerNames.add(pkg.getRserver());
       String key = pkg.getName() + ":" + getEntryDtoValue(pkg, "version");
       if (pkgCounts.containsKey(key))
@@ -132,7 +132,6 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
       else
         pkgCounts.put(key, 1);
     }
-    GWT.log("R servers " + rServerNames.size());
     for (Map.Entry<String, Integer> pkgCount : pkgCounts.entrySet()) {
       if (pkgCount.getValue() != rServerNames.size())
         inconsistencyNotice.setVisible(true);

@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -28,8 +27,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
-import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   private final ModalProvider<DataShieldROptionModalPresenter> modalProvider;
 
-  private RServerClusterDto cluster;
+  private DataShieldProfileDto profile;
 
   public interface Display extends View, HasUiHandlers<DataShieldROptionsUiHandlers> {
 
@@ -60,8 +59,8 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
     getView().setUiHandlers(this);
   }
 
-  public void setCluster(RServerClusterDto cluster) {
-    this.cluster = cluster;
+  public void setProfile(DataShieldProfileDto profile) {
+    this.profile = profile;
   }
 
   @Override
@@ -85,7 +84,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getCluster().equals(event.getCluster()))
               refresh();
           }
         });
@@ -93,7 +92,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         new DataShieldPackageUpdatedEvent.DataShieldPackageUpdatedHandler() {
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getCluster().equals(event.getCluster()))
               refresh();
           }
         });
@@ -102,7 +101,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getCluster().equals(event.getCluster()))
               refresh();
           }
         });
@@ -110,7 +109,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         new DataShieldROptionCreatedEvent.DataShieldROptionCreatedHandler() {
           @Override
           public void onDataShieldROptionCreated(DataShieldROptionCreatedEvent event) {
-            if (cluster.getName().equals(event.getProfile()))
+            if (profile.getName().equals(event.getProfile()))
               refresh();
           }
         });
@@ -118,12 +117,12 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Override
   public void addOption() {
-    modalProvider.get().setCluster(cluster);
+    modalProvider.get().setProfile(profile);
   }
 
   private void editOption(DataShieldROptionDto optionDto) {
     DataShieldROptionModalPresenter presenter = modalProvider.get();
-    presenter.setCluster(cluster);
+    presenter.setProfile(profile);
     presenter.setOption(optionDto);
   }
 
@@ -131,7 +130,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.DATASHIELD_ROPTION.create()
             .query("name", optionDto.getName())
-            .query("profile", cluster.getName()).build())
+            .query("profile", profile.getName()).build())
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -144,7 +143,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
   protected void onReveal() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.DATASHIELD_ROPTION.create()
-            .query("profile", cluster.getName()).build())
+            .query("profile", profile.getName()).build())
         .post()
         .authorize(getView().addROptionsAuthorizer()).send();
     refresh();
@@ -153,7 +152,7 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
   private void refresh() {
     ResourceRequestBuilderFactory.<JsArray<DataShieldROptionDto>>newBuilder()
         .forResource(UriBuilders.DATASHIELD_ROPTIONS.create()
-            .query("profile", cluster.getName()).build())
+            .query("profile", profile.getName()).build())
         .withCallback(new ResourceCallback<JsArray<DataShieldROptionDto>>() {
 
           @Override

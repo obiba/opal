@@ -10,38 +10,32 @@
 
 package org.obiba.opal.web.datashield;
 
-import org.obiba.datashield.core.DSOption;
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
 import org.obiba.opal.datashield.cfg.DatashieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import java.util.ArrayList;
+import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional
-@Scope("request")
-@Path("/datashield/options")
-public class DataShieldROptionsResourceImpl implements DataShieldROptionsResource {
+@Path("/datashield/profiles")
+public class DataShieldProfilesResource {
 
   @Autowired
   private DatashieldProfileService datashieldProfileService;
 
-  @Override
-  public List<DataShield.DataShieldROptionDto> getDataShieldROptions(String profile) {
-    List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
-
-    for (DSOption entry : config.getOptions()) {
-      options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getName())//
-          .setValue(entry.getValue()).build());
-    }
-
-    return options;
+  @GET
+  public List<DataShield.DataShieldProfileDto> getProfiles() {
+    return StreamSupport.stream(datashieldProfileService.getProfiles().spliterator(), false)
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
+
 }

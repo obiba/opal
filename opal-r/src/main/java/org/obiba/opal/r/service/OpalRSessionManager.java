@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.r.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -271,7 +272,13 @@ public class OpalRSessionManager {
   private RServerSession addRSession(String principal, String profile) {
     try {
       SubjectRSessions rSessions = getRSessions(principal);
-      RServerSession rSession = rServerManagerService.getRServer(profile).newRServerSession(principal);
+      String cluster = profile;
+      if (!Strings.isNullOrEmpty(profile) && profile.contains(".")) {
+        String[] tokens = profile.split("\\.");
+        cluster = tokens[0];
+      }
+      RServerSession rSession = rServerManagerService.getRServer(cluster).newRServerSession(principal);
+      rSession.setProfile(profile);
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
