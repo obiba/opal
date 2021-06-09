@@ -69,6 +69,26 @@ public class RServerManagerService implements Service {
   private boolean running;
 
   /**
+   * Get the R server profile corresponding to the default R server.
+   * 
+   * @return
+   */
+  public RServerProfile getDefaultRServerProfile() {
+    final RServerService service = getDefaultRServer();
+    return new RServerProfile() {
+      @Override
+      public String getName() {
+        return service.getName();
+      }
+
+      @Override
+      public String getCluster() {
+        return service.getName();
+      }
+    };
+  }
+
+  /**
    * Get R server service from default cluster.
    *
    * @return

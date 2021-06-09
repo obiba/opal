@@ -271,14 +271,20 @@ public class OpalRSessionManager {
 
   private RServerSession addRSession(String principal, RServerProfile profile) {
     try {
+      RServerProfile safeProfile = asSafeRServerProfile(profile);
       SubjectRSessions rSessions = getRSessions(principal);
-      RServerSession rSession = rServerManagerService.getRServer(profile.getCluster()).newRServerSession(principal);
-      rSession.setProfile(profile);
+      RServerSession rSession = rServerManagerService.getRServer(safeProfile.getCluster()).newRServerSession(principal);
+      rSession.setProfile(safeProfile);
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }
+  }
+
+  private RServerProfile asSafeRServerProfile(RServerProfile profile) {
+    if (profile != null) return profile;
+    return rServerManagerService.getDefaultRServerProfile();
   }
 
   private RServerSession getRSession(String principal, String rSessionId) {
