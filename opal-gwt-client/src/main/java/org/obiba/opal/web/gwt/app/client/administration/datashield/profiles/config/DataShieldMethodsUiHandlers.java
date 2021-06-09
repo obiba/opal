@@ -10,10 +10,15 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
-public interface DataShieldROptionModalUiHandlers extends ModalUiHandlers {
-  void save();
+import java.util.List;
 
-  void cancel();
+public interface DataShieldMethodsUiHandlers extends UiHandlers {
+
+  void onAddMethod();
+
+  void onRemoveMethods(List<DataShieldMethodDto> selectedItems);
+
 }

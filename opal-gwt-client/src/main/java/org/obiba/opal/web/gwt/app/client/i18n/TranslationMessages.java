@@ -128,13 +128,28 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Variable")
   String removeVariable();
 
-  @Description("Remove Aggregating Method label")
-  @DefaultMessage("Remove Aggregating Method")
+  @Description("Remove Aggregate Method label")
+  @DefaultMessage("Remove Aggregate Method")
   String removeDataShieldAggregateMethod();
 
-  @Description("Remove Assigning Method label")
-  @DefaultMessage("Remove Assigning Method")
+  @Description("Remove Aggregate Methods label")
+  @DefaultMessage("Remove Aggregate Methods")
+  String removeDataShieldAggregateMethods();
+
+  @Description("Remove Assign Method label")
+  @DefaultMessage("Remove Assign Method")
   String removeDataShieldAssignMethod();
+  @Description("Remove DS Option label")
+  @DefaultMessage("Remove Option")
+  String removeDataShieldOption();
+
+  @Description("Remove DS Options label")
+  @DefaultMessage("Remove Options")
+  String removeDataShieldOptions();
+
+  @Description("Remove Assign Method label")
+  @DefaultMessage("Remove Assign Methods")
+  String removeDataShieldAssignMethods();
 
   @Description("Remove Package label")
   @DefaultMessage("Remove Package")
@@ -500,13 +515,29 @@ public interface TranslationMessages extends Messages {
           "this variable will be lost.")
   String confirmRemoveVariable();
 
-  @Description("Please confirm that you want to remove this assigning method message")
-  @DefaultMessage("Please confirm that you want to remove this assigning method.")
-  String confirmDeleteDataShieldAssignMethod();
+  @Description("Please confirm that you want to remove this assign method message")
+  @DefaultMessage("Please confirm that you want to remove this assign method <b>{0}</b>.")
+  String confirmDeleteDataShieldAssignMethod(String name);
 
-  @Description("Please confirm that you want to remove this aggregating method message")
-  @DefaultMessage("Please confirm that you want to remove this aggregating method.")
-  String confirmDeleteDataShieldAggregateMethod();
+  @Description("Please confirm that you want to remove these assign methods message")
+  @DefaultMessage("Please confirm that you want to remove the selected assign methods.")
+  String confirmDeleteDataShieldAssignMethods();
+
+  @Description("Please confirm that you want to remove this aggregate method message")
+  @DefaultMessage("Please confirm that you want to remove this aggregate method <b>{0}</b>.")
+  String confirmDeleteDataShieldAggregateMethod(String name);
+
+  @Description("Please confirm that you want to remove these aggregate methods message")
+  @DefaultMessage("Please confirm that you want to remove the selected aggregate methods.")
+  String confirmDeleteDataShieldAggregateMethods();
+
+  @Description("Please confirm that you want to remove these options message")
+  @DefaultMessage("Please confirm that you want to remove these selected options.")
+  String confirmDeleteDataShieldOptions();
+
+  @Description("Please confirm that you want to remove these option message")
+  @DefaultMessage("Please confirm that you want to remove the option <b>{0}</b>.")
+  String confirmDeleteDataShieldOption(String name);
 
   @Description("Please confirm that you want to remove this package and all its methods and options message")
   @DefaultMessage("Please confirm that you want to remove this package and all its methods and options.")
@@ -521,7 +552,7 @@ public interface TranslationMessages extends Messages {
   String confirmPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to publish all packages methods and options message")
-  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Custom settings will not be modified.")
+  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Any custom settings will not be modified.")
   String confirmPublishAllDataShieldSettings(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")
@@ -588,6 +619,11 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} Resources")
   @AlternateMessage({ "one", "1 Resource" })
   String nResourcesLabel(@PluralCount int nb);
+
+  @Description("N DS methods label")
+  @DefaultMessage("{0} Methods")
+  @AlternateMessage({ "one", "1 Method" })
+  String nDataShieldMethodsLabel(@PluralCount int nb);
 
   @Description("N Indices label")
   @DefaultMessage("{0} Indices")

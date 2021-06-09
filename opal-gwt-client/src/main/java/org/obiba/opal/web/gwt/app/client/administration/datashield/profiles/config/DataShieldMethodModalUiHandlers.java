@@ -14,5 +14,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface DataShieldMethodModalUiHandlers extends ModalUiHandlers {
   void save();
+
   void cancel();
 }

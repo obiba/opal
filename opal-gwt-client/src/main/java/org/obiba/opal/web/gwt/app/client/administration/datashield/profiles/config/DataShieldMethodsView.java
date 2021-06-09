@@ -9,39 +9,39 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
-
-import com.github.gwtbootstrap.client.ui.Button;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.ViewImpl;
 
 import java.util.List;
 
@@ -51,13 +51,16 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOV
 /**
  *
  */
-public class DataShieldMethodsView extends ViewImpl implements DataShieldMethodsPresenter.Display {
+public class DataShieldMethodsView extends ViewWithUiHandlers<DataShieldMethodsUiHandlers> implements DataShieldMethodsPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
 
-  interface Binder extends UiBinder<Widget, DataShieldMethodsView> {}
+  interface Binder extends UiBinder<Widget, DataShieldMethodsView> {
+  }
 
   private final Translations translations;
+
+  private final TranslationMessages translationMessages;
 
   @UiField
   Panel methodsPanel;
@@ -66,7 +69,22 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
   Button addMethodButton;
 
   @UiField
-  CellTable<DataShieldMethodDto> methodsTable;
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  IconAnchor selectAllAnchor;
+
+  @UiField
+  IconAnchor clearSelectionAnchor;
+
+  @UiField
+  Table<DataShieldMethodDto> methodsTable;
 
   @UiField
   OpalSimplePager methodsTablePager;
@@ -82,13 +100,16 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
 
   private final ListDataProvider<DataShieldMethodDto> methodsDataProvider = new ListDataProvider<DataShieldMethodDto>();
 
+  private CheckboxColumn<DataShieldMethodDto> checkColumn;
+
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
 
   private List<DataShieldMethodDto> originalMethods;
 
   @Inject
-  public DataShieldMethodsView(Binder uiBinder, Translations translations) {
+  public DataShieldMethodsView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
     this.translations = translations;
+    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
     filter.getTextBox().setPlaceholder(translations.filterDataShieldMethods());
@@ -99,9 +120,15 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
     renderMethods(filterMethods(filter.getText()));
   }
 
-  @Override
-  public HandlerRegistration addMethodHandler(ClickHandler handler) {
-    return addMethodButton.addClickHandler(handler);
+  @UiHandler("addMethodButton")
+  public void onAddMethod(ClickEvent event) {
+    getUiHandlers().onAddMethod();
+  }
+
+  @UiHandler("deleteMethods")
+  void onDeleteMethods(ClickEvent event) {
+    getUiHandlers().onRemoveMethods(checkColumn.getSelectedItems());
+    checkColumn.clearSelection();
   }
 
   @Override
@@ -130,7 +157,6 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
 
   private void renderMethods(List<DataShieldMethodDto> rows) {
     methodsDataProvider.setList(rows);
-    int size = methodsDataProvider.getList().size();
     methodsTablePager.firstPage();
     methodsDataProvider.refresh();
   }
@@ -150,6 +176,10 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
   }
 
   private void addMethodsTableColumns() {
+    checkColumn = new CheckboxColumn<DataShieldMethodDto>(new MethodsCheckDisplay());
+    methodsTable.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
+    methodsTable.setColumnWidth(checkColumn, 1, Style.Unit.PX);
+
     methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
       @Override
       public String getValue(DataShieldMethodDto object) {
@@ -230,12 +260,61 @@ public class DataShieldMethodsView extends ViewImpl implements DataShieldMethods
 
   @Override
   public void setEnvironment(String env) {
-    if(DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+    if (DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
       assignMethods.setVisible(true);
       aggregateMethods.setVisible(false);
     } else {
       assignMethods.setVisible(false);
       aggregateMethods.setVisible(true);
+    }
+  }
+
+  private class MethodsCheckDisplay implements CheckboxColumn.Display<DataShieldMethodDto> {
+
+    @Override
+    public Table<DataShieldMethodDto> getTable() {
+      return methodsTable;
+    }
+
+    @Override
+    public Object getItemKey(DataShieldMethodDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public IconAnchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public IconAnchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public HasText getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<DataShieldMethodDto> handler) {
+      for (DataShieldMethodDto item : methodsDataProvider.getList())
+        handler.onItemSelection(item);
+    }
+
+    @Override
+    public String getNItemLabel(int nb) {
+      return translationMessages.nDataShieldMethodsLabel(nb).toLowerCase();
+    }
+
+    @Override
+    public Alert getSelectActionsAlert() {
+      return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return selectItemTipsAlert;
     }
   }
 }

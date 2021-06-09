@@ -9,22 +9,21 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackageInstallModalPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackageInstallModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 /**
  *
@@ -32,7 +31,8 @@ import com.google.web.bindery.event.shared.EventBus;
 public class DataShieldPackageInstallModalView extends ModalPopupViewWithUiHandlers<DataShieldPackageInstallModalUiHandlers>
     implements Display {
 
-  interface Binder extends UiBinder<Modal, DataShieldPackageInstallModalView> {}
+  interface Binder extends UiBinder<Modal, DataShieldPackageInstallModalView> {
+  }
 
   @UiField
   Modal dialog;

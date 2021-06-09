@@ -11,9 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.event;
 
 
-import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
-
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
 @GenEvent
 public class DataShieldROptionCreated {

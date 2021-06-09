@@ -216,7 +216,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
   }
 
   @UiHandler("deleteResources")
-  void onDeleteTables(ClickEvent event) {
+  void onDeleteResources(ClickEvent event) {
     getUiHandlers().onRemoveResources(checkColumn.getSelectedItems());
     checkColumn.clearSelection();
   }

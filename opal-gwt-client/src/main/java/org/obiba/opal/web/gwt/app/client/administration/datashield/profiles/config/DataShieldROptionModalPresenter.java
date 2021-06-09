@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
-import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

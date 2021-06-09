@@ -16,7 +16,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -128,7 +127,7 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
       rServerNames.add(pkg.getRserver());
       String key = pkg.getName() + ":" + getEntryDtoValue(pkg, "version");
       if (pkgCounts.containsKey(key))
-        pkgCounts.put(key, pkgCounts.get(key) +1);
+        pkgCounts.put(key, pkgCounts.get(key) + 1);
       else
         pkgCounts.put(key, 1);
     }

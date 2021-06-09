@@ -9,13 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
-import org.obiba.opal.web.model.client.opal.EntryDto;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,6 +18,12 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.model.client.opal.EntryDto;
 
 /**
  *
@@ -32,7 +31,8 @@ import com.google.web.bindery.event.shared.EventBus;
 public class DataShieldPackageModalView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
     implements DataShieldPackageModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldPackageModalView> {}
+  interface Binder extends UiBinder<Widget, DataShieldPackageModalView> {
+  }
 
   private static final int DIALOG_HEIGHT = 400;
 
@@ -67,7 +67,7 @@ public class DataShieldPackageModalView extends ModalPopupViewWithUiHandlers<Mod
 
   @Override
   public void addProperty(EntryDto dto) {
-    if(dto.getValue().toLowerCase().startsWith("http")) {
+    if (dto.getValue().toLowerCase().startsWith("http")) {
       Anchor a = new Anchor();
       a.setTarget("_blank");
       a.setHref(dto.getValue());

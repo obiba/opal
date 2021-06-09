@@ -10,13 +10,15 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
+import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import java.util.List;
 
 
 public interface DataShieldROptionsUiHandlers extends UiHandlers {
 
-  void addOption();
+  void onAddOption();
 
+  void onRemoveOptions(List<DataShieldROptionDto> selectedItems);
 }

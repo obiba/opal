@@ -22,6 +22,10 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -40,6 +44,12 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   private final ModalProvider<DataShieldROptionModalPresenter> modalProvider;
 
+  private final TranslationMessages translationMessages;
+
+  private Runnable removeOptionConfirmation;
+
+  private Runnable removeOptionsConfirmation;
+
   private DataShieldProfileDto profile;
 
   public interface Display extends View, HasUiHandlers<DataShieldROptionsUiHandlers> {
@@ -53,9 +63,10 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Inject
   public DataShieldROptionsPresenter(Display display, EventBus eventBus,
-                                     ModalProvider<DataShieldROptionModalPresenter> provider) {
+                                     ModalProvider<DataShieldROptionModalPresenter> provider, TranslationMessages translationMessages) {
     super(eventBus, display);
     modalProvider = provider.setContainer(this);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
   }
 
@@ -113,11 +124,49 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
               refresh();
           }
         });
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (event.getSource().equals(removeOptionConfirmation) && event.isConfirmed()) {
+          removeOptionConfirmation.run();
+          removeOptionConfirmation = null;
+        } else if (event.getSource().equals(removeOptionsConfirmation) && event.isConfirmed()) {
+          removeOptionsConfirmation.run();
+          removeOptionsConfirmation = null;
+        }
+      }
+    });
   }
 
   @Override
-  public void addOption() {
+  public void onAddOption() {
     modalProvider.get().setProfile(profile);
+  }
+
+  @Override
+  public void onRemoveOptions(final List<DataShieldROptionDto> selectedItems) {
+    removeOptionsConfirmation = new Runnable() {
+
+      @Override
+      public void run() {
+        UriBuilder builder = UriBuilders.DATASHIELD_ROPTIONS.create()
+            .query("profile", profile.getName());
+        for (DataShieldROptionDto dto : selectedItems)
+          builder.query("name", dto.getName());
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(builder.build())
+            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                refresh();
+              }
+            }).delete().send();
+      }
+    };
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(removeOptionsConfirmation, translationMessages.removeDataShieldOptions(),
+            translationMessages.confirmDeleteDataShieldOptions()));
   }
 
   private void editOption(DataShieldROptionDto optionDto) {
@@ -126,17 +175,26 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
     presenter.setOption(optionDto);
   }
 
-  private void removeOption(DataShieldROptionDto optionDto) {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.DATASHIELD_ROPTION.create()
-            .query("name", optionDto.getName())
-            .query("profile", profile.getName()).build())
-        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            refresh();
-          }
-        }).delete().send();
+  private void removeOption(final DataShieldROptionDto optionDto) {
+    removeOptionConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(UriBuilders.DATASHIELD_ROPTION.create()
+                .query("name", optionDto.getName())
+                .query("profile", profile.getName()).build())
+            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                refresh();
+              }
+            }).delete().send();
+      }
+    };
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(removeOptionConfirmation, translationMessages.removeDataShieldOption(),
+            translationMessages.confirmDeleteDataShieldOption(optionDto.getName())));
   }
 
   @Override

@@ -12,8 +12,10 @@ package org.obiba.opal.web.datashield;
 
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.obiba.opal.web.model.DataShield;
 
@@ -21,5 +23,8 @@ public interface DataShieldROptionsResource {
 
   @GET
   List<DataShield.DataShieldROptionDto> getDataShieldROptions(@QueryParam("profile") String profile);
+
+  @DELETE
+  Response deleteDataShieldROptions(@QueryParam("name") List<String> names, @QueryParam("profile") String profile);
 
 }

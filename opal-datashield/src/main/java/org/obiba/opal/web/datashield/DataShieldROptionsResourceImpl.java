@@ -20,8 +20,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional
@@ -42,7 +46,23 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
           .setValue(entry.getValue()).build());
     }
 
+    options.sort(Comparator.comparing(DataShield.DataShieldROptionDto::getName));
+
     return options;
+  }
+
+  @Override
+  public Response deleteDataShieldROptions(List<String> names, String profile) {
+    DatashieldProfile config = getDataShieldProfile(profile);
+    List<DSOption> options = StreamSupport.stream(config.getOptions().spliterator(), false)
+        .filter(o -> (names == null || names.isEmpty() || names.contains(o.getName())))
+        .collect(Collectors.toList());
+    if (!options.isEmpty()) {
+      for (DSOption option : options)
+        config.removeOption(option.getName());
+      datashieldProfileService.saveProfile(config);
+    }
+    return Response.ok().build();
   }
 
   private DatashieldProfile getDataShieldProfile(String profileName) {

@@ -30,7 +30,7 @@ public interface DataShieldEnvironmentResource {
 
   @DELETE
   @Path("/methods")
-  Response deleteDataShieldMethods(@QueryParam("profile") String profile);
+  Response deleteDataShieldMethods(@QueryParam("name") List<String> names, @QueryParam("profile") String profile);
 
   @POST
   @Path("/methods")

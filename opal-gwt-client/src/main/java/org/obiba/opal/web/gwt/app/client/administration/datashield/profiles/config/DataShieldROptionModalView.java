@@ -9,10 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -25,6 +21,9 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionModalPresenter.Mode;
 
@@ -34,7 +33,8 @@ import static org.obiba.opal.web.gwt.app.client.administration.datashield.profil
 public class DataShieldROptionModalView extends ModalPopupViewWithUiHandlers<DataShieldROptionModalUiHandlers>
     implements DataShieldROptionModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldROptionModalView> {}
+  interface Binder extends UiBinder<Widget, DataShieldROptionModalView> {
+  }
 
   @UiField
   Modal dialog;
@@ -83,7 +83,7 @@ public class DataShieldROptionModalView extends ModalPopupViewWithUiHandlers<Dat
   @Override
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE == dialogMode);
-    if(Mode.CREATE == dialogMode) {
+    if (Mode.CREATE == dialogMode) {
       dialog.setTitle(translations.addROptionTitle());
     } else {
       dialog.setTitle(translations.editROptionTitle());
@@ -98,8 +98,8 @@ public class DataShieldROptionModalView extends ModalPopupViewWithUiHandlers<Dat
   @Override
   public void showError(String message, FormField field) {
     ControlGroup group = null;
-    if(field != null) {
-      switch(field) {
+    if (field != null) {
+      switch (field) {
         case NAME:
           group = nameGroup;
           break;
@@ -108,7 +108,7 @@ public class DataShieldROptionModalView extends ModalPopupViewWithUiHandlers<Dat
           break;
       }
     }
-    if(group == null) {
+    if (group == null) {
       dialog.addAlert(message, AlertType.ERROR);
     } else {
       dialog.addAlert(message, AlertType.ERROR, group);

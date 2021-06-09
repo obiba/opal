@@ -10,14 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.github.gwtbootstrap.client.ui.*;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.MethodType;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,13 +22,21 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.MethodType;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodModalPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 
 /**
  *
  */
 public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<DataShieldMethodModalUiHandlers> implements Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldMethodModalView> {}
+  interface Binder extends UiBinder<Widget, DataShieldMethodModalView> {
+  }
 
   @UiField
   Modal dialog;
@@ -124,7 +124,7 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE == dialogMode);
     typeList.setEnabled(Mode.CREATE == dialogMode);
-    if(Mode.CREATE == dialogMode) {
+    if (Mode.CREATE == dialogMode) {
       dialog.setTitle(translations.addDataShieldMethod());
     } else {
       dialog.setTitle(translations.editDataShieldMethod());
@@ -158,8 +158,8 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
 
   @Override
   public void setType(MethodType type) {
-    for(int i = 0; i < typeList.getItemCount(); i++) {
-      if(typeList.getValue(i).equals(type.toString())) {
+    for (int i = 0; i < typeList.getItemCount(); i++) {
+      if (typeList.getValue(i).equals(type.toString())) {
         typeList.setSelectedIndex(i);
         break;
       }

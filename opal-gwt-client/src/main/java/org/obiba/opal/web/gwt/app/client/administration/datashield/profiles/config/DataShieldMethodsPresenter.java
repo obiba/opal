@@ -11,13 +11,11 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
@@ -35,7 +33,6 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -47,15 +44,17 @@ import java.util.List;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
-public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethodsPresenter.Display> {
+public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethodsPresenter.Display> implements DataShieldMethodsUiHandlers {
 
   private String env;
 
   private Runnable removeMethodConfirmation;
 
+  private Runnable removeMethodsConfirmation;
+
   private final ModalProvider<DataShieldMethodModalPresenter> methodModalProvider;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   private DataShieldProfileDto profile;
 
@@ -65,6 +64,7 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.methodModalProvider = methodModalProvider.setContainer(this);
+    getView().setUiHandlers(this);
   }
 
   public void setEnvironment(String env) {
@@ -88,15 +88,6 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
       }
     });
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
-    registerHandler(getView().addMethodHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        DataShieldMethodModalPresenter presenter = methodModalProvider.get();
-        presenter.initialize(profile, env);
-        presenter.createNewMethod();
-      }
-    }));
     addRegisteredHandler(DataShieldMethodCreatedEvent.getType(),
         new DataShieldMethodCreatedEvent.DataShieldMethodCreatedHandler() {
 
@@ -173,16 +164,6 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(methods()).post().authorize(authorizer).send();
   }
 
-  private void authorizeEditMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).put()
-        .authorize(authorizer).send();
-  }
-
-  private void authorizeDeleteMethod(DataShieldMethodDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete()
-        .authorize(authorizer).send();
-  }
-
   private void updateDataShieldMethods() {
     ResourceRequestBuilderFactory.<JsArray<DataShieldMethodDto>>newBuilder().forResource(methods()).get()//
         .withCallback(new ResourceCallback<JsArray<DataShieldMethodDto>>() {
@@ -196,38 +177,25 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
   protected void doDataShieldMethodActionImpl(final DataShieldMethodDto dto, String actionName) {
     if (actionName.equals(EDIT_ACTION)) {
-      authorizeEditMethod(dto, new Authorizer(getEventBus()) {
-
-        @Override
-        public void authorized() {
-          DataShieldMethodModalPresenter presenter = methodModalProvider.get();
-          presenter.initialize(profile, env);
-          presenter.updateMethod(dto);
-        }
-      });
-
+      DataShieldMethodModalPresenter presenter = methodModalProvider.get();
+      presenter.initialize(profile, env);
+      presenter.updateMethod(dto);
     } else if (actionName.equals(REMOVE_ACTION)) {
-      authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
+      removeMethodConfirmation = new Runnable() {
         @Override
-        public void authorized() {
-          removeMethodConfirmation = new Runnable() {
-            @Override
-            public void run() {
-              deleteDataShieldMethod(dto);
-            }
-          };
-          if (DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
-            getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAssignMethod(),
-                    translationMessages.confirmDeleteDataShieldAssignMethod()));
-          } else {
-            getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAggregateMethod(),
-                    translationMessages.confirmDeleteDataShieldAggregateMethod()));
-          }
+        public void run() {
+          deleteDataShieldMethod(dto);
         }
-      });
-
+      };
+      if (DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+        getEventBus().fireEvent(ConfirmationRequiredEvent
+            .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAssignMethod(),
+                translationMessages.confirmDeleteDataShieldAssignMethod(dto.getName())));
+      } else {
+        getEventBus().fireEvent(ConfirmationRequiredEvent
+            .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAggregateMethod(),
+                translationMessages.confirmDeleteDataShieldAggregateMethod(dto.getName())));
+      }
     }
   }
 
@@ -246,8 +214,31 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
       }
 
     };
-
     ResourceRequestBuilderFactory.newBuilder().forResource(method(dto.getName())).delete() //
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+  }
+
+  private void deleteDataShieldMethods(List<DataShieldMethodDto> dtos) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        fireEvent(ConfirmationTerminatedEvent.create());
+        if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
+          updateDataShieldMethods();
+        } else {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error("Failed removing methods.").build());
+        }
+      }
+
+    };
+    UriBuilder builder = UriBuilder.create().segment("datashield", "env", "{env}", "methods")
+        .query("profile", profile.getName());
+    for (DataShieldMethodDto dto : dtos)
+      builder.query("name", dto.getName());
+    ResourceRequestBuilderFactory.newBuilder().forResource(builder.build(env)).delete() //
         .withCallback(Response.SC_OK, callbackHandler) //
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
@@ -255,6 +246,32 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
   public void setProfile(DataShieldProfileDto profile) {
     this.profile = profile;
+  }
+
+  @Override
+  public void onAddMethod() {
+    DataShieldMethodModalPresenter presenter = methodModalProvider.get();
+    presenter.initialize(profile, env);
+    presenter.createNewMethod();
+  }
+
+  @Override
+  public void onRemoveMethods(final List<DataShieldMethodDto> selectedItems) {
+    removeMethodsConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        deleteDataShieldMethods(selectedItems);
+      }
+    };
+    if (DataShieldProfilePresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(removeMethodsConfirmation, translationMessages.removeDataShieldAssignMethods(),
+              translationMessages.confirmDeleteDataShieldAssignMethods()));
+    } else {
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(removeMethodsConfirmation, translationMessages.removeDataShieldAggregateMethods(),
+              translationMessages.confirmDeleteDataShieldAggregateMethods()));
+    }
   }
 
   //
@@ -285,22 +302,22 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if (removeMethodConfirmation != null && event.getSource().equals(removeMethodConfirmation) &&
-          event.isConfirmed()) {
+      if (event.getSource().equals(removeMethodConfirmation) && event.isConfirmed()) {
         removeMethodConfirmation.run();
         removeMethodConfirmation = null;
+      } else if (event.getSource().equals(removeMethodsConfirmation) && event.isConfirmed()) {
+        removeMethodsConfirmation.run();
+        removeMethodsConfirmation = null;
       }
     }
 
   }
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<DataShieldMethodsUiHandlers> {
 
     void showDataShieldMethods(List<DataShieldMethodDto> rows);
 
     void setMethodActionHandler(ActionHandler<DataShieldMethodDto> handler);
-
-    HandlerRegistration addMethodHandler(ClickHandler handler);
 
     HasAuthorization getAddMethodAuthorizer();
 

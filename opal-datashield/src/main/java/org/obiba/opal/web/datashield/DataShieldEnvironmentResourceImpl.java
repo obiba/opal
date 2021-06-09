@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.obiba.datashield.core.DSConfiguration;
 import org.obiba.datashield.core.DSEnvironment;
@@ -28,9 +29,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -53,18 +54,24 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
     for (DSMethod method : listMethods(profile)) {
       dtos.add(Dtos.asDto(method));
     }
-    sortByName(dtos);
+    dtos.sort(Comparator.comparing(DataShield.DataShieldMethodDto::getName));
     return dtos;
   }
 
   @Override
-  public Response deleteDataShieldMethods(String profile) {
+  public Response deleteDataShieldMethods(List<String> names, String profile) {
     DatashieldProfile config = datashieldProfileService.getProfile(profile);
-    for (DSMethod method : getEnvironment(config).getMethods()) {
-      getEnvironment(config).removeMethod(method.getName());
+    List<DSMethod> methods = getEnvironment(config).getMethods().stream()
+        .filter(m -> (names == null || names.isEmpty() || names.contains(m.getName())))
+        .collect(Collectors.toList());
+    if (!methods.isEmpty()) {
+      methods.forEach(m -> getEnvironment(config).removeMethod(m.getName()));
+      datashieldProfileService.saveProfile(config);
+      if (names == null || names.isEmpty())
+        DataShieldLog.adminLog("deleted all methods from type {}.", methodType);
+      else
+        DataShieldLog.adminLog("deleted methods from type {}: {}", methodType, Joiner.on(", ").join(names));
     }
-    datashieldProfileService.saveProfile(config);
-    DataShieldLog.adminLog("deleted all methods from type {}.", methodType);
     return Response.ok().build();
   }
 
@@ -111,18 +118,6 @@ public class DataShieldEnvironmentResourceImpl implements DataShieldEnvironmentR
 
   private DatashieldProfile getDatashieldProfile(String profile) {
     return datashieldProfileService.getProfile(profile);
-  }
-
-  private void sortByName(List<DataShield.DataShieldMethodDto> dtos) {
-    // sort alphabetically
-    Collections.sort(dtos, new Comparator<DataShield.DataShieldMethodDto>() {
-
-      @Override
-      public int compare(DataShield.DataShieldMethodDto d1, DataShield.DataShieldMethodDto d2) {
-        return d1.getName().compareTo(d2.getName());
-      }
-
-    });
   }
 
   private DSEnvironment getEnvironment(String profile) {

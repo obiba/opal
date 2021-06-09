@@ -9,16 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
-import org.obiba.opal.web.model.client.opal.EntryDto;
-import org.obiba.opal.web.model.client.opal.r.RPackageDto;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.model.client.opal.EntryDto;
+import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 public class DataShieldPackageModalPresenter extends ModalPresenterWidget<DataShieldPackageModalPresenter.Display> {
 
@@ -36,7 +35,7 @@ public class DataShieldPackageModalPresenter extends ModalPresenterWidget<DataSh
     JsArray<EntryDto> entries = dto.getDescriptionArray();
 
     getView().clearProperties();
-    for(int i = 0; i < entries.length(); i++) {
+    for (int i = 0; i < entries.length(); i++) {
       getView().addProperty(entries.get(i));
     }
   }
