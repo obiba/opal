@@ -45,6 +45,13 @@ public final class ResourcePermissionRequestPaths {
       }
     },
 
+    DATASHIELD_PROFILE_PERMISSIONS {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("datashield", "profile", "{}", "permissions");
+      }
+    },
+
     PROJECT_PERMISSIONS_DATASOURCE {
       @Override
       public UriBuilder create() {

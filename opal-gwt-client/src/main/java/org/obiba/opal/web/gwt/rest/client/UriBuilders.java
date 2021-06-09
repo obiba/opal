@@ -1182,6 +1182,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASHIELD_PROFILE_ACCESS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}", "_access");
+    }
+  },
+
   DATASHIELD_PACKAGES {
     @Override
     public UriBuilder create() {

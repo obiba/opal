@@ -23,17 +23,32 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
-            <g:FlowPanel addStyleNames="bottom-margin">
-                <b:Icon ui:field="statusIcon" type="CIRCLE" size="LARGE" addStyleNames="status-success"/>
-                <g:InlineLabel ui:field="statusLabel" addStyleNames="small-indent"/>
-            </g:FlowPanel>
-            <b:Button ui:field="enableProfile" type="DEFAULT" visible="false">
+            <b:Icon ui:field="statusIcon" type="CIRCLE" size="LARGE"/>
+            <g:InlineLabel ui:field="statusLabel" addStyleNames="small-indent"/>
+            <b:Button ui:field="enableProfile" type="DEFAULT" visible="false" addStyleNames="small-indent">
                 <ui:msg description="DS Profile enable label">Enable</ui:msg>
             </b:Button>
-            <b:Button ui:field="disableProfile" type="DEFAULT" visible="false">
+            <b:Button ui:field="disableProfile" type="DEFAULT" visible="false" addStyleNames="small-indent">
                 <ui:msg description="DS Profile disable label">Disable</ui:msg>
             </b:Button>
         </g:FlowPanel>
+
+        <b:Heading size="5">
+            <ui:msg description="Permissions label">Permissions</ui:msg>
+        </b:Heading>
+
+        <g:FlowPanel addStyleNames="bottom-margin">
+            <b:Icon ui:field="permsIcon" type="CIRCLE" size="LARGE"/>
+            <g:InlineLabel ui:field="permsLabel" addStyleNames="small-indent"/>
+            <b:Button ui:field="restrictProfile" type="DEFAULT" visible="false" addStyleNames="small-indent">
+                <ui:msg description="DS Profile restrict label">Restrict Access</ui:msg>
+            </b:Button>
+            <b:Button ui:field="unrestrictProfile" type="DEFAULT" visible="false" addStyleNames="small-indent">
+                <ui:msg description="DS Profile unrestrict label">Unrestrict Access</ui:msg>
+            </b:Button>
+        </g:FlowPanel>
+
+        <g:SimplePanel ui:field="permissionsPanel"/>
 
         <b:Heading size="5">
             <ui:msg description="DS Settings label">Settings</ui:msg>

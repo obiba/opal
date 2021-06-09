@@ -18,4 +18,6 @@ public interface DataShieldProfileUiHandlers extends UiHandlers {
 
   void onProfileEnable(boolean enabled);
 
+  void onProfileRestrictAccess(boolean restricted);
+
 }

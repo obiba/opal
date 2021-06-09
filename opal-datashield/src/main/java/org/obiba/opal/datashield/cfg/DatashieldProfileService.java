@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.slf4j.Logger;
@@ -39,12 +40,15 @@ public class DatashieldProfileService implements SystemService {
 
   private final OrientDbService orientDbService;
 
+  private final SubjectAclService subjectAclService;
+
   private final Lock lock = new ReentrantLock();
 
   @Autowired
-  public DatashieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService) {
+  public DatashieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService) {
     this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
+    this.subjectAclService = subjectAclService;
   }
 
   /**
@@ -123,6 +127,8 @@ public class DatashieldProfileService implements SystemService {
     lock.lock();
     try {
       orientDbService.save(profile, profile);
+      if (!profile.isRestrictedAccess())
+        subjectAclService.deleteNodePermissions("opal", "/datashield/profile/" + profile.getName());
     } finally {
       lock.unlock();
     }
@@ -137,6 +143,8 @@ public class DatashieldProfileService implements SystemService {
     lock.lock();
     try {
       orientDbService.delete(profile);
+      if (profile.isRestrictedAccess())
+        subjectAclService.deleteNodePermissions("opal", "/datashield/profile/" + profile.getName());
     } finally {
       lock.unlock();
     }

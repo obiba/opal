@@ -36,6 +36,8 @@ public class DatashieldProfile implements RServerProfile, DSConfiguration, HasUn
 
   private boolean enabled = false;
 
+  private boolean restrictedAccess = false;
+
   private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
 
   private final Map<String, String> options = Maps.newHashMap();
@@ -63,6 +65,14 @@ public class DatashieldProfile implements RServerProfile, DSConfiguration, HasUn
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  public boolean isRestrictedAccess() {
+    return restrictedAccess;
+  }
+
+  public void setRestrictedAccess(boolean restrictedAccess) {
+    this.restrictedAccess = restrictedAccess;
   }
 
   public void setCluster(String cluster) {

@@ -8,6 +8,7 @@ message DataShieldProfileDto {
   required string name = 1;
   required string cluster = 2;
   required bool enabled = 3;
+  required bool restrictedAccess = 4;
 }
 
 message DataShieldMethodDto {

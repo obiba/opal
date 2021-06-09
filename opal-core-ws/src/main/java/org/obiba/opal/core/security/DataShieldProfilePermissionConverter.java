@@ -9,16 +9,17 @@
  */
 package org.obiba.opal.core.security;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * Converts opal administration related resources permissions from opal domain to magma domain.
  */
 @Component
-public class DataShieldPermissionConverter extends OpalPermissionConverter {
+public class DataShieldProfilePermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
@@ -36,35 +37,16 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
   }
 
   public enum Permission {
-    DATASHIELD_ALL {
+    DATASHIELD_PROFILE_USE {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),
-            toRest("/datashield/packages", "*:GET/*"),
-            toRest("/datashield/profiles", "*:GET/*"),
-            toRest("/datashield/options", "*:GET/*"),
-            toRest("/datashield/env/aggregate/methods", "GET:GET"),
-            toRest("/datashield/env/assign/methods", "GET:GET"),
-            toRest("/service/r", "GET"),
-            toRest("/service/r", "PUT"),
-            toRest("/service/r", "DELETE"),
-            toRest("/service/r/clusters", "GET"),
-            toRest("/service/r/sessions", "GET"),
-            toRest("/service/r/workspaces", "GET"),
-            toRest("/service/r/workspaces", "DELETE"),
-            toRest("/system/subject-profiles/_search", "GET"));
-      }
-
-    },
-    DATASHIELD_USE {
-      @Override
-      public Iterable<String> convert(String node) {
+        String[] args = args(node, "/datashield/profile/(.+)");
         return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),
             toRest("/datashield/env", "GET:GET/GET"),
             toRest("/service/r/workspaces", "GET"),
-            toRest("/service/r/workspaces", "DELETE"));
+            toRest("/service/r/workspaces", "DELETE"),
+            toRest("/datashield/profile/{0}", "GET:GET/GET", args));
       }
-
     };
 
     public abstract Iterable<String> convert(String node);

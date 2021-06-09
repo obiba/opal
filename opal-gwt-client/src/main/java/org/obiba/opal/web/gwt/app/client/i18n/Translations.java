@@ -213,6 +213,7 @@ public interface Translations extends Constants {
       "R_USE", "Use",
       "DATASHIELD_ALL", "Administrate",
       "DATASHIELD_USE", "Use",
+      "DATASHIELD_PROFILE_USE", "Use",
       "REPORT_TEMPLATE_ALL", "Administrate",
       "REPORT_TEMPLATE_READ", "View reports" })
   Map<String, String> permissionMap();
@@ -268,6 +269,8 @@ public interface Translations extends Constants {
       "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.",
       "DATASHIELD_USE.help",
       "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.",
+      "DATASHIELD_PROFILE_USE.help",
+      "Use DataSHIELD services with this profile: can push accessible data to R and can execute limited R commands on them.",
       "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).",
       "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();
@@ -1297,6 +1300,14 @@ public interface Translations extends Constants {
   @Description("DS profile disabled label")
   @DefaultStringValue("Profile is not available for use.")
   String dataShieldProfileDisabledLabel();
+
+  @Description("DS profile restricted label")
+  @DefaultStringValue("Only DataSHIELD users with proper permissions can access this profile.")
+  String dataShieldProfileRestrictedLabel();
+
+  @Description("DS profile unrestricted label")
+  @DefaultStringValue("Any DataSHIELD user can access this profile.")
+  String dataShieldProfileUnrestrictedLabel();
 
   @Description("Add DataShield method label")
   @DefaultStringValue("Add Method")

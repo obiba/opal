@@ -30,6 +30,7 @@ public class DataShieldPermissionConverterTest extends OpalPermissionConverterTe
     testConversion("/", DataShieldPermissionConverter.Permission.DATASHIELD_ALL,
         "rest:/datashield/session:*:GET/*",
         "rest:/datashield/packages:*:GET/*",
+        "rest:/datashield/profiles:*:GET/*",
         "rest:/datashield/options:*:GET/*",
         "rest:/datashield/env/aggregate/methods:GET:GET",
         "rest:/datashield/env/assign/methods:GET:GET",

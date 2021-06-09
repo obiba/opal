@@ -21,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionT
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -66,14 +65,14 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
     resourceType = type;
     this.uriBuilder = uriBuilder;
     this.resources = resources;
-    retrievePermissions();
+    refreshPermissions();
   }
 
   @Override
   protected void onBind() {
     super.onBind();
 
-    getView().getActions().setActionHandler(new ActionHandler<Acl>() {
+    getView().setActionHandler(new ActionHandler<Acl>() {
 
       @Override
       public void doAction(Acl acl, String actionName) {
@@ -86,7 +85,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
     });
   }
 
-  private void retrievePermissions() {
+  public void refreshPermissions() {
     ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uriBuilder.create().build(resources)).get()
         .withCallback(new ResourceCallback<JsArray<Acl>>() {
           @Override
@@ -126,7 +125,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            retrievePermissions();
+            refreshPermissions();
           }
         })
         .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
@@ -150,7 +149,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            retrievePermissions();
+            refreshPermissions();
           }
         })
         .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
@@ -164,7 +163,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   public interface Display extends View, HasUiHandlers<ResourcePermissionsUiHandlers> {
     void setData(@Nonnull List<Acl> acls);
 
-    HasActionHandler<Acl> getActions();
+    void setActionHandler(ActionHandler<Acl> handler);
 
     List<Acl> getAclList();
   }

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldProfile;
@@ -67,7 +68,10 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
           "DataSHIELD profile is not enabled" : "DataSHIELD profile does not exist";
       throw new IllegalArgumentException(message + ": " + profile.getName());
     }
-    // TODO check profile permissions
+    // check access
+    if (profile.isRestrictedAccess() && !SecurityUtils.getSubject().isPermitted(String.format("rest:/datashield/profile/%s:GET", profile.getName()))) {
+      throw new ForbiddenException("DataSHIELD profile access is forbidden: " + profile.getName());
+    }
     return profile;
   }
 

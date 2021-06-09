@@ -20,9 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 @Transactional
@@ -52,6 +49,20 @@ public class DataShieldProfileResource {
     return Response.ok().build();
   }
 
+  @PUT
+  @Path("_access")
+  public Response restrictedAccessProfile(@PathParam("name") String name) {
+    doRestrictAccessProfile(name, true);
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("_access")
+  public Response unrestrictedAccessProfile(@PathParam("name") String name) {
+    doRestrictAccessProfile(name, false);
+    return Response.ok().build();
+  }
+
   /**
    * Remove a secondary profile, primary ones are sticked to their cluster.
    *
@@ -75,6 +86,12 @@ public class DataShieldProfileResource {
   private void doEnableProfile(String name, boolean enabled) {
     DatashieldProfile profile = getProfileInternal(name);
     profile.setEnabled(enabled);
+    datashieldProfileService.saveProfile(profile);
+  }
+
+  private void doRestrictAccessProfile(String name, boolean restricted) {
+    DatashieldProfile profile = getProfileInternal(name);
+    profile.setRestrictedAccess(restricted);
     datashieldProfileService.saveProfile(profile);
   }
 

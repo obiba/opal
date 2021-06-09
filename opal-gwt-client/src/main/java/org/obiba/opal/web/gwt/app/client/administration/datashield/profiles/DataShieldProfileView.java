@@ -11,22 +11,21 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Icon;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.*;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileUiHandlers> implements DataShieldProfilePresenter.Display {
 
-  interface Binder extends UiBinder<Widget, DataShieldProfileView> {}
+  interface Binder extends UiBinder<Widget, DataShieldProfileView> {
+  }
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -41,6 +40,21 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
 
   @UiField
   Button disableProfile;
+
+  @UiField
+  Icon permsIcon;
+
+  @UiField
+  InlineLabel permsLabel;
+
+  @UiField
+  Button restrictProfile;
+
+  @UiField
+  Button unrestrictProfile;
+
+  @UiField
+  SimplePanel permissionsPanel;
 
   @UiField
   SimplePanel aggregatePanel;
@@ -71,19 +85,37 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
       enableProfile.setVisible(true);
       disableProfile.setVisible(false);
     }
+    if (profile.getRestrictedAccess()) {
+      permsIcon.removeStyleName("status-success");
+      permsIcon.addStyleName("status-warning");
+      permsLabel.setText(translations.dataShieldProfileRestrictedLabel());
+      restrictProfile.setVisible(false);
+      unrestrictProfile.setVisible(true);
+      permissionsPanel.setVisible(true);
+    } else {
+      permsIcon.removeStyleName("status-warning");
+      permsIcon.addStyleName("status-success");
+      permsLabel.setText(translations.dataShieldProfileUnrestrictedLabel());
+      restrictProfile.setVisible(true);
+      unrestrictProfile.setVisible(false);
+      permissionsPanel.setVisible(false);
+    }
   }
 
   @Override
   public void addToSlot(Object slot, IsWidget content) {
-    if(slot == DataShieldProfilePresenter.AggregateEnvironmentSlot) {
+    if (slot == DataShieldProfilePresenter.AggregateEnvironmentSlot) {
       aggregatePanel.clear();
-      aggregatePanel.setWidget(content.asWidget());
-    } else if(slot == DataShieldProfilePresenter.AssignEnvironmentSlot) {
+      aggregatePanel.setWidget(content);
+    } else if (slot == DataShieldProfilePresenter.AssignEnvironmentSlot) {
       assignPanel.clear();
-      assignPanel.setWidget(content.asWidget());
-    } else if(slot == DataShieldProfilePresenter.OptionsSlot) {
+      assignPanel.setWidget(content);
+    } else if (slot == DataShieldProfilePresenter.OptionsSlot) {
       optionsPanel.clear();
-      optionsPanel.setWidget(content.asWidget());
+      optionsPanel.setWidget(content);
+    } else if (slot == DataShieldProfilePresenter.PermissionsSlot) {
+      permissionsPanel.clear();
+      permissionsPanel.setWidget(content);
     }
   }
 
@@ -100,6 +132,16 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   @UiHandler("disableProfile")
   void onProfileDisable(ClickEvent event) {
     getUiHandlers().onProfileEnable(false);
+  }
+
+  @UiHandler("restrictProfile")
+  void onProfileRestrict(ClickEvent event) {
+    getUiHandlers().onProfileRestrictAccess(true);
+  }
+
+  @UiHandler("unrestrictProfile")
+  void onProfileUnrestrict(ClickEvent event) {
+    getUiHandlers().onProfileRestrictAccess(false);
   }
 
 }

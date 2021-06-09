@@ -28,7 +28,8 @@ public class Dtos {
     return DataShield.DataShieldProfileDto.newBuilder()
         .setName(profile.getName())
         .setCluster(profile.getCluster())
-        .setEnabled(profile.isEnabled()).build();
+        .setEnabled(profile.isEnabled())
+        .setRestrictedAccess(profile.isRestrictedAccess()).build();
   }
 
   public static DefaultDSMethod fromDto(DataShield.DataShieldMethodDto dto) {
