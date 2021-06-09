@@ -85,7 +85,7 @@ public class DatashieldProfileService implements SystemService {
   public DatashieldProfile getProfile(String name) {
     lock.lock();
     try {
-      String p = Strings.isNullOrEmpty(name) ? RServerManagerService.DEFAULT_CLUSTER_NAME : name;
+      String p = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
       DatashieldProfile profile = findProfile(p);
       if (profile == null) {
         profile = new DatashieldProfile(p);
