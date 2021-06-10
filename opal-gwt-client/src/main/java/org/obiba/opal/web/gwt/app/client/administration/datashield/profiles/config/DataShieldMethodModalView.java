@@ -9,7 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config;
 
-import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.ControlLabel;
+import com.github.gwtbootstrap.client.ui.TextArea;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,12 +43,6 @@ public class DataShieldMethodModalView extends ModalPopupViewWithUiHandlers<Data
 
   @UiField
   Modal dialog;
-
-  @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
 
   @UiField
   TextBox name;

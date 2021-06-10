@@ -148,7 +148,7 @@ public class DataShieldPackagesPresenter
                     @Override
                     public void onResponseCode(Request request, Response response) {
                       fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(event.getProfile().getName()).build());
-                      fireEvent(new DataShieldPackageUpdatedEvent(event.getProfile().getName(), null));
+                      fireEvent(new DataShieldProfileUpdatedEvent(event.getProfile()));
                       fireEvent(ConfirmationTerminatedEvent.create());
                     }
                   }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
@@ -156,7 +156,7 @@ public class DataShieldPackagesPresenter
           };
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(publishPackagesConfirmation, translationMessages.publishAllDataShieldSettings(),
-                  translationMessages.confirmPublishAllDataShieldSettings(cluster.getName())));
+                  translationMessages.confirmPublishAllDataShieldSettings(event.getProfile().getName())));
         }
       }
     });

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield;
 
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -21,7 +22,10 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileAddedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackagesPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
@@ -32,6 +36,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionR
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -42,7 +47,10 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.gwt.http.client.Response.SC_OK;
 
@@ -61,7 +69,11 @@ public class DataShieldAdministrationPresenter
 
     void clearClusters();
 
+    void clearProfiles();
+
   }
+
+  private final ModalProvider<DataShieldProfileModalPresenter> dataShieldProfilePresenterModalProvider;
 
   private final Provider<DataShieldPackagesPresenter> packagesPresenterProvider;
 
@@ -75,14 +87,17 @@ public class DataShieldAdministrationPresenter
 
   private static final String DATASHIELD_NAME = "DataSHIELD";
 
+  private List<RServerClusterDto> clusters;
+
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-                                           Provider<DataShieldPackagesPresenter> packagesPresenterProvider,
+                                           ModalProvider<DataShieldProfileModalPresenter> dataShieldProfilePresenterModalProvider, Provider<DataShieldPackagesPresenter> packagesPresenterProvider,
                                            Provider<DataShieldProfilePresenter> profilePresenterProvider,
                                            Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
                                            DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     getView().setUiHandlers(this);
+    this.dataShieldProfilePresenterModalProvider = dataShieldProfilePresenterModalProvider.setContainer(this);
     this.packagesPresenterProvider = packagesPresenterProvider;
     this.profilePresenterProvider = profilePresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
@@ -101,6 +116,23 @@ public class DataShieldAdministrationPresenter
   }
 
   @Override
+  protected void onBind() {
+    super.onBind();
+    addRegisteredHandler(DataShieldProfileDeletedEvent.getType(), new DataShieldProfileDeletedEvent.DataShieldProfileDeletedHandler() {
+      @Override
+      public void onDataShieldProfileDeleted(DataShieldProfileDeletedEvent event) {
+        refreshProfiles();
+      }
+    });
+    addRegisteredHandler(DataShieldProfileAddedEvent.getType(), new DataShieldProfileAddedEvent.DataShieldProfileAddedHandler() {
+      @Override
+      public void onDataShieldProfileAdded(DataShieldProfileAddedEvent event) {
+        refreshProfiles();
+      }
+    });
+  }
+
+  @Override
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
@@ -116,33 +148,13 @@ public class DataShieldAdministrationPresenter
           @Override
           public void onResource(Response response, JsArray<RServerClusterDto> resource) {
             if (response.getStatusCode() == SC_OK) {
-              final List<RServerClusterDto> clusters = JsArrays.toList(resource);
+              clusters = JsArrays.toList(resource);
               for (RServerClusterDto cluster : clusters) {
                 DataShieldPackagesPresenter packagesPresenter = packagesPresenterProvider.get();
                 packagesPresenter.setCluster(cluster);
                 addToSlot(new PackagesSlot(cluster), packagesPresenter);
               }
-              ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build())
-                  .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
-                    @Override
-                    public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
-                      if (response.getStatusCode() == SC_OK) {
-                        for (DataShieldProfileDto profile : JsArrays.toIterable(resource)) {
-                          DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
-                          RServerClusterDto profileCluster = null;
-                          for (RServerClusterDto cluster : clusters) {
-                            if (cluster.getName().equals(profile.getCluster())) {
-                              profileCluster = cluster;
-                              break;
-                            }
-                          }
-                          profilePesenter.initialize(profile, profileCluster);
-                          addToSlot(new ProfilesSlot(profile, profileCluster), profilePesenter);
-                        }
-                      }
-                    }
-                  })
-                  .get().send();
+              refreshProfiles();
             }
           }
         })
@@ -152,6 +164,13 @@ public class DataShieldAdministrationPresenter
   @Override
   public void onDownloadLogs() {
     fireEvent(new FileDownloadRequestEvent("/system/log/datashield.log"));
+  }
+
+  @Override
+  public void onAddProfile() {
+    DataShieldProfileModalPresenter presenter = dataShieldProfilePresenterModalProvider.get();
+    presenter.initialize(clusters);
+
   }
 
   @Override
@@ -166,6 +185,41 @@ public class DataShieldAdministrationPresenter
   @TitleFunction
   public String getTitle() {
     return translations.pageDataShieldTitle();
+  }
+
+  private void refreshProfiles() {
+    getView().clearProfiles();
+    ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build())
+        .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
+            if (response.getStatusCode() == SC_OK) {
+              Map<String, RServerClusterDto> clusterMap = Maps.newHashMap();
+              for (RServerClusterDto cluster : clusters) {
+                clusterMap.put(cluster.getName(), cluster);
+              }
+              List<DataShieldProfileDto> profiles = JsArrays.toList(resource);
+              Collections.sort(profiles, new Comparator<DataShieldProfileDto>() {
+                @Override
+                public int compare(DataShieldProfileDto p1, DataShieldProfileDto p2) {
+                  return toKey(p1).compareTo(toKey(p2));
+                }
+
+                // trick to have the primary clusters before their secondaries
+                private String toKey(DataShieldProfileDto p) {
+                  return p.getCluster() + "." + (p.getCluster().equals(p.getName()) ? "." : "") + p.getCluster();
+                }
+
+              });
+              for (DataShieldProfileDto profile : profiles) {
+                DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
+                profilePesenter.initialize(profile, clusterMap.get(profile.getCluster()));
+                addToSlot(new ProfilesSlot(profile, clusterMap.get(profile.getCluster())), profilePesenter);
+              }
+            }
+          }
+        })
+        .get().send();
   }
 
   private final class PermissionsUpdate implements HasAuthorization {

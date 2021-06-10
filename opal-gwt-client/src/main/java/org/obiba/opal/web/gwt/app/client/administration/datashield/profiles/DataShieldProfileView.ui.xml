@@ -18,13 +18,12 @@
 
     <g:FlowPanel>
 
-        <b:Alert ui:field="missingClusterNotice" close="false" visible="false">
-            <g:Label>
-                <ui:msg description="DS Profile missing cluster information">
-                    The R server cluster associated to this profile is missing.
-                </ui:msg>
-            </g:Label>
-        </b:Alert>
+        <g:FlowPanel addStyleNames="clearfix">
+            <b:Heading size="4" ui:field="title" addStyleNames="pull-left"/>
+            <b:Button ui:field="deleteProfile" icon="TRASH" type="DANGER" addStyleNames="pull-right"/>
+        </g:FlowPanel>
+
+        <b:Alert ui:field="clusterNotice" close="false" visible="false"/>
 
         <b:Heading size="5">
             <ui:msg description="DS Status label">Status</ui:msg>

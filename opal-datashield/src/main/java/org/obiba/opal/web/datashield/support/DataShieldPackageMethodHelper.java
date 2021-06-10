@@ -19,8 +19,8 @@ import org.obiba.datashield.core.NoSuchDSMethodException;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.PackagedFunctionDSMethod;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerService;
@@ -56,7 +56,7 @@ public class DataShieldPackageMethodHelper {
   public static final String OPTIONS = "Options";
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private RPackageResourceHelper rPackageHelper;
@@ -107,7 +107,7 @@ public class DataShieldPackageMethodHelper {
     List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
     final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
 
-    DatashieldProfile config = (DatashieldProfile) profile;
+    DataShieldProfile config = (DataShieldProfile) profile;
     removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
         .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
         .map(DSMethod::getName)
@@ -140,7 +140,7 @@ public class DataShieldPackageMethodHelper {
       // ignore
     }
 
-    DatashieldProfile config = (DatashieldProfile) profile;
+    DataShieldProfile config = (DataShieldProfile) profile;
     removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
         .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
         .map(DSMethod::getName)
@@ -164,10 +164,10 @@ public class DataShieldPackageMethodHelper {
   }
 
   public void deletePackage(RServerProfile profile, String name) {
-    getDatashieldPackage(profile, name).forEach(pkg -> deletePackage((DatashieldProfile) profile, pkg));
+    getDatashieldPackage(profile, name).forEach(pkg -> deletePackage((DataShieldProfile) profile, pkg));
   }
 
-  public void deletePackage(DatashieldProfile profile, OpalR.RPackageDto pkg) {
+  public void deletePackage(DataShieldProfile profile, OpalR.RPackageDto pkg) {
     try {
       DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(pkg);
       removeMethods(profile, DSMethodType.AGGREGATE, methods.getAggregateList().stream()
@@ -214,28 +214,28 @@ public class DataShieldPackageMethodHelper {
   // Private methods
   //
 
-  private void removeMethods(DatashieldProfile config, DSMethodType type, Iterable<String> envMethods) {
+  private void removeMethods(DataShieldProfile config, DSMethodType type, Iterable<String> envMethods) {
     DSEnvironment env = config.getEnvironment(type);
     envMethods.forEach(env::removeMethod);
   }
 
-  private void removeOptions(DatashieldProfile config, List<DataShield.DataShieldROptionDto> roptions) {
+  private void removeOptions(DataShieldProfile config, List<DataShield.DataShieldROptionDto> roptions) {
     roptions.forEach(opt -> config.removeOption(opt.getName()));
   }
 
-  private void addMethods(DatashieldProfile config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
+  private void addMethods(DataShieldProfile config, DSMethodType type, Iterable<DataShield.DataShieldMethodDto> envMethods) {
     config.addOrUpdateMethods(type, StreamSupport.stream(envMethods.spliterator(), false)
         .map(m -> (DSMethod) Dtos.fromDto(m))
         .collect(Collectors.toList()));
   }
 
-  private void addOptions(DatashieldProfile config, List<DataShield.DataShieldROptionDto> roptions) {
+  private void addOptions(DataShieldProfile config, List<DataShield.DataShieldROptionDto> roptions) {
     roptions.forEach(opt -> config.addOrUpdateOption(opt.getName(), opt.getValue()));
   }
 
   // delete package methods as they are configured, not as they are declared (to handle overlaps)
   private void deletePackageMethods(String profile, String name, DSMethodType type) {
-    DatashieldProfile config = datashieldProfileService.getProfile(profile);
+    DataShieldProfile config = datashieldProfileService.getProfile(profile);
 
     List<DSMethod> configuredPkgMethods = config.getEnvironment(type).getMethods()
         .stream().filter(m -> m instanceof PackagedFunctionDSMethod)

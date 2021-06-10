@@ -44,15 +44,21 @@
         <b:Paragraph>
             <ui:msg description="DS Profiles information">
                 A DataSHIELD profile is associated to a R server cluster: the methods and options are extracted from the
-                installed DataSHIELD
-                packages settings and can be amended.
+                installed DataSHIELD packages settings and can be amended.
                 See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server
                 documentation</a>.
             </ui:msg>
         </b:Paragraph>
 
         <g:Image ui:field="profileLoading" url="image/loading.gif"/>
-        <b:TabPanel tabPosition="left" ui:field="profileTabs"/>
+        <g:FlowPanel ui:field="profilesPanel">
+            <b:Button ui:field="profileAdd" icon="PLUS" type="INFO" addStyleNames="large-bottom-margin">
+                <ui:msg description="DS Profile add label">Add Profile</ui:msg>
+            </b:Button>
+
+            <b:TabPanel tabPosition="left" ui:field="profileTabs"/>
+        </g:FlowPanel>
+
 
         <g:FlowPanel ui:field="permissionsPanel">
             <b:Heading size="4">

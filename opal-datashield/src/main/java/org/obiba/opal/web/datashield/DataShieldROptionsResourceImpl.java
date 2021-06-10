@@ -11,8 +11,8 @@
 package org.obiba.opal.web.datashield;
 
 import org.obiba.datashield.core.DSOption;
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,12 +34,12 @@ import java.util.stream.StreamSupport;
 public class DataShieldROptionsResourceImpl implements DataShieldROptionsResource {
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Override
   public List<DataShield.DataShieldROptionDto> getDataShieldROptions(String profile) {
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
-    DatashieldProfile config = getDataShieldProfile(profile);
+    DataShieldProfile config = getDataShieldProfile(profile);
 
     for (DSOption entry : config.getOptions()) {
       options.add(DataShield.DataShieldROptionDto.newBuilder().setName(entry.getName())//
@@ -53,7 +53,7 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
 
   @Override
   public Response deleteDataShieldROptions(List<String> names, String profile) {
-    DatashieldProfile config = getDataShieldProfile(profile);
+    DataShieldProfile config = getDataShieldProfile(profile);
     List<DSOption> options = StreamSupport.stream(config.getOptions().spliterator(), false)
         .filter(o -> (names == null || names.isEmpty() || names.contains(o.getName())))
         .collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
     return Response.ok().build();
   }
 
-  private DatashieldProfile getDataShieldProfile(String profileName) {
+  private DataShieldProfile getDataShieldProfile(String profileName) {
     return datashieldProfileService.getProfile(profileName);
   }
 }

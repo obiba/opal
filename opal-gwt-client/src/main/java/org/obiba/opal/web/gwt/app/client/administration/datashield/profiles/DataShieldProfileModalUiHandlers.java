@@ -10,16 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
-public interface DataShieldProfileUiHandlers extends UiHandlers {
+public interface DataShieldProfileModalUiHandlers extends ModalUiHandlers {
 
-  void onProfileDelete();
+  void save(DataShieldProfileDto profile);
 
-  void onProfileReset();
-
-  void onProfileEnable(boolean enabled);
-
-  void onProfileRestrictAccess(boolean restricted);
-
+  void cancel();
 }

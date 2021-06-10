@@ -33,9 +33,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Component
-public class DatashieldProfileService implements SystemService {
+public class DataShieldProfileService implements SystemService {
 
-  private static final Logger log = LoggerFactory.getLogger(DatashieldProfileService.class);
+  private static final Logger log = LoggerFactory.getLogger(DataShieldProfileService.class);
 
   private final RServerManagerService rServerManagerService;
 
@@ -46,7 +46,7 @@ public class DatashieldProfileService implements SystemService {
   private final Lock lock = new ReentrantLock();
 
   @Autowired
-  public DatashieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService) {
+  public DataShieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService) {
     this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
     this.subjectAclService = subjectAclService;
@@ -57,14 +57,14 @@ public class DatashieldProfileService implements SystemService {
    *
    * @return
    */
-  public List<DatashieldProfile> getProfiles() {
+  public List<DataShieldProfile> getProfiles() {
     lock.lock();
     try {
-      List<DatashieldProfile> profiles = Lists.newArrayList(orientDbService.list(DatashieldProfile.class));
+      List<DataShieldProfile> profiles = Lists.newArrayList(orientDbService.list(DataShieldProfile.class));
       List<String> clusterNames = getClusterNames();
       Set<String> primaryProfileNames = profiles.stream()
           .filter(p -> p.getName().equals(p.getCluster()))
-          .map(DatashieldProfile::getName)
+          .map(DataShieldProfile::getName)
           .collect(Collectors.toSet());
       // disable profiles which cluster does not exist
       profiles.stream().filter(p -> !clusterNames.contains(p.getCluster())).forEach(p -> {
@@ -75,12 +75,12 @@ public class DatashieldProfileService implements SystemService {
       clusterNames.stream()
           .filter(c -> !primaryProfileNames.contains(c))
           .forEach(c -> {
-            DatashieldProfile p = new DatashieldProfile(c);
+            DataShieldProfile p = new DataShieldProfile(c);
             saveProfile(p);
             profiles.add(p);
           });
 
-      profiles.sort(Comparator.comparing(DatashieldProfile::getName));
+      profiles.sort(Comparator.comparing(DataShieldProfile::getName));
 
       return profiles;
     } finally {
@@ -95,13 +95,13 @@ public class DatashieldProfileService implements SystemService {
    * @param name
    * @return
    */
-  public DatashieldProfile getProfile(String name) {
+  public DataShieldProfile getProfile(String name) {
     lock.lock();
     try {
       String pName = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
-      Optional<DatashieldProfile> profileOpt = getProfiles().stream().filter(p -> p.getName().equals(pName)).findFirst();
+      Optional<DataShieldProfile> profileOpt = getProfiles().stream().filter(p -> p.getName().equals(pName)).findFirst();
       if (!profileOpt.isPresent()) {
-        DatashieldProfile profile = new DatashieldProfile(pName);
+        DataShieldProfile profile = new DataShieldProfile(pName);
         profile.setEnabled(false);
         return profile;
       }
@@ -127,9 +127,9 @@ public class DatashieldProfileService implements SystemService {
    * @param name
    * @return null if none is found
    */
-  public DatashieldProfile findProfile(String name) {
+  public DataShieldProfile findProfile(String name) {
     String p = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultClusterName() : name;
-    return orientDbService.findUnique(new DatashieldProfile(p));
+    return orientDbService.findUnique(new DataShieldProfile(p));
   }
 
   /**
@@ -137,7 +137,7 @@ public class DatashieldProfileService implements SystemService {
    *
    * @param profile
    */
-  public void saveProfile(DatashieldProfile profile) {
+  public void saveProfile(DataShieldProfile profile) {
     lock.lock();
     try {
       orientDbService.save(profile, profile);
@@ -153,7 +153,7 @@ public class DatashieldProfileService implements SystemService {
    *
    * @param profile
    */
-  public void deleteProfile(DatashieldProfile profile) {
+  public void deleteProfile(DataShieldProfile profile) {
     lock.lock();
     try {
       orientDbService.delete(profile);
@@ -167,7 +167,7 @@ public class DatashieldProfileService implements SystemService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueIndex(DatashieldProfile.class);
+    orientDbService.createUniqueIndex(DataShieldProfile.class);
   }
 
   @Override

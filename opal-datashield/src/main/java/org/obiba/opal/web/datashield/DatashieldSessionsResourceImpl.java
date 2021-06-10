@@ -12,8 +12,8 @@ package org.obiba.opal.web.datashield;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -42,7 +42,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   static final String DS_CONTEXT = "DataSHIELD";
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -62,7 +62,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   @Override
   protected RServerProfile createProfile(String profileName) {
-    DatashieldProfile profile = datashieldProfileService.getProfile(profileName);
+    DataShieldProfile profile = datashieldProfileService.getProfile(profileName);
     if (!profile.isEnabled()) {
       String message = datashieldProfileService.hasProfile(profileName) ?
           "DataSHIELD profile is not enabled" : "DataSHIELD profile does not exist";
@@ -77,7 +77,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
-    DatashieldProfile profile = (DatashieldProfile) rSession.getProfile();
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
     if (profile.hasOptions()) {
       rSession.execute(
           new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));

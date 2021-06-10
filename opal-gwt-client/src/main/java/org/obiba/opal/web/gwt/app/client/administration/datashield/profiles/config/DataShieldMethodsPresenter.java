@@ -18,10 +18,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.*;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -120,6 +117,14 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
           @Override
           public void onDataShieldPackageUpdated(DataShieldPackageUpdatedEvent event) {
             if (profile.getCluster().equals(event.getCluster()))
+              updateDataShieldMethods();
+          }
+        });
+    addRegisteredHandler(DataShieldProfileUpdatedEvent.getType(),
+        new DataShieldProfileUpdatedEvent.DataShieldProfileUpdatedHandler() {
+          @Override
+          public void onDataShieldProfileUpdated(DataShieldProfileUpdatedEvent event) {
+            if (profile.getName().equals(event.getProfile().getName()))
               updateDataShieldMethods();
           }
         });

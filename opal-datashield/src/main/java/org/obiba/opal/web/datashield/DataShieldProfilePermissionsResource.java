@@ -12,10 +12,9 @@ package org.obiba.opal.web.datashield;
 
 import com.google.common.collect.Iterables;
 import org.obiba.opal.core.domain.security.SubjectAcl;
-import org.obiba.opal.core.security.DataShieldPermissionConverter;
 import org.obiba.opal.core.security.DataShieldProfilePermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
@@ -36,7 +35,7 @@ public class DataShieldProfilePermissionsResource extends AbstractPermissionsRes
   private SubjectAclService subjectAclService;
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @PathParam("name")
   private String name;

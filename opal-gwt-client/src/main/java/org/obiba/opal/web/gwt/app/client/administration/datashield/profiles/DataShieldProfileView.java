@@ -11,8 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Icon;
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,6 +21,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
@@ -29,10 +31,18 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   interface Binder extends UiBinder<Widget, DataShieldProfileView> {
   }
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
+
+  private final TranslationMessages translationMessages;
 
   @UiField
-  Alert missingClusterNotice;
+  Heading title;
+
+  @UiField
+  Button deleteProfile;
+
+  @UiField
+  Alert clusterNotice;
 
   @UiField
   Icon statusIcon;
@@ -74,13 +84,25 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   SimplePanel optionsPanel;
 
   @Inject
-  public DataShieldProfileView(Binder uiBinder) {
+  public DataShieldProfileView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+    this.translations = translations;
+    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
   public void renderProfile(DataShieldProfileDto profile, RServerClusterDto cluster) {
-    missingClusterNotice.setVisible(cluster == null);
+    title.setText(profile.getName());
+    title.setSubtext("(" + profile.getCluster() + ")");
+    if (cluster == null) {
+      clusterNotice.setText(translationMessages.dataShieldProfileClusterMissing(profile.getCluster()));
+      clusterNotice.setType(AlertType.WARNING);
+    } else {
+      clusterNotice.setText(translationMessages.dataShieldProfileClusterInfo(profile.getCluster()));
+      clusterNotice.setType(AlertType.SUCCESS);
+    }
+    clusterNotice.setVisible(true);
+    deleteProfile.setVisible(cluster == null || !profile.getName().equals(profile.getCluster()));
     resetProfile.setEnabled(cluster != null);
     if (profile.getEnabled()) {
       statusIcon.removeStyleName("status-error");
@@ -127,6 +149,11 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
       permissionsPanel.clear();
       permissionsPanel.setWidget(content);
     }
+  }
+
+  @UiHandler("deleteProfile")
+  void onProfileDelete(ClickEvent event) {
+    getUiHandlers().onProfileDelete();
   }
 
   @UiHandler("resetProfile")

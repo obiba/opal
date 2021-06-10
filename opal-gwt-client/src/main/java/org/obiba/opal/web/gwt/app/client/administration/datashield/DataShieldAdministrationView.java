@@ -42,6 +42,9 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   Image profileLoading;
 
   @UiField
+  Panel profilesPanel;
+
+  @UiField
   TabPanel profileTabs;
 
   @UiField
@@ -80,7 +83,7 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
       tab.add(content.asWidget());
       profileTabs.add(tab);
       profileTabs.selectTab(0);
-      profileTabs.setVisible(true);
+      profilesPanel.setVisible(true);
       profileLoading.setVisible(false);
     }
   }
@@ -103,8 +106,13 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
     clusterTabs.clear();
     clusterTabs.setVisible(false);
     clusterLoading.setVisible(true);
+    clearProfiles();
+  }
+
+  @Override
+  public void clearProfiles() {
     profileTabs.clear();
-    profileTabs.setVisible(false);
+    profilesPanel.setVisible(false);
     profileLoading.setVisible(true);
   }
 
@@ -112,6 +120,12 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
   }
+
+  @UiHandler("profileAdd")
+  void onAddProfile(ClickEvent event) {
+    getUiHandlers().onAddProfile();
+  }
+
 
   @UiHandler("downloadLogs")
   void onDownloadLogs(ClickEvent event) {

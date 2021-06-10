@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-public class DatashieldProfile implements RServerProfile, DSConfiguration, HasUniqueProperties {
+public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUniqueProperties {
 
   private String name;
 
@@ -42,10 +42,10 @@ public class DatashieldProfile implements RServerProfile, DSConfiguration, HasUn
 
   private final Map<String, String> options = Maps.newHashMap();
 
-  public DatashieldProfile() {
+  public DataShieldProfile() {
   }
 
-  public DatashieldProfile(String name) {
+  public DataShieldProfile(String name) {
     this.name = name;
     this.cluster = name;
   }

@@ -128,6 +128,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Variable")
   String removeVariable();
 
+  @Description("DS profile cluster label")
+  @DefaultMessage("The R server cluster associated to this profile is: {0}")
+  String dataShieldProfileClusterInfo(String name);
+
+  @Description("DS profile cluster missing label")
+  @DefaultMessage("The R server cluster associated to this profile is missing: {0}")
+  String dataShieldProfileClusterMissing(String name);
+
   @Description("Remove Aggregate Method label")
   @DefaultMessage("Remove Aggregate Method")
   String removeDataShieldAggregateMethod();

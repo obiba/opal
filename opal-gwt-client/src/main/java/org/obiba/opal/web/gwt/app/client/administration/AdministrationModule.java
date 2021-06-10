@@ -32,6 +32,8 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.identifier
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabaseView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.*;
@@ -205,6 +207,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         DataShieldROptionsView.class);
     bindPresenterWidget(DataShieldROptionModalPresenter.class, DataShieldROptionModalPresenter.Display.class,
         DataShieldROptionModalView.class);
+    bindPresenterWidget(DataShieldProfileModalPresenter.class, DataShieldProfileModalPresenter.Display.class,
+        DataShieldProfileModalView.class);
   }
 
   private void configureIndexes() {

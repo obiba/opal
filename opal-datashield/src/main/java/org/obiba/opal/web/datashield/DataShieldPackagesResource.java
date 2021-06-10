@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.List;
 public class DataShieldPackagesResource {
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
@@ -46,7 +46,7 @@ public class DataShieldPackagesResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("profile") String profile) {
-    DatashieldProfile dsProfile = getDataShieldProfile(profile);
+    DataShieldProfile dsProfile = getDataShieldProfile(profile);
     dsPackageMethodeHelper.installDatashieldPackage(dsProfile, name, ref);
 
     // install or re-install all known datashield package methods
@@ -102,7 +102,7 @@ public class DataShieldPackagesResource {
     return Response.ok().build();
   }
 
-  private DatashieldProfile getDataShieldProfile(String profileName) {
+  private DataShieldProfile getDataShieldProfile(String profileName) {
     return datashieldProfileService.getProfile(profileName);
   }
 }

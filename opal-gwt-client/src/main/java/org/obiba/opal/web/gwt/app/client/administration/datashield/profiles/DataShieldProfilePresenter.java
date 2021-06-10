@@ -17,6 +17,8 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeleted;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileResetEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
@@ -66,6 +68,19 @@ public class DataShieldProfilePresenter
     this.methodsPresenterProvider = methodsPresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.optionsProvider = optionsProvider;
+  }
+
+  @Override
+  public void onProfileDelete() {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.DATASHIELD_PROFILE.create().build(profile.getName()))
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(new DataShieldProfileDeletedEvent(profile));
+          }
+        }, SC_NO_CONTENT, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR)
+        .delete().send();
   }
 
   @Override

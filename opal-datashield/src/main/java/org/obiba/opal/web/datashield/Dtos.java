@@ -13,7 +13,7 @@ package org.obiba.opal.web.datashield;
 import com.google.common.base.Strings;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.web.model.DataShield;
 
 /**
@@ -24,13 +24,22 @@ public class Dtos {
   private Dtos() {
   }
 
-  public static DataShield.DataShieldProfileDto asDto(DatashieldProfile profile) {
+  public static DataShield.DataShieldProfileDto asDto(DataShieldProfile profile) {
     return DataShield.DataShieldProfileDto.newBuilder()
         .setName(profile.getName())
         .setCluster(profile.getCluster())
         .setEnabled(profile.isEnabled())
         .setRestrictedAccess(profile.isRestrictedAccess()).build();
   }
+
+  public static DataShieldProfile fromDto(DataShield.DataShieldProfileDto dto) {
+    DataShieldProfile profile = new DataShieldProfile(dto.getName());
+    profile.setCluster(dto.getCluster());
+    profile.setEnabled(dto.getEnabled());
+    profile.setRestrictedAccess(dto.getRestrictedAccess());
+    return profile;
+  }
+
 
   public static DefaultDSMethod fromDto(DataShield.DataShieldMethodDto dto) {
     if (dto.hasExtension(DataShield.RFunctionDataShieldMethodDto.method)) {

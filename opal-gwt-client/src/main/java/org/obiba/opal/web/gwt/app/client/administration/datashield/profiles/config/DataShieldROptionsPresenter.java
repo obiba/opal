@@ -18,10 +18,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.*;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -136,6 +133,14 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
         }
       }
     });
+    addRegisteredHandler(DataShieldProfileUpdatedEvent.getType(),
+        new DataShieldProfileUpdatedEvent.DataShieldProfileUpdatedHandler() {
+          @Override
+          public void onDataShieldProfileUpdated(DataShieldProfileUpdatedEvent event) {
+            if (profile.getName().equals(event.getProfile().getName()))
+              refresh();
+          }
+        });
   }
 
   @Override

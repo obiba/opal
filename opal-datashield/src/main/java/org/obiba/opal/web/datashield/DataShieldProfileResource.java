@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 public class DataShieldProfileResource {
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @GET
   public DataShield.DataShieldProfileDto getProfile(@PathParam("name") String name) {
@@ -73,9 +73,9 @@ public class DataShieldProfileResource {
   public Response deleteProfile(@PathParam("name") String name, @QueryParam("force") @DefaultValue("false") boolean force) {
     if (datashieldProfileService.hasProfile(name)) {
       // primary profiles cannot be removed (unless forced, in case a cluster is obsolete)
-      DatashieldProfile profile = datashieldProfileService.getProfile(name);
+      DataShieldProfile profile = datashieldProfileService.getProfile(name);
       if (force || !profile.getName().equals(profile.getCluster()))
-        datashieldProfileService.deleteProfile(new DatashieldProfile(name));
+        datashieldProfileService.deleteProfile(new DataShieldProfile(name));
     }
     return Response.noContent().build();
   }
@@ -85,19 +85,19 @@ public class DataShieldProfileResource {
   //
 
   private void doEnableProfile(String name, boolean enabled) {
-    DatashieldProfile profile = getProfileInternal(name);
+    DataShieldProfile profile = getProfileInternal(name);
     profile.setEnabled(enabled);
     datashieldProfileService.saveProfile(profile);
   }
 
   private void doRestrictAccessProfile(String name, boolean restricted) {
-    DatashieldProfile profile = getProfileInternal(name);
+    DataShieldProfile profile = getProfileInternal(name);
     profile.setRestrictedAccess(restricted);
     datashieldProfileService.saveProfile(profile);
   }
 
-  private DatashieldProfile getProfileInternal(String name) {
-    DatashieldProfile profile = datashieldProfileService.findProfile(name);
+  private DataShieldProfile getProfileInternal(String name) {
+    DataShieldProfile profile = datashieldProfileService.findProfile(name);
     if (profile == null)
       throw new NotFoundException("No DataSHIELD profile with name: " + name);
     return profile;

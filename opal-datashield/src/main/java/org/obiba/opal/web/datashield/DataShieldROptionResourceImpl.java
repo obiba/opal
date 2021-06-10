@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,11 +28,11 @@ import javax.ws.rs.core.Response;
 public class DataShieldROptionResourceImpl implements DataShieldROptionResource {
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Override
   public Response deleteDataShieldROption(String name, String profile) {
-    DatashieldProfile config = getDataShieldProfile(profile);
+    DataShieldProfile config = getDataShieldProfile(profile);
     config.removeOption(name);
     datashieldProfileService.saveProfile(config);
     return Response.ok().build();
@@ -40,7 +40,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
   @Override
   public Response addOrUpdateDataShieldROption(String profile, final DataShield.DataShieldROptionDto dto) {
-    DatashieldProfile config = getDataShieldProfile(profile);
+    DataShieldProfile config = getDataShieldProfile(profile);
     config.addOrUpdateOption(dto.getName(), dto.getValue());
     datashieldProfileService.saveProfile(config);
     return Response.ok().build();
@@ -48,7 +48,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
 
   @Override
   public Response getDataShieldROption(String name, String profile) {
-    DatashieldProfile config = getDataShieldProfile(profile);
+    DataShieldProfile config = getDataShieldProfile(profile);
 
     if (config.hasOption(name)) {
       DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)
@@ -60,7 +60,7 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
-  private DatashieldProfile getDataShieldProfile(String profileName) {
+  private DataShieldProfile getDataShieldProfile(String profileName) {
     return datashieldProfileService.getProfile(profileName);
   }
 }

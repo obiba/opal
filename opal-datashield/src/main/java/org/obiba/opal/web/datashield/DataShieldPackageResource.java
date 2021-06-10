@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.datashield;
 
-import org.obiba.opal.datashield.cfg.DatashieldProfile;
-import org.obiba.opal.datashield.cfg.DatashieldProfileService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.OpalR;
@@ -33,7 +33,7 @@ import java.util.List;
 public class DataShieldPackageResource {
 
   @Autowired
-  private DatashieldProfileService datashieldProfileService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
@@ -124,7 +124,7 @@ public class DataShieldPackageResource {
     return Response.ok().build();
   }
 
-  private DatashieldProfile getDataShieldProfile(String profileName) {
+  private DataShieldProfile getDataShieldProfile(String profileName) {
     return datashieldProfileService.getProfile(profileName);
   }
 
