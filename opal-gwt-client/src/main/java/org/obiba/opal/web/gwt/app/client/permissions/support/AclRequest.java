@@ -9,19 +9,16 @@
  */
 package org.obiba.opal.web.gwt.app.client.permissions.support;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.Acls;
 import org.obiba.opal.web.model.client.opal.Subject;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 
 /**
  *
@@ -69,7 +66,7 @@ public class AclRequest {
 
           @Override
           public void onResource(Response response, Acl acl) {
-            if(response.getStatusCode() == Response.SC_OK) {
+            if (response.getStatusCode() == Response.SC_OK) {
               aclAddCallback.onAdd(acl);
             } else {
               aclAddCallback.onAddFailed(response, subject, resource, action);
@@ -86,7 +83,7 @@ public class AclRequest {
 
           @Override
           public void onResource(Response response, Acl resource) {
-            if(response.getStatusCode() == Response.SC_OK) {
+            if (response.getStatusCode() == Response.SC_OK) {
               aclDeleteCallback.onDelete(subject);
             } else {
               aclDeleteCallback.onDeleteFailed(response, subject);
@@ -97,23 +94,19 @@ public class AclRequest {
 
   public boolean hasPermission(Acls acls) {
     String decodedResource = URL.decodePathSegment(resource);
-    for(Acl acl : JsArrays.toIterable(acls.getAclsArray())) {
-      if(acl.getResource().equals(decodedResource) && hasAction(acl)) return true;
+    for (Acl acl : JsArrays.toIterable(acls.getAclsArray())) {
+      if (acl.getResource().equals(decodedResource) && hasAction(acl)) return true;
     }
     return false;
   }
 
   private boolean hasAction(Acl acl) {
-    for(int i = 0; i < acl.getActionsArray().length(); i++) {
-      if(acl.getActionsArray().get(i).equals(action.getName())) {
+    for (int i = 0; i < acl.getActionsArray().length(); i++) {
+      if (acl.getActionsArray().get(i).equals(action.getName())) {
         return true;
       }
     }
     return false;
-  }
-
-  public static ResourceAuthorizationRequestBuilder newResourceAuthorizationRequestBuilder() {
-    return ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/authz/query").get();
   }
 
   //

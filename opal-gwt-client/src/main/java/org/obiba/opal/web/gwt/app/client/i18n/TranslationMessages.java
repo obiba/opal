@@ -552,7 +552,7 @@ public interface TranslationMessages extends Messages {
   String confirmPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to publish all packages methods and options message")
-  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Any custom settings will not be modified.")
+  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Any (non conflicting) custom settings will not be modified.")
   String confirmPublishAllDataShieldSettings(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")

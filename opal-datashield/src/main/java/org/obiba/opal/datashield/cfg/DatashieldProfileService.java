@@ -128,7 +128,7 @@ public class DatashieldProfileService implements SystemService {
    * @return null if none is found
    */
   public DatashieldProfile findProfile(String name) {
-    String p = Strings.isNullOrEmpty(name) ? RServerManagerService.DEFAULT_CLUSTER_NAME : name;
+    String p = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultClusterName() : name;
     return orientDbService.findUnique(new DatashieldProfile(p));
   }
 

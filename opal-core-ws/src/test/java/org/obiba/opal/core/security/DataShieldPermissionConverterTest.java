@@ -32,8 +32,8 @@ public class DataShieldPermissionConverterTest extends OpalPermissionConverterTe
         "rest:/datashield/packages:*:GET/*",
         "rest:/datashield/profiles:*:GET/*",
         "rest:/datashield/options:*:GET/*",
-        "rest:/datashield/env/aggregate/methods:GET:GET",
-        "rest:/datashield/env/assign/methods:GET:GET",
+        "rest:/datashield/env/aggregate/methods:*:GET/*",
+        "rest:/datashield/env/assign/methods:*:GET/*",
         "rest:/service/r:GET",
         "rest:/service/r:PUT",
         "rest:/service/r:DELETE",
@@ -41,6 +41,7 @@ public class DataShieldPermissionConverterTest extends OpalPermissionConverterTe
         "rest:/service/r/sessions:GET",
         "rest:/service/r/workspaces:GET",
         "rest:/service/r/workspaces:DELETE",
+        "rest:/system/permissions/datashield:*:GET/*",
         "rest:/system/subject-profiles/_search:GET");
   }
 

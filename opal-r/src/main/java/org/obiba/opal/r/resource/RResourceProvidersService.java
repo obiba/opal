@@ -20,6 +20,7 @@ import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
@@ -165,15 +166,22 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void loadResourceProviders() {
     synchronized (resourceProvidersTask) {
       resourceProviders.clear();
+      ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       try {
-        ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
-        rServerManagerService.getDefaultRServer().execute(rop);
-        RServerResult result = rop.getResult();
-        if (result.isNamedList()) {
-          RNamedList<RServerResult> pkgList = result.asNamedList();
-          for (String name : pkgList.keySet()) {
-            RServerResult rexp = pkgList.get(name);
-            resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
+        // scan all R server clusters
+        for (RServerService rServerService : rServerManagerService.getRServerClusters()) {
+          try {
+            rServerService.execute(rop);
+            RServerResult result = rop.getResult();
+            if (result.isNamedList()) {
+              RNamedList<RServerResult> pkgList = result.asNamedList();
+              for (String name : pkgList.keySet()) {
+                RServerResult rexp = pkgList.get(name);
+                resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
+              }
+            }
+          } catch (Exception e) {
+            log.error("Resource packages discovery failed for R server: {}", rServerService.getName(), e);
           }
         }
       } catch (Exception e) {

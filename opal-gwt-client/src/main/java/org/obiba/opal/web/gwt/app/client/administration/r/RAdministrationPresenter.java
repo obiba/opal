@@ -101,7 +101,8 @@ public class RAdministrationPresenter
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_R.create().build()).post()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
     getView().clearClusters();

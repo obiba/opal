@@ -204,13 +204,6 @@ public class DataShieldPackagesPresenter
             translationMessages.confirmDeleteAllDataShieldPackages()));
   }
 
-  // @Override
-  public void authorize(HasAuthorization authorizer) {
-    authorizePackagesR(CascadingAuthorizer.newBuilder()
-        .or(AclRequest.newResourceAuthorizationRequestBuilder())
-        .authorize(authorizer).build());
-  }
-
   private void authorize() {
     // view methods
     authorizePackagesR(new CompositeAuthorizer(getView().getPackagesAuthorizer(), new PackagesUpdate()));

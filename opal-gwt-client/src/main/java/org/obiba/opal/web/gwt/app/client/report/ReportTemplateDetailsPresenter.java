@@ -9,41 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.report;
 
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
-import org.obiba.opal.web.model.client.opal.ReportDto;
-import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -56,6 +21,34 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.ReportDto;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
+
+import javax.annotation.Nullable;
 
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
@@ -77,9 +70,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider,
-      TranslationMessages translationMessages) {
+                                        Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                        ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider,
+                                        TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
@@ -88,7 +81,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   public void refresh() {
-    if(reportTemplate != null) {
+    if (reportTemplate != null) {
       refreshProducedReports(reportTemplate);
     }
   }
@@ -128,10 +121,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
     reportCommandOptions.setName(reportTemplate.getName());
     reportCommandOptions.setProject(reportTemplate.getProject());
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report") //
-        .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)) //
-        .withCallback(Response.SC_CREATED, new CommandResponseCallBack()) //
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report")
+        .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions))
+        .withCallback(Response.SC_CREATED, new CommandResponseCallBack())
         .post().send();
   }
 
@@ -141,11 +134,11 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       @Override
       public void run() {
         String reportTemplateName = reportTemplate.getName();
-        ResourceRequestBuilderFactory.newBuilder() //
+        ResourceRequestBuilderFactory.newBuilder()
             .forResource(
-                UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName)) //
-            .withCallback(SC_OK, new RemoveReportTemplateResponseCallBack()) //
-            .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)) //
+                UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName))
+            .withCallback(SC_OK, new RemoveReportTemplateResponseCallBack())
+            .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName))
             .delete().send();
       }
     };
@@ -168,7 +161,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     getView().getActionColumn().setActionHandler(new ActionHandler<ReportDto>() {
       @Override
       public void doAction(ReportDto dto, String actionName) {
-        if(actionName != null) {
+        if (actionName != null) {
           doActionImpl(dto, actionName);
         }
       }
@@ -179,7 +172,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           @Override
           public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
             ReportTemplateDto template = event.getReportTemplate();
-            if(template == null) {
+            if (template == null) {
               getView().setReportTemplateDetails(null);
             } else {
               refreshReportTemplateDetails(template);
@@ -196,20 +189,21 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   private void authorize() {
     // display reports
 
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilder.create()
-            .segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build()) //
-        .authorize(getView().getListReportsAuthorizer()) //
+            .segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build())
+        .authorize(getView().getListReportsAuthorizer())
         .get().send();
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE.create().build(reportTemplate.getName())).post()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
     // run report
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report") //
-        .authorize(getView().getExecuteReportAuthorizer()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report")
+        .authorize(getView().getExecuteReportAuthorizer())
         .post().send();
 
     // download report design
@@ -220,15 +214,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     // remove
     String uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create()
         .build(reportTemplate.getProject(), reportTemplate.getName());
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(uri) //
-        .authorize(getView().getRemoveReportTemplateAuthorizer()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(uri)
+        .authorize(getView().getRemoveReportTemplateAuthorizer())
         .delete().send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(uri) //
-        .authorize(getView().getUpdateReportTemplateAuthorizer()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(uri)
+        .authorize(getView().getUpdateReportTemplateAuthorizer())
         .put().send();
   }
 
@@ -243,7 +237,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   protected void doActionImpl(final ReportDto dto, String actionName) {
-    if(actionName.equals(DOWNLOAD_ACTION)) {
+    if (actionName.equals(DOWNLOAD_ACTION)) {
       authorizeDownloadReport(dto, new Authorizer(getEventBus()) {
 
         @Override
@@ -251,7 +245,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           fireEvent(new FileDownloadRequestEvent(dto.getLink()));
         }
       });
-    } else if(actionName.equals(ActionsColumn.REMOVE_ACTION)) {
+    } else if (actionName.equals(ActionsColumn.REMOVE_ACTION)) {
       authorizeDeleteReport(dto, new Authorizer(getEventBus()) {
 
         @Override
@@ -259,15 +253,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           actionRequiringConfirmation = new Runnable() {
             @Override
             public void run() {
-              ResourceRequestBuilderFactory.newBuilder() //
-                  .forResource(dto.getLink()) //
+              ResourceRequestBuilderFactory.newBuilder()
+                  .forResource(dto.getLink())
                   .withCallback(SC_OK, new ResponseCodeCallback() {
                     @Override
                     public void onResponseCode(Request request, Response response) {
                       fireEvent(ConfirmationTerminatedEvent.create());
                       refreshProducedReports(reportTemplate);
                     }
-                  }) //
+                  })
                   .delete().send();
             }
           };
@@ -280,21 +274,21 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplateDto) {
-    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder() //
+    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder()
         .forResource(UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create()
-            .build(reportTemplateDto.getProject(), reportTemplateDto.getName())) //
-        .withCallback(new ProducedReportsResourceCallback()) //
-        .withCallback(SC_NOT_FOUND, new NoProducedReportsResourceCallback()) //
+            .build(reportTemplateDto.getProject(), reportTemplateDto.getName()))
+        .withCallback(new ProducedReportsResourceCallback())
+        .withCallback(SC_NOT_FOUND, new NoProducedReportsResourceCallback())
         .get().send();
   }
 
   private void refreshReportTemplateDetails(ReportTemplateDto reportTemplateDto) {
     String reportTemplateName = reportTemplateDto.getName();
-    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder() //
+    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder()
         .forResource(
-            UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplateDto.getProject(), reportTemplateName)) //
-        .withCallback(new ReportTemplateFoundCallBack()) //
-        .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)) //
+            UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplateDto.getProject(), reportTemplateName))
+        .withCallback(new ReportTemplateFoundCallBack())
+        .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName))
         .get().send();
   }
 
@@ -325,7 +319,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_CREATED) {
+      if (response.getStatusCode() == Response.SC_CREATED) {
         fireEvent(NotificationEvent.newBuilder().info("ReportJobStarted").build());
       }
     }
@@ -352,7 +346,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+      if (actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
           event.isConfirmed()) {
         actionRequiringConfirmation.run();
         actionRequiringConfirmation = null;

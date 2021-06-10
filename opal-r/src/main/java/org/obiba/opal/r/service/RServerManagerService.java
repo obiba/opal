@@ -132,6 +132,16 @@ public class RServerManagerService implements Service {
     throw new NoSuchElementException("No R server cluster with name: " + name);
   }
 
+  /**
+   * Get the name of the default R server cluster.
+   *
+   * @return
+   */
+  public String getDefaultClusterName() {
+    // TODO make it configurable (live?)
+    return DEFAULT_CLUSTER_NAME;
+  }
+
   @Subscribe
   public synchronized void onAppRegistered(AppRegisteredEvent event) {
     if (ROCK_APP_TYPE.equals(event.getApp().getType())) {
@@ -261,8 +271,4 @@ public class RServerManagerService implements Service {
       eventBus.post(new RServiceInitializedEvent(getName()));
   }
 
-  private String getDefaultClusterName() {
-    // TODO make it configurable (live?)
-    return DEFAULT_CLUSTER_NAME;
-  }
 }

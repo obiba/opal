@@ -71,6 +71,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   }
 
   private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datashield/profiles").post()
+        .authorize(getView().getDataShieldAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/identifiers/tables").get()
         .authorize(getView().getIdentifiersAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
@@ -107,6 +109,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     //
     // Authorization
     //
+
+    HasAuthorization getDataShieldAuthorizer();
 
     HasAuthorization getIdentifiersAuthorizer();
 

@@ -28,12 +28,12 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -92,7 +92,7 @@ public class DataShieldAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-
+    authorize(event.getHasAuthorization());
   }
 
   @Override
@@ -106,11 +106,12 @@ public class DataShieldAdministrationPresenter
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD.create().build()).post()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
     getView().clearClusters();
-    ResourceRequestBuilderFactory.<JsArray<RServerClusterDto>>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTERS.create().build()) //
+    ResourceRequestBuilderFactory.<JsArray<RServerClusterDto>>newBuilder().forResource(UriBuilders.SERVICE_R_CLUSTERS.create().build())
         .withCallback(new ResourceCallback<JsArray<RServerClusterDto>>() {
           @Override
           public void onResource(Response response, JsArray<RServerClusterDto> resource) {
@@ -121,7 +122,7 @@ public class DataShieldAdministrationPresenter
                 packagesPresenter.setCluster(cluster);
                 addToSlot(new PackagesSlot(cluster), packagesPresenter);
               }
-              ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build()) //
+              ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build())
                   .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
                     @Override
                     public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
@@ -155,6 +156,10 @@ public class DataShieldAdministrationPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
+    // test r on default cluster
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build())
+        .post().authorize(authorizer)
+        .send();
   }
 
   @Override

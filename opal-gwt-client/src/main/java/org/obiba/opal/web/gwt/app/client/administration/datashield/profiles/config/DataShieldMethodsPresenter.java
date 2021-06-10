@@ -130,13 +130,6 @@ public class DataShieldMethodsPresenter extends PresenterWidget<DataShieldMethod
     authorize();
   }
 
-  // @Override
-  public void authorize(HasAuthorization authorizer) {
-    authorizeMethods(CascadingAuthorizer.newBuilder()//
-        .or(AclRequest.newResourceAuthorizationRequestBuilder())//
-        .authorize(authorizer).build());
-  }
-
   private void authorize() {
     // view methods
     authorizeMethods(new CompositeAuthorizer(getView().getMethodsAuthorizer(), new MethodsUpdate()));

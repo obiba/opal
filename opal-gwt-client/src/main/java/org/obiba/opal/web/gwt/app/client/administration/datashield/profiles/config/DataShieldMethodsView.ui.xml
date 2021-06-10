@@ -22,10 +22,9 @@
             <b:Paragraph>
                 <ui:msg description="Aggregation Methods information">
                     The aggregation methods are used by DataSHIELD in order to compile individual data. The same
-                    aggregation
-                    methods must be defined in each DataSHIELD server that will be involved in a computation process.
-                    Each
-                    aggregation method is identified by a name that will be used from the R-DataSHIELD client.
+                    aggregation methods must be defined in each DataSHIELD server that will be involved in a computation
+                    process. Each aggregation method is identified by a name that will be used from the DataSHIELD
+                    client.
                 </ui:msg>
             </b:Paragraph>
             <o:CollapsiblePanel heading="DETAILS">
@@ -37,10 +36,9 @@
                         <b:Paragraph>
                             <ui:msg description="R Function aggregate information">
                                 Some aggregation methods are already defined in R as functions. For security reasons, R
-                                functions should
-                                be fully named, i.e. including package name space. This way the aggregating function to
-                                be used can be
-                                unambiguously identified. For example use "base::summary" in place of "summary".
+                                functions should be fully named, i.e. including package name space. This way the
+                                aggregating function to be used can be unambiguously identified. For example use
+                                "base::summary" in place of "summary".
                             </ui:msg>
                         </b:Paragraph>
                     </b:Column>
@@ -63,10 +61,8 @@
             <b:Paragraph>
                 <ui:msg description="Assign Methods information">
                     The assign methods are used by DataSHIELD in order to transform individual data on server side. The
-                    same
-                    assign methods must be defined in each DataSHIELD server that will be involved in a computation
-                    process.
-                    Each assign method is identified by a name that will be used from the R-DataSHIELD client.
+                    same assign methods must be defined in each DataSHIELD server that will be involved in a computation
+                    process. Each assign method is identified by a name that will be used from the DataSHIELD client.
                 </ui:msg>
             </b:Paragraph>
             <o:CollapsiblePanel heading="DETAILS">
@@ -78,10 +74,9 @@
                         <b:Paragraph>
                             <ui:msg description="R Function assign information">
                                 Some assign methods are already defined in R as functions. For security reasons, R
-                                functions should be
-                                fully named, i.e. including package name space. This way the assigning function to be
-                                used can be
-                                unambiguously identified. For example use "base::data.frame" in place of "data.frame".
+                                functions should befully named, i.e. including package name space. This way the
+                                assigning function to be used can be unambiguously identified. For example use
+                                "base::data.frame" in place of "data.frame".
                             </ui:msg>
                         </b:Paragraph>
                     </b:Column>

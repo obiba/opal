@@ -43,8 +43,8 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
             toRest("/datashield/packages", "*:GET/*"),
             toRest("/datashield/profiles", "*:GET/*"),
             toRest("/datashield/options", "*:GET/*"),
-            toRest("/datashield/env/aggregate/methods", "GET:GET"),
-            toRest("/datashield/env/assign/methods", "GET:GET"),
+            toRest("/datashield/env/aggregate/methods", "*:GET/*"),
+            toRest("/datashield/env/assign/methods", "*:GET/*"),
             toRest("/service/r", "GET"),
             toRest("/service/r", "PUT"),
             toRest("/service/r", "DELETE"),
@@ -52,6 +52,7 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
             toRest("/service/r/sessions", "GET"),
             toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"),
+            toRest("/system/permissions/datashield", "*:GET/*"),
             toRest("/system/subject-profiles/_search", "GET"));
       }
 

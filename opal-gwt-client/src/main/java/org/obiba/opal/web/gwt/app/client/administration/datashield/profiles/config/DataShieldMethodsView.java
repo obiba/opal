@@ -248,6 +248,7 @@ public class DataShieldMethodsView extends ViewWithUiHandlers<DataShieldMethodsU
 
       @Override
       public void unauthorized() {
+        methodsTable.removeColumn(checkColumn);
         methodsTable.removeColumn(actionsColumn);
       }
     });

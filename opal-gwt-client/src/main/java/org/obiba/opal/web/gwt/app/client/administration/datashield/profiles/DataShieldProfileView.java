@@ -17,10 +17,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -65,6 +62,9 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   SimplePanel permissionsPanel;
 
   @UiField
+  Button resetProfile;
+
+  @UiField
   SimplePanel aggregatePanel;
 
   @UiField
@@ -81,6 +81,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   @Override
   public void renderProfile(DataShieldProfileDto profile, RServerClusterDto cluster) {
     missingClusterNotice.setVisible(cluster == null);
+    resetProfile.setEnabled(cluster != null);
     if (profile.getEnabled()) {
       statusIcon.removeStyleName("status-error");
       statusIcon.addStyleName("status-success");

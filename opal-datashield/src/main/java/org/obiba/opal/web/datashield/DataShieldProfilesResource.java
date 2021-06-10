@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -36,6 +37,11 @@ public class DataShieldProfilesResource {
     return datashieldProfileService.getProfiles().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
+  }
+
+  @POST
+  public Response addProfile() {
+    return Response.serverError().build();
   }
 
 }

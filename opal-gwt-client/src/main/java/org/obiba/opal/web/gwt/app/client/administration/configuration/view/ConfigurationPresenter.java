@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -91,7 +92,8 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
     super.onReveal();
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_ADMINISTRATION.create().build()).post()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
