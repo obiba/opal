@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import static com.google.gwt.http.client.Response.*;
 
@@ -51,6 +52,8 @@ public class DataShieldProfilePresenter
 
   private DataShieldProfileDto profile;
 
+  private RServerClusterDto cluster;
+
   private ResourcePermissionsPresenter resourcePermissionsPresenter;
 
   @Inject
@@ -70,8 +73,9 @@ public class DataShieldProfilePresenter
     fireEvent(new DataShieldProfileResetEvent(profile));
   }
 
-  public void setProfile(DataShieldProfileDto profile) {
+  public void initialize(DataShieldProfileDto profile, RServerClusterDto cluster) {
     this.profile = profile;
+    this.cluster = cluster;
     DataShieldMethodsPresenter assignPresenter = methodsPresenterProvider.get();
     assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
     assignPresenter.setProfile(profile);
@@ -91,7 +95,7 @@ public class DataShieldProfilePresenter
         ResourcePermissionRequestPaths.UriBuilders.DATASHIELD_PROFILE_PERMISSIONS, profile.getName());
     addToSlot(PermissionsSlot, resourcePermissionsPresenter);
 
-    getView().renderProfile(profile);
+    getView().renderProfile(profile, cluster);
   }
 
   @Override
@@ -104,7 +108,7 @@ public class DataShieldProfilePresenter
             if (response.getStatusCode() == SC_OK) {
               profile.setEnabled(enabled);
             }
-            getView().renderProfile(profile);
+            getView().renderProfile(profile, cluster);
           }
         }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR);
     if (enabled)
@@ -123,7 +127,7 @@ public class DataShieldProfilePresenter
             if (response.getStatusCode() == SC_OK) {
               profile.setRestrictedAccess(restricted);
             }
-            getView().renderProfile(profile);
+            getView().renderProfile(profile, cluster);
             resourcePermissionsPresenter.refreshPermissions();
           }
         }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR);
@@ -146,6 +150,7 @@ public class DataShieldProfilePresenter
 
   public interface Display extends View, HasUiHandlers<DataShieldProfileUiHandlers> {
 
-    void renderProfile(DataShieldProfileDto profile);
+    void renderProfile(DataShieldProfileDto profile, RServerClusterDto cluster);
+
   }
 }

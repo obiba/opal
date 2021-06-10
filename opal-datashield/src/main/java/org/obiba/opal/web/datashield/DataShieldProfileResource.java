@@ -70,10 +70,11 @@ public class DataShieldProfileResource {
    * @return
    */
   @DELETE
-  public Response deleteProfile(@PathParam("name") String name) {
+  public Response deleteProfile(@PathParam("name") String name, @QueryParam("force") @DefaultValue("false") boolean force) {
     if (datashieldProfileService.hasProfile(name)) {
-      // primary profiles cannot be removed
-      if (name.contains("."))
+      // primary profiles cannot be removed (unless forced, in case a cluster is obsolete)
+      DatashieldProfile profile = datashieldProfileService.getProfile(name);
+      if (force || !profile.getName().equals(profile.getCluster()))
         datashieldProfileService.deleteProfile(new DatashieldProfile(name));
     }
     return Response.noContent().build();

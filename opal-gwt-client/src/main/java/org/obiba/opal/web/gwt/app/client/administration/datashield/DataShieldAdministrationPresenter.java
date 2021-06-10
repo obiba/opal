@@ -42,6 +42,8 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
+import java.util.List;
+
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class DataShieldAdministrationPresenter
@@ -113,30 +115,37 @@ public class DataShieldAdministrationPresenter
           @Override
           public void onResource(Response response, JsArray<RServerClusterDto> resource) {
             if (response.getStatusCode() == SC_OK) {
-              for (RServerClusterDto cluster : JsArrays.toIterable(resource)) {
+              final List<RServerClusterDto> clusters = JsArrays.toList(resource);
+              for (RServerClusterDto cluster : clusters) {
                 DataShieldPackagesPresenter packagesPresenter = packagesPresenterProvider.get();
                 packagesPresenter.setCluster(cluster);
                 addToSlot(new PackagesSlot(cluster), packagesPresenter);
               }
+              ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build()) //
+                  .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
+                    @Override
+                    public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
+                      if (response.getStatusCode() == SC_OK) {
+                        for (DataShieldProfileDto profile : JsArrays.toIterable(resource)) {
+                          DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
+                          RServerClusterDto profileCluster = null;
+                          for (RServerClusterDto cluster : clusters) {
+                            if (cluster.getName().equals(profile.getCluster())) {
+                              profileCluster = cluster;
+                              break;
+                            }
+                          }
+                          profilePesenter.initialize(profile, profileCluster);
+                          addToSlot(new ProfilesSlot(profile, profileCluster), profilePesenter);
+                        }
+                      }
+                    }
+                  })
+                  .get().send();
             }
           }
         })
         .get().send();
-    ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build()) //
-        .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<DataShieldProfileDto> resource) {
-            if (response.getStatusCode() == SC_OK) {
-              for (DataShieldProfileDto profile : JsArrays.toIterable(resource)) {
-                DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
-                profilePesenter.setProfile(profile);
-                addToSlot(new ProfilesSlot(profile), profilePesenter);
-              }
-            }
-          }
-        })
-        .get().send();
-
   }
 
   @Override
@@ -187,14 +196,22 @@ public class DataShieldAdministrationPresenter
   }
 
   public class ProfilesSlot {
+
     private final DataShieldProfileDto profile;
 
-    public ProfilesSlot(DataShieldProfileDto profile) {
+    private final RServerClusterDto cluster;
+
+    public ProfilesSlot(DataShieldProfileDto profile, RServerClusterDto cluster) {
       this.profile = profile;
+      this.cluster = cluster;
     }
 
     public DataShieldProfileDto getProfile() {
       return profile;
+    }
+
+    public boolean hasCluster() {
+      return cluster != null;
     }
 
     @Override

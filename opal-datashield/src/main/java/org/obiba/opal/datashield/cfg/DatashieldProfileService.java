@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,32 +53,44 @@ public class DatashieldProfileService implements SystemService {
   }
 
   /**
-   * List all saved profiles.
+   * List all saved profiles, make sure there is a profile for each cluster and disable profiles which cluster is missing.
    *
    * @return
    */
   public List<DatashieldProfile> getProfiles() {
-    List<DatashieldProfile> profiles = Lists.newArrayList(orientDbService.list(DatashieldProfile.class));
-    Set<String> primaryProfileNames = profiles.stream()
-        .filter(p -> p.getName().equals(p.getCluster()))
-        .map(DatashieldProfile::getName)
-        .collect(Collectors.toSet());
-    rServerManagerService.getRServerClusters().stream()
-        .map(RServerCluster::getName)
-        .filter(c -> !primaryProfileNames.contains(c))
-        .forEach(c -> {
-          DatashieldProfile p = new DatashieldProfile(c);
-          saveProfile(p);
-          profiles.add(p);
-        });
+    lock.lock();
+    try {
+      List<DatashieldProfile> profiles = Lists.newArrayList(orientDbService.list(DatashieldProfile.class));
+      List<String> clusterNames = getClusterNames();
+      Set<String> primaryProfileNames = profiles.stream()
+          .filter(p -> p.getName().equals(p.getCluster()))
+          .map(DatashieldProfile::getName)
+          .collect(Collectors.toSet());
+      // disable profiles which cluster does not exist
+      profiles.stream().filter(p -> !clusterNames.contains(p.getCluster())).forEach(p -> {
+        p.setEnabled(false);
+        saveProfile(p);
+      });
+      // add missing profiles (disabled)
+      clusterNames.stream()
+          .filter(c -> !primaryProfileNames.contains(c))
+          .forEach(c -> {
+            DatashieldProfile p = new DatashieldProfile(c);
+            saveProfile(p);
+            profiles.add(p);
+          });
 
-    profiles.sort(Comparator.comparing(DatashieldProfile::getName));
+      profiles.sort(Comparator.comparing(DatashieldProfile::getName));
 
-    return profiles;
+      return profiles;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
-   * Get the profile for the given name.
+   * Get the profile for the given name. If there is no such saved profile,
+   * returns a dummy profile (disabled).
    *
    * @param name
    * @return
@@ -85,13 +98,14 @@ public class DatashieldProfileService implements SystemService {
   public DatashieldProfile getProfile(String name) {
     lock.lock();
     try {
-      String p = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
-      DatashieldProfile profile = findProfile(p);
-      if (profile == null) {
-        profile = new DatashieldProfile(p);
+      String pName = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
+      Optional<DatashieldProfile> profileOpt = getProfiles().stream().filter(p -> p.getName().equals(pName)).findFirst();
+      if (!profileOpt.isPresent()) {
+        DatashieldProfile profile = new DatashieldProfile(pName);
         profile.setEnabled(false);
+        return profile;
       }
-      return profile;
+      return profileOpt.get();
     } finally {
       lock.unlock();
     }
@@ -160,5 +174,16 @@ public class DatashieldProfileService implements SystemService {
   @PreDestroy
   public void stop() {
 
+  }
+
+  /**
+   * Get R server cluster names.
+   *
+   * @return
+   */
+  private List<String> getClusterNames() {
+    return rServerManagerService.getRServerClusters().stream()
+        .map(RServerCluster::getName)
+        .collect(Collectors.toList());
   }
 }

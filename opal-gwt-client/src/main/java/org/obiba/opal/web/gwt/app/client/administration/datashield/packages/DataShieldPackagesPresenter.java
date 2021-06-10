@@ -57,7 +57,7 @@ public class DataShieldPackagesPresenter
 
   private final ModalProvider<DataShieldPackageModalPresenter> packageModalPresenterProvider;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   private Runnable removePackagesConfirmation;
 
@@ -176,6 +176,11 @@ public class DataShieldPackagesPresenter
   }
 
   @Override
+  protected void onUnbind() {
+    super.onUnbind();
+  }
+
+  @Override
   public void deleteAllPackages(List<RPackageDto> packages) {
     removePackagesConfirmation = new Runnable() {
       @Override
@@ -265,7 +270,7 @@ public class DataShieldPackagesPresenter
             getEventBus()
                 .fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
           }
-        }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_SERVICE_UNAVAILABLE)
+        }, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR, SC_SERVICE_UNAVAILABLE)
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
           @Override
           public void onResource(Response response, JsArray<RPackageDto> resource) {

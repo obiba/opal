@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.google.gwt.core.client.GWT;
@@ -24,6 +25,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileUiHandlers> implements DataShieldProfilePresenter.Display {
 
@@ -31,6 +33,9 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   }
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  Alert missingClusterNotice;
 
   @UiField
   Icon statusIcon;
@@ -74,7 +79,8 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   }
 
   @Override
-  public void renderProfile(DataShieldProfileDto profile) {
+  public void renderProfile(DataShieldProfileDto profile, RServerClusterDto cluster) {
+    missingClusterNotice.setVisible(cluster == null);
     if (profile.getEnabled()) {
       statusIcon.removeStyleName("status-error");
       statusIcon.addStyleName("status-success");
@@ -85,7 +91,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
       statusIcon.removeStyleName("status-success");
       statusIcon.addStyleName("status-error");
       statusLabel.setText(translations.dataShieldProfileDisabledLabel());
-      enableProfile.setVisible(true);
+      enableProfile.setVisible(cluster != null);
       disableProfile.setVisible(false);
     }
     if (profile.getRestrictedAccess()) {

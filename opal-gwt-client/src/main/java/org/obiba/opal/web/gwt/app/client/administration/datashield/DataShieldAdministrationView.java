@@ -71,8 +71,11 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
     } else if (slot instanceof DataShieldAdministrationPresenter.ProfilesSlot) {
       Tab tab = new Tab();
       tab.setHeading(slot.toString());
-      DataShieldProfileDto profile = ((DataShieldAdministrationPresenter.ProfilesSlot) slot).getProfile();
-      if (profile.getName().equals(profile.getCluster()))
+      DataShieldAdministrationPresenter.ProfilesSlot pSlot = (DataShieldAdministrationPresenter.ProfilesSlot) slot;
+      DataShieldProfileDto profile = pSlot.getProfile();
+      if (!pSlot.hasCluster())
+        tab.setIcon(IconType.BAN_CIRCLE);
+      else if (profile.getName().equals(profile.getCluster()))
         tab.setIcon(IconType.PUSHPIN);
       tab.add(content.asWidget());
       profileTabs.add(tab);
