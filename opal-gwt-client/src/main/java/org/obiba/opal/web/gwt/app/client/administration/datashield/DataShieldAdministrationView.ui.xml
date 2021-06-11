@@ -1,0 +1,86 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+    <g:FlowPanel>
+        <g:FlowPanel addStyleNames="section-header">
+            <b:Breadcrumbs ui:field="breadcrumbs"/>
+        </g:FlowPanel>
+
+        <b:Heading size="4">
+            <ui:msg description="DS Packages label">Packages</ui:msg>
+        </b:Heading>
+
+        <b:Paragraph>
+            <ui:msg description="DS Packages information">
+                DataSHIELD R servers are grouped by clusters. In each cluster all the R servers are considered to be
+                interchangeable, i.e.
+                a load balancer can select one or the other on DataSHIELD session creation.
+                See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server
+                documentation</a>.
+            </ui:msg>
+        </b:Paragraph>
+
+        <g:Image ui:field="clusterLoading" url="image/loading.gif"/>
+        <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
+
+        <b:Heading size="4">
+            <ui:msg description="DS Profiles label">Profiles</ui:msg>
+        </b:Heading>
+
+        <b:Paragraph>
+            <ui:msg description="DS Profiles information">
+                A DataSHIELD profile is associated to a R server cluster: the methods and options are extracted from the
+                installed DataSHIELD packages settings and can be amended.
+                See <a href="https://opaldoc.obiba.org/en/latest/admin/rserver.html" target="_blank">R Server
+                documentation</a>.
+            </ui:msg>
+        </b:Paragraph>
+
+        <g:Image ui:field="profileLoading" url="image/loading.gif"/>
+        <g:FlowPanel ui:field="profilesPanel">
+            <b:Button ui:field="profileAdd" icon="PLUS" type="INFO" addStyleNames="large-bottom-margin">
+                <ui:msg description="DS Profile add label">Add Profile</ui:msg>
+            </b:Button>
+
+            <b:TabPanel tabPosition="left" ui:field="profileTabs"/>
+        </g:FlowPanel>
+
+
+        <g:FlowPanel ui:field="permissionsPanel">
+            <b:Heading size="4">
+                <ui:msg description="Permissions label">Permissions</ui:msg>
+            </b:Heading>
+            <g:SimplePanel ui:field="permissions"/>
+        </g:FlowPanel>
+
+        <b:Heading size="4">
+            <ui:msg description="DataSHIELD Logs label">Logs</ui:msg>
+        </b:Heading>
+        <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+            <b:Paragraph>
+                <ui:msg description="Datashield logs description">Datashield activity logs can be downloaded in their
+                    raw form.
+                </ui:msg>
+            </b:Paragraph>
+            <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
+                <ui:msg description="Download datashield logs label">Download</ui:msg>
+            </b:Button>
+        </g:FlowPanel>
+
+
+    </g:FlowPanel>
+</ui:UiBinder>

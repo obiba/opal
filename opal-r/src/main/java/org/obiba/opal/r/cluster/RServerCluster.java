@@ -11,6 +11,7 @@
 package org.obiba.opal.r.cluster;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.r.service.RServerClusterService;
@@ -161,12 +162,12 @@ public class RServerCluster implements RServerClusterService {
 
   @Override
   public List<OpalR.RPackageDto> getInstalledPackagesDtos() {
+    List<OpalR.RPackageDto> allPackages = Lists.newArrayList();
     ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
     try {
       List<Future<List<OpalR.RPackageDto>>> futurePkgs = executor.invokeAll(rServerServices.stream()
           .map(service -> (Callable<List<OpalR.RPackageDto>>) service::getInstalledPackagesDtos)
           .collect(Collectors.toList()));
-      List<OpalR.RPackageDto> allPackages = Lists.newArrayList();
       for (Future<List<OpalR.RPackageDto>> fPkgs : futurePkgs) {
         try {
           allPackages.addAll(fPkgs.get());
@@ -175,21 +176,53 @@ public class RServerCluster implements RServerClusterService {
         }
       }
       allPackages.sort(Comparator.comparing(OpalR.RPackageDto::getName));
-      return allPackages;
     } catch (InterruptedException e) {
       log.error("Cannot retrieve all R packages", e);
-      return Lists.newArrayList();
     }
+    return allPackages;
   }
 
   @Override
   public List<OpalR.RPackageDto> getInstalledPackageDto(String name) {
-    return getNextRServerService().getInstalledPackageDto(name);
+    List<OpalR.RPackageDto> allPackages = Lists.newArrayList();
+    ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
+    try {
+      List<Future<List<OpalR.RPackageDto>>> futurePkgs = executor.invokeAll(rServerServices.stream()
+          .map(service -> (Callable<List<OpalR.RPackageDto>>) service.getInstalledPackageDto(name))
+          .collect(Collectors.toList()));
+      for (Future<List<OpalR.RPackageDto>> fPkgs : futurePkgs) {
+        try {
+          allPackages.addAll(fPkgs.get());
+        } catch (ExecutionException e) {
+          // ignore
+        }
+      }
+      allPackages.sort(Comparator.comparing(OpalR.RPackageDto::getName));
+    } catch (InterruptedException e) {
+      log.error("Cannot retrieve all R packages", e);
+    }
+    return allPackages;
   }
 
   @Override
   public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
-    return getNextRServerService().getDataShieldPackagesProperties();
+    Map<String, List<Opal.EntryDto>> allProperties = Maps.newHashMap();
+    ExecutorService executor = Executors.newFixedThreadPool(rServerServices.size());
+    try {
+      List<Future<Map<String, List<Opal.EntryDto>>>> futureProps = executor.invokeAll(rServerServices.stream()
+          .map(service -> (Callable<Map<String, List<Opal.EntryDto>>>) service::getDataShieldPackagesProperties)
+          .collect(Collectors.toList()));
+      for (Future<Map<String, List<Opal.EntryDto>>> fProps : futureProps) {
+        try {
+          allProperties.putAll(fProps.get());
+        } catch (ExecutionException e) {
+          // ignore
+        }
+      }
+    } catch (InterruptedException e) {
+      log.error("Cannot retrieve all Datashield packages properties", e);
+    }
+    return allProperties;
   }
 
   @Override

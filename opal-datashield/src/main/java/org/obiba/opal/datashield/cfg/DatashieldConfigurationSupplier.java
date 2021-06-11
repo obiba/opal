@@ -14,6 +14,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Deprecated
 @Component
 public class DatashieldConfigurationSupplier extends ExtensionConfigurationSupplier<DatashieldConfiguration> {
 

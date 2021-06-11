@@ -22,7 +22,7 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   private final RSerialize serialize;
 
   public RestrictedRScriptROperation(String script, DSEnvironment environment,
-      DSRScriptValidator validator, RSerialize serialize) throws ParseException {
+                                     DSRScriptValidator validator, RSerialize serialize) throws ParseException {
     super(script, environment, validator);
     this.serialize = serialize;
   }

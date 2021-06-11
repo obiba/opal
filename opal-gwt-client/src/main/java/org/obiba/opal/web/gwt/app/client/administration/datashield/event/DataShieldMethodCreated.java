@@ -10,12 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.event;
 
-import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
 @GenEvent
 public class DataShieldMethodCreated {
+
+  String profile;
 
   DataShieldMethodDto dto;
 

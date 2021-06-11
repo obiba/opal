@@ -37,8 +37,9 @@ message RSessionDto {
   required RSessionStatus status = 5;
   optional string link = 6;
   required string context = 7;
-  required string cluster = 8;
-  required string server = 9;
+  required string profile = 8;
+  required string cluster = 9;
+  required string server = 10;
 }
 
 message RPackageDto {

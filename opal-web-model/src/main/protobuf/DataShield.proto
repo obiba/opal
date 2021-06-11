@@ -4,14 +4,11 @@ package DataShield;
 
 option java_package = "org.obiba.opal.web.model";
 
-message DataShieldConfigDto {
-
-  enum Level {
-    RESTRICTED = 0;
-    UNRESTRICTED = 1;
-  }
-
-  required Level level = 1;
+message DataShieldProfileDto {
+  required string name = 1;
+  required string cluster = 2;
+  required bool enabled = 3;
+  required bool restrictedAccess = 4;
 }
 
 message DataShieldMethodDto {

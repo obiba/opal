@@ -17,7 +17,9 @@ import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.web.r.AbstractRSessionResource;
@@ -41,7 +43,7 @@ import javax.ws.rs.core.Response.Status;
 public class DataShieldSessionResourceImpl extends AbstractRSessionResource implements DataShieldSessionResource {
 
   @Autowired
-  private DatashieldConfigurationSupplier configurationSupplier;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -64,16 +66,18 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
 
   private Response aggregate(boolean async, String body, RSerialize serialize) {
     try {
-      ROperationWithResult operation = new RestrictedRScriptROperation(body, configurationSupplier.get().getEnvironment(DSMethodType.AGGREGATE),
+      RServerSession rSession = getRServerSession();
+      ROperationWithResult operation = new RestrictedRScriptROperation(body,
+          ((DataShieldProfile) rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
           DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()), serialize);
       if (async) {
-        String id = getRServerSession().executeAsync(operation);
+        String id = rSession.executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
       } else if (serialize == RSerialize.RAW) {
-        getRServerSession().execute(operation);
+        rSession.execute(operation);
         return Response.ok().entity(operation.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
       } else {
-        getRServerSession().execute(operation);
+        rSession.execute(operation);
         return Response.ok().entity(operation.getResult().asStrings()[0]).type(MediaType.APPLICATION_JSON).build();
       }
     } catch (ParseException e) {

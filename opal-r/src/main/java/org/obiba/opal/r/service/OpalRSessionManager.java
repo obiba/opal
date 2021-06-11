@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.r.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -179,7 +180,17 @@ public class OpalRSessionManager {
    * @return R session
    */
   public RServerSession newSubjectRSession() {
-    return addRSession(getSubjectPrincipal());
+    return newSubjectRSession(null);
+  }
+
+  /**
+   * Creates a new R connection in the provided profile, stores the corresponding R session.
+   *
+   * @param profile
+   * @return R session
+   */
+  public RServerSession newSubjectRSession(RServerProfile profile) {
+    return addRSession(getSubjectPrincipal(), profile);
   }
 
   /**
@@ -258,15 +269,22 @@ public class OpalRSessionManager {
     }
   }
 
-  private RServerSession addRSession(String principal) {
+  private RServerSession addRSession(String principal, RServerProfile profile) {
     try {
+      RServerProfile safeProfile = asSafeRServerProfile(profile);
       SubjectRSessions rSessions = getRSessions(principal);
-      RServerSession rSession = rServerManagerService.getDefaultRServer().newRServerSession(principal);
+      RServerSession rSession = rServerManagerService.getRServer(safeProfile.getCluster()).newRServerSession(principal);
+      rSession.setProfile(safeProfile);
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }
+  }
+
+  private RServerProfile asSafeRServerProfile(RServerProfile profile) {
+    if (profile != null) return profile;
+    return rServerManagerService.getDefaultRServerProfile();
   }
 
   private RServerSession getRSession(String principal, String rSessionId) {
@@ -331,7 +349,7 @@ public class OpalRSessionManager {
 
     void removeRSessions(String clusterName, String serverName) {
       List<RServerSession> sessionsToRemove = rSessions.stream()
-          .filter(s -> clusterName.equals(s.getRServerClusterName()) && serverName.equals(s.getRServerServiceName()))
+          .filter(s -> clusterName.equals(s.getProfile().getCluster()) && serverName.equals(s.getRServerServiceName()))
           .collect(Collectors.toList());
       for (RServerSession rSession : sessionsToRemove) {
         try {

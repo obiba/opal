@@ -9,10 +9,12 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
-import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.datashield.cfg.DataShieldProfileService;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +42,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   static final String DS_CONTEXT = "DataSHIELD";
 
   @Autowired
-  private DatashieldConfigurationSupplier configurationSupplier;
+  private DataShieldProfileService datashieldProfileService;
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -57,12 +60,27 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return super.removeRSessions();
   }
 
+  @Override
+  protected RServerProfile createProfile(String profileName) {
+    DataShieldProfile profile = datashieldProfileService.getProfile(profileName);
+    if (!profile.isEnabled()) {
+      String message = datashieldProfileService.hasProfile(profileName) ?
+          "DataSHIELD profile is not enabled" : "DataSHIELD profile does not exist";
+      throw new IllegalArgumentException(message + ": " + profile.getName());
+    }
+    // check access
+    if (profile.isRestrictedAccess() && !SecurityUtils.getSubject().isPermitted(String.format("rest:/datashield/profile/%s:GET", profile.getName()))) {
+      throw new ForbiddenException("DataSHIELD profile access is forbidden: " + profile.getName());
+    }
+    return profile;
+  }
+
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
-    DatashieldConfiguration config = configurationSupplier.get();
-    if (config.hasOptions()) {
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    if (profile.hasOptions()) {
       rSession.execute(
-          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
+          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
     }
     rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", configurationService.getOpalConfiguration().getSeed())));
     DataShieldLog.userLog("created a datashield session {}", rSession.getId());

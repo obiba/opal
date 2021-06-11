@@ -1,0 +1,77 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
+
+    <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
+        <b:ControlGroup>
+            <b:ControlLabel>
+                <ui:msg description="Name label">Name</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <b:TextBox name="name" ui:field="name"/>
+            </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="DS Method name description">
+                    The name of the DataSHIELD method name must be unique. This is the name of the allowed function
+                    that can be called by the DataSHIELD client.
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+        <b:ControlGroup>
+            <b:ControlLabel>
+                <ui:msg description="Type label">Type</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <o:Chooser ui:field="typeList"/>
+            </b:Controls>
+        </b:ControlGroup>
+        <b:ControlGroup ui:field="functionGroup">
+            <b:ControlLabel ui:field="functionLabel">
+                <ui:msg description="DataShield function label">Function</ui:msg>
+            </b:ControlLabel>
+            <b:TextBox name="function" ui:field="function" placeholder="package::function"/>
+            <b:HelpBlock>
+                <ui:msg description="DS Function value description">
+                    The R server side function that will be effectively called. Make sure there is no ambiguity by
+                    specifying the R package in which it is defined.
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+        <b:ControlGroup ui:field="scriptGroup">
+            <b:ControlLabel ui:field="scriptLabel">
+                <ui:msg description="DataShield script label">Script</ui:msg>
+            </b:ControlLabel>
+            <Controls>
+                <b:TextArea name="script" ui:field="script"/>
+            </Controls>
+            <b:HelpBlock>
+                <ui:msg description="DS Script value description">
+                    A custom R function implementation that will be effectively called.
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ModalFooter>
+            <b:Button ui:field="saveButton" type="PRIMARY">
+                <ui:msg description="Save button label">Save</ui:msg>
+            </b:Button>
+            <b:Button ui:field="cancelButton">
+                <ui:msg description="Cancel button label">Cancel</ui:msg>
+            </b:Button>
+        </b:ModalFooter>
+
+    </o:Modal>
+
+</ui:UiBinder>

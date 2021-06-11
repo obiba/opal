@@ -1,0 +1,65 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+    <g:FlowPanel ui:field="packagesPanel">
+
+        <b:Paragraph>
+            <ui:msg description="R server packages text">
+                List of all the DataSHIELD R packages installed on the R servers. Removing or installing an R package
+                applies to all R servers.
+            </ui:msg>
+        </b:Paragraph>
+
+        <b:Alert ui:field="inconsistencyNotice" close="false" visible="false">
+            <g:Label>
+                <ui:msg description="DS Packages inconsistency information">
+                    The installed DataSHIELD R packages are inconsistent between the R servers. Please make sure that
+                    these are the same (in the same version), otherwise
+                    unpredictable behaviour can happen to end-users.
+                </ui:msg>
+            </g:Label>
+        </b:Alert>
+
+        <g:FlowPanel addStyleNames="small-bottom-margin">
+            <b:ButtonGroup>
+                <b:Button ui:field="addPackageButton" icon="PLUS" type="INFO" styleName="btn">
+                    <ui:msg description="Add DataShield Package label">Add Package</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+                <b:Button ui:field="refresh" icon="REFRESH">
+                    <ui:msg description="Refresh R packages label">Refresh</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+                <b:Button ui:field="deleteAllPackagesButton" icon="TRASH" type="DANGER" styleName="btn">
+                    <ui:msg description="Delete all DataShield Packages label">Delete all</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
+            <b:Controls addStyleNames="pull-right small-indent">
+                <b:InputAddOn prependIcon="FILTER">
+                    <o:TextBoxClearable ui:field="packagesFilter" addStyleNames="inline-block"/>
+                </b:InputAddOn>
+            </b:Controls>
+        </g:FlowPanel>
+
+        <o:Table ui:field="packagesTable"/>
+    </g:FlowPanel>
+
+
+</ui:UiBinder>

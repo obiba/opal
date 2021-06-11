@@ -18,6 +18,7 @@ import java.util.Collections;
 public enum ResourcePermissionType {
   ADMINISTRATION(AclAction.PROJECT_ADD, AclAction.SYSTEM_ALL),
   DATASHIELD(AclAction.DATASHIELD_USE, AclAction.DATASHIELD_ALL),
+  DATASHIELD_PROFILE(AclAction.DATASHIELD_PROFILE_USE),
   R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),
   DATASOURCE(AclAction.DATASOURCE_VIEW, AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),

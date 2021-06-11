@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 /**
@@ -37,17 +34,17 @@ public class RServicePackageResource {
   private RServerManagerService rServerManagerService;
 
   @GET
-  public OpalR.RPackageDto getPackage(@PathParam("name") String name) {
-    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getDefaultRServer()).stream()
+  public OpalR.RPackageDto getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile)).stream()
         .filter(dto -> dto.getName().equals(name))
         .findFirst()
         .orElseThrow(() -> new NoSuchRPackageException(name));
   }
 
   @DELETE
-  public Response deletePackage(@PathParam("name") String name) {
+  public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     try {
-      rPackageHelper.removePackage(rServerManagerService.getDefaultRServer(), name);
+      rPackageHelper.removePackage(rServerManagerService.getRServer(profile), name);
     } catch (Exception e) {
       // ignore
     }

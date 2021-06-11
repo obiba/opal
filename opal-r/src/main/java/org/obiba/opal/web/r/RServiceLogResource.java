@@ -11,8 +11,6 @@
 package org.obiba.opal.web.r;
 
 import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.spi.r.RRuntimeException;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +37,8 @@ public class RServiceLogResource {
 
   @GET
   @Path("Rserve.log")
-  public Response tailRserveLog(@QueryParam("n") @DefaultValue("10000") Integer nbLines) {
-    String[] rlog = rServerManagerService.getDefaultRServer().getLog(nbLines);
+  public Response tailRserveLog(@QueryParam("n") @DefaultValue("10000") Integer nbLines, @QueryParam("profile") String profile) {
+    String[] rlog = rServerManagerService.getRServer(profile).getLog(nbLines);
     log.info("received {} lines", rlog.length);
     StreamingOutput stream = output -> {
       try (PrintWriter writer = new PrintWriter(output)) {
@@ -52,17 +50,5 @@ public class RServiceLogResource {
     return Response.ok(stream, "text/plain")
         .header("Content-Disposition", "attachment; filename=Rserve.log").build();
   }
-
-  protected RScriptROperation execute(String rscript) {
-    log.info(rscript);
-    RScriptROperation rop = new RScriptROperation(rscript, false);
-    try {
-      rServerManagerService.getDefaultRServer().execute(rop);
-      return rop;
-    } catch (Exception e) {
-      throw new RRuntimeException(e);
-    }
-  }
-
 
 }

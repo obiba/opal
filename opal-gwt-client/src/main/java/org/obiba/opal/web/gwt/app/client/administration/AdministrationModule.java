@@ -30,8 +30,14 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.data.DataD
 import org.obiba.opal.web.gwt.app.client.administration.database.list.data.DataDatabasesView;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabaseView;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.*;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.view.*;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.*;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.*;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.*;
@@ -57,10 +63,9 @@ import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresent
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalView;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsView;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesView;
+import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterView;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.*;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
@@ -177,6 +182,7 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureR() {
     bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class,
         RAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(RClusterPresenter.class, RClusterPresenter.Display.class, RClusterView.class);
     bindPresenterWidget(RSessionsPresenter.class, RSessionsPresenter.Display.class, RSessionsView.class);
     bindPresenterWidget(RWorkspacesPresenter.class, RWorkspacesPresenter.Display.class, RWorkspacesView.class);
     bindPresenterWidget(RPackageInstallModalPresenter.class, RPackageInstallModalPresenter.Display.class,
@@ -184,22 +190,25 @@ public class AdministrationModule extends AbstractPresenterModule {
   }
 
   private void configureDatashield() {
-    bindPresenter(DataShieldConfigPresenter.class, DataShieldConfigPresenter.Display.class, DataShieldConfigView.class,
-        DataShieldConfigPresenter.Proxy.class);
-    bindPresenterWidget(DataShieldPackageAdministrationPresenter.class,
-        DataShieldPackageAdministrationPresenter.Display.class, DataShieldPackageAdministrationView.class);
-    bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class,
-        DataShieldAdministrationView.class);
-    bindPresenterWidget(DataShieldPackageCreatePresenter.class, DataShieldPackageCreatePresenter.Display.class,
-        DataShieldPackageCreateView.class);
-    bindPresenterWidget(DataShieldPackagePresenter.class, DataShieldPackagePresenter.Display.class,
-        DataShieldPackageView.class);
-    bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class,
-        DataShieldMethodView.class);
+    bindPresenter(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class, DataShieldAdministrationView.class,
+        DataShieldAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(DataShieldProfilePresenter.class, DataShieldProfilePresenter.Display.class, DataShieldProfileView.class);
+    bindPresenterWidget(DataShieldPackagesPresenter.class,
+        DataShieldPackagesPresenter.Display.class, DataShieldPackagesView.class);
+    bindPresenterWidget(DataShieldMethodsPresenter.class, DataShieldMethodsPresenter.Display.class,
+        DataShieldMethodsView.class);
+    bindPresenterWidget(DataShieldPackageInstallModalPresenter.class, DataShieldPackageInstallModalPresenter.Display.class,
+        DataShieldPackageInstallModalView.class);
+    bindPresenterWidget(DataShieldPackageModalPresenter.class, DataShieldPackageModalPresenter.Display.class,
+        DataShieldPackageModalView.class);
+    bindPresenterWidget(DataShieldMethodModalPresenter.class, DataShieldMethodModalPresenter.Display.class,
+        DataShieldMethodModalView.class);
     bindPresenterWidget(DataShieldROptionsPresenter.class, DataShieldROptionsPresenter.Display.class,
         DataShieldROptionsView.class);
     bindPresenterWidget(DataShieldROptionModalPresenter.class, DataShieldROptionModalPresenter.Display.class,
         DataShieldROptionModalView.class);
+    bindPresenterWidget(DataShieldProfileModalPresenter.class, DataShieldProfileModalPresenter.Display.class,
+        DataShieldProfileModalView.class);
   }
 
   private void configureIndexes() {

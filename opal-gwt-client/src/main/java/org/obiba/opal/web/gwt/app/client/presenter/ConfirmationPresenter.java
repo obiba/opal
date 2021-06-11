@@ -67,14 +67,14 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
 
   @Override
   public void onYes() {
-    getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
     getView().disableDialog();
+    fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
   }
 
   @Override
   public void onNo() {
-    getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
     getView().hideDialog();
+    fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
   }
 
   //

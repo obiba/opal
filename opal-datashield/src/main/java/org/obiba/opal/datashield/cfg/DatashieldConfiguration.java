@@ -18,6 +18,7 @@ import org.obiba.opal.web.model.DataShield;
 
 import java.io.Serializable;
 
+@Deprecated
 public class DatashieldConfiguration extends DefaultDSConfiguration implements OpalConfigurationExtension, Serializable {
 
   @Deprecated

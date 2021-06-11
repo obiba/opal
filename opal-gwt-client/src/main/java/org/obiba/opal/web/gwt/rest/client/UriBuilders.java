@@ -1105,6 +1105,13 @@ public enum UriBuilders {
     }
   },
 
+  SERVICE_R_CLUSTERS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "clusters");
+    }
+  },
+
   SERVICE_R_CLUSTER {
     @Override
     public UriBuilder create() {
@@ -1147,10 +1154,73 @@ public enum UriBuilders {
     }
   },
 
+  R_SESSIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("r", "sessions");
+    }
+  },
+
+  DATASHIELD_PROFILES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profiles");
+    }
+  },
+
+  DATASHIELD_PROFILE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}");
+    }
+  },
+
+  DATASHIELD_PROFILE_ENABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}", "_enable");
+    }
+  },
+
+  DATASHIELD_PROFILE_ACCESS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "profile", "{}", "_access");
+    }
+  },
+
   DATASHIELD_PACKAGES {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datashield", "packages");
+    }
+  },
+
+  DATASHIELD_PACKAGES_PUBLISH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "packages", "_publish");
+    }
+  },
+
+  DATASHIELD_PACKAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "package", "{}");
+    }
+  },
+
+  DATASHIELD_PACKAGE_PUBLISH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "package", "{}", "_publish");
+    }
+  },
+
+  DATASHIELD_PACKAGE_METHODS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "package", "{}", "methods");
     }
   },
 

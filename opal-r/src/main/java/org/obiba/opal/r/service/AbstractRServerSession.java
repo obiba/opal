@@ -57,6 +57,8 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private final String serverName;
 
+  private RServerProfile profile;
+
   /**
    * R commands to be processed.
    */
@@ -130,9 +132,13 @@ public abstract class AbstractRServerSession implements RServerSession {
     return Strings.isNullOrEmpty(executionContext) ? DEFAULT_CONTEXT : executionContext;
   }
 
+  public void setProfile(RServerProfile profile) {
+    this.profile = profile;
+  }
+
   @Override
-  public String getRServerClusterName() {
-    return clusterName;
+  public RServerProfile getProfile() {
+    return profile;
   }
 
   @Override

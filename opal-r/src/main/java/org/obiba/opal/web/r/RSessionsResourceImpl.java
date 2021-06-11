@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +60,8 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   @Override
-  public Response newRSession(UriInfo info, String restore) {
-    RServerSession rSession = opalRSessionManager.newSubjectRSession();
+  public Response newRSession(UriInfo info, String restore, String profile) {
+    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
     onNewRSession(rSession);
     if (!Strings.isNullOrEmpty(restore)) {
       opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
@@ -68,6 +69,10 @@ public class RSessionsResourceImpl implements RSessionsResource {
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))
         .build();
+  }
+
+  protected RServerProfile createProfile(String profileName) {
+    return new DefaultRServerProfile(profileName);
   }
 
   protected void onNewRSession(RServerSession rSession) {
@@ -84,5 +89,24 @@ public class RSessionsResourceImpl implements RSessionsResource {
     root.append("/session");
 
     return info.getBaseUriBuilder().path(root.toString()).path(id).build();
+  }
+
+  public class DefaultRServerProfile implements RServerProfile {
+
+    private final String name;
+
+    public DefaultRServerProfile(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+    @Override
+    public String getCluster() {
+      return name;
+    }
   }
 }

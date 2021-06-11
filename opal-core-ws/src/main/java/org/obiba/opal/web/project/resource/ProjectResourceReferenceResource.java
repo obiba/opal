@@ -70,6 +70,7 @@ public class ProjectResourceReferenceResource {
   @Path("_test")
   public Response test(@PathParam("project") String project, @PathParam("name") String name) throws RServerException {
     ROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
+    // TODO test in the R server where the resource provider is defined
     rServerManagerService.getDefaultRServer().execute(rop);
     return Response.ok().build();
   }

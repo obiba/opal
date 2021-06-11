@@ -14,6 +14,7 @@ import org.obiba.datashield.core.impl.ScriptDSMethod;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
+@Deprecated
 public class CustomRScriptMethod extends ScriptDSMethod implements DataShieldMethod {
 
   public CustomRScriptMethod() {

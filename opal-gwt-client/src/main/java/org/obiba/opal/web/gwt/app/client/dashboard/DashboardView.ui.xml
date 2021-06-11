@@ -54,6 +54,14 @@
               </g:Label>
             </g:FlowPanel>
 
+            <g:FlowPanel ui:field="datashield">
+              <b2:IconAnchor ui:field="datashieldLink" icon="COG"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Manage Datashield link description">Configure DataSHIELD, grant access to DataSHIELD service.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
             <g:FlowPanel ui:field="tasks">
               <b2:IconAnchor ui:field="tasksLink" icon="TASKS"/>
               <g:Label addStyleNames="help-block">

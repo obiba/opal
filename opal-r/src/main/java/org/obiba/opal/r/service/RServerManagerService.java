@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -67,20 +68,78 @@ public class RServerManagerService implements Service {
 
   private boolean running;
 
+  /**
+   * Get the R server profile corresponding to the default R server.
+   * 
+   * @return
+   */
+  public RServerProfile getDefaultRServerProfile() {
+    final RServerService service = getDefaultRServer();
+    return new RServerProfile() {
+      @Override
+      public String getName() {
+        return service.getName();
+      }
+
+      @Override
+      public String getCluster() {
+        return service.getName();
+      }
+    };
+  }
+
+  /**
+   * Get R server service from default cluster.
+   *
+   * @return
+   */
   public RServerService getDefaultRServer() {
     if (rClusters.containsKey(getDefaultClusterName()))
       return rClusters.get(getDefaultClusterName());
     throw new NoSuchServiceException("R server (default)");
   }
 
+  /**
+   * Get R server service from cluster name. If name is null or empty, get the R server from the default cluster.
+   *
+   * @param name
+   * @return
+   */
+  public RServerService getRServer(String name) {
+    return getRServerCluster(name);
+  }
+
+  /**
+   * Get all R server clusters.
+   *
+   * @return
+   */
   public Collection<RServerCluster> getRServerClusters() {
     return rClusters.values();
   }
 
+  /**
+   * Get R server cluster by name. If name is null or empty, get the default cluster.
+   *
+   * @param name
+   * @return
+   */
   public RServerCluster getRServerCluster(String name) {
+    if (Strings.isNullOrEmpty(name) && rClusters.containsKey(getDefaultClusterName()))
+      return rClusters.get(getDefaultClusterName());
     if (rClusters.containsKey(name))
       return rClusters.get(name);
     throw new NoSuchElementException("No R server cluster with name: " + name);
+  }
+
+  /**
+   * Get the name of the default R server cluster.
+   *
+   * @return
+   */
+  public String getDefaultClusterName() {
+    // TODO make it configurable (live?)
+    return DEFAULT_CLUSTER_NAME;
   }
 
   @Subscribe
@@ -101,6 +160,7 @@ public class RServerManagerService implements Service {
         rServerService.setRServerClusterName(clusterName);
         if (running)
           rServerService.start();
+        log.info("R server '{}' added to cluster: {}", rServerService.getName(), clusterName);
       } catch (Exception e) {
         log.error("Rock R server registration failed: {}", event.getApp().getName(), e);
         eventBus.post(new AppRejectedEvent(event.getApp()));
@@ -211,8 +271,4 @@ public class RServerManagerService implements Service {
       eventBus.post(new RServiceInitializedEvent(getName()));
   }
 
-  private String getDefaultClusterName() {
-    // TODO make it configurable (live?)
-    return DEFAULT_CLUSTER_NAME;
-  }
 }

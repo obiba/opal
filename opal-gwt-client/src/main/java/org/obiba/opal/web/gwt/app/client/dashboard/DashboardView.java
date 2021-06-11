@@ -42,6 +42,9 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   IconAnchor exploreFilesLink;
 
   @UiField
+  IconAnchor datashieldLink;
+
+  @UiField
   IconAnchor tasksLink;
 
   @UiField
@@ -54,13 +57,10 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   IconAnchor myprofileLink;
 
   @UiField
-  Panel projects;
-
-  @UiField
   Panel identifiers;
 
   @UiField
-  Panel files;
+  Panel datashield;
 
   @UiField
   Panel tasks;
@@ -89,6 +89,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     identifiersLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.IDENTIFIERS);
     reportsLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
     exploreFilesLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
+    datashieldLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.DATASHIELD);
     tasksLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.TASKS);
     myprofileLink.setHref("#" + Places.PROFILE);
     pageTitle.setText(translations.pageDashboardTitle());
@@ -96,6 +97,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     exploreProjectsLink.setText(translations.exploreVariables());
     searchLink.setText(translations.pageSearchTitle());
     exploreFilesLink.setText(translations.manageFiles());
+    datashieldLink.setText("DataSHIELD");
     tasksLink.setText(translations.tasksLabel());
     reportsLink.setText(translations.runReports());
     identifiersLink.setText(translations.manageParticipantIdentifiers());
@@ -142,6 +144,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
       bookmarks.clear();
       bookmarks.add(content);
     }
+  }
+
+  @Override
+  public HasAuthorization getDataShieldAuthorizer() {
+    return new WidgetAuthorizer(datashield);
   }
 
   @Override

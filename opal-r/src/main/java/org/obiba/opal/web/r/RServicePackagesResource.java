@@ -42,14 +42,14 @@ public class RServicePackagesResource {
   private RServerManagerService rServerManagerService;
 
   @GET
-  public List<OpalR.RPackageDto> getPackages() {
-    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getDefaultRServer());
+  public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
+    return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile));
   }
 
   @PUT
-  public Response updateAllPackages() {
+  public Response updateAllPackages(@QueryParam("profile") String profile) {
     try {
-      rPackageHelper.updateAllCRANPackages(rServerManagerService.getDefaultRServer());
+      rPackageHelper.updateAllCRANPackages(rServerManagerService.getRServer(profile));
     } catch (Exception e) {
       log.error("Failed at updating all R packages", e);
     }
@@ -58,8 +58,9 @@ public class RServicePackagesResource {
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-                                 @QueryParam("ref") String ref, @QueryParam("manager") String manager) {
-    rPackageHelper.installPackage(rServerManagerService.getDefaultRServer(), name, ref, manager);
+                                 @QueryParam("ref") String ref, @QueryParam("manager") String manager,
+                                 @QueryParam("profile") String profile) {
+    rPackageHelper.installPackage(rServerManagerService.getRServer(profile), name, ref, manager);
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();
   }

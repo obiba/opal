@@ -10,17 +10,7 @@
 
 package org.obiba.opal.web.project.permissions;
 
-import java.util.List;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
+import com.google.common.collect.Iterables;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.security.TablePermissionConverter;
@@ -32,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Iterables;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.MagmaPermissionsPredicate;
@@ -56,7 +48,6 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   /**
    * Get all table-level permissions of a table in the project.
    *
-   * @param domain
    * @param type
    * @return
    */
@@ -82,7 +73,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermissionConverter.Permission permission) {
+                                     @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermissionConverter.Permission permission) {
 
     // make sure datasource and table exists
     getValueTable();
@@ -99,7 +90,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
    */
   @DELETE
   public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals) {
+                                         @QueryParam("principal") List<String> principals) {
 
     // make sure datasource and table exists
     getValueTable();
@@ -114,7 +105,6 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   /**
    * Get all variable-level permissions of a table in the project.
    *
-   * @param domain
    * @param type
    * @return
    */
@@ -133,7 +123,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   }
 
   private ValueTable getValueTable() {
-    if(valueTable == null) {
+    if (valueTable == null) {
       valueTable = MagmaEngine.get().getDatasource(name).getValueTable(table);
     }
     return valueTable;
