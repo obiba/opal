@@ -23,7 +23,9 @@
             <b:Button ui:field="deleteProfile" icon="TRASH" type="DANGER" addStyleNames="pull-right"/>
         </g:FlowPanel>
 
-        <b:Alert ui:field="clusterNotice" close="false" visible="false"/>
+        <b:Paragraph ui:field="clusterNotice" visible="false"/>
+
+        <b:Alert ui:field="clusterMissingNotice" close="false" visible="false"/>
 
         <b:Heading size="5">
             <ui:msg description="DS Status label">Status</ui:msg>

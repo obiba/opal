@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.datashield;
 
+import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.DataShield;
@@ -100,6 +101,9 @@ public class DataShieldProfileResource {
     DataShieldProfile profile = datashieldProfileService.findProfile(name);
     if (profile == null)
       throw new NotFoundException("No DataSHIELD profile with name: " + name);
+    if (profile.isRestrictedAccess() && !SecurityUtils.getSubject().isPermitted(String.format("rest:/datashield/profile/%s:GET", profile.getName())))
+      throw new ForbiddenException("DataSHIELD profile access is forbidden: " + profile.getName());
     return profile;
   }
+
 }

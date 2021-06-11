@@ -30,14 +30,12 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldPackageMethodsDto;
@@ -211,18 +209,6 @@ public class DataShieldPackagesPresenter
     authorizeAddPackageR(getView().getAddPackageAuthorizer());
   }
 
-  private String packageR(String packageR) {
-    return UriBuilders.DATASHIELD_PACKAGE.create()
-        .query("profile", cluster.getName())
-        .build(packageR);
-  }
-
-  private String packageRMethods(String packageR) {
-    return UriBuilders.DATASHIELD_PACKAGE_METHODS.create()
-        .query("profile", cluster.getName())
-        .build(packageR);
-  }
-
   private void authorizePackagesR(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGES.create().build()).get().authorize(authorizer).send();
   }
@@ -233,20 +219,8 @@ public class DataShieldPackagesPresenter
   }
 
   private void authorizeViewMethod(RPackageDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).get()
-        .authorize(authorizer).send();
-  }
-
-  private void authorizeDeleteMethod(RPackageDto dto, HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(packageR(dto.getName()))
-        .delete()
-        .authorize(authorizer).send();
-  }
-
-  private void authorizePublishMethods(RPackageDto dto, HasAuthorization authorizer) {
-    // Check access to delete/put a method
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packageRMethods(dto.getName())).get()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGE.create()
+        .build(dto.getName())).get()
         .authorize(authorizer).send();
   }
 
@@ -278,38 +252,20 @@ public class DataShieldPackagesPresenter
 
   protected void doDataShieldPackageActionImpl(final RPackageDto dto, String actionName) {
     if (actionName.equals(ActionsPackageRColumn.PUBLISH_ACTION)) {
-      authorizePublishMethods(dto, new Authorizer(getEventBus()) {
-
-        @Override
-        public void authorized() {
-          publishPackageConfirmation = new PublishMethodsRunnable(dto);
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishPackageConfirmation, translationMessages.publishDataShieldSettings(),
-                  translationMessages.confirmPublishDataShieldSettings(dto.getName(), cluster.getName())));
-        }
-      });
+      publishPackageConfirmation = new PublishMethodsRunnable(dto);
+      fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(publishPackageConfirmation, translationMessages.publishDataShieldSettings(),
+              translationMessages.confirmPublishDataShieldSettings(dto.getName(), cluster.getName())));
     } else if (actionName.equals(ActionsPackageRColumn.UNPUBLISH_ACTION)) {
-      authorizePublishMethods(dto, new Authorizer(getEventBus()) {
-
-        @Override
-        public void authorized() {
-          publishPackageConfirmation = new UnPublishMethodsRunnable(dto);
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishPackageConfirmation, translationMessages.unPublishDataShieldSettings(),
-                  translationMessages.confirmUnPublishDataShieldSettings(dto.getName(), cluster.getName())));
-        }
-      });
-
+      publishPackageConfirmation = new UnPublishMethodsRunnable(dto);
+      fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(publishPackageConfirmation, translationMessages.unPublishDataShieldSettings(),
+              translationMessages.confirmUnPublishDataShieldSettings(dto.getName(), cluster.getName())));
     } else if (actionName.equals(ActionsPackageRColumn.REMOVE_ACTION)) {
-      authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
-        @Override
-        public void authorized() {
-          removePackageConfirmation = new RemovePackageRunnable(dto);
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(removePackageConfirmation, translationMessages.removeDataShieldPackage(),
-                  translationMessages.confirmDeleteDataShieldPackage()));
-        }
-      });
+      removePackageConfirmation = new RemovePackageRunnable(dto);
+      fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(removePackageConfirmation, translationMessages.removeDataShieldPackage(),
+              translationMessages.confirmDeleteDataShieldPackage()));
     }
   }
 
@@ -419,9 +375,12 @@ public class DataShieldPackagesPresenter
 
       };
 
-      ResourceRequestBuilderFactory.newBuilder().forResource(packageR(dto.getName())).delete() //
-          .withCallback(SC_OK, callbackHandler) //
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.DATASHIELD_PACKAGE.create()
+              .query("profile", cluster.getName())
+              .build(dto.getName())).delete()
+          .withCallback(SC_OK, callbackHandler)
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
           .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
   }
@@ -436,13 +395,15 @@ public class DataShieldPackagesPresenter
 
     @Override
     public void run() {
-      ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
-          .forResource(packageRMethods(dto.getName()))
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create()
+              .query("profile", cluster.getName())
+              .build(dto.getName()))
           .put()
-          .withCallback(new ResourceCallback<DataShieldPackageMethodsDto>() {
+          .withCallback(new ResponseCodeCallback() {
 
             @Override
-            public void onResource(Response response, DataShieldPackageMethodsDto resource) {
+            public void onResponseCode(Request request, Response response) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if (response.getStatusCode() == SC_OK) {
                 fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
@@ -450,7 +411,8 @@ public class DataShieldPackagesPresenter
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
-          }).send();
+
+          }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).send();
     }
 
   }
@@ -466,7 +428,9 @@ public class DataShieldPackagesPresenter
     @Override
     public void run() {
       ResourceRequestBuilderFactory.newBuilder()
-          .forResource(packageRMethods(dto.getName()))
+          .forResource(UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create()
+              .query("profile", cluster.getName())
+              .build(dto.getName()))
           .delete()
           .withCallback(new ResponseCodeCallback() {
 

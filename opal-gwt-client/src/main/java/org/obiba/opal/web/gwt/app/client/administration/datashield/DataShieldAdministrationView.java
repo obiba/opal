@@ -56,6 +56,8 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
   @UiField
   Panel breadcrumbs;
 
+  private int profileTabsCount;
+
   @Inject
   public DataShieldAdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -82,7 +84,11 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
         tab.setIcon(IconType.PUSHPIN);
       tab.add(content.asWidget());
       profileTabs.add(tab);
-      profileTabs.selectTab(0);
+      profileTabsCount++;
+      if (pSlot.isSelected()) {
+        profileTabs.selectTab(profileTabsCount - 1);
+      } else if (profileTabsCount == 1)
+        profileTabs.selectTab(0);
       profilesPanel.setVisible(true);
       profileLoading.setVisible(false);
     }
@@ -114,6 +120,7 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
     profileTabs.clear();
     profilesPanel.setVisible(false);
     profileLoading.setVisible(true);
+    profileTabsCount = 0;
   }
 
   @Override

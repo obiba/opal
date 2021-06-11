@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import org.apache.shiro.SecurityUtils;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.DataShield;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional
@@ -37,6 +41,7 @@ public class DataShieldProfilesResource {
   @GET
   public List<DataShield.DataShieldProfileDto> getProfiles() {
     return datashieldProfileService.getProfiles().stream()
+        .filter(this::canAccessProfile)
         .map(Dtos::asDto)
         .collect(Collectors.toList());
   }
@@ -48,10 +53,24 @@ public class DataShieldProfilesResource {
     if (datashieldProfileService.hasProfile(profileDto.getName()))
       throw new BadRequestException("DataSHIELD profile already exists: " + profileDto.getName());
 
-    datashieldProfileService.saveProfile(Dtos.fromDto(profileDto));
+    DataShieldProfile profile = Dtos.fromDto(profileDto);
+    // init with cluster's primary profile
+    if (!profileDto.getName().equals(profileDto.getCluster())) {
+      DataShieldProfile baseProfile = datashieldProfileService.getProfile(profileDto.getCluster());
+      profile.addOrUpdateMethods(DSMethodType.AGGREGATE, baseProfile.getEnvironment(DSMethodType.AGGREGATE).getMethods());
+      profile.addOrUpdateMethods(DSMethodType.ASSIGN, baseProfile.getEnvironment(DSMethodType.ASSIGN).getMethods());
+      StreamSupport.stream(baseProfile.getOptions().spliterator(), false).forEach(o -> profile.addOrUpdateOption(o.getName(), o.getValue()));
+    }
+
+    datashieldProfileService.saveProfile(profile);
 
     URI profileUri = UriBuilder.fromPath("/datashield/profile/" + profileDto.getName()).build();
     return Response.created(profileUri).build();
+  }
+
+  private boolean canAccessProfile(DataShieldProfile profile) {
+    if (!profile.isRestrictedAccess()) return true;
+    return SecurityUtils.getSubject().isPermitted(String.format("rest:/datashield/profile/%s:GET", profile.getName()));
   }
 
 }

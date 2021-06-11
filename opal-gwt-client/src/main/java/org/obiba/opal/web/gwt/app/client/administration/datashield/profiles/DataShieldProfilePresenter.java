@@ -17,18 +17,18 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeleted;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileResetEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
@@ -48,6 +48,8 @@ public class DataShieldProfilePresenter
 
   public static Object PermissionsSlot = new Object();
 
+  private final TranslationMessages translationMessages;
+
   private final Provider<DataShieldMethodsPresenter> methodsPresenterProvider;
 
   private final Provider<DataShieldROptionsPresenter> optionsProvider;
@@ -58,12 +60,15 @@ public class DataShieldProfilePresenter
 
   private ResourcePermissionsPresenter resourcePermissionsPresenter;
 
+  private Runnable removeProfileConfirmation;
+
   @Inject
   public DataShieldProfilePresenter(Display display, EventBus eventBus,
                                     Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-                                    Provider<DataShieldMethodsPresenter> methodsPresenterProvider,
+                                    TranslationMessages translationMessages, Provider<DataShieldMethodsPresenter> methodsPresenterProvider,
                                     Provider<DataShieldROptionsPresenter> optionsProvider) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
     this.methodsPresenterProvider = methodsPresenterProvider;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
@@ -72,15 +77,27 @@ public class DataShieldProfilePresenter
 
   @Override
   public void onProfileDelete() {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.DATASHIELD_PROFILE.create().build(profile.getName()))
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            fireEvent(new DataShieldProfileDeletedEvent(profile));
-          }
-        }, SC_NO_CONTENT, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR)
-        .delete().send();
+    removeProfileConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        UriBuilder builder = UriBuilders.DATASHIELD_PROFILE.create();
+        if (profile.getName().equals(profile.getCluster()))
+          builder.query("force", "true");
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(builder.build(profile.getName()))
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                fireEvent(new DataShieldProfileDeletedEvent(profile));
+              }
+            }, SC_NO_CONTENT, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR)
+            .delete().send();
+      }
+    };
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(removeProfileConfirmation, translationMessages.removeDataShieldProfile(),
+            translationMessages.confirmDeleteDataShieldProfile(profile.getName())));
   }
 
   @Override
@@ -154,6 +171,15 @@ public class DataShieldProfilePresenter
 
   @Override
   protected void onBind() {
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (event.getSource().equals(removeProfileConfirmation) && event.isConfirmed()) {
+          removeProfileConfirmation.run();
+          removeProfileConfirmation = null;
+        }
+      }
+    });
   }
 
   public interface DataShieldEnvironment {

@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.Data
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.ResourcePermissionsPresenter;
@@ -127,7 +128,9 @@ public class DataShieldAdministrationPresenter
     addRegisteredHandler(DataShieldProfileAddedEvent.getType(), new DataShieldProfileAddedEvent.DataShieldProfileAddedHandler() {
       @Override
       public void onDataShieldProfileAdded(DataShieldProfileAddedEvent event) {
-        refreshProfiles();
+        fireEvent(NotificationEvent.newBuilder()
+            .info(translationMessages.dataShieldProfileAddedInfo(event.getProfile().getName(), event.getProfile().getCluster())).build());
+        refreshProfiles(event.getProfile());
       }
     });
   }
@@ -188,6 +191,10 @@ public class DataShieldAdministrationPresenter
   }
 
   private void refreshProfiles() {
+    refreshProfiles(null);
+  }
+
+  private void refreshProfiles(final DataShieldProfileDto selectProfile) {
     getView().clearProfiles();
     ResourceRequestBuilderFactory.<JsArray<DataShieldProfileDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PROFILES.create().build())
         .withCallback(new ResourceCallback<JsArray<DataShieldProfileDto>>() {
@@ -214,7 +221,8 @@ public class DataShieldAdministrationPresenter
               for (DataShieldProfileDto profile : profiles) {
                 DataShieldProfilePresenter profilePesenter = profilePresenterProvider.get();
                 profilePesenter.initialize(profile, clusterMap.get(profile.getCluster()));
-                addToSlot(new ProfilesSlot(profile, clusterMap.get(profile.getCluster())), profilePesenter);
+                boolean selected = selectProfile != null && selectProfile.getName().equals(profile.getName());
+                addToSlot(new ProfilesSlot(profile, clusterMap.get(profile.getCluster()), selected), profilePesenter);
               }
             }
           }
@@ -260,9 +268,12 @@ public class DataShieldAdministrationPresenter
 
     private final RServerClusterDto cluster;
 
-    public ProfilesSlot(DataShieldProfileDto profile, RServerClusterDto cluster) {
+    private final boolean selected;
+
+    public ProfilesSlot(DataShieldProfileDto profile, RServerClusterDto cluster, boolean selected) {
       this.profile = profile;
       this.cluster = cluster;
+      this.selected = selected;
     }
 
     public DataShieldProfileDto getProfile() {
@@ -271,6 +282,10 @@ public class DataShieldAdministrationPresenter
 
     public boolean hasCluster() {
       return cluster != null;
+    }
+
+    public boolean isSelected() {
+      return selected;
     }
 
     @Override

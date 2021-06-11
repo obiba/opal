@@ -9,10 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.profiles;
 
-import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -42,7 +40,10 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   Button deleteProfile;
 
   @UiField
-  Alert clusterNotice;
+  Paragraph clusterNotice;
+
+  @UiField
+  Alert clusterMissingNotice;
 
   @UiField
   Icon statusIcon;
@@ -95,11 +96,13 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
     title.setText(profile.getName());
     title.setSubtext("(" + profile.getCluster() + ")");
     if (cluster == null) {
-      clusterNotice.setText(translationMessages.dataShieldProfileClusterMissing(profile.getCluster()));
-      clusterNotice.setType(AlertType.WARNING);
+      clusterMissingNotice.setText(translationMessages.dataShieldProfileClusterMissing(profile.getCluster()));
+      clusterMissingNotice.setVisible(true);
+      clusterNotice.setVisible(false);
     } else {
       clusterNotice.setText(translationMessages.dataShieldProfileClusterInfo(profile.getCluster()));
-      clusterNotice.setType(AlertType.SUCCESS);
+      clusterNotice.setVisible(true);
+      clusterMissingNotice.setVisible(false);
     }
     clusterNotice.setVisible(true);
     deleteProfile.setVisible(cluster == null || !profile.getName().equals(profile.getCluster()));

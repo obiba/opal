@@ -129,6 +129,7 @@ public class DataShieldMethodsView extends ViewWithUiHandlers<DataShieldMethodsU
   void onDeleteMethods(ClickEvent event) {
     getUiHandlers().onRemoveMethods(checkColumn.getSelectedItems());
     checkColumn.clearSelection();
+    filter.setText("");
   }
 
   @Override

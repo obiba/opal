@@ -136,6 +136,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("The R server cluster associated to this profile is missing: {0}")
   String dataShieldProfileClusterMissing(String name);
 
+  @Description("DS profile added label")
+  @DefaultMessage("DataSHIELD profile {0} added, initialized with {1} profile settings.")
+  String dataShieldProfileAddedInfo(String name, String pName);
+
   @Description("Remove Aggregate Method label")
   @DefaultMessage("Remove Aggregate Method")
   String removeDataShieldAggregateMethod();
@@ -147,6 +151,11 @@ public interface TranslationMessages extends Messages {
   @Description("Remove Assign Method label")
   @DefaultMessage("Remove Assign Method")
   String removeDataShieldAssignMethod();
+
+  @Description("Remove Profile label")
+  @DefaultMessage("Remove Profile")
+  String removeDataShieldProfile();
+
   @Description("Remove DS Option label")
   @DefaultMessage("Remove Option")
   String removeDataShieldOption();
@@ -523,8 +532,12 @@ public interface TranslationMessages extends Messages {
           "this variable will be lost.")
   String confirmRemoveVariable();
 
+  @Description("Please confirm that you want to remove the profile message")
+  @DefaultMessage("Please confirm that you want to remove the profile <b>{0}</b>.")
+  String confirmDeleteDataShieldProfile(String name);
+
   @Description("Please confirm that you want to remove this assign method message")
-  @DefaultMessage("Please confirm that you want to remove this assign method <b>{0}</b>.")
+  @DefaultMessage("Please confirm that you want to remove the assign method <b>{0}</b>.")
   String confirmDeleteDataShieldAssignMethod(String name);
 
   @Description("Please confirm that you want to remove these assign methods message")
@@ -532,7 +545,7 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteDataShieldAssignMethods();
 
   @Description("Please confirm that you want to remove this aggregate method message")
-  @DefaultMessage("Please confirm that you want to remove this aggregate method <b>{0}</b>.")
+  @DefaultMessage("Please confirm that you want to remove the aggregate method <b>{0}</b>.")
   String confirmDeleteDataShieldAggregateMethod(String name);
 
   @Description("Please confirm that you want to remove these aggregate methods message")
@@ -556,7 +569,7 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteAllDataShieldPackages();
 
   @Description("Please confirm that you want to publish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profiles based on the cluster <b>{1}</b>.")
+  @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profile <b>{1}</b>.")
   String confirmPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to publish all packages methods and options message")
@@ -564,7 +577,7 @@ public interface TranslationMessages extends Messages {
   String confirmPublishAllDataShieldSettings(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profiles based on the cluster <b>{1}</b>.")
+  @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profile <b>{1}</b>.")
   String confirmUnPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to unregister this database message")
