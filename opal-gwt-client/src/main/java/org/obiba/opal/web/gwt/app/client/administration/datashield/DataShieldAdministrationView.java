@@ -82,6 +82,8 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
         tab.setIcon(IconType.BAN_CIRCLE);
       else if (profile.getName().equals(profile.getCluster()))
         tab.setIcon(IconType.PUSHPIN);
+      else
+        tab.setIcon(IconType.ANGLE_RIGHT);
       tab.add(content.asWidget());
       profileTabs.add(tab);
       profileTabsCount++;

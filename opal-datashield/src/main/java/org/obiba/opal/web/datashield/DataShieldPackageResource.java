@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Manage a Datashield Package.
@@ -62,50 +63,56 @@ public class DataShieldPackageResource {
   @PUT
   @Path("methods")
   @Deprecated
-  public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    return dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name);
+  public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
+    DataShield.DataShieldPackageMethodsDto rval = DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).build();
+    if (profiles != null)
+      dsPackageMethodeHelper.publish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
+    return rval;
   }
 
   /**
    * Append package DataSHIELD settings to profile configuration.
    *
    * @param name
-   * @param profile
+   * @param profiles
    * @return
    */
   @PUT
   @Path("_publish")
-  public Response publishPackageSettings(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name);
+  public Response publishPackageSettings(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
+    if (profiles != null)
+      dsPackageMethodeHelper.publish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
     return Response.ok().build();
   }
 
   /**
-   * Delete all methods of the package.
+   * Delete all settings of the package from the listed profiles.
    *
    * @param name
-   * @param profile
+   * @param profiles
    * @return
    */
   @DELETE
   @Path("methods")
   @Deprecated
-  public Response deletePackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name);
+  public Response deletePackageMethods(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
+    if (profiles != null)
+      dsPackageMethodeHelper.unpublish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
     return Response.noContent().build();
   }
 
   /**
-   * Remove package DataSHIELD settings from profile configuration.
+   * Remove package DataSHIELD settings from each profile configuration.
    *
    * @param name
-   * @param profile
+   * @param profiles
    * @return
    */
   @DELETE
   @Path("_publish")
-  public Response deletePackageSettings(@PathParam("name") String name, @QueryParam("profile") String profile) {
-    dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name);
+  public Response deletePackageSettings(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
+    if (profiles != null)
+      dsPackageMethodeHelper.unpublish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
     return Response.noContent().build();
   }
 

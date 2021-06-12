@@ -22,8 +22,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileAddedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.*;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.DataShieldPackagesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
@@ -133,6 +132,12 @@ public class DataShieldAdministrationPresenter
         refreshProfiles(event.getProfile());
       }
     });
+    addRegisteredHandler(DataShieldProfilesUpdatedEvent.getType(), new DataShieldProfilesUpdatedEvent.DataShieldProfilesUpdatedHandler() {
+      @Override
+      public void onDataShieldProfilesUpdated(DataShieldProfilesUpdatedEvent event) {
+        refreshProfiles();
+      }
+    });
   }
 
   @Override
@@ -224,6 +229,7 @@ public class DataShieldAdministrationPresenter
                 boolean selected = selectProfile != null && selectProfile.getName().equals(profile.getName());
                 addToSlot(new ProfilesSlot(profile, clusterMap.get(profile.getCluster()), selected), profilePesenter);
               }
+              fireEvent(new DataShieldProfilesReceivedEvent(profiles));
             }
           }
         })

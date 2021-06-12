@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldPackageMethodsDto;
+import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
@@ -68,6 +70,8 @@ public class DataShieldPackagesPresenter
   private RServerClusterDto cluster;
 
   private List<RPackageDto> packages;
+
+  private List<DataShieldProfileDto> profiles;
 
   @Inject
   public DataShieldPackagesPresenter(Display display, EventBus eventBus,
@@ -155,6 +159,16 @@ public class DataShieldPackagesPresenter
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(publishPackagesConfirmation, translationMessages.publishAllDataShieldSettings(),
                   translationMessages.confirmPublishAllDataShieldSettings(event.getProfile().getName())));
+        }
+      }
+    });
+    addRegisteredHandler(DataShieldProfilesReceivedEvent.getType(), new DataShieldProfilesReceivedEvent.DataShieldProfilesReceivedHandler() {
+      @Override
+      public void onDataShieldProfilesReceived(DataShieldProfilesReceivedEvent event) {
+        profiles = Lists.newArrayList();
+        for (DataShieldProfileDto profile : event.getProfiles()) {
+          if (profile.getCluster().equals(cluster.getName()))
+            profiles.add(profile);
         }
       }
     });
@@ -395,10 +409,11 @@ public class DataShieldPackagesPresenter
 
     @Override
     public void run() {
+      UriBuilder builder = UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create();
+      for (DataShieldProfileDto profile : profiles)
+        builder.query("profile", profile.getName());
       ResourceRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create()
-              .query("profile", cluster.getName())
-              .build(dto.getName()))
+          .forResource(builder.build(dto.getName()))
           .put()
           .withCallback(new ResponseCodeCallback() {
 
@@ -406,7 +421,7 @@ public class DataShieldPackagesPresenter
             public void onResponseCode(Request request, Response response) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if (response.getStatusCode() == SC_OK) {
-                fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
+                fireEvent(new DataShieldProfilesUpdatedEvent(profiles));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
@@ -427,10 +442,11 @@ public class DataShieldPackagesPresenter
 
     @Override
     public void run() {
+      UriBuilder builder = UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create();
+      for (DataShieldProfileDto profile : profiles)
+        builder.query("profile", profile.getName());
       ResourceRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilders.DATASHIELD_PACKAGE_PUBLISH.create()
-              .query("profile", cluster.getName())
-              .build(dto.getName()))
+          .forResource(builder.build(dto.getName()))
           .delete()
           .withCallback(new ResponseCodeCallback() {
 
@@ -438,7 +454,7 @@ public class DataShieldPackagesPresenter
             public void onResponseCode(Request request, Response response) {
               fireEvent(ConfirmationTerminatedEvent.create());
               if (response.getStatusCode() == Response.SC_NO_CONTENT) {
-                fireEvent(new DataShieldPackageUpdatedEvent(cluster.getName(), dto));
+                fireEvent(new DataShieldProfilesUpdatedEvent(profiles));
               } else {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }

@@ -569,7 +569,7 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteAllDataShieldPackages();
 
   @Description("Please confirm that you want to publish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profile <b>{1}</b>.")
+  @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profiles based on the <b>{1}</b> R servers.")
   String confirmPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to publish all packages methods and options message")
@@ -577,7 +577,7 @@ public interface TranslationMessages extends Messages {
   String confirmPublishAllDataShieldSettings(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")
-  @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profile <b>{1}</b>.")
+  @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profiles based on the <b>{1}</b> R servers.")
   String confirmUnPublishDataShieldSettings(String name, String profile);
 
   @Description("Please confirm that you want to unregister this database message")

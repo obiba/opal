@@ -97,7 +97,22 @@ public class DataShieldPackageMethodHelper {
   }
 
   /**
-   * Get the package settings and push them to the config.
+   * Get the package settings and push them to the profiles config.
+   *
+   * @param profiles Profiles expected to be from the same R cluster
+   * @param name     Package name
+   * @return
+   */
+  public DataShield.DataShieldPackageMethodsDto publish(List<RServerProfile> profiles, String name) {
+    List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profiles.get(0), name);
+    DataShield.DataShieldPackageMethodsDto rval = DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).build();
+    for (RServerProfile profile : profiles)
+      rval = publish(profile, packageDtos);
+    return rval;
+  }
+
+  /**
+   * Get the package settings and push them to the profile's config.
    *
    * @param profile
    * @param name    Package name
@@ -105,29 +120,28 @@ public class DataShieldPackageMethodHelper {
    */
   public DataShield.DataShieldPackageMethodsDto publish(RServerProfile profile, String name) {
     List<OpalR.RPackageDto> packageDtos = getDatashieldPackage(profile, name);
-    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
-
-    DataShieldProfile config = (DataShieldProfile) profile;
-    removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
-        .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
-        .map(DSMethod::getName)
-        .collect(Collectors.toList()));
-    addMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList());
-    removeMethods(config, DSMethodType.ASSIGN, config.getEnvironment(DSMethodType.ASSIGN).getMethods().stream()
-        .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
-        .map(DSMethod::getName)
-        .collect(Collectors.toList()));
-    addMethods(config, DSMethodType.ASSIGN, methods.getAssignList());
-    addOptions(config, getPackageROptions(packageDtos));
-    datashieldProfileService.saveProfile(config);
-
-    DataShieldLog.adminLog("Package '{}' config added.", name);
-
-    return methods;
+    return publish(profile, packageDtos);
   }
 
   /**
-   * Remove all the methods associated to the package.
+   * Remove all the methods associated to the package from the profiles settings.
+   *
+   * @param profiles Profiles expected to be from the same R cluster
+   * @param name     Package name
+   */
+  public void unpublish(List<RServerProfile> profiles, String name) {
+    List<OpalR.RPackageDto> packageDtos = null;
+    try {
+      packageDtos = getDatashieldPackage(profiles.get(0), name);
+    } catch (NoSuchRPackageException e) {
+      return;
+    }
+    for (RServerProfile profile : profiles)
+      unpublish(profile, packageDtos);
+  }
+
+  /**
+   * Remove all the methods associated to the package from the profile's settings.
    *
    * @param profile
    * @param name    Package name
@@ -137,9 +151,13 @@ public class DataShieldPackageMethodHelper {
     try {
       packageDtos = getDatashieldPackage(profile, name);
     } catch (NoSuchRPackageException e) {
-      // ignore
+      return;
     }
+    unpublish(profile, packageDtos);
+  }
 
+  private void unpublish(RServerProfile profile, List<OpalR.RPackageDto> packageDtos) {
+    String name = packageDtos.get(0).getName();
     DataShieldProfile config = (DataShieldProfile) profile;
     removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
         .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
@@ -213,6 +231,29 @@ public class DataShieldPackageMethodHelper {
   //
   // Private methods
   //
+
+  private DataShield.DataShieldPackageMethodsDto publish(RServerProfile profile, List<OpalR.RPackageDto> packageDtos) {
+    String name = packageDtos.get(0).getName();
+    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDtos);
+
+    DataShieldProfile config = (DataShieldProfile) profile;
+    removeMethods(config, DSMethodType.AGGREGATE, config.getEnvironment(DSMethodType.AGGREGATE).getMethods().stream()
+        .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
+        .map(DSMethod::getName)
+        .collect(Collectors.toList()));
+    addMethods(config, DSMethodType.AGGREGATE, methods.getAggregateList());
+    removeMethods(config, DSMethodType.ASSIGN, config.getEnvironment(DSMethodType.ASSIGN).getMethods().stream()
+        .filter(m -> m.hasPackage() && ((DefaultDSMethod) m).getPackage().equals(name))
+        .map(DSMethod::getName)
+        .collect(Collectors.toList()));
+    addMethods(config, DSMethodType.ASSIGN, methods.getAssignList());
+    addOptions(config, getPackageROptions(packageDtos));
+    datashieldProfileService.saveProfile(config);
+
+    DataShieldLog.adminLog("Package '{}' config added.", name);
+
+    return methods;
+  }
 
   private void removeMethods(DataShieldProfile config, DSMethodType type, Iterable<String> envMethods) {
     DSEnvironment env = config.getEnvironment(type);
