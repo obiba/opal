@@ -21,6 +21,7 @@ public class DataShieldPermissionConverterTest extends OpalPermissionConverterTe
     testConversion("/", DataShieldPermissionConverter.Permission.DATASHIELD_USE,
         "rest:/datashield/session:*:GET/*",
         "rest:/datashield/env:GET:GET/GET",
+        "rest:/datashield/profiles:GET",
         "rest:/service/r/workspaces:GET",
         "rest:/service/r/workspaces:DELETE");
   }
