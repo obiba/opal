@@ -39,6 +39,7 @@ public class RPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         return Lists.newArrayList(toRest("/r/session", "*:GET/*"),
+            toRest("/r/profiles", "GET"),
             toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"));
       }

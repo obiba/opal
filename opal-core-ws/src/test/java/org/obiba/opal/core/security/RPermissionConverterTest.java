@@ -20,6 +20,7 @@ public class RPermissionConverterTest extends OpalPermissionConverterTest<RPermi
   public void testRUse() {
     testConversion("/", RPermissionConverter.Permission.R_USE,
         "rest:/r/session:*:GET/*",
+        "rest:/r/profiles:GET",
         "rest:/service/r/workspaces:GET",
         "rest:/service/r/workspaces:DELETE");
   }

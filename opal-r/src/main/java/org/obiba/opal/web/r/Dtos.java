@@ -37,6 +37,15 @@ public class Dtos {
   private Dtos() {
   }
 
+  public static OpalR.RProfileDto asProfileDto(RServerCluster cluster) {
+    return OpalR.RProfileDto.newBuilder()
+        .setName(cluster.getName())
+        .setEnabled(true)
+        .setRestrictedAccess(false)
+        .build();
+  }
+
+
   public static OpalR.RServerClusterDto asDto(RServerCluster cluster) {
     return OpalR.RServerClusterDto.newBuilder()
         .setName(cluster.getName())
