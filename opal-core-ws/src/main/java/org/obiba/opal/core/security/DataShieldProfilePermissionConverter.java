@@ -43,6 +43,7 @@ public class DataShieldProfilePermissionConverter extends OpalPermissionConverte
         String[] args = args(node, "/datashield/profile/(.+)");
         return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),
             toRest("/datashield/env", "GET:GET/GET"),
+            toRest("/datashield/profiles", "GET"),
             toRest("/service/r/workspaces", "GET"),
             toRest("/service/r/workspaces", "DELETE"),
             toRest("/datashield/profile/{0}", "GET:GET/GET", args));

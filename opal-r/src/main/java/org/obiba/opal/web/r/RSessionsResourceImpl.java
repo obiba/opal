@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
@@ -37,6 +38,9 @@ import java.util.stream.Collectors;
 public class RSessionsResourceImpl implements RSessionsResource {
 
   static final String R_CONTEXT = "R";
+
+  @Autowired
+  private RServerManagerService rServerManagerService;
 
   protected OpalRSessionManager opalRSessionManager;
 
@@ -72,6 +76,8 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   protected RServerProfile createProfile(String profileName) {
+    if (Strings.isNullOrEmpty(profileName))
+      return rServerManagerService.getDefaultRServerProfile();
     return new DefaultRServerProfile(profileName);
   }
 

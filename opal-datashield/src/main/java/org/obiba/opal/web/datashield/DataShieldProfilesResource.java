@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -39,9 +36,10 @@ public class DataShieldProfilesResource {
   private DataShieldProfileService datashieldProfileService;
 
   @GET
-  public List<DataShield.DataShieldProfileDto> getProfiles() {
+  public List<DataShield.DataShieldProfileDto> getProfiles(@QueryParam("enabled") Boolean enabled) {
     return datashieldProfileService.getProfiles().stream()
         .filter(this::canAccessProfile)
+        .filter(p -> enabled == null || (enabled && p.isEnabled()) || (!enabled && !p.isEnabled()))
         .map(Dtos::asDto)
         .collect(Collectors.toList());
   }
@@ -69,6 +67,9 @@ public class DataShieldProfilesResource {
   }
 
   private boolean canAccessProfile(DataShieldProfile profile) {
+    // regular users cannot see disabled profiles
+    if (!profile.isEnabled() && !SecurityUtils.getSubject().isPermitted("rest:/datashield/profiles:POST"))
+      return false;
     if (!profile.isRestrictedAccess()) return true;
     return SecurityUtils.getSubject().isPermitted(String.format("rest:/datashield/profile/%s:GET", profile.getName()));
   }

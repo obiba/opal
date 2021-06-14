@@ -21,6 +21,7 @@ public class DataShieldProfilePermissionConverterTest extends OpalPermissionConv
     testConversion("/datashield/profile/pwel", DataShieldProfilePermissionConverter.Permission.DATASHIELD_PROFILE_USE,
         "rest:/datashield/session:*:GET/*",
         "rest:/datashield/env:GET:GET/GET",
+        "rest:/datashield/profiles:GET",
         "rest:/service/r/workspaces:GET",
         "rest:/service/r/workspaces:DELETE",
         "rest:/datashield/profile/pwel:GET:GET/GET");

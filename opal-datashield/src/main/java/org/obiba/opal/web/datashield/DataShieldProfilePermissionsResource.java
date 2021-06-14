@@ -14,6 +14,7 @@ import com.google.common.collect.Iterables;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.security.DataShieldProfilePermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
@@ -53,11 +54,14 @@ public class DataShieldProfilePermissionsResource extends AbstractPermissionsRes
     // make sure profile exists
     checkProfileExists();
     setPermission(principals, type, permission.name());
+    DataShieldProfile profile = datashieldProfileService.findProfile(name);
+    profile.setRestrictedAccess(true);
+    datashieldProfileService.saveProfile(profile);
     return Response.ok().build();
   }
 
   @DELETE
-  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
+  public Response deletePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
                                          @QueryParam("principal") List<String> principals) {
 
     // make sure profile exists
