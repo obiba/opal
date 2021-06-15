@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface DataShieldPackageInstallModalUiHandlers extends ModalUiHandlers {
-  void installPackage();
+
+  void installPackage(String name, String ref);
 
 }

@@ -103,12 +103,7 @@ public class DataShieldPackageInstallModalView extends ModalPopupViewWithUiHandl
 
   @UiHandler("installButton")
   public void onInstallButton(ClickEvent event) {
-    getUiHandlers().installPackage();
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name.setText(name != null ? name : "");
+    getUiHandlers().installPackage(getName().getText(), reference.getText());
   }
 
   @Override
@@ -123,11 +118,6 @@ public class DataShieldPackageInstallModalView extends ModalPopupViewWithUiHandl
       public void setText(String text) {
       }
     };
-  }
-
-  @Override
-  public HasText getReference() {
-    return reference;
   }
 
   @Override

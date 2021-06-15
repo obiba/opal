@@ -122,6 +122,14 @@ public interface RServerService {
   void installBioconductorPackage(String name) throws RServerException;
 
   /**
+   * Install a local R package archive file.
+   *
+   * @param path
+   * @throws RServerException
+   */
+  void installLocalPackage(String path) throws RServerException;
+
+  /**
    * Try to update all CRAN packages.
    */
   void updateAllCRANPackages() throws RServerException;

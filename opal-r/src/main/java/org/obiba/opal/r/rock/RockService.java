@@ -22,7 +22,9 @@ import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.InstallLocalPackageOperation;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
@@ -66,6 +68,8 @@ public class RockService implements RServerService {
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
+  private final OpalRuntime opalRuntime;
+
   private final EventBus eventBus;
 
   private final AppsService appsService;
@@ -89,8 +93,9 @@ public class RockService implements RServerService {
   private String userPassword;
 
   @Autowired
-  public RockService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, AppsService appsService) {
+  public RockService(TransactionalThreadFactory transactionalThreadFactory, OpalRuntime opalRuntime, EventBus eventBus, AppsService appsService) {
     this.transactionalThreadFactory = transactionalThreadFactory;
+    this.opalRuntime = opalRuntime;
     this.eventBus = eventBus;
     this.appsService = appsService;
   }
@@ -275,6 +280,12 @@ public class RockService implements RServerService {
     params.put("name", name);
     params.put("manager", "bioconductor");
     installPackage(params);
+  }
+
+  @Override
+  public void installLocalPackage(String path) throws RServerException {
+    InstallLocalPackageOperation rop = new InstallLocalPackageOperation(opalRuntime.getFileSystem().resolveLocalFile(path));
+    execute(rop);
   }
 
   @Override

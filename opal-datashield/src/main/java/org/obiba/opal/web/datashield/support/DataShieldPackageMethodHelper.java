@@ -221,11 +221,13 @@ public class DataShieldPackageMethodHelper {
     return methodDtos;
   }
 
-  public void installDatashieldPackage(RServerProfile profile, String name, String ref) {
-    if (Strings.isNullOrEmpty(ref))
+  public void installDatashieldPackage(RServerProfile profile, String name, String ref, String manager) {
+    if (Strings.isNullOrEmpty(manager) || "cran".equalsIgnoreCase(manager))
       rPackageHelper.installCRANPackage(rServerManagerService.getRServer(profile.getCluster()), name);
-    else
+    else if ("gh".equalsIgnoreCase(manager) || "github".equalsIgnoreCase(manager))
       rPackageHelper.installGitHubPackage(rServerManagerService.getRServer(profile.getCluster()), name, ref);
+    else if ("local".equalsIgnoreCase(manager))
+      rPackageHelper.installLocalPackage(rServerManagerService.getRServer(profile.getCluster()), name);
   }
 
   //

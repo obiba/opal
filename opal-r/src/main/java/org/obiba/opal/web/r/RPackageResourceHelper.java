@@ -73,6 +73,8 @@ public class RPackageResourceHelper {
       installGitHubPackage(service, name, ref);
     else if ("bioc".equalsIgnoreCase(manager) || "bioconductor".equalsIgnoreCase(manager))
       installBioconductorPackage(service, name);
+    else if ("local".equalsIgnoreCase(manager))
+      installLocalPackage(service, name);
   }
 
   /**
@@ -118,6 +120,20 @@ public class RPackageResourceHelper {
       service.installBioconductorPackage(name);
     } catch (Exception e) {
       log.warn("Failed to install the R package from Bioconductor: {}", name, e);
+    }
+  }
+
+  /**
+   * Install a local R package archive file.
+   *
+   * @param service
+   * @param path
+   */
+  public void installLocalPackage(RServerService service, String path) {
+    try {
+      service.installLocalPackage(path);
+    } catch (Exception e) {
+      log.warn("Failed to install the R package from path: {}", path, e);
     }
   }
 

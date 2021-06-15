@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Manages Datashield packages.
@@ -45,18 +46,17 @@ public class DataShieldPackagesResource {
 
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
-                                 @QueryParam("ref") String ref, @QueryParam("profile") String profile) {
+                                 @QueryParam("ref") String ref, @QueryParam("manager") String manager, @QueryParam("profile") String profile) {
     DataShieldProfile dsProfile = getDataShieldProfile(profile);
-    dsPackageMethodeHelper.installDatashieldPackage(dsProfile, name, ref);
+    List<String> originalPkgNames = getPackages(profile).stream()
+        .map(OpalR.RPackageDto::getName)
+        .collect(Collectors.toList());
+    dsPackageMethodeHelper.installDatashieldPackage(dsProfile, name, ref, manager);
 
-    // install or re-install all known datashield package methods
-    List<OpalR.RPackageDto> pkgs = getPackages(profile);
-    for (OpalR.RPackageDto pkg : pkgs) {
-      dsPackageMethodeHelper.publish(dsProfile, pkg.getName());
-    }
-    // make sure last is the one we install (check it is a "datashield" package first)
-    if (getPackages(profile).stream().anyMatch(p -> p.getName().equals(name)))
-      dsPackageMethodeHelper.publish(dsProfile, name);
+    // publish settings of new package(s)
+    getPackages(profile).stream()
+        .filter(p -> !originalPkgNames.contains(p.getName()))
+        .forEach(p -> dsPackageMethodeHelper.publish(dsProfile, p.getName()));
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
     return Response.created(ub.build(name)).build();
@@ -105,4 +105,5 @@ public class DataShieldPackagesResource {
   private DataShieldProfile getDataShieldProfile(String profileName) {
     return datashieldProfileService.getProfile(profileName);
   }
+
 }

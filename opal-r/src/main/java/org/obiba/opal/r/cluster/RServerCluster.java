@@ -290,6 +290,23 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
+  public void installLocalPackage(String path) {
+    // syntax is /some/path/pkgName_xxx.tar.gz
+    String[] segments = path.split("/");
+    String[] tokens = segments[segments.length - 1].split("_");
+    String pkgName = tokens[0];
+    invokeAll(rServerServices.stream().map(service -> (Callable<Void>) () -> {
+      try {
+        service.installLocalPackage(path);
+      } catch (RServerException e) {
+        log.warn("Failed to install R package from local R package archive on {}: {}", service.getName(), path, e);
+      }
+      return null;
+    }).collect(Collectors.toList()));
+    eventBus.post(new RPackageInstalledEvent(getName(), pkgName));
+  }
+
+  @Override
   public void updateAllCRANPackages() {
     invokeAll(rServerServices.stream().map(service -> (Callable<Void>) () -> {
       try {

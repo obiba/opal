@@ -15,7 +15,9 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.InstallLocalPackageOperation;
 import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
@@ -77,6 +79,9 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Autowired
   private TransactionalThreadFactory transactionalThreadFactory;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   @Autowired
   private EventBus eventBus;
@@ -249,6 +254,12 @@ public class RserveService implements RServerService, ROperationTemplate {
   public void installBioconductorPackage(String name) {
     ensureCRANPackage("BiocManager");
     execute(String.format("BiocManager::install('%s', ask = FALSE)", name));
+  }
+
+  @Override
+  public void installLocalPackage(String path) throws RServerException {
+    InstallLocalPackageOperation rop = new InstallLocalPackageOperation(opalRuntime.getFileSystem().resolveLocalFile(path));
+    execute(rop);
   }
 
   @Override

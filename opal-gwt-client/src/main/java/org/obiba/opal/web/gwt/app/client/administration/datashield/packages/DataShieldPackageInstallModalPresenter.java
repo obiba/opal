@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 
+import com.google.common.base.Strings;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -69,14 +70,14 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
   }
 
   @Override
-  public void installPackage() {
+  public void installPackage(final String name, final String ref) {
     if (packageValidationHandler.validate()) {
       getView().setInProgress(true);
-      ResponseCodeCallback createCallback = new CreatePackageCallBack();
+      ResponseCodeCallback createCallback = new CreatePackageCallBack(name, ref);
       ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
-          .forResource(packageR(getView().getName().getText()))
+          .forResource(packageR(name))
           .get()
-          .withCallback(new AlreadyExistMethodCallBack())
+          .withCallback(new AlreadyExistPackageCallBack())
           .withCallback(Response.SC_NOT_FOUND, createCallback).send();
     }
   }
@@ -104,7 +105,7 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
 
   }
 
-  private class AlreadyExistMethodCallBack implements ResourceCallback<RPackageDto> {
+  private class AlreadyExistPackageCallBack implements ResourceCallback<RPackageDto> {
 
     @Override
     public void onResource(Response response, RPackageDto resource) {
@@ -118,9 +119,18 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
 
     private HandlerRegistration unhandledExceptionHandler;
 
+    private final String name;
+
+    private final String ref;
+
+    private CreatePackageCallBack(String name, String ref) {
+      this.name = name;
+      this.ref = ref;
+    }
+
     @Override
     public void onResponseCode(Request request, Response response) {
-      postMethod(getDataShieldPackageDto());
+      postMethod(getDataShieldPackageDto(name));
     }
 
     private void postMethod(RPackageDto dto) {
@@ -137,42 +147,30 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
           });
 
       ResponseCodeCallback callbackHandler = new CreateOrUpdatePackageCallBack(dto);
-
-      if (getView().getReference().getText().isEmpty()) {
-        ResourceRequestBuilderFactory.newBuilder().forResource(packagesR(getView().getName().getText())).post()
-            .withResourceBody(RPackageDto.stringify(dto))
-            .withCallback(Response.SC_OK, callbackHandler)
-            .withCallback(Response.SC_NOT_FOUND, callbackHandler)
-            .withCallback(Response.SC_CREATED, callbackHandler).send();
-      } else {
-        ResourceRequestBuilderFactory.newBuilder()
-            .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()
-            .withResourceBody(RPackageDto.stringify(dto))
-            .withCallback(Response.SC_OK, callbackHandler)
-            .withCallback(Response.SC_CREATED, callbackHandler)
-            .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-      }
-    }
-
-    private String packagesR(String name) {
-      return UriBuilder.create().segment("datashield", "packages")
-          .query("name", name)
-          .query("profile", cluster.getName())
-          .build(name);
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(packagesR(name, ref)).post()
+          .withResourceBody(RPackageDto.stringify(dto))
+          .withCallback(Response.SC_OK, callbackHandler)
+          .withCallback(Response.SC_CREATED, callbackHandler)
+          .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
     }
 
     private String packagesR(String name, String reference) {
-      return UriBuilder.create().segment("datashield", "packages")
+      UriBuilder builder = UriBuilder.create().segment("datashield", "packages")
           .query("name", name)
-          .query("ref", reference)
-          .query("profile", cluster.getName())
-          .build(name, reference);
+          .query("profile", cluster.getName());
+      if (Strings.isNullOrEmpty(reference))
+        return builder.query("manager", "cran").build();
+      else
+        return builder
+            .query("ref", reference)
+            .query("manager", "github")
+            .build();
     }
 
-    private RPackageDto getDataShieldPackageDto() {
+    private RPackageDto getDataShieldPackageDto(String name) {
       RPackageDto dto = RPackageDto.create();
-      dto.setName(getView().getName().getText());
-
+      dto.setName(name);
       return dto;
     }
   }
@@ -205,11 +203,7 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
 
     void hideDialog();
 
-    void setName(String name);
-
     HasText getName();
-
-    HasText getReference();
 
     void clear();
 
