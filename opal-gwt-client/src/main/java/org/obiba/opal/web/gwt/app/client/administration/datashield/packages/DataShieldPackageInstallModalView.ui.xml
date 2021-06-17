@@ -16,42 +16,83 @@
 
     <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
 
-        <g:FlowPanel>
+        <b:ControlGroup>
+            <b:ControlLabel>
+                <ui:msg description="R package repository label">Repository</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <o:Chooser name="hour" ui:field="repository"/>
+            </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="R package repository description">R package repository or manager.
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+
+        <g:FlowPanel ui:field="cranPanel">
             <b:RadioButton name="pkg" ui:field="allPkg">
-                <ui:msg description="Install all Datashield Packages label">Install all DataSHIELD packages</ui:msg>
+                <ui:msg description="Install base Datashield Packages label">Install base DataSHIELD packages</ui:msg>
             </b:RadioButton>
             <b:RadioButton name="pkg" ui:field="namedPkg">
                 <ui:msg description="Install specific Datashield Package label">Install a specific DataSHIELD package
                 </ui:msg>
             </b:RadioButton>
             <g:FlowPanel addStyleNames="indent">
-                <b:TextBox ui:field="name" enabled="false"/>
-                <b:HelpBlock>
-                    <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be
-                        installed with its dependencies
-                        on the R server. When installing a Git reference, the name can be fully qualified, i.e. prefixed
-                        with the
-                        GitHub user/organization name (default is "datashield"), for example "someUser/somePackage".
-                    </ui:msg>
-                </b:HelpBlock>
+                <b:ControlGroup ui:field="cranNameGroup">
+                    <b:ControlLabel>
+                        <ui:msg description="R package name label">Name</ui:msg>
+                    </b:ControlLabel>
+                    <b:Controls>
+                        <b:TextBox ui:field="cranName"/>
+                    </b:Controls>
+                    <b:HelpBlock>
+                        <ui:msg description="Github R package name description">Name of the R package to be installed with its dependencies
+                            on the R server.
+                        </ui:msg>
+                    </b:HelpBlock>
+                </b:ControlGroup>
             </g:FlowPanel>
         </g:FlowPanel>
 
-        <o:CollapsiblePanel>
-            <b:ControlGroup>
+        <g:FlowPanel ui:field="ghPanel" visible="false">
+            <b:ControlGroup ui:field="ghOrgGroup">
+                <b:ControlLabel>
+                    <ui:msg description="Github organization label">User or organization name</ui:msg>
+                </b:ControlLabel>
+                <b:Controls>
+                    <b:TextBox ui:field="ghOrg"/>
+                </b:Controls>
+                <b:HelpBlock>
+                    <ui:msg description="Github Organization description">Name of the GitHub user or organization owning the R package code repository.
+                    </ui:msg>
+                </b:HelpBlock>
+            </b:ControlGroup>
+
+            <b:ControlGroup ui:field="ghNameGroup">
+                <b:ControlLabel>
+                    <ui:msg description="Github R package name label">Name</ui:msg>
+                </b:ControlLabel>
+                <b:Controls>
+                    <b:TextBox ui:field="ghName"/>
+                </b:Controls>
+                <b:HelpBlock>
+                    <ui:msg description="R package name description">Name of the R package code repository.
+                    </ui:msg>
+                </b:HelpBlock>
+            </b:ControlGroup>
+
+            <b:ControlGroup ui:field="gitRefGroup">
                 <b:ControlLabel>
                     <ui:msg description="Git reference label">Git reference</ui:msg>
                 </b:ControlLabel>
                 <b:Controls>
-                    <b:TextBox name="reference" ui:field="reference"/>
+                    <b:TextBox ui:field="reference" placeholder="master"/>
                 </b:Controls>
                 <b:HelpBlock>
-                    <ui:msg description="Git reference description">Could be a commit, tag, or branch name on
-                        <a href="https://github.com/datashield" target="_blank">DataSHIELD source</a>
-                    </ui:msg>
+                    <ui:msg description="Github reference description">Optional commit, tag, or branch name in the GitHub repository (default is master).</ui:msg>
                 </b:HelpBlock>
             </b:ControlGroup>
-        </o:CollapsiblePanel>
+        </g:FlowPanel>
 
         <b:ModalFooter>
             <b:Button ui:field="installButton" type="PRIMARY">

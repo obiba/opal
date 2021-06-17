@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.packages;
 import com.google.common.base.Strings;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -22,9 +21,6 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -33,13 +29,8 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget<DataShieldPackageInstallModalPresenter.Display>
     implements DataShieldPackageInstallModalUiHandlers {
-
-  private PackageValidationHandler packageValidationHandler;
 
   private RServerClusterDto cluster;
 
@@ -51,11 +42,6 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
 
   public void setCluster(RServerClusterDto cluster) {
     this.cluster = cluster;
-  }
-
-  @Override
-  protected void onBind() {
-    packageValidationHandler = new PackageValidationHandler(getEventBus());
   }
 
   /**
@@ -70,39 +56,27 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
   }
 
   @Override
-  public void installPackage(final String name, final String ref) {
-    if (packageValidationHandler.validate()) {
-      getView().setInProgress(true);
-      ResponseCodeCallback createCallback = new CreatePackageCallBack(name, ref);
-      ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
-          .forResource(packageR(name))
-          .get()
-          .withCallback(new AlreadyExistPackageCallBack())
-          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
-    }
+  public void installCRANPackage(String name) {
+    doInstallPackage(name, "");
+  }
+
+  @Override
+  public void installGithubPackage(String name, String ref) {
+    doInstallPackage(name, Strings.isNullOrEmpty(ref.trim()) ? "master" : ref.trim());
   }
 
   //
   // Inner classes and interfaces
   //
 
-  private class PackageValidationHandler extends AbstractValidationHandler {
-
-    PackageValidationHandler(EventBus eventBus) {
-      super(eventBus);
-    }
-
-    private Set<FieldValidator> validators;
-
-    @Override
-    protected Set<FieldValidator> getValidators() {
-      if (validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getName(), "DataShieldPackageNameIsRequired"));
-      }
-      return validators;
-    }
-
+  private void doInstallPackage(String name, String ref) {
+    getView().setInProgress(true);
+    ResponseCodeCallback createCallback = new CreatePackageCallBack(name, ref);
+    ResourceRequestBuilderFactory.<RPackageDto>newBuilder()
+        .forResource(packageR(name))
+        .get()
+        .withCallback(new AlreadyExistPackageCallBack())
+        .withCallback(Response.SC_NOT_FOUND, createCallback).send();
   }
 
   private class AlreadyExistPackageCallBack implements ResourceCallback<RPackageDto> {
@@ -202,8 +176,6 @@ public class DataShieldPackageInstallModalPresenter extends ModalPresenterWidget
     String DATASHIELD_ALL_PKG = "datashield";
 
     void hideDialog();
-
-    HasText getName();
 
     void clear();
 

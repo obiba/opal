@@ -14,6 +14,8 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface DataShieldPackageInstallModalUiHandlers extends ModalUiHandlers {
 
-  void installPackage(String name, String ref);
+  void installCRANPackage(String name);
+
+  void installGithubPackage(String name, String ref);
 
 }

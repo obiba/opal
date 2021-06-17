@@ -38,7 +38,7 @@
                     <b:TextBox ui:field="cranName"/>
                 </b:Controls>
                 <b:HelpBlock>
-                    <ui:msg description="Github R package name description">Name of the R package to be installed with its dependencies
+                    <ui:msg description="CRAN R package name description">Name of the R package to be installed with its dependencies
                         on the R server.
                     </ui:msg>
                 </b:HelpBlock>

@@ -32,12 +32,12 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.identifier
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabaseView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.DataShieldAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.*;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileModalView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.DataShieldProfileView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.*;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.packages.*;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.*;
@@ -63,9 +63,12 @@ import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresent
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RPackageInstallModalView;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsView;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesView;
 import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.profiles.RClusterView;
-import org.obiba.opal.web.gwt.app.client.administration.r.list.*;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;

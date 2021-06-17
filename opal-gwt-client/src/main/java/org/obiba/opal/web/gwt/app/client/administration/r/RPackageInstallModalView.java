@@ -123,7 +123,7 @@ public class RPackageInstallModalView extends ModalPopupViewWithUiHandlers<RPack
           dialog.addAlert(translations.userMessageMap().get("NameIsRequired"), AlertType.ERROR, cranNameGroup);
           return;
         }
-        getUiHandlers().installPackage(cranName.getText());
+        getUiHandlers().installCRANPackage(cranName.getText());
         break;
       case GITHUB_REPO:
         boolean hasError = false;

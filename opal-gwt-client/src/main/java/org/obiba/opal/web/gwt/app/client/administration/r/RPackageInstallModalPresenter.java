@@ -36,7 +36,7 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
   }
 
   @Override
-  public void installPackage(String name) {
+  public void installCRANPackage(String name) {
     doInstallPackage(name, null, "cran");
   }
 
