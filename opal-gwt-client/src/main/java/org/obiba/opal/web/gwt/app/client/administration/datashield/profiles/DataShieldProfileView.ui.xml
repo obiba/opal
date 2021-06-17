@@ -65,12 +65,12 @@
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
             <b:Paragraph>
-                <ui:msg description="DS Profile reload description">Reset the DataSHIELD profile settings as they were
-                    originally defined by the installed DataSHIELD packages description.
+                <ui:msg description="DS Profile reload description">
+                    Reset the DataSHIELD profile settings with some selected DataSHIELD packages.
                 </ui:msg>
             </b:Paragraph>
-            <b:Button ui:field="resetProfile" icon="REFRESH" type="INFO">
-                <ui:msg description="DS Profile reset label">Reset</ui:msg>
+            <b:Button ui:field="initProfile" icon="REFRESH" type="INFO">
+                <ui:msg description="DS Profile init label">Initialize</ui:msg>
             </b:Button>
         </g:FlowPanel>
 

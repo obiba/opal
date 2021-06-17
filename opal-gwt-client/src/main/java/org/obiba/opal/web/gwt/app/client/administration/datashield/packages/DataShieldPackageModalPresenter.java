@@ -27,10 +27,6 @@ public class DataShieldPackageModalPresenter extends ModalPresenterWidget<DataSh
     getView().setUiHandlers(this);
   }
 
-  @Override
-  protected void onBind() {
-  }
-
   public void displayPackage(RPackageDto dto) {
     JsArray<EntryDto> entries = dto.getDescriptionArray();
 

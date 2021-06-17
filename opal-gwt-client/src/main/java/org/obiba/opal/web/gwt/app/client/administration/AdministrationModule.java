@@ -204,6 +204,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         DataShieldPackageInstallModalView.class);
     bindPresenterWidget(DataShieldPackageModalPresenter.class, DataShieldPackageModalPresenter.Display.class,
         DataShieldPackageModalView.class);
+    bindPresenterWidget(DataShieldPackagesPublishModalPresenter.class, DataShieldPackagesPublishModalPresenter.Display.class,
+        DataShieldPackagesPublishModalView.class);
     bindPresenterWidget(DataShieldMethodModalPresenter.class, DataShieldMethodModalPresenter.Display.class,
         DataShieldMethodModalView.class);
     bindPresenterWidget(DataShieldROptionsPresenter.class, DataShieldROptionsPresenter.Display.class,

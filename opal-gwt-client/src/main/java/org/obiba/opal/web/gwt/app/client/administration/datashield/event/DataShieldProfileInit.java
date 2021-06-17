@@ -15,7 +15,7 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
 import org.obiba.opal.web.model.client.datashield.DataShieldProfileDto;
 
 @GenEvent
-public class DataShieldProfileReset {
+public class DataShieldProfileInit {
 
   DataShieldProfileDto profile;
 

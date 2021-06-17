@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
@@ -72,7 +73,9 @@ public class DataShieldPackagesResource {
   @PUT
   @Path("_publish")
   public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
-    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(getDataShieldProfile(profile), name));
+    DataShieldProfile profileObj = getDataShieldProfile(profile);
+    profileObj.clear();
+    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profileObj, name));
     return Response.ok().build();
   }
 

@@ -18,7 +18,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileResetEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldProfileInitEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldMethodsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.profiles.config.DataShieldROptionsPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -101,8 +101,8 @@ public class DataShieldProfilePresenter
   }
 
   @Override
-  public void onProfileReset() {
-    fireEvent(new DataShieldProfileResetEvent(profile));
+  public void onProfileInitialize() {
+    fireEvent(new DataShieldProfileInitEvent(profile));
   }
 
   public void initialize(DataShieldProfileDto profile, RServerClusterDto cluster) {

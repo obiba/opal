@@ -73,7 +73,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   SimplePanel permissionsPanel;
 
   @UiField
-  Button resetProfile;
+  Button initProfile;
 
   @UiField
   SimplePanel aggregatePanel;
@@ -106,7 +106,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
     }
     clusterNotice.setVisible(true);
     deleteProfile.setVisible(cluster == null || !profile.getName().equals(profile.getCluster()));
-    resetProfile.setEnabled(cluster != null);
+    initProfile.setEnabled(cluster != null);
     if (profile.getEnabled()) {
       statusIcon.removeStyleName("status-error");
       statusIcon.addStyleName("status-success");
@@ -159,9 +159,9 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
     getUiHandlers().onProfileDelete();
   }
 
-  @UiHandler("resetProfile")
-  void onProfileReset(ClickEvent event) {
-    getUiHandlers().onProfileReset();
+  @UiHandler("initProfile")
+  void onProfileInit(ClickEvent event) {
+    getUiHandlers().onProfileInitialize();
   }
 
   @UiHandler("enableProfile")

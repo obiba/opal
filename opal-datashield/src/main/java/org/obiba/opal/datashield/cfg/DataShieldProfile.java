@@ -79,6 +79,11 @@ public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUn
     this.cluster = cluster;
   }
 
+  public void clear() {
+    environments.clear();
+    options.clear();
+  }
+
   @Override
   public String getCluster() {
     return cluster;

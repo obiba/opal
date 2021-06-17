@@ -769,7 +769,7 @@ public interface Translations extends Constants {
       "ResourceAssignFailed", "Resource assignment in R has failed: ",
       "SQLError", "{0}",
       "FolderCreated", "Folder created: {0}",
-      "DataShieldProfileReset", "DataSHIELD profile {0} reinitialized."
+      "DataShieldProfileInit", "DataSHIELD profile {0} initialized."
   })
   Map<String, String> userMessageMap();
 
@@ -1288,6 +1288,10 @@ public interface Translations extends Constants {
   @Description("Package description label")
   @DefaultStringValue("Package Description")
   String dataShieldPackageDescription();
+
+  @Description("DS Profile init title")
+  @DefaultStringValue("Profile Initialization")
+  String dataShieldProfileInitTitle();
 
   @Description("Add DataShield package label")
   @DefaultStringValue("Add DataSHIELD Package")

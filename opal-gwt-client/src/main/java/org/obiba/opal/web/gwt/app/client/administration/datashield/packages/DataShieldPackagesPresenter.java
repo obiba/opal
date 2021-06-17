@@ -57,6 +57,8 @@ public class DataShieldPackagesPresenter
 
   private final ModalProvider<DataShieldPackageModalPresenter> packageModalPresenterProvider;
 
+  private final ModalProvider<DataShieldPackagesPublishModalPresenter> packagesPublishModalPresenterProvider;
+
   private final TranslationMessages translationMessages;
 
   private Runnable removePackagesConfirmation;
@@ -77,12 +79,14 @@ public class DataShieldPackagesPresenter
   public DataShieldPackagesPresenter(Display display, EventBus eventBus,
                                      ModalProvider<DataShieldPackageInstallModalPresenter> packageInstallModalPresenterProvider,
                                      ModalProvider<DataShieldPackageModalPresenter> packageModalPresenterProvider,
+                                     ModalProvider<DataShieldPackagesPublishModalPresenter> packagesPublishModalPresenterProvider,
                                      TranslationMessages translationMessages) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.translationMessages = translationMessages;
     this.packageInstallModalPresenterProvider = packageInstallModalPresenterProvider.setContainer(this);
     this.packageModalPresenterProvider = packageModalPresenterProvider.setContainer(this);
+    this.packagesPublishModalPresenterProvider = packagesPublishModalPresenterProvider.setContainer(this);
   }
 
   @Override
@@ -128,37 +132,12 @@ public class DataShieldPackagesPresenter
               updateDataShieldPackages();
           }
         });
-    addRegisteredHandler(DataShieldProfileResetEvent.getType(), new DataShieldProfileResetEvent.DataShieldProfileResetHandler() {
+    addRegisteredHandler(DataShieldProfileInitEvent.getType(), new DataShieldProfileInitEvent.DataShieldProfileInitHandler() {
       @Override
-      public void onDataShieldProfileReset(final DataShieldProfileResetEvent event) {
+      public void onDataShieldProfileInit(final DataShieldProfileInitEvent event) {
         if (event.getProfile().getCluster().equals(cluster.getName()) && packages != null && !packages.isEmpty()) {
-          publishPackagesConfirmation = new Runnable() {
-            @Override
-            public void run() {
-              UriBuilder builder = UriBuilders.DATASHIELD_PACKAGES_PUBLISH.create();
-              Set<String> pkgNames = Sets.newHashSet();
-              for (final RPackageDto pkg : packages)
-                pkgNames.add(pkg.getName());
-              for (String name : pkgNames)
-                builder.query("name", name);
-              builder.query("profile", event.getProfile().getName());
-
-              ResourceRequestBuilderFactory.<DataShieldPackageMethodsDto>newBuilder()
-                  .forResource(builder.build())
-                  .put()
-                  .withCallback(new ResponseCodeCallback() {
-                    @Override
-                    public void onResponseCode(Request request, Response response) {
-                      fireEvent(NotificationEvent.newBuilder().info("DataShieldProfileReset").args(event.getProfile().getName()).build());
-                      fireEvent(new DataShieldProfileUpdatedEvent(event.getProfile()));
-                      fireEvent(ConfirmationTerminatedEvent.create());
-                    }
-                  }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR).send();
-            }
-          };
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(publishPackagesConfirmation, translationMessages.publishAllDataShieldSettings(),
-                  translationMessages.confirmPublishAllDataShieldSettings(event.getProfile().getName())));
+          DataShieldPackagesPublishModalPresenter presenter = packagesPublishModalPresenterProvider.get();
+          presenter.initialize(packages, event.getProfile());
         }
       }
     });

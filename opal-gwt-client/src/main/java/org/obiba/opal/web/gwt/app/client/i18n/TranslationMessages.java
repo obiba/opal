@@ -17,7 +17,7 @@ import com.google.gwt.i18n.client.Messages;
  * in the {@code com.google.gwt.i18n.client} package.
  */
 @LocalizableResource.GenerateKeys
-@LocalizableResource.Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
+@LocalizableResource.Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = {"default"})
 public interface TranslationMessages extends Messages {
 
   @Description("Existing derived category not mapped label")
@@ -180,10 +180,6 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Publish Package Settings")
   String publishDataShieldSettings();
 
-  @Description("Publish Packages Settings label")
-  @DefaultMessage("Reset Settings")
-  String publishAllDataShieldSettings();
-
   @Description("UnPublish Package Settings label")
   @DefaultMessage("Unpublish Package Settings")
   String unPublishDataShieldSettings();
@@ -276,42 +272,42 @@ public interface TranslationMessages extends Messages {
 
   @Description("Vocabulary count label")
   @DefaultMessage("{0} vocabularies")
-  @AlternateMessage({ "=0", "No vocabularies", "one", "1 vocabulary" })
+  @AlternateMessage({"=0", "No vocabularies", "one", "1 vocabulary"})
   String vocabularyCount(@PluralCount int count);
 
   @Description("Term count label")
   @DefaultMessage("{0} terms")
-  @AlternateMessage({ "=0", "No terms", "one", "1 term" })
+  @AlternateMessage({"=0", "No terms", "one", "1 term"})
   String termCount(@PluralCount int count);
 
   @Description("Table count label")
   @DefaultMessage("{0} tables")
-  @AlternateMessage({ "=0", "No tables", "one", "1 table" })
+  @AlternateMessage({"=0", "No tables", "one", "1 table"})
   String tableCount(@PluralCount int count);
 
   @Description("Table count label")
   @DefaultMessage("{0} VCFs")
-  @AlternateMessage({ "=0", "No VCF file", "one", "1 VCF file" })
+  @AlternateMessage({"=0", "No VCF file", "one", "1 VCF file"})
   String vcfFilesCount(@PluralCount int count);
 
   @Description("Variable count label")
   @DefaultMessage("{0} variables")
-  @AlternateMessage({ "=0", "No variables", "one", "1 variable" })
+  @AlternateMessage({"=0", "No variables", "one", "1 variable"})
   String variableCount(@PluralCount int count);
 
   @Description("Analysis count label")
   @DefaultMessage("{0} analyses")
-  @AlternateMessage({ "=0", "No analysis", "one", "1 analysis" })
+  @AlternateMessage({"=0", "No analysis", "one", "1 analysis"})
   String analysisCount(@PluralCount int count);
 
   @Description("Analysis Result count label")
   @DefaultMessage("{0} results")
-  @AlternateMessage({ "=0", "No result", "one", "1 result" })
+  @AlternateMessage({"=0", "No result", "one", "1 result"})
   String analysisResultCount(@PluralCount int count);
 
   @Description("Entities count label")
   @DefaultMessage("{0} entities")
-  @AlternateMessage({ "=0", "No entities", "one", "1 entity" })
+  @AlternateMessage({"=0", "No entities", "one", "1 entity"})
   String entityCount(@PluralCount int count);
 
   @Description("Category name duplicated label")
@@ -572,9 +568,9 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to publish <b>{0}</b> package declared methods and options in the profiles based on the <b>{1}</b> R servers.")
   String confirmPublishDataShieldSettings(String name, String profile);
 
-  @Description("Please confirm that you want to publish all packages methods and options message")
-  @DefaultMessage("Please confirm that you want to publish all installed packages declared methods and options in the profile <b>{0}</b>. Any (non conflicting) custom settings will not be modified.")
-  String confirmPublishAllDataShieldSettings(String profile);
+  @Description("DS profile init message")
+  @DefaultMessage("Initialize the settings of profile {0} with the selected packages declared methods and options.")
+  String selectPackagesToInitProfile(String profile);
 
   @Description("Please confirm that you want to unpublish this package methods and options message")
   @DefaultMessage("Please confirm that you want to unpublish <b>{0}</b> package declared methods and options from the profiles based on the <b>{1}</b> R servers.")
@@ -598,62 +594,62 @@ public interface TranslationMessages extends Messages {
 
   @Description("Please confirm that you want to remove {0} variables message")
   @DefaultMessage("Please confirm that you want to remove {0} variables.")
-  @AlternateMessage({ "one", "Please confirm that you want to remove {0} variable." })
+  @AlternateMessage({"one", "Please confirm that you want to remove {0} variable."})
   String confirmRemoveVariables(@PluralCount int nb);
 
   @Description("Please confirm that you want to remove {0} tables message")
   @DefaultMessage("Please confirm that you want to remove {0} tables.")
-  @AlternateMessage({ "one", "Please confirm that you want to remove {0} table." })
+  @AlternateMessage({"one", "Please confirm that you want to remove {0} table."})
   String confirmRemoveTables(@PluralCount int nb);
 
   @Description("N Categories label")
   @DefaultMessage("{0} Categories")
-  @AlternateMessage({ "one", "1 Category" })
+  @AlternateMessage({"one", "1 Category"})
   String nCategoriesLabel(@PluralCount int nb);
 
   @Description("N VCFs label")
   @DefaultMessage("{0} VCF files")
-  @AlternateMessage({ "one", "1 VCF file" })
+  @AlternateMessage({"one", "1 VCF file"})
   String nVCFsLabel(@PluralCount int nb);
 
   @Description("N Attributes label")
   @DefaultMessage("{0} Attributes")
-  @AlternateMessage({ "one", "1 Attribute" })
+  @AlternateMessage({"one", "1 Attribute"})
   String nAttributesLabel(@PluralCount int nb);
 
   @Description("N Tables label")
   @DefaultMessage("{0} Tables")
-  @AlternateMessage({ "one", "1 Table" })
+  @AlternateMessage({"one", "1 Table"})
   String nTablesLabel(@PluralCount int nb);
 
   @Description("N view count label")
   @DefaultMessage("({0} views)")
-  @AlternateMessage({ "one", "(1 view)" })
+  @AlternateMessage({"one", "(1 view)"})
   String nViewCountLabel(@PluralCount int nb);
 
   @Description("N derived variable count label")
   @DefaultMessage("({0} derived variables)")
-  @AlternateMessage({ "one", "(1 derived variable)" })
+  @AlternateMessage({"one", "(1 derived variable)"})
   String nDerivedVariableCountLabel(@PluralCount int nb);
 
   @Description("N Resources label")
   @DefaultMessage("{0} Resources")
-  @AlternateMessage({ "one", "1 Resource" })
+  @AlternateMessage({"one", "1 Resource"})
   String nResourcesLabel(@PluralCount int nb);
 
   @Description("N DS methods label")
   @DefaultMessage("{0} Methods")
-  @AlternateMessage({ "one", "1 Method" })
+  @AlternateMessage({"one", "1 Method"})
   String nDataShieldMethodsLabel(@PluralCount int nb);
 
   @Description("N Indices label")
   @DefaultMessage("{0} Indices")
-  @AlternateMessage({ "one", "1 Index" })
+  @AlternateMessage({"one", "1 Index"})
   String nIndicesLabel(@PluralCount int nb);
 
   @Description("N Variables label")
   @DefaultMessage("{0} Variables")
-  @AlternateMessage({ "one", "1 Variable" })
+  @AlternateMessage({"one", "1 Variable"})
   String nVariablesLabel(@PluralCount int nb);
 
   @Description("Errors remaining message")
@@ -662,26 +658,26 @@ public interface TranslationMessages extends Messages {
 
   @Description("/{0} entities label")
   @DefaultMessage("/{0} entities")
-  @AlternateMessage({ "one", "/1 entity" })
+  @AlternateMessage({"one", "/1 entity"})
   String summaryTotalEntitiesLabel(@PluralCount int nb);
 
   @Description("X tables are selected for being for being exported.")
   @DefaultMessage("{0} tables are selected for being exported.")
-  @AlternateMessage({ "one", "1 table is selected for being exported." })
+  @AlternateMessage({"one", "1 table is selected for being exported."})
   String exportNTables(@PluralCount int nb);
 
   @Description("X VCF files are selected for being for being exported.")
   @DefaultMessage("{0} VCF files are selected for being exported.")
-  @AlternateMessage({ "one", "1 VCF file is selected for being exported." })
+  @AlternateMessage({"one", "1 VCF file is selected for being exported."})
   String exportNVCFs(@PluralCount int nb);
 
   @Description("X tables are selected for being for being copied.")
   @DefaultMessage("{0} tables are selected for being copied.")
-  @AlternateMessage({ "one", "1 table is selected for being copied." })
+  @AlternateMessage({"one", "1 table is selected for being copied."})
   String copyNTables(@PluralCount int nb);
 
   @Description("N Bookmarks label")
   @DefaultMessage("{0} Bookmarks")
-  @AlternateMessage({ "one", "1 Bookmark" })
+  @AlternateMessage({"one", "1 Bookmark"})
   String nBookmarksLabel(@PluralCount int nb);
 }
