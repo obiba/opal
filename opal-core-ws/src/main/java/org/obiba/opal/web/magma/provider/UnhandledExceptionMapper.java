@@ -34,10 +34,13 @@ public class UnhandledExceptionMapper extends ErrorDtoExceptionMapper<Exception>
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(Exception exception) {
-    log.error("Unhandled exception", exception);
     Throwable cause = exception;
     while (cause.getCause() != null)
       cause = cause.getCause();
+    if (log.isDebugEnabled())
+      log.error("Unhandled exception", exception);
+    else
+      log.error("Unhandled exception {}: {}", cause.getClass().getSimpleName(), cause.getMessage());
     return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException",
         cause.getClass().getSimpleName(), cause.getMessage()).build();
   }

@@ -70,6 +70,7 @@ public class AppsResource {
   @NotAuthenticated
   public Response registerApp(@Context HttpServletRequest servletRequest, Apps.AppDto appDto) {
     appsService.checkToken(servletRequest.getHeader(APP_AUTH_HEADER));
+    appsService.checkSelfRegistrationRules(appDto.getServer());
     appsService.registerApp(Dtos.fromDto(appDto));
     return Response.ok().build();
   }

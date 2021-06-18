@@ -10,8 +10,6 @@
 
 package org.obiba.opal.r.rock;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
@@ -55,7 +53,7 @@ public class RockServerDiscoveryService {
     for (String host : hosts)
       discoverOrCheckHost(host);
   }
-  
+
   @Subscribe
   public synchronized void onAppUnregistered(AppUnregisteredEvent event) {
     if ("rock".equals(event.getApp().getType())) {
@@ -91,9 +89,9 @@ public class RockServerDiscoveryService {
         app.setCluster(jsonApp.getString("cluster"));
         app.setType("rock");
         JSONArray tags = jsonApp.has("tags") ? jsonApp.getJSONArray("tags") : null;
-        if (tags != null && tags.length()>0) {
+        if (tags != null && tags.length() > 0) {
           List<String> tagList = Lists.newArrayList();
-          for (int i = 0; i<tags.length(); i++)
+          for (int i = 0; i < tags.length(); i++)
             tagList.add(tags.getString(i));
           app.setTags(tagList);
         }

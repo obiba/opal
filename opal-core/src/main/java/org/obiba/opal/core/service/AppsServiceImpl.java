@@ -16,15 +16,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.opal.core.cfg.AppsService;
-import org.obiba.opal.core.domain.AppConfig;
-import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.AppsConfig;
 import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.event.AppRegisteredEvent;
 import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
 import org.obiba.opal.core.runtime.App;
-import org.obiba.opal.web.model.Apps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,8 @@ import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class AppsServiceImpl implements AppsService {
@@ -46,8 +45,14 @@ public class AppsServiceImpl implements AppsService {
 
   private final EventBus eventBus;
 
-  @Value("${apps.token}")
+  @Value("${apps.registration.token}")
   private String defaultToken;
+
+  @Value("${apps.registration.include}")
+  private String registrationInclude;
+
+  @Value("${apps.registration.exclude}")
+  private String registrationExclude;
 
   @Value("${apps.discovery.rock.hosts}")
   private String[] defaultRockHosts;
@@ -130,6 +135,26 @@ public class AppsServiceImpl implements AppsService {
   public void checkToken(String value) {
     if (Strings.isNullOrEmpty(value) || !value.equals(getAppsConfig().getToken()))
       throw new UnauthorizedException("App registration operation not authorized");
+  }
+
+  @Override
+  public void checkSelfRegistrationRules(String server) {
+    if (!Strings.isNullOrEmpty(registrationInclude)) {
+      Pattern p = Pattern.compile(registrationInclude);
+      Matcher m = p.matcher(server);
+      if (!m.matches()) {
+        log.info("App server {} does not pass the white list rule", server);
+        throw new UnauthorizedException("App registration operation not authorized");
+      }
+    }
+    if (!Strings.isNullOrEmpty(registrationExclude)) {
+      Pattern p = Pattern.compile(registrationExclude);
+      Matcher m = p.matcher(server);
+      if (m.matches()) {
+        log.info("App server {} does not pass the black list rule", server);
+        throw new UnauthorizedException("App registration operation not authorized");
+      }
+    }
   }
 
   public AppsConfig getAppsConfig() {

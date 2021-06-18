@@ -64,6 +64,13 @@ public interface AppsService extends SystemService {
   void checkToken(String value);
 
   /**
+   * Check self-registrating server passes black and white lists.
+   *
+   * @param server
+   */
+  void checkSelfRegistrationRules(String server);
+
+  /**
    * Get the apps management settings.
    *
    * @return
@@ -88,4 +95,5 @@ public interface AppsService extends SystemService {
    * @param app
    */
   RockAppConfig getRockAppConfig(App app);
+
 }
