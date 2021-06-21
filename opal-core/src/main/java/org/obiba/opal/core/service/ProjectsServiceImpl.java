@@ -378,13 +378,18 @@ public class ProjectsServiceImpl implements ProjectService {
           load(datasourceLoadQueue.take());
         }
       } catch (InterruptedException ignored) {
-        log.debug("Stopping datasource loader");
+        log.debug("Interrupting datasource loader");
       }
+      log.info("Stopping datasource loader");
     }
 
     private void load(Project project) {
-      registerDatasource(project, transactionTemplate, databaseRegistry);
-      projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
+      try {
+        registerDatasource(project, transactionTemplate, databaseRegistry);
+        projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
+      } catch (Exception e) {
+        log.error("Loading datasource of project {} failed for database: {}", project.getName(), project.getDatabase(), e);
+      }
     }
   }
 }
