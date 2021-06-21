@@ -76,6 +76,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
   public void testTableEdit() {
     testConversion("/datasource/patate/table/pwel", TablePermissionConverter.Permission.TABLE_EDIT,
         "rest:/datasource/patate/table/pwel:PUT:GET",
+        "rest:/datasource/patate/table/pwel:DELETE",
         "rest:/datasource/patate/table/pwel/variables:POST:GET/*",
         "rest:/datasource/patate/table/pwel/variables:DELETE:GET",
         "rest:/datasource/patate/table/pwel/index:GET:GET",
@@ -137,6 +138,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/datasource/patate/table/pwel:PUT:GET",
+        "rest:/datasource/patate/table/pwel:DELETE",
         "rest:/datasource/patate/table/pwel/variables:POST:GET/*",
         "rest:/datasource/patate/table/pwel/variables:DELETE:GET",
         "rest:/datasource/patate/table/pwel/index:GET:GET",
