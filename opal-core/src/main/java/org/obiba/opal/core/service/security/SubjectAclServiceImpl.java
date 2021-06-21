@@ -171,6 +171,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     Assert.notNull(permission, "permission cannot be null");
     HasUniqueProperties acl = new SubjectAcl(domain, node, subject, permission);
     orientDbService.save(acl, acl);
+    notifyListeners(subject);
   }
 
   @Override
@@ -350,8 +351,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
           @Override
           public Iterable<String> getPermissions() {
-            return StreamSupport.stream(find(from.getDomain(), getNode(), from.getSubject()).spliterator(), false)
-                .map(SubjectAcl::getPermission).collect(Collectors.toList());
+            return Collections.singletonList(from.getPermission());
           }
         }).collect(Collectors.toList());
   }
