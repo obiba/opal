@@ -12,11 +12,19 @@ package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.obiba.datashield.core.DSEnvironment;
+import org.obiba.datashield.core.DSMethod;
+import org.obiba.datashield.core.DSMethodType;
+import org.obiba.datashield.core.impl.DefaultDSMethod;
+import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.datashield.CustomRScriptMethod;
+import org.obiba.opal.datashield.RFunctionDataShieldMethod;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.web.model.DataShield;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +53,14 @@ public class DataShieldProfileService implements SystemService {
 
   private final Lock lock = new ReentrantLock();
 
+  private final DatashieldConfigurationSupplier datashieldConfigurationSupplier;
+
   @Autowired
-  public DataShieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService) {
+  public DataShieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService, DatashieldConfigurationSupplier datashieldConfigurationSupplier) {
     this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
     this.subjectAclService = subjectAclService;
+    this.datashieldConfigurationSupplier = datashieldConfigurationSupplier;
   }
 
   /**
@@ -168,6 +179,7 @@ public class DataShieldProfileService implements SystemService {
   @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(DataShieldProfile.class);
+    upgradeDefaultDataShieldConfig();
   }
 
   @Override
@@ -175,6 +187,10 @@ public class DataShieldProfileService implements SystemService {
   public void stop() {
 
   }
+
+  //
+  // Private methods
+  //
 
   /**
    * Get R server cluster names.
@@ -185,5 +201,54 @@ public class DataShieldProfileService implements SystemService {
     return rServerManagerService.getRServerClusters().stream()
         .map(RServerCluster::getName)
         .collect(Collectors.toList());
+  }
+
+  private void upgradeDefaultDataShieldConfig() {
+    if (orientDbService.count(DataShieldProfile.class) == 0) {
+      log.info("Upgrading DataSHIELD configuration...");
+      try {
+        DatashieldConfiguration datashieldConfiguration = datashieldConfigurationSupplier.get();
+        DataShieldProfile profile = new DataShieldProfile(rServerManagerService.getDefaultClusterName());
+        for (DSMethodType type : DSMethodType.values())
+          upgradeDSEnvironment(datashieldConfiguration.getEnvironment(type), profile.getEnvironment(type));
+        datashieldConfiguration.getOptions().forEach(opt -> profile.addOrUpdateOption(opt.getName(), opt.getValue()));
+        profile.setEnabled(true);
+        saveProfile(profile);
+        datashieldConfigurationSupplier.modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
+          @Override
+          public void doWithConfig(DatashieldConfiguration config) {
+            // empty legacy config
+            final DSEnvironment aggs = config.getEnvironment(DSMethodType.AGGREGATE);
+            Lists.newArrayList(aggs.getMethods()).forEach(m -> aggs.removeMethod(m.getName()));
+            final DSEnvironment asss = config.getEnvironment(DSMethodType.ASSIGN);
+            Lists.newArrayList(asss.getMethods()).forEach(m -> asss.removeMethod(m.getName()));
+            config.getOptions().forEach(opt -> config.removeOption(opt.getName()));
+          }
+        });
+      } catch (Exception e) {
+        log.warn("DataSHIELD configuration upgrade failed", e);
+      }
+    }
+  }
+
+  private void upgradeDSEnvironment(DSEnvironment oldEnv, DSEnvironment newEnv) {
+    if (oldEnv != null) {
+      oldEnv.getMethods().stream()
+          .map(this::upgradeDSMethod)
+          .forEach(newEnv::addOrUpdate);
+    }
+  }
+
+  private DSMethod upgradeDSMethod(DSMethod oldMethod) {
+    if (oldMethod instanceof RFunctionDataShieldMethod) {
+      RFunctionDataShieldMethod m = (RFunctionDataShieldMethod)oldMethod;
+      return new DefaultDSMethod(m.getName(), m.getFunction(), m.getPackage(), m.getVersion());
+    }
+    if (oldMethod instanceof CustomRScriptMethod) {
+      CustomRScriptMethod m = (CustomRScriptMethod)oldMethod;
+      return new DefaultDSMethod(m.getName(), m.getScript());
+    }
+    // not suposed to be here
+    return new DefaultDSMethod(oldMethod.getName(), oldMethod.getName());
   }
 }
