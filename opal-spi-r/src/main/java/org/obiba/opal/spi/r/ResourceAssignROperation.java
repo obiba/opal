@@ -31,6 +31,10 @@ public class ResourceAssignROperation extends AbstractROperation {
     this.requiredPackages = requiredPackages;
   }
 
+  public List<String> getRequiredPackages() {
+    return requiredPackages;
+  }
+
   @Override
   public void doWithConnection() {
     if (symbol == null) return;

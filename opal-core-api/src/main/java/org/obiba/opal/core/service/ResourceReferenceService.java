@@ -12,6 +12,7 @@ package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.spi.resource.Resource;
 
 import java.util.List;
@@ -101,6 +102,6 @@ public interface ResourceReferenceService extends SystemService {
    * @return
    * @throws NoSuchResourceReferenceException
    */
-  ROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException;
+  ResourceAssignROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException;
 
 }

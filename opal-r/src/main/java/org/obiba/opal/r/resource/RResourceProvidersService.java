@@ -19,6 +19,7 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.event.*;
@@ -169,19 +170,19 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       try {
         // scan all R server clusters
-        for (RServerService rServerService : rServerManagerService.getRServerClusters()) {
+        for (RServerCluster rServerCluster : rServerManagerService.getRServerClusters()) {
           try {
-            rServerService.execute(rop);
+            rServerCluster.execute(rop);
             RServerResult result = rop.getResult();
             if (result.isNamedList()) {
               RNamedList<RServerResult> pkgList = result.asNamedList();
               for (String name : pkgList.keySet()) {
-                RServerResult rexp = pkgList.get(name);
-                resourceProviders.put(name, new RResourceProvider(name, rexp.asStrings()[0]));
+                RServerResult res = pkgList.get(name);
+                resourceProviders.put(name, new RResourceProvider(name, res.asStrings()[0]));
               }
             }
           } catch (Exception e) {
-            log.error("Resource packages discovery failed for R server: {}", rServerService.getName(), e);
+            log.error("Resource packages discovery failed for R servers cluster: {}", rServerCluster.getName(), e);
           }
         }
       } catch (Exception e) {
@@ -218,7 +219,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   /**
    * Fetch resource R package names and their location folder.
    */
-  private class ResourcePackageScriptsROperation extends AbstractROperationWithResult {
+  private static class ResourcePackageScriptsROperation extends AbstractROperationWithResult {
 
     @Override
     protected void doWithConnection() {

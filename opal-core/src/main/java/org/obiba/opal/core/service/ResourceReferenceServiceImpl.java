@@ -151,7 +151,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
-  public ROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException {
+  public ResourceAssignROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException {
     ResourceReference ref = getResourceReference(project, name);
     Resource resource = createResource(ref);
     List<String> requiredPackages = getRequiredPackages(ref);

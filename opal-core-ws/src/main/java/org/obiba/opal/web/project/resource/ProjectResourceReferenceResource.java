@@ -18,6 +18,7 @@ import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,9 +70,9 @@ public class ProjectResourceReferenceResource {
   @PUT
   @Path("_test")
   public Response test(@PathParam("project") String project, @PathParam("name") String name) throws RServerException {
-    ROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
-    // TODO test in the R server where the resource provider is defined
-    rServerManagerService.getDefaultRServer().execute(rop);
+    ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
+    // test in the R server where the resource provider is defined
+    rServerManagerService.getRServerWithPackages(rop.getRequiredPackages()).execute(rop);
     return Response.ok().build();
   }
 

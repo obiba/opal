@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.service;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -21,12 +22,14 @@ import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.rock.RockService;
 import org.obiba.opal.r.rserve.RserveService;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.r.service.event.RServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
+import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +37,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Management of the R servers available.
@@ -107,6 +109,22 @@ public class RServerManagerService implements Service {
    */
   public RServerService getRServer(String name) {
     return getRServerCluster(name);
+  }
+
+  public RServerService getRServerWithPackages(List<String> requiredPackages) {
+    for (RServerCluster cluster : getRServerClusters()) {
+      Optional<RServerService> rServerServiceOpt = cluster.getRServerServices().stream().findFirst();
+      if (rServerServiceOpt.isPresent()) {
+        List<String> packageNames = rServerServiceOpt.get().getInstalledPackagesDtos().stream()
+            .map(OpalR.RPackageDto::getName)
+            .filter(requiredPackages::contains)
+            .distinct()
+            .collect(Collectors.toList());
+        if (packageNames.size() == requiredPackages.size())
+          return rServerServiceOpt.get();
+      }
+    }
+    throw new NoSuchElementException("No R server with packages: " + Joiner.on(", ").join(requiredPackages));
   }
 
   /**
@@ -270,5 +288,4 @@ public class RServerManagerService implements Service {
     if (rClusters.containsKey(getDefaultClusterName()))
       eventBus.post(new RServiceInitializedEvent(getName()));
   }
-
 }
