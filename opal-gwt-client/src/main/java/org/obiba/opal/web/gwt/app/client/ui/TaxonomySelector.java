@@ -10,10 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.*;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
@@ -49,6 +46,8 @@ public class TaxonomySelector extends Composite {
 
   private static final String ANY_VALUE = "_any_";
 
+  private static final int MAX_TERMS_COUNT = 1000;
+
   private final String currentLocale = AttributeHelper.getCurrentLanguage();
 
   @UiField(provided = true)
@@ -71,6 +70,9 @@ public class TaxonomySelector extends Composite {
 
   @UiField
   ControlGroup termGroup;
+
+  @UiField
+  Alert tooMuchTermsNotice;
 
   @UiField
   Chooser termChooser;
@@ -233,8 +235,13 @@ public class TaxonomySelector extends Composite {
       private void applyTermSuggestion(VariableFieldSuggestOracle.TermSuggestion termSuggestion) {
         setTaxonomy(termSuggestion.getTaxonomy());
         setVocabulary(termSuggestion.getVocabulary());
-        termChooser.setSelectedValue(termSuggestion.getTerm().getName());
-        setTermHelp(termSuggestion.getTerm());
+        TermDto term = termSuggestion.getTerm();
+        if (!termChooser.isEnabled()) {
+          termChooser.clear();
+          termChooser.addItem(getTermTitle(term), term.getName());
+        }
+        termChooser.setSelectedValue(term.getName());
+        setTermHelp(term);
       }
 
       private void setTaxonomy(TaxonomyDto taxonomy) {
@@ -309,9 +316,18 @@ public class TaxonomySelector extends Composite {
     if (vocabulary.getTermsCount() > 0 && termSelectionOptional) {
       termChooser.addItem("(" + translations.any() + ")", ANY_VALUE);
     }
-    for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
-      termChooser.addItem(getTermTitle(term), term.getName());
-      if (firstTerm == null) firstTerm = term;
+    if (vocabulary.getTermsCount() > MAX_TERMS_COUNT) {
+      termChooser.setEnabled(false);
+      tooMuchTermsNotice.setVisible(true);
+      firstTerm = vocabulary.getTermsArray().get(0);
+      termChooser.addItem(getTermTitle(firstTerm), firstTerm.getName());
+    } else {
+      termChooser.setEnabled(true);
+      tooMuchTermsNotice.setVisible(false);
+      for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
+        termChooser.addItem(getTermTitle(term), term.getName());
+        if (firstTerm == null) firstTerm = term;
+      }
     }
     enableTermSelection(firstTerm != null);
     if (firstTerm != null && !termSelectionOptional) {
