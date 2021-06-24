@@ -46,7 +46,7 @@ public class TaxonomySelector extends Composite {
 
   private static final String ANY_VALUE = "_any_";
 
-  private static final int MAX_TERMS_COUNT = 1000;
+  private static final int MAX_TERMS_COUNT = 200;
 
   private final String currentLocale = AttributeHelper.getCurrentLanguage();
 
