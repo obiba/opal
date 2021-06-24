@@ -17,13 +17,13 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 
 @Component
 @Path("/system/subject-profiles")
@@ -51,5 +51,18 @@ public class SubjectProfilesResource {
         .setQuery(query == null ? "" : query)
         .addAllSuggestions(suggestions);
     return builder.build();
+  }
+
+  @DELETE
+  public Response deleteProfiles(@QueryParam("p") List<String> principals) {
+    for (String principal : principals) {
+      try {
+        subjectProfileService.deleteProfile(principal);
+        subjectAclService.deleteSubjectPermissions(USER.subjectFor(principal));
+      } catch (Exception e) {
+        // ignore
+      }
+    }
+    return Response.ok().build();
   }
 }

@@ -9,8 +9,18 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.users.profile.admin;
 
-import java.util.List;
-
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -23,49 +33,40 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import java.util.List;
 
-public class SubjectProfilesAdministrationPresenter extends
-    ItemAdministrationPresenter<SubjectProfilesAdministrationPresenter.Display, SubjectProfilesAdministrationPresenter.Proxy> {
+public class SubjectProfilesAdministrationPresenter
+    extends ItemAdministrationPresenter<SubjectProfilesAdministrationPresenter.Display, SubjectProfilesAdministrationPresenter.Proxy>
+    implements SubjectProfilesAdministrationUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.PROFILES)
-  public interface Proxy extends ProxyPlace<SubjectProfilesAdministrationPresenter> {}
+  public interface Proxy extends ProxyPlace<SubjectProfilesAdministrationPresenter> {
+  }
 
-  private Runnable removeConfirmation;
+  private Runnable removeProfileConfirmation;
+
+  private Runnable removeProfilesConfirmation;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public SubjectProfilesAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+                                                DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.PROFILES.create().build()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.SUBJECT_PROFILES.create().build()) //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListProfilesAuthorization())) //
         .get().send();
   }
@@ -81,9 +82,12 @@ public class SubjectProfilesAdministrationPresenter extends
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
-        if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
-          removeConfirmation.run();
-          removeConfirmation = null;
+        if (event.getSource().equals(removeProfileConfirmation) && event.isConfirmed()) {
+          removeProfileConfirmation.run();
+          removeProfileConfirmation = null;
+        } else if (event.getSource().equals(removeProfilesConfirmation) && event.isConfirmed()) {
+          removeProfilesConfirmation.run();
+          removeProfilesConfirmation = null;
         }
       }
     }));
@@ -91,11 +95,11 @@ public class SubjectProfilesAdministrationPresenter extends
     getView().getActions().setActionHandler(new ActionHandler<SubjectProfileDto>() {
       @Override
       public void doAction(SubjectProfileDto object, String actionName) {
-        if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
-          removeConfirmation = new RemoveRunnable(object);
+        if (ActionsColumn.REMOVE_ACTION.equals(actionName)) {
+          removeProfileConfirmation = new RemoveRunnable(object);
           String title = translations.removeUserProfile();
           String message = translationMessages.confirmRemoveUserProfile(object.getPrincipal());
-          fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, title, message));
+          fireEvent(ConfirmationRequiredEvent.createWithMessages(removeProfileConfirmation, title, message));
         }
       }
     });
@@ -114,6 +118,33 @@ public class SubjectProfilesAdministrationPresenter extends
   }
 
   @Override
+  public void onRemoveProfiles(final List<SubjectProfileDto> profiles) {
+    removeProfilesConfirmation = new Runnable() {
+
+      @Override
+      public void run() {
+        UriBuilder builder = UriBuilders.SUBJECT_PROFILES.create();
+        for (SubjectProfileDto profile : profiles) {
+          builder.query("p", profile.getPrincipal());
+        }
+        ResourceRequestBuilderFactory.newBuilder()
+            .forResource(builder.build())
+            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
+                refreshProfiles();
+              }
+            }).delete().send();
+      }
+    };
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(removeProfilesConfirmation, translations.removeUserProfiles(),
+            translationMessages.confirmRemoveUserProfiles()));
+  }
+
+
+  @Override
   @TitleFunction
   public String getTitle() {
     return translations.pageProfilesTitle();
@@ -122,7 +153,7 @@ public class SubjectProfilesAdministrationPresenter extends
   private void refreshProfiles() {
     // Fetch all profiles
     ResourceRequestBuilderFactory.<JsArray<SubjectProfileDto>>newBuilder() //
-        .forResource(UriBuilders.PROFILES.create().build()) //
+        .forResource(UriBuilders.SUBJECT_PROFILES.create().build()) //
         .withCallback(new ResourceCallback<JsArray<SubjectProfileDto>>() {
           @Override
           public void onResource(Response response, JsArray<SubjectProfileDto> resource) {
@@ -143,7 +174,7 @@ public class SubjectProfilesAdministrationPresenter extends
     @Override
     public void run() {
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilders.PROFILE.create().build(profile.getPrincipal())) //
+          .forResource(UriBuilders.SUBJECT_PROFILE.create().build(profile.getPrincipal())) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -170,7 +201,7 @@ public class SubjectProfilesAdministrationPresenter extends
     }
   }
 
-  public interface Display extends View, HasBreadcrumbs {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SubjectProfilesAdministrationUiHandlers> {
 
     void renderProfiles(List<SubjectProfileDto> rows);
 

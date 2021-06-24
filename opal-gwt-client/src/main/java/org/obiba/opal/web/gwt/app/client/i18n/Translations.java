@@ -2686,6 +2686,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Remove User Profile")
   String removeUserProfile();
 
+  @Description("Remove User Profiles label")
+  @DefaultStringValue("Remove User Profiles")
+  String removeUserProfiles();
+
   @Description("Remove ID Provider label")
   @DefaultStringValue("Remove ID Provider")
   String removeIDProvider();

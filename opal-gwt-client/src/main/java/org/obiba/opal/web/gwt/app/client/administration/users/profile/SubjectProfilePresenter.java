@@ -117,7 +117,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
   @Override
   protected void onReveal() {
     ResourceRequestBuilderFactory.<SubjectProfileDto>newBuilder() //
-        .forResource(UriBuilders.PROFILE.create().build("_current")) //
+        .forResource(UriBuilders.SUBJECT_PROFILE.create().build("_current")) //
         .withCallback(new ResourceCallback<SubjectProfileDto>() {
           @Override
           public void onResource(Response response, SubjectProfileDto resource) {

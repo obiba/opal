@@ -250,6 +250,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its settings will be lost: user permissions, personal access tokens and bookmarks.")
   String confirmRemoveUserProfile(String name);
 
+  @Description("Confirm remove user profiles label")
+  @DefaultMessage("Please confirm that you want to remove the profiles of the selected users. All their settings will be lost: user permissions, personal access tokens and bookmarks.")
+  String confirmRemoveUserProfiles();
+
   @Description("Confirm remove id provider label")
   @DefaultMessage("Please confirm that you want to remove the identity provider {0}. None of its users will be able to login anymore.")
   String confirmRemoveIDProvider(String name);
@@ -641,6 +645,11 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} Methods")
   @AlternateMessage({"one", "1 Method"})
   String nDataShieldMethodsLabel(@PluralCount int nb);
+
+  @Description("N Subject profiles label")
+  @DefaultMessage("{0} Profiles")
+  @AlternateMessage({"one", "1 Profile"})
+  String nSubjectProfilesLabel(@PluralCount int nb);
 
   @Description("N Indices label")
   @DefaultMessage("{0} Indices")

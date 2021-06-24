@@ -720,7 +720,7 @@ public enum UriBuilders {
     }
   },
 
-  PROFILES {
+  SUBJECT_PROFILES {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profiles");
@@ -728,7 +728,7 @@ public enum UriBuilders {
     }
   },
 
-  PROFILE {
+  SUBJECT_PROFILE {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profile", "{}");

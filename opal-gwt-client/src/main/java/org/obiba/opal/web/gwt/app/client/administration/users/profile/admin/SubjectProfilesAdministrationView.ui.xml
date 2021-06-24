@@ -9,30 +9,54 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-    ui:generateLocales="default">
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
-  <g:FlowPanel>
+    <g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="section-header">
-      <b:Breadcrumbs ui:field="breadcrumbs"/>
+        <g:FlowPanel addStyleNames="section-header">
+            <b:Breadcrumbs ui:field="breadcrumbs"/>
+        </g:FlowPanel>
+
+        <b:Heading size="4">
+            <ui:msg description="User Profiles label">User Profiles</ui:msg>
+        </b:Heading>
+        <b:Paragraph>
+            <ui:msg description="Profiles information">
+                Each user who logged in has a profile. A realm is the user directory in which a user is defined. Logging
+                in from different realm with the same user name is forbidden for security reasons. If removed, the user
+                profile will be automatically recreated when the user logs in.
+            </ui:msg>
+        </b:Paragraph>
+        <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
+            <o:OpalSimplePager ui:field="profilesPager" location="RIGHT" addStyleNames="pull-right"/>
+        </g:FlowPanel>
+
+        <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+            <g:FlowPanel addStyleNames="pull-left">
+                <b2:IconAnchor icon="TRASH" ui:field="deleteOptions" addStyleNames="inline">
+                    <ui:msg description="Remove label">Remove</ui:msg>
+                </b2:IconAnchor>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="pull-right">
+                <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+                <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
+                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
+                    <ui:msg description="Clear label">Clear</ui:msg>
+                </b2:IconAnchor>
+            </g:FlowPanel>
+        </b:Alert>
+
+        <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+            <g:Label>
+                <ui:msg description="Select options tips label">Select options to remove.</ui:msg>
+            </g:Label>
+        </b:Alert>
+        <o:Table ui:field="profilesTable"/>
+
     </g:FlowPanel>
-
-    <b:Heading size="4">
-      <ui:msg description="User Profiles label">User Profiles</ui:msg>
-    </b:Heading>
-    <b:Paragraph>
-      <ui:msg description="Profiles information">
-        Each user who logged in has a profile. A realm is the user directory in which a user is defined. Logging in from
-        different realm with the same user name is forbidden for security reasons. If removed, the user profile will be
-        automatically recreated when the user logs in.
-      </ui:msg>
-    </b:Paragraph>
-    <o:OpalSimplePager ui:field="profilesPager" location="RIGHT" addStyleNames="pull-right bottom-margin"/>
-    <o:Table ui:field="profilesTable" addStyleNames="small-top-margin"/>
-
-  </g:FlowPanel>
 </ui:UiBinder>

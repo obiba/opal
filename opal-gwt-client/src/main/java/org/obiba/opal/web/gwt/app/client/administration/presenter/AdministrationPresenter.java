@@ -135,7 +135,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
         .authorize(composeAuthorizer(getView().getUsersGroupsAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROFILES.create().build()).get()
+        .forResource(UriBuilders.SUBJECT_PROFILES.create().build()).get()
         .authorize(composeAuthorizer(getView().getProfilesAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
