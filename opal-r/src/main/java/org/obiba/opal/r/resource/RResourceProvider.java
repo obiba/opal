@@ -36,8 +36,8 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
   RResourceProvider(String name, String script) {
     this.name = name;
     try {
-      ScriptEngineManager manager = new ScriptEngineManager();
-      this.engine = manager.getEngineByName("JavaScript");
+      ScriptEngineManager manager = new ScriptEngineManager(null);
+      this.engine = manager.getEngineByName("nashorn");
       engine.eval(script);
     } catch (ScriptException e) {
       log.error("Resource javascript evaluation failed for package {}", name, e);

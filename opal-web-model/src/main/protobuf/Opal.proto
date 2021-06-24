@@ -448,6 +448,8 @@ message IDProviderDto {
   optional string groupsClaim = 12;
   repeated ParameterDto parameters = 13;
   required bool enabled = 14;
+  optional string usernameClaim = 15;
+  optional string groupsScript = 16;
 }
 
 message AuthProviderDto {

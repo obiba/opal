@@ -161,10 +161,14 @@ public class Dtos {
         builder.setLabel(entry.getValue());
       else if ("providerUrl".equals(entry.getKey()))
         builder.setProviderUrl(entry.getValue());
+      else if ("usernameClaim".equals(entry.getKey()))
+        builder.setUsernameClaim(entry.getValue());
       else if ("groups".equals(entry.getKey()))
         builder.setGroups(entry.getValue());
       else if ("groupsClaim".equals(entry.getKey()))
         builder.setGroupsClaim(entry.getValue());
+      else if ("groupsJS".equals(entry.getKey()))
+        builder.setGroupsScript(entry.getValue());
       else if ("enabled".equals(entry.getKey())) {
         try {
           builder.setEnabled(Boolean.parseBoolean(entry.getValue()));
@@ -191,28 +195,25 @@ public class Dtos {
     configuration.setDiscoveryURI(dto.getDiscoveryURI());
     configuration.setScope(dto.getScope());
     configuration.setUseNonce(dto.getUseNonce());
-    if (dto.hasConnectTimeout()) {
+    if (dto.hasConnectTimeout())
       configuration.setConnectTimeout(dto.getConnectTimeout());
-    }
-    if (dto.hasReadTimeout()) {
+    if (dto.hasReadTimeout())
       configuration.setReadTimeout(dto.getReadTimeout());
-    }
-    if (dto.hasGroups()) {
+    if (dto.hasUsernameClaim())
+      configuration.getCustomParams().put("usernameClaim", dto.getUsernameClaim());
+    if (dto.hasGroups())
       configuration.getCustomParams().put("groups", dto.getGroups());
-    }
-    if (dto.hasGroupsClaim()) {
+    if (dto.hasGroupsClaim())
       configuration.getCustomParams().put("groupsClaim", dto.getGroupsClaim());
-    }
-    if (dto.hasLabel()) {
+    if (dto.hasGroupsScript())
+      configuration.getCustomParams().put("groupsJS", dto.getGroupsScript());
+    if (dto.hasLabel())
       configuration.getCustomParams().put("label", dto.getLabel());
-    }
-    if (dto.hasProviderUrl()) {
+    if (dto.hasProviderUrl())
       configuration.getCustomParams().put("providerUrl", dto.getProviderUrl());
-    }
     configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
-    if (dto.getParametersCount() > 0) {
+    if (dto.getParametersCount() > 0)
       dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
-    }
     return configuration;
   }
 

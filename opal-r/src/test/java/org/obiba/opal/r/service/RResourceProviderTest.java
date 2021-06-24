@@ -10,22 +10,23 @@
 
 package org.obiba.opal.r.service;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.Map;
 
 public class RResourceProviderTest {
 
   @Test
   public void jsEngineTest() throws ScriptException {
-    ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript"); //Creates a ScriptEngine
+    ScriptEngine engine = new ScriptEngineManager(null).getEngineByName("nashorn"); //Creates a ScriptEngine
     engine.eval("var pkg = { settings: { 'title': 'Title', 'types': [ { 'name': 'aaa' }, { 'name': 'bbb' } ] }, asResource: function(url, format) { return { 'url': url, 'format': format }; } }");
-    ScriptObjectMirror pkgObj = (ScriptObjectMirror) engine.get("pkg");
+    Bindings pkgObj = (Bindings) engine.get("pkg");
+    JSONObject pkg = new JSONObject(pkgObj);
+    System.out.println(pkg.toString(2));
     JSONObject settings = new JSONObject(engine.eval("JSON.stringify(pkg.settings)").toString());
     System.out.println(settings.toString(2));
     JSONObject resource = new JSONObject(engine.eval("JSON.stringify(pkg.asResource('http://toto.example.org', 'csv'))").toString());

@@ -51,16 +51,16 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   Modal modal;
 
   @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
+  TextBox usernameClaim;
 
   @UiField
   TextBox groups;
 
   @UiField
   TextBox groupsClaim;
+
+  @UiField
+  TextArea groupsScript;
 
   @UiField
   ControlGroup nameGroup;
@@ -114,6 +114,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     initConstrainedModal(translations);
+    groupsScript.setPlaceholder("// input: userInfo\n// output: an array of strings\n\n// example:\nuserInfo.some.property.map(x => x.split(':')[0])");
+    groupsScript.setVisibleLines(6);
+    groupsScript.setWidth("500px");
   }
 
 
@@ -141,8 +144,10 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     useNonce.setValue(provider.getUseNonce());
     label.setValue(provider.getLabel());
     providerUrl.setValue(provider.getProviderUrl());
+    usernameClaim.setValue(provider.getUsernameClaim());
     groups.setValue(provider.getGroups());
     groupsClaim.setValue(provider.getGroupsClaim());
+    groupsScript.setValue(provider.getGroupsScript());
     connectTimeout.setValue(provider.getConnectTimeout());
     readTimeout.setValue(provider.getReadTimeout());
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
@@ -194,15 +199,25 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setSecret(secret.getValue());
     provider.setDiscoveryURI(discoveryUri.getValue());
     provider.setScope(Strings.isNullOrEmpty(scope.getValue()) ? "openid" : scope.getValue());
-    if (Strings.isNullOrEmpty(groups.getText())) {
+    if (Strings.isNullOrEmpty(groups.getText().trim())) {
       provider.clearGroups();
     } else {
       provider.setGroups(groups.getText());
     }
-    if (Strings.isNullOrEmpty(groupsClaim.getText())) {
+    if (Strings.isNullOrEmpty(usernameClaim.getText().trim())) {
+      provider.clearUsernameClaim();
+    } else {
+      provider.setUsernameClaim(usernameClaim.getText());
+    }
+    if (Strings.isNullOrEmpty(groupsClaim.getText().trim())) {
       provider.clearGroupsClaim();
     } else {
       provider.setGroupsClaim(groupsClaim.getText());
+    }
+    if (Strings.isNullOrEmpty(groupsScript.getText().trim())) {
+      provider.clearGroupsScript();
+    } else {
+      provider.setGroupsScript(groupsScript.getText());
     }
     provider.setProviderUrl(providerUrl.getValue());
     provider.setLabel(label.getValue());
