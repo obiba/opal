@@ -135,57 +135,58 @@
 
         <b:ControlGroup>
             <b:ControlLabel>
-                <ui:msg description="Provider Groups Claim label">Groups Claim</ui:msg>
+                <ui:msg description="Provider Username Mapping label">Username Mapping</ui:msg>
             </b:ControlLabel>
             <b:Controls>
-                <b:TextBox ui:field="groupsClaim" placeholder="groups"/>
+                <b:TextBox ui:field="usernameClaim"/>
                 <b:HelpBlock>
-                    <ui:msg description="Provider Groups Claim help label">
-                        Optional name of the (non-standard) claim in the UserInfo response that represents the groups to
-                        which the user belongs. These groups will be applied to the authenticated user. The value of
-                        this claim can be an array of strings or a string of comma or space-separated group names. The
-                        default values is "groups".
+                    <ui:msg description="Provider Username Claim help label">
+                        Optional name of the claim in the ID token and in the UserInfo response which value will
+                        represent the username in Opal. If not explicitly specified (or not found), the username
+                        will be looked up with the claims in the following order: "preferred_username", "username",
+                        "email", "name" and "sub" (subject ID).
                     </ui:msg>
                 </b:HelpBlock>
             </b:Controls>
         </b:ControlGroup>
 
+        <b:ControlGroup>
+            <b:ControlLabel>
+                <ui:msg description="Provider Groups Mapping label">Groups Mapping</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+                <o:Chooser ui:field="groupsMapping"/>
+            </b:Controls>
+        </b:ControlGroup>
+
+        <b:ControlGroup ui:field="groupsClaimGroup">
+            <b:Controls>
+                <b:TextBox ui:field="groupsClaim" placeholder="groups"/>
+            </b:Controls>
+            <b:HelpBlock>
+                <ui:msg description="Provider Groups Claim help label">
+                    Optional name of the (non-standard) claim in the UserInfo response that represents the groups to
+                    which the user belongs. These groups will be applied to the authenticated user. The value of
+                    this claim can be an array of strings or a string of comma or space-separated group names. The
+                    default values is "groups".
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup ui:field="groupsScriptGroup" visible="false">
+            <Controls>
+                <b:TextArea ui:field="groupsScript"/>
+            </Controls>
+            <b:HelpBlock>
+                <ui:msg description="Groups script description">
+                    An optional custom javascript to extract the array of group names from the UserInfo object.
+                    Allows to adapt to non-standard claims and to transform values into Opal group names. These groups
+                    will be applied to the authenticated user.
+                </ui:msg>
+            </b:HelpBlock>
+        </b:ControlGroup>
+
         <o:CollapsiblePanel ui:field="advancedOptions" heading="ADVANCED_OPTIONS">
-
-            <b:ControlGroup>
-                <b:ControlLabel>
-                    <ui:msg description="Provider Username Claim label">Username Claim</ui:msg>
-                </b:ControlLabel>
-                <b:Controls>
-                    <b:TextBox ui:field="usernameClaim"/>
-                    <b:HelpBlock>
-                        <ui:msg description="Provider Username Claim help label">
-                            Optional name of the claim in the ID token and in the UserInfo response which value will
-                            represent the username in Opal. If not explicitly specified (or not found), the username
-                            will be looked up with the claims in the following order: "preferred_username", "username",
-                            "email", "name" and "sub" (subject ID).
-                        </ui:msg>
-                    </b:HelpBlock>
-                </b:Controls>
-            </b:ControlGroup>
-
-            <b:ControlGroup ui:field="scriptGroup">
-                <b:ControlLabel ui:field="scriptLabel">
-                    <ui:msg description="Groups script label">Groups Claim Script</ui:msg>
-                </b:ControlLabel>
-                <Controls>
-                    <b:TextArea ui:field="groupsScript"/>
-                </Controls>
-                <b:HelpBlock>
-                    <ui:msg description="Groups script description">
-                        An optional custom javascript to extract the array of group names from the UserInfo object.
-                        Allows
-                        to adapt to non-standard claims and to transform values into Opal group names. These groups will
-                        be
-                        applied to the authenticated user.
-                    </ui:msg>
-                </b:HelpBlock>
-            </b:ControlGroup>
 
             <b:ControlGroup>
                 <b:CheckBox ui:field="useNonce" value="true">

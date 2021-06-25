@@ -203,10 +203,10 @@ public class Dtos {
       configuration.getCustomParams().put("usernameClaim", dto.getUsernameClaim());
     if (dto.hasGroups())
       configuration.getCustomParams().put("groups", dto.getGroups());
-    if (dto.hasGroupsClaim())
-      configuration.getCustomParams().put("groupsClaim", dto.getGroupsClaim());
     if (dto.hasGroupsScript())
       configuration.getCustomParams().put("groupsJS", dto.getGroupsScript());
+    else if (dto.hasGroupsClaim())
+      configuration.getCustomParams().put("groupsClaim", dto.getGroupsClaim());
     if (dto.hasLabel())
       configuration.getCustomParams().put("label", dto.getLabel());
     if (dto.hasProviderUrl())

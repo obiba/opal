@@ -106,15 +106,15 @@ public class IDProvidersAdministrationView extends ViewWithUiHandlers<IDProvider
 
           @Override
           public String[] allActions() {
-            return new String[]{REMOVE_ACTION, EDIT_ACTION, ENABLE_ACTION, DISABLE_ACTION, DUPLICATE_ACTION};
+            return new String[]{EDIT_ACTION, DUPLICATE_ACTION, ENABLE_ACTION, DISABLE_ACTION, REMOVE_ACTION};
           }
 
           @Override
           public String[] getActions(IDProviderDto value) {
             if (value.getEnabled())
-              return new String[]{REMOVE_ACTION, EDIT_ACTION, DISABLE_ACTION, DUPLICATE_ACTION};
+              return new String[]{EDIT_ACTION, DUPLICATE_ACTION, DISABLE_ACTION, REMOVE_ACTION};
             else
-              return new String[]{REMOVE_ACTION, EDIT_ACTION, ENABLE_ACTION, DUPLICATE_ACTION};
+              return new String[]{EDIT_ACTION, DUPLICATE_ACTION, ENABLE_ACTION, REMOVE_ACTION};
           }
         }), translations.actionsLabel());
 

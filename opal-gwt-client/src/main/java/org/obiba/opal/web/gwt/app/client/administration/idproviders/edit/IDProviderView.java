@@ -12,9 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.idproviders.edit;
 import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -26,6 +24,7 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -54,10 +53,19 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   TextBox usernameClaim;
 
   @UiField
+  Chooser groupsMapping;
+
+  @UiField
   TextBox groups;
 
   @UiField
+  ControlGroup groupsClaimGroup;
+
+  @UiField
   TextBox groupsClaim;
+
+  @UiField
+  ControlGroup groupsScriptGroup;
 
   @UiField
   TextArea groupsScript;
@@ -117,8 +125,22 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     groupsScript.setPlaceholder("// input: userInfo\n// output: an array of strings\n\n// example:\nuserInfo.some.property.map(x => x.split(':')[0])");
     groupsScript.setVisibleLines(6);
     groupsScript.setWidth("500px");
+    groupsMapping.addItem("By claim value", "claim");
+    groupsMapping.addItem("By javascript", "js");
+    groupsMapping.setSelectedValue("claim");
+    groupsMapping.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent chosenChangeEvent) {
+        if ("claim".equals(groupsMapping.getSelectedValue())) {
+          groupsClaimGroup.setVisible(true);
+          groupsScriptGroup.setVisible(false);
+        } else {
+          groupsClaimGroup.setVisible(false);
+          groupsScriptGroup.setVisible(true);
+        }
+      }
+    });
   }
-
 
   /**
    * Used to support ConstraintViolation exceptions
@@ -148,6 +170,15 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     groups.setValue(provider.getGroups());
     groupsClaim.setValue(provider.getGroupsClaim());
     groupsScript.setValue(provider.getGroupsScript());
+    if (Strings.isNullOrEmpty(provider.getGroupsScript())) {
+      groupsClaimGroup.setVisible(true);
+      groupsScriptGroup.setVisible(false);
+      groupsMapping.setSelectedValue("claim");
+    } else {
+      groupsClaimGroup.setVisible(false);
+      groupsScriptGroup.setVisible(true);
+      groupsMapping.setSelectedValue("js");
+    }
     connectTimeout.setValue(provider.getConnectTimeout());
     readTimeout.setValue(provider.getReadTimeout());
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
@@ -209,13 +240,10 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     } else {
       provider.setUsernameClaim(usernameClaim.getText());
     }
-    if (Strings.isNullOrEmpty(groupsClaim.getText().trim())) {
-      provider.clearGroupsClaim();
-    } else {
+    provider.clearGroupsClaim();
+    provider.clearGroupsScript();
+    if ("claim".equals(groupsMapping.getSelectedValue())) {
       provider.setGroupsClaim(groupsClaim.getText());
-    }
-    if (Strings.isNullOrEmpty(groupsScript.getText().trim())) {
-      provider.clearGroupsScript();
     } else {
       provider.setGroupsScript(groupsScript.getText());
     }
