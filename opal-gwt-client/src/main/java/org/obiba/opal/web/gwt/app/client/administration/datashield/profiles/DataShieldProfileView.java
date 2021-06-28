@@ -141,8 +141,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
     }
     rParserVersionLabel.setVisible(profile.hasRParserVersion());
     if (profile.hasRParserVersion())
-      rParserVersionLabel.setText(translationMessages.dataShieldRParserInfo(profile.getRParserVersion(),
-          translations.dataShieldRParserShortDescriptionMap().get(profile.getRParserVersion())));
+      rParserVersionLabel.setText(translationMessages.dataShieldRParserInfo(profile.getRParserVersion()));
   }
 
   @Override
