@@ -38,7 +38,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   @Autowired
   private DataShieldProfileService datashieldProfileService;
 
-  @Value("#{new Boolean('${org.obiba.opal.datashield.useTibble}')}")
+  @Value("#{new Boolean('${datashield.useTibble}')}")
   private boolean useTibble;
 
   @Override

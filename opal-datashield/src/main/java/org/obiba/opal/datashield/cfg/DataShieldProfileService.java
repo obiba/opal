@@ -46,7 +46,7 @@ public class DataShieldProfileService implements SystemService {
 
   private static final Logger log = LoggerFactory.getLogger(DataShieldProfileService.class);
 
-  @Value("${org.obiba.opal.datashield.r.parser}")
+  @Value("${datashield.r.parser}")
   private String defaultRParserVersion;
 
   private final RServerManagerService rServerManagerService;
