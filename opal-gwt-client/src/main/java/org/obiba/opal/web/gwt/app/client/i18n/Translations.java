@@ -1285,6 +1285,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Specify whether the data file is to be archived.")
   String dataImportArchiveStep();
 
+  @Description("DS R parser description map")
+  @DefaultStringMapValue({
+      "default", "system default",
+      "v1", "standard",
+      "v2", "subsets are forbidden" })
+  Map<String, String> dataShieldRParserShortDescriptionMap();
+
   @Description("Package description label")
   @DefaultStringValue("Package Description")
   String dataShieldPackageDescription();

@@ -10,9 +10,6 @@
 package org.obiba.opal.web.datashield;
 
 import org.obiba.datashield.core.DSMethodType;
-import org.obiba.datashield.r.expr.DSRScriptValidator;
-import org.obiba.datashield.r.expr.FirstNodeInvokesFunctionValidator;
-import org.obiba.datashield.r.expr.NoBinaryOpsValidator;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -67,9 +64,11 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   private Response aggregate(boolean async, String body, RSerialize serialize) {
     try {
       RServerSession rSession = getRServerSession();
+      DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
       ROperationWithResult operation = new RestrictedRScriptROperation(body,
-          ((DataShieldProfile) rSession.getProfile()).getEnvironment(DSMethodType.AGGREGATE),
-          DSRScriptValidator.of(new FirstNodeInvokesFunctionValidator(), new NoBinaryOpsValidator()), serialize);
+          profile.getEnvironment(DSMethodType.AGGREGATE),
+          datashieldProfileService.getRParserVersionOrDefault(profile),
+          serialize);
       if (async) {
         String id = rSession.executeAsync(operation);
         return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();

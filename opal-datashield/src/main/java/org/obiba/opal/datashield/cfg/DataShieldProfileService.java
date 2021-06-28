@@ -28,6 +28,7 @@ import org.obiba.opal.web.model.DataShield;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +46,9 @@ public class DataShieldProfileService implements SystemService {
 
   private static final Logger log = LoggerFactory.getLogger(DataShieldProfileService.class);
 
+  @Value("${org.obiba.opal.datashield.r.parser}")
+  private String defaultRParserVersion;
+
   private final RServerManagerService rServerManagerService;
 
   private final OrientDbService orientDbService;
@@ -61,6 +65,11 @@ public class DataShieldProfileService implements SystemService {
     this.orientDbService = orientDbService;
     this.subjectAclService = subjectAclService;
     this.datashieldConfigurationSupplier = datashieldConfigurationSupplier;
+  }
+
+  public String getRParserVersionOrDefault(DataShieldProfile profile) {
+    if (profile.hasRParserVersion()) return profile.getRParserVersion();
+    return Strings.isNullOrEmpty(defaultRParserVersion) ? "v1" : defaultRParserVersion;
   }
 
   /**

@@ -13,12 +13,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
-import org.obiba.datashield.r.expr.*;
+import org.obiba.datashield.r.expr.ParseException;
+import org.obiba.datashield.r.expr.RScriptGenerator;
+import org.obiba.datashield.r.expr.RScriptGeneratorFactory;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
 
-import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,25 +27,24 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   private final String script;
 
-  private final SimpleNode scriptAst;
 
   private final DSEnvironment environment;
 
+  private final RScriptGenerator rScriptGenerator;
+
   @SuppressWarnings("ConstantConditions")
   public AbstractRestrictedRScriptROperation(String script, DSEnvironment environment,
-                                             DSRScriptValidator validator) throws ParseException, InvalidScriptException {
+                                             String rParserVersion) throws ParseException {
     Preconditions.checkArgument(script != null, "script cannot be null");
     Preconditions.checkArgument(environment != null, "environment cannot be null");
-    Preconditions.checkArgument(validator != null, "validator cannot be null");
+    Preconditions.checkArgument(rParserVersion != null, "R parser version cannot be null");
 
     this.script = script;
     this.environment = environment;
-
     DataShieldLog.userLog("parsing '{}'", script);
-    scriptAst = new DataShieldGrammar(new StringReader(script)).root();
     try {
-      validator.validate(scriptAst);
-    } catch (InvalidScriptException e) {
+      this.rScriptGenerator = RScriptGeneratorFactory.make(rParserVersion, environment, script);
+    } catch (Exception e) {
       DataShieldLog.userLog("Script failed validation: " + e.getMessage());
       throw e;
     }
@@ -56,7 +56,7 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
   }
 
   protected String restricted() {
-    return new RScriptGenerator(environment).toScript(scriptAst);
+    return rScriptGenerator.toScript();
   }
 
   /**

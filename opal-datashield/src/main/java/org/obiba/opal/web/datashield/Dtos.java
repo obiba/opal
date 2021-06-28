@@ -25,11 +25,16 @@ public class Dtos {
   }
 
   public static DataShield.DataShieldProfileDto asDto(DataShieldProfile profile) {
-    return DataShield.DataShieldProfileDto.newBuilder()
+    DataShield.DataShieldProfileDto.Builder builder = DataShield.DataShieldProfileDto.newBuilder()
         .setName(profile.getName())
         .setCluster(profile.getCluster())
         .setEnabled(profile.isEnabled())
-        .setRestrictedAccess(profile.isRestrictedAccess()).build();
+        .setRestrictedAccess(profile.isRestrictedAccess());
+
+    if (profile.hasRParserVersion())
+        builder.setRParserVersion(profile.getRParserVersion());
+
+    return builder.build();
   }
 
   public static DataShieldProfile fromDto(DataShield.DataShieldProfileDto dto) {
@@ -37,6 +42,7 @@ public class Dtos {
     profile.setCluster(dto.getCluster());
     profile.setEnabled(dto.getEnabled());
     profile.setRestrictedAccess(dto.getRestrictedAccess());
+    profile.setRParserVersion(dto.hasRParserVersion() ? dto.getRParserVersion() : null);
     return profile;
   }
 

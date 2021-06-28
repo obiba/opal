@@ -83,8 +83,10 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
     try {
+      DataShieldProfile profile = (DataShieldProfile) getRServerSession().getProfile();
       ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-          ((DataShieldProfile) getRServerSession().getProfile()).getEnvironment(DSMethodType.ASSIGN));
+          profile.getEnvironment(DSMethodType.ASSIGN),
+          datashieldProfileService.getRParserVersionOrDefault(profile));
       if (async) {
         String id = getRServerSession().executeAsync(rop);
         return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();

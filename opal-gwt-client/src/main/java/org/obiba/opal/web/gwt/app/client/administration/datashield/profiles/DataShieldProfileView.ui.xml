@@ -64,6 +64,10 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
+            <g:Label ui:field="rParserVersionLabel"/>
+        </g:FlowPanel>
+
+        <g:FlowPanel addStyleNames="large-bottom-margin">
             <b:Paragraph>
                 <ui:msg description="DS Profile reload description">
                     Reset the DataSHIELD profile settings with some selected DataSHIELD packages.

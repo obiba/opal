@@ -10,6 +10,7 @@
 
 package org.obiba.opal.datashield.cfg;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.datashield.core.DSConfiguration;
@@ -37,6 +38,8 @@ public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUn
   private boolean enabled = false;
 
   private boolean restrictedAccess = false;
+
+  private String rParserVersion;
 
   private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
 
@@ -87,6 +90,19 @@ public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUn
   @Override
   public String getCluster() {
     return cluster;
+  }
+
+  public void setRParserVersion(String rParserVersion) {
+    this.rParserVersion = rParserVersion;
+  }
+
+  public boolean hasRParserVersion() {
+    return !Strings.isNullOrEmpty(rParserVersion);
+  }
+
+  @Override
+  public String getRParserVersion() {
+    return rParserVersion;
   }
 
   @Override

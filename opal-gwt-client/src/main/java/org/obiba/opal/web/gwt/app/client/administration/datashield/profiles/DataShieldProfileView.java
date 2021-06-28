@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -71,6 +72,9 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
 
   @UiField
   SimplePanel permissionsPanel;
+
+  @UiField
+  Label rParserVersionLabel;
 
   @UiField
   Button initProfile;
@@ -135,6 +139,10 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
       unrestrictProfile.setVisible(false);
       permissionsPanel.setVisible(false);
     }
+    rParserVersionLabel.setVisible(profile.hasRParserVersion());
+    if (profile.hasRParserVersion())
+      rParserVersionLabel.setText(translationMessages.dataShieldRParserInfo(profile.getRParserVersion(),
+          translations.dataShieldRParserShortDescriptionMap().get(profile.getRParserVersion())));
   }
 
   @Override

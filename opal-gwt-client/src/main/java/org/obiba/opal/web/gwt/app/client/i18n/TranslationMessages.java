@@ -140,6 +140,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("DataSHIELD profile {0} added, initialized with {1} profile settings.")
   String dataShieldProfileAddedInfo(String name, String pName);
 
+  @Description("DS profile R parser label")
+  @DefaultMessage("The R parser version is: {0} ({1})")
+  String dataShieldRParserInfo(String name, String description);
+
   @Description("Remove Aggregate Method label")
   @DefaultMessage("Remove Aggregate Method")
   String removeDataShieldAggregateMethod();

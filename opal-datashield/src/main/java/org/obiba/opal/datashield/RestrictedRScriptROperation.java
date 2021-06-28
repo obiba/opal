@@ -10,7 +10,6 @@
 package org.obiba.opal.datashield;
 
 import org.obiba.datashield.core.DSEnvironment;
-import org.obiba.datashield.r.expr.DSRScriptValidator;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.spi.r.RSerialize;
 
@@ -22,8 +21,8 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   private final RSerialize serialize;
 
   public RestrictedRScriptROperation(String script, DSEnvironment environment,
-                                     DSRScriptValidator validator, RSerialize serialize) throws ParseException {
-    super(script, environment, validator);
+                                     String rParserVersion, RSerialize serialize) throws ParseException {
+    super(script, environment, rParserVersion);
     this.serialize = serialize;
   }
 
