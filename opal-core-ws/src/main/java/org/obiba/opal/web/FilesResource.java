@@ -505,8 +505,11 @@ public class FilesResource {
       org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder);
     else
       org.obiba.core.util.FileUtil.unzip(archiveFile, destinationFolder, archiveKey);
+    FileObject unzippedFileObj = destination.getChild(destinationFolder.getName());
+    if (unzippedFileObj == null)
+      throw new BadRequestException("Archive file extraction failed.");
 
-    Opal.FileDto dto = getBaseFolderBuilder(destination.getChild(destinationFolder.getName())).build();
+    Opal.FileDto dto = getBaseFolderBuilder(unzippedFileObj).build();
     URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(destinationPath).path(destinationFolder.getName()).build();
     return Response.created(folderUri)//
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
@@ -607,7 +610,7 @@ public class FilesResource {
 
     // Create FileDtos for each file & folder in the folder corresponding to the path.
     if (folder.isReadable()) {
-      addChildren(folderBuilder, folder, 2);
+      addChildren(folderBuilder, folder, 1);
     }
 
     return Response.ok(folderBuilder.build()).build();
