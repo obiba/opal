@@ -64,6 +64,20 @@ public class DataShieldProfileResource {
     return Response.ok().build();
   }
 
+  @PUT
+  @Path("_rparser")
+  public Response setRParser(@PathParam("name") String name, @QueryParam("version") String version) {
+    doApplyRParserVersion(name, version);
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("_rparser")
+  public Response removeRParser(@PathParam("name") String name) {
+    doApplyRParserVersion(name, null);
+    return Response.ok().build();
+  }
+
   /**
    * Remove a secondary profile, primary ones are sticked to their cluster.
    *
@@ -84,6 +98,12 @@ public class DataShieldProfileResource {
   //
   // Private methods
   //
+
+  private void doApplyRParserVersion(String name, String version) {
+    DataShieldProfile profile = getProfileInternal(name);
+    profile.setRParserVersion(version);
+    datashieldProfileService.saveProfile(profile);
+  }
 
   private void doEnableProfile(String name, boolean enabled) {
     DataShieldProfile profile = getProfileInternal(name);

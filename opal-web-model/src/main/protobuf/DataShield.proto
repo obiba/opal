@@ -9,7 +9,7 @@ message DataShieldProfileDto {
   required string cluster = 2;
   required bool enabled = 3;
   required bool restrictedAccess = 4;
-  optional string rParserVersion = 5;
+  optional string rParser = 5;
 }
 
 message DataShieldMethodDto {

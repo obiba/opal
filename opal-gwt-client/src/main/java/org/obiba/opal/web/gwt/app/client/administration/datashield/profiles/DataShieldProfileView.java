@@ -74,7 +74,7 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
   SimplePanel permissionsPanel;
 
   @UiField
-  Label rParserVersionLabel;
+  Label rParserLabel;
 
   @UiField
   Button initProfile;
@@ -139,9 +139,9 @@ public class DataShieldProfileView extends ViewWithUiHandlers<DataShieldProfileU
       unrestrictProfile.setVisible(false);
       permissionsPanel.setVisible(false);
     }
-    rParserVersionLabel.setVisible(profile.hasRParserVersion());
-    if (profile.hasRParserVersion())
-      rParserVersionLabel.setText(translationMessages.dataShieldRParserInfo(profile.getRParserVersion()));
+    rParserLabel.setVisible(profile.hasRParser());
+    if (profile.hasRParser())
+      rParserLabel.setText(translationMessages.dataShieldRParserInfo(profile.getRParser()));
   }
 
   @Override

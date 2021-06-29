@@ -32,7 +32,7 @@ public class Dtos {
         .setRestrictedAccess(profile.isRestrictedAccess());
 
     if (profile.hasRParserVersion())
-        builder.setRParserVersion(profile.getRParserVersion());
+        builder.setRParser(profile.getRParserVersion());
 
     return builder.build();
   }
@@ -42,7 +42,7 @@ public class Dtos {
     profile.setCluster(dto.getCluster());
     profile.setEnabled(dto.getEnabled());
     profile.setRestrictedAccess(dto.getRestrictedAccess());
-    profile.setRParserVersion(dto.hasRParserVersion() ? dto.getRParserVersion() : null);
+    profile.setRParserVersion(dto.hasRParser() ? dto.getRParser() : null);
     return profile;
   }
 

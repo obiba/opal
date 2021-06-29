@@ -64,7 +64,7 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
-            <g:Label ui:field="rParserVersionLabel"/>
+            <g:Label ui:field="rParserLabel"/>
         </g:FlowPanel>
 
         <g:FlowPanel addStyleNames="large-bottom-margin">
