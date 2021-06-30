@@ -32,7 +32,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 @Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -52,35 +51,31 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   private DataExportService dataExportService;
 
   @Override
-  public Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
+  public Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException {
     return aggregate(async, body, RSerialize.RAW);
   }
 
   @Override
-  public Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
+  public Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException {
     return aggregate(async, body, RSerialize.JSON);
   }
 
-  private Response aggregate(boolean async, String body, RSerialize serialize) {
-    try {
-      RServerSession rSession = getRServerSession();
-      DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
-      ROperationWithResult operation = new RestrictedRScriptROperation(body,
-          profile.getEnvironment(DSMethodType.AGGREGATE),
-          datashieldProfileService.getRParserVersionOrDefault(profile),
-          serialize);
-      if (async) {
-        String id = rSession.executeAsync(operation);
-        return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
-      } else if (serialize == RSerialize.RAW) {
-        rSession.execute(operation);
-        return Response.ok().entity(operation.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
-      } else {
-        rSession.execute(operation);
-        return Response.ok().entity(operation.getResult().asStrings()[0]).type(MediaType.APPLICATION_JSON).build();
-      }
-    } catch (ParseException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+  private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {
+    RServerSession rSession = getRServerSession();
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    ROperationWithResult operation = new RestrictedRScriptROperation(body,
+        profile.getEnvironment(DSMethodType.AGGREGATE),
+        datashieldProfileService.getRParserVersionOrDefault(profile),
+        serialize);
+    if (async) {
+      String id = rSession.executeAsync(operation);
+      return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
+    } else if (serialize == RSerialize.RAW) {
+      rSession.execute(operation);
+      return Response.ok().entity(operation.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
+    } else {
+      rSession.execute(operation);
+      return Response.ok().entity(operation.getResult().asStrings()[0]).type(MediaType.APPLICATION_JSON).build();
     }
   }
 

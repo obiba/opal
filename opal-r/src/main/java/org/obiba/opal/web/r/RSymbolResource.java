@@ -49,7 +49,7 @@ public interface RSymbolResource {
 
   @PUT
   @Consumes("application/x-rscript")
-  Response putRScript(@Context UriInfo uri, String script, @QueryParam("async") @DefaultValue("false") boolean async);
+  Response putRScript(@Context UriInfo uri, String script, @QueryParam("async") @DefaultValue("false") boolean async) throws Exception;
 
   /**
    * Assign value table variables to a R data.frame.

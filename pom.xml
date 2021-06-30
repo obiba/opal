@@ -44,7 +44,7 @@
     <commons-math.version>3.5</commons-math.version>
     <commons-vfs.version>2.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
-    <ds4j.version>2.0-SNAPSHOT</ds4j.version>
+    <ds4j.version>2.0.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
     <ehcache-core.version>2.6.11</ehcache-core.version>
     <fest.version>2.0M10</fest.version>
@@ -100,7 +100,7 @@
     <newrelic.version>3.20.0</newrelic.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>1.16-SNAPSHOT</obiba-commons.version>
+    <obiba-commons.version>1.16.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>

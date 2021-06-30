@@ -44,9 +44,11 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     DataShieldLog.userLog("parsing '{}'", script);
     try {
       this.rScriptGenerator = RScriptGeneratorFactory.make(rParserVersion, environment, script);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       DataShieldLog.userLog("Script failed validation: " + e.getMessage());
-      throw e;
+      if (e instanceof ParseException)
+        throw e;
+      throw new ParseException(e.getMessage(), e);
     }
   }
 

@@ -95,7 +95,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public Response putRScript(UriInfo uri, String script, boolean async) {
+  public Response putRScript(UriInfo uri, String script, boolean async) throws Exception {
     RScriptROperation rop = new RScriptROperation(String.format("is.null(base::assign('%s', %s))", name, script));
     rop.setIgnoreResult(true);
     return assignSymbol(uri, rop, async);

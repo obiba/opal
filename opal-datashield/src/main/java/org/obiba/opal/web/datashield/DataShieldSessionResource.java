@@ -18,6 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.web.r.RSessionResource;
 
 public interface DataShieldSessionResource extends RSessionResource {
@@ -25,11 +26,11 @@ public interface DataShieldSessionResource extends RSessionResource {
   @POST
   @Path("/aggregate")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body);
+  Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException;
 
   @POST
   @Path("/aggregate")
   @Produces(MediaType.APPLICATION_JSON)
-  Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body);
+  Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException;
 
 }

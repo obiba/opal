@@ -54,7 +54,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   }
 
   @Override
-  public Response putRScript(UriInfo uri, String script, boolean async) {
+  public Response putRScript(UriInfo uri, String script, boolean async) throws Exception {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
     return putRestrictedRScript(uri, script, async);
   }
@@ -81,21 +81,17 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     return Response.status(Status.FORBIDDEN).build();
   }
 
-  protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
-    try {
-      DataShieldProfile profile = (DataShieldProfile) getRServerSession().getProfile();
-      ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-          profile.getEnvironment(DSMethodType.ASSIGN),
-          datashieldProfileService.getRParserVersionOrDefault(profile));
-      if (async) {
-        String id = getRServerSession().executeAsync(rop);
-        return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
-      } else {
-        getRServerSession().execute(rop);
-        return Response.created(getSymbolURI(uri)).build();
-      }
-    } catch (ParseException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+  protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) throws ParseException {
+    DataShieldProfile profile = (DataShieldProfile) getRServerSession().getProfile();
+    ROperation rop = new RestrictedAssignmentROperation(getName(), content,
+        profile.getEnvironment(DSMethodType.ASSIGN),
+        datashieldProfileService.getRParserVersionOrDefault(profile));
+    if (async) {
+      String id = getRServerSession().executeAsync(rop);
+      return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
+    } else {
+      getRServerSession().execute(rop);
+      return Response.created(getSymbolURI(uri)).build();
     }
   }
 
