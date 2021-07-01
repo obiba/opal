@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.service.security.realm;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -105,7 +106,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       return isSystemAdministrationPermitted(principals, node);
 
     if (node.startsWith("/files/projects")) {
-      return isProjectFilesPermitted(principals, node);
+      return isProjectFilesPermitted(principals, node, action);
     }
 
     return true;
@@ -142,16 +143,16 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     if (elems.length == 4 && "datasource".equals(elems[1]) && SQL_ACTIONS.contains(elems[3]))
       return isUsingSQLPermitted(principals);
 
-    if ((isReadNoValues(principals) || isRead(principals)) && EDIT_METHODS.contains(action))
+    if ((isReadOnlyNoValues(principals) || isReadOnly(principals)) && EDIT_METHODS.contains(action))
       return false;
 
-    if (isReadNoValues(principals) && "datasource".equals(elems[1]) && (node.endsWith("/valueSets") || node.contains("/valueSet/")))
+    if (isReadOnlyNoValues(principals) && "datasource".equals(elems[1]) && (node.endsWith("/valueSets") || node.contains("/valueSet/")))
       return false;
 
     return true;
   }
 
-  private boolean isProjectFilesPermitted(PrincipalCollection principals, String node) {
+  private boolean isProjectFilesPermitted(PrincipalCollection principals, String node, String action) {
     String[] elems = node.split("/");
     if (elems.length < 4) return true;
 
@@ -166,7 +167,11 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
       projectAccessible = projectRestrictions.contains(project);
     if (!projectAccessible) return false;
 
-    return !isReadNoValues(principals) && !isRead(principals);
+    if (!hasAccessLimitation(principals))
+      return true;
+    if (isReadOnly(principals))
+      return !EDIT_METHODS.contains(action);
+    return !isReadOnlyNoValues(principals);
   }
 
   private boolean isProjectCommandPermitted(PrincipalCollection principals, String node) {
@@ -198,12 +203,16 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
     return getToken(principals).getProjects();
   }
 
-  private boolean isReadNoValues(PrincipalCollection principals) {
+  private boolean isReadOnlyNoValues(PrincipalCollection principals) {
     return Opal.SubjectTokenDto.AccessType.READ_NO_VALUES.name().equals(getToken(principals).getAccess());
   }
 
-  private boolean isRead(PrincipalCollection principals) {
+  private boolean isReadOnly(PrincipalCollection principals) {
     return Opal.SubjectTokenDto.AccessType.READ.name().equals(getToken(principals).getAccess());
+  }
+
+  private boolean hasAccessLimitation(PrincipalCollection principals) {
+    return !Strings.isNullOrEmpty(getToken(principals).getAccess());
   }
 
   private List<String> getProjectCommands(PrincipalCollection principals) {
@@ -226,8 +235,8 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
    */
   private Set<String> getFilteredCommands(PrincipalCollection principals) {
     SubjectToken token = getToken(principals);
-    boolean readNoValues = isReadNoValues(principals);
-    boolean read = isRead(principals);
+    boolean readNoValues = isReadOnlyNoValues(principals);
+    boolean read = isReadOnly(principals);
     return token.getCommands().stream()
         .filter(cmd -> (!readNoValues && !read) // can read/write
             || (readNoValues && READ_NO_VALUES_COMMANDS.contains(cmd))  // can read without values, not write
@@ -248,7 +257,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isUsingRPermitted(PrincipalCollection principals) {
-    return getToken(principals).isUseR() && !isReadNoValues(principals);
+    return getToken(principals).isUseR() && !isReadOnlyNoValues(principals);
   }
 
   private boolean isUsingDatashieldPermitted(PrincipalCollection principals) {
@@ -256,7 +265,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
   }
 
   private boolean isUsingSQLPermitted(PrincipalCollection principals) {
-    return getToken(principals).isUseSQL() && !isReadNoValues(principals);
+    return getToken(principals).isUseSQL() && !isReadOnlyNoValues(principals);
   }
 
   private boolean isSystemAdministrationPermitted(PrincipalCollection principals, String node) {
