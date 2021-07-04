@@ -75,7 +75,12 @@ public class DataShieldPackagesResource {
   public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
     DataShieldProfile profileObj = getDataShieldProfile(profile);
     profileObj.clear();
-    names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profileObj, name));
+    if (names == null || names.isEmpty()) {
+      dsPackageMethodeHelper.getInstalledPackagesDtos(profileObj)
+          .forEach(pkg -> dsPackageMethodeHelper.publish(profileObj, pkg));
+    } else {
+      names.stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profileObj, name));
+    }
     return Response.ok().build();
   }
 
@@ -89,7 +94,12 @@ public class DataShieldPackagesResource {
   @DELETE
   @Path("_publish")
   public Response deletePackageSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
-    names.forEach(name -> dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name));
+    DataShieldProfile profileObj = getDataShieldProfile(profile);
+    if (names == null || names.isEmpty()) {
+      profileObj.clear();
+      datashieldProfileService.saveProfile(profileObj);
+    } else
+      names.forEach(name -> dsPackageMethodeHelper.unpublish(getDataShieldProfile(profile), name));
     return Response.noContent().build();
   }
 
