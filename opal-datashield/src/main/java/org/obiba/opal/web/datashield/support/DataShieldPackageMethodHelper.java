@@ -123,6 +123,10 @@ public class DataShieldPackageMethodHelper {
     return publish(profile, packageDtos);
   }
 
+  public DataShield.DataShieldPackageMethodsDto publish(RServerProfile profile, OpalR.RPackageDto packageDto) {
+    return publish(profile, Lists.newArrayList(packageDto));
+  }
+
   /**
    * Remove all the methods associated to the package from the profiles settings.
    *
