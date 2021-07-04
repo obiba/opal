@@ -97,7 +97,6 @@
     <mongeez.version>0.9.4</mongeez.version>
     <mongodb-driver.version>3.12.8</mongodb-driver.version>
     <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
-    <newrelic.version>3.20.0</newrelic.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
     <obiba-commons.version>1.16.0</obiba-commons.version>
@@ -1485,14 +1484,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-
-      <dependency>
-        <groupId>com.newrelic.agent.java</groupId>
-        <artifactId>newrelic-agent</artifactId>
-        <version>${newrelic.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 

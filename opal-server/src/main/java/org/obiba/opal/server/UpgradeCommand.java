@@ -123,7 +123,6 @@ public class UpgradeCommand {
   private void prepareConfigFiles() {
     prepareOpalConfigFile();
     prepareDistConfigFile("logback.xml");
-    prepareDistConfigFile("newrelic.yml");
   }
 
   private void prepareDistConfigFile(String name) {

@@ -63,8 +63,8 @@ case "$1" in
         ln -s /etc/opal /var/lib/opal/conf
       fi
 
-      chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
-      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
+      chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal
+      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal
       chmod +x /usr/share/opal/tools/shiro-hasher
       find /etc/opal/ -type f | xargs chmod 640
 
@@ -78,6 +78,14 @@ case "$1" in
         cp /etc/opal/opal-config.xml /etc/opal/opal-config.xml.opal1-backup
         mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
       fi
+
+      if [ -e /etc/init.d/opal ]; then
+        update-rc.d opal defaults >/dev/null
+        rm /etc/init.d/opal
+      fi
+      systemctl daemon-reload
+      systemctl enable opal
+      systemctl start opal
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
