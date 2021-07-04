@@ -21,8 +21,12 @@ set -e
 
 case "$1" in
 	purge)
+	      # Remove service
+	      update-rc.d opal remove >/dev/null || true
+
+	      # Remove user
         userdel -f opal || true
-        rm -rf /var/lib/opal /var/log/opal /tmp/opal /etc/opal /usr/share/opal
+        rm -rf /var/lib/opal /var/log/opal /etc/opal /usr/share/opal
     ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)

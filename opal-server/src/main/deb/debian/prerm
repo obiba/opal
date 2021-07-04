@@ -19,19 +19,18 @@ set -e
 NAME=opal
 
 case "$1" in
-    remove|deconfigure)
-    ;;
-
-    upgrade)
+    remove|deconfigure|upgrade)
         # Read configuration variable file if it is present
         [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-        if which service >/dev/null 2>&1; then
-                service opal stop
-        elif which invoke-rc.d >/dev/null 2>&1; then
-                invoke-rc.d opal stop
-        else
-                /etc/init.d/opal stop
+        if [ -x "/etc/init.d/opal" ]; then
+            if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
+              invoke-rc.d opal stop || true
+            else
+              /etc/init.d/opal stop || true
+            fi
+        elif [ $(systemctl list-unit-files "opal.service" | wc -l) -gt 3 ]; then
+            systemctl stop opal
         fi
     ;;
 

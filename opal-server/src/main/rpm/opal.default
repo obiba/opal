@@ -29,4 +29,4 @@ OPAL_LOG=/var/log/opal
 OPAL_ARGS=""
 
 # arguments to pass to java
-JAVA_ARGS="-Xms1G -Xmx2G -XX:MaxPermSize=256M -XX:+UseG1GC -Dnewrelic.config.file=$OPAL_HOME/conf/newrelic.yml -javaagent:$OPAL_DIST/lib/newrelic-agent-${newrelic.version}.jar"
+JAVA_ARGS="-Xms1G -Xmx2G -XX:+UseG1GC"

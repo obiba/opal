@@ -25,6 +25,8 @@
     <opal.dir>${install.dir}/opal-server-${project.version}</opal.dir>
     <package.name>opal-server-${project.version}</package.name>
     <dist.location>${basedir}/target/${package.name}-dist/${package.name}</dist.location>
+    <deb.dir>${basedir}/target/deb</deb.dir>
+    <deb.version>${project.version}</deb.version>
   </properties>
 
   <dependencies>
@@ -116,10 +118,6 @@
       <artifactId>obiba-password-hasher</artifactId>
       <classifier>cli</classifier>
     </dependency>
-    <dependency>
-      <groupId>com.newrelic.agent.java</groupId>
-      <artifactId>newrelic-agent</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -181,16 +179,13 @@
                   <targetOS>Linux</targetOS>
                   <mappings>
                     <mapping>
-                      <directory>/etc/init.d</directory>
+                      <directory>/usr/lib/systemd/system</directory>
+                      <filemode>644</filemode>
                       <directoryIncluded>false</directoryIncluded>
-                      <filemode>755</filemode>
                       <configuration>true</configuration>
                       <sources>
                         <source>
-                          <location>src/main/rpm/init.d</location>
-                          <includes>
-                            <include>opal</include>
-                          </includes>
+                          <location>src/main/rpm/opal.service</location>
                         </source>
                       </sources>
                     </mapping>
@@ -227,17 +222,6 @@
                       <sources>
                         <source>
                           <location>${dist.location}/conf</location>
-                        </source>
-                      </sources>
-                    </mapping>
-                    <mapping>
-                      <directory>/etc/init</directory>
-                      <filemode>644</filemode>
-                      <directoryIncluded>false</directoryIncluded>
-                      <sources>
-                        <source>
-                          <location>src/main/rpm/upstart.conf</location>
-                          <destination>opal.conf</destination>
                         </source>
                       </sources>
                     </mapping>
@@ -306,12 +290,6 @@
                       <username>opal</username>
                       <groupname>adm</groupname>
                     </mapping>
-                    <mapping>
-                      <directory>/tmp/opal</directory>
-                      <filemode>740</filemode>
-                      <username>opal</username>
-                      <groupname>adm</groupname>
-                    </mapping>
                   </mappings>
                   <preinstallScriptlet>
                     <scriptFile>src/main/rpm/scripts/preinstall.sh</scriptFile>
@@ -321,6 +299,14 @@
                     <scriptFile>src/main/rpm/scripts/postinstall.sh</scriptFile>
                     <fileEncoding>utf-8</fileEncoding>
                   </postinstallScriptlet>
+                  <pretransScriptlet>
+                    <scriptFile>src/main/rpm/scripts/pretrans.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </pretransScriptlet>
+                  <posttransScriptlet>
+                    <scriptFile>src/main/rpm/scripts/posttrans.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </posttransScriptlet>
                   <preremoveScriptlet>
                     <scriptFile>src/main/rpm/scripts/prerm.sh</scriptFile>
                     <fileEncoding>utf-8</fileEncoding>
@@ -344,8 +330,6 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="deb.dir" value="${basedir}/target/deb" />
-                    <property name="deb.version" value="${project.version}" />
                     <tstamp>
                       <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
                     </tstamp>
@@ -356,9 +340,11 @@
                       <filterset>
                         <filter token="project.version" value="${deb.version}" />
                         <filter token="date" value="${deb.date}" />
-                        <filter token="newrelic_version" value="${newrelic.version}" />
                       </filterset>
                     </copy>
+
+                    <copy todir="${deb.dir}/usr/lib/systemd/system" file="src/main/deb/systemd/opal.service" />
+                    <copy todir="${deb.dir}/etc/default" file="src/main/deb/default/opal" />
 
                     <mkdir dir="${deb.dir}/usr/share" />
                     <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
