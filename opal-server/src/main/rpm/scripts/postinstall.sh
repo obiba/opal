@@ -62,6 +62,14 @@ if [ -f "/etc/opal/opal-config.xml" ]; then
   mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
 fi
 
+# make sure newrelic is removed from defaults
+if grep -q newrelic /etc/default/opal; then
+  sed -r 's,(\s+-Dnewrelic.config.file=.*)(\s+-javaagent.*)(.*)",\3",g' /etc/default/opal > /tmp/opal.default
+  mv /tmp/opal.default /etc/default/opal
+  chown opal:adm /etc/default/opal
+  chmod 644 /etc/default/opal
+fi
+
 # for clean install
 if [ $1 -eq 1 ] ; then
   # Initial installation

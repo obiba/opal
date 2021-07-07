@@ -79,6 +79,14 @@ case "$1" in
         mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
       fi
 
+      # make sure newrelic is removed from defaults
+      if grep -q newrelic /etc/default/opal; then
+        sed -r 's,(\s+-Dnewrelic.config.file=.*)(\s+-javaagent.*)(.*)",\3",g' /etc/default/opal > /tmp/opal.default
+        mv /tmp/opal.default /etc/default/opal
+        chown opal:adm /etc/default/opal
+        chmod 644 /etc/default/opal
+      fi
+
       if [ -e /etc/init.d/opal ]; then
         update-rc.d opal defaults >/dev/null
         rm /etc/init.d/opal
