@@ -134,7 +134,7 @@ class RserveSession extends AbstractRServerSession {
   }
 
   private String updateRTempDir() {
-    RScriptROperation rop = new RScriptROperation("if (!require(unixtools)) { install.packages('unixtools', repos = 'http://www.rforge.net/') }", false);
+    RScriptROperation rop = new RScriptROperation("if (!require(unixtools)) { install.packages('unixtools', repos = 'https://www.rforge.net/') }", false);
     execute(rop);
     rop = new RScriptROperation("unixtools::set.tempdir(base::file.path(base::tempdir(), base::basename(base::getwd())))", false);
     execute(rop);
