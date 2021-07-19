@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.services;
 
-import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.sql.SQLExecution;
 import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.web.model.SQL;
@@ -19,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.stream.Collectors;
 

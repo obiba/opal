@@ -164,6 +164,8 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
       rClassToApply = MagmaAssignROperation.RClass.TIBBLE;
     else if ("data.frame".equals(rClass))
       rClassToApply = MagmaAssignROperation.RClass.DATA_FRAME;
+    else if ("data.frame.no.factors".equals(rClass))
+      rClassToApply = MagmaAssignROperation.RClass.DATA_FRAME_NO_FACTORS;
     else if ("tibble.with.factors".equals(rClass))
       rClassToApply = MagmaAssignROperation.RClass.TIBBLE_WITH_FACTORS;
     else {
