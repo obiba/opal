@@ -28,7 +28,7 @@ import java.io.InputStream;
 public class MagmaAssignROperation extends AbstractROperation {
 
   public enum RClass {
-    DATA_FRAME, TIBBLE, TIBBLE_WITH_FACTORS, VECTOR
+    DATA_FRAME, DATA_FRAME_NO_FACTORS, TIBBLE, TIBBLE_WITH_FACTORS, VECTOR
   }
 
   private static final String DEFAULT_ID_COLUMN = "_id";
@@ -97,6 +97,9 @@ public class MagmaAssignROperation extends AbstractROperation {
       case VECTOR:
       case DATA_FRAME:
         converter = new ValueTableDataFrameRConverter(this);
+        break;
+      case DATA_FRAME_NO_FACTORS:
+        converter = new ValueTableDataFrameRConverter(this, false, false);
         break;
       case TIBBLE_WITH_FACTORS:
         converter = new ValueTableDataFrameRConverter(this, true);

@@ -219,7 +219,7 @@ public class RSQLService implements Service, SQLService {
         queryStr = queryStr.replaceAll(fromTable, tableSymbol);
       MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, valueTable, dataExportService,
           Strings.isNullOrEmpty(idName) ? DEFAULT_ID_COLUMN : idName,
-          MagmaAssignROperation.RClass.DATA_FRAME);
+          MagmaAssignROperation.RClass.DATA_FRAME_NO_FACTORS);
       rSession.execute(mop);
     }
     queryStr = queryStr.replaceAll("'", "\\\\'");
