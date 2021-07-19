@@ -13,10 +13,14 @@ package org.obiba.opal.sql;
 import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public class SQLExtractor {
+
+  private static final Logger log = LoggerFactory.getLogger(SQLExtractor.class);
 
   public static Set<String> extractTables(String sql) throws SQLParserException {
     try {
@@ -67,9 +71,12 @@ public class SQLExtractor {
 
         @Override
         public Void visitTable_name(SQLParser.Table_nameContext ctx) {
-          tables.add(ctx.getText());
+          log.info("table {} from context {}", ctx.getText(), ctx.getParent().getClass().getSimpleName());
+          if (ctx.getParent() instanceof SQLParser.Table_or_subqueryContext)
+            tables.add(ctx.getText());
           return super.visitTable_name(ctx);
         }
+
       });
 
       return tables;

@@ -21,6 +21,7 @@ public class SQLExtractorTest {
   @Test
   public void testExtractTables() throws SQLParserException {
     doExtractTables("select * from CNSIM1", "CNSIM1");
+    doExtractTables("select tab.LAB_GLUC from CNSIM1 as tab", "CNSIM1");
     doExtractTables("select * from CNSIM1 union all select * from CNSIM2", "CNSIM1 | CNSIM2");
     doExtractTables("select count(LAB_HDL) as hdl_count, avg(LAB_HDL) as hdl_avg, GENDER as gender " +
         "from (select * from CNSIM1 union all select * from CNSIM2) " +
