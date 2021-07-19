@@ -1,4 +1,3 @@
-# transform a haven_labelled vector into a factor with appropritae levels (can be more than the observed values)
 .with.factors <- function(x, as.data.frame = TRUE) {
     rval <- `x`
     if (!is.null(rval)) {
@@ -7,17 +6,22 @@
         }
         for (n in colnames(rval)) {
             attrs <- attributes(rval[[n]])
-            if (attrs$opal.nature == 'CATEGORICAL' && "haven_labelled" %in% class(rval[[n]]) && !is.null(attrs$labels)) {
-                v <- factor(rval[[n]], levels = attrs$labels)
-                # restore attributes (without conflicting with factor's ones)
-                for (attr in names(attrs)) {
-                    if (!(attr %in% c("levels", "class"))) {
-                        attributes(v)[[attr]] <- attrs[[attr]]
+            if ("haven_labelled" %in% class(rval[[n]]) && !is.null(attrs$labels)) {
+                if (attrs$opal.nature == 'CATEGORICAL') {
+                    v <- factor(rval[[n]], levels = attrs$labels)
+                    # restore attributes (without conflicting with factor's ones)
+                    for (attr in names(attrs)) {
+                        if (!(attr %in% c("levels", "class"))) {
+                            attributes(v)[[attr]] <- attrs[[attr]]
+                        }
                     }
+                    rval[[n]] <- v
                 }
-                rval[[n]] <- v
+                else if (attrs$opal.nature == 'CONTINUOUS') {
+                    rval[[n]] <- base::unclass(rval[[n]])
+                }
             }
-              # do not want haven things in data frame (plus datashield supports only a single class)
+            # do not want haven things in data frame (plus datashield supports only a single class)
             else if (as.data.frame) {
                 attributes(rval[[n]])[["class"]] <- attrs[["class"]][1]
             }
