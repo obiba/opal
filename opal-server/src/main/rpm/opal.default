@@ -17,7 +17,8 @@ MAXOPENFILES=16384
 OPAL_USER=opal
 
 # location of the opal distribution file
-OPAL_DIST=$(readlink -f /usr/share/opal)
+# This is set using the ExecStartPre command in the opal.service
+#OPAL_DIST=$(readlink -f /usr/share/opal)
 
 # Opal home location
 OPAL_HOME=/var/lib/opal
