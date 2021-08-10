@@ -194,7 +194,7 @@
                       <filemode>755</filemode>
                       <sources>
                         <source>
-                          <location>src/main/rpm/opal.sh</location>
+                          <location>src/main/rpm/start.sh</location>
                         </source>
                         <source>
                           <location>src/main/rpm/update.sh</location>
@@ -348,6 +348,9 @@
 
                     <mkdir dir="${deb.dir}/usr/share" />
                     <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
+                    <delete dir="${deb.dir}/usr/share/opal-server-${project.version}/bin" />
+                    <copy todir="${deb.dir}/usr/share/opal-server-${project.version}/bin" file="src/main/deb/systemd/start.sh" />
+                    <chmod file="${deb.dir}/usr/share/opal-server-${project.version}/bin/start.sh" perm="+x" />
 
                     <mkdir dir="${deb.dir}/etc" />
                     <copy todir="${deb.dir}/etc/opal">
