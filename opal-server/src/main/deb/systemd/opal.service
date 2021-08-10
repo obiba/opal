@@ -10,7 +10,7 @@ User=opal
 LimitNOFILE=16384
 StandardOutput=file:/var/log/opal/stdout.log
 StandardError=file:/var/log/opal/stderr.log
-ExecStart=/usr/bin/java $JAVA_ARGS -cp "${OPAL_HOME}/conf:${OPAL_DIST}/lib/*" -DOPAL_HOME=${OPAL_HOME} -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $OPAL_ARGS
+ExecStart=$JAVA $JAVA_ARGS -cp "${OPAL_HOME}/conf:${OPAL_DIST}/lib/*" -DOPAL_HOME=${OPAL_HOME} -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $OPAL_ARGS
 
 [Install]
 WantedBy=network-online.target
