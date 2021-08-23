@@ -161,7 +161,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private void updateFormatChooser() {
     // Remove JDBC format if no database of this type exists
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
-        .forResource(UriBuilders.DATABASES_SQL.create().build())
+        .forResource(UriBuilders.DATABASES_FOR_IMPORT.create().build())
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
@@ -169,8 +169,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             boolean jdbc = false;
             for (int i = 0; i < resource.length(); i++) {
               SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
-              if (sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
-                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
+              if (sqlSettingsDto != null && sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName())) {
                 jdbc = true;
               }
             }

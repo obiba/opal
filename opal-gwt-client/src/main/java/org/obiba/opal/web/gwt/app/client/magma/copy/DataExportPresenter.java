@@ -173,7 +173,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   private void updateFormatChooser() {
     // Remove JDBC formats if no database of this type exists
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
-        .forResource(UriBuilders.DATABASES_SQL.create().build())
+        .forResource(UriBuilders.DATABASES_FOR_EXPORT.create().build())
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
@@ -181,8 +181,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
             JsArray<DatabaseDto> databases = JsArrays.create();
             for(int i = 0; i < resource.length(); i++) {
               SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
-              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
-                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.EXPORT.getName())) {
+              if(sqlSettingsDto != null && sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName())) {
                 databases.push(resource.get(i));
               }
             }

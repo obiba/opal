@@ -803,7 +803,7 @@ public enum UriBuilders {
   DATABASES_FOR_IMPORT {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("system", "databases").query("usage", "import");
+      return UriBuilder.create().segment("system", "databases").query("usage", "import").query("settings", "true");
 
     }
   },
@@ -811,7 +811,7 @@ public enum UriBuilders {
   DATABASES_FOR_EXPORT {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("system", "databases").query("usage", "export");
+      return UriBuilder.create().segment("system", "databases").query("usage", "export").query("settings", "true");
 
     }
   },
