@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
@@ -42,7 +43,9 @@ public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display
   @Override
   public void onReveal() {
     super.onReveal();
-    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource("/system/databases/sql").withCallback(
+
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
+        .forResource(UriBuilders.DATABASES_FOR_IMPORT.create().build()).withCallback(
         new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
@@ -50,8 +53,7 @@ public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display
             JsArray<DatabaseDto> databases = JsArrays.create();
             for(int i = 0; i < resource.length(); i++) {
               SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
-              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
-                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
+              if(sqlSettingsDto != null && sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName())) {
                 databases.push(resource.get(i));
               }
             }
