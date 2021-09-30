@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.2.7</version>
+    <version>4.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>opal-gwt-client</artifactId>
