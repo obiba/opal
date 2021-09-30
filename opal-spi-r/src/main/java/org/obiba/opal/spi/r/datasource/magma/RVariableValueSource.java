@@ -13,6 +13,7 @@ package org.obiba.opal.spi.r.datasource.magma;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.json.JSONObject;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
 import org.obiba.opal.spi.r.RNamedList;
@@ -358,11 +359,13 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private Value getSingleValue(Object objValue) {
+    if (JSONObject.NULL.equals(objValue))
+      return getValueType().nullValue();
     if (isDate())
       return getDateValue(objValue);
-    else if (isDateTime())
+    if (isDateTime())
       return getDateTimeValue(objValue);
-    else if (isNumeric())
+    if (isNumeric())
       return getNumeric(objValue);
     return getValueType().valueOf(objValue);
   }
