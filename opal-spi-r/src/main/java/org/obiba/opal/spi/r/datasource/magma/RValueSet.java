@@ -61,7 +61,7 @@ class RValueSet extends ValueSetBean {
           String id = rowNamedResults.get(getRValueTable().getIdColumn()).asStrings()[0];
           if (getVariableEntity().getIdentifier().equals(id)) {
             Map<String, Object> rowMap = asMapOfObjects(rowResult);
-            for (String colName : rowMap.keySet()) {
+            for (String colName : colPositions.keySet()) {
               int colPos = colPositions.get(colName);
               if (!columnValues.containsKey(colPos))
                 columnValues.put(colPos, Lists.newArrayList());
