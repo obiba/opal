@@ -2,6 +2,8 @@
 
 [Unit]
 Description=OBiBa Opal service
+# Wait for network
+After=network-online.target
 
 [Service]
 WorkingDirectory=/var/lib/opal
@@ -13,4 +15,4 @@ StandardError=file:/var/log/opal/stderr.log
 ExecStart=/usr/share/opal/bin/start.sh
 
 [Install]
-WantedBy=network-online.target
+WantedBy=multi-user.target

@@ -182,7 +182,6 @@
                       <directory>/usr/lib/systemd/system</directory>
                       <filemode>644</filemode>
                       <directoryIncluded>false</directoryIncluded>
-                      <configuration>true</configuration>
                       <sources>
                         <source>
                           <location>src/main/rpm/opal.service</location>
@@ -218,7 +217,7 @@
                       <filemode>640</filemode>
                       <username>opal</username>
                       <groupname>adm</groupname>
-                      <configuration>true</configuration>
+                      <configuration>noreplace</configuration>
                       <sources>
                         <source>
                           <location>${dist.location}/conf</location>
@@ -229,6 +228,7 @@
                       <directory>/etc/default</directory>
                       <filemode>644</filemode>
                       <directoryIncluded>false</directoryIncluded>
+                      <configuration>noreplace</configuration>
                       <sources>
                         <source>
                           <location>src/main/rpm/opal.default</location>
