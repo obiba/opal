@@ -41,11 +41,21 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
 
-  private static final int MINIMUM_LEMGTH = 6;
+  private static final int PWD_MINIMUM_LENGTH = 8;
+
+  private static final int PWD_MAXIMUM_LENGTH = 64;
+
+  static final Pattern PWD_PATTERN = Pattern.compile(
+      "^(?=.*[0-9])"       // a digit must occur at least once
+          + "(?=.*[a-z])"      // a lower case alphabet must occur at least once
+          + "(?=.*[A-Z])"      // a upper case alphabet must occur at least once
+          + "(?=.*[@#$%^&+=])" // a special character that must occur at least once
+          + "(?=\\S+$).{" + PWD_MINIMUM_LENGTH + "," + PWD_MAXIMUM_LENGTH + "}$");
 
   /**
    * Number of times the user password is hashed for attack resiliency
@@ -130,26 +140,23 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       throws PasswordException, SubjectPrincipalNotFoundException {
     SubjectCredentials subjectCredentials = getSubjectCredentials(principal);
 
-    if (subjectCredentials == null) {
-      throw new SubjectPrincipalNotFoundException(principal);
-    }
+    if (subjectCredentials == null) throw new SubjectPrincipalNotFoundException(principal);
 
     String currentPassword = subjectCredentials.getPassword();
+    if (!currentPassword.equals(hashPassword(oldPassword))) throw new OldPasswordMismatchException();
 
-    if (!currentPassword.equals(hashPassword(oldPassword))) {
-      throw new OldPasswordMismatchException();
-    }
-
-    if (newPassword.length() < MINIMUM_LEMGTH) {
-      throw new PasswordTooShortException(MINIMUM_LEMGTH);
-    }
-
-    if (oldPassword.equals(newPassword)) {
-      throw new PasswordNotChangedException();
-    }
+    validatePassword(newPassword);
+    if (oldPassword.equals(newPassword)) throw new PasswordNotChangedException();
 
     subjectCredentials.setPassword(hashPassword(newPassword));
     save(subjectCredentials);
+  }
+
+  @Override
+  public void validatePassword(String newPassword) {
+    if (newPassword.length() < PWD_MINIMUM_LENGTH) throw new PasswordTooShortException(PWD_MINIMUM_LENGTH);
+    if (newPassword.length() > PWD_MAXIMUM_LENGTH) throw new PasswordTooLongException(PWD_MAXIMUM_LENGTH);
+    if (!PWD_PATTERN.matcher(newPassword).matches()) throw new PasswordTooWeakException();
   }
 
   /**

@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -289,7 +290,14 @@ public class VariableSuggestOracle extends SuggestOracle {
             }
           }
 
-        })//
+        })
+        .withCallback(com.google.gwt.http.client.Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(com.google.gwt.http.client.Request request,
+                                     com.google.gwt.http.client.Response response) {
+            // ignore
+          }
+        })
         .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(com.google.gwt.http.client.Request request,
