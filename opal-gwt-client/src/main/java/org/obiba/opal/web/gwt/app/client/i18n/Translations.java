@@ -650,7 +650,7 @@ public interface Translations extends Constants {
       "PasswordLengthMin", "Password must contain at least {0} characters.",
       "PasswordLengthMax", "Password must contain a maximum of {0} characters.",
       "PasswordLengthMax", "Password must contain a maximum of {0} characters.",
-      "PasswordTooWeak", "Password is too weak: must contain at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=) and no white space.",
+      "PasswordTooWeak", "Password is too weak: must contain at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=!) and no white space.",
       "PasswordsMustMatch", "Passwords do not match.",
       "GroupDeletedOk", "Group {0} has been successfully removed.",
       "GroupAlreadyExists", "Group already exists.",

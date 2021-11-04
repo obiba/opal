@@ -223,7 +223,6 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            GWT.log("403");
             getView().clearResults();
           }
         }, Response.SC_FORBIDDEN)//

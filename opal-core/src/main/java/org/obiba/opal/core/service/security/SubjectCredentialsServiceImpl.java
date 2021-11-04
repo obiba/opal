@@ -54,7 +54,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       "^(?=.*[0-9])"       // a digit must occur at least once
           + "(?=.*[a-z])"      // a lower case alphabet must occur at least once
           + "(?=.*[A-Z])"      // a upper case alphabet must occur at least once
-          + "(?=.*[@#$%^&+=])" // a special character that must occur at least once
+          + "(?=.*[@#$%^&+=!])" // a special character that must occur at least once
           + "(?=\\S+$).{" + PWD_MINIMUM_LENGTH + "," + PWD_MAXIMUM_LENGTH + "}$");
 
   /**
@@ -114,6 +114,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public String hashPassword(String password) {
+    validatePassword(password);
     return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
         .toString();
   }
@@ -144,16 +145,13 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
     String currentPassword = subjectCredentials.getPassword();
     if (!currentPassword.equals(hashPassword(oldPassword))) throw new OldPasswordMismatchException();
-
-    validatePassword(newPassword);
     if (oldPassword.equals(newPassword)) throw new PasswordNotChangedException();
 
     subjectCredentials.setPassword(hashPassword(newPassword));
     save(subjectCredentials);
   }
 
-  @Override
-  public void validatePassword(String newPassword) {
+  private void validatePassword(String newPassword) {
     if (newPassword.length() < PWD_MINIMUM_LENGTH) throw new PasswordTooShortException(PWD_MINIMUM_LENGTH);
     if (newPassword.length() > PWD_MAXIMUM_LENGTH) throw new PasswordTooLongException(PWD_MAXIMUM_LENGTH);
     if (!PWD_PATTERN.matcher(newPassword).matches()) throw new PasswordTooWeakException();
