@@ -9,32 +9,24 @@
  */
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.google.common.collect.Lists;
-import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.model.client.opal.FileDto;
-
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.model.client.opal.FileDto;
+
+import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptDownloadModalPresenter.Display>
     implements EncryptDownloadModalUiHandlers {
@@ -44,6 +36,7 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
   private static final int PASSWORD_MX_LENGTH = 16;
 
   private static final int MIN_PASSWORD_LENGTH = 8;
+  private static final int MAX_PASSWORD_LENGTH = 64;
 
   private final ValidationHandler validationHandler;
 
@@ -64,9 +57,9 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
   @Override
   public void onDownload() {
     getView().clearErrors();
-    if(validationHandler.validate()) {
+    if (validationHandler.validate()) {
       String password = getView().getPassword().getText();
-      if(files.size() == 1) {
+      if (files.size() == 1) {
         fireEvent(new FileDownloadRequestEvent.Builder(FileDtos.getLink(files.get(0))).password(password).build());
       } else {
         fireEvent(
@@ -86,8 +79,8 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
   public String onGeneratePassword() {
     String generated = "";
 
-    for( int i=0; i < PASSWORD_MX_LENGTH; i++ ) {
-      generated += PASSWORD_CHARACTERS.charAt((int)Math.floor(Math.random() * PASSWORD_CHARACTERS_LENGTH));
+    for (int i = 0; i < PASSWORD_MX_LENGTH; i++) {
+      generated += PASSWORD_CHARACTERS.charAt((int) Math.floor(Math.random() * PASSWORD_CHARACTERS_LENGTH));
     }
 
     return generated;
@@ -103,7 +96,7 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
+      if (validators == null) {
         validators = new LinkedHashSet<>();
         if (getView().shouldEncrypt()) {
           String passwordForm = Display.FormField.PASSWORD.name();
@@ -113,6 +106,10 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
               new ConditionValidator(minLengthCondition(password), "PasswordLengthMin", passwordForm);
           minLength.setArgs(Lists.newArrayList(String.valueOf(MIN_PASSWORD_LENGTH)));
           validators.add(minLength);
+          ConditionValidator maxLength =
+              new ConditionValidator(maxLengthCondition(password), "PasswordLengthMax", passwordForm);
+          maxLength.setArgs(Lists.newArrayList(String.valueOf(MAX_PASSWORD_LENGTH)));
+          validators.add(maxLength);
         }
       }
       return validators;
@@ -123,6 +120,15 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
         @Override
         public Boolean getValue() {
           return !password.getText().isEmpty() && password.getText().length() >= MIN_PASSWORD_LENGTH;
+        }
+      };
+    }
+
+    private HasValue<Boolean> maxLengthCondition(final HasText password) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return !password.getText().isEmpty() && password.getText().length() <= MIN_PASSWORD_LENGTH;
         }
       };
     }

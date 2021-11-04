@@ -64,6 +64,7 @@ public class SubjectCredentialsResource {
     switch(subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
         if(dto.hasPassword()) {
+          subjectCredentialsService.validatePassword(dto.getPassword());
           subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
         }
         break;

@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
@@ -219,6 +220,13 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
             fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
           }
         }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            GWT.log("403");
+            getView().clearResults();
+          }
+        }, Response.SC_FORBIDDEN)//
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

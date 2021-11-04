@@ -69,6 +69,13 @@ public interface SubjectCredentialsService extends SystemService {
       throws PasswordException, SubjectPrincipalNotFoundException;
 
   /**
+   * Apply strong password policy.
+   *
+   * @param newPassword
+   */
+  void validatePassword(String newPassword);
+
+  /**
    * Deletes a subjectCredentials from subjectCredentials table and from subject_acl
    *
    * @param subjectCredentials

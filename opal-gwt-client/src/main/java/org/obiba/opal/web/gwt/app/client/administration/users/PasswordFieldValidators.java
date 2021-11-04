@@ -10,21 +10,20 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class PasswordFieldValidators {
-  private static final int MIN_PASSWORD_LENGTH = 6;
+  private static final int MIN_PASSWORD_LENGTH = 8;
+  private static final int MAX_PASSWORD_LENGTH = 64;
 
   private final String passwordForm;
 
@@ -52,6 +51,10 @@ public class PasswordFieldValidators {
         passwordForm);
     minLength.setArgs(Lists.newArrayList(String.valueOf(MIN_PASSWORD_LENGTH)));
     validators.add(minLength);
+    ConditionValidator maxLength = new ConditionValidator(maxLengthCondition(password), "PasswordLengthMax",
+        passwordForm);
+    maxLength.setArgs(Lists.newArrayList(String.valueOf(MAX_PASSWORD_LENGTH)));
+    validators.add(maxLength);
     validators.add(
         new ConditionValidator(passwordsMatchCondition(password, confirmation), "PasswordsMustMatch", passwordForm));
   }
@@ -60,7 +63,16 @@ public class PasswordFieldValidators {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return passwordHasText.getText().isEmpty() || passwordHasText.getText().length() >= MIN_PASSWORD_LENGTH;
+        return !passwordHasText.getText().isEmpty() && passwordHasText.getText().length() >= MIN_PASSWORD_LENGTH;
+      }
+    };
+  }
+
+  private HasValue<Boolean> maxLengthCondition(final HasText passwordHasText) {
+    return new HasBooleanValue() {
+      @Override
+      public Boolean getValue() {
+        return !passwordHasText.getText().isEmpty() && passwordHasText.getText().length() <= MAX_PASSWORD_LENGTH;
       }
     };
   }

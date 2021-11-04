@@ -255,17 +255,37 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   public void test_change_password_with_short_password() {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
-        .password(subjectCredentialsService.hashPassword("password")).build();
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
 
     subjectCredentialsService.save(subjectCredentials);
-    subjectCredentialsService.changePassword("user1", "password", "pass");
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd", "pass");
+  }
+
+  @Test(expected = PasswordTooLongException.class)
+  public void test_change_password_with_long_password() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd", "passP@ssw0rdP@ssw0rdP@ssw0rdP@ssw0rdP@ssw0rdP@ssw0rdP@ssw0rdP@ssw0rd");
+  }
+
+  @Test(expected = PasswordTooWeakException.class)
+  public void test_change_password_with_weak_password() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd", "password");
   }
 
   @Test(expected = OldPasswordMismatchException.class)
   public void test_change_password_with_old_password_mismatch() {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
-        .password(subjectCredentialsService.hashPassword("password")).build();
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
 
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.changePassword("user1", "password2", "password1");
@@ -275,22 +295,22 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   public void test_change_password_with_password_unchanged() {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
-        .password(subjectCredentialsService.hashPassword("password")).build();
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
 
     subjectCredentialsService.save(subjectCredentials);
-    subjectCredentialsService.changePassword("user1", "password", "password");
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd", "P@ssw0rd");
   }
 
   @Test
   public void test_change_password_with_password_changed() {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
-        .password(subjectCredentialsService.hashPassword("password")).build();
+        .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
 
     subjectCredentialsService.save(subjectCredentials);
-    subjectCredentialsService.changePassword("user1", "password", "password1");
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd", "P@ssw0rd1");
     SubjectCredentials subjectCredentials1 = subjectCredentialsService.getSubjectCredentials("user1");
-    assertThat(subjectCredentials1.getPassword().equals(subjectCredentialsService.hashPassword("password1"))).isTrue();
+    assertThat(subjectCredentials1.getPassword().equals(subjectCredentialsService.hashPassword("P@ssw0rd1"))).isTrue();
   }
 
   private void assertSubjectEquals(SubjectCredentials expected, SubjectCredentials found) {
