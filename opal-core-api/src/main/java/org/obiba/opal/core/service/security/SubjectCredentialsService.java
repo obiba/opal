@@ -48,6 +48,12 @@ public interface SubjectCredentialsService extends SystemService {
    */
   SubjectCredentials getSubjectCredentials(String name);
 
+  /**
+   * Validate and hash a password.
+   *
+   * @param password
+   * @return
+   */
   String hashPassword(String password);
 
   /**
@@ -67,13 +73,6 @@ public interface SubjectCredentialsService extends SystemService {
    */
   void changePassword(String principal, String oldPassword, String newPassword)
       throws PasswordException, SubjectPrincipalNotFoundException;
-
-  /**
-   * Apply strong password policy.
-   *
-   * @param newPassword
-   */
-  void validatePassword(String newPassword);
 
   /**
    * Deletes a subjectCredentials from subjectCredentials table and from subject_acl

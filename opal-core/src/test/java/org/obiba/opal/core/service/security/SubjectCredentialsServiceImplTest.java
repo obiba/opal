@@ -69,6 +69,31 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   }
 
   @Test
+  public void test_validate_special_chars_password() {
+    subjectCredentialsService.hashPassword("P@ssw0rd");
+    subjectCredentialsService.hashPassword("P#ssw0rd");
+    subjectCredentialsService.hashPassword("P$ssw0rd");
+    subjectCredentialsService.hashPassword("P%ssw0rd");
+    subjectCredentialsService.hashPassword("P^ssw0rd");
+    subjectCredentialsService.hashPassword("P&ssw0rd");
+    subjectCredentialsService.hashPassword("P+ssw0rd");
+    subjectCredentialsService.hashPassword("P=ssw0rd");
+    subjectCredentialsService.hashPassword("P!ssw0rd");
+    try {
+      subjectCredentialsService.hashPassword("Pssw0rd*éà");
+      assertThat(true).isFalse();
+    } catch (PasswordTooWeakException e) {
+      assertThat(true).isTrue();
+    }
+    try {
+      subjectCredentialsService.hashPassword("P@ssw0rd ");
+      assertThat(true).isFalse();
+    } catch (PasswordTooWeakException e) {
+      assertThat(true).isTrue();
+    }
+  }
+
+  @Test
   public void test_create_new_user() {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
@@ -288,7 +313,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
         .password(subjectCredentialsService.hashPassword("P@ssw0rd")).build();
 
     subjectCredentialsService.save(subjectCredentials);
-    subjectCredentialsService.changePassword("user1", "password2", "password1");
+    subjectCredentialsService.changePassword("user1", "P@ssw0rd0", "P@ssw0rd1");
   }
 
   @Test(expected = PasswordNotChangedException.class)

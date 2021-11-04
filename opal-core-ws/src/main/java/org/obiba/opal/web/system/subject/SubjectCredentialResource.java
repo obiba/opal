@@ -9,13 +9,6 @@
  */
 package org.obiba.opal.web.system.subject;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
@@ -23,6 +16,9 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 @Component
 @Scope("request")
@@ -45,21 +41,20 @@ public class SubjectCredentialResource {
 
   @PUT
   public Response update(Opal.SubjectCredentialsDto dto) {
-    if(!name.equals(dto.getName())) {
+    if (!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
     if (getSubjectCredentials() == null) return Response.status(Response.Status.NOT_FOUND).build();
 
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
-    switch(subjectCredentials.getAuthenticationType()) {
+    switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
-        if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-          subjectCredentialsService.validatePassword(dto.getPassword());
+        if (dto.hasPassword() && !dto.getPassword().isEmpty()) {
           subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
         }
         break;
       case CERTIFICATE:
-        if(dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
+        if (dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         }
         break;
@@ -71,7 +66,7 @@ public class SubjectCredentialResource {
   @DELETE
   public Response delete() {
     SubjectCredentials subjectCredentials = getSubjectCredentials();
-    if(subjectCredentials == null) {
+    if (subjectCredentials == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     subjectCredentialsService.delete(subjectCredentials);

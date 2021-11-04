@@ -9,15 +9,10 @@
  */
 package org.obiba.opal.web.system.subject;
 
-import java.util.List;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -27,10 +22,13 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Component
 @Path("/system/subject-credentials")
@@ -53,7 +51,7 @@ public class SubjectCredentialsResource {
   @POST
   public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
-    if(subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
+    if (subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
       ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
           .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique",
               SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
@@ -61,15 +59,14 @@ public class SubjectCredentialsResource {
       throw new ConstraintViolationException(ImmutableSet.of(violation));
     }
 
-    switch(subjectCredentials.getAuthenticationType()) {
+    switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
-        if(dto.hasPassword()) {
-          subjectCredentialsService.validatePassword(dto.getPassword());
+        if (dto.hasPassword()) {
           subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
         }
         break;
       case CERTIFICATE:
-        if(dto.hasCertificate()) {
+        if (dto.hasCertificate()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         } else {
           ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
