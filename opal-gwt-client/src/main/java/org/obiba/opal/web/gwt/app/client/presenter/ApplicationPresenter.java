@@ -74,6 +74,8 @@ import org.obiba.opal.web.model.client.search.QueryResultDto;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.gwt.http.client.Response.*;
+
 /**
  *
  */
@@ -430,14 +432,10 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            // do nothing
-            if (response.getStatusCode()<300) {
-              Window.Location.replace("/");
-            }
+            fireEvent(new SessionEndedEvent());
           }
-        })
+        }, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_BAD_GATEWAY, SC_INTERNAL_SERVER_ERROR)
         .delete().send();
-    fireEvent(new SessionEndedEvent());
   }
 
   @Override
