@@ -20,7 +20,7 @@
     <servlet-class>org.mortbay.servlet.ProxyServlet$Transparent</servlet-class>
     <init-param>
       <param-name>ProxyTo</param-name>
-      <param-value>http://localhost:8080/ws</param-value>
+      <param-value>https://localhost:8443/ws</param-value>
     </init-param>
     <init-param>
       <param-name>Prefix</param-name>

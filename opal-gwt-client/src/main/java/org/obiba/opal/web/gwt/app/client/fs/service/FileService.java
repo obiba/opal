@@ -24,7 +24,6 @@ public class FileService {
 
   public FileService() {
     stockStore = Storage.getSessionStorageIfSupported();
-    GWT.log("Session storage is supported: " + isStoreSupported());
   }
 
   public String getLastFolder() {

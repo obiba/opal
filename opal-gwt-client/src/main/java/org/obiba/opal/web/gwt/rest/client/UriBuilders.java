@@ -680,11 +680,25 @@ public enum UriBuilders {
     }
   },
 
+  AUTH_SESSION_CURRENT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("auth", "session", "_current");
+    }
+  },
+
+  AUTH_SESSION_CURRENT_USERNAME {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("auth", "session", "_current", "username");
+    }
+  },
+
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-credentials");
-
     }
   },
 

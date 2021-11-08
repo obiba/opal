@@ -64,8 +64,6 @@ public class CopySystemIdentifiersModalPresenter
   public void onSubmit(TableDto selection) {
     if(!validationHandler.validate()) return;
 
-    GWT.log(selection.getDatasourceName() + " " + table.getName());
-
     getView().setBusy(true);
     String uri = UriBuilder.create().segment("identifiers", "mappings", "entities", "_sync")
         .query("datasource", selection.getDatasourceName(), "table", selection.getName()).build();

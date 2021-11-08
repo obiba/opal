@@ -17,14 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.resources.ResourceProvidersService;
-import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
@@ -92,29 +85,29 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
     DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
+    registerHandlers();
+
     initConfirmationPresenter();
 
     initUserSession();
-
-    registerHandlers();
   }
 
   private void initUserSession() {
-    String username = requestCredentials.getUsername();
+    initUsernameFromSession();
+    /*String username = requestCredentials.getUsername();
     if(!requestCredentials.hasCredentials()) {
+      GWT.log("OpalBootstrapperImpl.initUserSession");
       placeManager.revealUnauthorizedPlace(Places.LOGIN);
     } else if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
       initUsernameFromSession();
     } else {
       revealCurrentPlace();
-    }
+    }*/
   }
 
   private void initUsernameFromSession() {
-    // get the username
-    UriBuilder builder = UriBuilder.create()
-        .segment("auth", "session", "_current", "username");
-    ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get() //
+    // try to get the username
+    ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(UriBuilders.AUTH_SESSION_CURRENT_USERNAME.create().build()).get() //
         .withCallback(new SubjectResourceCallback()).send();
   }
 
@@ -133,7 +126,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       @Override
       public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
         requestCredentials.invalidate();
-        Window.Location.reload();
+        placeManager.revealUnauthorizedPlace(Places.LOGIN);
       }
     });
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
@@ -150,23 +143,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
       @Override
       public void onSessionEnded(SessionEndedEvent event) {
-        if(requestCredentials.hasCredentials()) {
-          ResourceRequestBuilderFactory.newBuilder().forResource(
-              UriBuilder.create().segment("auth", "session", "_current").build())//
-              .withCallback(new ResponseCodeCallback() {
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  // do nothing
-                  requestCredentials.invalidate();
-                  if (response.getStatusCode()<300) {
-                    Window.Location.replace("/");
-                  }
-                }
-              }) //
-              .delete().send();
-        } else {
-          Window.Location.replace("/");
-        }
+        Window.Location.replace("/");
       }
     });
 
@@ -193,7 +170,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
         requestCredentials.setUsername(subject.getPrincipal());
         revealCurrentPlace();
       } else {
-        eventBus.fireEvent(new SessionEndedEvent());
+        placeManager.revealUnauthorizedPlace(Places.LOGIN);
       }
     }
   }

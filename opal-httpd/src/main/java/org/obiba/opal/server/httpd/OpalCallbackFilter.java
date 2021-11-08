@@ -58,7 +58,7 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
   public OpalCallbackFilter(OIDCConfigurationProvider oidcConfigurationProvider,
                             OIDCSessionManager oidcSessionManager,
                             AuthenticationExecutor authenticationExecutor,
-                            OpalGeneralConfigService  opalGeneralConfigService) {
+                            OpalGeneralConfigService opalGeneralConfigService) {
     this.oidcConfigurationProvider = oidcConfigurationProvider;
     this.oidcSessionManager = oidcSessionManager;
     this.authenticationExecutor = authenticationExecutor;
@@ -106,6 +106,8 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
       Cookie cookie = new Cookie("opalsid", subjectSession.getId().toString());
       cookie.setMaxAge(timeout);
       cookie.setPath("/");
+      cookie.setSecure(true);
+      cookie.setHttpOnly(true);
       response.addCookie(cookie);
       log.debug("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
     }

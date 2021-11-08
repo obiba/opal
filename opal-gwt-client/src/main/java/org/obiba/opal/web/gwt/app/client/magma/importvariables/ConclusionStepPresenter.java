@@ -122,7 +122,6 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
     @Override
     public void onResponseCode(Request request, Response response) {
       resourceRequestsCompleted++;
-      GWT.log(request.toString() + " -> " + response.getStatusCode());
       if (response.getStatusCode() >= 300) {
         resourceRequestsFailed++;
         if (response.getText() != null && !response.getText().isEmpty()) {

@@ -268,7 +268,6 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
 
   private void installPluginArchive(final String file) {
     if (!file.endsWith("-dist.zip")) {
-      GWT.log("file=" + file);
       fireEvent(NotificationEvent.newBuilder().error("NotPluginArchive").build());
       return;
     }

@@ -16,6 +16,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -425,6 +426,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   public void onQuit() {
     cartService.clear();
     fileService.clear();
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.AUTH_SESSION_CURRENT.create().build())
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // do nothing
+            if (response.getStatusCode()<300) {
+              Window.Location.replace("/");
+            }
+          }
+        })
+        .delete().send();
     fireEvent(new SessionEndedEvent());
   }
 

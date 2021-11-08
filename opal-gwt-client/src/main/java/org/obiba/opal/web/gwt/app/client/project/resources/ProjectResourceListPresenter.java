@@ -118,7 +118,6 @@ public class ProjectResourceListPresenter extends PresenterWidget<ProjectResourc
 
   @Override
   protected void onReveal() {
-    GWT.log("onReveal: " + resourceProvidersService.hasResourceProviders());
     getView().showHasResourceProviders(resourceProvidersService.hasResourceProviders());
   }
 

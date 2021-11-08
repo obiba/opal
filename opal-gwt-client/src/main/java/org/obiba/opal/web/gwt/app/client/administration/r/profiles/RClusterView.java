@@ -418,7 +418,6 @@ public class RClusterView extends ViewWithUiHandlers<RClusterUiHandlers>
       String status = dto.getRunning() ?
           translations.statusMap().get("RUNNING") + ":" + StatusImageCell.BULLET_GREEN
           : "STOPPED:" + StatusImageCell.BULLET_RED;
-      GWT.log(status);
       return status;
     }
   }

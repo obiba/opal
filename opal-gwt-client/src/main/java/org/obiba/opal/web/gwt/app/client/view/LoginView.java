@@ -170,6 +170,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @Override
   public void renderAuthProviders(JsArray<AuthProviderDto> providers) {
+    authClientsPanel.clear();
     List<Widget> widgets = Lists.newArrayList();
     for (int i=0;i<providers.length(); i++) {
       AuthProviderDto provider = providers.get(i);

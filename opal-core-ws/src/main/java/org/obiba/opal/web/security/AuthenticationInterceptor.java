@@ -77,7 +77,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
       response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
-          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, false));
+          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, true, true));
       Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
       if(cookieValue != null) {
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
@@ -87,7 +87,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       if(isWebServiceAuthenticated(response.getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
-            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false));
+            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, true, true));
       }
     }
   }

@@ -45,7 +45,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Properties;
 
@@ -205,6 +204,11 @@ public class OpalJettyServer {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath(Strings.isNullOrEmpty(contextPath) ? "/" : contextPath);
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
+
+    servletContextHandler.getSessionHandler().setHttpOnly(true);
+    servletContextHandler.getSessionHandler().setSecureRequestOnly(true);
+    servletContextHandler.getSessionHandler().getSessionCookieConfig().setHttpOnly(true);
+    servletContextHandler.getSessionHandler().getSessionCookieConfig().setSecure(true);
 
     initEventListeners();
     initNotAllowedMethods();

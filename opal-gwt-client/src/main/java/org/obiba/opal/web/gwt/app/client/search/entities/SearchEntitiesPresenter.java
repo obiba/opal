@@ -163,7 +163,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     if (magmaJsStatements.size()>1) {
       entityFilter = entityFilter + "\n  .and(" + Joiner.on(")\n  .and(").join(magmaJsStatements.subList(1, magmaJsStatements.size())) + ")";
     }
-    GWT.log(entityFilter);
     variablesToViewPresenter.show(variableFullNames, entityFilter);
   }
 

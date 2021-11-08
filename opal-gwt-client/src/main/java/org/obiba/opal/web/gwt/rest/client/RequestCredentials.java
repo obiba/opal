@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.rest.client;
 
 import java.util.Date;
 
+import com.google.common.base.Joiner;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.security.OpalAuth;
 
 import com.google.gwt.core.client.impl.Md5Digest;
