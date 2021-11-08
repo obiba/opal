@@ -78,7 +78,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   Table<ProjectDto> projectsTable;
 
   @UiField
-  ButtonGroup addGroup;
+  ButtonGroup addProject;
 
   @UiField
   TextBoxClearable filter;
@@ -146,7 +146,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   @Override
   public HasAuthorization getAddProjectAuthorizer() {
-    return new WidgetAuthorizer(addGroup);
+    return new WidgetAuthorizer(addProject);
   }
 
   @UiHandler("add")

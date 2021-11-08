@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 @Path("/projects")
@@ -63,6 +64,9 @@ public class ProjectsResource {
     Project project = Dtos.fromDto(projectFactoryDto);
     // verify project does not exists
     if (projectService.hasProject(project.getName())) throw new IllegalArgumentException("Project already exists");
+
+    if (!Pattern.compile("^[\\w _-]+$").matcher(project.getName()).matches())
+      throw new IllegalArgumentException("Project nome invalid: only words, blank space, underscore and hyphen characters are valid");
 
     projectService.save(project);
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
