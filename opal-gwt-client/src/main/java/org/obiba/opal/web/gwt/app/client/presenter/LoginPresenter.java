@@ -35,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.AuthProviderDto;
+import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -215,22 +216,38 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post()
-        .withCallback(Response.SC_FORBIDDEN, authError).withCallback(Response.SC_UNAUTHORIZED, authError)
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.AUTH_SESSIONS.create().build())
+        .withFormBody("username", username, "password", password)
+        .withCallback(Response.SC_FORBIDDEN, authError)
+        .withCallback(Response.SC_UNAUTHORIZED, authError)
         .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            // When a 201 happens, we should have credentials, but we'll test anyway.
-            if (credentials.hasCredentials()) {
-              getView().clear();
-              credentials.setUsername(username);
-              fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+            String location = response.getHeader("Location");
+            initUsername(location);
+          }
+        })
+        .post().send();
+  }
+
+  private void initUsername(final String location) {
+    // try to get the username
+    ResourceRequestBuilderFactory.<Subject>newBuilder()
+        .forResource(UriBuilders.AUTH_SESSION_CURRENT_USERNAME.create().build())
+        .withCallback(new ResourceCallback<Subject>() {
+          @Override
+          public void onResource(Response response, Subject resource) {
+            if (response.getStatusCode() == Response.SC_OK) {
+              credentials.setUsername(resource.getPrincipal());
+              fireEvent(new SessionCreatedEvent(location));
             } else {
               getView().setBusy(false);
               getView().showErrorMessageAndClearPassword();
             }
           }
-        }).withFormBody("username", username, "password", password).send();
+        })
+        .get().send();
   }
 }

@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.rest.client;
 import java.util.Date;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.security.OpalAuth;
 
@@ -24,27 +25,12 @@ import com.google.gwt.user.client.Cookies;
  */
 public class RequestCredentials {
 
-  /**
-   * Obiba single sign-on session.
-   */
-  private static final String OBIBASID = "obibaid";
-
-  /**
-   * Opal session id cookie name.
-   */
-  private static final String OPALSID = "opalsid";
-
-  /**
-   * Opal request id cookie name.
-   */
-  private static final String OPALRID = "opalrid";
-
   private String username;
 
   public RequestBuilder provideCredentials(RequestBuilder builder) {
-    if(hasOpalCredentials()) {
+    /*if(hasOpalCredentials()) {
       builder.setHeader(OpalAuth.CREDENTIALS_HEADER, extractOpalCredentials());
-    }
+    }*/
     return builder;
   }
 
@@ -62,7 +48,7 @@ public class RequestCredentials {
    * @param url the URL to request (GET, POST)
    */
   public void provideCredentials(String url) {
-    if(hasCredentials()) {
+    /*if(hasCredentials()) {
       Md5Digest digest = new Md5Digest();
       digest.update(extractOpalCredentials().getBytes());
       String urlToHash = url;
@@ -75,7 +61,7 @@ public class RequestCredentials {
       long time = new Date().getTime();
       // Cookie will be valid for 1 second
       Cookies.setCookie(OPALRID, urlHash, new Date(time + 1000), null, "/", false);
-    }
+    }*/
   }
 
   /**
@@ -96,33 +82,11 @@ public class RequestCredentials {
    * @return true if we currently have credentials to offer to the server.
    */
   public boolean hasCredentials() {
-    return hasOpalCredentials() || hasObibaCredentials();
-  }
-
-  public boolean hasOpalCredentials() {
-    return extractOpalCredentials() != null && !extractOpalCredentials().isEmpty();
-  }
-
-  /**
-   * Returns the Opal session id.
-   *
-   * @return the opalsid.
-   */
-  public String extractOpalCredentials() {
-    return Cookies.getCookie(OPALSID);
-  }
-
-  public boolean hasObibaCredentials() {
-    return extractObibaCredentials() != null && !extractObibaCredentials().isEmpty();
-  }
-
-  public String extractObibaCredentials() {
-    return Cookies.getCookie(OBIBASID);
+    return !Strings.isNullOrEmpty(username);//hasOpalCredentials() || hasObibaCredentials();
   }
 
   public void invalidate() {
-    Cookies.removeCookie(OPALSID, "/");
-    Cookies.removeCookie(OBIBASID, "/");
+    username = "";
   }
 
   private static String toHexString(byte... bytes) {

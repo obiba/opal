@@ -680,6 +680,13 @@ public enum UriBuilders {
     }
   },
 
+  AUTH_SESSIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("auth", "sessions");
+    }
+  },
+
   AUTH_SESSION_CURRENT {
     @Override
     public UriBuilder create() {

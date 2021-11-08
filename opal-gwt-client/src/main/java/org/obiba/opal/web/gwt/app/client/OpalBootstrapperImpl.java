@@ -107,8 +107,10 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   private void initUsernameFromSession() {
     // try to get the username
-    ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(UriBuilders.AUTH_SESSION_CURRENT_USERNAME.create().build()).get() //
-        .withCallback(new SubjectResourceCallback()).send();
+    ResourceRequestBuilderFactory.<Subject>newBuilder()
+        .forResource(UriBuilders.AUTH_SESSION_CURRENT_USERNAME.create().build())
+        .withCallback(new SubjectResourceCallback())
+        .get().send();
   }
 
   private void initConfirmationPresenter() {
