@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.security;
 
-import com.google.common.base.Strings;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -21,6 +20,9 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+/**
+ * Basic CSRF detection.
+ */
 @Component
 public class CSRFInterceptor extends AbstractSecurityComponent implements RequestCyclePreProcess {
 
@@ -35,13 +37,17 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
   public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
     String host = request.getHttpHeaders().getHeaderString(HOST_HEADER);
     String referer = request.getHttpHeaders().getHeaderString(REFERER_HEADER);
-    log.info("host={} referer={}", host, referer);
     if (referer != null) {
+      boolean forbidden = false;
       if ("localhost:8080".equals(host)) {
-        if (!referer.startsWith(String.format("http://%s", host)))
-          return Response.status(Status.FORBIDDEN).build();
-      } else if (!referer.startsWith(String.format("https://%s", host)))
+        if (!referer.startsWith(String.format("http://%s/", host)))
+          forbidden = true;
+      } else if (!referer.startsWith(String.format("https://%s/", host)))
+        forbidden = true;
+      if (forbidden) {
+        log.warn("CSRF detection: Host={}, Referer={}", host, referer);
         return Response.status(Status.FORBIDDEN).build();
+      }
     }
     return null;
   }
