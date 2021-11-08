@@ -23,16 +23,23 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
 public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackageInstallModalPresenter.Display> implements RPackageInstallModalUiHandlers {
 
+  private RServerClusterDto cluster;
+
   @Inject
   public RPackageInstallModalPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
     getView().setUiHandlers(this);
+  }
+
+  public void setRServerCluster(RServerClusterDto cluster) {
+    this.cluster = cluster;
   }
 
   @Override
@@ -60,7 +67,7 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
     }
     getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(builder.build("default")) //
+        .forResource(builder.build(cluster.getName())) //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

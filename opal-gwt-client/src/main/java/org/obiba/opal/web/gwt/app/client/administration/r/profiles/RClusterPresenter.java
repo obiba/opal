@@ -217,7 +217,7 @@ public class RClusterPresenter extends PresenterWidget<RClusterPresenter.Display
 
   @Override
   public void onInstallPackage() {
-    rPackageInstallModalPresenterModalProvider.get();
+    rPackageInstallModalPresenterModalProvider.get().setRServerCluster(cluster);
   }
 
   @Override
