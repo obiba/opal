@@ -14,6 +14,9 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -32,13 +35,27 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   private static final String REFERER_HEADER = "Referer";
 
+  private final String serverPort;
+
+  @Autowired
+  public CSRFInterceptor(@Value("${org.obiba.opal.http.port:8080}") String port) {
+    serverPort = port;
+  }
+
   @Nullable
   @Override
   public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
     String host = request.getHttpHeaders().getHeaderString(HOST_HEADER);
     String referer = request.getHttpHeaders().getHeaderString(REFERER_HEADER);
     if (referer != null) {
-      boolean forbidden = !referer.startsWith(String.format("http://%s/", host)) && !referer.startsWith(String.format("https://%s/", host));
+      String localhost = String.format("localhost:%s", serverPort);
+      boolean forbidden = false;
+
+      if (localhost.equals(host)) {
+        if (!referer.startsWith(String.format("http://%s/", host)))
+          forbidden = true;
+      } else if (!referer.startsWith(String.format("https://%s/", host)))
+        forbidden = true;
       if (forbidden) {
         log.warn("CSRF detection: Host={}, Referer={}", host, referer);
         return Response.status(Status.FORBIDDEN).build();
