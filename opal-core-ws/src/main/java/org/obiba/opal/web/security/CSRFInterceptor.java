@@ -38,12 +38,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
     String host = request.getHttpHeaders().getHeaderString(HOST_HEADER);
     String referer = request.getHttpHeaders().getHeaderString(REFERER_HEADER);
     if (referer != null) {
-      boolean forbidden = false;
-      if ("localhost:8080".equals(host)) {
-        if (!referer.startsWith(String.format("http://%s/", host)))
-          forbidden = true;
-      } else if (!referer.startsWith(String.format("https://%s/", host)))
-        forbidden = true;
+      boolean forbidden = !referer.startsWith(String.format("http://%s/", host)) && !referer.startsWith(String.format("https://%s/", host));
       if (forbidden) {
         log.warn("CSRF detection: Host={}, Referer={}", host, referer);
         return Response.status(Status.FORBIDDEN).build();
