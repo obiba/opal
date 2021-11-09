@@ -70,10 +70,4 @@ if grep -q newrelic /etc/default/opal; then
   chmod 644 /etc/default/opal
 fi
 
-# for clean install
-if [ $1 -eq 1 ] ; then
-  # Initial installation
-  systemctl preset opal.service >/dev/null 2>&1 || :
-fi
-
 exit 0
