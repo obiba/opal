@@ -75,6 +75,12 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return profile;
   }
 
+  @Override
+  protected boolean createRSessionEnabled() {
+    // Datashield service is always available
+    return true;
+  }
+
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
     DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();

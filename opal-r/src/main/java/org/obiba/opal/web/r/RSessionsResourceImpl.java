@@ -17,11 +17,13 @@ import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -41,6 +43,9 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   @Autowired
   private RServerManagerService rServerManagerService;
+
+  @Value("${org.obiba.opal.r.endpoint}")
+  private boolean plainREnabled;
 
   protected OpalRSessionManager opalRSessionManager;
 
@@ -65,6 +70,8 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   @Override
   public Response newRSession(UriInfo info, String restore, String profile) {
+    if (!createRSessionEnabled())
+      throw new ForbiddenException("Plain R service endpoint is not enabled");
     RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
     onNewRSession(rSession);
     if (!Strings.isNullOrEmpty(restore)) {
@@ -79,6 +86,10 @@ public class RSessionsResourceImpl implements RSessionsResource {
     if (Strings.isNullOrEmpty(profileName))
       return rServerManagerService.getDefaultRServerProfile();
     return new DefaultRServerProfile(profileName);
+  }
+
+  protected boolean createRSessionEnabled() {
+    return plainREnabled;
   }
 
   protected void onNewRSession(RServerSession rSession) {
