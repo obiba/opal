@@ -119,7 +119,7 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return !password.getText().isEmpty() && password.getText().length() >= MIN_PASSWORD_LENGTH;
+          return password.getText().isEmpty() || password.getText().length() >= MIN_PASSWORD_LENGTH;
         }
       };
     }
@@ -128,7 +128,7 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return !password.getText().isEmpty() && password.getText().length() <= MIN_PASSWORD_LENGTH;
+          return password.getText().isEmpty() || password.getText().length() <= MAX_PASSWORD_LENGTH;
         }
       };
     }

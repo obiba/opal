@@ -63,7 +63,7 @@ public class PasswordFieldValidators {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return !passwordHasText.getText().isEmpty() && passwordHasText.getText().length() >= MIN_PASSWORD_LENGTH;
+        return passwordHasText.getText().isEmpty() || passwordHasText.getText().length() >= MIN_PASSWORD_LENGTH;
       }
     };
   }
@@ -72,7 +72,7 @@ public class PasswordFieldValidators {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return !passwordHasText.getText().isEmpty() && passwordHasText.getText().length() <= MAX_PASSWORD_LENGTH;
+        return passwordHasText.getText().isEmpty() || passwordHasText.getText().length() <= MAX_PASSWORD_LENGTH;
       }
     };
   }
