@@ -37,9 +37,13 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   private final String serverPort;
 
+  private final boolean productionMode;
+
   @Autowired
-  public CSRFInterceptor(@Value("${org.obiba.opal.http.port:8080}") String port) {
+  public CSRFInterceptor(@Value("${org.obiba.opal.http.port:8080}") String port,
+                         @Value("${productionMode}") boolean productionMode) {
     serverPort = port;
+    this.productionMode = productionMode;
   }
 
   @Nullable
@@ -53,7 +57,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
       if (localhost.equals(host)) {
         if (!referer.startsWith(String.format("http://%s/", host)))
-          forbidden = true;
+          forbidden = productionMode;
       } else if (!referer.startsWith(String.format("https://%s/", host)))
         forbidden = true;
       if (forbidden) {
