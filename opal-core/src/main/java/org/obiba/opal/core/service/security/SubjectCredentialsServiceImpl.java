@@ -114,9 +114,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public String hashPassword(String password) {
-    validatePassword(password);
-    return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
-        .toString();
+    return hashPassword(password, true);
   }
 
   @Override
@@ -144,11 +142,18 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if (subjectCredentials == null) throw new SubjectPrincipalNotFoundException(principal);
 
     String currentPassword = subjectCredentials.getPassword();
-    if (!currentPassword.equals(hashPassword(oldPassword))) throw new OldPasswordMismatchException();
+    if (!currentPassword.equals(hashPassword(oldPassword, false))) throw new OldPasswordMismatchException();
     if (oldPassword.equals(newPassword)) throw new PasswordNotChangedException();
 
     subjectCredentials.setPassword(hashPassword(newPassword));
     save(subjectCredentials);
+  }
+
+  private String hashPassword(String password, boolean validate) {
+    if (validate)
+      validatePassword(password);
+    return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
+        .toString();
   }
 
   private void validatePassword(String newPassword) {
