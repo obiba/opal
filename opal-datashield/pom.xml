@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.3.0</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>opal-datashield</artifactId>
