@@ -36,12 +36,14 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -247,9 +249,17 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
   }
 
   private boolean vocabularyMatches(VocabularyDto vocabulary, List<String> tokens) {
-    String toText = Joiner.on(" ").join(vocabulary.getName(),
-        Joiner.on(" ").join(JsArrays.toIterable(vocabulary.getTitleArray())),
-        Joiner.on(" ").join(JsArrays.toIterable(vocabulary.getDescriptionArray())));
+    List<String> texts = Lists.newArrayList();
+
+    for(LocaleTextDto localeTextDto : JsArrays.toIterable(vocabulary.getTitleArray())) {
+      texts.add(localeTextDto.getText());
+    }
+
+    for(LocaleTextDto localeTextDto : JsArrays.toIterable(vocabulary.getDescriptionArray())) {
+      texts.add(localeTextDto.getText());
+    }
+
+    String toText = Joiner.on(" ").join(vocabulary.getName(), Joiner.on(" ").join(texts));
     return FilterHelper.matches(toText, tokens);
   }
 
