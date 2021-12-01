@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.v
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -317,10 +318,21 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   }
 
   private boolean termMatches(TermDto term, List<String> tokens) {
-    String toText = Joiner.on(" ").join(term.getName(),
-        Joiner.on(" ").join(JsArrays.toIterable(term.getTitleArray())),
-        Joiner.on(" ").join(JsArrays.toIterable(term.getDescriptionArray())),
-        Joiner.on(" ").join(JsArrays.toIterable(term.getKeywordsArray())));
+    List<String> texts = Lists.newArrayList();
+
+    for(LocaleTextDto localeTextDto : JsArrays.toIterable(term.getTitleArray())) {
+      texts.add(localeTextDto.getText());
+    }
+
+    for(LocaleTextDto localeTextDto : JsArrays.toIterable(term.getDescriptionArray())) {
+      texts.add(localeTextDto.getText());
+    }
+
+    for(LocaleTextDto localeTextDto : JsArrays.toIterable(term.getKeywordsArray())) {
+      texts.add(localeTextDto.getText());
+    }
+
+    String toText = Joiner.on(" ").join(term.getName(), Joiner.on(" ").join(texts));
     return FilterHelper.matches(toText, tokens);
   }
 
