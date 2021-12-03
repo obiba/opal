@@ -12,10 +12,14 @@ package org.obiba.opal.server;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
@@ -26,6 +30,7 @@ public class OpalServer {
 
   private OpalServer() {
     asciiArt();
+    setProxy();
     setProperties();
     configureSLF4JBridgeHandler();
     log.info("Starting Opal server!");
@@ -43,6 +48,32 @@ public class OpalServer {
         " /_/   /_/   /_/    \\____/|_| /_/    \\_\\______|\n" +
         "                                               \n" +
         "                                               ");
+  }
+
+  private void setProxy() {
+    String proxyUser = System.getProperty("http.proxyUser");
+    if (!Strings.isNullOrEmpty(proxyUser)) {
+      logAndSystemOut("Setting up proxy with user/password...");
+      // Java ignores http.proxyUser. Here come's the workaround.
+      Authenticator.setDefault(new Authenticator() {
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+          if (getRequestorType() == Authenticator.RequestorType.PROXY) {
+            String prot = getRequestingProtocol().toLowerCase();
+            String host = System.getProperty(prot + ".proxyHost", "");
+            String port = System.getProperty(prot + ".proxyPort", "80");
+            String user = System.getProperty(prot + ".proxyUser", "");
+            String password = System.getProperty(prot + ".proxyPassword", "");
+            if (getRequestingHost().equalsIgnoreCase(host)) {
+              if (Integer.parseInt(port) == getRequestingPort()) {
+                return new PasswordAuthentication(user, password.toCharArray());
+              }
+            }
+          }
+          return null;
+        }
+      });
+    }
   }
 
   /**
