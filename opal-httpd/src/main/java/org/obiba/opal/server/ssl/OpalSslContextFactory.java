@@ -32,6 +32,9 @@ public class OpalSslContextFactory implements SslContextFactory {
   @Value("${org.obiba.opal.public.url}")
   private String publicUrl;
 
+  @Value("${org.obiba.opal.ssl.credentials}")
+  private boolean useCredentialsTrustManager;
+
   @Autowired
   private SystemKeyStoreService systemKeyStoreService;
 
@@ -44,7 +47,7 @@ public class OpalSslContextFactory implements SslContextFactory {
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1.2");
       ctx.init(new KeyManager[] { new X509ExtendedKeyManagerImpl(opalKeystore) },
-          new TrustManager[] { credentialsTrustManager }, null);
+          useCredentialsTrustManager ? new TrustManager[] { credentialsTrustManager } : null, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);
