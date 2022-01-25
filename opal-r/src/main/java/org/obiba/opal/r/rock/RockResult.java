@@ -92,6 +92,7 @@ class RockResult implements RServerResult {
     if (isList()) return listResult.stream().allMatch(RServerResult::isNumeric);
     if (isNamedList()) return namedListResult.values().stream().allMatch(RServerResult::isNumeric);
     if (nativeResult != null) {
+      if (nativeResult instanceof String) return false;
       try {
         Double.parseDouble(nativeResult.toString());
         return true;
@@ -134,6 +135,7 @@ class RockResult implements RServerResult {
     if (isList()) return listResult.stream().allMatch(RServerResult::isInteger);
     if (isNamedList()) return namedListResult.values().stream().allMatch(RServerResult::isInteger);
     if (nativeResult != null) {
+      if (nativeResult instanceof String) return false;
       try {
         Integer.parseInt(nativeResult.toString());
         return true;

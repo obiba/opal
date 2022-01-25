@@ -99,6 +99,18 @@ public class RockResultTest {
   }
 
   @Test
+  public void jsonArrayStringTest() {
+    RockResult result = new RockResult("[\"01\", \"02\", \"03\"]");
+    Assert.assertFalse(result.isNumeric());
+    Assert.assertTrue(result.isString());
+    String[] values = result.asStrings();
+    Assert.assertEquals(3, values.length);
+    Assert.assertEquals("01", values[0]);
+    Assert.assertEquals("02", values[1]);
+    Assert.assertEquals("03", values[2]);
+  }
+
+  @Test
   public void jsonObjectNamedListTest() {
     RockResult result = new RockResult("{ string: \"a\", integer: 1, numeric: 2.2, list: [\"b\", \"c\"], object: { data: \"d\" } }");
     Assert.assertTrue(result.isNamedList());
