@@ -89,7 +89,7 @@
     <logback.version>1.2.3</logback.version>
     <logstash-logback.version>6.6</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>2.2.5</magma.version>
+    <magma.version>2.3-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>2.2.5</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
