@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.collect.Lists;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.WhereClause;
@@ -78,7 +79,7 @@ public final class ViewDtos {
   }
 
   @NotNull
-  public ViewDto asDto(@NotNull View view) {
+  public ViewDto asDto(@NotNull ValueView view) {
     for(ViewDtoExtension extension : extensions) {
       if(extension.isDtoOf(view)) {
         return extension.asDto(view);

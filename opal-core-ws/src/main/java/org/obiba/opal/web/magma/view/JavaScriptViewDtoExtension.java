@@ -9,12 +9,9 @@
  */
 package org.obiba.opal.web.magma.view;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.ValueTableReference;
 import org.obiba.magma.support.ValueTableWrapper;
@@ -22,13 +19,15 @@ import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.View.Builder;
-import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * An implementation of {@Code ViewDtoExtension} for {@code View} instances that have a {@code SelectClause}.
@@ -42,15 +41,15 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public boolean isDtoOf(@NotNull View view) {
-    return view.getListClause() instanceof NoneClause;
+  public boolean isDtoOf(@NotNull ValueView view) {
+    return view instanceof View && ((View) view).getListClause() instanceof NoneClause;
   }
 
   @Override
   public View fromDto(ViewDto viewDto, Builder viewBuilder) {
     JavaScriptViewDto jsDto = viewDto.getExtension(JavaScriptViewDto.view);
 
-    if(jsDto.hasSelect()) {
+    if (jsDto.hasSelect()) {
       SelectClause selectClause = new JavascriptClause(jsDto.getSelect());
       viewBuilder.select(selectClause);
     }
@@ -59,18 +58,19 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public ViewDto asDto(View view) {
+  public ViewDto asDto(ValueView view) {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
-    if(view.getWhereClause() instanceof JavascriptClause) {
-      viewDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+    View jsView = (View)view;
+    if (jsView.getWhereClause() instanceof JavascriptClause) {
+      viewDtoBuilder.setWhere(((JavascriptClause) jsView.getWhereClause()).getScript());
     }
-    setFromTables(view, viewDtoBuilder);
+    setFromTables(jsView, viewDtoBuilder);
 
     JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
-    if(view.getSelectClause() instanceof JavascriptClause) {
-      jsDtoBuilder.setSelect(((JavascriptClause) view.getSelectClause()).getScript());
+    if (jsView.getSelectClause() instanceof JavascriptClause) {
+      jsDtoBuilder.setSelect(((JavascriptClause) jsView.getSelectClause()).getScript());
     }
 
     viewDtoBuilder.setExtension(JavaScriptViewDto.view, jsDtoBuilder.build());
@@ -80,19 +80,19 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
 
   private void setFromTables(ValueTableWrapper view, ViewDto.Builder viewDtoBuilder) {
     ValueTable from = view.getWrappedValueTable();
-    if(from instanceof JoinTable) {
+    if (from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();
-      for(ValueTable vt : fromTables) {
-        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
+      for (ValueTable vt : fromTables) {
+        if (hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
       }
       viewDtoBuilder.addAllInnerFrom(((JoinTable) from).getInnerTableReferences());
     } else {
-      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
+      if (hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
     }
   }
 
   String toStringReference(ValueTable vt) {
-    if(vt instanceof ValueTableReference) {
+    if (vt instanceof ValueTableReference) {
       return ((ValueTableReference) vt).getReference();
     }
     return vt.getDatasource().getName() + "." + vt.getName();

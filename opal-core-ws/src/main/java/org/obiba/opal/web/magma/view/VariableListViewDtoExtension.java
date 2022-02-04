@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.js.views.VariablesClause;
@@ -47,8 +48,8 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public boolean isDtoOf(@NotNull View view) {
-    return !(view.getListClause() instanceof NoneClause);
+  public boolean isDtoOf(@NotNull ValueView view) {
+    return !(view instanceof View && ((View)view).getListClause() instanceof NoneClause);
   }
 
   @Override
@@ -68,14 +69,15 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public ViewDto asDto(View view) {
+  public ViewDto asDto(ValueView view) {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
-    if(view.getWhereClause() instanceof JavascriptClause) {
-      viewDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+    View jsView = (View) view;
+    if(jsView.getWhereClause() instanceof JavascriptClause) {
+      viewDtoBuilder.setWhere(((JavascriptClause) jsView.getWhereClause()).getScript());
     }
-    setFromTables(view, viewDtoBuilder);
+    setFromTables(jsView, viewDtoBuilder);
 
     VariableListViewDto.Builder listDtoBuilder = VariableListViewDto.newBuilder();
     for(Variable v : view.getVariables()) {

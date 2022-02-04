@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma.view;
 
 import javax.validation.constraints.NotNull;
 
+import org.obiba.magma.ValueView;
 import org.obiba.magma.views.View;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -22,11 +23,11 @@ public interface ViewDtoExtension {
 
   boolean isExtensionOf(@NotNull ViewDto viewDto);
 
-  boolean isDtoOf(@NotNull View view);
+  boolean isDtoOf(@NotNull ValueView view);
 
   View fromDto(ViewDto viewDto, View.Builder viewBuilder);
 
   TableDto asTableDto(ViewDto viewDto, TableDto.Builder tableDtoBuilder);
 
-  ViewDto asDto(View view);
+  ViewDto asDto(ValueView view);
 }

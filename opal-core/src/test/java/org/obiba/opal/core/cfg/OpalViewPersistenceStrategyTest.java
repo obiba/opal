@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
@@ -59,25 +60,25 @@ public class OpalViewPersistenceStrategyTest {
     System.setProperty(OPAL_HOME, getTestFilesRoot() + File.separator + EMPTY_DIRECTORY);
     // Re-initialise to pick up the the OPAL_HOME specified for this test.
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
-    Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
+    Set<ValueView> result = viewPersistenceStrategy.readViews("datasourceName");
     assertThat(result).isEmpty();
   }
 
   @Test
   public void testReadWithNoViewsFileReturnsEmptySet() throws Exception {
-    Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
+    Set<ValueView> result = viewPersistenceStrategy.readViews("datasourceName");
     assertThat(result).isEmpty();
   }
 
   @Test
   public void testReadOfSimpleView() throws Exception {
-    Set<View> result = viewPersistenceStrategy.readViews("simple-views");
+    Set<ValueView> result = viewPersistenceStrategy.readViews("simple-views");
     assertThat(result).hasSize(1);
   }
 
   @Test(expected = StreamException.class)
   public void testReadofEmptyViewFileThrowsStreamException() throws Exception {
-    Set<View> result = viewPersistenceStrategy.readViews("empty-views");
+    Set<ValueView> result = viewPersistenceStrategy.readViews("empty-views");
     assertThat(result).isEmpty();
   }
 
@@ -94,17 +95,17 @@ public class OpalViewPersistenceStrategyTest {
     replay(datasourceMock, valueTableMock);
 
     // Write a temporary views file with a single view.
-    Set<View> views = Sets.newHashSet();
+    Set<ValueView> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("temporary-views", views, null, null);
     // Verify the temporary views file exists.
-    Set<View> singleViewResult = viewPersistenceStrategy.readViews("temporary-views");
+    Set<ValueView> singleViewResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(singleViewResult).hasSize(1);
     // Write the temporary views file with an empty views set. This will remove the file.
-    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View>of(), null, null);
+    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<ValueView>of(), null, null);
     // Verify that the temporary file has been removed, by ensuring that an empty set has been returned.
-    Set<View> noViewsResult = viewPersistenceStrategy.readViews("temporary-views");
+    Set<ValueView> noViewsResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(noViewsResult).isEmpty();
   }
 
@@ -120,7 +121,7 @@ public class OpalViewPersistenceStrategyTest {
 
     replay(datasourceMock, valueTableMock);
 
-    Set<View> views = Sets.newHashSet();
+    Set<ValueView> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("single-views", views, null, null);

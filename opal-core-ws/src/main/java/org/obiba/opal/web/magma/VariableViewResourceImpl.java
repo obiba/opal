@@ -10,10 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Lists;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.*;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
@@ -63,12 +60,11 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
   @Override
   public Response deleteVariable() {
-    View view = getValueTableAsView();
-    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    ValueView view = getValueTableAsView();
+    try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {
 
       // Remove from listClause
-      for (VariableValueSource v : view.getListClause().getVariableValueSources()) {
-        Variable variable = v.getVariable();
+      for (Variable variable : view.getVariables()) {
         if (variable.getName().equals(getName())) {
           getEventBus().post(new VariableDeletedEvent(getValueTable(), variable));
           variableWriter.removeVariable(variable);
@@ -114,10 +110,10 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    View view = getValueTableAsView();
+    ValueView view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
 
-    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {
 
       // Rename existing variable
       if (!updatedVariable.getName().equals(variable.getName())) {
@@ -140,7 +136,7 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     variableWriter.removeVariable(variable);
   }
 
-  private View getValueTableAsView() {
+  private ValueView getValueTableAsView() {
     return viewManager.getView(getDatasource().getName(), getValueTable().getName());
   }
 }

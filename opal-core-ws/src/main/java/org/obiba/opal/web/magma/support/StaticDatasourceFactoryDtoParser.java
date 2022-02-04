@@ -9,19 +9,13 @@
  */
 package org.obiba.opal.web.magma.support;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
-import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewAwareDatasource;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -32,6 +26,11 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Static datasource is used as a transient datasource.
@@ -62,7 +61,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
     private StaticDatasourceFactory(DatasourceFactoryDto dto) {
       this.dto = dto;
-      if(dto.getName() != null) {
+      if (dto.getName() != null) {
         setName(dto.getName());
       }
     }
@@ -72,13 +71,13 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     protected Datasource internalCreate() {
       StaticDatasourceFactoryDto staticDto = dto.getExtension(StaticDatasourceFactoryDto.params);
       StaticDatasource ds = new StaticDatasource(getName());
-      for(TableDto tableDto : staticDto.getTablesList()) {
+      for (TableDto tableDto : staticDto.getTablesList()) {
         addValueTable(ds, tableDto);
       }
 
-      Set<View> views = new LinkedHashSet<>();
-      for(ViewDto viewDto : staticDto.getViewsList()) {
-        if(viewDto.getFromCount() == 0) {
+      Set<ValueView> views = new LinkedHashSet<>();
+      for (ViewDto viewDto : staticDto.getViewsList()) {
+        if (viewDto.getFromCount() == 0) {
           // cannot make a view from it, so make it a table
           addValueTable(ds, viewDtos.asTableDto(viewDto));
         } else {
@@ -92,7 +91,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     private void addValueTable(StaticDatasource ds, TableDto tableDto) {
       StaticValueTable table = new StaticValueTable(ds, tableDto.getName(), new HashSet<String>(),
           tableDto.getEntityType());
-      for(Magma.VariableDto variableDto : tableDto.getVariablesList()) {
+      for (Magma.VariableDto variableDto : tableDto.getVariablesList()) {
         table.addVariable(Dtos.fromDto(variableDto));
       }
       ds.addValueTable(table);

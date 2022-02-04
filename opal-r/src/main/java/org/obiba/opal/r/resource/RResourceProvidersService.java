@@ -21,12 +21,10 @@ import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
-import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +39,6 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private static final Logger log = LoggerFactory.getLogger(RResourceProvidersService.class);
 
   private static final String RESOURCE_JS_FILE = "resources/resource.js";
-
-  @Autowired
-  private RPackageResourceHelper rPackageHelper;
 
   @Autowired
   private RServerManagerService rServerManagerService;

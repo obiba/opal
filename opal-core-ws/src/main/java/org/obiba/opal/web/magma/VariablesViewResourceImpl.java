@@ -12,8 +12,8 @@ package org.obiba.opal.web.magma;
 import com.google.common.base.Joiner;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
@@ -61,9 +61,9 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   public Response addOrUpdateVariablesFromFile(Magma.ViewDto viewDto, @Nullable String comment) {
     View view = viewDtos.fromDto(viewDto);
     view.initialise();
-    View source = getValueTableAsView();
+    ValueView source = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try (VariableWriter variableWriter = source.getListClause().createWriter()) {
+    try (VariableWriter variableWriter = source.createVariableWriter()) {
       for (Variable variable : view.getVariables()) {
         operationContext.addVariable(source, variable);
         variableWriter.writeVariable(variable);
@@ -84,9 +84,9 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   }
 
   private void addOrUpdateViewVariables(Iterable<Variable> variables, @Nullable String comment) {
-    View view = getValueTableAsView();
+    ValueView view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try (VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (VariableWriter variableWriter = view.createVariableWriter()) {
       for (Variable variable : variables) {
         operationContext.addVariable(view, variable);
         variableWriter.writeVariable(variable);
@@ -97,16 +97,15 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   }
 
   @Override
-  public Response deleteVariables(List<String> variables) {
-    View view = getValueTableAsView();
+  public Response deleteVariables(List<String> variableNames) {
+    ValueView view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {
       List<String> names = new ArrayList<>();
       // Remove from listClause
-      for (VariableValueSource variableSource : view.getListClause().getVariableValueSources()) {
-        Variable variable = variableSource.getVariable();
+      for (Variable variable : view.getVariables()) {
         String name = variable.getName();
-        if (variables.contains(name)) {
+        if (variableNames.contains(name)) {
           getEventBus().post(new VariableDeletedEvent(getValueTable(), variable));
           operationContext.deleteVariable(view, variable);
           names.add(name);
@@ -119,7 +118,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     return Response.ok().build();
   }
 
-  private View getValueTableAsView() {
+  private ValueView getValueTableAsView() {
     return viewManager.getView(getDatasource().getName(), getValueTable().getName());
   }
 }

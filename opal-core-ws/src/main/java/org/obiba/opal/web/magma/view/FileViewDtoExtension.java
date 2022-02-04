@@ -9,17 +9,9 @@
  */
 package org.obiba.opal.web.magma.view;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.collect.Sets;
 import org.apache.commons.vfs2.FileObject;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.VariablesClause;
 import org.obiba.magma.support.Disposables;
@@ -38,7 +30,9 @@ import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Sets;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An implementation of {@Code ViewDtoExtension} that can create {@code View} instances by de-serializing an
@@ -52,7 +46,7 @@ public class FileViewDtoExtension implements ViewDtoExtension {
 
   @Autowired
   public FileViewDtoExtension(OpalRuntime opalRuntime) {
-    if(opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    if (opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
     this.opalRuntime = opalRuntime;
   }
 
@@ -62,13 +56,13 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public boolean isDtoOf(@NotNull View view) {
+  public boolean isDtoOf(@NotNull ValueView view) {
     // Always false: we cannot convert an existing view to a file.
     return false;
   }
 
   @Override
-  public ViewDto asDto(View view) {
+  public ViewDto asDto(ValueView view) {
     throw new UnsupportedOperationException();
   }
 
@@ -77,19 +71,19 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
-      if(file.exists()) {
-        try(InputStream is = file.getContent().getInputStream()) {
+      if (file.exists()) {
+        try (InputStream is = file.getContent().getInputStream()) {
           return makeViewFromFile(viewBuilder, fileDto, is);
         }
       }
       throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   private View makeViewFromFile(Builder viewBuilder, FileViewDto fileDto, InputStream is) {
-    switch(fileDto.getType()) {
+    switch (fileDto.getType()) {
       case SERIALIZED_XML:
         return makeViewFromXMLFile(viewBuilder, is);
       case EXCEL:
@@ -124,19 +118,19 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
-      if(file.exists()) {
-        try(InputStream is = file.getContent().getInputStream()) {
+      if (file.exists()) {
+        try (InputStream is = file.getContent().getInputStream()) {
           return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);
         }
       }
       throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   private TableDto makeTableDtoFromFile(Magma.TableDto.Builder tableDtoBuilder, FileViewDto fileDto, InputStream is) {
-    switch(fileDto.getType()) {
+    switch (fileDto.getType()) {
       case SERIALIZED_XML:
         return makeTableDtoFromXMLFile(tableDtoBuilder, is);
       case EXCEL:
@@ -151,7 +145,7 @@ public class FileViewDtoExtension implements ViewDtoExtension {
     View view = (View) MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream()
         .fromXML(is);
     view.initialise();
-    for(VariableValueSource vs : view.getListClause().getVariableValueSources()) {
+    for (VariableValueSource vs : view.getListClause().getVariableValueSources()) {
       Variable v = vs.getVariable();
       tableDtoBuilder.setEntityType(v.getEntityType());
       tableDtoBuilder.addVariables(Dtos.asDto(v));
@@ -169,7 +163,7 @@ public class FileViewDtoExtension implements ViewDtoExtension {
       // Get the first table, whichever it is
       ValueTable t = ed.getValueTables().iterator().next();
       tableDtoBuilder.setEntityType(t.getEntityType());
-      for(Variable v : t.getVariables()) {
+      for (Variable v : t.getVariables()) {
         tableDtoBuilder.addVariables(Dtos.asDto(v));
       }
       return tableDtoBuilder.build();

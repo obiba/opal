@@ -28,6 +28,7 @@ import org.obiba.git.command.DeleteFilesCommand;
 import org.obiba.git.command.GitCommandHandler;
 import org.obiba.git.command.ReadFilesCommand;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.views.support.VariableOperationContext;
@@ -55,8 +56,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private GitCommandHandler handler;
 
   @Override
-  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment,
-      @Nullable VariableOperationContext context) {
+  public void writeViews(@NotNull String datasourceName, @NotNull Set<ValueView> views, @Nullable String comment,
+                         @Nullable VariableOperationContext context) {
     log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
         OpalGitUtils.getGitViewsRepoFolder(datasourceName), views, comment, context);
@@ -65,7 +66,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeView(@NotNull String datasourceName, @NotNull View view, @Nullable String comment,
+  public void writeView(@NotNull String datasourceName, @NotNull ValueView view, @Nullable String comment,
       @Nullable VariableOperationContext context) {
     writeViews(datasourceName, ImmutableSet.of(view), comment, context);
   }
@@ -90,10 +91,10 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public Set<View> readViews(@NotNull String datasourceName) {
+  public Set<ValueView> readViews(@NotNull String datasourceName) {
     log.debug("ReadViews ds: {}", datasourceName);
     File datasourceRepo = OpalGitUtils.getGitViewsRepoFolder(datasourceName);
-    ImmutableSet.Builder<View> builder = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueView> builder = ImmutableSet.builder();
     List<String> viewNames = Lists.newArrayList();
     if(datasourceRepo.exists()) {
       for(View view : readGitViews(datasourceRepo)) {
@@ -105,7 +106,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return builder.build();
   }
 
-  private void readLegacyViews(String datasourceName, ImmutableSet.Builder<View> builder, List<String> viewNames) {
+  private void readLegacyViews(String datasourceName, ImmutableSet.Builder<ValueView> builder, List<String> viewNames) {
     LegacyViews legacyViews = new LegacyViews(datasourceName);
     boolean noLegacy = true;
     for(View view : legacyViews.readViews()) {
