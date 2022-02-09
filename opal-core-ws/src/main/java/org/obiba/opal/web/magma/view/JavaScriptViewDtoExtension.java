@@ -33,7 +33,7 @@ import java.util.List;
  * An implementation of {@Code ViewDtoExtension} for {@code View} instances that have a {@code SelectClause}.
  */
 @Component
-public class JavaScriptViewDtoExtension implements ViewDtoExtension {
+public class JavaScriptViewDtoExtension extends TableViewDtoExtension {
 
   @Override
   public boolean isExtensionOf(@NotNull ViewDto viewDto) {
@@ -46,7 +46,8 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public View fromDto(ViewDto viewDto, Builder viewBuilder) {
+  public ValueView fromDto(ViewDto viewDto) {
+    Builder viewBuilder = getBuilder(viewDto);
     JavaScriptViewDto jsDto = viewDto.getExtension(JavaScriptViewDto.view);
 
     if (jsDto.hasSelect()) {
@@ -62,7 +63,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
-    View jsView = (View)view;
+    View jsView = (View) view;
     if (jsView.getWhereClause() instanceof JavascriptClause) {
       viewDtoBuilder.setWhere(((JavascriptClause) jsView.getWhereClause()).getScript());
     }

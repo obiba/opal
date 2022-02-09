@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 
 class RValueSetBatch implements ValueSetBatch {
 
-  private final RValueTable table;
+  private final TibbleTable table;
 
   private final List<VariableEntity> entities;
 
   private final RValueSetFetcher fetcher;
 
-  public RValueSetBatch(RValueTable table, List<VariableEntity> entities) {
+  public RValueSetBatch(TibbleTable table, List<VariableEntity> entities) {
     this.table = table;
     this.entities = entities;
     this.fetcher = new RValueSetFetcher(table);

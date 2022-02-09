@@ -14,6 +14,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.Variable;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
@@ -59,8 +60,8 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
 
   @Override
   public Response addOrUpdateVariablesFromFile(Magma.ViewDto viewDto, @Nullable String comment) {
-    View view = viewDtos.fromDto(viewDto);
-    view.initialise();
+    ValueView view = viewDtos.fromDto(viewDto);
+    Initialisables.initialise(view);
     ValueView source = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
     try (VariableWriter variableWriter = source.createVariableWriter()) {

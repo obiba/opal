@@ -9,13 +9,6 @@
  */
 package org.obiba.opal.web.magma.view;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.Variable;
@@ -26,7 +19,6 @@ import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.views.JoinTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.View.Builder;
-import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma;
@@ -36,11 +28,16 @@ import org.obiba.opal.web.model.Magma.VariableListViewDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 /**
  * An implementation of {@Code ViewDtoExtension} for {@code View} instances that have a {@code ListClause}.
  */
 @Component
-public class VariableListViewDtoExtension implements ViewDtoExtension {
+public class VariableListViewDtoExtension extends TableViewDtoExtension {
 
   @Override
   public boolean isExtensionOf(@NotNull ViewDto viewDto) {
@@ -49,15 +46,16 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
 
   @Override
   public boolean isDtoOf(@NotNull ValueView view) {
-    return !(view instanceof View && ((View)view).getListClause() instanceof NoneClause);
+    return view instanceof View && !(((View) view).getListClause() instanceof NoneClause);
   }
 
   @Override
-  public View fromDto(ViewDto viewDto, Builder viewBuilder) {
+  public ValueView fromDto(ViewDto viewDto) {
+    Builder viewBuilder = getBuilder(viewDto);
     VariableListViewDto listDto = viewDto.getExtension(VariableListViewDto.view);
 
     Collection<Variable> variables = new LinkedHashSet<>();
-    for(VariableDto variableDto : listDto.getVariablesList()) {
+    for (VariableDto variableDto : listDto.getVariablesList()) {
       variables.add(Dtos.fromDto(variableDto));
     }
 
@@ -74,13 +72,13 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
     View jsView = (View) view;
-    if(jsView.getWhereClause() instanceof JavascriptClause) {
+    if (jsView.getWhereClause() instanceof JavascriptClause) {
       viewDtoBuilder.setWhere(((JavascriptClause) jsView.getWhereClause()).getScript());
     }
     setFromTables(jsView, viewDtoBuilder);
 
     VariableListViewDto.Builder listDtoBuilder = VariableListViewDto.newBuilder();
-    for(Variable v : view.getVariables()) {
+    for (Variable v : view.getVariables()) {
       listDtoBuilder.addVariables(Dtos.asDto(v));
     }
     viewDtoBuilder.setExtension(VariableListViewDto.view, listDtoBuilder.build());
@@ -90,9 +88,9 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
 
   private void setFromTables(ValueTableWrapper view, ViewDto.Builder viewDtoBuilder) {
     ValueTable from = view.getWrappedValueTable();
-    if(from instanceof JoinTable) {
+    if (from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();
-      for(ValueTable vt : fromTables) {
+      for (ValueTable vt : fromTables) {
         viewDtoBuilder.addFrom(toStringReference(vt));
       }
       viewDtoBuilder.addAllInnerFrom(((JoinTable) from).getInnerTableReferences());
@@ -102,7 +100,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   }
 
   String toStringReference(ValueTable vt) {
-    if(vt instanceof ValueTableReference) {
+    if (vt instanceof ValueTableReference) {
       return ((ValueTableReference) vt).getReference();
     }
     return vt.getDatasource().getName() + "." + vt.getName();
@@ -111,7 +109,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   @Override
   public TableDto asTableDto(ViewDto viewDto, Magma.TableDto.Builder tableDtoBuilder) {
     VariableListViewDto listDto = viewDto.getExtension(VariableListViewDto.view);
-    if(listDto.getVariablesCount() > 0) {
+    if (listDto.getVariablesCount() > 0) {
       tableDtoBuilder.setEntityType(listDto.getVariables(0).getEntityType());
     }
     tableDtoBuilder.addAllVariables(listDto.getVariablesList());

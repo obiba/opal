@@ -355,6 +355,15 @@ message FileViewDto {
   }
 }
 
+message ResourceViewDto {
+  repeated VariableDto variables = 1;
+  optional string idColumn = 2;
+  optional string entityType = 3;
+  extend ViewDto {
+    optional ResourceViewDto view = 1004;
+  }
+}
+
 message JavaScriptErrorDto {
   required string message = 1; // RhinoException.details()
   required string sourceName = 2; // RhinoException.sourceName()

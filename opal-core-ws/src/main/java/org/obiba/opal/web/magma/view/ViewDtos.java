@@ -16,7 +16,6 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import com.google.common.collect.Lists;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueView;
@@ -37,31 +36,18 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public final class ViewDtos {
 
-  private Set<ViewDtoExtension> extensions;
+  private Set<ValueViewDtoExtension> extensions;
 
   @Autowired
-  public void setExtensions(Collection<ViewDtoExtension> extensions) {
+  public void setExtensions(Collection<ValueViewDtoExtension> extensions) {
     this.extensions = ImmutableSet.copyOf(extensions);
   }
 
   @NotNull
-  public View fromDto(@NotNull ViewDto viewDto) {
-    List<ValueTable> fromTables = getFromTables(viewDto);
-    View.Builder builder = View.Builder
-        .newView(viewDto.getName(), fromTables);
-
-    if (viewDto.getInnerFromCount() > 0) {
-      builder.innerFrom(viewDto.getInnerFromList());
-    }
-    
-    if(viewDto.hasWhere()) {
-      WhereClause whereClause = new JavascriptClause(viewDto.getWhere());
-      builder.where(whereClause);
-    }
-
-    for(ViewDtoExtension extension : extensions) {
+  public ValueView fromDto(@NotNull ViewDto viewDto) {
+    for(ValueViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
-        return extension.fromDto(viewDto, builder);
+        return extension.fromDto(viewDto);
       }
     }
     throw new IllegalStateException("Unknown view type");
@@ -70,7 +56,7 @@ public final class ViewDtos {
   @NotNull
   public TableDto asTableDto(@NotNull ViewDto viewDto) {
     TableDto.Builder builder = TableDto.newBuilder().setName(viewDto.getName());
-    for(ViewDtoExtension extension : extensions) {
+    for(ValueViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
         return extension.asTableDto(viewDto, builder);
       }
@@ -80,7 +66,7 @@ public final class ViewDtos {
 
   @NotNull
   public ViewDto asDto(@NotNull ValueView view) {
-    for(ViewDtoExtension extension : extensions) {
+    for(ValueViewDtoExtension extension : extensions) {
       if(extension.isDtoOf(view)) {
         return extension.asDto(view);
       }

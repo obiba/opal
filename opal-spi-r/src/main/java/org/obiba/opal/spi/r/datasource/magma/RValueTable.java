@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * A value table based on a tibble.
  */
-public class RValueTable extends AbstractValueTable {
+public class RValueTable extends AbstractValueTable implements TibbleTable {
 
   private static final Logger log = LoggerFactory.getLogger(RValueTable.class);
 
@@ -61,19 +61,23 @@ public class RValueTable extends AbstractValueTable {
     return new RValueSetBatch(this, entities);
   }
 
-  String getSymbol() {
+  @Override
+  public String getSymbol() {
     return symbol;
   }
 
-  boolean isMultilines() {
+  @Override
+  public boolean isMultilines() {
     return ((RVariableEntityProvider) getVariableEntityProvider()).isMultilines();
   }
 
-  int getIdPosition() {
+  @Override
+  public int getIdPosition() {
     return idPosition;
   }
 
-  String getIdColumn() {
+  @Override
+  public String getIdColumn() {
     return ((RVariableEntityProvider) getVariableEntityProvider()).getIdColumn();
   }
 
@@ -120,7 +124,8 @@ public class RValueTable extends AbstractValueTable {
       setVariableEntityBatchSize(optimizedBatchSize);
   }
 
-  RServerResult execute(String script) {
+  @Override
+  public RServerResult execute(String script) {
     return execute(new RScriptROperation(script, false));
   }
 
@@ -151,20 +156,24 @@ public class RValueTable extends AbstractValueTable {
     return NullTimestamps.get();
   }
 
-  String getDefaultLocale() {
+  @Override
+  public String getDefaultLocale() {
     return ((RDatasource) getDatasource()).getLocale();
+  }
+
+  @Override
+  public RVariableEntity getRVariableEntity(VariableEntity entity) {
+    if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
+    return ((RVariableEntityProvider) getVariableEntityProvider()).getRVariableEntity(entity);
+  }
+
+  @Override
+  public Map<String, Integer> getColumnPositions() {
+    return columnPositions;
   }
 
   private ROperationTemplate getRSession() {
     return ((RDatasource) getDatasource()).getRSession();
   }
 
-  public RVariableEntity getRVariableEntity(VariableEntity entity) {
-    if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
-    return ((RVariableEntityProvider) getVariableEntityProvider()).getRVariableEntity(entity);
-  }
-
-  public Map<String, Integer> getColumnPositions() {
-    return columnPositions;
-  }
 }

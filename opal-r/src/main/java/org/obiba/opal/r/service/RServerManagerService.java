@@ -22,7 +22,6 @@ import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.rock.RockService;
 import org.obiba.opal.r.rserve.RserveService;
@@ -72,7 +71,7 @@ public class RServerManagerService implements Service {
 
   /**
    * Get the R server profile corresponding to the default R server.
-   * 
+   *
    * @return
    */
   public RServerProfile getDefaultRServerProfile() {

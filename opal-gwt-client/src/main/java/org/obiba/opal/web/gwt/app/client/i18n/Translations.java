@@ -2482,6 +2482,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Table References")
   String tableReferencesLabel();
 
+  @Description("Resource References label")
+  @DefaultStringValue("Resource References")
+  String resourceReferencesLabel();
+
   @Description("Edit categories label")
   @DefaultStringValue("Edit Categories")
   String editCategories();

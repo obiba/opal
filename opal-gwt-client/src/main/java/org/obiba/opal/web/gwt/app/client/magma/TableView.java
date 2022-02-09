@@ -52,9 +52,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAnnotationColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.*;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.*;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -439,10 +437,44 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
-  public void setFromTables(JsArrayString tableNames, JsArrayString innerTables) {
+  public void setView(ViewDto viewDto) {
     if (propertiesTable.getRowCount() > 2) {
       propertiesTable.removeProperty(2);
     }
+    if (viewDto == null) {
+      viewProperties.setVisible(false);
+    } else {
+      if (viewDto.getExtension(ResourceViewDto.ViewDtoExtensions.view) == null) {
+        setFromTables(viewDto.getFromArray(), viewDto.getInnerFromArray());
+        setWhereScript(viewDto.hasWhere() ? viewDto.getWhere() : null);
+      } else {
+        setFromResources(viewDto.getFromArray());
+      }
+    }
+  }
+
+  private void setFromResources(JsArrayString resourceNames) {
+    if (resourceNames != null) {
+      FlowPanel fromResourceLinks = new FlowPanel();
+      for (int i = 0; i < resourceNames.length(); i++) {
+        String tableFullName = resourceNames.get(i);
+        IconAnchor a = new IconAnchor();
+        a.setText(tableFullName);
+        // a.setIcon(innerTablesList.contains(tableFullName) ? IconType.CIRCLE_BLANK : IconType.CIRCLE);
+        MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
+        a.setHref("#" + placeManager
+            .buildHistoryToken(ProjectPlacesHelper.getResourcePlace(parser.getDatasource(), parser.getTable())));
+        fromResourceLinks.add(a);
+
+        if (i < resourceNames.length() - 1) {
+          fromResourceLinks.add(new InlineLabel(", "));
+        }
+      }
+      propertiesTable.addProperty(new Label(translations.resourceReferencesLabel()), fromResourceLinks);
+    }
+  }
+
+  private void setFromTables(JsArrayString tableNames, JsArrayString innerTables) {
     List<String> innerTablesList = new ArrayList<String>(JsArrays.toList(innerTables));
     if (tableNames != null) {
       FlowPanel fromTableLinks = new FlowPanel();
@@ -464,8 +496,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
   }
 
-  @Override
-  public void setWhereScript(String script) {
+  private void setWhereScript(String script) {
+    viewProperties.setVisible(true);
     if (Strings.isNullOrEmpty(script)) {
       whereScript.setText("// " + translations.noFilter());
     } else {
@@ -811,7 +843,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     crossOracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
     crossOracle.setTable("\"" + tableDto.getName() + "\"");
 
-    viewProperties.setVisible(dto.hasViewLink());
+    viewProperties.setVisible(false);
     initializeFilter();
   }
 

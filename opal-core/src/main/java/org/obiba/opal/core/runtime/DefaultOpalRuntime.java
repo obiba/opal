@@ -80,9 +80,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
     initExtensions();
     initPlugins();
     initFileSystem();
-    initMagmaEngine();
     initServicePlugins();
     initServices();
+    initMagmaEngine();
   }
 
   @Override

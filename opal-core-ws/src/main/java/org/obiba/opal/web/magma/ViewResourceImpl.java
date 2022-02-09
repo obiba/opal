@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -20,6 +21,7 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.spi.r.datasource.magma.ResourceView;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -62,7 +64,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   @Override
   public ViewDto getView() {
-    return viewDtos.asDto(asView());
+    return viewDtos.asDto(asValueView());
   }
 
   @Override
@@ -104,7 +106,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   @Override
   public Response downloadViewDefinition() {
-    return Response.ok(asView(), "application/xml")
+    return Response.ok(asValueView(), "application/xml")
         .header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
   }
 
@@ -113,7 +115,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Scope("request")
   public TableResource getFrom() {
     TableResource resource = applicationContext.getBean("tableResource", TableResource.class);
-    resource.setValueTable(asView().getWrappedValueTable());
+    resource.setValueTable(asTableView().getWrappedValueTable());
     resource.setLocales(getLocales());
     return resource;
   }
@@ -138,21 +140,54 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
         "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) return true;
 
     // user can see the values of the view, so make sure user is also permitted to see the referred tables values
-    for(String tableName : viewDto.getFromList()) {
-      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-      ValueTable fromTable = resolver.resolveTable();
-      if(!authorizer.isPermitted(
-          "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
-        return false;
+    if (isTableView()) {
+      for (String tableName : viewDto.getFromList()) {
+        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+        ValueTable fromTable = resolver.resolveTable();
+        if (!authorizer.isPermitted(
+            "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
+          return false;
+        }
+      }
+    } else if (isResourceView()) {
+      for (String tableName : viewDto.getFromList()) {
+        // reuse project's table naming for the resource...
+        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+        if (!authorizer.isPermitted(
+            "rest:/project/" + resolver.getDatasourceName() + "/resource/" + resolver.getTableName() + ":GET")) {
+          return false;
+        }
       }
     }
     return true;
   }
 
-  private View asView() {
+  private ValueView asValueView() {
     ValueTable table = getValueTable();
-    if(table.isView()) return (View) table;
-    throw new InvalidRequestException("Not a view");
+    if(table.isView()) return (ValueView) table;
+    throw new InvalidRequestException("Not a value view");
+  }
+
+  private View asTableView() {
+    ValueTable table = getValueTable();
+    if(isTableView()) return (View) table;
+    throw new InvalidRequestException("Not a table view");
+  }
+
+  private boolean isTableView() {
+    ValueTable table = getValueTable();
+    return table.isView() && table instanceof View;
+  }
+
+  private ResourceView asResourceView() {
+    ValueTable table = getValueTable();
+    if(isResourceView()) return (ResourceView) table;
+    throw new InvalidRequestException("Not a resource view");
+  }
+
+  private boolean isResourceView() {
+    ValueTable table = getValueTable();
+    return table.isView() && table instanceof ResourceView;
   }
 
 }

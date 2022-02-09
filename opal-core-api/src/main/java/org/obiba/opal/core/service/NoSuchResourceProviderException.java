@@ -15,7 +15,7 @@ public class NoSuchResourceProviderException extends RuntimeException {
   private final String name;
 
   public NoSuchResourceProviderException(String name) {
-    super("No Resource with name \"" + name + "\"");
+    super("No Resource provider with name \"" + name + "\"");
     this.name = name;
   }
 

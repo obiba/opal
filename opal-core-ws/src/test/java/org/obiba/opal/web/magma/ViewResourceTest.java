@@ -18,7 +18,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
-import org.obiba.opal.web.magma.view.ViewDtoExtension;
+import org.obiba.opal.web.magma.view.ValueViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.springframework.context.ApplicationContext;
 
@@ -87,7 +87,7 @@ public class ViewResourceTest {
   private ViewDtos newViewDtos() {
     ViewDtos viewDtos = new ViewDtos();
     viewDtos.setExtensions(
-        ImmutableSet.<ViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
+        ImmutableSet.<ValueViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
     return viewDtos;
   }
 }

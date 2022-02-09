@@ -31,7 +31,7 @@ class RValueSet extends ValueSetBean {
 
   private Map<Integer, List<Object>> columnValues;
 
-  RValueSet(@NotNull RValueTable table, @NotNull VariableEntity entity) {
+  RValueSet(@NotNull TibbleTable table, @NotNull VariableEntity entity) {
     super(table, entity);
     this.fetcher = new RValueSetFetcher(table);
   }
@@ -55,10 +55,10 @@ class RValueSet extends ValueSetBean {
 
       if (list.stream().anyMatch(RServerResult::isNamedList)) {
         // results from rock are one JSON object per row
-        Map<String, Integer> colPositions = getRValueTable().getColumnPositions();
+        Map<String, Integer> colPositions = getTibbleTable().getColumnPositions();
         for (RServerResult rowResult : list) {
           RNamedList<RServerResult> rowNamedResults = rowResult.asNamedList();
-          String id = rowNamedResults.get(getRValueTable().getIdColumn()).asStrings()[0];
+          String id = rowNamedResults.get(getTibbleTable().getIdColumn()).asStrings()[0];
           if (getVariableEntity().getIdentifier().equals(id)) {
             Map<String, Object> rowMap = asMapOfObjects(rowResult);
             for (String colName : colPositions.keySet()) {
@@ -75,7 +75,7 @@ class RValueSet extends ValueSetBean {
         List<Integer> rowIdx = Lists.newArrayList();
         int row = 0;
         for (String id : ids) {
-          if (getRVariableEntity().equals(new RVariableEntity(getRValueTable().getEntityType(), id))) {
+          if (getRVariableEntity().equals(new RVariableEntity(getTibbleTable().getEntityType(), id))) {
             rowIdx.add(row);
           }
           row++;
@@ -116,15 +116,15 @@ class RValueSet extends ValueSetBean {
   }
 
   private RVariableEntity getRVariableEntity() {
-    return getRValueTable().getRVariableEntity(getVariableEntity());
+    return getTibbleTable().getRVariableEntity(getVariableEntity());
   }
 
   private int getIdPosition() {
-    return getRValueTable().getIdPosition();
+    return getTibbleTable().getIdPosition();
   }
 
-  private RValueTable getRValueTable() {
-    return (RValueTable) getValueTable();
+  private TibbleTable getTibbleTable() {
+    return (TibbleTable) getValueTable();
   }
 
 }

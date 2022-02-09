@@ -26,7 +26,7 @@ import java.util.Map;
  */
 class RVariableEntityProvider implements VariableEntityProvider {
 
-  private RValueTable valueTable;
+  private TibbleTable valueTable;
 
   private final String entityType;
 
@@ -40,7 +40,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
 
   private boolean multilines = false;
 
-  RVariableEntityProvider(RValueTable valueTable, String entityType, String idColumn) {
+  RVariableEntityProvider(TibbleTable valueTable, String entityType, String idColumn) {
     this.valueTable = valueTable;
     this.entityType = Strings.isNullOrEmpty(entityType) ? "Participant" : entityType;
     this.idColumn = idColumn;

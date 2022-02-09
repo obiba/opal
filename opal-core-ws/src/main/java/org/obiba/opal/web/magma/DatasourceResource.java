@@ -15,9 +15,9 @@ import com.googlecode.protobuf.format.JsonFormat;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
@@ -176,10 +176,10 @@ public class DatasourceResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
 
-    // check the permissions and if table exists for the user
+    // check the permissions and if table/resource exists for the user
     AclAction action = getAction(viewDto);
 
-    View view = viewDtos.fromDto(viewDto);
+    ValueView view = viewDtos.fromDto(viewDto);
     viewManager.addView(getDatasource().getName(), view, comment, null);
     scheduleViewIndexation(view);
     getEventBus().post(new ValueTableAddedEvent(getDatasource().getName(), viewDto.getName()));
@@ -217,6 +217,10 @@ public class DatasourceResource {
   }
 
   private AclAction getAction(ViewDto viewDto) {
+    return viewDto.hasExtension(Magma.ResourceViewDto.view) ? getResourceAction(viewDto) : getTableAction(viewDto);
+  }
+
+  private AclAction getTableAction(ViewDto viewDto) {
     AclAction action = AclAction.TABLE_ALL;
     if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
 
@@ -228,6 +232,16 @@ public class DatasourceResource {
         action = AclAction.TABLE_EDIT;
         break;
       }
+    }
+    return action;
+  }
+
+  private AclAction getResourceAction(ViewDto viewDto) {
+    AclAction action = AclAction.RESOURCE_ALL;
+
+    for (String tableName : viewDto.getFromList()) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      // TODO verify resource exists for the user
     }
     return action;
   }
@@ -305,7 +319,7 @@ public class DatasourceResource {
         : MagmaEngine.get().getTransientDatasourceInstance(name);
   }
 
-  private ViewResource getViewResource(ValueTable view) {
+  private ViewResource getViewResource(ValueView view) {
     ViewResource resource = applicationContext.getBean(ViewResource.class);
     resource.setLocales(getLocales());
     resource.setValueTable(view);

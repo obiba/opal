@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
  */
 class RValueSetFetcher {
 
-  private final RValueTable table;
+  private final TibbleTable table;
 
-  RValueSetFetcher(RValueTable table) {
+  RValueSetFetcher(TibbleTable table) {
     this.table = table;
   }
 

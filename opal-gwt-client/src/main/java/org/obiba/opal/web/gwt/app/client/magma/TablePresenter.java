@@ -61,6 +61,7 @@ import org.obiba.opal.web.gwt.app.client.support.*;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.ResourceViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -385,11 +386,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       public void onTaxonomies(List<TaxonomyDto> taxonomies) {
         table = tableDto;
         getView().initialize(tableDto, taxonomies);
+        getView().setView(null);
         if (tableIsView()) {
           showViewProperties(table);
-        } else {
-          getView().setFromTables(null, null);
-          getView().setWhereScript(null);
         }
         variableFilter = "";
         valuesFilter = null;
@@ -414,8 +413,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().setFromTables(null, null);
-            getView().setWhereScript(null);
+            getView().setView(null);
           }
         }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)
         .withCallback(new ViewResourceCallback()).send();
@@ -938,8 +936,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
-      getView().setFromTables(viewDto.getFromArray(), viewDto.getInnerFromArray());
-      getView().setWhereScript(viewDto.hasWhere() ? viewDto.getWhere() : null);
+      getView().setView(viewDto);
     }
   }
 
@@ -1007,9 +1004,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     void setIndexStatusAlert(TableIndexStatusDto statusDto);
 
-    void setFromTables(JsArrayString tables, JsArrayString innerTables);
-
-    void setWhereScript(String script);
+    void setView(ViewDto viewDto);
 
     void setCancelVisible(boolean b);
 

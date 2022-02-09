@@ -18,10 +18,7 @@ import com.google.protobuf.ExtensionRegistry;
 import com.googlecode.protobuf.format.JsonFormat;
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.core.util.FileUtil;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceCopierProgressListener;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
@@ -242,7 +239,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
             ExtensionRegistry registry = ExtensionRegistry.newInstance();
             Magma.registerAllExtensions(registry);
             JsonFormat.merge(reader, registry, viewDtoBuilder);
-            View view = viewDtos.fromDto(viewDtoBuilder.build());
+            ValueView view = viewDtos.fromDto(viewDtoBuilder.build());
             removeTableOrView(view.getName());
             viewManager.addView(getProjectName(), view, "Restored", null);
           } catch (IOException e) {

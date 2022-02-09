@@ -10,18 +10,10 @@
 
 package org.obiba.opal.core.cfg;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.thoughtworks.xstream.XStream;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.git.command.DeleteFilesCommand;
@@ -35,25 +27,35 @@ import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.vcs.OpalGitUtils;
 import org.obiba.opal.core.vcs.command.OpalWriteViewsCommand;
+import org.obiba.opal.spi.r.datasource.magma.ResourceView;
+import org.obiba.opal.spi.resource.TabularResourceConnectorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.thoughtworks.xstream.XStream;
-
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.*;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private static final Logger log = LoggerFactory.getLogger(OpalViewPersistenceStrategy.class);
 
+  private final GitCommandHandler handler;
+
+  private final TabularResourceConnectorFactory tabularResourceConnectorFactory;
+
   @Autowired
-  private GitCommandHandler handler;
+  public OpalViewPersistenceStrategy(GitCommandHandler handler, TabularResourceConnectorFactory tabularResourceConnectorFactory) {
+    this.handler = handler;
+    this.tabularResourceConnectorFactory = tabularResourceConnectorFactory;
+  }
 
   @Override
   public void writeViews(@NotNull String datasourceName, @NotNull Set<ValueView> views, @Nullable String comment,
@@ -67,7 +69,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void writeView(@NotNull String datasourceName, @NotNull ValueView view, @Nullable String comment,
-      @Nullable VariableOperationContext context) {
+                        @Nullable VariableOperationContext context) {
     writeViews(datasourceName, ImmutableSet.of(view), comment, context);
   }
 
@@ -84,7 +86,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     try {
       FileUtil.delete(OpalGitUtils.getGitViewsRepoFolder(datasourceName));
       FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasourceName));
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
     }
 
@@ -96,8 +98,12 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     File datasourceRepo = OpalGitUtils.getGitViewsRepoFolder(datasourceName);
     ImmutableSet.Builder<ValueView> builder = ImmutableSet.builder();
     List<String> viewNames = Lists.newArrayList();
-    if(datasourceRepo.exists()) {
-      for(View view : readGitViews(datasourceRepo)) {
+    if (datasourceRepo.exists()) {
+      for (ValueView view : readGitViews(datasourceRepo)) {
+        if (view instanceof ResourceView) {
+          ResourceView resView = (ResourceView) view;
+          resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource()));
+        }
         builder.add(view);
         viewNames.add(view.getName());
       }
@@ -109,13 +115,13 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private void readLegacyViews(String datasourceName, ImmutableSet.Builder<ValueView> builder, List<String> viewNames) {
     LegacyViews legacyViews = new LegacyViews(datasourceName);
     boolean noLegacy = true;
-    for(View view : legacyViews.readViews()) {
-      if(!viewNames.contains(view.getName())) {
+    for (View view : legacyViews.readViews()) {
+      if (!viewNames.contains(view.getName())) {
         builder.add(view);
         noLegacy = false;
       }
     }
-    if(noLegacy) {
+    if (noLegacy) {
       legacyViews.removeViews();
     }
   }
@@ -130,17 +136,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   }
 
-  private Set<View> readGitViews(File datasourceRepo) {
-    ImmutableSet.Builder<View> builder = ImmutableSet.builder();
+  private Set<ValueView> readGitViews(File datasourceRepo) {
     Set<InputStream> files = handler
         .execute(new ReadFilesCommand.Builder(datasourceRepo, OpalGitUtils.getGitViewsWorkFolder()).recursive(true).filter("View\\.xml$").build());
 
-    for(InputStream file : files) {
-      InputStreamReader reader = new InputStreamReader(file, Charsets.UTF_8);
-      builder.add((View) getXStream().fromXML(reader));
-    }
-
-    return builder.build();
+    return files.stream()
+        .map(file -> {
+          InputStreamReader reader = new InputStreamReader(file, Charsets.UTF_8);
+          ValueView view = (ValueView) getXStream().fromXML(reader);
+          // TODO inject connector
+          return view;
+        }).collect(Collectors.toSet());
   }
 
   private XStream getXStream() {
@@ -172,7 +178,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     public Set<View> readViews() {
       Set<View> result = ImmutableSet.of();
       File datasourceViewsFile = getDatasourceViewsFile();
-      if(!datasourceViewsFile.exists()) {
+      if (!datasourceViewsFile.exists()) {
         return result;
       }
       log.debug("Reading the legacy views '{}'.", datasourceViewsFile.getAbsolutePath());
@@ -180,7 +186,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       try {
         reader = new InputStreamReader(new FileInputStream(datasourceViewsFile), Charsets.UTF_8);
         result = (Set<View>) getXStream().fromXML(reader);
-      } catch(FileNotFoundException e) {
+      } catch (FileNotFoundException e) {
         return ImmutableSet.of();
       } finally {
         StreamUtil.silentSafeClose(reader);
@@ -190,7 +196,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
     private void removeViews() {
       File datasourceViewsFile = getDatasourceViewsFile();
-      if(datasourceViewsFile.exists()) {
+      if (datasourceViewsFile.exists()) {
         datasourceViewsFile.delete();
       }
     }

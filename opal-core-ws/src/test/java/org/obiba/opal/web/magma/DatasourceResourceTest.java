@@ -25,19 +25,12 @@ import javax.ws.rs.core.UriInfo;
 
 import net.sf.ehcache.CacheManager;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.realm.SimpleAccountRealm;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -55,7 +48,6 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectService;
@@ -69,7 +61,7 @@ import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.PluginDatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
-import org.obiba.opal.web.magma.view.ViewDtoExtension;
+import org.obiba.opal.web.magma.view.ValueViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
@@ -601,7 +593,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   private ViewDtos newViewDtos() {
     ViewDtos viewDtos = new ViewDtos();
     viewDtos.setExtensions(
-        ImmutableSet.<ViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
+        ImmutableSet.<ValueViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
     return viewDtos;
   }
 

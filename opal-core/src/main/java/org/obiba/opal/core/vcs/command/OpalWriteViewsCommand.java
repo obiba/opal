@@ -95,9 +95,11 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
       getXStream().toXML(view, writer);
     }
 
-    doWriteGitViewWhere(viewRepo, (View) view, varFilesToRemove);
-    if (context != null && context.hasOperations((View) view)) {
-      doWriteGitViewVariables(viewRepo, view, context.getOperations((View) view), varFilesToRemove);
+    if (view instanceof View) {
+      doWriteGitViewWhere(viewRepo, (View) view, varFilesToRemove);
+    }
+    if (context != null && context.hasOperations(view)) {
+      doWriteGitViewVariables(viewRepo, view, context.getOperations(view), varFilesToRemove);
     } else {
       doWriteGitViewVariables(viewRepo, view, varFilesToRemove);
     }

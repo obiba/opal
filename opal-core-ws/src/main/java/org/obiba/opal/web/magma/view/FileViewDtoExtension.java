@@ -40,7 +40,7 @@ import java.io.InputStream;
  */
 @SuppressWarnings("UnusedDeclaration")
 @Component
-public class FileViewDtoExtension implements ViewDtoExtension {
+public class FileViewDtoExtension extends TableViewDtoExtension {
 
   private final OpalRuntime opalRuntime;
 
@@ -67,7 +67,8 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public View fromDto(ViewDto viewDto, Builder viewBuilder) {
+  public ValueView fromDto(ViewDto viewDto) {
+    Builder viewBuilder = getBuilder(viewDto);
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
