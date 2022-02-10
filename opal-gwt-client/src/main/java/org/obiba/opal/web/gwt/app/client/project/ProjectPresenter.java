@@ -257,8 +257,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().setProject(project);
             authorize();
 
-            if (tab != Display.ProjectTab.TABLES && tab != Display.ProjectTab.GENOTYPES) {
-              // these two tabs will be selected upon their authorization
+            if (tab != Display.ProjectTab.TABLES && tab != Display.ProjectTab.RESOURCES && tab != Display.ProjectTab.GENOTYPES) {
+              // these tabs will be selected upon their authorization
               onTabSelected(tab.ordinal());
               getView().selectTab(tab.ordinal());
             }

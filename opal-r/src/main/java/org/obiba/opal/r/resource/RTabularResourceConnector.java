@@ -20,6 +20,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -178,7 +179,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   }
 
   private void ensureRSession() {
-    if (rSession == null || rSession.isClosed()) {
+    if (rSession == null || !rSessionManager.hasRSession(rSession.getId()) || rSession.isClosed()) {
+      rSession = null;
       initialise();
     }
   }

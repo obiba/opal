@@ -131,6 +131,21 @@ public class OpalRSessionManager {
   }
 
   /**
+   * Check the R session with the provided identifier exists.
+   *
+   * @param rSessionId
+   * @return
+   */
+  public boolean hasRSession(String rSessionId) {
+    for (SubjectRSessions rSessions : rSessionMap.values()) {
+      if (rSessions.hasRSession(rSessionId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Remove the R session with the provided identifier.
    *
    * @param rSessionId

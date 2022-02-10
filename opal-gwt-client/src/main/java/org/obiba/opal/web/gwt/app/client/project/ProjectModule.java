@@ -63,5 +63,7 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectResourceView.class);
     bindPresenterWidget(ProjectResourceModalPresenter.class, ProjectResourceModalPresenter.Display.class,
         ProjectResourceModalView.class);
+    bindPresenterWidget(ResourceViewModalPresenter.class, ResourceViewModalPresenter.Display.class,
+        ResourceViewModalView.class);
   }
 }

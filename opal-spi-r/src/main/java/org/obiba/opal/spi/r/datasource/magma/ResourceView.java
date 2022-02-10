@@ -13,12 +13,9 @@ package org.obiba.opal.spi.r.datasource.magma;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.obiba.magma.*;
-import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
-import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.ViewAwareDatasource;
@@ -32,7 +29,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * A view that accesses a resource in its tabular form.
@@ -133,7 +129,10 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
       initialiseVariables();
       initialised = true;
     } catch (Exception e) {
-      log.error("Resource view init failed", e);
+      if (log.isDebugEnabled())
+        log.error("Resource view '{}' init failed", name, e);
+      else
+        log.warn("Resource view '{}' init failed: {}", name, e.getMessage());
     }
   }
 
@@ -413,11 +412,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public void dispose() {
-    try {
-      Disposables.dispose(connector);
-    } catch (Exception ignored) {
-      log.debug("Error while disposing the Resource connector", ignored);
-    }
+    Disposables.silentlyDispose(connector);
   }
 
   //
@@ -461,7 +456,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
       // TODO better init
       initialiseVariables();
     }
-  }  /**
+  }
+
+  /**
    * Lazy iterator of value sets: will make batch queries for extracting value sets.
    */
   private class ValueSetIterator implements Iterator<ValueSet> {

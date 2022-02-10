@@ -19,25 +19,20 @@
     <g:FlowPanel>
 
         <g:FlowPanel ui:field="buttonsPanel" addStyleNames="pull-right" visible="false">
-            <b:ButtonGroup>
-                <b:Button icon="TERMINAL" type="INFO" ui:field="test">
-                    <ui:msg description="Test resource label">Test</ui:msg>
-                </b:Button>
-            </b:ButtonGroup>
-            <b:ButtonGroup>
-                <b:Button icon="PENCIL" ui:field="edit">
-                    <ui:msg description="Edit resource label">Edit</ui:msg>
-                </b:Button>
-            </b:ButtonGroup>
-            <b:ButtonGroup>
-                <b:Button icon="COPY" ui:field="duplicate">
-                    <ui:msg description="Duplicate label">Duplicate</ui:msg>
-                </b:Button>
-            </b:ButtonGroup>
-            <b:ButtonGroup>
-                <b:Button icon="TRASH" ui:field="remove" addStyleNames="btn-danger">
-                </b:Button>
-            </b:ButtonGroup>
+            <b:Button ui:field="addView" type="INFO" icon="PLUS" addStyleNames="btn xsmall-right-indent">
+                <ui:msg description="Add Resource View Button label">Add View</ui:msg>
+            </b:Button>
+            <b:Button icon="TERMINAL" type="INFO" ui:field="test" addStyleNames="btn xsmall-right-indent">
+                <ui:msg description="Test resource label">Test</ui:msg>
+            </b:Button>
+            <b:Button icon="PENCIL" ui:field="edit" addStyleNames="btn xsmall-right-indent">
+                <ui:msg description="Edit resource label">Edit</ui:msg>
+            </b:Button>
+            <b:Button icon="COPY" ui:field="duplicate" addStyleNames="btn xsmall-right-indent">
+                <ui:msg description="Duplicate label">Duplicate</ui:msg>
+            </b:Button>
+            <b:Button icon="TRASH" ui:field="remove" addStyleNames="btn-danger">
+            </b:Button>
         </g:FlowPanel>
 
         <b:TabPanel tabPosition="above" ui:field="tabPanel">

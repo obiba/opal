@@ -1,0 +1,76 @@
+<!--
+  ~ Copyright (c) 2021 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:c="urn:import:org.obiba.opal.web.gwt.app.client.magma"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
+
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false" minHeight="600"
+           minWidth="700">
+    <!--Name-->
+    <b:ControlGroup ui:field="nameGroup">
+      <b:ControlLabel>
+        <ui:msg description="Name label">Name</ui:msg>
+        <o:RequiredIcon/>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="name"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="View Name help">A view must have a unique name.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <!--Entity Type-->
+    <b:ControlGroup ui:field="entityTypeGroup">
+      <b:ControlLabel>
+        <ui:msg description="Entity Type label">Entity Type</ui:msg>
+        <o:RequiredIcon/>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="entityType" placeholder="Participant"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="View Entity Type help">What these view data are about.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <!--ID column-->
+    <b:ControlGroup ui:field="idColumnGroup">
+      <b:ControlLabel>
+        <ui:msg description="ID Column label">ID Column</ui:msg>
+        <o:RequiredIcon/>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="idColumn"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="View ID Column help">The column in the resource's tabular representation that provides the entity identifiers.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Save label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="closeButton">
+        <ui:msg description="Cancel label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>

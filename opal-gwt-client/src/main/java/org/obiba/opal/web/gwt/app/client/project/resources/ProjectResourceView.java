@@ -120,6 +120,11 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     getUiHandlers().onEdit();
   }
 
+  @UiHandler("addView")
+  void onAddView(ClickEvent event) {
+    getUiHandlers().onAddView();
+  }
+
   @UiHandler("duplicate")
   void onDuplicate(ClickEvent event) {
     getUiHandlers().onDuplicate();

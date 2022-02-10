@@ -10,18 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface ProjectResourceUiHandlers extends UiHandlers {
+public interface ResourceViewModalUiHandlers extends ModalUiHandlers {
 
-  void onEdit();
-
-  void onAddView();
-
-  void onDuplicate();
-
-  void onDelete();
-
-  void onTest();
+  void onSave(String name, String entityType, String idColumn);
 
 }

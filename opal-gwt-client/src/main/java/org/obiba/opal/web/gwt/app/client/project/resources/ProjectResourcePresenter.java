@@ -57,6 +57,8 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
 
   private final ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider;
 
+  private final ModalProvider<ResourceViewModalPresenter> resourceViewModalProvider;
+
   private String projectName;
 
   private ResourceReferenceDto resource;
@@ -66,12 +68,13 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   @Inject
   public ProjectResourcePresenter(EventBus eventBus,
                                   Display view,
-                                  PlaceManager placeManager, TranslationMessages translationMessages, Translations translations, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider) {
+                                  PlaceManager placeManager, TranslationMessages translationMessages, Translations translations, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<ProjectResourceModalPresenter> projectResourceModalProvider, ModalProvider<ResourceViewModalPresenter> resourceViewModalProvider) {
     super(eventBus, view);
     this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     this.translations = translations;
     this.projectResourceModalProvider = projectResourceModalProvider.setContainer(this);
+    this.resourceViewModalProvider = resourceViewModalProvider.setContainer(this);
     getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
   }
@@ -109,6 +112,12 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
   public void onEdit() {
     ProjectResourceModalPresenter modal = projectResourceModalProvider.get();
     modal.initialize(projectName, resource, false);
+  }
+
+  @Override
+  public void onAddView() {
+    ResourceViewModalPresenter modal = resourceViewModalProvider.get();
+    modal.initialize(projectName, resource.getName());
   }
 
   @Override
