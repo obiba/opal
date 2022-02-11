@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -131,7 +132,8 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
     ResourceViewDto resDto = ResourceViewDto.create();
     resDto.setEntityType(entityType);
-    resDto.setIdColumn(idColumn);
+    if (!Strings.isNullOrEmpty(idColumn))
+      resDto.setIdColumn(idColumn);
     updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
 
     return updatedView;

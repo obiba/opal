@@ -75,7 +75,7 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
   void onSave(ClickEvent event) {
     getUiHandlers().onSave(getName().getText(),
         Strings.isNullOrEmpty(entityType.getText()) ? "Participant" : entityType.getText(),
-        Strings.isNullOrEmpty(idColumn.getText()) ? "id" : idColumn.getText());
+        idColumn.getText());
   }
 
   @Override

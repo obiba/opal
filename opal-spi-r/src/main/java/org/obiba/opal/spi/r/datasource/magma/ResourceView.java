@@ -10,6 +10,7 @@
 
 package org.obiba.opal.spi.r.datasource.magma;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -52,7 +53,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   private String entityType;
 
   // the column that identifies the entities
-  private String idColumn = ID_COLUMN_DEFAULT;
+  private String idColumn;
 
   // created date
   private Value created = DateTimeType.get().now();
@@ -73,7 +74,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   private transient List<VariableEntity> entities;
 
-  private transient int idPosition = 0;
+  private transient int idPosition = -1;
 
   private transient Map<String, Integer> columnPositions = Maps.newHashMap();
 
@@ -308,7 +309,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public Variable getVariable(String name) throws NoSuchVariableException {
-    return variables.stream().filter(var -> var.getName().equals(name)).findFirst().get();
+    return variables.stream().filter(var -> var.getName().equals(name))
+        .findFirst()
+        .orElseThrow(() -> new NoSuchVariableException(getName(), name));
   }
 
   @Override
@@ -381,9 +384,17 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   }
 
   private void initialiseIdColumn() {
-    connector.getColumns().stream()
-        .filter(col -> col.getName().equals(idColumn))
-        .findFirst().ifPresent(column -> idPosition = column.getPosition());
+    List<TabularResourceConnector.Column> columns = connector.getColumns();
+    if (!columns.isEmpty()) {
+      if (Strings.isNullOrEmpty(idColumn)) {
+        idColumn = columns.get(0).getName();
+        idPosition = 0;
+      } else {
+        columns.stream()
+            .filter(col -> col.getName().equals(idColumn))
+            .findFirst().ifPresent(column -> idPosition = column.getPosition());
+      }
+    }
   }
 
   private void initialiseVariables() {

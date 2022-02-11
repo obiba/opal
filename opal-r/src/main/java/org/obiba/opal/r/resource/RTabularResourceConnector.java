@@ -179,9 +179,28 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   }
 
   private void ensureRSession() {
-    if (rSession == null || !rSessionManager.hasRSession(rSession.getId()) || rSession.isClosed()) {
+    if (rSession == null || !isAlive()) {
+      if (rSession != null) {
+        dispose();
+      }
       rSession = null;
       initialise();
+    }
+  }
+
+  /**
+   * Check the R session is functional: the connection can break because of many reasons, then executing a basic R
+   * command is the safer approach.
+   *
+   * @return
+   */
+  private boolean isAlive() {
+    try {
+      ROperationWithResult rop = new RScriptROperation("base::ls()", false);
+      rSession.execute(rop);
+      return true;
+    } catch (Exception e) {
+      return false;
     }
   }
 

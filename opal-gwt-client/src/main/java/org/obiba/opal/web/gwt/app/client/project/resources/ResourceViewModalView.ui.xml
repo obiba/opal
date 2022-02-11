@@ -34,31 +34,29 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!--ID column-->
+    <b:ControlGroup ui:field="idColumnGroup">
+      <b:ControlLabel>
+        <ui:msg description="ID Column label">ID Column</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="idColumn"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="View ID Column help">The column name in the resource's tabular representation that provides the entity identifiers. If not specified, the first column will be used.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <!--Entity Type-->
     <b:ControlGroup ui:field="entityTypeGroup">
       <b:ControlLabel>
         <ui:msg description="Entity Type label">Entity Type</ui:msg>
-        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:Controls>
         <b:TextBox ui:field="entityType" placeholder="Participant"/>
       </b:Controls>
       <b:HelpBlock>
         <ui:msg description="View Entity Type help">What these view data are about.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
-    <!--ID column-->
-    <b:ControlGroup ui:field="idColumnGroup">
-      <b:ControlLabel>
-        <ui:msg description="ID Column label">ID Column</ui:msg>
-        <o:RequiredIcon/>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox ui:field="idColumn"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="View ID Column help">The column in the resource's tabular representation that provides the entity identifiers.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
