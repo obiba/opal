@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -52,6 +53,12 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
 
   @UiField
   TextBox entityType;
+
+  @UiField
+  Button saveButton;
+
+  @UiField
+  Button closeButton;
 
   private Translations translations;
 
@@ -109,6 +116,13 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
     } else if (group.equals(FormField.NAME)) {
       dialog.addAlert(msg, AlertType.ERROR, nameGroup);
     }
+  }
+
+  @Override
+  public void setInProgress(boolean progress) {
+    dialog.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    closeButton.setEnabled(!progress);
   }
 
   @Override

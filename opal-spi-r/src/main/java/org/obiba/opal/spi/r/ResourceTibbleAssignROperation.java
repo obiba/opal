@@ -29,6 +29,7 @@ public class ResourceTibbleAssignROperation extends AbstractROperation {
 
     try {
       ensurePackage("resourcer");
+      ensurePackage("dplyr");
       String script = String.format("resourcer::as.resource.tbl(%s)", clientSymbol);
       eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
     } catch (Exception e) {

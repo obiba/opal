@@ -19,22 +19,76 @@ import java.util.List;
  */
 public interface TabularResourceConnector extends Initialisable, Disposable {
 
+  /**
+   * Get the (R) symbol name that refers to the tabular representation of the resource.
+   *
+   * @return
+   */
   String getSymbol();
 
+  /**
+   * Get all columns.
+   *
+   * @return
+   */
   List<Column> getColumns();
 
+  /**
+   * Check there is a column with given nale.
+   *
+   * @param name
+   * @return
+   */
   boolean hasColumn(String name);
 
+  /**
+   * Get column by name.
+   *
+   * @param name
+   * @return
+   */
   Column getColumn(String name);
 
   interface Column {
 
+    /**
+     * Get column name.
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     * Get column position.
+     *
+     * @return
+     */
     int getPosition();
 
-    List<Value> asVector(ValueType valueType);
+    /**
+     * Get the column's vector length.
+     *
+     * @param distinct
+     * @return
+     */
+    int getLength(boolean distinct);
 
+    /**
+     * Get the column's vector of values, sliced.
+     *
+     * @param valueType
+     * @param offset
+     * @param limit
+     * @return
+     */
+    List<Value> asVector(ValueType valueType, boolean  distinct, int offset, int limit);
+
+    /**
+     * Get the column as a variable object.
+     *
+     * @param entityType
+     * @return
+     */
     Variable asVariable(String entityType);
   }
 }

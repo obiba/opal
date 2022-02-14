@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class ResourceVariableValueSource extends AbstractRVariableValueSource {
 
-  private final Variable variable;
+  private Variable variable;
 
   private final ResourceView valueTable;
 
@@ -33,6 +33,10 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
   @Override
   public Variable getVariable() {
     return variable;
+  }
+
+  public void setVariable(Variable variable) {
+    this.variable = variable;
   }
 
   @Override
@@ -65,7 +69,8 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
 
       @Override
       public Iterable<Value> getValues(List<VariableEntity> entities) {
-        return valueTable.getConnector().getColumn(variable.getName()).asVector(variable.getValueType());
+        // TODO filter by entity and make batch queries
+        return valueTable.getConnector().getColumn(valueTable.getColumnName(variable)).asVector(variable.getValueType(), false, 0, -1);
       }
     };
   }

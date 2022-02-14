@@ -111,6 +111,7 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
     UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "views");
 
+    getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder()//
         .post()//
         .forResource(ub.build())//
@@ -151,6 +152,8 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
     void showError(String message, @Nullable FormField id);
 
+    void setInProgress(boolean progress);
+
     HasText getName();
   }
 
@@ -164,6 +167,7 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      getView().setInProgress(false);
       if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         getView().hide();
         placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(getDatasourceName(), viewName));

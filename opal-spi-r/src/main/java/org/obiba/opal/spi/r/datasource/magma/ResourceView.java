@@ -72,7 +72,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   private transient IRTabularResourceConnector connector;
 
-  private transient List<VariableEntity> entities;
+  //private transient List<VariableEntity> entities;
 
   private transient int idPosition = -1;
 
@@ -219,24 +219,26 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public List<VariableEntity> getVariableEntities() {
-    if (entities == null) {
-      if (connector.hasColumn(idColumn)) {
-        entities = connector.getColumn(idColumn).asVector(TextType.get()).stream()
-            .filter(val -> val != null && !val.isNull())
-            .map(Value::toString)
-            .distinct()
-            .map(id -> new RVariableEntity(getEntityType(), id))
-            .collect(Collectors.toList());
-      } else {
-        entities = Lists.newArrayList();
-      }
+    return getVariableEntities(0, -1);
+  }
+
+  @Override
+  public List<VariableEntity> getVariableEntities(int offset, int limit) {
+    if (connector.hasColumn(idColumn)) {
+      return connector.getColumn(idColumn).asVector(TextType.get(), true, offset, limit).stream()
+          .filter(val -> val != null && !val.isNull())
+          .map(Value::toString)
+          .distinct()
+          .map(id -> new RVariableEntity(getEntityType(), id))
+          .collect(Collectors.toList());
+    } else {
+      return Lists.newArrayList();
     }
-    return entities;
   }
 
   @Override
   public int getVariableEntityCount() {
-    return getVariableEntities().size();
+    return connector.hasColumn(idColumn) ? connector.getColumn(idColumn).getLength(true) : 0;
   }
 
   //
@@ -251,15 +253,12 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public Iterable<ValueSet> getValueSets() {
-    return getValueSets(entities);
+    return getValueSets(getVariableEntities());
   }
 
   @Override
   public Iterable<ValueSet> getValueSets(Iterable<VariableEntity> entities) {
     return () -> new ValueSetIterator(entities);
-    /*return StreamSupport.stream(entities.spliterator(), false)
-        .map(this::getValueSet)
-        .collect(Collectors.toList());*/
   }
 
   @Override
@@ -293,7 +292,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public boolean hasVariable(String name) {
-    return false;
+    return variables.stream().anyMatch(var -> var.getName().equals(name));
   }
 
   @Override
@@ -309,7 +308,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public Variable getVariable(String name) throws NoSuchVariableException {
-    return variables.stream().filter(var -> var.getName().equals(name))
+    return variables.stream()
+        .filter(var -> var.getName().equals(name))
         .findFirst()
         .orElseThrow(() -> new NoSuchVariableException(getName(), name));
   }
@@ -410,7 +410,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
         .collect(Collectors.toMap(TabularResourceConnector.Column::getName, Function.identity()));
 
     variableValueSources = variables.stream()
-        .map(var -> new ResourceVariableValueSource(var, columnByName.get(var.getName()), this))
+        .map(var -> new ResourceVariableValueSource(var, columnByName.get(getColumnName(var)), this))
         .collect(Collectors.toSet());
     for (VariableValueSource vvs : variableValueSources) {
       try {
@@ -424,6 +424,13 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   @Override
   public void dispose() {
     Disposables.silentlyDispose(connector);
+  }
+
+  public String getColumnName(Variable variable) {
+    String columnName = variable.getName();
+    if (variable.hasAttribute("opal.column"))
+      columnName = variable.getAttributeStringValue("opal.column");
+    return columnName;
   }
 
   //
@@ -445,8 +452,25 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
         }
       }
 
-      if (!updated) {
-        variableSet.add(variable);
+      if (updated) {
+        // update variable value source's variable for consistency
+        for (VariableValueSource vvs : variableValueSources) {
+          if (vvs.getVariable().getName().equals(variable.getName())) {
+            ((ResourceVariableValueSource) vvs).setVariable(variable);
+            break;
+          }
+        }
+      } else {
+        String columnName = getColumnName(variable);
+        Optional<TabularResourceConnector.Column> column = connector.getColumns().stream()
+            .filter(col -> col.getName().equals(columnName)).findFirst();
+        if (column.isPresent()) {
+          variableSet.add(variable);
+          variableValueSources.add(new ResourceVariableValueSource(variable, column.get(), ResourceView.this));
+        } else {
+          // TODO with variable that do not map to a R column
+          throw new MagmaRuntimeException("No R column found for variable " + variable.getName());
+        }
       }
 
       variables = variableSet;

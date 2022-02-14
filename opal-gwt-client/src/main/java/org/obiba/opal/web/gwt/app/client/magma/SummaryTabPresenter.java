@@ -212,7 +212,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
             getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
           }
         })//
-        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+        .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().renderNoSummary();
@@ -227,7 +227,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
             }
             getEventBus().fireEvent(event);
           }
-        })//
+        }, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR)//
         .send();
   }
 

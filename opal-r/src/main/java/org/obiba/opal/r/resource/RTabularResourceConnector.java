@@ -226,8 +226,21 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     }
 
     @Override
-    public List<Value> asVector(ValueType valueType) {
-      RServerResult vector = execute(String.format("%s$`%s`", TIBBLE_SYMBOL, getName()));
+    public int getLength(boolean distinct) {
+      RServerResult result = execute(String.format("n_distinct(%s$`%s`)", TIBBLE_SYMBOL, getName()));
+      return result.isInteger() ? result.asIntegers()[0] : 0;
+    }
+
+    @Override
+    public List<Value> asVector(ValueType valueType, boolean distinct, int offset, int limit) {
+      String cmd = distinct ? String.format("%s %%>%% distinct(`%s`)", TIBBLE_SYMBOL, getName()) : TIBBLE_SYMBOL;
+      if (offset == 0 && limit < 0) {
+        cmd = String.format("%s %%>%% pull(`%s`)", cmd, getName());
+      } else {
+        cmd = String.format("%s %%>%% filter(between(row_number(), %s, %s)) %%>%% pull(`%s`)",
+            cmd, offset + 1, limit < 0 ? "n()" : offset + limit, getName());
+      }
+      RServerResult vector = execute(cmd);
       if (vector.isList()) {
         return vector.asList().stream()
             .map(val -> valueType.valueOf(val.asNativeJavaObject()))
@@ -239,7 +252,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
 
     @Override
     public Variable asVariable(String entityType) {
-      return RVariableHelper.newVariable(desc, entityType, false, "en", position);
+      Variable variable = RVariableHelper.newVariable(desc, entityType, false, "en", position);
+      return Variable.Builder.sameAs(variable).addAttribute("opal.column", getName()).build();
     }
 
   }
