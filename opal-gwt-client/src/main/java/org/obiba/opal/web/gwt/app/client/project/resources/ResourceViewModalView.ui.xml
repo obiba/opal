@@ -34,6 +34,19 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!-- Project -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Project label">Project</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="datasourceListBox" visibleItemCount="1"/>
+      <b:HelpBlock addStyleNames="help-block">
+        <ui:msg description="View project help">The view will be attached to the selected project.
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+
     <!--ID column-->
     <b:ControlGroup ui:field="idColumnGroup">
       <b:ControlLabel>

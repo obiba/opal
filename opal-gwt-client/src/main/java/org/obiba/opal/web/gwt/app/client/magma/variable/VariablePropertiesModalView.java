@@ -103,6 +103,13 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
   }
 
   @Override
+  public void setInProgress(boolean progress) {
+    dialog.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    closeButton.setEnabled(!progress);
+  }
+
+  @Override
   public void renderProperties(VariableDto variable, boolean modifyName, boolean modifyValueType) {
     if(variable != null) {
       variableName.setText(variable.getName());

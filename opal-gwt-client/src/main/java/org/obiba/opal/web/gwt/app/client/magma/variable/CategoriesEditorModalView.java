@@ -237,6 +237,13 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   @Override
+  public void setInProgress(boolean progress) {
+    dialog.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    closeButton.setEnabled(!progress);
+  }
+
+  @Override
   public void renderCategoryRows(JsArray<CategoryDto> rows, List<LocaleDto> locales) {
     addEditableColumns(locales);
 

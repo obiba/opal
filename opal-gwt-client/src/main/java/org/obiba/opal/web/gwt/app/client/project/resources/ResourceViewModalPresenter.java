@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -23,13 +24,12 @@ import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.*;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.ResourceViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -59,6 +59,8 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
   private final ValidationHandler validationHandler;
 
+  private JsArray<DatasourceDto> datasources;
+
   @Inject
   public ResourceViewModalPresenter(EventBus eventBus, Display display, Translations translations,
                                     PlaceManager placeManager) {
@@ -67,6 +69,11 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
     this.placeManager = placeManager;
     validationHandler = new PropertiesValidationHandler();
     getView().setUiHandlers(this);
+  }
+
+  @Override
+  protected void onBind() {
+    refreshDatasources();
   }
 
   /**
@@ -86,17 +93,33 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
     getView().setName(resourceName);
   }
 
+  private void refreshDatasources() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            datasources = JsArrays.toSafeArray(resource);
+            for (int i = 0; i < datasources.length(); i++) {
+              DatasourceDto d = datasources.get(i);
+              d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
+            }
+            // pre select the first datasource
+            getView().setDatasources(datasources, Strings.isNullOrEmpty(datasourceName) ? datasources.get(0).getName() : datasourceName);
+          }
+        }).send();
+  }
+
   @Override
-  public void onSave(final String name, String entityType, String idColumn) {
+  public void onSave(String destinationDatasourceName, final String name, String entityType, String idColumn) {
     if (!validationHandler.validate()) return;
 
     ViewDto dto = getViewDto(name, entityType, idColumn);
-    if (view == null) createView(dto);
+    if (view == null) createView(destinationDatasourceName, dto);
     else updateView(dto);
   }
 
   private void updateView(ViewDto dto) {
-    ResponseCodeCallback completed = new CompletedCallback(dto.getName());
+    ResponseCodeCallback completed = new CompletedCallback(getDatasourceName(), dto.getName());
 
     UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create().query("comment", view.getName().equals(dto.getName())
         ? TranslationsUtils.replaceArguments(translations.updateComment(), dto.getName())
@@ -106,10 +129,10 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
         .withResourceBody(ViewDto.stringify(dto)).withCallback(completed, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_FORBIDDEN).send();
   }
 
-  private void createView(ViewDto dto) {
-    ResponseCodeCallback completed = new CompletedCallback(dto.getName());
+  private void createView(String destinationDatasourceName, ViewDto dto) {
+    ResponseCodeCallback completed = new CompletedCallback(destinationDatasourceName, dto.getName());
 
-    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "views");
+    UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasourceName, "views");
 
     getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder()//
@@ -148,6 +171,8 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
       NAME
     }
 
+    void setDatasources(JsArray<DatasourceDto> datasources, String name);
+
     void renderProperties(ViewDto view);
 
     void showError(String message, @Nullable FormField id);
@@ -159,9 +184,12 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
 
   private class CompletedCallback implements ResponseCodeCallback {
 
+    private final String destinationDatasourceName;
+
     private final String viewName;
 
-    private CompletedCallback(String viewName) {
+    private CompletedCallback(String destinationDatasourceName, String viewName) {
+      this.destinationDatasourceName = destinationDatasourceName;
       this.viewName = viewName;
     }
 
@@ -170,7 +198,7 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
       getView().setInProgress(false);
       if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         getView().hide();
-        placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(getDatasourceName(), viewName));
+        placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(destinationDatasourceName, viewName));
       } else if (response.getStatusCode() == Response.SC_FORBIDDEN) {
         getView().showError(translations.userMessageMap().get("UnauthorizedOperation"), null);
       } else {

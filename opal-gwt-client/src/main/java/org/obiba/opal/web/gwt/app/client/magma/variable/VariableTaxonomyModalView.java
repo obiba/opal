@@ -81,6 +81,13 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   }
 
   @Override
+  public void setInProgress(boolean progress) {
+    modal.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    cancelButton.setEnabled(!progress);
+  }
+
+  @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     taxonomySelector.setTaxonomies(taxonomies);
   }

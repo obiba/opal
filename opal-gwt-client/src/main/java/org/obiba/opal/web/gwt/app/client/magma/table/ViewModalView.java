@@ -31,6 +31,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -44,6 +45,7 @@ import org.obiba.opal.web.gwt.app.client.magma.TableReferenceColumn;
 import org.obiba.opal.web.gwt.app.client.magma.TableReferencesTable;
 import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.model.client.magma.ResourceViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -77,6 +79,9 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
   Button saveButton;
 
   @UiField
+  Panel tableRefs;
+
+  @UiField
   ControlGroup tablesGroup;
 
   @UiField
@@ -104,13 +109,16 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
   IconAnchor clearSelectionAnchor;
 
   @UiField
-  IconAnchor deleteLink;
+  Panel resourceRefs;
 
   @UiField
-  IconAnchor moveUpLink;
+  TextBox resourceFrom;
 
   @UiField
-  IconAnchor moveDownLink;
+  TextBox idColumn;
+
+  @UiField
+  TextBox entityType;
 
   @UiField
   ControlGroup fileSelectionGroup;
@@ -231,18 +239,43 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave(getName().getText(), dataProvider.getList(), innerTableReferences);
+    if (tableRefs.isVisible()) {
+      getUiHandlers().onSave(getName().getText(), dataProvider.getList(), innerTableReferences);
+    } else {
+      getUiHandlers().onSave(getName().getText(), resourceFrom.getText(), idColumn.getText(), entityType.getText());
+    }
+  }
+
+  @Override
+  public void setInProgress(boolean progress) {
+    dialog.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    closeButton.setEnabled(!progress);
   }
 
   @Override
   public void renderProperties(ViewDto view) {
     name.setText(view.getName());
+    if (view.getExtension(ResourceViewDto.ViewDtoExtensions.view) != null) {
+      ResourceViewDto resView = (ResourceViewDto)view.getExtension(ResourceViewDto.ViewDtoExtensions.view);
+      resourceFrom.setText(view.getFromArray().get(0));
+      idColumn.setText(resView.getIdColumn());
+      entityType.setText(resView.getEntityType());
+    }
     fileSelectionGroup.setVisible(false);
     dialog.setTitle(translations.editProperties());
   }
 
   @Override
+  public void prepareResources(JsArrayString refs, JsArrayString froms) {
+    tableRefs.setVisible(false);
+    resourceRefs.setVisible(true);
+  }
+
+  @Override
   public void prepareTables(JsArray<TableDto> tables, JsArrayString froms, JsArrayString innerFroms) {
+    tableRefs.setVisible(true);
+    resourceRefs.setVisible(false);
     tableChooser.addTableSelections(tables);
     renderTableReferencesRows(tables, froms, innerFroms);
   }

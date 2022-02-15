@@ -9,16 +9,20 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.table;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.*;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -32,14 +36,11 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.*;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.google.gwt.http.client.Response.*;
 
@@ -81,12 +82,20 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
   public void initialize(ViewDto view) {
     this.view = view;
     getView().renderProperties(view);
-    renderSelectableTables();
+    if (isResourceView()) {
+      renderSelectableResources();
+    } else {
+      renderSelectableTables();
+    }
   }
 
   public void initialize(String datasourceName) {
     this.datasourceName = datasourceName;
     renderSelectableTables();
+  }
+
+  private boolean isResourceView() {
+    return view != null && view.getExtension(ResourceViewDto.ViewDtoExtensions.view) != null;
   }
 
   @Override
@@ -95,13 +104,21 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
     fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
-   }
+  }
 
   @Override
   public void onSave(final String name, List<TableDto> referencedTables, List<String> innerFrom) {
     if (!validationHandler.validate()) return;
-
+    getView().setInProgress(true);
     ViewDto dto = getViewDto(name, referencedTables, innerFrom);
+    if (view == null) createView(dto);
+    else updateView(dto);
+  }
+
+  @Override
+  public void onSave(String name, String from, String idColumn, String entityType) {
+    ViewDto dto = getViewDto(name, from, idColumn, entityType);
+    getView().setInProgress(true);
     if (view == null) createView(dto);
     else updateView(dto);
   }
@@ -134,19 +151,44 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
     return view == null ? datasourceName : view.getDatasourceName();
   }
 
+  private ViewDto getViewDto(String name, String from, String idColumn, String entityType) {
+    ViewDto updatedView = ViewDto.create();
+    updatedView.setName(name);
+    JsArrayString froms = JsArrays.from(from);
+    updatedView.setFromArray(froms);
+
+    ResourceViewDto resDto;
+    if (view != null) {
+      resDto = (ResourceViewDto) view.getExtension(ResourceViewDto.ViewDtoExtensions.view);
+    } else {
+      resDto = ResourceViewDto.create();
+      updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
+    }
+    JsArray<VariableDto> variables = JsArrays.toSafeArray(resDto.getVariablesArray());
+    for (int i = 0; i < variables.length(); i++) {
+      variables.get(i).setEntityType(entityType);
+    }
+    resDto.setVariablesArray(variables);
+    resDto.setIdColumn(idColumn);
+    resDto.setEntityType(Strings.isNullOrEmpty(entityType) ? "Participant" : entityType);
+    updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
+
+    return updatedView;
+  }
+
   private ViewDto getViewDto(String name, List<TableDto> referencedTables, List<String> innerFrom) {
     ViewDto updatedView = ViewDto.create();
     updatedView.setName(name);
     JsArrayString tables = JavaScriptObject.createArray().cast();
-    for(TableDto tableDto : referencedTables) {
+    for (TableDto tableDto : referencedTables) {
       tables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     updatedView.setFromArray(tables);
     if (!innerFrom.isEmpty()) updatedView.setInnerFromArray(JsArrays.fromIterable(innerFrom));
-    if(view != null && view.hasWhere()) updatedView.setWhere(view.getWhere());
+    if (view != null && view.hasWhere()) updatedView.setWhere(view.getWhere());
 
     String fileName = fileSelectionPresenter.getSelectedFile();
-    if(Strings.isNullOrEmpty(fileName)) {
+    if (Strings.isNullOrEmpty(fileName)) {
       if (view == null) {
         VariableListViewDto listDto = VariableListViewDto.create();
         listDto.setVariablesArray(JsArrays.<VariableDto>create());
@@ -167,11 +209,15 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
 
   private FileViewDto.FileViewType getFileType(String fileName) {
     RegExp regExp = RegExp.compile("\\.xml$");
-    if(regExp.test(fileName.toLowerCase())) {
+    if (regExp.test(fileName.toLowerCase())) {
       return FileViewDto.FileViewType.SERIALIZED_XML;
     }
 
     return FileViewDto.FileViewType.EXCEL;
+  }
+
+  private void renderSelectableResources() {
+    getView().prepareResources(null, null);
   }
 
   private void renderSelectableTables() {
@@ -195,8 +241,8 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
            */
           private TableDto findViewTabledto(JsArray<TableDto> tables) {
             TableDto viewTableDto = null;
-            for(TableDto table : JsArrays.toIterable(tables)) {
-              if(getDatasourceName().equals(table.getDatasourceName()) && view.getName().equals(table.getName())) {
+            for (TableDto table : JsArrays.toIterable(tables)) {
+              if (getDatasourceName().equals(table.getDatasourceName()) && view.getName().equals(table.getName())) {
                 viewTableDto = table;
                 break;
               }
@@ -211,12 +257,12 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
            * @return
            */
           private JsArray<TableDto> filterTables(JsArray<TableDto> tables, TableDto viewTableDto) {
-            if(viewTableDto == null) return tables;
+            if (viewTableDto == null) return tables;
 
             boolean hasEntityType = hasEntityType(viewTableDto);
             JsArray<TableDto> filteredTables = JsArrays.create();
-            for(TableDto table : JsArrays.toIterable(tables)) {
-              if(!table.equals(viewTableDto) && (!hasEntityType || hasEntityType(table) && table.getEntityType().equals(viewTableDto.getEntityType()))) {
+            for (TableDto table : JsArrays.toIterable(tables)) {
+              if (!table.equals(viewTableDto) && (!hasEntityType || hasEntityType(table) && table.getEntityType().equals(viewTableDto.getEntityType()))) {
                 filteredTables.push(table);
               }
             }
@@ -238,7 +284,11 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
       FILE_SELECTION
     }
 
+    void setInProgress(boolean progress);
+
     void renderProperties(ViewDto view);
+
+    void prepareResources(JsArrayString refs, JsArrayString froms);
 
     void prepareTables(JsArray<TableDto> tables, JsArrayString froms, JsArrayString innerFroms);
 
@@ -261,10 +311,11 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
+      getView().setInProgress(false);
+      if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         getView().hide();
         placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(getDatasourceName(), viewName));
-      } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+      } else if (response.getStatusCode() == Response.SC_FORBIDDEN) {
         getView().showError(translations.userMessageMap().get("UnauthorizedOperation"), null);
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
@@ -294,7 +345,7 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
       validators.add(
           new RequiredTextValidator(getView().getName(), "ViewNameRequired", Display.FormField.NAME.name()));
       validators.add(
-          new DisallowedCharactersValidator(getView().getName(), new char[] { '.', ':' }, "ViewNameDisallowedChars",
+          new DisallowedCharactersValidator(getView().getName(), new char[]{'.', ':'}, "ViewNameDisallowedChars",
               Display.FormField.NAME.name()));
     }
 

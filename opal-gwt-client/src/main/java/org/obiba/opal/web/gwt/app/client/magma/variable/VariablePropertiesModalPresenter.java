@@ -94,6 +94,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
 
     VariableDto newVariable = getVariableDto();
 
+    getView().setInProgress(true);
     if(variable != null) {
       onUpdate(newVariable);
     } else {
@@ -124,6 +125,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().setInProgress(false);
             if(response.getStatusCode() == Response.SC_NOT_FOUND) {
               doCreate(newVariable);
             } else if(response.getStatusCode() == Response.SC_OK) {
@@ -208,6 +210,8 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
       NAME
     }
 
+    void setInProgress(boolean progress);
+
     void renderProperties(VariableDto variable, boolean modifyName, boolean modifyValueType);
 
     void showError(String message, @Nullable FormField id);
@@ -225,6 +229,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      getView().setInProgress(false);
       if(response.getStatusCode() == Response.SC_OK) {
         getView().hide();
         onSuccess();

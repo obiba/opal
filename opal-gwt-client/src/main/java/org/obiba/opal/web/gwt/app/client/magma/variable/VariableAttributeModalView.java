@@ -103,6 +103,13 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
+  public void setInProgress(boolean progress) {
+    modal.setBusy(progress);
+    saveButton.setEnabled(!progress);
+    cancelButton.setEnabled(!progress);
+  }
+
+  @Override
   public void setNamespace(String namespace) {
     this.namespace.setText(namespace);
   }

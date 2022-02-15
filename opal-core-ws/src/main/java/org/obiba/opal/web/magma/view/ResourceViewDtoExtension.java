@@ -82,6 +82,7 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
     ResourceViewDto.Builder resDtoBuilder = ResourceViewDto.newBuilder();
     view.getVariables().forEach(v -> resDtoBuilder.addVariables(Dtos.asDto(v)));
     resDtoBuilder.setIdColumn(resView.getIdColumn());
+    resDtoBuilder.setEntityType(resView.getEntityType());
 
     viewDtoBuilder.setExtension(ResourceViewDto.view, resDtoBuilder.build());
 

@@ -102,11 +102,18 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
           ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
           : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
 
+      getView().setInProgress(true);
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(uriBuilder.build(table.getDatasourceName(), table.getName())) //
           .withResourceBody("[" + variableDtos.toString() + "]") //
           .withCallback(Response.SC_OK, successCallback) //
-          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().setInProgress(false);
+              super.onResponseCode(request, response);
+            }
+          }) //
           .post().send();
 
     }
@@ -405,6 +412,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      getView().setInProgress(false);
       getView().hide();
       if (dialogMode != null) fireEvent(new VariableRefreshEvent());
     }
@@ -516,6 +524,8 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
       NAME,
       VALUE
     }
+
+    void setInProgress(boolean progress);
 
     void hideDialog();
 

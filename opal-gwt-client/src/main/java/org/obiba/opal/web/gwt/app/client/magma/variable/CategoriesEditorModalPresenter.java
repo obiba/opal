@@ -91,12 +91,14 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
         : UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
             .query("comment", translationMessages.updateVariableCategories(variable.getName()));
 
+    getView().setInProgress(true);
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource(uri.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
         .withResourceBody(VariableDto.stringify(dto)).accept("application/json") //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().setInProgress(false);
             if(response.getStatusCode() == Response.SC_OK) {
               getView().hide();
             } else {
@@ -158,6 +160,8 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
   }
 
   public interface Display extends PopupView, HasUiHandlers<CategoriesEditorModalUiHandlers> {
+
+    void setInProgress(boolean progress);
 
     void renderCategoryRows(JsArray<CategoryDto> rows, List<LocaleDto> locales);
 

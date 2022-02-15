@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,8 +26,10 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.ResourceViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -49,6 +52,9 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
   TextBox name;
 
   @UiField
+  Chooser datasourceListBox;
+
+  @UiField
   TextBox idColumn;
 
   @UiField
@@ -59,6 +65,8 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
 
   @UiField
   Button closeButton;
+
+  private JsArray<DatasourceDto> datasources;
 
   private Translations translations;
 
@@ -73,6 +81,16 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
     dialog.setTitle(translations.addViewTitle());
   }
 
+  @Override
+  public void setDatasources(JsArray<DatasourceDto> datasources, String name) {
+    datasourceListBox.clear();
+    for(int i = 0; i < datasources.length(); i++) {
+      datasourceListBox.addItem(datasources.get(i).getName(), datasources.get(i).getName());
+    }
+    datasourceListBox.setSelectedValue(name);
+    this.datasources = datasources;
+  }
+
   @UiHandler("closeButton")
   void onClose(ClickEvent event) {
     dialog.hide();
@@ -80,7 +98,9 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave(getName().getText(),
+    getUiHandlers().onSave(
+        datasourceListBox.getSelectedValue(),
+        getName().getText(),
         Strings.isNullOrEmpty(entityType.getText()) ? "Participant" : entityType.getText(),
         idColumn.getText());
   }
