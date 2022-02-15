@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.magma.derive.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.support.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -337,6 +338,7 @@ public abstract class DerivedVariableGenerator {
   public static JsArray<AttributeDto> copyAttributes(JsArray<AttributeDto> origAttrs) {
     JsArray<AttributeDto> attrs = JsArrays.create();
     for(AttributeDto origAttr : toIterable(JsArrays.toSafeArray(origAttrs))) {
+      if (!origAttr.hasNamespace() && origAttr.getName().equals(AttributeDtos.COLUMN_ATTRIBUTE))
       attrs.push(copyAttribute(origAttr));
     }
     return attrs;

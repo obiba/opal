@@ -508,12 +508,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
-  public void setDerivedVariable(boolean derived, String value) {
+  public void setDerivedVariable(boolean derived, String scriptValue) {
     TabPanelHelper.setTabVisible(tabPanel, SCRIPT_TAB_INDEX, derived);
     comment.setText("");
     scriptHeaderPanel.setVisible(derived);
-    script.setVisible(derived && !value.isEmpty());
-    script.setText(value);
+    script.setVisible(derived && !scriptValue.isEmpty());
+    script.setText(scriptValue);
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -287,7 +288,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       return;
     }
     String script = VariableDtos.getScript(variable);
-    getView().setDerivedVariable(true, script);
+    // TODO handle derivation by column mapping
+    String column = VariableDtos.getColumn(variable);
+    getView().setDerivedVariable(Strings.isNullOrEmpty(column), script);
     scriptEditorPresenter.setTable(table);
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());

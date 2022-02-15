@@ -163,12 +163,15 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
   }
 
   private void doWriteGitViewVariable(File viewRepo, Variable variable) throws IOException {
-    String script = variable.hasAttribute("script") ? variable.getAttributeStringValue("script") : "null";
-    File variableFile = new File(viewRepo, variable.getName() + OpalGitUtils.VARIABLE_FILE_EXTENSION);
+    // is column mapping?
+    if (!variable.hasAttribute("opal", "column")) {
+      String script = variable.hasAttribute("script") ? variable.getAttributeStringValue("script") : "null";
+      File variableFile = new File(viewRepo, variable.getName() + OpalGitUtils.VARIABLE_FILE_EXTENSION);
 
-    try (FileWriter fileWriter = new FileWriter(variableFile)) {
-      fileWriter.append(script);
-      fileWriter.flush();
+      try (FileWriter fileWriter = new FileWriter(variableFile)) {
+        fileWriter.append(script);
+        fileWriter.flush();
+      }
     }
   }
 

@@ -21,11 +21,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.JsArray;
 
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.COMMENT_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.MAELSTROM_NAMESPACE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.OPAL_NAMESPACE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.SCRIPT_ATTRIBUTE;
+import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.*;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class VariableDtos {
@@ -57,6 +53,17 @@ public class VariableDtos {
     }
     return true;
   }
+
+  /**
+   * Get resource's tibble column name to which the derived variable is mapped.
+   *
+   * @param variable
+   * @return
+   */
+  public static String getColumn(VariableDto variable) {
+    return getAttributeValue(variable, OPAL_NAMESPACE, COLUMN_ATTRIBUTE);
+  }
+
 
   /**
    * Get the script value if it exists (otherwise returns 'null' script).
@@ -171,8 +178,9 @@ public class VariableDtos {
   /**
    * Get first attribute with the given name and locale from the provided category.
    *
-   * @param variable
+   * @param category
    * @param name
+   * @param locale
    * @return
    */
   @Nullable

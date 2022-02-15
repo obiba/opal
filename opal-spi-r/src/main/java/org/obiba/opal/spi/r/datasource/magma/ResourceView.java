@@ -428,8 +428,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   public String getColumnName(Variable variable) {
     String columnName = variable.getName();
-    if (variable.hasAttribute("opal.column"))
-      columnName = variable.getAttributeStringValue("opal.column");
+    if (variable.hasAttribute("opal", "column"))
+      columnName = variable.getAttributeStringValue("opal", "column");
     return columnName;
   }
 

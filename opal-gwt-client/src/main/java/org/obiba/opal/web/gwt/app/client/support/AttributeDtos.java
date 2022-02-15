@@ -31,6 +31,8 @@ public class AttributeDtos {
 
   public static final String SCRIPT_ATTRIBUTE = "script";
 
+  public static final String COLUMN_ATTRIBUTE = "column";
+
   public static final String DERIVED_FROM_ATTRIBUTE = "derivedFrom";
 
   public static final String DESCRIPTION_ATTRIBUTE = "description";

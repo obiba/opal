@@ -16,6 +16,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.obiba.magma.Attribute;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
@@ -253,7 +254,9 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     @Override
     public Variable asVariable(String entityType) {
       Variable variable = RVariableHelper.newVariable(desc, entityType, false, "en", position);
-      return Variable.Builder.sameAs(variable).addAttribute("opal.column", getName()).build();
+      return Variable.Builder.sameAs(variable)
+          .addAttribute(Attribute.Builder.newAttribute("column").withNamespace("opal").withValue(getName()).build())
+          .build();
     }
 
   }
