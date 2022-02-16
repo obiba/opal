@@ -45,7 +45,7 @@ public class BinarySummaryResourceImpl extends AbstractSummaryResource implement
     }
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(Math.BinarySummaryDto.binarySummary, Dtos.asDto(summary).build());
+        .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build());
     if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //

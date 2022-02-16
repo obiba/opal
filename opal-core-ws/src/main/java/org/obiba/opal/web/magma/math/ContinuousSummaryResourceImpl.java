@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.magma.math;
 
-import java.util.List;
-
-import javax.ws.rs.core.Response;
-
+import org.obiba.magma.math.Distribution;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.opal.web.TimestampedResponses;
@@ -23,7 +20,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.obiba.magma.math.summary.ContinuousVariableSummary.Distribution;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -33,7 +32,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
 
   @Override
   public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset, Integer limit,
-      boolean fullIfCached, boolean resetCache) {
+                      boolean fullIfCached, boolean resetCache) {
 
     ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder() //
         .variable(getVariable()) //
@@ -45,7 +44,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
         .offset(offset).build();
 
     ContinuousVariableSummary summary;
-    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
+    if (fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
       summaryFactory.setLimit(limit);
@@ -55,7 +54,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(ContinuousSummaryDto.continuous, Dtos.asDto(summary).build());
-    if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
+    if (summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //
         ? TimestampedResponses.ok(getValueTable(), dto).build() //

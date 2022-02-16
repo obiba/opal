@@ -48,7 +48,7 @@ class RVariableValueSource extends AbstractRVariableValueSource implements Varia
   }
 
   @Override
-  public Iterable<Value> getValues(List<VariableEntity> entities) {
+  public Iterable<Value> getValues(Iterable<VariableEntity> entities) {
     return null;
   }
 

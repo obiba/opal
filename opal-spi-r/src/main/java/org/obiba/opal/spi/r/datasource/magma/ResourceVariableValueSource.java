@@ -68,7 +68,7 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
       }
 
       @Override
-      public Iterable<Value> getValues(List<VariableEntity> entities) {
+      public Iterable<Value> getValues(Iterable<VariableEntity> entities) {
         // TODO filter by entity and make batch queries
         return valueTable.getConnector().getColumn(valueTable.getColumnName(variable)).asVector(variable.getValueType(), false, 0, -1);
       }

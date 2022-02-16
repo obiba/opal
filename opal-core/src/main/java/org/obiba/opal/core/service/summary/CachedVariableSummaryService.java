@@ -10,32 +10,15 @@
 
 package org.obiba.opal.core.service.summary;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.math.summary.AbstractVariableSummary;
-import org.obiba.magma.math.summary.BinaryVariableSummary;
-import org.obiba.magma.math.summary.BinaryVariableSummaryFactory;
-import org.obiba.magma.math.summary.CategoricalVariableSummary;
-import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
-import org.obiba.magma.math.summary.ContinuousVariableSummary;
-import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
-import org.obiba.magma.math.summary.DefaultVariableSummary;
-import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
-import org.obiba.magma.math.summary.GeoVariableSummary;
-import org.obiba.magma.math.summary.GeoVariableSummaryFactory;
-import org.obiba.magma.math.summary.TextVariableSummary;
-import org.obiba.magma.math.summary.TextVariableSummaryFactory;
-import org.obiba.magma.math.summary.VariableSummary;
-import org.obiba.magma.math.summary.VariableSummaryFactory;
+import org.obiba.magma.math.Distribution;
+import org.obiba.magma.math.summary.*;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.service.VariableSummaryService;
@@ -44,8 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Stopwatch;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class CachedVariableSummaryService implements VariableSummaryService {
@@ -82,7 +66,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
   @Override
   public void stackVariable(@NotNull ValueTable valueTable, @NotNull Variable variable, @NotNull Value value) {
-    if(!cacheSummaries) log.debug("Variable summaries cache disabled!");
+    if (!cacheSummaries) log.debug("Variable summaries cache disabled!");
 
     // skip binary variable
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
@@ -90,7 +74,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     getService(CategoricalVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
 
-    if(variable.getValueType().isNumeric()) {
+    if (variable.getValueType().isNumeric()) {
       getService(ContinuousVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
     } else {
       getService(DefaultVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
@@ -99,12 +83,12 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
   @Override
   public void computeSummaries(@NotNull ValueTable table) {
-    if(!cacheSummaries) {
+    if (!cacheSummaries) {
       log.info("Variable summaries cache disabled!");
       return;
     }
     Stopwatch stopwatch = Stopwatch.createStarted();
-    for(AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
+    for (AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
       summaryService.computeAndCacheSummaries(table);
     }
     clearComputingSummaries(table);
@@ -113,8 +97,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
   @Override
   public void clearComputingSummaries(@NotNull ValueTable valueTable) {
-    if(!cacheSummaries) return;
-    for(AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
+    if (!cacheSummaries) return;
+    for (AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
       summaryService.clearComputingSummaries(valueTable);
     }
   }
@@ -149,7 +133,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     @NotNull
     @Override
     protected ContinuousVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
-      return new ContinuousVariableSummary.Builder(variable, ContinuousVariableSummary.Distribution.normal);
+      return new ContinuousVariableSummary.Builder(variable, Distribution.normal);
     }
   }
 

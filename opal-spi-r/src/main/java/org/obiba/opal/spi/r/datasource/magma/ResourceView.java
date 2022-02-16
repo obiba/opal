@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * A view that accesses a resource in its tabular form.
@@ -282,8 +283,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   }
 
   @Override
-  public Iterable<Timestamps> getValueSetTimestamps(List<VariableEntity> entities) {
-    return entities.stream().map(this::getValueSetTimestamps).collect(Collectors.toList());
+  public Iterable<Timestamps> getValueSetTimestamps(Iterable<VariableEntity> entities) {
+    return StreamSupport.stream(entities.spliterator(), false).map(this::getValueSetTimestamps).collect(Collectors.toList());
   }
 
   //
