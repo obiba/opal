@@ -81,7 +81,17 @@ public interface TabularResourceConnector extends Initialisable, Disposable {
      * @param limit
      * @return
      */
-    List<Value> asVector(ValueType valueType, boolean  distinct, int offset, int limit);
+    List<Value> asVector(ValueType valueType, boolean distinct, int offset, int limit);
+
+    /**
+     * Get the column's vector of values for entities.
+     *
+     * @param valueType
+     * @param idColumn
+     * @param entities
+     * @return
+     */
+    List<Value> asVector(ValueType valueType, String idColumn, Iterable<VariableEntity> entities);
 
     /**
      * Get the column as a variable object.

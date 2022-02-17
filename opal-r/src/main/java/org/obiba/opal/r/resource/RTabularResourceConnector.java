@@ -16,10 +16,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.obiba.magma.Attribute;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
@@ -29,6 +26,7 @@ import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
+import org.obiba.opal.spi.r.datasource.magma.RVariableEntity;
 import org.obiba.opal.spi.r.datasource.magma.RVariableHelper;
 import org.obiba.opal.spi.r.resource.IRTabularResourceConnector;
 import org.obiba.opal.spi.resource.TabularResourceConnector;
@@ -36,7 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class RTabularResourceConnector implements TabularResourceConnector, IRTabularResourceConnector {
 
@@ -164,6 +164,10 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     return doExecute(rop).getResult();
   }
 
+  //
+  // Private methods
+  //
+
   private ROperationWithResult doExecute(ROperationWithResult rop) {
     try {
       getRSession().execute(rop);
@@ -204,6 +208,10 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
       return false;
     }
   }
+
+  //
+  // Private classes
+  //
 
   private class ColumnDescription implements Column {
 
@@ -252,11 +260,44 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     }
 
     @Override
+    public List<Value> asVector(ValueType valueType, String idColumn, Iterable<VariableEntity> entities) {
+      String idsSymbol = "ids_" + Math.abs(new Random().nextInt());
+      assignIds(entities, idsSymbol);
+      String cmd = String.format("%s %%>%% filter(`%s` %%in%% %s) %%>%% pull(`%s`)", TIBBLE_SYMBOL, idColumn, idsSymbol, getName());
+      RServerResult vector = execute(cmd);
+      rmIds(idsSymbol);
+      if (vector.isList()) {
+        return vector.asList().stream()
+            .map(val -> valueType.valueOf(val.asNativeJavaObject()))
+            .collect(Collectors.toList());
+      } else {
+        return Lists.newArrayList();
+      }
+    }
+
+    @Override
     public Variable asVariable(String entityType) {
       Variable variable = RVariableHelper.newVariable(desc, entityType, false, "en", position);
       return Variable.Builder.sameAs(variable)
           .addAttribute(Attribute.Builder.newAttribute("column").withNamespace("opal").withValue(getName()).build())
           .build();
+    }
+
+    //
+    // Private methods
+    //
+
+    private void assignIds(Iterable<VariableEntity> entities, String idsSymbol) {
+      String idsVector = StreamSupport.stream(entities.spliterator(), false)
+          .map(e -> (RVariableEntity) e)
+          .map(e -> e.isNumeric() ? e.getRIdentifier() : String.format("\"%s\"", e.getRIdentifier()))
+          .collect(Collectors.joining(","));
+      idsVector = String.format("c(%s)", idsVector);
+      execute(String.format("base::assign(\"%s\", %s)", idsSymbol, idsVector));
+    }
+
+    private void rmIds(String idsSymbol) {
+      execute(String.format("base::rm(\"%s\")", idsSymbol));
     }
 
   }

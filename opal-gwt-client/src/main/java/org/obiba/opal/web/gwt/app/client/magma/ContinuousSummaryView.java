@@ -9,7 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma;
 
+import com.google.common.collect.ImmutableList;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
@@ -20,23 +32,13 @@ import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
-import com.google.common.collect.ImmutableList;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-
 /**
  *
  */
 public class ContinuousSummaryView extends Composite {
 
-  interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
+  interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {
+  }
 
   private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
@@ -59,7 +61,7 @@ public class ContinuousSummaryView extends Composite {
   private NormalProbabilityChartFactory qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous, ImmutableList<FrequencyDto> frequenciesNonMissing,
-      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, VariableDto variableDto) {
+                               ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, VariableDto variableDto) {
     initWidget(uiBinder.createAndBindUi(this));
 
     initDescriptivestats(continuous);
@@ -78,18 +80,22 @@ public class ContinuousSummaryView extends Composite {
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
     addDescriptiveStatistics(descriptiveStats);
 
-    if(descriptiveStats.getVariance() > 0) {
-      histogram = new HistogramChartFactory();
-      JsArray<IntervalFrequencyDto> frequencyArray = continuous.getIntervalFrequencyArray();
-      if(frequencyArray != null) {
+    if (descriptiveStats.getVariance() > 0) {
+      JsArray<IntervalFrequencyDto> frequencyArray = JsArrays.toSafeArray(continuous.getIntervalFrequencyArray());
+      if (frequencyArray.length() > 0) {
+        histogram = new HistogramChartFactory();
         int length = frequencyArray.length();
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
           IntervalFrequencyDto value = frequencyArray.get(i);
           histogram.push(value.getDensity(), value.getLower(), value.getUpper());
         }
       }
-      qqPlot = new NormalProbabilityChartFactory(descriptiveStats.getMin(), descriptiveStats.getMax());
-      qqPlot.push(descriptiveStats.getPercentilesArray(), continuous.getDistributionPercentilesArray());
+      JsArrayNumber percentiles = descriptiveStats.getPercentilesArray();
+      JsArrayNumber distributionPercentiles = continuous.getDistributionPercentilesArray();
+      if (percentiles != null && distributionPercentiles != null) {
+        qqPlot = new NormalProbabilityChartFactory(descriptiveStats.getMin(), descriptiveStats.getMax());
+        qqPlot.push(descriptiveStats.getPercentilesArray(), continuous.getDistributionPercentilesArray());
+      }
     }
   }
 
@@ -116,11 +122,11 @@ public class ContinuousSummaryView extends Composite {
   @Override
   protected void onLoad() {
     super.onLoad();
-    if(histogram != null) {
+    if (histogram != null) {
       histogramPanel.clear();
       histogramPanel.add(histogram.createChart(translations.histogram(), translations.density()));
     }
-    if(qqPlot != null) {
+    if (qqPlot != null) {
       normalProbability.clear();
       normalProbability.add(qqPlot.createChart(translations.normalProbability(), translations.theoreticalQuantiles(),
           translations.sampleQuantiles()));

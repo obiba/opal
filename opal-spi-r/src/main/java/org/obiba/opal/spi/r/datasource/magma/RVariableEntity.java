@@ -15,7 +15,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import javax.validation.constraints.NotNull;
 import java.text.NumberFormat;
 
-class RVariableEntity extends VariableEntityBean {
+public class RVariableEntity extends VariableEntityBean {
 
   private final String rEntityIdentifier;
 
@@ -33,11 +33,11 @@ class RVariableEntity extends VariableEntityBean {
     this.numeric = true;
   }
 
-  String getRIdentifier() {
+  public String getRIdentifier() {
     return rEntityIdentifier;
   }
 
-  boolean isNumeric() {
+  public boolean isNumeric() {
     return numeric;
   }
 
