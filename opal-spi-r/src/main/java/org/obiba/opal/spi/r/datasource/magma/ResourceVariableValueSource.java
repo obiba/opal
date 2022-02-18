@@ -243,14 +243,28 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
     @Override
     public ContinuousSummary asContinuousSummary(Distribution distribution, List<Double> defaultPercentiles, int intervals, Set<Category> categories) {
       assignIds(entities);
+      ResourceContinuousSummary summary = new ResourceContinuousSummary();
+
       String columnName = getColumnName();
       List<RServerResult> descResults = queryDescriptiveStatistics(columnName);
       List<RServerResult> freqResults = queryDefaultFrequencies(columnName);
+      RNamedList<RServerResult> histResult = queryHistogram(columnName, intervals);
+      List<RServerResult> percentileResults = queryPercentiles(columnName, defaultPercentiles);
       rmIds();
 
-      ResourceContinuousSummary summary = new ResourceContinuousSummary();
-
       summary.setStats(descResults);
+      percentileResults.forEach(percentile -> summary.addPercentile(percentile.asDoubles()[0]));
+      List<RServerResult> breaks = histResult.get("breaks").asList();
+      List<RServerResult> counts = histResult.get("counts").asList();
+      List<RServerResult> density = histResult.get("density").asList();
+      for (int i = 0; i < counts.size(); i++) {
+        DefaultInterval interval = new DefaultInterval();
+        interval.setLower(breaks.get(i).asDoubles()[0]);
+        interval.setUpper(breaks.get(i + 1).asDoubles()[0]);
+        interval.setFreq(counts.get(i).asIntegers()[0]);
+        interval.setDensity(density.get(i).asDoubles()[0]);
+        summary.addIntervalFrequency(interval);
+      }
 
       int freqSum = freqResults.stream()
           .filter(RServerResult::isNamedList)
@@ -345,6 +359,23 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
       return valueTable.getColumnName(variable);
     }
 
+    private RNamedList<RServerResult> queryHistogram(String columnName, int intervals) {
+      String cmd = String.format("is.null(base::assign('x', hist(%s$`%s`, breaks = %s, plot = FALSE)))", valueTable.getConnector().getSymbol(), columnName, intervals);
+      valueTable.execute(cmd);
+      cmd = "list(breaks = x$breaks, counts = x$counts, density = x$density)";
+      RServerResult result = valueTable.execute(cmd);
+      return result.asNamedList();
+    }
+
+    private List<RServerResult> queryPercentiles(String columnName, List<Double> defaultPercentiles) {
+      String probs = defaultPercentiles.stream()
+          .map(pct -> pct / 100 + "")
+          .collect(Collectors.joining(","));
+      String cmd = String.format("quantile(%s$`%s`, prob = c(%s), na.rm = TRUE)", valueTable.getConnector().getSymbol(), columnName, probs);
+      RServerResult result = valueTable.execute(cmd);
+      return result.asList();
+    }
+
     private List<RServerResult> queryDescriptiveStatistics(String columnName) {
       String cmd = String.format("%s %%>%% filter(`%s` %%in%% %s, !is.na(`%s`)) %%>%% select(`%s`) %%>%% summarise(" +
               "mean = mean(`%s`)," +
@@ -397,7 +428,7 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
           .map(e -> e.isNumeric() ? e.getRIdentifier() : String.format("\"%s\"", e.getRIdentifier()))
           .collect(Collectors.joining(","));
       idsVector = String.format("c(%s)", idsVector);
-      valueTable.execute(String.format("base::assign(\"%s\", %s)", idsSymbol, idsVector));
+      valueTable.execute(String.format("is.null(base::assign(\"%s\", %s))", idsSymbol, idsVector));
     }
 
     private void rmIds() {

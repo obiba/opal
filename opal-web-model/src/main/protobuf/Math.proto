@@ -94,7 +94,6 @@ message IntervalFrequencyDto {
   required double upper = 2;
   required int64 freq = 3;
   required double density = 4;
-  required double densityPct = 5;
 }
 
 message DescriptiveStatsDto {

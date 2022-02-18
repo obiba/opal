@@ -349,13 +349,12 @@ public final class Dtos {
 
     Math.ContinuousSummaryDto.Builder continuousBuilder = Math.ContinuousSummaryDto.newBuilder()
         .addAllDistributionPercentiles(summary.getDistributionPercentiles());
-    for (IntervalFrequency.Interval interval : summary.getIntervalFrequencies()) {
+    for (Interval interval : summary.getIntervalFrequencies()) {
       Math.IntervalFrequencyDto.Builder freqBuilder = Math.IntervalFrequencyDto.newBuilder()
           .setFreq(interval.getFreq());
       if (isNumeric(interval.getLower())) freqBuilder.setLower(interval.getLower());
       if (isNumeric(interval.getUpper())) freqBuilder.setUpper(interval.getUpper());
       if (isNumeric(interval.getDensity())) freqBuilder.setDensity(interval.getDensity());
-      if (isNumeric(interval.getDensityPct())) freqBuilder.setDensityPct(interval.getDensityPct());
       continuousBuilder.addIntervalFrequency(freqBuilder);
     }
 
