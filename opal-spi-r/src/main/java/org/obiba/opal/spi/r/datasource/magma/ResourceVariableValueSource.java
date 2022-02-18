@@ -14,10 +14,7 @@ import com.google.common.collect.Lists;
 import org.json.JSONObject;
 import org.obiba.magma.*;
 import org.obiba.magma.math.*;
-import org.obiba.magma.math.summary.support.DefaultCategoricalSummary;
-import org.obiba.magma.math.summary.support.DefaultFrequenciesSummary;
-import org.obiba.magma.math.summary.support.DefaultFrequency;
-import org.obiba.magma.math.summary.support.DefaultGeoSummary;
+import org.obiba.magma.math.summary.support.*;
 import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.PointType;
 import org.obiba.magma.type.PolygonType;
@@ -349,7 +346,8 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
     }
 
     private List<RServerResult> queryDescriptiveStatistics(String columnName) {
-      String cmd = String.format("%s %%>%% filter(`%s` %%in%% %s, !is.na(`%s`)) %%>%% select(`%s`) %%>%% summarise(mean = mean(`%s`)," +
+      String cmd = String.format("%s %%>%% filter(`%s` %%in%% %s, !is.na(`%s`)) %%>%% select(`%s`) %%>%% summarise(" +
+              "mean = mean(`%s`)," +
               "n = n()," +
               "min = min(`%s`)," +
               "max = max(`%s`)," +
@@ -407,36 +405,21 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
     }
   }
 
-  public static class ResourceContinuousSummary implements ContinuousSummary {
+  public static class ResourceContinuousSummary extends DefaultContinuousSummary {
 
-    private final List<Frequency> frequencies = Lists.newArrayList();
-
-    private long n = 0;
-
-    private double min = 0;
-    private double max = 0;
-    private double sum = 0;
-    private double sumsq = 0;
-    private double mean = 0;
-    private double median = 0;
-    private double geomean = 0;
-    private double variance = 0;
-    private double stddev = 0;
-    private double skewness = 0;
-    private double kurtosis = 0;
 
     public void setStats(List<RServerResult> descResults) {
-      min = getStat(descResults, "min");
-      max = getStat(descResults, "max");
-      sum = getStat(descResults, "sum");
-      sumsq = getStat(descResults, "sumsq");
-      mean = getStat(descResults, "mean");
-      median = getStat(descResults, "median");
-      geomean = getStat(descResults, "geomean");
-      variance = getStat(descResults, "variance");
-      stddev = getStat(descResults, "stddev");
-      skewness = getStat(descResults, "skewness");
-      kurtosis = getStat(descResults, "kurtosis");
+      setMin(getStat(descResults, "min"));
+      setMax(getStat(descResults, "max"));
+      setSum(getStat(descResults, "sum"));
+      setSumsq(getStat(descResults, "sumsq"));
+      setMean(getStat(descResults, "mean"));
+      setMedian(getStat(descResults, "median"));
+      setGeometricMean(getStat(descResults, "geomean"));
+      setVariance(getStat(descResults, "variance"));
+      setStandardDeviation(getStat(descResults, "stddev"));
+      setSkewness(getStat(descResults, "skewness"));
+      setKurtosis(getStat(descResults, "kurtosis"));
 
       try {
         setN(descResults.stream()
@@ -461,92 +444,5 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
       }
     }
 
-    @Override
-    public double getMin() {
-      return min;
-    }
-
-    @Override
-    public double getMax() {
-      return max;
-    }
-
-    @Override
-    public double getSum() {
-      return sum;
-    }
-
-    @Override
-    public double getSumsq() {
-      return sumsq;
-    }
-
-    @Override
-    public double getMean() {
-      return mean;
-    }
-
-    @Override
-    public double getMedian() {
-      return median;
-    }
-
-    @Override
-    public double getGeometricMean() {
-      return geomean;
-    }
-
-    @Override
-    public double getVariance() {
-      return variance;
-    }
-
-    @Override
-    public double getStandardDeviation() {
-      return stddev;
-    }
-
-    @Override
-    public double getSkewness() {
-      return skewness;
-    }
-
-    @Override
-    public double getKurtosis() {
-      return kurtosis;
-    }
-
-    @Override
-    public Iterable<Double> getPercentiles() {
-      return Lists.newArrayList();
-    }
-
-    @Override
-    public Iterable<Double> getDistributionPercentiles() {
-      return Lists.newArrayList();
-    }
-
-    @Override
-    public Iterable<IntervalFrequency.Interval> getIntervalFrequencies() {
-      return Lists.newArrayList();
-    }
-
-    @Override
-    public long getN() {
-      return n;
-    }
-
-    public void setN(long n) {
-      this.n = n;
-    }
-
-    @Override
-    public Iterable<Frequency> getFrequencies() {
-      return frequencies;
-    }
-
-    public void addFrequency(Frequency frequency) {
-      frequencies.add(frequency);
-    }
   }
 }
