@@ -33,7 +33,7 @@ class RValueSetFetcher {
     String rid = re.getRIdentifier();
     if (!re.isNumeric()) rid = String.format("'%s'", rid);
     // subset tibble: get the row(s) matching the entity id (result is a tibble)
-    String cmd = String.format("`%s`[`%s`$`%s` == %s,]", table.getSymbol(), table.getSymbol(), table.getIdColumn(), rid);
+    String cmd = String.format("tibble::as_tibble(`%s` %%>%% filter(`%s` == %s))", table.getSymbol(), table.getIdColumn(), rid);
     return table.execute(cmd);
   }
 
@@ -48,7 +48,7 @@ class RValueSetFetcher {
         })
         .collect(Collectors.joining(","));
     // subset tibble: get the row(s) matching the entity ids (result is a tibble)
-    String cmd = String.format("`%s`[`%s`$`%s` %%in%% c(%s),]", table.getSymbol(), table.getSymbol(), table.getIdColumn(), ids);
+    String cmd = String.format("tibble::as_tibble(`%s` %%>%% filter(`%s` %%in%% c(%s)))", table.getSymbol(), table.getIdColumn(), ids);
     return table.execute(cmd);
   }
 
