@@ -261,8 +261,13 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
 
     @Override
     public int getLength(boolean distinct) {
-      RServerResult result = execute(String.format("n_distinct(%s$`%s`)", TIBBLE_SYMBOL, getName()));
-      return result.isInteger() ? result.asIntegers()[0] : 0;
+      try {
+        RServerResult result = execute(String.format("%s %%>%% distinct(`%s`) %%>%% summarise(n = n())", TIBBLE_SYMBOL, getName()));
+        return result.asList().get(0).asNamedList().get("n").asIntegers()[0];
+      } catch (Exception e) {
+        log.warn("Resource vector length failed", e);
+        return 0;
+      }
     }
 
     @Override
