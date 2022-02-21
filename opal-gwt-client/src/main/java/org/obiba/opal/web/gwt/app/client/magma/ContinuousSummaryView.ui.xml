@@ -16,17 +16,20 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel>
+
+  <g:FlowPanel ui:field="plotsPanel" visible="false">
     <b:Heading size="4">
-      <ui:msg description="Plots label">Plots</ui:msg>
-    </b:Heading>
-    <b:FluidRow>
-      <b:Column size="5">
-        <g:SimplePanel ui:field="histogramPanel"/>
-      </b:Column>
-      <b:Column size="5" offset="2">
-        <g:SimplePanel ui:field="normalProbability"/>
-      </b:Column>
-    </b:FluidRow>
+        <ui:msg description="Plots label">Plots</ui:msg>
+      </b:Heading>
+      <b:FluidRow>
+        <b:Column size="5">
+          <g:SimplePanel ui:field="histogramPanel"/>
+        </b:Column>
+        <b:Column size="5" offset="2">
+          <g:SimplePanel ui:field="normalProbability"/>
+        </b:Column>
+      </b:FluidRow>
+    </g:FlowPanel>
 
     <b:Heading size="4">
       <ui:msg description="Statistics label">Statistics</ui:msg>

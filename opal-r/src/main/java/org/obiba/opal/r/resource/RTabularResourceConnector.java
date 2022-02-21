@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -64,8 +66,10 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   // the R session in which the resource is assigned, with its tabular representation
   private RServerSession rSession;
 
-  // column descriptions
+  // R columns descriptions
   private List<Column> columns;
+
+  protected final Lock lock = new ReentrantLock();
 
   public RTabularResourceConnector(ResourceReferenceService resourceReferenceService, OpalRSessionManager rSessionManager, String project, String name, String profile) {
     this.resourceReferenceService = resourceReferenceService;
@@ -109,6 +113,16 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   }
 
   @Override
+  public boolean isMultilines(String idColumn) {
+    String cmd = String.format("length(%s$`%s`)", TIBBLE_SYMBOL, idColumn);
+    RServerResult result = execute(cmd);
+    int linesCount = result.isInteger() ? result.asIntegers()[0] : 0;
+    result = execute(String.format("n_distinct(%s$`%s`)", TIBBLE_SYMBOL, idColumn));
+    int entitiesCount = result.isInteger() ? result.asIntegers()[0] : 0;
+    return linesCount > entitiesCount;
+  }
+
+  @Override
   public void dispose() {
     if (rSession != null) {
       rSessionManager.removeRSession(rSession.getId());
@@ -118,27 +132,32 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   }
 
   @Override
-  public synchronized void initialise() {
+  public void initialise() {
     if (rSession != null) return;
     // TODO R server profile
-    rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), Strings.isNullOrEmpty(profile) ?
-        null :
-        new RServerProfile() {
-          @Override
-          public String getName() {
-            return profile;
-          }
+    lock.lock();
+    try {
+      rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), Strings.isNullOrEmpty(profile) ?
+          null :
+          new RServerProfile() {
+            @Override
+            public String getName() {
+              return profile;
+            }
 
-          @Override
-          public String getCluster() {
-            return profile;
-          }
-        });
-    rSession.setExecutionContext("View");
-    ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
-    rSession.execute(rop);
-    ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL);
-    rSession.execute(rop2);
+            @Override
+            public String getCluster() {
+              return profile;
+            }
+          });
+      rSession.setExecutionContext("View");
+      ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
+      rSession.execute(rop);
+      ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL);
+      rSession.execute(rop2);
+    } finally {
+      lock.unlock();
+    }
   }
 
   private Subject getSubject() {
@@ -169,11 +188,17 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   //
 
   private ROperationWithResult doExecute(ROperationWithResult rop) {
+    lock.lock();
     try {
       getRSession().execute(rop);
     } catch (Exception e) {
-      log.error("R operation failed: {}", e.getMessage(), e);
+      if (log.isDebugEnabled())
+        log.error("Resource R operation failed: {}", e.getMessage(), e);
+      else
+        log.error("Resource R operation failed: {}", e.getMessage());
       throw new MagmaRRuntimeException(e.getMessage());
+    } finally {
+      lock.unlock();
     }
     return rop;
   }
@@ -276,8 +301,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     }
 
     @Override
-    public Variable asVariable(String entityType) {
-      Variable variable = RVariableHelper.newVariable(desc, entityType, false, "en", position);
+    public Variable asVariable(String entityType, boolean multilines) {
+      Variable variable = RVariableHelper.newVariable(desc, entityType, multilines, "en", position);
       return Variable.Builder.sameAs(variable)
           .addAttribute(Attribute.Builder.newAttribute("column").withNamespace("opal").withValue(getName()).build())
           .build();

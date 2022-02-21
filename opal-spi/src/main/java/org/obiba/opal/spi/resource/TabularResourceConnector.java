@@ -49,6 +49,14 @@ public interface TabularResourceConnector extends Initialisable, Disposable {
    */
   Column getColumn(String name);
 
+  /**
+   * Get whether there are multiple lines per entity.
+   *
+   * @param idColumn
+   * @return
+   */
+  boolean isMultilines(String idColumn);
+
   interface Column {
 
     /**
@@ -97,8 +105,9 @@ public interface TabularResourceConnector extends Initialisable, Disposable {
      * Get the column as a variable object.
      *
      * @param entityType
+     * @param multilines
      * @return
      */
-    Variable asVariable(String entityType);
+    Variable asVariable(String entityType, boolean multilines);
   }
 }

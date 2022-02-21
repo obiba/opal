@@ -194,8 +194,11 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public boolean isMultilines() {
-    // TODO check whether it is multi line (compare id column length vs distinct length)
-    return false;
+    try {
+      return connector.isMultilines(getIdColumn());
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   @Override
@@ -324,7 +327,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   public VariableValueSource getVariableValueSource(String variableName) throws NoSuchVariableException {
     ensureInitialised();
     if (!initialised) {
-      throw new IllegalStateException("The initialise() method must be called before getVariableValueSource().");
+      throw new IllegalStateException("Resource view not initialized.");
     }
     for (VariableValueSource variableValueSource : variableValueSources) {
       if (variableValueSource.getVariable().getName().equals(variableName)) {
@@ -400,10 +403,11 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   private void initialiseVariables() {
     if (variables.isEmpty()) {
+      boolean multilines = isMultilines();
       connector.getColumns().stream()
           .filter(column -> !idColumn.equals(column.getName()))
           .forEach(column -> {
-            variables.add(column.asVariable(getEntityType()));
+            variables.add(column.asVariable(getEntityType(), multilines));
           });
     }
 
@@ -469,8 +473,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
           variableSet.add(variable);
           variableValueSources.add(new ResourceVariableValueSource(variable, column.get(), ResourceView.this));
         } else {
-          // TODO with variable that do not map to a R column
-          throw new MagmaRuntimeException("No R column found for variable " + variable.getName());
+          variableSet.add(variable);
+          variableValueSources.add(new ResourceVariableValueSource(variable, null, ResourceView.this));
         }
       }
 
@@ -489,7 +493,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
     @Override
     public void close() {
-      // TODO better init
+      // TODO better init?
       initialiseVariables();
     }
   }

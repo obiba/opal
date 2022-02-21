@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma;
 
 import java.util.Collection;
 
+import com.google.gwt.user.client.ui.Panel;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
@@ -43,6 +44,9 @@ public class GeoSummaryView extends Composite {
   SummaryFlexTable stats;
 
   @UiField
+  Panel plotsPanel;
+
+  @UiField
   PolygonMap map;
 
   @UiField
@@ -63,11 +67,13 @@ public class GeoSummaryView extends Composite {
       stats.drawTotal(total);
     }
 
-    for(PointDto pointDto : JsArrays.toIterable(summaryDto.getPointsArray())) {
-      map.addPoint(pointDto.getLon(), pointDto.getLat());
+    if (summaryDto.getPointsArray() != null && summaryDto.getPointsArray().length()> 0) {
+      for (PointDto pointDto : JsArrays.toIterable(summaryDto.getPointsArray())) {
+        map.addPoint(pointDto.getLon(), pointDto.getLat());
+      }
+      map.drawPolygon();
+      plotsPanel.setVisible(true);
     }
-
-    map.drawPolygon();
     addDescriptiveStatistics();
   }
 
