@@ -11,6 +11,8 @@
 package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -73,11 +76,11 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   private transient IRTabularResourceConnector connector;
 
-  //private transient List<VariableEntity> entities;
-
   private transient int idPosition = -1;
 
-  private transient Map<String, Integer> columnPositions = Maps.newHashMap();
+  private transient Cache<String, List<VariableEntity>> entitiesCache;
+
+  private transient Cache<String, Integer> entitiesCountCache;
 
   public ResourceView() {
   }
@@ -222,27 +225,42 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   //
 
   @Override
-  public List<VariableEntity> getVariableEntities() {
-    return getVariableEntities(0, -1);
-  }
+  public synchronized List<VariableEntity> getVariableEntities() {
+    if (entitiesCache == null) {
+      entitiesCache = CacheBuilder.newBuilder()
+          .expireAfterWrite(60, TimeUnit.SECONDS)
+          .build();
+    }
+    List<VariableEntity> entities = entitiesCache.getIfPresent("entities");
+    if (entities != null) return entities;
 
-  @Override
-  public List<VariableEntity> getVariableEntities(int offset, int limit) {
     if (connector.hasColumn(idColumn)) {
-      return connector.getColumn(idColumn).asVector(TextType.get(), true, offset, limit).stream()
+      entities = connector.getColumn(idColumn).asVector(TextType.get(), true, 0, -1).stream()
           .filter(val -> val != null && !val.isNull())
           .map(Value::toString)
           .distinct()
           .map(id -> new RVariableEntity(getEntityType(), id))
           .collect(Collectors.toList());
+      entitiesCache.put("entities", entities);
+      return entities;
     } else {
       return Lists.newArrayList();
     }
   }
 
   @Override
-  public int getVariableEntityCount() {
-    return connector.hasColumn(idColumn) ? connector.getColumn(idColumn).getLength(true) : 0;
+  public synchronized int getVariableEntityCount() {
+    if (entitiesCountCache == null) {
+      entitiesCountCache = CacheBuilder.newBuilder()
+          .expireAfterWrite(60, TimeUnit.SECONDS)
+          .build();
+    }
+    Integer count = entitiesCountCache.getIfPresent("count");
+    if (count != null) return count;
+
+    count = connector.hasColumn(idColumn) ? connector.getColumn(idColumn).getLength(true) : 0;
+    entitiesCountCache.put("count", count);
+    return count;
   }
 
   //

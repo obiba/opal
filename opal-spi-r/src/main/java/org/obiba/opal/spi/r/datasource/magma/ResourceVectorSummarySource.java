@@ -181,7 +181,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
     String columnName = getColumnName();
     List<RServerResult> descResults = queryDescriptiveStatistics(columnName, categories);
-    List<RServerResult> extendedDescResults = Lists.newArrayList();
+    RNamedList<RServerResult> extendedDescResults = null;
     try {
       extendedDescResults = queryExtendedDescriptiveStatistics(columnName, categories);
     } catch (Exception e) {
@@ -300,7 +300,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private RNamedList<RServerResult> queryHistogram(String columnName, int intervals, Set<Category> categories) {
-    String histStatement = String.format("%s %s %%>%% with(hist(`%s`, breaks = %s, plot = FALSE))",
+    String histStatement = String.format("hist(%s %s %%>%% select(`%s`) %%>%% pull(), breaks = %s, plot = FALSE)",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
         columnName, intervals);
@@ -320,7 +320,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
     String probs = defaultPercentiles.stream()
         .map(pct -> pct / 100 + "")
         .collect(Collectors.joining(","));
-    String cmd = String.format("%s %s %%>%% with(quantile(`%s`, prob = c(%s), na.rm = TRUE))",
+    String cmd = String.format("quantile(%s %s %%>%% select(`%s`) %%>%% pull(), prob = c(%s), na.rm = TRUE)",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
         columnName, probs);
@@ -348,18 +348,15 @@ class ResourceVectorSummarySource implements VectorSummarySource {
     return result.asList();
   }
 
-  private List<RServerResult> queryExtendedDescriptiveStatistics(String columnName, Set<Category> categories) {
-    String cmd = String.format("%s %s %%>%% filter(!is.na(`%s`)) %%>%% select(`%s`) %%>%% " +
-            "summarise(" +
-            "median = median(`%s`)," +
-            "skewness = moments::skewness(`%s`)," +
-            "kurtosis = moments::kurtosis(`%s`))",
+  private RNamedList<RServerResult> queryExtendedDescriptiveStatistics(String columnName, Set<Category> categories) {
+    String cmd = String.format("is.null(base::assign('x', %s %s %%>%% filter(!is.na(`%s`)) %%>%% select(`%s`) %%>%% pull()))",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
-        columnName, columnName, columnName,
-        columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName);
+        columnName, columnName);
+    execute(cmd);
+    cmd = "list(median = median(x), skewness = moments::skewness(x), kurtosis = moments::kurtosis(x))";
     RServerResult result = execute(cmd);
-    return result.asList();
+    return result.asNamedList();
   }
 
   private List<RServerResult> queryDefaultFrequencies(String columnName, Set<Category> categories) {
@@ -458,8 +455,8 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   public static class ResourceContinuousSummary extends DefaultContinuousSummary {
-    
-    public void setStats(List<RServerResult> descResults, List<RServerResult> extendedDescResults) {
+
+    public void setStats(List<RServerResult> descResults, RNamedList<RServerResult> extendedDescResults) {
       setMean(getStat(descResults, "mean"));
       setMin(getStat(descResults, "min"));
       setMax(getStat(descResults, "max"));
@@ -469,10 +466,10 @@ class ResourceVectorSummarySource implements VectorSummarySource {
       setVariance(getStat(descResults, "variance"));
       setStandardDeviation(getStat(descResults, "stddev"));
 
-      if (!extendedDescResults.isEmpty()) {
-        setMedian(getStat(extendedDescResults, "median"));
-        setSkewness(getStat(extendedDescResults, "skewness"));
-        setKurtosis(getStat(extendedDescResults, "kurtosis"));
+      if (extendedDescResults != null && !extendedDescResults.getNames().isEmpty()) {
+        setMedian(extendedDescResults.get("median").asDoubles()[0]);
+        setSkewness(extendedDescResults.get("skewness").asDoubles()[0]);
+        setKurtosis(extendedDescResults.get("kurtosis").asDoubles()[0]);
       } else {
         setMedian(Double.NaN);
         setSkewness(Double.NaN);
