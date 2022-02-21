@@ -181,12 +181,18 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
     String columnName = getColumnName();
     List<RServerResult> descResults = queryDescriptiveStatistics(columnName, categories);
+    List<RServerResult> extendedDescResults = Lists.newArrayList();
+    try {
+      extendedDescResults = queryExtendedDescriptiveStatistics(columnName, categories);
+    } catch (Exception e) {
+      log.warn("Some descriptive statistics could not be queried", e);
+    }
     List<RServerResult> freqResults = queryDefaultFrequencies(columnName, categories);
     RNamedList<RServerResult> histResult = queryHistogram(columnName, intervals, categories);
     List<RServerResult> percentileResults = queryPercentiles(columnName, defaultPercentiles, categories);
     rmIds();
 
-    summary.setStats(descResults);
+    summary.setStats(descResults, extendedDescResults);
     percentileResults.stream()
         .map(percentile -> isNull(percentile.asNativeJavaObject()) ? 0 : percentile.asDoubles()[0])
         .forEach(summary::addPercentile);
@@ -327,16 +333,27 @@ class ResourceVectorSummarySource implements VectorSummarySource {
             "summarise(" +
             "mean = mean(`%s`)," +
             "n = n()," +
-            "min = min(`%s`)," +
-            "max = max(`%s`)," +
-            "median = median(`%s`)," +
+            "min = min(`%s`, na.rm = TRUE)," +
+            "max = max(`%s`, na.rm = TRUE)," +
             "geomean = exp(mean(log(`%s`)))," +
-            "stddev = sd(`%s`)," +
-            "variance = var(`%s`)," +
+            "stddev = sd(`%s`, na.rm = TRUE)," +
+            "sum = sum(`%s`, na.rm = TRUE)," +
+            "sumsq = sum((`%s`)^2, na.rm = TRUE)," +
+            "variance = var(`%s`, na.rm = TRUE))",
+        getTibbleStatement(columnName),
+        getFilterMissingsStatement(columnName, categories),
+        columnName, columnName, columnName,
+        columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName);
+    RServerResult result = execute(cmd);
+    return result.asList();
+  }
+
+  private List<RServerResult> queryExtendedDescriptiveStatistics(String columnName, Set<Category> categories) {
+    String cmd = String.format("%s %s %%>%% filter(!is.na(`%s`)) %%>%% select(`%s`) %%>%% " +
+            "summarise(" +
+            "median = median(`%s`)," +
             "skewness = moments::skewness(`%s`)," +
-            "kurtosis = moments::kurtosis(`%s`)," +
-            "sum = sum(`%s`)," +
-            "sumsq = sum((`%s`)^2))",
+            "kurtosis = moments::kurtosis(`%s`))",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
         columnName, columnName, columnName,
@@ -441,19 +458,26 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   public static class ResourceContinuousSummary extends DefaultContinuousSummary {
-
-    public void setStats(List<RServerResult> descResults) {
+    
+    public void setStats(List<RServerResult> descResults, List<RServerResult> extendedDescResults) {
+      setMean(getStat(descResults, "mean"));
       setMin(getStat(descResults, "min"));
       setMax(getStat(descResults, "max"));
       setSum(getStat(descResults, "sum"));
       setSumsq(getStat(descResults, "sumsq"));
-      setMean(getStat(descResults, "mean"));
-      setMedian(getStat(descResults, "median"));
       setGeometricMean(getStat(descResults, "geomean"));
       setVariance(getStat(descResults, "variance"));
       setStandardDeviation(getStat(descResults, "stddev"));
-      setSkewness(getStat(descResults, "skewness"));
-      setKurtosis(getStat(descResults, "kurtosis"));
+
+      if (!extendedDescResults.isEmpty()) {
+        setMedian(getStat(extendedDescResults, "median"));
+        setSkewness(getStat(extendedDescResults, "skewness"));
+        setKurtosis(getStat(extendedDescResults, "kurtosis"));
+      } else {
+        setMedian(Double.NaN);
+        setSkewness(Double.NaN);
+        setKurtosis(Double.NaN);
+      }
 
       try {
         setN(descResults.stream()

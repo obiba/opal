@@ -111,13 +111,14 @@ public class ContinuousSummaryView extends Composite {
     addGridStat(translations.max(), descriptiveStats.getMax(), row++);
     addGridStat(translations.meanLabel(), descriptiveStats.getMean(), row++);
     addGridStat(translations.geometricMeanLabel(), descriptiveStats.getGeometricMean(), row++);
-    addGridStat(translations.median(), descriptiveStats.getMedian(), row++);
     addGridStat(translations.standardDeviationLabel(), descriptiveStats.getStdDev(), row++);
     addGridStat(translations.variance(), descriptiveStats.getVariance(), row++);
-    addGridStat(translations.skewness(), descriptiveStats.getSkewness(), row++);
-    addGridStat(translations.kurtosis(), descriptiveStats.getKurtosis(), row++);
     addGridStat(translations.sum(), descriptiveStats.getSum(), row++);
     addGridStat(translations.sumOfSquares(), descriptiveStats.getSumsq(), row++);
+    // extended stats
+    if (descriptiveStats.hasMedian()) addGridStat(translations.median(), descriptiveStats.getMedian(), row++);
+    if (descriptiveStats.hasSkewness()) addGridStat(translations.skewness(), descriptiveStats.getSkewness(), row++);
+    if (descriptiveStats.hasKurtosis()) addGridStat(translations.kurtosis(), descriptiveStats.getKurtosis(), row++);
   }
 
   @Override
