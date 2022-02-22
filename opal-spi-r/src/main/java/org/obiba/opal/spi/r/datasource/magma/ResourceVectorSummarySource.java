@@ -146,9 +146,13 @@ class ResourceVectorSummarySource implements VectorSummarySource {
         if (isNull(freqMap.get(columnName).asNativeJavaObject())) {
           summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NULL_NAME, count, count * 1F / freqSum, true));
         } else {
-          String value = isLogical ?
-          String.format("%s", freqMap.get(columnName).asLogical()):
-          freqMap.get(columnName).asStrings()[0];
+          String value = freqMap.get(columnName).asStrings()[0];
+          if (isLogical) {
+            if (freqMap.get(columnName).isInteger())
+              value = freqMap.get(columnName).asIntegers()[0] == 1 ? "true" : "false";
+            else
+              value = String.format("%s", freqMap.get(columnName).asLogical());
+          }
           if (categoryNames.contains(value)) {
             summary.addFrequency(new DefaultFrequency(value, count, count * 1F / freqSum, missings.contains(value)));
             if (count > max) {
