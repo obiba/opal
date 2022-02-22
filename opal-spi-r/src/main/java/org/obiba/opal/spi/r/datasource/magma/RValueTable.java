@@ -96,8 +96,18 @@ public class RValueTable extends AbstractValueTable implements TibbleTable {
     String lambdaParam = "n";
     if (lambdaParam.equals(getSymbol())) lambdaParam = ".n";
     RServerResult columnDescs = execute(String.format(
-        "lapply(colnames(`%s`), function(%s) { attrs <- attributes(`%s`[[%s]]) ; attrs$labels_names <- names(attrs$labels) ; list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attrs) })",
-        getSymbol(), lambdaParam, getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
+        "lapply(colnames(`%s`), function(%s) { " +
+            "attrs <- attributes(`%s`[[%s]]) ; " +
+            "attrs$labels_names <- names(attrs$labels) ; " +
+            "klass <- `%s` %%>%% select(%s) %%>%% head(0) %%>%% pull() %%>%% class ;" +
+            "type <- `%s` %%>%% select(%s) %%>%% head(0) %%>%% pull() %%>%% tibble::type_sum() ;" +
+            "list(name=%s, class=klass, type=type, attributes=attrs)" +
+            "})",
+        getSymbol(), lambdaParam,
+        getSymbol(), lambdaParam,
+        getSymbol(), lambdaParam,
+        getSymbol(), lambdaParam,
+        lambdaParam));
     List<RServerResult> columns = columnDescs.asList();
     try {
       int i = 0;

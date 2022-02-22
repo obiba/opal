@@ -87,11 +87,18 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   @Override
   public List<Column> getColumns() {
     if (columns == null) {
-      RServerResult columnDescs = execute(String.format("lapply(colnames(%s), function(col) { " +
-          "attrs <- attributes(%s[[col]]) ; " +
-          "attrs$labels_names <- names(attrs$labels) ; " +
-          "list(name=col, class=class(%s[[col]]), type=tibble::type_sum(%s[[col]]), attributes=attrs) " +
-          "})", TIBBLE_SYMBOL, TIBBLE_SYMBOL, TIBBLE_SYMBOL, TIBBLE_SYMBOL));
+      RServerResult columnDescs = execute(String.format(
+          "lapply(colnames(`%s`), function(col) { " +
+              "attrs <- attributes(`%s`[[col]]) ; " +
+              "attrs$labels_names <- names(attrs$labels) ; " +
+              "klass <- `%s` %%>%% select(col) %%>%% head(0) %%>%% pull() %%>%% class ;" +
+              "type <- `%s` %%>%% select(col) %%>%% head(0) %%>%% pull() %%>%% tibble::type_sum() ;" +
+              "list(name=col, class=klass, type=type, attributes=attrs)" +
+              "})",
+          getSymbol(),
+          getSymbol(),
+          getSymbol(),
+          getSymbol()));
       int i = 0;
       columns = Lists.newArrayList();
       for (RServerResult desc : columnDescs.asList()) {
@@ -114,10 +121,10 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
 
   @Override
   public boolean isMultilines(String idColumn) {
-    String cmd = String.format("length(%s$`%s`)", TIBBLE_SYMBOL, idColumn);
+    String cmd = String.format("length(%s$`%s`)", getSymbol(), idColumn);
     RServerResult result = execute(cmd);
     int linesCount = result.isInteger() ? result.asIntegers()[0] : 0;
-    result = execute(String.format("n_distinct(%s$`%s`)", TIBBLE_SYMBOL, idColumn));
+    result = execute(String.format("n_distinct(%s$`%s`)", getSymbol(), idColumn));
     int entitiesCount = result.isInteger() ? result.asIntegers()[0] : 0;
     return linesCount > entitiesCount;
   }

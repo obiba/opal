@@ -75,7 +75,7 @@ public class RDatasource extends AbstractDatasource {
       @Override
       protected void doWithConnection() {
         ensurePackage("tibble");
-        eval("library(tibble)", false);
+        ensurePackage("dplyr");
       }
     });
   }
