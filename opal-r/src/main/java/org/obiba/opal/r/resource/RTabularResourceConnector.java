@@ -91,8 +91,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
           "lapply(colnames(`%s`), function(col) { " +
               "attrs <- attributes(`%s`[[col]]) ; " +
               "attrs$labels_names <- names(attrs$labels) ; " +
-              "klass <- `%s` %%>%% select(col) %%>%% head(0) %%>%% pull() %%>%% class ;" +
-              "type <- `%s` %%>%% select(col) %%>%% head(0) %%>%% pull() %%>%% tibble::type_sum() ;" +
+              "klass <- `%s` %%>%% select(col) %%>%% head(10) %%>%% pull() %%>%% class ;" +
+              "type <- `%s` %%>%% select(col) %%>%% head(10) %%>%% pull() %%>%% tibble::type_sum() ;" +
               "list(name=col, class=klass, type=type, attributes=attrs)" +
               "})",
           getSymbol(),
@@ -157,7 +157,7 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
               return profile;
             }
           });
-      rSession.setExecutionContext("View");
+      rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
       ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
       rSession.execute(rop);
       ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL);

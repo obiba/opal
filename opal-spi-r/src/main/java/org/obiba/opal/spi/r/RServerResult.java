@@ -70,7 +70,18 @@ public interface RServerResult {
    */
   boolean asLogical();
 
+  /**
+   * Get the JSON representation of the data.
+   * @return
+   */
   String asJSON();
+
+  /**
+   * Check wether the data is null or represents a null value.
+   *
+   * @return
+   */
+  boolean isNull();
 
   /**
    * Check if the evaluation result is an array of strings.

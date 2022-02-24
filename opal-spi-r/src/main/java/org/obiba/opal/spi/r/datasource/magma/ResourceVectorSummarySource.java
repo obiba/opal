@@ -12,7 +12,6 @@ package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.json.JSONObject;
 import org.obiba.magma.*;
 import org.obiba.magma.math.*;
 import org.obiba.magma.math.summary.support.*;
@@ -79,7 +78,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
           .collect(Collectors.toList())) {
         int count = freqMap.get("n").asIntegers()[0];
         n += count;
-        if (isNull(freqMap.get(columnName).asNativeJavaObject())) {
+        if (freqMap.get(columnName).isNull()) {
           summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NULL_NAME, count, count * 1F / freqSum, true));
         } else if (detailed) {
           String value = freqMap.get(columnName).asStrings()[0];
@@ -143,7 +142,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
           .collect(Collectors.toList())) {
         int count = freqMap.get("n").asIntegers()[0];
         n += count;
-        if (isNull(freqMap.get(columnName).asNativeJavaObject())) {
+        if (freqMap.get(columnName).isNull()) {
           summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NULL_NAME, count, count * 1F / freqSum, true));
         } else {
           String value = freqMap.get(columnName).asStrings()[0];
@@ -198,18 +197,27 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
     summary.setStats(descResults, extendedDescResults);
     percentileResults.stream()
-        .map(percentile -> isNull(percentile.asNativeJavaObject()) ? 0 : percentile.asDoubles()[0])
+        .map(percentile -> percentile.isNull() ? 0 : percentile.asDoubles()[0])
         .forEach(summary::addPercentile);
     if (histResult != null) {
       List<RServerResult> breaks = histResult.get("breaks").asList();
-      List<RServerResult> counts = histResult.get("counts").asList();
-      List<RServerResult> density = histResult.get("density").asList();
-      for (int i = 0; i < counts.size(); i++) {
+      if (histResult.get("counts").isList()) {
+        List<RServerResult> counts = histResult.get("counts").asList();
+        List<RServerResult> density = histResult.get("density").asList();
+        for (int i = 0; i < counts.size(); i++) {
+          DefaultInterval interval = new DefaultInterval();
+          interval.setLower(breaks.get(i).asDoubles()[0]);
+          interval.setUpper(breaks.get(i + 1).asDoubles()[0]);
+          interval.setFreq(counts.get(i).asIntegers()[0]);
+          interval.setDensity(density.get(i).asDoubles()[0]);
+          summary.addIntervalFrequency(interval);
+        }
+      } else if (histResult.get("counts").isInteger()) {
         DefaultInterval interval = new DefaultInterval();
-        interval.setLower(breaks.get(i).asDoubles()[0]);
-        interval.setUpper(breaks.get(i + 1).asDoubles()[0]);
-        interval.setFreq(counts.get(i).asIntegers()[0]);
-        interval.setDensity(density.get(i).asDoubles()[0]);
+        interval.setLower(breaks.get(0).asDoubles()[0]);
+        interval.setUpper(breaks.get(1).asDoubles()[0]);
+        interval.setFreq(histResult.get("counts").asIntegers()[0]);
+        interval.setDensity(histResult.get("density").asDoubles()[0]);
         summary.addIntervalFrequency(interval);
       }
     }
@@ -260,7 +268,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
           .collect(Collectors.toList())) {
         int count = freqMap.get("n").asIntegers()[0];
         n += count;
-        if (isNull(freqMap.get(columnName).asNativeJavaObject())) {
+        if (freqMap.get(columnName).isNull()) {
           summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NULL_NAME, count, count * 1F / freqSum, true));
         } else {
           String value = freqMap.get(columnName).asStrings()[0];
@@ -381,10 +389,6 @@ class ResourceVectorSummarySource implements VectorSummarySource {
     return result.asList();
   }
 
-  private boolean isNull(Object objValue) {
-    return objValue == null || JSONObject.NULL.equals(objValue) || objValue.toString().equals("NA");
-  }
-
   private void assignIds() {
     String idsVector = StreamSupport.stream(entities.spliterator(), false)
         .map(e -> (RVariableEntity) e)
@@ -471,9 +475,9 @@ class ResourceVectorSummarySource implements VectorSummarySource {
       setStandardDeviation(getStat(descResults, "stddev"));
 
       if (extendedDescResults != null && !extendedDescResults.getNames().isEmpty()) {
-        setMedian(extendedDescResults.get("median").asDoubles()[0]);
-        setSkewness(extendedDescResults.get("skewness").asDoubles()[0]);
-        setKurtosis(extendedDescResults.get("kurtosis").asDoubles()[0]);
+        setMedian(extendedDescResults.get("median").isNull() ? Double.NaN : extendedDescResults.get("median").asDoubles()[0]);
+        setSkewness(extendedDescResults.get("skewness").isNull() ? Double.NaN : extendedDescResults.get("skewness").asDoubles()[0]);
+        setKurtosis(extendedDescResults.get("kurtosis").isNull() ? Double.NaN : extendedDescResults.get("kurtosis").asDoubles()[0]);
       } else {
         setMedian(Double.NaN);
         setSkewness(Double.NaN);
@@ -484,6 +488,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
         setN(descResults.stream()
             .filter(RServerResult::isNamedList)
             .map(RServerResult::asNamedList)
+            .filter(map -> !map.get("n").isNull())
             .map(map -> map.get("n").asIntegers()[0])
             .findFirst().orElse(0));
       } catch (Exception e) {
@@ -496,6 +501,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
         return descResults.stream()
             .filter(RServerResult::isNamedList)
             .map(RServerResult::asNamedList)
+            .filter(map -> !map.get(type).isNull())
             .map(map -> map.get(type).asDoubles()[0])
             .findFirst().orElse(0d);
       } catch (Exception e) {

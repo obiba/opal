@@ -218,6 +218,12 @@ class RockResult implements RServerResult {
   }
 
   @Override
+  public boolean isNull() {
+    Object objValue = asNativeJavaObject();
+    return objValue == null || JSONObject.NULL.equals(objValue) || objValue.toString().equals("NA");
+  }
+
+  @Override
   public boolean isString() {
     return isList() || isNamedList() || jsonResult != null || nativeResult != null;
   }

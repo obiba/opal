@@ -11,6 +11,7 @@
 package org.obiba.opal.r.rserve;
 
 import com.google.common.collect.Lists;
+import org.json.JSONObject;
 import org.obiba.opal.spi.r.RMatrix;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RRuntimeException;
@@ -18,6 +19,7 @@ import org.obiba.opal.spi.r.RServerResult;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPLogical;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +110,11 @@ class RserveResult implements RServerResult {
   @Override
   public String asJSON() {
     return asStrings()[0];
+  }
+
+  @Override
+  public boolean isNull() {
+    return result == null || result.isNull();
   }
 
   @Override

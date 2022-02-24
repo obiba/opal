@@ -99,8 +99,8 @@ public class RValueTable extends AbstractValueTable implements TibbleTable {
         "lapply(colnames(`%s`), function(%s) { " +
             "attrs <- attributes(`%s`[[%s]]) ; " +
             "attrs$labels_names <- names(attrs$labels) ; " +
-            "klass <- `%s` %%>%% select(%s) %%>%% head(0) %%>%% pull() %%>%% class ;" +
-            "type <- `%s` %%>%% select(%s) %%>%% head(0) %%>%% pull() %%>%% tibble::type_sum() ;" +
+            "klass <- `%s` %%>%% select(%s) %%>%% head(10) %%>%% pull() %%>%% class ;" +
+            "type <- `%s` %%>%% select(%s) %%>%% head(10) %%>%% pull() %%>%% tibble::type_sum() ;" +
             "list(name=%s, class=klass, type=type, attributes=attrs)" +
             "})",
         getSymbol(), lambdaParam,
