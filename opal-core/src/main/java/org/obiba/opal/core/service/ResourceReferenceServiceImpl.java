@@ -159,6 +159,13 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
+  public String getProfile(String project, String name) {
+    ResourceReference ref = getResourceReference(project, name);
+    ResourceProvidersService.ResourceProvider provider = resourceProvidersService.getResourceProvider(ref.getProvider());
+    return provider.getProfile();
+  }
+
+  @Override
   @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(ResourceReference.class);

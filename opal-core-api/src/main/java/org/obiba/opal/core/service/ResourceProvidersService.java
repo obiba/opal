@@ -69,6 +69,13 @@ public interface ResourceProvidersService extends SystemService {
     String getName();
 
     /**
+     * Get the profile name where this resource provider was found (in practice: the R server cluster name).
+     *
+     * @return
+     */
+    String getProfile();
+
+    /**
      * Get the human readable name.
      *
      * @return

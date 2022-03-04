@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class RResourceProvidersService implements Service, ResourceProvidersService {
@@ -47,7 +48,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   private boolean ensureResourcerDone = false;
 
-  private final Map<String, ResourceProvider> resourceProviders = Maps.newHashMap();
+  private final Map<String, List<ResourceProvider>> resourceProviders = Maps.newHashMap();
 
   private final Object resourceProvidersTask = new Object();
 
@@ -173,7 +174,10 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
               RNamedList<RServerResult> pkgList = result.asNamedList();
               for (String name : pkgList.keySet()) {
                 RServerResult res = pkgList.get(name);
-                resourceProviders.put(name, new RResourceProvider(name, res.asStrings()[0]));
+                if (!resourceProviders.containsKey(name)) {
+                  resourceProviders.put(name, Lists.newArrayList());
+                }
+                resourceProviders.get(name).add(new RResourceProvider(rServerCluster.getName(), name, res.asStrings()[0]));
               }
             }
           } catch (Exception e) {
@@ -193,7 +197,10 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
    */
   public synchronized Map<String, ResourceProvider> getResourceProvidersMap() {
     synchronized (resourceProvidersTask) {
-      return resourceProviders;
+      // get first provider even if it appears in multiple profiles
+      return resourceProviders.entrySet().stream()
+          .collect(Collectors.toMap(Map.Entry::getKey,
+              e -> e.getValue().get(0)));
     }
   }
 

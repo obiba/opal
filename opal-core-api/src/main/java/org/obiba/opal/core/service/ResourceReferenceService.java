@@ -104,4 +104,12 @@ public interface ResourceReferenceService extends SystemService {
    */
   ResourceAssignROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException;
 
+  /**
+   * Get the profile name that could be associated to this resource reference.
+   *
+   * @param project
+   * @param name
+   * @return
+   */
+  String getProfile(String project, String name);
 }

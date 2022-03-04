@@ -27,13 +27,16 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   private static final Logger log = LoggerFactory.getLogger(RResourceProvider.class);
 
+  private final String profile;
+
   private final String name;
 
   private JSONObject settings;
 
   private ScriptEngine engine;
 
-  RResourceProvider(String name, String script) {
+  RResourceProvider(String profile, String name, String script) {
+    this.profile = profile;
     this.name = name;
     try {
       ScriptEngineManager manager = new ScriptEngineManager(null);
@@ -47,6 +50,11 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getProfile() {
+    return profile;
   }
 
   @Override

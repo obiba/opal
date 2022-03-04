@@ -144,8 +144,19 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     // TODO R server profile
     lock.lock();
     try {
+      String profileName = resourceReferenceService.getProfile(project, name);
       rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), Strings.isNullOrEmpty(profile) ?
-          null :
+          new RServerProfile() {
+            @Override
+            public String getName() {
+              return profileName;
+            }
+
+            @Override
+            public String getCluster() {
+              return profileName;
+            }
+          } :
           new RServerProfile() {
             @Override
             public String getName() {
