@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ResourceVariableValueSource extends AbstractRVariableValueSource {
 
@@ -128,6 +129,28 @@ public class ResourceVariableValueSource extends AbstractRVariableValueSource {
       return new ResourceVectorSummarySource(ResourceVariableValueSource.this, entities);
     }
 
+    public ValueTable getValueTable() {
+      return valueTable;
+    }
+
+    public Variable getVariable() {
+      return variable;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof ResourceVariableValueSource.ResourceVectorSource)) return false;
+
+      ResourceVariableValueSource.ResourceVectorSource rvs = (ResourceVariableValueSource.ResourceVectorSource) o;
+      return rvs.getValueTable().getDatasource().getName().equals(valueTable.getDatasource().getName()) &&
+          rvs.getValueTable().getName().equals(valueTable.getName()) &&
+          rvs.getVariable().getName().equals(variable.getName());
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(valueTable.getDatasource().getName(), valueTable.getName(), variable.getName());
+    }
   }
 
 }
