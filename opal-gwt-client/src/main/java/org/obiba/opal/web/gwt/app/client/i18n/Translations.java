@@ -772,7 +772,9 @@ public interface Translations extends Constants {
       "ResourceAssignFailed", "Resource assignment in R has failed: ",
       "SQLError", "{0}",
       "FolderCreated", "Folder created: {0}",
-      "DataShieldProfileInit", "DataSHIELD profile {0} initialized."
+      "DataShieldProfileInit", "DataSHIELD profile {0} initialized.",
+      "ResourceViewReconnectSuccess", "Connection to resource succeeded.",
+      "ResourceViewReconnectFailed", "Connection to resource failed. Please verify that the resource is well described."
   })
   Map<String, String> userMessageMap();
 
@@ -2482,9 +2484,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Table References")
   String tableReferencesLabel();
 
-  @Description("Resource References label")
-  @DefaultStringValue("Resource References")
-  String resourceReferencesLabel();
+  @Description("Resource Reference label")
+  @DefaultStringValue("Resource Reference")
+  String resourceReferenceLabel();
 
   @Description("Edit categories label")
   @DefaultStringValue("Edit Categories")

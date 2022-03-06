@@ -35,6 +35,10 @@ public interface ViewResource extends TableResource {
   @DELETE
   Response removeView();
 
+  @PUT
+  @Path("/_init")
+  Response initView();
+
   @GET
   @Path("/xml")
   @Produces("application/xml")

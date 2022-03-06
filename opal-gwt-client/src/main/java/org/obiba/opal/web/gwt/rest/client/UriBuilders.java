@@ -376,6 +376,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_VIEW_INIT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "_init");
+    }
+  },
+
   DATASOURCE_VIEW_VARIABLES {
     @Override
     public UriBuilder create() {

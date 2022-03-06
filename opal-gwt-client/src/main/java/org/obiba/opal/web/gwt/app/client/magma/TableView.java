@@ -17,12 +17,14 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -239,6 +241,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Button sqlQuery;
 
+  private Button reconnectButton;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -453,6 +457,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
   }
 
+  @Override
+  public void resourceViewReconnectCompleted() {
+    if (reconnectButton != null)
+      reconnectButton.setEnabled(true);
+  }
+
   private void setFromResources(JsArrayString resourceNames) {
     if (resourceNames != null) {
       FlowPanel fromResourceLinks = new FlowPanel();
@@ -460,7 +470,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         String tableFullName = resourceNames.get(i);
         IconAnchor a = new IconAnchor();
         a.setText(tableFullName);
-        // a.setIcon(innerTablesList.contains(tableFullName) ? IconType.CIRCLE_BLANK : IconType.CIRCLE);
         MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
         a.setHref("#" + placeManager
             .buildHistoryToken(ProjectPlacesHelper.getResourcePlace(parser.getDatasource(), parser.getTable())));
@@ -470,7 +479,21 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
           fromResourceLinks.add(new InlineLabel(", "));
         }
       }
-      propertiesTable.addProperty(new Label(translations.resourceReferencesLabel()), fromResourceLinks);
+      reconnectButton = new Button();
+      reconnectButton.setIcon(IconType.REFRESH);
+      reconnectButton.setSize(ButtonSize.SMALL);
+      reconnectButton.setText("Reconnect");
+      reconnectButton.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+          reconnectButton.setEnabled(false);
+          getUiHandlers().onReconnectResourceView();
+        }
+      });
+      FlowPanel panel = new FlowPanel();
+      panel.add(fromResourceLinks);
+      panel.add(reconnectButton);
+      propertiesTable.addProperty(new Label(translations.resourceReferenceLabel()), panel);
     }
   }
 

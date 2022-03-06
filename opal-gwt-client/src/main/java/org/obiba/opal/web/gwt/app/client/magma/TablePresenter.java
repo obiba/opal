@@ -495,6 +495,22 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
+  public void onReconnectResourceView() {
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(UriBuilders.DATASOURCE_VIEW_INIT.create().build(table.getDatasourceName(), table.getName()))//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == Response.SC_OK)
+              fireEvent(NotificationEvent.newBuilder().success(translations.userMessageMap().get("ResourceViewReconnectSuccess")).build());
+            else
+              fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceViewReconnectFailed") + response.getStatusText()).build());
+            getView().resourceViewReconnectCompleted();
+          }
+        }, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
+  }
+
+  @Override
   public void onExportData() {
     DataExportPresenter provider = dataExportModalProvider.get();
     Set<TableDto> tables = new HashSet<>();
@@ -949,6 +965,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   public interface Display extends View, HasUiHandlers<TableUiHandlers> {
+
+    void resourceViewReconnectCompleted();
 
     enum Slots {
       Permissions, Values, ContingencyTable, Analyses

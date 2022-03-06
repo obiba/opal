@@ -446,6 +446,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public void dispose() {
+    initialised = false;
     Disposables.silentlyDispose(connector);
   }
 

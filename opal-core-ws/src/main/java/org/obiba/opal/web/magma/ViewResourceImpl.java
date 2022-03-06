@@ -105,6 +105,12 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   }
 
   @Override
+  public Response initView() {
+    viewManager.initView(getDatasource().getName(), getValueTable().getName());
+    return Response.ok().build();
+  }
+
+  @Override
   public Response downloadViewDefinition() {
     return Response.ok(asValueView(), "application/xml")
         .header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
