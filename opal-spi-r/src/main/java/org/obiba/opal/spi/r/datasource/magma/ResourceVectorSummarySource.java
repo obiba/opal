@@ -233,7 +233,10 @@ class ResourceVectorSummarySource implements VectorSummarySource {
         .map(RServerResult::asNamedList)
         .collect(Collectors.toList())) {
       int count = freqMap.get("n").asIntegers()[0];
-      if (freqMap.get("na").asLogical()) {
+      boolean isNA = freqMap.get("na").asLogical();
+      if (freqMap.get("na").isInteger())
+        isNA = freqMap.get("na").asIntegers()[0] == 1;
+      if (isNA) {
         summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NULL_NAME, count, count * 1F / freqSum, true));
       } else {
         summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NOT_NULL_NAME, count, count * 1F / freqSum, false));

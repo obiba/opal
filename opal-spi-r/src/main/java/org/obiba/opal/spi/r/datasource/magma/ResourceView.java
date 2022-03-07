@@ -453,6 +453,12 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   public void dispose() {
     status = ValueTableStatus.CLOSED;
     initialised = false;
+    if (entitiesCache != null) {
+      entitiesCache.invalidateAll();
+    }
+    if (entitiesCountCache != null) {
+      entitiesCountCache.invalidateAll();
+    }
     Disposables.silentlyDispose(connector);
   }
 
