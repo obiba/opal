@@ -9,25 +9,22 @@
  */
 package org.obiba.opal.web.magma.view;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
+import com.google.common.collect.ImmutableSet;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableStatus;
 import org.obiba.magma.ValueView;
-import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.views.View;
-import org.obiba.magma.views.WhereClause;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableSet;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Utilities for handling View Dtos. This class is not static like others because it is extensible through a set of
@@ -45,8 +42,8 @@ public final class ViewDtos {
 
   @NotNull
   public ValueView fromDto(@NotNull ViewDto viewDto) {
-    for(ValueViewDtoExtension extension : extensions) {
-      if(extension.isExtensionOf(viewDto)) {
+    for (ValueViewDtoExtension extension : extensions) {
+      if (extension.isExtensionOf(viewDto)) {
         return extension.fromDto(viewDto);
       }
     }
@@ -56,8 +53,8 @@ public final class ViewDtos {
   @NotNull
   public TableDto asTableDto(@NotNull ViewDto viewDto) {
     TableDto.Builder builder = TableDto.newBuilder().setName(viewDto.getName());
-    for(ValueViewDtoExtension extension : extensions) {
-      if(extension.isExtensionOf(viewDto)) {
+    for (ValueViewDtoExtension extension : extensions) {
+      if (extension.isExtensionOf(viewDto)) {
         return extension.asTableDto(viewDto, builder);
       }
     }
@@ -66,18 +63,32 @@ public final class ViewDtos {
 
   @NotNull
   public ViewDto asDto(@NotNull ValueView view) {
-    for(ValueViewDtoExtension extension : extensions) {
-      if(extension.isDtoOf(view)) {
-        return extension.asDto(view);
+    for (ValueViewDtoExtension extension : extensions) {
+      if (extension.isDtoOf(view)) {
+        return extension.asDto(view).toBuilder()
+            .setStatus(asDto(view.getStatus())).build();
       }
     }
     throw new IllegalStateException("Unknown view type");
   }
 
+  private Magma.TableStatusDto asDto(ValueTableStatus status) {
+    switch (status) {
+      case CLOSED:
+        return Magma.TableStatusDto.CLOSED;
+      case ERROR:
+        return Magma.TableStatusDto.ERROR;
+      case LOADING:
+        return Magma.TableStatusDto.LOADING;
+      default:
+        return Magma.TableStatusDto.READY;
+    }
+  }
+
   @NotNull
   private List<ValueTable> getFromTables(@NotNull ViewDto viewDto) {
     List<ValueTable> fromTables = new ArrayList<>();
-    for(int i = 0; i < viewDto.getFromCount(); i++) {
+    for (int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);
       fromTables.add(MagmaEngine.get().createReference(fromTable));
     }

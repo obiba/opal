@@ -311,12 +311,20 @@ message LinkDto {
   required string link = 2;
 }
 
+enum TableStatusDto {
+  CLOSED = 1;
+  LOADING = 2;
+  READY = 3;
+  ERROR = 4;
+}
+
 message ViewDto {
   repeated string from = 1;
   optional string name = 2;
   optional string datasourceName = 3;
   optional string where = 4;
   repeated string innerFrom = 5;
+  optional TableStatusDto status = 6;
   extensions 1000 to max;
 }
 

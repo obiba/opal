@@ -197,7 +197,8 @@ public class DatasourceResource {
     List<ViewDto> views = getDatasource().getValueTables().stream()
         .filter(valueTable -> valueTable.isView() && (
             (viewNames != null && viewNames.contains(valueTable.getName())) || (viewNames == null || viewNames.size() == 0)))
-        .map(valueTable -> viewDtos.asDto(viewManager.getView(valueTable.getDatasource().getName(), valueTable.getName())))
+        .map(valueTable -> viewDtos.asDto(viewManager.getView(valueTable.getDatasource().getName(), valueTable.getName()))
+            .toBuilder().clearStatus().build())
         .collect(Collectors.toList());
 
     StreamingOutput outputStream = stream -> {

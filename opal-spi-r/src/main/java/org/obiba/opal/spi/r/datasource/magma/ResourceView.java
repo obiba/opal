@@ -15,7 +15,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
@@ -82,6 +81,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   private transient Cache<String, Integer> entitiesCountCache;
 
+  private transient ValueTableStatus status;
+
   public ResourceView() {
   }
 
@@ -128,16 +129,20 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public synchronized void initialise() {
+    status = ValueTableStatus.LOADING;
     try {
       Initialisables.initialise(connector);
       initialiseIdColumn();
       initialiseVariables();
       initialised = true;
+      status = ValueTableStatus.READY;
     } catch (Exception e) {
+      status = ValueTableStatus.ERROR;
       if (log.isDebugEnabled())
         log.error("Resource view '{}' init failed", name, e);
       else
         log.warn("Resource view '{}' init failed: {}", name, e.getMessage());
+      // TODO throw e ?
     }
   }
 
@@ -446,8 +451,14 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public void dispose() {
+    status = ValueTableStatus.CLOSED;
     initialised = false;
     Disposables.silentlyDispose(connector);
+  }
+
+  @Override
+  public ValueTableStatus getStatus() {
+    return status == null ? ValueTableStatus.CLOSED : status;
   }
 
   public String getColumnName(Variable variable) {

@@ -198,7 +198,8 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     log.debug("Backup of {} views started", getProjectName());
     List<Magma.ViewDto> views = getDatasource().getValueTables().stream()
         .filter(ValueTable::isView)
-        .map(valueTable -> viewDtos.asDto(viewManager.getView(valueTable.getDatasource().getName(), valueTable.getName())))
+        .map(valueTable -> viewDtos.asDto(viewManager.getView(valueTable.getDatasource().getName(), valueTable.getName()))
+            .toBuilder().clearStatus().build())
         .collect(Collectors.toList());
 
     if (views.isEmpty()) {
