@@ -240,14 +240,7 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
 
     table.addColumn(new NameColumn(new ResourceLinkCell(placeManager)), translations.nameLabel());
 
-    table.addColumn(new TextColumn<ResourceReferenceDto>() {
-      @Override
-      public String getValue(ResourceReferenceDto object) {
-        ResourceFactoryDto factory = resourceProvidersService.getResourceFactory(object.getProvider(), object.getFactory());
-        if (factory == null || !factory.hasTitle()) return object.getProvider() + ":" + object.getFactory();
-        return factory.getTitle();
-      }
-    }, translations.typeLabel());
+    table.addColumn(new ResourceTypeColumn(resourceProvidersService), translations.typeLabel());
 
 
     table.addColumn(new ResourceDescriptionColumn(), translations.descriptionLabel());
@@ -384,6 +377,27 @@ public class ProjectResourceListView extends ViewWithUiHandlers<ProjectResourceL
     @Override
     public String getValue(ResourceReferenceDto object) {
       return object.hasDescription() ? Markdown.parse(object.getDescription()) : "";
+    }
+  }
+
+  private static class ResourceTypeColumn extends Column<ResourceReferenceDto, String> {
+
+    private final ResourceProvidersService resourceProvidersService;
+
+    public ResourceTypeColumn(ResourceProvidersService resourceProvidersService) {
+      super(new HTMLCell());
+      this.resourceProvidersService = resourceProvidersService;
+    }
+
+    @Override
+    public String getValue(ResourceReferenceDto object) {
+      ResourceFactoryDto factory = resourceProvidersService.getResourceFactory(object.getProvider(), object.getFactory());
+      if (factory == null) {
+        return "<span style='color: red'>" + object.getProvider() + ":" + object.getFactory() + "</span>";
+      } else if (!factory.hasTitle())
+        return object.getProvider() + ":" + object.getFactory();
+      else
+        return factory.getTitle();
     }
   }
 

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Provider;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ResourceReferenceDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import javax.inject.Inject;
 
@@ -150,11 +152,16 @@ public class ProjectResourcePresenter extends PresenterWidget<ProjectResourcePre
           public void onResponseCode(Request request, Response response) {
             if (response.getStatusCode() == Response.SC_OK)
               fireEvent(NotificationEvent.newBuilder().success(translations.userMessageMap().get("ResourceAssignSuccess")).build());
-            else
-              fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceAssignFailed") + response.getStatusText()).build());
+            else if (response.getStatusCode() == Response.SC_BAD_REQUEST) {
+              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+              fireEvent(NotificationEvent.newBuilder().error(error.getStatus())
+                  .args(error.getArgumentsArray()).build());
+            } else
+              fireEvent(NotificationEvent.newBuilder().error("ResourceAssignOtherFailure")
+                  .args(response.getStatusText()).build());
             getView().testCompleted();
           }
-        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST)
+        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND)
         .put().send();
   }
 

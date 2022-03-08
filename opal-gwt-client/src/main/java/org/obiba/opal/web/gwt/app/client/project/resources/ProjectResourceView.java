@@ -10,7 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
+import com.github.gwtbootstrap.client.ui.Row;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.json.client.JSONBoolean;
@@ -47,6 +49,10 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
 
   @UiField
   com.github.gwtbootstrap.client.ui.Button test;
+
+  @UiField
+  com.github.gwtbootstrap.client.ui.Button addView;
+
 
   @UiField
   TabPanel tabPanel;
@@ -92,6 +98,12 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
 
   @UiField
   Panel buttonsPanel;
+
+  @UiField
+  Row formRow;
+
+  @UiField
+  Alert brokenResourceNotice;
 
   private ResourceReferenceDto resource;
 
@@ -159,21 +171,25 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
 
   private void initializeResourceFactoryUI() {
     ResourceFactoryDto factory = resourceProvidersService.getResourceFactory(resource.getProvider(), resource.getFactory());
-    factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
-    factoryTitle.setText(factory.getTitle());
-    ResourceProviderDto provider = resourceProvidersService.getResourceProvider(factory.getProvider());
-    if (provider.hasWeb()) {
-      providerLabel.setVisible(false);
-      providerLink.setHref(provider.getWeb());
-      providerLink.setTarget("_blank");
-      providerLink.setText(provider.getName() + " - " + provider.getTitle());
-      providerLink.setTitle(provider.getDescription());
-      providerLink.setVisible(true);
-    } else {
-      providerLink.setVisible(false);
-      providerLabel.setText(provider.getName() + " - " + provider.getTitle());
-      providerLabel.setTitle(provider.getDescription());
-      providerLabel.setVisible(true);
+    if (factory != null) {
+      factoryDescription.setHTML(factory.hasDescription() ? Markdown.parseNoStyle(factory.getDescription()) : "");
+      factoryTitle.setText(factory.getTitle());
+      ResourceProviderDto provider = resourceProvidersService.getResourceProvider(factory.getProvider());
+      if (provider.hasWeb()) {
+        providerLabel.setVisible(false);
+        providerLink.setHref(provider.getWeb());
+        providerLink.setTarget("_blank");
+        providerLink.setText(provider.getName() + " - " + provider.getTitle());
+        providerLink.setTitle(provider.getDescription());
+        providerLink.setVisible(true);
+      } else {
+        providerLink.setVisible(false);
+        providerLabel.setText(provider.getName() + " - " + provider.getTitle());
+        providerLabel.setTitle(provider.getDescription());
+        providerLabel.setVisible(true);
+      }
+      applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), resource.getParameters());
+      applySchemaForm(credentialsFormPanel, factory.getCredentialsSchemaForm(), resource.getCredentials());
     }
     name.setText(resource.getName());
     descriptionPanel.clear();
@@ -182,19 +198,24 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
     }
     url.setVisible(false);
     urlLink.setVisible(false);
-    if (resource.getResource().getUrl().startsWith("http")) {
-      urlLink.setText(resource.getResource().getUrl());
-      urlLink.setHref(resource.getResource().getUrl());
-      urlLink.setTarget("_blank");
-      urlLink.setVisible(true);
+    if (resource.hasResource()) {
+      if (resource.getResource().getUrl().startsWith("http")) {
+        urlLink.setText(resource.getResource().getUrl());
+        urlLink.setHref(resource.getResource().getUrl());
+        urlLink.setTarget("_blank");
+        urlLink.setVisible(true);
+      } else {
+        url.setText(resource.getResource().getUrl());
+        url.setVisible(true);
+      }
+      format.setText(resource.getResource().getFormat());
     } else {
-      url.setText(resource.getResource().getUrl());
-      url.setVisible(true);
+       brokenResourceNotice.clear();
+       brokenResourceNotice.setText(translations.userMessageMap().get("ResourceProviderNotFound").replace("{0}", resource.getProvider()));
     }
-    format.setText(resource.getResource().getFormat());
-
-    applySchemaForm(paramsFormPanel, factory.getParametersSchemaForm(), resource.getParameters());
-    applySchemaForm(credentialsFormPanel, factory.getCredentialsSchemaForm(), resource.getCredentials());
+    formRow.setVisible(resource.hasResource());
+    brokenResourceNotice.setVisible(!resource.hasResource());
+    addView.setEnabled(resource.hasResource());
   }
 
   private void applySchemaForm(Panel containerPanel, String schemaForm, String values) {

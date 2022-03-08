@@ -102,7 +102,7 @@
                 </b:FluidRow>
 
 
-                <b:Row>
+                <b:Row ui:field="formRow">
                     <b:Column size="6">
                         <b:Heading size="4">
                             <ui:msg description="Parameters label">Parameters</ui:msg>
@@ -121,6 +121,9 @@
                         </g:FlowPanel>
                     </b:Column>
                 </b:Row>
+
+                <b:Alert ui:field="brokenResourceNotice" close="false" visible="false" type="ERROR">
+                </b:Alert>
             </b:Tab>
 
             <b:Tab heading="Permissions">

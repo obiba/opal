@@ -155,6 +155,9 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     ResourceReference ref = getResourceReference(project, name);
     Resource resource = createResource(ref);
     List<String> requiredPackages = getRequiredPackages(ref);
+    if (resource == null) {
+      throw new ResourceAssignException(project, name, requiredPackages);
+    }
     return new ResourceAssignROperation(symbol, resource, requiredPackages);
   }
 
