@@ -73,6 +73,22 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!--Profile-->
+    <b:ControlGroup ui:field="profileGroup">
+      <b:ControlLabel>
+        <ui:msg description="View R Server Profile label">R Server Profile</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="profile"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="View R Server Profile help">
+          Optional R server profile name to be used for establishing the connection with the resource.
+          If not specified, the profile will be guessed based on the R package associated to the resource.
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save label">Save</ui:msg>

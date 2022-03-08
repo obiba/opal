@@ -58,6 +58,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   // the column that identifies the entities
   private String idColumn;
 
+  // R server profile where the resource should be created
+  private String profile;
+
   // created date
   private Value created = DateTimeType.get().now();
 
@@ -116,6 +119,22 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   public String getIdColumn() {
     return idColumn;
+  }
+
+  public boolean hasIdColumn() {
+    return !Strings.isNullOrEmpty(idColumn);
+  }
+
+  public void setProfile(String profile) {
+    this.profile = profile;
+  }
+
+  public String getProfile() {
+    return profile;
+  }
+
+  public boolean hasProfile() {
+    return !Strings.isNullOrEmpty(profile);
   }
 
   public String getResourceFullName() {

@@ -110,10 +110,10 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
   }
 
   @Override
-  public void onSave(String destinationDatasourceName, final String name, String entityType, String idColumn) {
+  public void onSave(String destinationDatasourceName, final String name, String entityType, String idColumn, String profile) {
     if (!validationHandler.validate()) return;
 
-    ViewDto dto = getViewDto(name, entityType, idColumn);
+    ViewDto dto = getViewDto(name, entityType, idColumn, profile);
     if (view == null) createView(destinationDatasourceName, dto);
     else updateView(dto);
   }
@@ -147,7 +147,7 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
     return view == null ? datasourceName : view.getDatasourceName();
   }
 
-  private ViewDto getViewDto(String name, String entityType, String idColumn) {
+  private ViewDto getViewDto(String name, String entityType, String idColumn, String profile) {
     ViewDto updatedView = ViewDto.create();
     updatedView.setName(name);
     JsArrayString resources = JavaScriptObject.createArray().cast();
@@ -158,6 +158,8 @@ public class ResourceViewModalPresenter extends ModalPresenterWidget<ResourceVie
     resDto.setEntityType(entityType);
     if (!Strings.isNullOrEmpty(idColumn))
       resDto.setIdColumn(idColumn);
+    if (!Strings.isNullOrEmpty(profile))
+      resDto.setProfile(profile);
     updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
 
     return updatedView;

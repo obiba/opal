@@ -20,8 +20,9 @@ public interface TabularResourceConnectorFactory {
    *
    * @param project
    * @param resource
+   * @param profile
    * @return
    */
-  TabularResourceConnector newConnector(String project, String resource);
+  TabularResourceConnector newConnector(String project, String resource, String profile);
 
 }

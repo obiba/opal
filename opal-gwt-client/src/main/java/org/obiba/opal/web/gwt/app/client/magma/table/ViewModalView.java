@@ -121,6 +121,9 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
   TextBox entityType;
 
   @UiField
+  TextBox profile;
+
+  @UiField
   ControlGroup fileSelectionGroup;
 
   @UiField
@@ -242,7 +245,7 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
     if (tableRefs.isVisible()) {
       getUiHandlers().onSave(getName().getText(), dataProvider.getList(), innerTableReferences);
     } else {
-      getUiHandlers().onSave(getName().getText(), resourceFrom.getText(), idColumn.getText(), entityType.getText());
+      getUiHandlers().onSave(getName().getText(), resourceFrom.getText(), idColumn.getText(), entityType.getText(), profile.getText());
     }
   }
 

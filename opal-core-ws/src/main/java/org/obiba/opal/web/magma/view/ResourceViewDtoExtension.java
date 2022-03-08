@@ -59,6 +59,8 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
     view.setProject(resolver.getDatasourceName());
     view.setResource(resolver.getTableName());
     view.setEntityType(resDto.hasEntityType() ? resDto.getEntityType() : participantEntityType);
+    if (resDto.hasProfile())
+      view.setProfile(resDto.getProfile());
     if (resDto.hasIdColumn())
       view.setIdColumn(resDto.getIdColumn());
     view.setVariables(resDto.getVariablesList().stream()
@@ -66,7 +68,7 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
         .collect(Collectors.toList()));
 
     // set connector
-    view.setConnector(tabularResourceConnectorFactory.newConnector(view.getProject(), view.getResource()));
+    view.setConnector(tabularResourceConnectorFactory.newConnector(view.getProject(), view.getResource(), view.getProfile()));
 
     return view;
   }
@@ -81,8 +83,10 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
 
     ResourceViewDto.Builder resDtoBuilder = ResourceViewDto.newBuilder();
     view.getVariables().forEach(v -> resDtoBuilder.addVariables(Dtos.asDto(v)));
-    if (resDtoBuilder.hasIdColumn())
+    if (resView.hasIdColumn())
       resDtoBuilder.setIdColumn(resView.getIdColumn());
+    if (resView.hasProfile())
+      resDtoBuilder.setProfile(resView.getProfile());
     resDtoBuilder.setEntityType(resView.getEntityType());
 
     viewDtoBuilder.setExtension(ResourceViewDto.view, resDtoBuilder.build());

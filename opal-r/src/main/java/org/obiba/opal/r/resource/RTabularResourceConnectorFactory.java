@@ -31,8 +31,8 @@ public class RTabularResourceConnectorFactory implements TabularResourceConnecto
   }
 
   @Override
-  public TabularResourceConnector newConnector(String project, String resource) {
-    return new RTabularResourceConnector(resourceReferenceService, rSessionManager, project, resource, null);
+  public TabularResourceConnector newConnector(String project, String resource, String profile) {
+    return new RTabularResourceConnector(resourceReferenceService, rSessionManager, project, resource, profile);
   }
 
 }

@@ -14,6 +14,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface ResourceViewModalUiHandlers extends ModalUiHandlers {
 
-  void onSave(String destinationDatasourceName, String name, String entityType, String idColumn);
+  void onSave(String destinationDatasourceName, String name, String entityType, String idColumn, String profile);
 
 }

@@ -367,6 +367,7 @@ message ResourceViewDto {
   repeated VariableDto variables = 1;
   optional string idColumn = 2;
   optional string entityType = 3;
+  optional string profile = 4;
   extend ViewDto {
     optional ResourceViewDto view = 1004;
   }

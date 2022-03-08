@@ -61,6 +61,9 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
   TextBox entityType;
 
   @UiField
+  TextBox profile;
+
+  @UiField
   Button saveButton;
 
   @UiField
@@ -102,7 +105,8 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
         datasourceListBox.getSelectedValue(),
         getName().getText(),
         Strings.isNullOrEmpty(entityType.getText()) ? "Participant" : entityType.getText(),
-        idColumn.getText());
+        idColumn.getText(),
+        profile.getText());
   }
 
   @Override

@@ -53,6 +53,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("ID")
   String idLabel();
 
+  @Description("ID Column label")
+  @DefaultStringValue("ID Column")
+  String idColumnLabel();
+
   @Description("Context label")
   @DefaultStringValue("Context")
   String contextLabel();
@@ -72,6 +76,10 @@ public interface Translations extends Constants {
   @Description("R Server label")
   @DefaultStringValue("R Server")
   String rServerLabel();
+
+  @Description("R Server Profile label")
+  @DefaultStringValue("R Server Profile")
+  String rServerProfileLabel();
 
   @Description("Type label")
   @DefaultStringValue("Type")

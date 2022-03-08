@@ -102,7 +102,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       for (ValueView view : readGitViews(datasourceRepo)) {
         if (view instanceof ResourceView) {
           ResourceView resView = (ResourceView) view;
-          resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource()));
+          resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource(), resView.getProfile()));
         }
         builder.add(view);
         viewNames.add(view.getName());

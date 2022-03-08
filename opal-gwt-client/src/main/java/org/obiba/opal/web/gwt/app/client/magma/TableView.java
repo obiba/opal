@@ -442,7 +442,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setView(ViewDto viewDto) {
-    if (propertiesTable.getRowCount() > 2) {
+    while (propertiesTable.getRowCount() > 2) {
       propertiesTable.removeProperty(2);
     }
     if (viewDto == null) {
@@ -452,6 +452,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         setFromTables(viewDto.getFromArray(), viewDto.getInnerFromArray());
         setWhereScript(viewDto.hasWhere() ? viewDto.getWhere() : null);
       } else {
+        setRecourceViewProperties((ResourceViewDto) viewDto.getExtension(ResourceViewDto.ViewDtoExtensions.view));
         setFromResources(viewDto.getFromArray());
       }
     }
@@ -495,6 +496,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel.add(reconnectButton);
       propertiesTable.addProperty(new Label(translations.resourceReferenceLabel()), panel);
     }
+  }
+
+  private void setRecourceViewProperties(ResourceViewDto resView) {
+    propertiesTable.addProperty(new Label(translations.idColumnLabel()), new Label(resView.getIdColumn()));
+    propertiesTable.addProperty(new Label(translations.rServerProfileLabel()), new Label(resView.getProfile()));
   }
 
   private void setFromTables(JsArrayString tableNames, JsArrayString innerTables) {

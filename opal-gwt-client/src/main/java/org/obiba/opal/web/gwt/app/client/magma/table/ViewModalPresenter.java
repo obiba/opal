@@ -116,8 +116,8 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
   }
 
   @Override
-  public void onSave(String name, String from, String idColumn, String entityType) {
-    ViewDto dto = getViewDto(name, from, idColumn, entityType);
+  public void onSave(String name, String from, String idColumn, String entityType, String profile) {
+    ViewDto dto = getViewDto(name, from, idColumn, entityType, profile);
     getView().setInProgress(true);
     if (view == null) createView(dto);
     else updateView(dto);
@@ -151,7 +151,7 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
     return view == null ? datasourceName : view.getDatasourceName();
   }
 
-  private ViewDto getViewDto(String name, String from, String idColumn, String entityType) {
+  private ViewDto getViewDto(String name, String from, String idColumn, String entityType, String profile) {
     ViewDto updatedView = ViewDto.create();
     updatedView.setName(name);
     JsArrayString froms = JsArrays.from(from);
@@ -169,7 +169,10 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
       variables.get(i).setEntityType(entityType);
     }
     resDto.setVariablesArray(variables);
-    resDto.setIdColumn(idColumn);
+    if (!Strings.isNullOrEmpty(idColumn))
+      resDto.setIdColumn(idColumn);
+    if (!Strings.isNullOrEmpty(profile))
+      resDto.setProfile(profile);
     resDto.setEntityType(Strings.isNullOrEmpty(entityType) ? "Participant" : entityType);
     updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
 

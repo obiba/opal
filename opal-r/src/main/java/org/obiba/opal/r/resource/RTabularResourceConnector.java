@@ -17,8 +17,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.*;
-import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -144,30 +142,34 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     // TODO R server profile
     lock.lock();
     try {
-      String profileName = resourceReferenceService.getProfile(project, name);
-      rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), Strings.isNullOrEmpty(profile) ?
-          new RServerProfile() {
-            @Override
-            public String getName() {
-              return profileName;
-            }
+      RServerProfile rServerProfile;
+      if (Strings.isNullOrEmpty(profile)) {
+        String profileName = resourceReferenceService.getProfile(project, name);
+        rServerProfile = new RServerProfile() {
+          @Override
+          public String getName() {
+            return profileName;
+          }
 
-            @Override
-            public String getCluster() {
-              return profileName;
-            }
-          } :
-          new RServerProfile() {
-            @Override
-            public String getName() {
-              return profile;
-            }
+          @Override
+          public String getCluster() {
+            return profileName;
+          }
+        };
+      } else {
+        rServerProfile = new RServerProfile() {
+          @Override
+          public String getName() {
+            return profile;
+          }
 
-            @Override
-            public String getCluster() {
-              return profile;
-            }
-          });
+          @Override
+          public String getCluster() {
+            return profile;
+          }
+        };
+      }
+      rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), rServerProfile);
       rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
       ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
       rSession.execute(rop);

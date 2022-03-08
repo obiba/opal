@@ -19,5 +19,5 @@ public interface ViewModalUiHandlers extends ModalUiHandlers {
 
   void onSave(String name, List<TableDto> referencedTables, List<String> innerFrom);
 
-  void onSave(String name, String from, String idColumn, String entityType);
+  void onSave(String name, String from, String idColumn, String entityType, String profile);
 }
