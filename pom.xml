@@ -84,7 +84,7 @@
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.13.1</junit.version>
-    <liquibase.version>3.6.2</liquibase.version>
+    <liquibase.version>4.8.0</liquibase.version>
     <lang-tag.version>1.4.4</lang-tag.version>
     <logback.version>1.2.3</logback.version>
     <logstash-logback.version>6.6</logstash-logback.version>
