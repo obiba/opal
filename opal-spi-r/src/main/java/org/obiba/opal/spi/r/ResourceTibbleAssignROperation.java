@@ -9,6 +9,10 @@
  */
 package org.obiba.opal.spi.r;
 
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.InputStream;
+
 /**
  * Bind the rows of R objects using dplyr and assign result to a symbol in R.
  */
@@ -18,21 +22,26 @@ public class ResourceTibbleAssignROperation extends AbstractROperation {
 
   private final String clientSymbol;
 
-  public ResourceTibbleAssignROperation(String symbol, String clientSymbol) {
+  private final String utilsScript;
+
+  public ResourceTibbleAssignROperation(String symbol, String clientSymbol, String utilsScript) {
     this.symbol = symbol;
     this.clientSymbol = clientSymbol;
+    this.utilsScript = utilsScript;
   }
 
   @Override
   public void doWithConnection() {
     if (symbol == null) return;
 
-    try {
+    try (InputStream is = new ClassPathResource(utilsScript).getInputStream();) {
       ensurePackage("resourcer");
       ensurePackage("dplyr");
       ensurePackage("moments"); // needed for descriptive stats
       String script = String.format("resourcer::as.resource.tbl(%s)", clientSymbol);
       eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
+      writeFile(utilsScript, is);
+      eval(String.format("base::source('%s')", utilsScript));
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }

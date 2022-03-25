@@ -30,7 +30,10 @@ import org.obiba.opal.spi.r.resource.IRTabularResourceConnector;
 import org.obiba.opal.spi.resource.TabularResourceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
@@ -41,6 +44,8 @@ import java.util.stream.StreamSupport;
 public class RTabularResourceConnector implements TabularResourceConnector, IRTabularResourceConnector {
 
   private static final Logger log = LoggerFactory.getLogger(RTabularResourceConnector.class);
+
+  private static final String RESOURCE_UTILS_SCRIPT = ".resource.R";
 
   private static final String RESOURCE_CLIENT_SYMBOL = ".client";
 
@@ -85,18 +90,7 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   @Override
   public List<Column> getColumns() {
     if (columns == null) {
-      RServerResult columnDescs = execute(String.format(
-          "lapply(colnames(`%s`), function(col) { " +
-              "attrs <- attributes(`%s`[[col]]) ; " +
-              "attrs$labels_names <- names(attrs$labels) ; " +
-              "klass <- `%s` %%>%% select(col) %%>%% head(10) %%>%% pull() %%>%% class ;" +
-              "type <- `%s` %%>%% select(col) %%>%% head(10) %%>%% pull() %%>%% tibble::type_sum() ;" +
-              "list(name=col, class=klass, type=type, attributes=attrs)" +
-              "})",
-          getSymbol(),
-          getSymbol(),
-          getSymbol(),
-          getSymbol()));
+      RServerResult columnDescs = execute(String.format(".resource.get_columns(`%s`)", getSymbol()));
       int i = 0;
       columns = Lists.newArrayList();
       for (RServerResult desc : columnDescs.asList()) {
@@ -119,12 +113,9 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
 
   @Override
   public boolean isMultilines(String idColumn) {
-    String cmd = String.format("length(%s$`%s`)", getSymbol(), idColumn);
+    String cmd = String.format(".resource.is_multilines(%s, '%s')", getSymbol(), idColumn);
     RServerResult result = execute(cmd);
-    int linesCount = result.isInteger() ? result.asIntegers()[0] : 0;
-    result = execute(String.format("n_distinct(%s$`%s`)", getSymbol(), idColumn));
-    int entitiesCount = result.isInteger() ? result.asIntegers()[0] : 0;
-    return linesCount > entitiesCount;
+    return result.asLogical();
   }
 
   @Override
@@ -173,7 +164,7 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
       rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
       ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
       rSession.execute(rop);
-      ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL);
+      ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL, RESOURCE_UTILS_SCRIPT);
       rSession.execute(rop2);
     } finally {
       lock.unlock();

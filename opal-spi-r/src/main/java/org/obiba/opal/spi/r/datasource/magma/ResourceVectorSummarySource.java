@@ -344,39 +344,28 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private List<RServerResult> queryDescriptiveStatistics(String columnName, Set<Category> categories) {
-    String cmd = String.format("as_tibble(%s %s %%>%% filter(!is.na(`%s`)) %%>%% select(`%s`) %%>%% " +
-            "summarise(" +
-            "mean = mean(`%s`)," +
-            "n = n()," +
-            "min = min(`%s`, na.rm = TRUE)," +
-            "max = max(`%s`, na.rm = TRUE)," +
-            "geomean = exp(mean(log(`%s`)))," +
-            "stddev = sd(`%s`, na.rm = TRUE)," +
-            "sum = sum(`%s`, na.rm = TRUE)," +
-            "sumsq = sum((`%s`)^2, na.rm = TRUE)," +
-            "variance = var(`%s`, na.rm = TRUE)))",
+    String cmd = String.format("as_tibble(%s %s %%>%% .resource.get_descriptive_stats(`%s`))",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
-        columnName, columnName, columnName,
-        columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName, columnName);
+        columnName);
     RServerResult result = execute(cmd);
     return result.asList();
   }
 
   private RNamedList<RServerResult> queryExtendedDescriptiveStatistics(String columnName, Set<Category> categories) {
-    String cmd = String.format("is.null(base::assign('x', as.numeric(%s %s %%>%% filter(!is.na(`%s`)) %%>%% select(`%s`) %%>%% pull())))",
+    String cmd = String.format("as_tibble(%s %s %%>%% .resource.get_ext_descriptive_stats(`%s`))",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
-        columnName, columnName);
-    execute(cmd);
-    cmd = "list(median = median(x), skewness = moments::skewness(x), kurtosis = moments::kurtosis(x))";
+        columnName);
     RServerResult result = execute(cmd);
+    if (result.isList())
+      return result.asList().get(0).asNamedList();
     return result.asNamedList();
   }
 
   private List<RServerResult> queryDefaultFrequencies(String columnName, Set<Category> categories) {
     // TODO include missing categories
-    String cmd = String.format("as_tibble(%s %%>%% group_by(na = is.na(`%s`)) %%>%% summarise(n = n()))",
+    String cmd = String.format("as_tibble(%s %%>%% .resource.get_default_frequencies(`%s`))",
         getTibbleStatement(columnName), columnName);
     RServerResult result = execute(cmd);
     return result.asList();
@@ -384,9 +373,9 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
   private List<RServerResult> queryDetailedFrequencies(String columnName) {
     assignIds();
-    String cmd = String.format("as_tibble(%s %%>%% select(`%s`) %%>%% group_by(`%s`) %%>%% summarise(n = n()))",
+    String cmd = String.format("as_tibble(%s %%>%% .resource.get_detailed_frequencies(`%s`))",
         getTibbleStatement(columnName),
-        columnName, columnName);
+        columnName);
     RServerResult result = execute(cmd);
     rmIds();
     return result.asList();
@@ -422,11 +411,11 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private String getTibbleStatement(String columnName) {
-    String symbolWithMutateStement = resourceVariableValueSource.hasColumn() ?
+    String symbolWithMutateStatement = resourceVariableValueSource.hasColumn() ?
         getSymbol() :
         String.format("%s %%>%% mutate(`%s` = %s)", getSymbol(), columnName, getMutateStatement());
-    return isAllIds() ? symbolWithMutateStement :
-        String.format("%s %%>%% filter(`%s` %%in%% %s)", symbolWithMutateStement, getIdColumn(), idsSymbol);
+    return isAllIds() ? symbolWithMutateStatement :
+        String.format("%s %%>%% filter(`%s` %%in%% %s)", symbolWithMutateStatement, getIdColumn(), idsSymbol);
   }
 
   private String getMutateStatement() {
