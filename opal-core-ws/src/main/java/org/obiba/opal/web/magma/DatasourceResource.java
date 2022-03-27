@@ -16,12 +16,15 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueView;
+import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
+import org.obiba.opal.core.service.NoSuchResourceReferenceException;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -61,6 +64,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Scope("request")
 @Path("/datasource/{name}")
 public class DatasourceResource {
+
+  private final static Authorizer authorizer = new ShiroAuthorizer();
 
   @PathParam("name")
   private String name;
@@ -217,42 +222,6 @@ public class DatasourceResource {
         .build();
   }
 
-  private AclAction getAction(ViewDto viewDto) {
-    return viewDto.hasExtension(Magma.ResourceViewDto.view) ? getResourceAction(viewDto) : getTableAction(viewDto);
-  }
-
-  private AclAction getTableAction(ViewDto viewDto) {
-    AclAction action = AclAction.TABLE_ALL;
-    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
-
-    for (String tableName : viewDto.getFromList()) {
-      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-      ValueTable table = resolver.resolveTable();
-      if (!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
-          "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) {
-        action = AclAction.TABLE_EDIT;
-        break;
-      }
-    }
-    return action;
-  }
-
-  private AclAction getResourceAction(ViewDto viewDto) {
-    AclAction action = AclAction.RESOURCE_ALL;
-
-    for (String tableName : viewDto.getFromList()) {
-      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-      // TODO verify resource exists for the user
-    }
-    return action;
-  }
-
-  private void scheduleViewIndexation(ValueTable view) {
-    Schedule schedule = new Schedule();
-    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
-    indexManagerConfigService.update(view, schedule);
-  }
-
   @Path("/view/{viewName}")
   public ViewResource getView(@PathParam("viewName") String viewName) {
     return getViewResource(viewManager.getView(getDatasource().getName(), viewName));
@@ -320,6 +289,53 @@ public class DatasourceResource {
         : MagmaEngine.get().getTransientDatasourceInstance(name);
   }
 
+  //
+  // Private methods
+  //
+
+
+  private AclAction getAction(ViewDto viewDto) {
+    return viewDto.hasExtension(Magma.ResourceViewDto.view) ? getResourceAction(viewDto) : getTableAction(viewDto);
+  }
+
+  private AclAction getTableAction(ViewDto viewDto) {
+    AclAction action = AclAction.TABLE_ALL;
+    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
+
+    for (String tableName : viewDto.getFromList()) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      ValueTable table = resolver.resolveTable();
+      if (!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
+          "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) {
+        action = AclAction.TABLE_EDIT;
+        break;
+      }
+    }
+    return action;
+  }
+
+  private AclAction getResourceAction(ViewDto viewDto) {
+    AclAction action = AclAction.TABLE_ALL;
+
+    for (String resourceName : viewDto.getFromList()) {
+      // reuse project's table naming for the resource...
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(resourceName);
+      String projectName = resolver.getDatasourceName();
+      String resName = resolver.getTableName();
+      if (!canViewResourceReference(projectName, resName))
+        throw new NoSuchResourceReferenceException(projectName, resName);
+      if (!canEditResourceReference(projectName, resName))
+        action = AclAction.TABLE_READ;
+    }
+    return action;
+  }
+
+  private void scheduleViewIndexation(ValueTable view) {
+    Schedule schedule = new Schedule();
+    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
+    indexManagerConfigService.update(view, schedule);
+  }
+
   private ViewResource getViewResource(ValueView view) {
     ViewResource resource = applicationContext.getBean(ViewResource.class);
     resource.setLocales(getLocales());
@@ -338,6 +354,14 @@ public class DatasourceResource {
 
   private EventBus getEventBus() {
     return eventBus == null ? eventBus = new EventBus() : eventBus;
+  }
+
+  private boolean canViewResourceReference(String project, String name) {
+    return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":GET");
+  }
+
+  private boolean canEditResourceReference(String project, String name) {
+    return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":PUT");
   }
 
 }

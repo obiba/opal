@@ -15,6 +15,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -23,6 +24,7 @@ import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.spi.r.datasource.magma.ResourceView;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,8 @@ import javax.ws.rs.core.Response.Status;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class ViewResourceImpl extends TableResourceImpl implements ViewResource {
+
+  private final static Authorizer authorizer = new ShiroAuthorizer();
 
   private ViewManager viewManager;
 
@@ -69,12 +73,16 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   @Override
   public Response updateView(ViewDto viewDto, @Nullable String comment) {
-    if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+    if (!viewDto.hasName())
+      return Response.status(Status.BAD_REQUEST).build();
+    if (isResourceView() && !viewDto.hasExtension(Magma.ResourceViewDto.view))
+      return Response.status(Status.BAD_REQUEST).build();
 
-    if (!checkValuesPermissions(viewDto))return Response.status(Status.FORBIDDEN).build();
+    if (!checkValuesPermissions(viewDto))
+      return Response.status(Status.FORBIDDEN).build();
 
     ValueTable table = getValueTable();
-    if(!viewDto.getName().equals(table.getName())) {
+    if (!viewDto.getName().equals(table.getName())) {
       getEventBus().post(new ValueTableRenamedEvent(table, viewDto.getName()));
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
@@ -137,32 +145,40 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   }
 
   private boolean checkValuesPermissions(ViewDto viewDto) {
-    if(!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return true;
+    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return true;
 
     Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
 
     ValueTable table = getValueTable();
-    if(!authorizer.isPermitted(
-        "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) return true;
+    if (!authorizer.isPermitted(
+        "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET"))
+      return true;
 
+    return viewDto.hasExtension(Magma.ResourceViewDto.view) ? checkResourceValuesPermissions(viewDto) : checkTableValuesPermissions(viewDto);
+  }
+
+  private boolean checkTableValuesPermissions(ViewDto viewDto) {
+    Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
     // user can see the values of the view, so make sure user is also permitted to see the referred tables values
-    if (isTableView()) {
-      for (String tableName : viewDto.getFromList()) {
-        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-        ValueTable fromTable = resolver.resolveTable();
-        if (!authorizer.isPermitted(
-            "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
-          return false;
-        }
+    for (String tableName : viewDto.getFromList()) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      ValueTable fromTable = resolver.resolveTable();
+      if (!authorizer.isPermitted(
+          "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
+        return false;
       }
-    } else if (isResourceView()) {
-      for (String tableName : viewDto.getFromList()) {
-        // reuse project's table naming for the resource...
-        MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-        if (!authorizer.isPermitted(
-            "rest:/project/" + resolver.getDatasourceName() + "/resource/" + resolver.getTableName() + ":GET")) {
-          return false;
-        }
+    }
+    return true;
+  }
+
+  private boolean checkResourceValuesPermissions(ViewDto viewDto) {
+    // user can see the values of the view, so make sure user is also permitted to edit the resource ref
+    for (String tableName : viewDto.getFromList()) {
+      // reuse project's table naming for the resource...
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      if (!authorizer.isPermitted(
+          "rest:/project/" + resolver.getDatasourceName() + "/resource/" + resolver.getTableName() + ":PUT")) {
+        return false;
       }
     }
     return true;
@@ -170,13 +186,13 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   private ValueView asValueView() {
     ValueTable table = getValueTable();
-    if(table.isView()) return (ValueView) table;
+    if (table.isView()) return (ValueView) table;
     throw new InvalidRequestException("Not a value view");
   }
 
   private View asTableView() {
     ValueTable table = getValueTable();
-    if(isTableView()) return (View) table;
+    if (isTableView()) return (View) table;
     throw new InvalidRequestException("Not a table view");
   }
 
@@ -187,7 +203,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   private ResourceView asResourceView() {
     ValueTable table = getValueTable();
-    if(isResourceView()) return (ResourceView) table;
+    if (isResourceView()) return (ResourceView) table;
     throw new InvalidRequestException("Not a resource view");
   }
 
