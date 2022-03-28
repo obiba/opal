@@ -57,6 +57,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("ID Column")
   String idColumnLabel();
 
+  @Description("All Columns label")
+  @DefaultStringValue("All Columns")
+  String allColumnsLabel();
+
   @Description("Context label")
   @DefaultStringValue("Context")
   String contextLabel();

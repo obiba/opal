@@ -142,6 +142,19 @@
         </b:HelpBlock>
       </b:ControlGroup>
 
+      <!--All columns-->
+      <b:ControlGroup>
+        <b:CheckBox ui:field="allColumns" inline="true">
+          <ui:msg description="Resource view all columns label">All columns</ui:msg>
+        </b:CheckBox>
+        <b:HelpBlock>
+          <ui:msg description="Resource view all columns help label">
+            When checked, all the observed resource's columns (except the identifier's column) will be mapped to a variable when the connection
+            with the resource is established. This means that when a new column appears in the resource, a corresponding variable will be automatically added.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
       <!--Profile-->
       <b:ControlGroup ui:field="profileGroup">
         <b:ControlLabel>

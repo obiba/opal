@@ -116,8 +116,8 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
   }
 
   @Override
-  public void onSave(String name, String from, String idColumn, String entityType, String profile) {
-    ViewDto dto = getViewDto(name, from, idColumn, entityType, profile);
+  public void onSave(String name, String from, String idColumn, String entityType, String profile, boolean allColumns) {
+    ViewDto dto = getViewDto(name, from, idColumn, entityType, profile, allColumns);
     getView().setInProgress(true);
     if (view == null) createView(dto);
     else updateView(dto);
@@ -151,7 +151,7 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
     return view == null ? datasourceName : view.getDatasourceName();
   }
 
-  private ViewDto getViewDto(String name, String from, String idColumn, String entityType, String profile) {
+  private ViewDto getViewDto(String name, String from, String idColumn, String entityType, String profile, boolean allColumns) {
     ViewDto updatedView = ViewDto.create();
     updatedView.setName(name);
     JsArrayString froms = JsArrays.from(from);
@@ -173,6 +173,7 @@ public class ViewModalPresenter extends ModalPresenterWidget<ViewModalPresenter.
       resDto.setIdColumn(idColumn);
     if (!Strings.isNullOrEmpty(profile))
       resDto.setProfile(profile);
+    resDto.setAllColumns(allColumns);
     resDto.setEntityType(Strings.isNullOrEmpty(entityType) ? "Participant" : entityType);
     updatedView.setExtension(ResourceViewDto.ViewDtoExtensions.view, resDto);
 

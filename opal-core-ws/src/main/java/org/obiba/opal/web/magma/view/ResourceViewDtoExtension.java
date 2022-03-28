@@ -63,6 +63,8 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
       view.setProfile(resDto.getProfile());
     if (resDto.hasIdColumn())
       view.setIdColumn(resDto.getIdColumn());
+    if (resDto.hasAllColumns())
+      view.setAllColumns(resDto.getAllColumns());
     view.setVariables(resDto.getVariablesList().stream()
         .map(Dtos::fromDto)
         .collect(Collectors.toList()));
@@ -87,6 +89,7 @@ public class ResourceViewDtoExtension implements ValueViewDtoExtension {
       resDtoBuilder.setIdColumn(resView.getIdColumn());
     if (resView.hasProfile())
       resDtoBuilder.setProfile(resView.getProfile());
+    resDtoBuilder.setAllColumns(resView.isAllColumns());
     resDtoBuilder.setEntityType(resView.getEntityType());
 
     viewDtoBuilder.setExtension(ResourceViewDto.view, resDtoBuilder.build());

@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.table;
 
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
@@ -44,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.TableReferenceColumn;
 import org.obiba.opal.web.gwt.app.client.magma.TableReferencesTable;
 import org.obiba.opal.web.gwt.app.client.ui.*;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.model.client.magma.ResourceViewDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -119,6 +117,9 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
 
   @UiField
   TextBox entityType;
+
+  @UiField
+  CheckBox allColumns;
 
   @UiField
   TextBox profile;
@@ -245,7 +246,7 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
     if (tableRefs.isVisible()) {
       getUiHandlers().onSave(getName().getText(), dataProvider.getList(), innerTableReferences);
     } else {
-      getUiHandlers().onSave(getName().getText(), resourceFrom.getText(), idColumn.getText(), entityType.getText(), profile.getText());
+      getUiHandlers().onSave(getName().getText(), resourceFrom.getText(), idColumn.getText(), entityType.getText(), profile.getText(), allColumns.getValue());
     }
   }
 
@@ -264,6 +265,8 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
       resourceFrom.setText(view.getFromArray().get(0));
       idColumn.setText(resView.getIdColumn());
       entityType.setText(resView.getEntityType());
+      profile.setText(resView.getProfile());
+      allColumns.setValue(!resView.hasAllColumns() || resView.getAllColumns());
     }
     fileSelectionGroup.setVisible(false);
     dialog.setTitle(translations.editProperties());

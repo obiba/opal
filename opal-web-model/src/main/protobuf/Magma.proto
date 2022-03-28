@@ -369,6 +369,7 @@ message ResourceViewDto {
   optional string idColumn = 2;
   optional string entityType = 3;
   optional string profile = 4;
+  optional bool allColumns = 5 [default = true];
   extend ViewDto {
     optional ResourceViewDto view = 1004;
   }

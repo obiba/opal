@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.project.resources;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -64,6 +65,9 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
   TextBox profile;
 
   @UiField
+  CheckBox allColumns;
+
+  @UiField
   Button saveButton;
 
   @UiField
@@ -82,6 +86,7 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.addViewTitle());
+    allColumns.setValue(true);
   }
 
   @Override
@@ -106,7 +111,8 @@ public class ResourceViewModalView extends ModalPopupViewWithUiHandlers<Resource
         getName().getText(),
         Strings.isNullOrEmpty(entityType.getText()) ? "Participant" : entityType.getText(),
         idColumn.getText(),
-        profile.getText());
+        profile.getText(),
+        allColumns.getValue());
   }
 
   @Override

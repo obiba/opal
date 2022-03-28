@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma;
 
 import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
@@ -500,6 +501,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private void setRecourceViewProperties(ResourceViewDto resView) {
     propertiesTable.addProperty(new Label(translations.idColumnLabel()), new Label(resView.getIdColumn()));
+    String allColumnsLabel = (!resView.hasAllColumns() || resView.getAllColumns()) ? translations.yesLabel() : translations.noLabel();
+    propertiesTable.addProperty(new Label(translations.allColumnsLabel()), new Label(allColumnsLabel));
     propertiesTable.addProperty(new Label(translations.rServerProfileLabel()), new Label(resView.getProfile()));
   }
 

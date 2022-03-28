@@ -67,7 +67,11 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   // updated date
   private Value updated = DateTimeType.get().now();
 
+  // the variables, mapping the columns
   private Set<Variable> variables = new LinkedHashSet<>();
+
+  // whether the observed columns should always be mapped to a variable
+  private boolean allColumns = true;
 
   // the datasource to which this view is attached to
   private transient ViewAwareDatasource viewAwareDatasource;
@@ -135,6 +139,14 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   public boolean hasProfile() {
     return !Strings.isNullOrEmpty(profile);
+  }
+
+  public boolean isAllColumns() {
+    return allColumns;
+  }
+
+  public void setAllColumns(boolean allColumns) {
+    this.allColumns = allColumns;
   }
 
   public String getResourceFullName() {
@@ -444,13 +456,24 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   }
 
   private void initialiseVariables() {
+    boolean multilines = isMultilines();
     if (variables.isEmpty()) {
-      boolean multilines = isMultilines();
       connector.getColumns().stream()
           .filter(column -> !idColumn.equals(column.getName()))
-          .forEach(column -> {
-            variables.add(column.asVariable(getEntityType(), multilines));
-          });
+          .forEach(column -> variables.add(column.asVariable(getEntityType(), multilines)));
+    } else if (allColumns) {
+      // merge already mapped columns with observed ones, do not remove variables that are mapped
+      // to columns that do not exist any more
+
+      // list already mapped columns
+      List<String> mappedColumns = variables.stream()
+          .map(var -> var.hasAttribute("opal", "column") ? var.getAttributeStringValue("opal", "column") : null)
+          .filter(col -> !Strings.isNullOrEmpty(col))
+          .collect(Collectors.toList());
+      // append missing columns
+      connector.getColumns().stream()
+          .filter(column -> !idColumn.equals(column.getName()) && !mappedColumns.contains(column.getName()))
+          .forEach(column -> variables.add(column.asVariable(getEntityType(), multilines)));
     }
 
     Map<String, TabularResourceConnector.Column> columnByName = connector.getColumns().stream()
