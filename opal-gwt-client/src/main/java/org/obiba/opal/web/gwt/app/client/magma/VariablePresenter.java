@@ -288,9 +288,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       return;
     }
     String script = VariableDtos.getScript(variable);
-    // TODO handle derivation by column mapping
-    String column = VariableDtos.getColumn(variable);
-    getView().setDerivedVariable(Strings.isNullOrEmpty(column), script);
+    boolean isJsView = table.hasViewType() && "View".equals(table.getViewType());
+    getView().setDerivedVariable(isJsView, script);
     scriptEditorPresenter.setTable(table);
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());

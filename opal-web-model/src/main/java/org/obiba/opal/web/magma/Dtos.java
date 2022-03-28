@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.math.*;
 import org.obiba.magma.math.summary.TextVariableSummary;
+import org.obiba.magma.support.ValueTableWrapper;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.*;
@@ -192,6 +193,10 @@ public final class Dtos {
     builder.setLink(link);
     if (valueTable.isView()) {
       builder.setViewLink(link.replaceFirst("/table/", "/view/"));
+      ValueTable innerTable = valueTable;
+      if (valueTable instanceof ValueTableWrapper)
+        innerTable = ((ValueTableWrapper) valueTable).getWrappedValueTable();
+      builder.setViewType(innerTable.getClass().getSimpleName());
     }
 
     return builder;

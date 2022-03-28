@@ -419,10 +419,10 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private String getMutateStatement() {
-    if (resourceVariableValueSource.hasScript()) {
-      String script = resourceVariableValueSource.getScript();
-      return "null".equals(script) ? getNAForValueType() : script;
-    }
+//    if (resourceVariableValueSource.hasScript()) {
+//      String script = resourceVariableValueSource.getScript();
+//      return "null".equals(script) ? getNAForValueType() : script;
+//    }
     return getNAForValueType();
   }
 

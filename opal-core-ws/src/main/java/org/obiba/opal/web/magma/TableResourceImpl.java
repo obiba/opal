@@ -61,7 +61,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     String path = uriInfo.getPath(false);
     TableDto.Builder builder = Dtos.asDto(getValueTable(), counts).setLink(path);
     if (getValueTable().isView()) {
-      builder.setViewLink(path.replaceFirst("table", "view"));
+      builder.setViewLink(path.replaceFirst("/table/", "/view/"));
     }
     return builder.build();
   }

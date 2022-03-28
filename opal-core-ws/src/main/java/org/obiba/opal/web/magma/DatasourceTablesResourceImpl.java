@@ -92,10 +92,6 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   public List<TableDto> getTables(boolean counts, String entityType, boolean indexedOnly) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     if (datasource == null) return tables;
-    UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
-        .path(DatasourceResource.class, "getTable");
-    UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
-        .path(DatasourceResource.class, "getView");
     List<ValueTable> filteredTables = datasource.getValueTables().stream()
         .filter(vt -> entityType == null || vt.getEntityType().equals(entityType))
         .filter(vt -> !indexedOnly || hasUpToDateIndex(vt))
@@ -110,10 +106,6 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
           builder = Dtos.asDto(valueTable, true, false);
         }
         else throw e;
-      }
-      builder.setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
-      if(valueTable.isView()) {
-        builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
       }
       tables.add(builder.build());
     }

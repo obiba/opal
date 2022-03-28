@@ -232,6 +232,7 @@ message TableDto {
   repeated VariableDto variables = 7;
   optional string viewLink = 8;
   optional TimestampsDto timestamps = 9;
+  optional string viewType = 10;
 }
 
 message VariableDto {
