@@ -61,7 +61,7 @@ public class OpalServer {
           if (getRequestorType() == Authenticator.RequestorType.PROXY) {
             String prot = getRequestingProtocol().toLowerCase();
             String host = System.getProperty(prot + ".proxyHost", "");
-            String port = System.getProperty(prot + ".proxyPort", "80");
+            String port = System.getProperty(prot + ".proxyPort", "https".equals(prot) ? "443" : "80");
             String user = System.getProperty(prot + ".proxyUser", "");
             String password = System.getProperty(prot + ".proxyPassword", "");
             if (getRequestingHost().equalsIgnoreCase(host)) {
