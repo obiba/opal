@@ -51,20 +51,23 @@ public class OpalServer {
   }
 
   private void setProxy() {
-    String proxyUser = System.getProperty("http.proxyUser");
+    String proxyUser = System.getProperty("http.proxyUser", System.getProperty("https.proxyUser"));
     if (!Strings.isNullOrEmpty(proxyUser)) {
       logAndSystemOut("Setting up proxy with user/password...");
       // Java ignores http.proxyUser. Here come's the workaround.
       Authenticator.setDefault(new Authenticator() {
         @Override
         protected PasswordAuthentication getPasswordAuthentication() {
-          if (getRequestorType() == Authenticator.RequestorType.PROXY) {
-            String prot = getRequestingProtocol().toLowerCase();
+          String prot = getRequestingProtocol().toLowerCase();
+          log.info("requestorType={} requestingProtocol={} requestingHost={} requestingPort={}", getRequestorType(), prot, getRequestingHost(), getRequestingPort());
+          String requestorType = System.getProperty("requestorType", "proxy"); // can be 'proxy', 'server' or 'any'
+          if (requestorType.equalsIgnoreCase("any") || requestorType.equalsIgnoreCase(getRequestorType().toString())) {
             String host = System.getProperty(prot + ".proxyHost", "");
             String port = System.getProperty(prot + ".proxyPort", "https".equals(prot) ? "443" : "80");
             String user = System.getProperty(prot + ".proxyUser", "");
             String password = System.getProperty(prot + ".proxyPassword", "");
-            if (getRequestingHost().equalsIgnoreCase(host)) {
+            log.info("proxyHost={} proxyPort={} proxyUser={} proxyPassword={}", host, port, user, Strings.isNullOrEmpty(password) ? "": "********");
+            if (host.equalsIgnoreCase(getRequestingHost())) {
               if (Integer.parseInt(port) == getRequestingPort()) {
                 return new PasswordAuthentication(user, password.toCharArray());
               }
