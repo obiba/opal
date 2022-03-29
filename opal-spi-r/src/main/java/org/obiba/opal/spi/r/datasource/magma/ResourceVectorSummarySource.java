@@ -152,7 +152,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
             else
               value = String.format("%s", freqMap.get(columnName).asLogical());
           }
-          if (categoryNames.contains(value)) {
+          if (categoryNames.isEmpty() || categoryNames.contains(value)) {
             summary.addFrequency(new DefaultFrequency(value, count, count * 1F / freqSum, missings.contains(value)));
             if (count > max) {
               max = count;

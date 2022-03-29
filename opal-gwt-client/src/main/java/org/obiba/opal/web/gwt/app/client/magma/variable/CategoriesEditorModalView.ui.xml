@@ -31,9 +31,13 @@
             <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
               <ui:msg description="Add label">Add</ui:msg>
             </b:Button>
+            <b:Button icon="PLUS" type="INFO" ui:field="discoverButton" addStyleNames="small-indent">
+              <ui:msg description="Discover label">Discover</ui:msg>
+            </b:Button>
           </b:InputAddOn>
           <b:HelpBlock>
-            <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
+            <ui:msg description="Add categories help block">
+              Add categories by pressing Enter or the "Add" button, or add observed categories by pressing the "Discover" button.
             </ui:msg>
           </b:HelpBlock>
         </b:Controls>

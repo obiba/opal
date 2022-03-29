@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
@@ -72,7 +73,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private TranslationMessages translationMessages;
 
-  interface Binder extends UiBinder<Widget, CategoriesEditorModalView> {}
+  interface Binder extends UiBinder<Widget, CategoriesEditorModalView> {
+  }
 
   private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<CategoryDto>();
 
@@ -92,9 +94,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   TextBox addCategoryName;
-
-  @UiField
-  Button addButton;
 
   @UiField
   Button closeButton;
@@ -117,18 +116,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiField
   IconAnchor clearSelectionAnchor;
 
-  @UiField
-  IconAnchor deleteLink;
-
-  @UiField
-  IconAnchor moveUpLink;
-
-  @UiField
-  IconAnchor moveDownLink;
-
   @Inject
   public CategoriesEditorModalView(EventBus eventBus, Binder uiBinder, Translations translations,
-      TranslationMessages translationMessages) {
+                                   TranslationMessages translationMessages) {
     super(eventBus);
     this.translations = translations;
     this.translationMessages = translationMessages;
@@ -152,9 +142,14 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     addCategory();
   }
 
+  @UiHandler("discoverButton")
+  void onDiscoverButton(ClickEvent event) {
+    getUiHandlers().onDiscoverCategories();
+  }
+
   @UiHandler("addCategoryName")
   void onKeyDown(KeyDownEvent event) {
-    if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
       addCategory();
       // Prevent the window from reloading
       event.preventDefault();
@@ -165,8 +160,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   void onDelete(ClickEvent event) {
     // Remove selected items from table
     List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    for(CategoryDto categoryDto : dataProvider.getList()) {
-      if(!checkActionCol.getSelectionModel().isSelected(categoryDto)) {
+    for (CategoryDto categoryDto : dataProvider.getList()) {
+      if (!checkActionCol.getSelectionModel().isSelected(categoryDto)) {
         categories.add(categoryDto);
       }
     }
@@ -195,9 +190,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     int i = 0;
     int pos = 0;
-    for(CategoryDto categoryDto : dataProvider.getList()) {
-      if(checkActionCol.getSelectionModel().isSelected(categoryDto)) {
-        if(reordered.isEmpty()) {
+    for (CategoryDto categoryDto : dataProvider.getList()) {
+      if (checkActionCol.getSelectionModel().isSelected(categoryDto)) {
+        if (reordered.isEmpty()) {
           pos = i - 1;
         }
         reordered.add(categoryDto);
@@ -219,9 +214,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     int i = 0;
     int pos = 0;
-    for(CategoryDto c : dataProvider.getList()) {
-      if(checkActionCol.getSelectionModel().isSelected(c)) {
-        if(reordered.isEmpty()) {
+    for (CategoryDto c : dataProvider.getList()) {
+      if (checkActionCol.getSelectionModel().isSelected(c)) {
+        if (reordered.isEmpty()) {
           pos = i + 1;
         }
         reordered.add(c);
@@ -252,6 +247,31 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
   }
 
+  @Override
+  public void addCategories(List<String> observedCategories) {
+    dialog.clearAlert(nameGroup);
+    List<CategoryDto> existingCats = new ArrayList<CategoryDto>(dataProvider.getList());
+    List<String> existingCatNames = Lists.newArrayList();
+    for (CategoryDto existingCat : existingCats)
+      existingCatNames.add(existingCat.getName());
+
+    for (String name : observedCategories) {
+      // Validate that the new name does not conflicts with an existing one
+      if (!existingCatNames.contains(name)) {
+        CategoryDto newCategory = CategoryDto.create();
+        newCategory.setName(name);
+        newCategory.setIsMissing(false);
+        existingCats.add(newCategory);
+        existingCatNames.add(name);
+      }
+    }
+
+    dataProvider.setList(existingCats);
+    dataProvider.refresh();
+    pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
+    pager.setPage(0);
+  }
+
   private void addEditableColumns(Iterable<LocaleDto> locales) {
     checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
     table.addColumn(checkActionCol, checkActionCol.getCheckColumnHeader());
@@ -274,7 +294,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     // Render no locale
     renderLocalizedCategoryRows("");
     // prepare cells for each translations
-    for(LocaleDto locale : locales) {
+    for (LocaleDto locale : locales) {
       renderLocalizedCategoryRows(locale.getName());
     }
     renderMissingColumn();
@@ -309,7 +329,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       @Override
       public void update(int index, CategoryDto object, String value) {
         AttributeDto label = VariableDtos.getAttribute(object, LABEL, localeName);
-        if(label == null) {
+        if (label == null) {
           // Create new attribute
           VariableDtos.createAttribute(object, LABEL, localeName, value);
         } else {
@@ -319,7 +339,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     });
 
     String headerString = translations.labelLabel();
-    if(!localeName.isEmpty()) {
+    if (!localeName.isEmpty()) {
       headerString += " (" + translations.localeMap().get(localeName) + ")";
     }
 
@@ -330,7 +350,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   public JsArray<CategoryDto> getCategories() {
     JsArray<CategoryDto> list = JsArrays.create();
 
-    for(CategoryDto v : dataProvider.getList()) {
+    for (CategoryDto v : dataProvider.getList()) {
       list.push(v);
     }
     return list;
@@ -338,7 +358,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @Override
   public void showError(String message, @Nullable ControlGroup group) {
-    if(group == null) {
+    if (group == null) {
       dialog.addAlert(message, AlertType.ERROR);
     } else {
       dialog.addAlert(message, AlertType.ERROR, group);
@@ -346,31 +366,35 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   private void addCategory() {
+    addCategory(addCategoryName.getText());
+  }
+
+  private void addCategory(String name) {
     dialog.clearAlert(nameGroup);
     List<CategoryDto> existingCat = new ArrayList<CategoryDto>(dataProvider.getList());
 
     // Validate that the new name does not conflicts with an existing one
-    if(!validateName(existingCat)) return;
+    if (!validateName(name, existingCat)) return;
 
     CategoryDto newCategory = CategoryDto.create();
-    newCategory.setName(addCategoryName.getText());
+    newCategory.setName(name);
     newCategory.setIsMissing(false);
     existingCat.add(newCategory);
 
     dataProvider.setList(existingCat);
     dataProvider.refresh();
     pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
-    pager.setPage(dataProvider.getList().size() / table.getPageSize());
+    pager.setPage(0);
     addCategoryName.setText("");
   }
 
-  private boolean validateName(Iterable<CategoryDto> existingCat) {
-    if(addCategoryName.getText().isEmpty()) {
+  private boolean validateName(String name, Iterable<CategoryDto> existingCat) {
+    if (name.isEmpty()) {
       showError(translations.categoryNameRequired(), nameGroup);
       return false;
     }
-    for(CategoryDto categoryDto : existingCat) {
-      if(categoryDto.getName().equals(addCategoryName.getText())) {
+    for (CategoryDto categoryDto : existingCat) {
+      if (categoryDto.getName().equals(name)) {
         showError(translations.categoryNameAlreadyExists(), nameGroup);
         return false;
       }

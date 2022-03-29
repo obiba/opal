@@ -15,8 +15,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -28,6 +31,9 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
@@ -70,6 +76,30 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
           @Override
           public void onResource(Response response, JsArray<LocaleDto> locales) {
             getView().renderCategoryRows(variable.getCategoriesArray(), JsArrays.toList(locales));
+          }
+        }).get().send();
+  }
+
+  @Override
+  public void onDiscoverCategories() {
+    getView().setInProgress(true);
+    String uri = UriBuilder.create().fromPath(variable.getLink()).segment("summary")
+        .query("nature", "categorical", "distinct", "true").build();
+    ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+        .forResource(uri) //
+        .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
+          @Override
+          public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
+            getView().setInProgress(false);
+            CategoricalSummaryDto categoricalSummaryDto = statisticsDto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+            List<String> observedCategories = Lists.newArrayList();
+            for (FrequencyDto frequencyDto : JsArrays.toIterable(categoricalSummaryDto.getFrequenciesArray())) {
+              String val = frequencyDto.getValue();
+              if (val.endsWith(".0")) val = val.substring(0, val.length()-2);
+              if (!"N/A".equals(val))
+                observedCategories.add(val);
+            }
+            getView().addCategories(observedCategories);
           }
         }).get().send();
   }
@@ -169,5 +199,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
 
     void showError(String message, @Nullable ControlGroup group);
 
+    void addCategories(List<String> observedCategories);
   }
 }
