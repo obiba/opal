@@ -103,7 +103,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
       SubjectProfile profile = subjectProfileService.getProfile(username);
       if (profile.hasSecret() && "TOTP".equals(strategy)) {
         if (Strings.isNullOrEmpty(code)) {
-          throw new NoSuchOtpException(strategy);
+          throw new NoSuchOtpException(strategy, "X-Opal-");
         }
         if (!totpService.validateCode(code, profile.getSecret())) {
            throw new AuthenticationException("Wrong TOTP");
