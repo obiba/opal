@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.web.gwt.rest.client;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
@@ -58,6 +57,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   private final Collection<String> accept = new HashSet<>();
 
   private final HashMultimap<String, String> form = HashMultimap.create();
+
+  private final Map<String, String> headers = Maps.newHashMap();
 
   private ResourceCallback<T> resourceCallback;
 
@@ -133,6 +134,11 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     accept.add(acceptHeader);
     return this;
   }
+  @Override
+  public DefaultResourceRequestBuilder<T> header(String header, String value) {
+    headers.put(header, value);
+    return this;
+  }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   @Override
@@ -197,6 +203,11 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   public RequestBuilder build() {
     builder = new InnerRequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
+    if (!headers.isEmpty()) {
+      for (String h : headers.keySet()) {
+        builder.setHeader(h, headers.get(h));
+      }
+    }
     if(!accept.isEmpty()) {
       builder.setHeader("Accept", buildAcceptHeader());
     }
@@ -263,7 +274,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
       setOpalVersion(response);
 
-      if(credentials.hasExpired(builder) || code == Response.SC_UNAUTHORIZED) {
+      String authHeader = response.getHeader("WWW-Authenticate");
+      if(credentials.hasExpired(builder) || (code == Response.SC_UNAUTHORIZED && !"X-Opal-TOTP".equals(authHeader))) {
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
       } else {

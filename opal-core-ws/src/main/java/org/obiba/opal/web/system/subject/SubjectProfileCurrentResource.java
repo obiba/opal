@@ -17,6 +17,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.IDProvidersService;
+import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.opal.web.model.SQL;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -54,6 +55,9 @@ public class SubjectProfileCurrentResource {
   @Autowired
   private IDProvidersService idProvidersService;
 
+  @Autowired
+  private TotpService totpService;
+
   @GET
   @NoAuthorization
   public Response get() {
@@ -69,6 +73,24 @@ public class SubjectProfileCurrentResource {
       if (!Strings.isNullOrEmpty(accountUrl)) break;
     }
     return Response.ok().entity(Dtos.asDto(profile, accountUrl)).build();
+  }
+
+  @PUT
+  @Path("/otp")
+  @Produces("text/plain")
+  @NoAuthorization
+  public Response enableOtp() {
+    subjectProfileService.updateProfileSecret(getPrincipal(), true);
+    SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
+    return Response.ok(totpService.getQrImageDataUri(getPrincipal(), profile.getSecret()), "text/plain").build();
+  }
+
+  @DELETE
+  @Path("/otp")
+  @NoAuthorization
+  public Response disableOtp() {
+    subjectProfileService.updateProfileSecret(getPrincipal(), false);
+    return Response.ok().build();
   }
 
   @Path("/bookmarks")

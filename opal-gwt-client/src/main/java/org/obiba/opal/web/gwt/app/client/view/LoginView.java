@@ -10,53 +10,57 @@
 
 package org.obiba.opal.web.gwt.app.client.view;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.client.ui.*;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
-
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Brand;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Image;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.HasKeyUpHandlers;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.LoginUiHandlers;
 import org.obiba.opal.web.model.client.opal.AuthProviderDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class LoginView extends ViewImpl implements LoginPresenter.Display {
+public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements LoginPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, LoginView> {}
+  interface Binder extends UiBinder<Widget, LoginView> {
+  }
 
   @UiField
   Panel alertPanel;
+
+  @UiField
+  Well credentialsWell;
 
   @UiField
   TextBox userName;
 
   @UiField
   PasswordTextBox password;
+
+  @UiField
+  Well otpWell;
+
+  @UiField
+  TextBox otp;
 
   @UiField
   Button login;
@@ -87,26 +91,56 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     this.translations = translations;
     userName.setFocus(true);
     password.addKeyPressHandler(new CapsLockTestKeyPressesHandler());
+    KeyUpHandler enterKeyHandler = new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          getUiHandlers().onSignIn(userName.getText(), password.getText());
+        }
+      }
+    };
+    userName.addKeyUpHandler(enterKeyHandler);
+    password.addKeyUpHandler(enterKeyHandler);
+    otp.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText());
+        }
+      }
+    });
   }
 
-  @Override
-  public HasClickHandlers getSignIn() {
-    return login;
+  @UiHandler("login")
+  public void onSignIn(ClickEvent event) {
+    if (Strings.isNullOrEmpty(userName.getText()) || Strings.isNullOrEmpty(password.getText()))
+      return;
+    getUiHandlers().onSignIn(userName.getText(), password.getText());
   }
 
-  @Override
-  public HasValue<String> getPassword() {
-    return password;
+  @UiHandler("validate")
+  public void onValidate(ClickEvent event) {
+    if (Strings.isNullOrEmpty(otp.getText()))
+      return;
+    getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText());
   }
 
-  @Override
-  public HasValue<String> getUserName() {
-    return userName;
+  @UiHandler("cancel")
+  public void onCancel(ClickEvent event) {
+    clearPassword();
+    otpWell.setVisible(false);
+    credentialsWell.setVisible(true);
   }
 
   @Override
   public void focusOnUserName() {
     userName.setFocus(true);
+  }
+
+  @Override
+  public void showTotp() {
+    credentialsWell.setVisible(false);
+    otpWell.setVisible(true);
   }
 
   @Override
@@ -142,20 +176,10 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   }
 
   @Override
-  public HasKeyUpHandlers getPasswordTextBox() {
-    return password;
-  }
-
-  @Override
-  public HasKeyUpHandlers getUserNameTextBox() {
-    return userName;
-  }
-
-  @Override
   public void setApplicationName(String text) {
     applicationName.setText(text);
     if (Document.get() != null) {
-      Document.get().setTitle (text);
+      Document.get().setTitle(text);
     }
   }
 
@@ -172,7 +196,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   public void renderAuthProviders(JsArray<AuthProviderDto> providers) {
     authClientsPanel.clear();
     List<Widget> widgets = Lists.newArrayList();
-    for (int i=0;i<providers.length(); i++) {
+    for (int i = 0; i < providers.length(); i++) {
       AuthProviderDto provider = providers.get(i);
 
       String key = provider.getName();
@@ -186,7 +210,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     }
 
     if (widgets.size() > 0) {
-      for (Widget w: widgets) {
+      for (Widget w : widgets) {
         w.setWidth("100%");
         authClientsPanel.add(w);
       }
@@ -195,7 +219,10 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   }
 
   private void clearPassword() {
-    getPassword().setValue("");
+    password.setValue("");
+    otp.setValue("");
+    otpWell.setVisible(false);
+    credentialsWell.setVisible(true);
   }
 
   private final class CapsLockTestKeyPressesHandler implements KeyPressHandler {
@@ -203,7 +230,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     @Override
     public void onKeyPress(KeyPressEvent event) {
       int code = event.getUnicodeCharCode();
-      if((!event.isShiftKeyDown() && (code >= 65 && code <= 90)) ||
+      if ((!event.isShiftKeyDown() && (code >= 65 && code <= 90)) ||
           (event.isShiftKeyDown() && (code >= 97 && code <= 122))) {
         passwordGroup.setType(ControlGroupType.WARNING);
         passwordHelp.setVisible(true);

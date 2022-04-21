@@ -26,9 +26,9 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.opal.core.service.security.event.SubjectCredentialsDeletedEvent;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
-import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.shiro.realm.SudoRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +62,9 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   @Autowired
   private EventBus eventBus;
+
+  @Autowired
+  private TotpService totpService;
 
   @Value("#{new Boolean('${org.obiba.opal.security.multiProfile}')}")
   private boolean multiProfile;
@@ -98,8 +101,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
         }
       } else if (!profile.getRealm().equals(realm)) {
         throw new AuthenticationException(
-                "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
-                        " expected). Make sure the same subject is not defined in several realms."
+            "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
+                " expected). Make sure the same subject is not defined in several realms."
         );
       }
       profile.setUpdated(new Date());
@@ -109,6 +112,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
       orientDbService.save(newProfile, newProfile);
     }
   }
+
   @Override
   public void ensureProfile(@NotNull PrincipalCollection principalCollection) {
     String principal = principalCollection.getPrimaryPrincipal().toString();
@@ -157,6 +161,13 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   public synchronized void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     profile.setUpdated(new Date());
+    orientDbService.save(profile, profile);
+  }
+
+  @Override
+  public void updateProfileSecret(String principal, boolean enable) {
+    SubjectProfile profile = getProfile(principal);
+    profile.setSecret(enable ? totpService.generateSecret() : null);
     orientDbService.save(profile, profile);
   }
 

@@ -22,7 +22,7 @@
       <b:Row addStyleNames="top-margin">
         <b:Column size="4" offset="4">
           <g:SimplePanel ui:field="alertPanel"/>
-          <b:Well addStyleNames="large-top-margin">
+          <b:Well ui:field="credentialsWell" addStyleNames="large-top-margin">
             <b:ControlGroup>
               <b:ControlLabel>
                 <ui:msg description="User name field label">User Name</ui:msg>
@@ -48,6 +48,23 @@
               </g:HTMLPanel>
               <g:FlowPanel ui:field="authClientsPanel" addStyleNames="large-right-indent"/>
             </g:FlowPanel>
+          </b:Well>
+          <b:Well ui:field="otpWell" addStyleNames="large-top-margin" visible="false">
+            <b:ControlGroup>
+              <b:ControlLabel>
+                <ui:msg description="TOTP Code label">Code</ui:msg>
+              </b:ControlLabel>
+              <b:TextBox ui:field="otp" addStyleNames="almost-full-width"/>
+              <b:HelpBlock>
+                <ui:msg description="TOTP Code help">Enter 6 digits PIN code</ui:msg>
+              </b:HelpBlock>
+            </b:ControlGroup>
+            <b:Button ui:field="validate" type="INFO">
+              <ui:msg description="Validate button label">Validate</ui:msg>
+            </b:Button>
+            <b:Button ui:field="cancel" type="PRIMARY">
+              <ui:msg description="Cancel button label">Cancel</ui:msg>
+            </b:Button>
           </b:Well>
         </b:Column>
       </b:Row>

@@ -11,6 +11,7 @@ package org.obiba.opal.core.domain.security;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -34,6 +35,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   private Set<String> groups;
 
   private Set<Bookmark> bookmarks;
+
+  private String secret;
 
   public SubjectProfile() {
   }
@@ -121,6 +124,18 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   public boolean hasBookmarks() {
     return bookmarks != null;
+  }
+
+  public boolean hasSecret() {
+    return !Strings.isNullOrEmpty(secret);
+  }
+
+  public String getSecret() {
+    return secret;
+  }
+
+  public void setSecret(String secret) {
+    this.secret = secret;
   }
 
   @Override

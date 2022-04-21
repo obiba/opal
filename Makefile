@@ -3,7 +3,7 @@
 ##
 version=4.4-SNAPSHOT
 magma_version=3.0-SNAPSHOT
-commons_version=1.16-SNAPSHOT
+commons_version=2.0-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
 #java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M"
 
@@ -195,8 +195,7 @@ commons-all:
 	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc` ${opal_project}/opal-server/target/opal-server-${version}/lib && \
 	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-*-cli.jar && \
 	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-jersey-*.jar && \
-	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-mongodb-*.jar && \
-	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-wicket-*.jar
+	rm ${opal_project}/opal-server/target/opal-server-${version}/lib/obiba-mongodb-*.jar
 
 #
 # Compile and install all DataSHIELD4J sub-projects

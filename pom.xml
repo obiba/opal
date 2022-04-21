@@ -99,7 +99,7 @@
     <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>1.16.1</obiba-commons.version>
+    <obiba-commons.version>2.0-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
@@ -120,6 +120,7 @@
     <spring.version>4.3.30.RELEASE</spring.version>
     <spring-batch.version>3.0.10.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
+    <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
     <xmlunit.version>1.6</xmlunit.version>
@@ -677,6 +678,11 @@
         <groupId>javax.persistence</groupId>
         <artifactId>persistence-api</artifactId>
         <version>${jpa.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>dev.samstevens.totp</groupId>
+        <artifactId>totp</artifactId>
+        <version>${totp.version}</version>
       </dependency>
 
       <dependency>

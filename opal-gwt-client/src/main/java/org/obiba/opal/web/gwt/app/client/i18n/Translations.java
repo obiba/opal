@@ -25,6 +25,13 @@ import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
 @Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
 public interface Translations extends Constants {
 
+  @Description("2FA Enable label")
+  @DefaultStringValue("Enable 2FA")
+  String otpEnable();
+
+  @Description("2FA Disable label")
+  @DefaultStringValue("Disable 2FA")
+  String otpDisable();
   @Description("Report template create dialog title")
   @DefaultStringValue("Add Report Template")
   String addReportTemplateDialogTitle();
