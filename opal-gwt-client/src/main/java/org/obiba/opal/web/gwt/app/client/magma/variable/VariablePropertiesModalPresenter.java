@@ -125,10 +125,10 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().setInProgress(false);
             if(response.getStatusCode() == Response.SC_NOT_FOUND) {
               doCreate(newVariable);
             } else if(response.getStatusCode() == Response.SC_OK) {
+              getView().setInProgress(false);
               getView().showError(translations.variableNameAlreadyExists(), Display.FormField.NAME);
             }
           }

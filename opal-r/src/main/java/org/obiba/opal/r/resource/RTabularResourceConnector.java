@@ -162,10 +162,11 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
       }
       rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), rServerProfile);
       rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
-      ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL);
-      rSession.execute(rop);
-      ResourceTibbleAssignROperation rop2 = new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL, RESOURCE_UTILS_SCRIPT);
-      rSession.execute(rop2);
+      // prepare R env with util functions
+      rSession.execute(new SourceROperation(RESOURCE_UTILS_SCRIPT));
+      // assign resource
+      rSession.execute(resourceReferenceService.asAssignOperation(project, name, RESOURCE_CLIENT_SYMBOL));
+      rSession.execute(new ResourceTibbleAssignROperation(TIBBLE_SYMBOL, RESOURCE_CLIENT_SYMBOL));
     } finally {
       lock.unlock();
     }

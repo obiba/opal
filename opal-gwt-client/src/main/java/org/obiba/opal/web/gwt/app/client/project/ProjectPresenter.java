@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.project;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -352,7 +353,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           public void onResource(Response response, ProjectSummaryDto resource) {
             getView().setProjectSummary(resource);
           }
-        }).get().send();
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // GWT.log(response.getText());
+          }
+        }, Response.SC_BAD_REQUEST)
+        .get().send();
   }
 
   private void onTablesTabSelected(String path) {

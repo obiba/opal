@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -333,7 +334,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void setCurrentVariablesFilterSelect(List<VariableDto> variables) {
     StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
     if (variables.isEmpty()) {
-      script.append("^$");
+      GWT.log("variables is empty!!!");
+      script.append(".*");
     } else {
       for (int i = 0; i < variables.size(); i++) {
         if (i > 0) script.append("|");
@@ -475,6 +477,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
           private String getVariablesFilterSelect(String filter) {
             String regex = filter.replaceAll("/", "\\\\/").toLowerCase();
+            GWT.log(regex);
             return "name().lowerCase().matches(/" + regex + "/)";
           }
 

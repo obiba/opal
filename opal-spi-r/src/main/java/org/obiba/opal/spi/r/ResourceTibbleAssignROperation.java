@@ -22,26 +22,21 @@ public class ResourceTibbleAssignROperation extends AbstractROperation {
 
   private final String clientSymbol;
 
-  private final String utilsScript;
-
-  public ResourceTibbleAssignROperation(String symbol, String clientSymbol, String utilsScript) {
+  public ResourceTibbleAssignROperation(String symbol, String clientSymbol) {
     this.symbol = symbol;
     this.clientSymbol = clientSymbol;
-    this.utilsScript = utilsScript;
   }
 
   @Override
   public void doWithConnection() {
     if (symbol == null) return;
 
-    try (InputStream is = new ClassPathResource(utilsScript).getInputStream();) {
+    try {
       ensurePackage("resourcer");
       ensurePackage("dplyr");
       ensurePackage("moments"); // needed for descriptive stats
       String script = String.format("resourcer::as.resource.tbl(%s)", clientSymbol);
       eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
-      writeFile(utilsScript, is);
-      eval(String.format("base::source('%s')", utilsScript));
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }
