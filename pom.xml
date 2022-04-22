@@ -86,7 +86,7 @@
     <junit.version>4.13.1</junit.version>
     <liquibase.version>3.6.2</liquibase.version>
     <lang-tag.version>1.4.4</lang-tag.version>
-    <logback.version>1.2.3</logback.version>
+    <logback.version>1.2.9</logback.version>
     <logstash-logback.version>6.6</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
     <magma.version>3.0-SNAPSHOT</magma.version>
