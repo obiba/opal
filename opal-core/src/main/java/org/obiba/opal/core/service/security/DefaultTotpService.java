@@ -78,7 +78,7 @@ public class DefaultTotpService implements TotpService {
   @Override
   public boolean validateCode(String code, String secret) {
     TimeProvider timeProvider = new SystemTimeProvider();
-    CodeGenerator codeGenerator = new DefaultCodeGenerator();
+    CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.valueOf(DEFAULT_HASH_ALGORITHM), DEFAULT_DIGITS);
     CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
     return verifier.isValidCode(secret, code);
   }

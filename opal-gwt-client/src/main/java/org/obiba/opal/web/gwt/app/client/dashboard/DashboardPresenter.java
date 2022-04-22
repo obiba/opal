@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.dashboard;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -23,12 +25,16 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.NewsDto;
+import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
+
+import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_ONLY;
 
@@ -81,6 +87,21 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .forResource(UriBuilders.SHELL_COMMANDS.create().build())
         .get().authorize(getView().getTasksAuthorizer()).send();
     setInSlot(BOOKMARKS, bookmarkListPresenter);
+    ResourceRequestBuilderFactory.<SubjectProfileDto>newBuilder() //
+        .forResource(UriBuilders.SUBJECT_PROFILE.create().build("_current")) //
+        .withCallback(new ResourceCallback<SubjectProfileDto>() {
+          @Override
+          public void onResource(Response response, SubjectProfileDto resource) {
+            if (response.getStatusCode() == Response.SC_OK) {
+              List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
+              boolean realmCandidate = realms.contains("opal-user-realm") || realms.contains("opal-ini-realm") || realms.contains("obiba-realm");
+              getView().showOtpAlert(!resource.getOtpEnabled() && realmCandidate);
+            } else {
+              getView().showOtpAlert(false);
+            }
+          }
+        }) //
+        .get().send();
   }
 
   private void initReleaseNotes() {
@@ -119,6 +140,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     HasAuthorization getTasksAuthorizer();
 
     void showNews(NewsDto notes);
+
+    void showOtpAlert(boolean visible);
   }
 
 }

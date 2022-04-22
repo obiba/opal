@@ -141,6 +141,7 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   public void showTotp() {
     credentialsWell.setVisible(false);
     otpWell.setVisible(true);
+    otp.setFocus(true);
   }
 
   @Override

@@ -129,11 +129,11 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
         .withCallback(new ResourceCallback<SubjectProfileDto>() {
           @Override
           public void onResource(Response response, SubjectProfileDto resource) {
-            List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
             if (response.getStatusCode() == Response.SC_OK) {
               profile = resource;
+              List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
               getView().enableChangePassword(realms.contains("opal-user-realm"), resource.getRealm(), resource.getAccountUrl());
-              getView().showOtpSwitch(realms.contains("opal-user-realm") || realms.contains("opal-ini-realm"));
+              getView().showOtpSwitch(realms.contains("opal-user-realm") || realms.contains("opal-ini-realm") || realms.contains("obiba-realm"));
               getView().setOtpSwitchState(profile.getOtpEnabled());
               if (!Strings.isNullOrEmpty(imageUri))
                 getView().showQrCode(imageUri);

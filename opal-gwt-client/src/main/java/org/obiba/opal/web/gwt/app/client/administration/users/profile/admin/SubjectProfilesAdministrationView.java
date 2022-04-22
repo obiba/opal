@@ -11,12 +11,14 @@ package org.obiba.opal.web.gwt.app.client.administration.users.profile.admin;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -33,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
 import java.util.Collections;
@@ -121,6 +124,20 @@ public class SubjectProfilesAdministrationView extends ViewWithUiHandlers<Subjec
       }
 
     }, translations.userGroupsLabel());
+
+    Column<SubjectProfileDto, Boolean> otp = new Column<SubjectProfileDto, Boolean>(new IconCell<Boolean>() {
+      @Override
+      public IconType getIconType(Boolean value) {
+        //return value ? IconType.CHECK : IconType.CHECK_EMPTY;
+        return value ? IconType.OK : null;
+      }
+    }) {
+      @Override
+      public Boolean getValue(SubjectProfileDto object) {
+        return object.getOtpEnabled();
+      }
+    };
+    profilesTable.addColumn(otp, "2FA");
     profilesTable.addColumn(new TextColumn<SubjectProfileDto>() {
 
       @Override
@@ -142,12 +159,15 @@ public class SubjectProfilesAdministrationView extends ViewWithUiHandlers<Subjec
 
           @Override
           public String[] allActions() {
-            return new String[]{REMOVE_ACTION};
+            return new String[]{ REMOVE_ACTION, DISABLE_OTP_ACTION };
           }
 
           @Override
           public String[] getActions(SubjectProfileDto value) {
-            return new String[]{REMOVE_ACTION};
+            if (value.getOtpEnabled()) {
+              return new String[]{ REMOVE_ACTION, DISABLE_OTP_ACTION };
+            }
+            return new String[]{ REMOVE_ACTION };
           }
         }), translations.actionsLabel());
 
@@ -175,6 +195,12 @@ public class SubjectProfilesAdministrationView extends ViewWithUiHandlers<Subjec
   void onDeleteOptions(ClickEvent event) {
     getUiHandlers().onRemoveProfiles(checkColumn.getSelectedItems());
     checkColumn.clearSelection();
+  }
+
+  @UiHandler("refresh")
+  public void onRefresh(ClickEvent event) {
+    profilesTable.showLoadingIndicator(profilesDataProvider);
+    getUiHandlers().onRefresh();
   }
 
   private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, OpalSimplePager pager) {
