@@ -32,11 +32,14 @@ public class DefaultTotpService implements TotpService {
 
   private static final int DEFAULT_DIGITS = 6;
 
-  private static final int DEFAULT_SECRET_LENGTH = 32;
+  private static final int DEFAULT_SECRET_LENGTH = 64;
 
   private static final String DEFAULT_HASH_ALGORITHM = "SHA1";
 
   private final OpalGeneralConfigService serverService;
+
+  @Autowired
+  private CryptoService cryptoService;
 
   @Autowired
   public DefaultTotpService(OpalGeneralConfigService serverService) {
@@ -47,7 +50,7 @@ public class DefaultTotpService implements TotpService {
   public String generateSecret() {
     // 32 chars long secret
     SecretGenerator generator = new DefaultSecretGenerator(DEFAULT_SECRET_LENGTH);
-    return generator.generate();
+    return cryptoService.encrypt(generator.generate());
   }
 
   @Override
@@ -55,7 +58,7 @@ public class DefaultTotpService implements TotpService {
     String serverName = serverService.getConfig().getName();
     QrData data = new QrData.Builder()
         .label(label)
-        .secret(secret)
+        .secret(cryptoService.decrypt(secret))
         .issuer(serverName)
         .algorithm(HashingAlgorithm.valueOf(DEFAULT_HASH_ALGORITHM))
         .digits(DEFAULT_DIGITS)
@@ -80,6 +83,6 @@ public class DefaultTotpService implements TotpService {
     TimeProvider timeProvider = new SystemTimeProvider();
     CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.valueOf(DEFAULT_HASH_ALGORITHM), DEFAULT_DIGITS);
     CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
-    return verifier.isValidCode(secret, code);
+    return verifier.isValidCode(cryptoService.decrypt(secret), code);
   }
 }
