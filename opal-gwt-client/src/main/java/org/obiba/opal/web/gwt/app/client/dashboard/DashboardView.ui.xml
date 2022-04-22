@@ -22,6 +22,13 @@
     </g:FlowPanel>
 
     <g:FlowPanel>
+      <b:Alert type="INFO" close="false" visible="false" animation="true" ui:field="noOtpAlert">
+        <ui:msg description="No OTP label">You can enhance your account security with two-factor authentication.
+        </ui:msg>
+        <g:Anchor ui:field="otpSettings">
+          <ui:msg description="My Profile label">Enable 2FA</ui:msg>
+        </g:Anchor>
+      </b:Alert>
       <b:FluidRow>
         <b:Column size="6">
           <b:NavList addStyleNames="no-padding-left">
@@ -90,7 +97,7 @@
             <g:FlowPanel>
               <b2:IconAnchor ui:field="myprofileLink" icon="USER"/>
               <g:Label addStyleNames="help-block">
-                <ui:msg description="My profile link description">Change password and create personal access tokens.
+                <ui:msg description="My profile link description">Change password, enable 2FA or create personal access tokens.
                 </ui:msg>
               </g:Label>
             </g:FlowPanel>

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.dashboard;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.PageHeader;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
@@ -31,6 +32,12 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   @UiField
   PageHeader pageTitle;
+
+  @UiField
+  Alert noOtpAlert;
+
+  @UiField
+  Anchor otpSettings;
 
   @UiField
   IconAnchor exploreProjectsLink;
@@ -92,6 +99,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     datashieldLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.DATASHIELD);
     tasksLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.TASKS);
     myprofileLink.setHref("#" + Places.PROFILE);
+    otpSettings.setHref("#" + Places.PROFILE);
     pageTitle.setText(translations.pageDashboardTitle());
 
     exploreProjectsLink.setText(translations.exploreVariables());
@@ -128,6 +136,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
         i++;
       }
     }
+  }
+
+  @Override
+  public void showOtpAlert(boolean visible) {
+    noOtpAlert.setVisible(visible);
   }
 
   @Override

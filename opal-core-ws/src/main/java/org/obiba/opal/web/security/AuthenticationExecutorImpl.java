@@ -10,11 +10,19 @@
 
 package org.obiba.opal.web.security;
 
-import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.service.NoSuchSubjectProfileException;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.shiro.web.filter.AbstractAuthenticationExecutor;
+import org.obiba.shiro.web.filter.NoSuchOtpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Perform the authentication, either by username-password token or by obiba ticket token.
@@ -46,9 +54,27 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private TotpService totpService;
+
+  @Autowired
+  private OpalGeneralConfigService configService;
+
   @PostConstruct
   public void configure() {
     configureBan(maxTry, trialTime, banTime);
+  }
+
+  @Override
+  protected void processRequest(HttpServletRequest request, AuthenticationToken token) {
+    if (token.getPrincipal() instanceof String && token.getCredentials() != null) {
+      OpalGeneralConfig config = configService.getConfig();
+      if (config.hasOtpStrategy()) {
+        String otpHeader = request.getHeader("X-Opal-" + config.getOtpStrategy());
+        validateOtp(config.getOtpStrategy(), otpHeader, token);
+      }
+    }
+    super.processRequest(request, token);
   }
 
   @Override
@@ -68,6 +94,23 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
       if (subjectSession != null) {
         subjectSession.setAttribute(ENSURED_PROFILE, true);
       }
+    }
+  }
+
+  private void validateOtp(String strategy, String code, AuthenticationToken token) {
+    String username = token.getPrincipal().toString();
+    try {
+      SubjectProfile profile = subjectProfileService.getProfile(username);
+      if (profile.hasSecret() && "TOTP".equals(strategy)) {
+        if (Strings.isNullOrEmpty(code)) {
+          throw new NoSuchOtpException(strategy, "X-Opal-");
+        }
+        if (!totpService.validateCode(code, profile.getSecret())) {
+           throw new AuthenticationException("Wrong TOTP");
+        }
+      } // else 2FA not activated
+    } catch (NoSuchSubjectProfileException e) {
+      // first login or wrong username
     }
   }
 

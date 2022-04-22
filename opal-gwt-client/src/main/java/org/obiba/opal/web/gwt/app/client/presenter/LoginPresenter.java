@@ -13,13 +13,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.*;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -33,33 +31,27 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.AuthProviderDto;
 import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
+;
 
-  public interface Display extends View {
+public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy>
+    implements LoginUiHandlers {
+
+  public interface Display extends View, HasUiHandlers<LoginUiHandlers> {
 
     void focusOnUserName();
 
     void clear();
 
+    void showTotp();
+
     void showErrorMessageAndClearPassword();
 
     void showErrorMessageAndClearPassword(String message);
-
-    HasValue<String> getUserName();
-
-    HasValue<String> getPassword();
-
-    HasClickHandlers getSignIn();
-
-    HasKeyUpHandlers getUserNameTextBox();
-
-    HasKeyUpHandlers getPasswordTextBox();
 
     void setApplicationName(String text);
 
@@ -80,8 +72,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   private final Translations translations;
 
-  private HandlerRegistration unhandledExceptionHandler;
-
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
                         ResourceAuthorizationCache authorizationCache, Translations translations) {
@@ -89,33 +79,11 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
     this.translations = translations;
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
-    getView().getSignIn().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        createSecurityResource();
-      }
-    });
-    getView().getUserNameTextBox().addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          createSecurityResource();
-        }
-      }
-    });
-    getView().getPasswordTextBox().addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          createSecurityResource();
-        }
-      }
-    });
-
     addRegisteredHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
       @Override
       public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
@@ -134,6 +102,76 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   protected void onReveal() {
     refreshApplicationName();
     refreshAuthProviders();
+  }
+
+  @Override
+  public void onSignIn(String username, String password) {
+    getView().setBusy(true);
+
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.AUTH_SESSIONS.create().build())
+        .withFormBody("username", username, "password", password)
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            showLoginError(response);
+          }
+        })
+        .withCallback(Response.SC_UNAUTHORIZED, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            String authHeader = response.getHeader("WWW-Authenticate");
+            if ("X-Opal-TOTP".equals(authHeader)) {
+              getView().setBusy(false);
+              getView().showTotp();
+            } else
+              showLoginError(response);
+          }
+        })
+        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            String location = response.getHeader("Location");
+            initUsername(location);
+          }
+        })
+        .post().send();
+  }
+
+  @Override
+  public void onSignIn(String username, String password, String code) {
+    getView().setBusy(true);
+
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.AUTH_SESSIONS.create().build())
+        .header("X-Opal-TOTP", code)
+        .withFormBody("username", username, "password", password)
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            showLoginError(response);
+          }
+        })
+        .withCallback(Response.SC_UNAUTHORIZED, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            showLoginError(response);
+          }
+        })
+        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            String location = response.getHeader("Location");
+            initUsername(location);
+          }
+        })
+        .post().send();
   }
 
   private void refreshApplicationName() {
@@ -162,10 +200,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
         }).get().send();
   }
 
-  private void createSecurityResource() {
-    createSecurityResource(getView().getUserName().getValue(), getView().getPassword().getValue());
-  }
-
   @Override
   public void onReset() {
     // TODO: Temporarily commenting out the "focus on user name" behaviour.
@@ -175,61 +209,31 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     authorizationCache.clear();
   }
 
-  private void createSecurityResource(final String username, String password) {
-    unhandledExceptionHandler = addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
-      @Override
-      public void onUnhandledResponse(UnhandledResponseEvent e) {
-        unhandledExceptionHandler.removeHandler();
-        getView().setBusy(false);
-      }
-    });
-
-    getView().setBusy(true);
-    ResponseCodeCallback authError = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        getView().setBusy(false);
-        try {
-          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-          String msg = errorDto.getStatus();
-          if (translations.userMessageMap().containsKey(msg) || "BannedUser".equals(msg)) {
-            String status = errorDto.getStatus();
-            JsArrayString args = errorDto.getArgumentsArray();
-            if ("BannedUser".equals(status)) {
-              int remainingBanTime = Integer.parseInt(args.get(1));
-              String arg = remainingBanTime + "";
-              status = "BannedUserSecs";
-              if (remainingBanTime > 60) {
-                arg = (remainingBanTime / 60) + "";
-                status = "BannedUserMin" + ("1".equals(arg) ? "" : "s");
-              }
-              args = JsArrays.from(arg);
-            }
-            getView().showErrorMessageAndClearPassword(TranslationsUtils.replaceArguments(translations.userMessageMap().get(status), args));
-            return;
+  private void showLoginError(Response response) {
+    getView().setBusy(false);
+    try {
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+      String msg = errorDto.getStatus();
+      if (translations.userMessageMap().containsKey(msg) || "BannedUser".equals(msg)) {
+        String status = errorDto.getStatus();
+        JsArrayString args = errorDto.getArgumentsArray();
+        if ("BannedUser".equals(status)) {
+          int remainingBanTime = Integer.parseInt(args.get(1));
+          String arg = remainingBanTime + "";
+          status = "BannedUserSecs";
+          if (remainingBanTime > 60) {
+            arg = (remainingBanTime / 60) + "";
+            status = "BannedUserMin" + ("1".equals(arg) ? "" : "s");
           }
-        } catch (Exception ignored) {
-          GWT.log(ignored.getMessage());
+          args = JsArrays.from(arg);
         }
-        getView().showErrorMessageAndClearPassword();
+        getView().showErrorMessageAndClearPassword(TranslationsUtils.replaceArguments(translations.userMessageMap().get(status), args));
+        return;
       }
-    };
-
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.AUTH_SESSIONS.create().build())
-        .withFormBody("username", username, "password", password)
-        .withCallback(Response.SC_FORBIDDEN, authError)
-        .withCallback(Response.SC_UNAUTHORIZED, authError)
-        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            String location = response.getHeader("Location");
-            initUsername(location);
-          }
-        })
-        .post().send();
+    } catch (Exception ignored) {
+      GWT.log(ignored.getMessage());
+    }
+    getView().showErrorMessageAndClearPassword();
   }
 
   private void initUsername(final String location) {

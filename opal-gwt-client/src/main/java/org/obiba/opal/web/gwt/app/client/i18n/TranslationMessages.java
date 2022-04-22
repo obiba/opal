@@ -251,7 +251,7 @@ public interface TranslationMessages extends Messages {
   String confirmRemoveUser(String name);
 
   @Description("Confirm remove user profile label")
-  @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its settings will be lost: user permissions, personal access tokens and bookmarks.")
+  @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its settings will be lost: user permissions, 2FA secret key, personal access tokens and bookmarks.")
   String confirmRemoveUserProfile(String name);
 
   @Description("Confirm remove user profiles label")

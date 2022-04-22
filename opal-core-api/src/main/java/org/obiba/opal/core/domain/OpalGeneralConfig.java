@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Strings;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.google.common.base.Function;
@@ -38,6 +39,9 @@ public class OpalGeneralConfig extends AbstractTimestamped {
   private String defaultCharacterSet = DEFAULT_CHARSET;
 
   private String publicUrl;
+
+  // One time password strategy
+  private String otpStrategy = "TOTP";
 
   @NotNull
   public String getName() {
@@ -79,6 +83,18 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public void setPublicUrl(String publicUrl) {
     this.publicUrl = publicUrl;
+  }
+
+  public String getOtpStrategy() {
+    return otpStrategy;
+  }
+
+  public void setOtpStrategy(String otpStrategy) {
+    this.otpStrategy = otpStrategy;
+  }
+
+  public boolean hasOtpStrategy() {
+    return !Strings.isNullOrEmpty(otpStrategy);
   }
 
   @Override

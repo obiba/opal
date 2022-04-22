@@ -11,6 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
 import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,10 +20,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -58,6 +59,18 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   @UiField
   Form accountForm;
+
+  @UiField
+  Panel otpPanel;
+
+  @UiField
+  Button otpSwitch;
+
+  @UiField
+  Panel qrPanel;
+
+  @UiField
+  Image qrImage;
 
   @UiField
   FlowPanel bookmarks;
@@ -110,6 +123,24 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   }
 
   @Override
+  public void showOtpSwitch(boolean visible) {
+    otpPanel.setVisible(visible);
+  }
+
+  @Override
+  public void setOtpSwitchState(boolean otpEnabled) {
+    otpSwitch.setText(otpEnabled ? translations.otpDisable() : translations.otpEnable());
+    otpSwitch.setIcon(otpEnabled ? IconType.UNLOCK : IconType.LOCK);
+    qrPanel.setVisible(false);
+  }
+
+  @Override
+  public void showQrCode(String imageUri) {
+    qrPanel.setVisible(true);
+    qrImage.setUrl(imageUri);
+  }
+
+  @Override
   public void renderTokens(List<SubjectTokenDto> tokens) {
     Collections.sort(tokens, new Comparator<SubjectTokenDto>() {
       @Override
@@ -128,6 +159,11 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   @UiHandler("changePassword")
   public void onChangePassword(ClickEvent event) {
     getUiHandlers().onChangePassword();
+  }
+
+  @UiHandler("otpSwitch")
+  public void onSwitchOtp(ClickEvent event) {
+    getUiHandlers().onOtpSwitch();
   }
 
   @UiHandler("addToken")

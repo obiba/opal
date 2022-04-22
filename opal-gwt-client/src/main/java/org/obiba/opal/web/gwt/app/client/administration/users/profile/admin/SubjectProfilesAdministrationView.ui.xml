@@ -33,6 +33,11 @@
             </ui:msg>
         </b:Paragraph>
         <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
+            <b:ButtonGroup>
+                <b:Button ui:field="refresh" icon="REFRESH">
+                    <ui:msg description="Refresh apps label">Refresh</ui:msg>
+                </b:Button>
+            </b:ButtonGroup>
             <o:OpalSimplePager ui:field="profilesPager" location="RIGHT" addStyleNames="pull-right"/>
         </g:FlowPanel>
 

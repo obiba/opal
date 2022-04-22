@@ -11,13 +11,17 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.requestfactory.shared.RequestFactory;
+import com.gwtplatform.dispatch.rest.client.core.RequestBuilderFactory;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -26,6 +30,7 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import org.obiba.opal.spi.resource.Resource;
 import org.obiba.opal.web.gwt.app.client.administration.users.changePassword.ChangePasswordModalPresenter;
 import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -38,10 +43,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
@@ -116,29 +118,65 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
 
   @Override
   protected void onReveal() {
+    updateProfile(null);
+    setInSlot(BOOKMARKS, bookmarkListPresenter);
+    refreshTokens();
+  }
+
+  private void updateProfile(final String imageUri) {
     ResourceRequestBuilderFactory.<SubjectProfileDto>newBuilder() //
         .forResource(UriBuilders.SUBJECT_PROFILE.create().build("_current")) //
         .withCallback(new ResourceCallback<SubjectProfileDto>() {
           @Override
           public void onResource(Response response, SubjectProfileDto resource) {
-            List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
             if (response.getStatusCode() == Response.SC_OK) {
               profile = resource;
+              List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
               getView().enableChangePassword(realms.contains("opal-user-realm"), resource.getRealm(), resource.getAccountUrl());
+              getView().showOtpSwitch(realms.contains("opal-user-realm") || realms.contains("opal-ini-realm") || realms.contains("obiba-realm"));
+              getView().setOtpSwitchState(profile.getOtpEnabled());
+              if (!Strings.isNullOrEmpty(imageUri))
+                getView().showQrCode(imageUri);
             } else {
               getView().enableChangePassword(false, "?", null);
+              getView().showOtpSwitch(false);
             }
             getView().renderGroups(JsArrays.toList(resource.getGroupsArray()));
           }
         }) //
         .get().send();
-    setInSlot(BOOKMARKS, bookmarkListPresenter);
-    refreshTokens();
   }
 
   @Override
   public void onChangePassword() {
     changePasswordModalProvider.get().setPrincipal(profile.getPrincipal());
+  }
+
+  @Override
+  public void onOtpSwitch() {
+    ResourceRequestBuilder builder = ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SUBJECT_PROFILE_OTP.create().build("_current"));
+    if (profile.getOtpEnabled()) {
+      builder.withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              updateProfile(null);
+            }
+          }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_GATEWAY)
+          .delete().send();
+    } else {
+      builder.accept("text/plain")
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if (response.getStatusCode() == Response.SC_OK) {
+                updateProfile(response.getText());
+              } else {
+                updateProfile(null);
+              }
+            }
+          }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_GATEWAY)
+          .put().send();
+    }
   }
 
   @Override
@@ -222,8 +260,15 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
 
     void enableChangePassword(boolean enabled, String realm, String accountUrl);
 
+    void showOtpSwitch(boolean visible);
+
+    void setOtpSwitchState(boolean otpEnabled);
+
+    void showQrCode(String imageUri);
+
     void renderTokens(List<SubjectTokenDto> tokens);
 
     void renderGroups(List<String> groups);
+
   }
 }

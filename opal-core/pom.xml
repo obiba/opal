@@ -156,6 +156,10 @@
       <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>
     <dependency>
+      <groupId>dev.samstevens.totp</groupId>
+      <artifactId>totp</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
     </dependency>

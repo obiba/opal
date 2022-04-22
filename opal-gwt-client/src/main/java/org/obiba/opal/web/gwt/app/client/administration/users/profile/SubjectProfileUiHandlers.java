@@ -17,6 +17,8 @@ public interface SubjectProfileUiHandlers extends UiHandlers {
 
   void onChangePassword();
 
+  void onOtpSwitch();
+
   void onAddToken();
 
   void onAddDataSHIELDToken();

@@ -29,6 +29,8 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   ResourceRequestBuilder<T> accept(String acceptHeader);
 
+  ResourceRequestBuilder<T> header(String header, String value);
+
   ResourceRequestBuilder<T> withBody(String contentType, String body);
 
   ResourceRequestBuilder<T> withResourceBody(String dto);

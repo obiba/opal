@@ -260,6 +260,7 @@ message SubjectProfileDto {
   required string lastUpdate = 4;
   optional string accountUrl = 5;
   repeated string groups = 6;
+  optional bool otpEnabled = 7 [default = false];
 }
 
 message SubjectTokenDto {

@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.security.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -51,6 +52,14 @@ public class SubjectProfileResource {
   public Response delete() {
     subjectProfileService.deleteProfile(principal);
     subjectAclService.deleteSubjectPermissions(USER.subjectFor(principal));
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("/otp")
+  @NoAuthorization
+  public Response disableOtp() {
+    subjectProfileService.updateProfileSecret(principal, false);
     return Response.ok().build();
   }
 

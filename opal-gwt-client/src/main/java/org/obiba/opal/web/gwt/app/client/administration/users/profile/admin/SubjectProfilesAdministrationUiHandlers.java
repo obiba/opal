@@ -18,4 +18,6 @@ import java.util.List;
 public interface SubjectProfilesAdministrationUiHandlers extends UiHandlers {
 
   void onRemoveProfiles(List<SubjectProfileDto> profiles);
+
+  void onRefresh();
 }

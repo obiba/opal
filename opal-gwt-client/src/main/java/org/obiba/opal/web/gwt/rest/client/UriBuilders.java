@@ -764,6 +764,22 @@ public enum UriBuilders {
     }
   },
 
+  SUBJECT_PROFILE_OTP {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profile", "{}", "otp");
+
+    }
+  },
+
+  SUBJECT_PROFILE_OTP_QR {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profile", "{}", "otp", "qr");
+
+    }
+  },
+
   CURRENT_SUBJECT_TOKENS {
     @Override
     public UriBuilder create() {

@@ -100,6 +100,15 @@ public class SubjectProfilesAdministrationPresenter
           String title = translations.removeUserProfile();
           String message = translationMessages.confirmRemoveUserProfile(object.getPrincipal());
           fireEvent(ConfirmationRequiredEvent.createWithMessages(removeProfileConfirmation, title, message));
+        } else if (Display.DISABLE_OTP_ACTION.equals(actionName)) {
+          ResourceRequestBuilderFactory.newBuilder() //
+              .forResource(UriBuilders.SUBJECT_PROFILE_OTP.create().build(object.getPrincipal())) //
+              .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  refreshProfiles();
+                }
+              }).delete().send();
         }
       }
     });
@@ -143,6 +152,10 @@ public class SubjectProfilesAdministrationPresenter
             translationMessages.confirmRemoveUserProfiles()));
   }
 
+  @Override
+  public void onRefresh() {
+    refreshProfiles();
+  }
 
   @Override
   @TitleFunction
@@ -202,6 +215,8 @@ public class SubjectProfilesAdministrationPresenter
   }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SubjectProfilesAdministrationUiHandlers> {
+
+    String DISABLE_OTP_ACTION = "Disable 2FA";
 
     void renderProfiles(List<SubjectProfileDto> rows);
 

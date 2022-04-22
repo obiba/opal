@@ -23,6 +23,7 @@ import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +153,26 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public EventBus eventBus() {
       return new EventBus();
+    }
+
+    @Bean
+    public TotpService totpService() {
+      return new TotpService() {
+        @Override
+        public String generateSecret() {
+          return "ABCD";
+        }
+
+        @Override
+        public String getQrImageDataUri(String label, String secret) {
+          return null;
+        }
+
+        @Override
+        public boolean validateCode(String code, String secret) {
+          return false;
+        }
+      };
     }
 
     @Bean

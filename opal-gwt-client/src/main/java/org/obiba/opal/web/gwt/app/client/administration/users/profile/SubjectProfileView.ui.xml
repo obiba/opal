@@ -52,6 +52,44 @@
       </b:ButtonGroup>
     </b:Form>
 
+    <g:FlowPanel ui:field="otpPanel">
+
+      <b:Heading size="4">
+        <ui:msg description="2FA label">Two-Factor Authentication</ui:msg>
+      </b:Heading>
+
+      <b:Paragraph>
+        <ui:msg description="2FA description">
+          In addition to your username/password authentication, a dynamic password (also called one-time password)
+          can be requested for an enhanced security of your account access. This one-time password is time-based (TOTP):
+          to generate the temporary PIN code, install the <b>Microsoft Authenticator</b> app
+          (<a href="https://play.google.com/store/apps/details?id=com.azure.authenticator" target="_blank">Android</a> or
+          <a href="https://apps.apple.com/us/app/microsoft-authenticator/id983156458" target="_blank">iOS</a>)
+          or the <b>FreeOTP+</b> app (<a href="https://play.google.com/store/apps/details?id=org.liberty.android.freeotpplus" target="_blank">Android</a> only)
+          on your mobile device, enable 2FA in your profile and follow instructions to initialise the authenticator app.
+        </ui:msg>
+      </b:Paragraph>
+
+      <b:Button ui:field="otpSwitch" type="INFO" addStyleNames="bottom-margin">
+        <ui:msg description="User account label">User Account</ui:msg>
+      </b:Button>
+
+      <g:FlowPanel ui:field="qrPanel" visible="false">
+        <b:Well>
+          <b:Paragraph>
+            <ui:msg description="TOTP QR description">
+              Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:
+            </ui:msg>
+          </b:Paragraph>
+
+          <g:FlowPanel addStyleNames="text-center">
+            <g:Image ui:field="qrImage">
+            </g:Image>
+          </g:FlowPanel>
+        </b:Well>
+      </g:FlowPanel>
+    </g:FlowPanel>
+
     <b:Heading size="4">
       <ui:msg description="Personal Access Tokens label">Personal Access Tokens</ui:msg>
     </b:Heading>

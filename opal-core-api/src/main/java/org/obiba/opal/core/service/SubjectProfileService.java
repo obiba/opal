@@ -79,6 +79,14 @@ public interface SubjectProfileService extends SystemService {
   void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException;
 
   /**
+   * Set or remove profile's secret key, for 2FA.
+   *
+   * @param principal
+   * @param enable
+   */
+  void updateProfileSecret(@NotNull String principal, boolean enable);
+
+  /**
    * Get all subject profiles.
    *
    * @return

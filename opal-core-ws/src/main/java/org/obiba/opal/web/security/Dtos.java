@@ -30,9 +30,9 @@ public class Dtos {
   }
 
   public static SubjectCredentials fromDto(Opal.SubjectCredentialsDto dto) {
-    SubjectCredentials.Builder builder = SubjectCredentials.Builder.create() //
-        .name(dto.getName()) //
-        .enabled(dto.getEnabled()) //
+    SubjectCredentials.Builder builder = SubjectCredentials.Builder.create()
+        .name(dto.getName())
+        .enabled(dto.getEnabled())
         .groups(Sets.newHashSet(dto.getGroupsList()));
     switch (dto.getAuthenticationType()) {
       case PASSWORD:
@@ -65,9 +65,9 @@ public class Dtos {
   }
 
   public static Opal.SubjectCredentialsDto asDto(SubjectCredentials subjectCredentials) {
-    Opal.SubjectCredentialsDto.Builder builder = Opal.SubjectCredentialsDto.newBuilder() //
-        .setName(subjectCredentials.getName()) //
-        .setEnabled(subjectCredentials.isEnabled()) //
+    Opal.SubjectCredentialsDto.Builder builder = Opal.SubjectCredentialsDto.newBuilder()
+        .setName(subjectCredentials.getName())
+        .setEnabled(subjectCredentials.isEnabled())
         .addAllGroups(subjectCredentials.getGroups());
     switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
@@ -82,9 +82,9 @@ public class Dtos {
   }
 
   public static Opal.GroupDto asDto(Group group) {
-    return Opal.GroupDto.newBuilder() //
-        .setName(group.getName()) //
-        .addAllSubjectCredentials(group.getSubjectCredentials()) //
+    return Opal.GroupDto.newBuilder()
+        .setName(group.getName())
+        .addAllSubjectCredentials(group.getSubjectCredentials())
         .build();
   }
 
@@ -115,10 +115,11 @@ public class Dtos {
   }
 
   public static Opal.SubjectProfileDto asDto(SubjectProfile profile, String accountUrl) {
-    Opal.SubjectProfileDto.Builder builder = Opal.SubjectProfileDto.newBuilder() //
-        .setPrincipal(profile.getPrincipal()) //
-        .setRealm(profile.getRealm()) //
-        .setCreated(ISO_8601.format(profile.getCreated())) //
+    Opal.SubjectProfileDto.Builder builder = Opal.SubjectProfileDto.newBuilder()
+        .setPrincipal(profile.getPrincipal())
+        .setRealm(profile.getRealm())
+        .setOtpEnabled(profile.hasSecret())
+        .setCreated(ISO_8601.format(profile.getCreated()))
         .setLastUpdate(ISO_8601.format(profile.getUpdated()));
 
     if (!Strings.isNullOrEmpty(accountUrl))
@@ -130,8 +131,8 @@ public class Dtos {
   }
 
   public static Opal.BookmarkDto asDto(Bookmark bookmark) {
-    Opal.BookmarkDto.Builder builder = Opal.BookmarkDto.newBuilder() //
-        .setResource(bookmark.getResource()) //
+    Opal.BookmarkDto.Builder builder = Opal.BookmarkDto.newBuilder()
+        .setResource(bookmark.getResource())
         .setCreated(ISO_8601.format(bookmark.getCreated()));
 
     String[] fragments = StringUtils.tokenizeToStringArray(bookmark.getResource(), "/");

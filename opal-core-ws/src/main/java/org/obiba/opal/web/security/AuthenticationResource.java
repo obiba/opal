@@ -34,6 +34,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
+import org.obiba.shiro.web.filter.NoSuchOtpException;
 import org.obiba.shiro.web.filter.UserBannedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +58,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
       @FormParam("username") String username, @FormParam("password") String password) {
     try {
-      //if (SecurityUtils.getSubject().isAuthenticated()) return Response.status(Status.BAD_REQUEST).build();
-      authenticationExecutor.login(new UsernamePasswordToken(username, password));
+      authenticationExecutor.login(servletRequest, new UsernamePasswordToken(username, password));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' at ip: '{}': session ID is '{}'.", username,
               servletRequest.getRemoteAddr(), sessionId);
@@ -68,6 +68,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     } catch (UserBannedException e) {
       log.info("Authentication failure: {}", e.getMessage());
       throw e;
+    } catch (NoSuchOtpException e) {
+      return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", "X-Opal-" + e.getOtpStrategy()).build();
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
           e.getMessage());
