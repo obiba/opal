@@ -21,7 +21,7 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Identity Providers label">Identity Providers</ui:msg>
     </b:Heading>
     <b:Paragraph>

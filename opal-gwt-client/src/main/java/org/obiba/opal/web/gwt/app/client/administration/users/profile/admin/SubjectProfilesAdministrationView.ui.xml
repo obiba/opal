@@ -22,7 +22,7 @@
             <b:Breadcrumbs ui:field="breadcrumbs"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="User Profiles label">User Profiles</ui:msg>
         </b:Heading>
         <b:Paragraph>

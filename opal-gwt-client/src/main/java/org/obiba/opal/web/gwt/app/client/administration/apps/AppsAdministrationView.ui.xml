@@ -27,7 +27,7 @@
             </ui:msg>
         </b:Paragraph>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Apps registry label">Apps Registry</ui:msg>
         </b:Heading>
         <g:FlowPanel addStyleNames="xlarge-bottom-margin">
@@ -40,7 +40,7 @@
             <o:Table ui:field="appsTable" addStyleNames="small-top-margin" pageSize="20"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Apps self registration label">Self-registration</ui:msg>
         </b:Heading>
         <b:Paragraph>
@@ -62,7 +62,7 @@
             </b:Button>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Apps discovery label">Discovery</ui:msg>
         </b:Heading>
         <b:Paragraph>

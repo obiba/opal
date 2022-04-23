@@ -19,7 +19,7 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Versions label">Versions</ui:msg>
     </b:Heading>
     <b:Row>
@@ -28,7 +28,7 @@
       </b:Column>
     </b:Row>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="System Logs label">Logs</ui:msg>
     </b:Heading>
     <g:FlowPanel addStyleNames="xlarge-bottom-margin">
@@ -48,7 +48,7 @@
       </b:DropdownButton>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="JVM Status header">Status</ui:msg>
     </b:Heading>
     <g:Label ui:field="uptime" addStyleNames="bottom-margin"/>
@@ -64,7 +64,7 @@
       <b:Column size="4" offset="2" ui:field="gcChartColumn"/>
     </b:Row>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="System Properties label">System Properties</ui:msg>
     </b:Heading>
     <o:PropertiesTable ui:field="systemProperties"/>

@@ -124,28 +124,28 @@
     </b:FluidRow>
 
     <g:FlowPanel ui:field="idMappingsPanel" visible="false">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Identifiers Mappings label">Identifiers Mappings</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="idMappings"/>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="keyStorePanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Keystore label">Keystore</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="keyStore"/>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="reloadDatabasePanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Project Database label">Database</ui:msg>
       </b:Heading>
       <b:Paragraph>
@@ -163,7 +163,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="deletePanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
       </b:Heading>
       <b:Paragraph>

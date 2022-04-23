@@ -107,7 +107,7 @@
           <b:CodeBlock ui:field="whereScript"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
           <ui:msg description="Variables label">Variables</ui:msg>
         </b:Heading>
 
@@ -276,7 +276,7 @@
 
         <!-- Cross variables -->
         <b:FluidRow ui:field="contingencyTablePanel" visible="false">
-          <b:Heading size="4">
+          <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Contingency table label">Contingency table</ui:msg>
           </b:Heading>
           <b:FluidRow>

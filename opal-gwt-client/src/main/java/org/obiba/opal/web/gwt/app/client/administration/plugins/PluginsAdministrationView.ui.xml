@@ -60,7 +60,7 @@
       </b:Tab>
       <b:Tab heading="Advanced">
         <g:FlowPanel>
-          <b:Heading size="4">
+          <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Plugin Archive Installation label">Plugin Archive Installation</ui:msg>
           </b:Heading>
           <b:Paragraph>
@@ -72,7 +72,7 @@
             <ui:msg description="Install Plugin label">Install Plugin</ui:msg>
           </b:Button>
 
-          <b:Heading size="4">
+          <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="Plugin Update Site label">Update Site</ui:msg>
           </b:Heading>
           <b:Paragraph>

@@ -20,7 +20,7 @@
             <b:Breadcrumbs ui:field="breadcrumbs"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="DS Packages label">Packages</ui:msg>
         </b:Heading>
 
@@ -37,7 +37,7 @@
         <g:Image ui:field="clusterLoading" url="image/loading.gif"/>
         <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="DS Profiles label">Profiles</ui:msg>
         </b:Heading>
 
@@ -61,13 +61,13 @@
 
 
         <g:FlowPanel ui:field="permissionsPanel">
-            <b:Heading size="4">
+            <b:Heading size="4" addStyleNames="xxlarge-top-margin">
                 <ui:msg description="Permissions label">Permissions</ui:msg>
             </b:Heading>
             <g:SimplePanel ui:field="permissions"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
             <ui:msg description="DataSHIELD Logs label">Logs</ui:msg>
         </b:Heading>
         <g:FlowPanel addStyleNames="xlarge-bottom-margin">

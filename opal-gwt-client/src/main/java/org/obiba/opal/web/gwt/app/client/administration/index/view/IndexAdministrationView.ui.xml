@@ -21,7 +21,7 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Search service label">Search Service</ui:msg>
     </b:Heading>
 
@@ -54,7 +54,7 @@
 
     <g:FlowPanel ui:field="indicesPanel">
 
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Variables index label">Variables Index</ui:msg>
       </b:Heading>
 
@@ -77,7 +77,7 @@
         </g:Label>
       </g:FlowPanel>
 
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Values Index label">Values Index</ui:msg>
       </b:Heading>
 

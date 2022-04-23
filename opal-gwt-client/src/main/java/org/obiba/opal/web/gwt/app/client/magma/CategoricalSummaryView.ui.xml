@@ -16,7 +16,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Plots label">Plots</ui:msg>
     </b:Heading>
     <o:NavPillsPanel ui:field="chartsPanel">
@@ -30,7 +30,7 @@
       </b:FluidRow>
     </o:NavPillsPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
 

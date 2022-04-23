@@ -81,7 +81,7 @@
     </o:PropertiesTable>
 
     <g:FlowPanel ui:field="reportsPanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Reports label">Reports</ui:msg>
       </b:Heading>
       <g:FlowPanel>
@@ -94,7 +94,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:SimplePanel ui:field="permissions"></g:SimplePanel>

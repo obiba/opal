@@ -17,7 +17,7 @@
 
   <g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
 

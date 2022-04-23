@@ -18,7 +18,7 @@
   <g:FlowPanel>
 
     <g:FlowPanel ui:field="plotsPanel" visible="false">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Plots label">Plots</ui:msg>
       </b:Heading>
       <b:FluidRow>
@@ -28,7 +28,7 @@
       </b:FluidRow>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
 

@@ -32,7 +32,7 @@
       </b:Column>
     </b:Row>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Keystore label">Keystore</ui:msg>
     </b:Heading>
     <b:Paragraph>
@@ -58,7 +58,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:SimplePanel ui:field="permissions"/>

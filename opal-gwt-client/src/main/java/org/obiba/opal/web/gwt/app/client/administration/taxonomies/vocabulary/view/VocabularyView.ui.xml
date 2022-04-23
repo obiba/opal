@@ -76,7 +76,7 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Terms label">Terms</ui:msg>
     </b:Heading>
 

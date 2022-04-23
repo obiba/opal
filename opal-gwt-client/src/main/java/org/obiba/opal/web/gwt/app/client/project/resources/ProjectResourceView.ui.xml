@@ -39,7 +39,7 @@
 
             <b:Tab heading="Reference" active="true">
 
-                <b:Heading size="4">
+                <b:Heading size="4" addStyleNames="xxlarge-top-margin">
                     <ui:msg description="Resource Properties label">Properties</ui:msg>
                 </b:Heading>
 
@@ -104,7 +104,7 @@
 
                 <b:Row ui:field="formRow">
                     <b:Column size="6">
-                        <b:Heading size="4">
+                        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
                             <ui:msg description="Parameters label">Parameters</ui:msg>
                         </b:Heading>
                         <g:FlowPanel ui:field="paramsFormPanel">
@@ -113,7 +113,7 @@
                     </b:Column>
                     <b:Column size="5">
                         <g:FlowPanel ui:field="credentialsPanel">
-                            <b:Heading size="4">
+                            <b:Heading size="4" addStyleNames="xxlarge-top-margin">
                                 <ui:msg description="Credentials label">Credentials</ui:msg>
                             </b:Heading>
                             <g:FlowPanel ui:field="credentialsFormPanel">

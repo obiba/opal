@@ -72,7 +72,7 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Vocabularies label">Vocabularies</ui:msg>
     </b:Heading>
 

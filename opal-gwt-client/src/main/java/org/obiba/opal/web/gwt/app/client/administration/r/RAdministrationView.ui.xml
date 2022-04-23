@@ -21,7 +21,7 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="R servers admin label">R Servers</ui:msg>
     </b:Heading>
 
@@ -38,7 +38,7 @@
     <b:TabPanel tabPosition="left" ui:field="clusterTabs"/>
 
     <g:FlowPanel>
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="R sessions label">R Sessions</ui:msg>
       </b:Heading>
       <b:Paragraph>
@@ -51,7 +51,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel>
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="R workspaces label">R Workspaces</ui:msg>
       </b:Heading>
       <b:Paragraph>
@@ -64,7 +64,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:SimplePanel ui:field="permissions"/>

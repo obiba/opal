@@ -22,7 +22,7 @@
       <ui:msg description="My Profile label">My Profile</ui:msg>
     </b:PageHeader>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Account Settings label">Account</ui:msg>
     </b:Heading>
 
@@ -54,7 +54,7 @@
 
     <g:FlowPanel ui:field="otpPanel">
 
-      <b:Heading size="4">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="2FA label">Two-Factor Authentication</ui:msg>
       </b:Heading>
 
@@ -90,7 +90,7 @@
       </g:FlowPanel>
     </g:FlowPanel>
 
-    <b:Heading size="4">
+    <b:Heading size="4" addStyleNames="xxlarge-top-margin">
       <ui:msg description="Personal Access Tokens label">Personal Access Tokens</ui:msg>
     </b:Heading>
 

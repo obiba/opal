@@ -127,7 +127,7 @@
           </b:Column>
         </b:FluidRow>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
           <ui:msg description="Categories label">Categories</ui:msg>
         </b:Heading>
         <g:FlowPanel addStyleNames="clearfix">
@@ -138,7 +138,7 @@
           <o2:CategoriesTable ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
         </g:FlowPanel>
 
-        <b:Heading size="4">
+        <b:Heading size="4" addStyleNames="xxlarge-top-margin">
           <ui:msg description="Attributes label">Attributes</ui:msg>
         </b:Heading>
 
