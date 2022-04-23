@@ -106,6 +106,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     getUiHandlers().onAddTaxonomy();
   }
 
+  @UiHandler("importFile")
+  void onImportFileTaxonomy(ClickEvent event) {
+    getUiHandlers().onImportFileTaxonomy();
+  }
+
   @UiHandler("importGithub")
   void onImportGithubTaxonomies(ClickEvent event) {
     getUiHandlers().onImportGithubTaxonomies();

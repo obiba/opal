@@ -730,7 +730,7 @@ public interface Translations extends Constants {
       "TaxonomyGitUserRequired", "Github user or organization name is required.",
       "TaxonomyGitRepositoryRequired", "Github repository name is required.",
       "TaxonomyGitDownloadKeyRequired", "A download key is required.",
-      "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import related information is correct.",
+      "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import parameters are correct.",
       "TaxonomyTagsImportFailed", "Failed to retrieve taxonomy released versions. Please contact technical support.",
       "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.",
       "TaxonomyNotFound", "No such taxonomy with name: {0}.",
@@ -795,7 +795,8 @@ public interface Translations extends Constants {
       "FolderCreated", "Folder created: {0}",
       "DataShieldProfileInit", "DataSHIELD profile {0} initialized.",
       "ResourceViewReconnectSuccess", "Connection to resource succeeded.",
-      "ResourceViewReconnectFailed", "Connection to resource failed. Please verify that the resource is well described."
+      "ResourceViewReconnectFailed", "Connection to resource failed. Please verify that the resource is well described.",
+      "TaxonomyFileIsRequired", "A valid taxonomy file is required (.yml).",
   })
   Map<String, String> userMessageMap();
 
@@ -2179,11 +2180,13 @@ public interface Translations extends Constants {
   @Description("Quick Search Variables title")
   @DefaultStringValue("Search variables...")
   String quickSearchVariablesTitle();
-
   @Description("Import Github Taxonomy")
   @DefaultStringValue("Import Github Taxonomy")
   String importGitTaxonomy();
 
+  @Description("Import File Taxonomy")
+  @DefaultStringValue("Import File Taxonomy")
+  String importFileTaxonomy();
   @Description("Import Maelstrom Taxonomy")
   @DefaultStringValue("Import Maelstrom Research Taxonomies")
   String importMaelstromTaxonomies();

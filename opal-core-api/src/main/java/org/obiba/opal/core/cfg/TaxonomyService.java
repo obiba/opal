@@ -32,11 +32,10 @@ public interface TaxonomyService extends SystemService, GitService {
    * @param username default to maelstrom-research
    * @param repo
    * @param ref default to master
-   * @param key Download key for MR taxonomies
    * @return empty list if import failed
    */
   List<Taxonomy> importGitHubTaxonomies(@NotNull String username, @NotNull String repo, @NotNull String ref,
-      boolean override, @Nullable String key);
+      boolean override);
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
@@ -45,11 +44,10 @@ public interface TaxonomyService extends SystemService, GitService {
    * @param repo
    * @param ref default to master
    * @param taxonomyFile default to taxonomy.yml
-   * @param key Download key for MR taxonomies
    * @return null if import failed
    */
   Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-                                @NotNull String taxonomyFile, boolean override, @Nullable String key);
+                                @NotNull String taxonomyFile, boolean override);
 
   /**
    * Retrieves {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} tag names from a GitHub repository.
@@ -64,9 +62,10 @@ public interface TaxonomyService extends SystemService, GitService {
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a file in Opal's file system.
    *
    * @param file
+   * @param override
    * @return
    */
-  Taxonomy importFileTaxonomy(@NotNull String file) throws FileSystemException;
+  Taxonomy importFileTaxonomy(@NotNull String file, boolean override) throws FileSystemException;
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from an InputStream.

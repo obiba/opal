@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.git;
+package org.obiba.opal.web.gwt.app.client.administration.taxonomies.add;
 
 import javax.annotation.Nullable;
 
@@ -69,12 +69,6 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   ControlGroup repositoryGroup;
 
   @UiField
-  ControlGroup downloadKeyGroup;
-
-  @UiField
-  ControlGroup overrideGroup;
-
-  @UiField
   CheckBox overrideExisting;
 
   @UiField
@@ -85,9 +79,6 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
 
   @UiField
   FlowPanel mrPanel;
-
-  @UiField
-  TextBox downloadKey;
 
   @UiField
   FlowPanel tagPanel;
@@ -125,7 +116,7 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   void onSave(ClickEvent event) {
     String ref = tagMode ? tags.getSelectedValue() : reference.getText();
     getUiHandlers().onImport(user.getText(), repository.getText(), ref, file.getText(),
-        overrideExisting.getValue(), downloadKey.getValue());
+        overrideExisting.getValue());
   }
 
   @UiHandler("cancel")
@@ -141,11 +132,6 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   @Override
   public HasText getRepository() {
     return repository;
-  }
-
-  @Override
-  public HasText getDownloadKey() {
-    return downloadKey;
   }
 
   @Override
@@ -196,8 +182,6 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
         case REPOSITORY:
           group = repositoryGroup;
           break;
-        case DOWNLOAD_KEY:
-          group = downloadKeyGroup;
       }
     }
     if(group == null) {

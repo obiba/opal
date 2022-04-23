@@ -8,12 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.git;
-
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+package org.obiba.opal.web.gwt.app.client.administration.taxonomies.add;
 
 import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface TaxonomyGitImportModalUiHandlers extends UiHandlers, ModalUiHandlers {
-  void onImport(String user, String repository, String reference, String path, boolean override, String downloadKey);
+public interface TaxonomyFileImportModalUiHandlers extends UiHandlers, ModalUiHandlers {
+  void onImportFile(boolean override);
 }

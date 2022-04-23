@@ -8,30 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.git;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.HasValue;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyImportedEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.*;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.VcsTagsInfoDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+package org.obiba.opal.web.gwt.app.client.administration.taxonomies.add;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArrayString;
@@ -43,6 +20,22 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyImportedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.opal.VcsTagsInfoDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<TaxonomyGitImportModalPresenter.Display>
     implements TaxonomyGitImportModalUiHandlers {
@@ -55,8 +48,6 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
 
   private ValidationHandler validationHandler;
 
-  private boolean downloadKeyRequired = false;
-
   @Inject
   public TaxonomyGitImportModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
@@ -65,7 +56,6 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   }
 
   public TaxonomyGitImportModalPresenter showMaelstromForm() {
-    downloadKeyRequired = true;
     getView().showMaelstromForm(MLSTR_USER, MLSTR_REPO);
     getTags(MLSTR_USER, MLSTR_REPO);
     return this;
@@ -77,25 +67,24 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   }
 
   @Override
-  public void onImport(String user, String repository, String reference, String file, boolean override, String downloadKey) {
-    if(!validationHandler.validate()) return;
+  public void onImport(String user, String repository, String reference, String file, boolean override) {
+    if (!validationHandler.validate()) return;
 
     UriBuilder uriBuilder = UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", user)
         .query("repo", repository).query("override", String.valueOf(override));
 
     if (!Strings.isNullOrEmpty(reference)) uriBuilder.query("ref", reference);
     if (!Strings.isNullOrEmpty(file)) uriBuilder.query("file", file);
-    if (!Strings.isNullOrEmpty(downloadKey)) uriBuilder.query("key", downloadKey);
 
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build())
-      .withCallback(new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          getView().hideDialog();
-          getEventBus().fireEvent(new TaxonomyImportedEvent());
-        }
-      }, Response.SC_OK, Response.SC_CREATED) //
-      .withCallback(new TaxonomyResourceErrorHandler(getView(), translations, "TaxonomyImportFailed"),
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            getEventBus().fireEvent(new TaxonomyImportedEvent());
+          }
+        }, Response.SC_OK, Response.SC_CREATED) //
+        .withCallback(new TaxonomyResourceErrorHandler(getView(), translations, "TaxonomyImportFailed"),
             Response.SC_CONFLICT, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR) /**/.post().send();
   }
 
@@ -139,13 +128,13 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
     @Override
     public void onResponseCode(Request request, Response response) {
       String message = response.getText();
-      ClientErrorDto errorDto = Strings.isNullOrEmpty(message) ? null : (ClientErrorDto)JsonUtils.unsafeEval(message);
+      ClientErrorDto errorDto = Strings.isNullOrEmpty(message) ? null : (ClientErrorDto) JsonUtils.unsafeEval(message);
 
       if (errorDto != null) {
         view.showError(null, TranslationsUtils.replaceArguments(
             translations.userMessageMap().get(errorDto.getStatus()),
             JsArrays.toList(errorDto.getArgumentsArray())));
-      } else if(Strings.isNullOrEmpty(message)) {
+      } else if (!Strings.isNullOrEmpty(message)) {
         view.showError(null, message);
       } else {
         view.showError(defaultMessage);
@@ -159,14 +148,12 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
 
     HasText getRepository();
 
-    HasText getDownloadKey();
-
     void addTags(JsArrayString tagNames);
 
     void showMaelstromForm(String user, String repo);
 
     enum FormField {
-      USER, REPOSITORY, DOWNLOAD_KEY
+      USER, REPOSITORY
     }
 
     void hideDialog();
@@ -184,7 +171,7 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators != null) {
+      if (validators != null) {
         return validators;
       }
 
@@ -192,8 +179,6 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
       validators.add(new RequiredTextValidator(getView().getUser(), "TaxonomyGitUserRequired",
           Display.FormField.USER.name()));
       validators.add(new RequiredTextValidator(getView().getRepository(), "TaxonomyGitRepositoryRequired", Display.FormField.REPOSITORY.name()));
-      if (downloadKeyRequired)
-        validators.add(new RequiredTextValidator(getView().getDownloadKey(), "TaxonomyGitDownloadKeyRequired", Display.FormField.DOWNLOAD_KEY.name()));
       return validators;
     }
 

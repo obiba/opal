@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.add.TaxonomyFileImportModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyImportedEvent;
@@ -17,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.Taxonom
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.git.TaxonomyGitImportModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.add.TaxonomyGitImportModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -51,18 +52,22 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
   private final ModalProvider<TaxonomyGitImportModalPresenter> taxonomyGitImportModalPresenterModalProvider;
 
+  private final ModalProvider<TaxonomyFileImportModalPresenter> taxonomyFileImportModalPresenterModalProvider;
+
   private boolean editable = false;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public TaxonomiesPresenter(Display display, EventBus eventBus, TaxonomyPresenter taxonomyPresenter,
-      VocabularyPresenter vocabularyPresenter, ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider,
-      ModalProvider<TaxonomyGitImportModalPresenter> taxonomyGitImportModalPresenterModalProvider) {
+                             VocabularyPresenter vocabularyPresenter, ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider,
+                             ModalProvider<TaxonomyGitImportModalPresenter> taxonomyGitImportModalPresenterModalProvider,
+                             ModalProvider<TaxonomyFileImportModalPresenter> taxonomyFileImportModalPresenterModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.taxonomyPresenter = taxonomyPresenter;
     this.vocabularyPresenter = vocabularyPresenter;
     this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
+    this.taxonomyFileImportModalPresenterModalProvider = taxonomyFileImportModalPresenterModalProvider.setContainer(this);
     this.taxonomyGitImportModalPresenterModalProvider = taxonomyGitImportModalPresenterModalProvider.setContainer(this);
   }
 
@@ -141,6 +146,11 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   @Override
   public void onImportGithubMaelstromTaxonomies() {
     taxonomyGitImportModalPresenterModalProvider.get().showMaelstromForm();
+  }
+
+  @Override
+  public void onImportFileTaxonomy() {
+    taxonomyFileImportModalPresenterModalProvider.get();
   }
 
   private void addHandlers() {

@@ -43,6 +43,9 @@
           <b:NavLink ui:field="importGithub">
             <ui:msg description="Import Taxonomy Git label">Import from Github...</ui:msg>
           </b:NavLink>
+          <b:NavLink ui:field="importFile">
+            <ui:msg description="Import Taxonomy File label">Import from File...</ui:msg>
+          </b:NavLink>
         </b:DropdownButton>
       </b:Column>
       <b:Column size="9">

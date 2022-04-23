@@ -77,17 +77,16 @@ public class TaxonomiesResource {
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo,
       @QueryParam("ref") @DefaultValue("master") String ref,
       @QueryParam("file") String file,
-      @QueryParam("override") @DefaultValue("false") boolean override,
-      @QueryParam("key") String key) {
+      @QueryParam("override") @DefaultValue("false") boolean override) {
 
     if (Strings.isNullOrEmpty(file)) {
-      List<Taxonomy> taxonomies = taxonomyService.importGitHubTaxonomies(username, repo, ref, override, key);
+      List<Taxonomy> taxonomies = taxonomyService.importGitHubTaxonomies(username, repo, ref, override);
       if(override && taxonomies.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).build();
       URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomies").build();
       return Response.created(uri).build();
     }
 
-    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file, override, key);
+    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file, override);
     if(taxonomy == null) return Response.status(Response.Status.BAD_REQUEST).build();
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(taxonomy.getName()).build();
     return Response.created(uri).build();
@@ -95,10 +94,11 @@ public class TaxonomiesResource {
 
   @POST
   @Path("import/_file")
-  public Response importTaxonomyFromFile(@Context UriInfo uriInfo, @QueryParam("file") String file) throws
+  public Response importTaxonomyFromFile(@Context UriInfo uriInfo, @QueryParam("file") String file,
+                                         @QueryParam("override") @DefaultValue("false") boolean override) throws
       FileSystemException {
     if(Strings.isNullOrEmpty(file)) return Response.status(Response.Status.BAD_REQUEST).build();
-    Taxonomy taxonomy = taxonomyService.importFileTaxonomy(file);
+    Taxonomy taxonomy = taxonomyService.importFileTaxonomy(file, override);
     if(taxonomy == null) return Response.status(Response.Status.BAD_REQUEST).build();
 
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(taxonomy.getName()).build();

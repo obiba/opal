@@ -108,21 +108,6 @@
         <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a>
       </b:Paragraph>
 
-      <b:Paragraph>
-        A download key can be obtained using the
-        <a href="https://taxonomies.maelstrom-research.org" target="_blank" class="btn btn-primary">Download Request Form</a>
-      </b:Paragraph>
-
-      <!-- Download Key -->
-      <b:ControlGroup ui:field="downloadKeyGroup">
-        <b:ControlLabel>
-          <ui:msg description="Download Key label">Download Key</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <b:TextBox ui:field="downloadKey"/>
-        </b:Controls>
-      </b:ControlGroup>
-
       <!-- Accepted -->
       <b:ControlGroup ui:field="acceptedGroup">
         <b:CheckBox ui:field="accepted">
