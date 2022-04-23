@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.add;
+package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsonUtils;
@@ -24,22 +24,27 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.BackupCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-public class TaxonomyFileImportModalPresenter extends ModalPresenterWidget<TaxonomyFileImportModalPresenter.Display>
-    implements TaxonomyFileImportModalUiHandlers {
+public class ProjectBackupModalPresenter extends ModalPresenterWidget<ProjectBackupModalPresenter.Display>
+    implements ProjectBackupModalUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private final Translations translations;
 
+  private String projectName;
+
   @Inject
-  public TaxonomyFileImportModalPresenter(EventBus eventBus, Display display, FileSelectionPresenter fileSelectionPresenter, Translations translations) {
+  public ProjectBackupModalPresenter(EventBus eventBus, Display display, FileSelectionPresenter fileSelectionPresenter, Translations translations) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
     getView().setUiHandlers(this);
@@ -49,32 +54,38 @@ public class TaxonomyFileImportModalPresenter extends ModalPresenterWidget<Taxon
   @Override
   protected void onBind() {
     fileSelectionPresenter.bind();
-    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FILE);
+    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FOLDER);
     getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
   }
 
   @Override
-  public void onImportFile(boolean override) {
+  public void onBackup(boolean viewsAsTables) {
     String path = fileSelectionPresenter.getSelectedFile();
-    if (Strings.isNullOrEmpty(path) || !path.endsWith(".yml")) {
-      getView().showError("TaxonomyFileIsRequired");
+    if (Strings.isNullOrEmpty(path)) {
+      getView().showError("ProjectBackupFolderIsRequired");
       return;
     }
-    UriBuilder uriBuilder = UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_FILE.create()
-        .query("file", path)
-        .query("override", String.valueOf(override));
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build())
-        .withCallback(new ResponseCodeCallback() {
+    BackupCommandOptionsDto dto = BackupCommandOptionsDto.create();
+    dto.setArchive(path);
+    dto.setViewsAsTables(viewsAsTables);
+    dto.setOverride(true);
+
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_BACKUP.create().build(projectName))
+        .post()
+        .withResourceBody(BackupCommandOptionsDto.stringify(dto))
+        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().hideDialog();
-            getEventBus().fireEvent(new TaxonomyImportedEvent());
+            getView().hide();
           }
-        }, Response.SC_OK, Response.SC_CREATED) //
-        .withCallback(new TaxonomyResourceErrorHandler(getView(), translations, "TaxonomyImportFailed"),
-            Response.SC_CONFLICT, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)
-        .post().send();
+        })
+        .send();
+  }
+
+  public void setProjectName(String name) {
+    this.projectName = name;
   }
 
   private static class TaxonomyResourceErrorHandler implements ResponseCodeCallback {
@@ -108,7 +119,7 @@ public class TaxonomyFileImportModalPresenter extends ModalPresenterWidget<Taxon
     }
   }
 
-  public interface Display extends PopupView, HasUiHandlers<TaxonomyFileImportModalUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<ProjectBackupModalUiHandlers> {
 
     void hideDialog();
 

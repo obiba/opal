@@ -10,36 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.project.edit;
 
-import java.util.*;
-
-import javax.annotation.Nullable;
-import javax.inject.Provider;
-
-import com.google.common.collect.Lists;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.*;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -50,10 +22,31 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportFolderService;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
+import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
+import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
-import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_CREATED;
-import static com.google.gwt.http.client.Response.SC_OK;
+import javax.annotation.Nullable;
+import javax.inject.Provider;
+import java.util.*;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectModalPresenter.Display>
     implements EditProjectUiHandlers {
@@ -72,24 +65,20 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
   private final DataExportFolderService dataExportFolderService;
 
-  private final Translations translations;
-
   @Inject
   public EditProjectModalPresenter(EventBus eventBus,
                                    Display display,
                                    Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
-                                   DataExportFolderService dataExportFolderService,
-                                   Translations translations) {
+                                   DataExportFolderService dataExportFolderService) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenterProvider.get();
     this.dataExportFolderService = dataExportFolderService;
-    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
   public void setProjectName(@Nullable String projectName) {
     this.projectName = projectName;
-    if(!Strings.isNullOrEmpty(projectName)) {
+    if (!Strings.isNullOrEmpty(projectName)) {
       ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
           .forResource(UriBuilders.PROJECT.create().build(projectName)) //
           .withCallback(new ResourceCallback<ProjectDto>() {
@@ -120,7 +109,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> databases) {
             getView().setAvailableDatabases(databases);
-            if(project != null) {
+            if (project != null) {
               getView().getDatabase().setText(project.getDatabase());
               getView().getVcfStoreService().setText(project.getVcfStoreService());
               getView().setExportFolder(project.getExportFolder());
@@ -150,7 +139,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
   public void save() {
     getView().setBusy(true);
     getView().clearErrors();
-    if(project == null) {
+    if (project == null) {
       create();
     } else {
       update();
@@ -160,7 +149,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
   }
 
   private void create() {
-    if(!validationHandler.validate()) return;
+    if (!validationHandler.validate()) return;
     createProject();
   }
 
@@ -192,10 +181,10 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
     String tags = getView().getTags().getText();
-    if(!Strings.isNullOrEmpty(tags)) {
+    if (!Strings.isNullOrEmpty(tags)) {
       JsArrayString arr = JavaScriptObject.createArray().cast();
       dto.setTagsArray(arr);
-      for(String t : tags.split(",")) {
+      for (String t : tags.split(",")) {
         arr.push(t.trim());
       }
     }
@@ -206,7 +195,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     JsArray<ProjectDto.IdentifiersMappingDto> idMappings = project.getIdMappingsArray();
     if (idMappings != null) dto.setIdMappingsArray(idMappings);
 
-    if(project != null) dto.setArchived(project.getArchived());
+    if (project != null) dto.setArchived(project.getArchived());
     return dto;
   }
 
@@ -251,10 +240,10 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     dto.setVcfStoreService(getView().getVcfStoreService().getText());
     dto.setExportFolder(getView().getExportFolder().getText());
     String tags = getView().getTags().getText();
-    if(!Strings.isNullOrEmpty(tags)) {
+    if (!Strings.isNullOrEmpty(tags)) {
       JsArrayString tagsArray = JavaScriptObject.createArray().cast();
       dto.setTagsArray(tagsArray);
-      for(String tag : tags.split(" ")) {
+      for (String tag : tags.split(" ")) {
         tagsArray.push(tag);
       }
     }
@@ -271,7 +260,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
+      if (validators == null) {
         validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
         validators.add(new UniqueProjectNameValidator());
@@ -296,8 +285,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
       @Override
       protected boolean hasError() {
         String name = getView().getName().getText();
-        for(ProjectDto projectDto : JsArrays.toIterable(projects)) {
-          if(projectDto.getName().equals(name)) {
+        for (ProjectDto projectDto : JsArrays.toIterable(projects)) {
+          if (projectDto.getName().equals(name)) {
             return true;
           }
         }

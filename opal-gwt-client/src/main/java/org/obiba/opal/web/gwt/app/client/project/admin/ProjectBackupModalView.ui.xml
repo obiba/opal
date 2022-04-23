@@ -18,29 +18,31 @@
 
   <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
+
       <!-- File Path -->
       <b:ControlGroup>
         <b:ControlLabel>
-          <ui:msg description="Taxonomy File label">Taxonomy File</ui:msg>
+          <ui:msg description="Backup Folder label">Backup Folder</ui:msg>
         </b:ControlLabel>
         <b:Controls>
           <o:OpalSimplePanel ui:field="filePanel"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Taxonomy File Path help">Taxonomy YAML file path to import.</ui:msg>
+          <ui:msg description="Backup Folder help">Destination folder where tables/views, resources, files and report templates will be backed up.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
       <b:ControlGroup>
-        <b:CheckBox ui:field="overrideExisting">
-          <ui:msg description="Override existing taxonomy label">Override existing taxonomy</ui:msg>
+        <b:CheckBox ui:field="viewsAsTables">
+          <ui:msg description="Views as tables label">Views as tables, i.e. export data instead of keeping derivation scripts</ui:msg>
         </b:CheckBox>
       </b:ControlGroup>
+
     </g:FlowPanel>
 
     <b:ModalFooter>
-      <b:Button type="PRIMARY" ui:field="importFile">
-        <ui:msg description="Import label">Import</ui:msg>
+      <b:Button type="PRIMARY" ui:field="submit">
+        <ui:msg description="Submit label">Submit</ui:msg>
       </b:Button>
       <b:Button ui:field="cancel">
         <ui:msg description="Cancel label">Cancel</ui:msg>

@@ -117,6 +117,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS_BACKUP {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_backup");
+    }
+  },
+
   PROJECT_COMMANDS_COPY {
     @Override
     public UriBuilder create() {

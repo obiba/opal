@@ -67,6 +67,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final ModalProvider<EditProjectModalPresenter> editProjectModalProvider;
 
+  private final ModalProvider<ProjectBackupModalPresenter> projectBackupModalProvider;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final Provider<ProjectKeyStorePresenter> projectDataExchangeProvider;
@@ -84,7 +86,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
                                         ModalProvider<EditProjectModalPresenter> editProjectModalProvider,
-                                        Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                        ModalProvider<ProjectBackupModalPresenter> projectBackupModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
                                         Provider<ProjectKeyStorePresenter> projectDataExchangeProvider,
                                         Provider<ProjectIdentifiersMappingsPresenter> identifiersMappingsPresenterProvider,
                                         TranslationMessages translationMessages) {
@@ -93,6 +95,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     this.translationMessages = translationMessages;
     this.placeManager = placeManager;
     this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
+    this.projectBackupModalProvider = projectBackupModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectDataExchangeProvider = projectDataExchangeProvider;
     this.identifiersMappingsPresenter = identifiersMappingsPresenterProvider.get();
@@ -239,6 +242,18 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     };
 
     fireEvent(ConfirmationRequiredEvent.createWithMessages(reloadConfirmation, translationMessages.reloadProject(), translationMessages.confirmReloadProject()));
+  }
+
+  @Override
+  public void onBackup() {
+    ProjectBackupModalPresenter presenter = projectBackupModalProvider.create();
+    presenter.setProjectName(project.getName());
+    projectBackupModalProvider.show();
+  }
+
+  @Override
+  public void onRestore() {
+
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {

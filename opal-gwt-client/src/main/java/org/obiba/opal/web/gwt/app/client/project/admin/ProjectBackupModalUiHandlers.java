@@ -11,19 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface ProjectAdministrationUiHandlers extends UiHandlers {
-
-  void onEdit();
-
-  void onDelete();
-
-  void onArchive();
-
-  void onReload();
-
-  void onBackup();
-
-  void onRestore();
-
+public interface ProjectBackupModalUiHandlers extends UiHandlers, ModalUiHandlers {
+  void onBackup(boolean viewsAsTables);
 }

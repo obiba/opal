@@ -112,6 +112,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Project")
   String projectLabel();
 
+  @Description("Backup Project label")
+  @DefaultStringValue("Backup Project")
+  String backupProjectLabel();
   @Description("Scope label")
   @DefaultStringValue("Scope")
   String scopeLabel();

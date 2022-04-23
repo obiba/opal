@@ -88,20 +88,19 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Panel vcfServicePanel;
 
   @UiField
-  Paragraph vcfServiceText;
-
-  @UiField
   Label vcfServiceName;
 
   @UiField
   Label exportFolder;
-
 
   @UiField
   Button reloadProject;
 
   @UiField
   Label reloadProjectBusy;
+
+  @UiField
+  Panel backupRestorePanel;
 
   @UiField
   FlowPanel idMappingsPanel;
@@ -175,7 +174,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(editProperties, editPropertiesStorage);
+    return new WidgetAuthorizer(editProperties, editPropertiesStorage, backupRestorePanel);
   }
 
   @Override
@@ -224,6 +223,15 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     getUiHandlers().onEdit();
   }
 
+  @UiHandler("backupProject")
+  void onBackupProject(ClickEvent event) {
+    getUiHandlers().onBackup();
+  }
+
+  @UiHandler("restoreProject")
+  void onRestoreProject(ClickEvent event) {
+    getUiHandlers().onRestore();
+  }
 
   @UiHandler("deleteProject")
   void onDeleteProject(ClickEvent event) {

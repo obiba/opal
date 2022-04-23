@@ -162,6 +162,34 @@
       </b:Form>
     </g:FlowPanel>
 
+    <g:FlowPanel ui:field="backupRestorePanel">
+      <b:Heading size="4" addStyleNames="xxlarge-top-margin">
+        <ui:msg description="Project Backup Restore label">Backup / Restore</ui:msg>
+      </b:Heading>
+      <b:Paragraph>
+        <ui:msg description="Backup Project text">
+          The project backup task has a limited scope: tables (dictionary and data export), views (either as a logical table or as an exported table),
+          resources, files and report templates. Other project elements that are not part of the backup: user and group permissions, view change history,
+          table analysis, report executions etc.
+        </ui:msg>
+      </b:Paragraph>
+      <b:Form>
+        <b:Button type="INFO" icon="CIRCLE_ARROW_DOWN" ui:field="backupProject">
+          <ui:msg description="Backup Project button">Backup</ui:msg>
+        </b:Button>
+      </b:Form>
+      <b:Paragraph>
+        <ui:msg description="Restore Project text">
+          Restore the data of a project from a backup archive file to be found on the file system.
+        </ui:msg>
+      </b:Paragraph>
+      <b:Form>
+        <b:Button type="INFO" icon="CIRCLE_ARROW_UP" ui:field="restoreProject">
+          <ui:msg description="Restore Project button">Restore</ui:msg>
+        </b:Button>
+      </b:Form>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="deletePanel">
       <b:Heading size="4" addStyleNames="xxlarge-top-margin">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
