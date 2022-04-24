@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Row;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
@@ -230,7 +231,15 @@ public class ProjectResourceView extends ViewWithUiHandlers<ProjectResourceUiHan
       containerPanel.add(helpBlock);
     }
     //jsonObject.put("readOnly", JSONBoolean.getInstance(!enabled));
-    JSONObject jsonObjectValues = values == null ? null : (JSONObject) JSONParser.parseLenient(values);
+
+    JSONObject jsonObjectValues = null;
+    if (!Strings.isNullOrEmpty(values)) {
+      try {
+        jsonObjectValues = (JSONObject) JSONParser.parseLenient(values);
+      } catch (Exception e) {
+        // ignore
+      }
+    }
     JsonSchemaGWT.buildUiIntoPanel(jsonObject, jsonObjectValues, containerPanel, eventBus);
   }
 }

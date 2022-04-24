@@ -225,7 +225,15 @@ public class ProjectResourceModalView extends ModalPopupViewWithUiHandlers<Proje
       containerPanel.add(helpBlock);
     }
     //jsonObject.put("readOnly", JSONBoolean.getInstance(!enabled));
-    JSONObject jsonObjectValues = values == null ? null : (JSONObject) JSONParser.parseLenient(values);
+
+    JSONObject jsonObjectValues = null;
+    if (!Strings.isNullOrEmpty(values)) {
+      try {
+        jsonObjectValues = (JSONObject) JSONParser.parseLenient(values);
+      } catch (Exception e) {
+        // ignore
+      }
+    }
     JsonSchemaGWT.buildUiIntoPanel(jsonObject, jsonObjectValues, containerPanel, getEventBus());
   }
 

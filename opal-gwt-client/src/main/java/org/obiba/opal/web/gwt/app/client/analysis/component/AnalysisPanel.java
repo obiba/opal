@@ -228,7 +228,11 @@ public class AnalysisPanel extends Composite implements PluginTemplateVisitor {
     JSONObject jsonObjectValues = null;
 
     if (analysis != null && analysis.hasParameters()) {
-      jsonObjectValues = (JSONObject)JSONParser.parseLenient(analysis.getParameters());
+      try {
+        jsonObjectValues = (JSONObject) JSONParser.parseLenient(analysis.getParameters());
+      } catch (Exception e) {
+        // ignore
+      }
     }
 
     JsonSchemaGWT.buildUiIntoPanel(jsonObject, jsonObjectValues, formPanel, eventBus);
