@@ -12,6 +12,7 @@ package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.security.SubjectToken;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,12 +43,28 @@ public interface SubjectTokenService extends SystemService {
   void deleteToken(String principal, String name);
 
   /**
+   * Renew an inactive token.
+   *
+   * @param principal
+   * @param name
+   */
+  void renewToken(String principal, String name);
+
+  /**
    * Get the token object from its identifier.
    *
    * @param id
    * @return
    */
   SubjectToken getToken(String id) throws NoSuchSubjectTokenException;
+
+  /**
+   * Get token inactive and expire dates.
+   *
+   * @param token
+   * @return
+   */
+  SubjectTokenTimestamps getTokenTimestamps(SubjectToken token);
 
   /**
    * Get the token object from its identifier and principal.
@@ -89,5 +106,27 @@ public interface SubjectTokenService extends SystemService {
    * @return
    */
   List<SubjectToken> getTokens(String principal);
+
+  class SubjectTokenTimestamps {
+    private final Date expiresAt;
+    private final Date inactiveAt;
+
+    public SubjectTokenTimestamps(Date inactiveAt, Date expiresAt) {
+      this.expiresAt = expiresAt;
+      this.inactiveAt = inactiveAt;
+    }
+
+    public Date getExpiresAt() {
+      return expiresAt;
+    }
+
+    public Date getInactiveAt() {
+      return inactiveAt;
+    }
+
+    public boolean isActive() {
+      return inactiveAt == null || inactiveAt.after(new Date());
+    }
+  }
 
 }

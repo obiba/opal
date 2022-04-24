@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.security.*;
+import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.util.StringUtils;
 
@@ -88,7 +89,7 @@ public class Dtos {
         .build();
   }
 
-  public static Opal.SubjectTokenDto asDto(SubjectToken token) {
+  public static Opal.SubjectTokenDto asDto(SubjectToken token, SubjectTokenService.SubjectTokenTimestamps tokenTimestamps) {
     Opal.SubjectTokenDto.Builder builder = Opal.SubjectTokenDto.newBuilder()
         .setPrincipal(token.getPrincipal())
         .setName(token.getName())
@@ -106,6 +107,12 @@ public class Dtos {
 
     if (!Strings.isNullOrEmpty(token.getAccess()))
         builder.setAccess(Opal.SubjectTokenDto.AccessType.valueOf(token.getAccess()));
+
+    if (tokenTimestamps.getExpiresAt() != null)
+      builder.setExpiresAt(ISO_8601.format(tokenTimestamps.getExpiresAt()));
+    if (tokenTimestamps.getInactiveAt() != null)
+      builder.setInactiveAt(ISO_8601.format(tokenTimestamps.getInactiveAt()));
+    builder.setInactive(!tokenTimestamps.isActive());
 
     return builder.build();
   }

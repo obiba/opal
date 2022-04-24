@@ -12,6 +12,7 @@ package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectToken;
@@ -20,10 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class SubjectTokenServiceImpl implements SubjectTokenService {
@@ -35,6 +39,18 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
    */
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;
+
+  /**
+   * Nb of days since creation after which the token is removed.
+   */
+  @Value("${org.obiba.opal.security.login.pat.expiresIn}")
+  private int expiresIn;
+
+  /**
+   * Nb of days of inactivaty after which token needs to be renewed.
+   */
+  @Value("${org.obiba.opal.security.login.pat.activityTimeout}")
+  private int activityTimeout;
 
   private final OrientDbService orientDbService;
 
@@ -90,6 +106,13 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   }
 
   @Override
+  public void renewToken(String principal, String name) {
+    Optional<SubjectToken> first = getTokens(principal).stream()
+        .filter(tk -> tk.getName().equals(name)).findFirst();
+    first.ifPresent(token -> orientDbService.save(token, token));
+  }
+
+  @Override
   public SubjectToken getToken(String id) throws NoSuchSubjectTokenException {
     SubjectToken template = new SubjectToken();
     template.setToken(hashToken(id));
@@ -105,6 +128,13 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
     SubjectToken token = getToken(id);
     if (token.getPrincipal().equals(principal)) return token;
     throw new NoSuchSubjectTokenException(id);
+  }
+
+  @Override
+  public SubjectTokenTimestamps getTokenTimestamps(SubjectToken token) {
+    Date inactiveAt = activityTimeout>0 ? DateUtils.addDays(token.getUpdated(), activityTimeout) : null;
+    Date expiresAt = expiresIn>0 ? DateUtils.addDays(token.getCreated(), expiresIn) : null;
+    return new SubjectTokenTimestamps(inactiveAt, expiresAt);
   }
 
   @Override
@@ -134,6 +164,23 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Subscribe
   public void onSubjectProfileDeleted(SubjectProfileDeletedEvent event) {
     deleteTokens(event.getProfile().getPrincipal());
+  }
+
+  /**
+   * Remove expired tokens. Check is triggered every day at 1am.
+   */
+  @Scheduled(cron = "0 0 1 * * *")
+  public void removeExpiredTokens() {
+    if (expiresIn<=0) return;
+    Iterable<SubjectToken> tokens = orientDbService.list(SubjectToken.class);
+    Date now = new Date();
+    for (SubjectToken token : tokens) {
+      Date expiresAt = DateUtils.addDays(token.getCreated(), expiresIn);
+      if (expiresAt.after(now)) {
+        log.info("Removing expired personal access token: {}:{}", token.getPrincipal(), token.getName());
+        orientDbService.delete(token);
+      }
+    }
   }
 
   private String hashToken(String id) {

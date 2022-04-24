@@ -38,7 +38,7 @@ public class SubjectTokensResource {
   @GET
   public List<Opal.SubjectTokenDto> getAll() {
     return subjectTokenService.getTokens(principal).stream()
-        .map(Dtos::asDto)
+        .map(token -> Dtos.asDto(token, subjectTokenService.getTokenTimestamps(token)))
         .collect(Collectors.toList());
   }
 

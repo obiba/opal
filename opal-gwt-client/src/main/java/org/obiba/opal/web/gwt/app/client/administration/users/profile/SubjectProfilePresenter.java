@@ -238,6 +238,19 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
     fireEvent(ConfirmationRequiredEvent.createWithMessages(confirmation, title, message));
   }
 
+  @Override
+  public void onRenewToken(SubjectTokenDto token) {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.CURRENT_SUBJECT_TOKEN_RENEW.create().build(token.getName()))
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refreshTokens();
+          }
+        })
+        .put().send();
+  }
+
   private void refreshTokens() {
     // Fetch all providers
     ResourceRequestBuilderFactory.<JsArray<SubjectTokenDto>>newBuilder() //
@@ -257,6 +270,8 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
   }
 
   public interface Display extends View, HasUiHandlers<SubjectProfileUiHandlers> {
+
+    String RENEW_ACTION = "Renew";
 
     void enableChangePassword(boolean enabled, String realm, String accountUrl);
 

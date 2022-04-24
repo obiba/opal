@@ -41,7 +41,7 @@ public class SubjectTokensCurrentResource {
   public List<Opal.SubjectTokenDto> getAll() {
     checkSubjectNotToken();
     return subjectTokenService.getTokens(getPrincipal()).stream()
-        .map(Dtos::asDto)
+        .map(token -> Dtos.asDto(token, subjectTokenService.getTokenTimestamps(token)))
         .collect(Collectors.toList());
   }
 

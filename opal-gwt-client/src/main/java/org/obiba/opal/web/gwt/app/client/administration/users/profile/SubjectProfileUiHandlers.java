@@ -29,4 +29,5 @@ public interface SubjectProfileUiHandlers extends UiHandlers {
 
   void onRemoveToken(SubjectTokenDto token);
 
+  void onRenewToken(SubjectTokenDto token);
 }

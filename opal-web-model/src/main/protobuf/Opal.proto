@@ -283,6 +283,9 @@ message SubjectTokenDto {
   optional bool updateProject = 13 [default = false];
   optional bool deleteProject = 14 [default = false];
   optional AccessType access = 15;
+  optional bool inactive = 16;
+  optional string inactiveAt = 17;
+  optional string expiresAt = 18;
 }
 
 message LinkDto {

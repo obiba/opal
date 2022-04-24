@@ -65,13 +65,18 @@ public class OpalTokenRealm extends AuthorizingRealm {
     String tokenId = httpToken.getPrincipal().toString();
     try {
       SubjectToken subToken = subjectTokenService.getToken(tokenId);
+      if (!subjectTokenService.getTokenTimestamps(subToken).isActive()) {
+        throw new ExpiredCredentialsException("Personal access token is inactive");
+      }
       SubjectProfile subProfile = subjectProfileService.getProfile(subToken.getPrincipal());
       SimplePrincipalCollection principals = new SimplePrincipalCollection();
       principals.add(subToken.getPrincipal(), subProfile.getFirstRealm());
       principals.add(tokenId, getName());
       return new SimpleAuthenticationInfo(principals, tokenId);
-    } catch (NoSuchSubjectTokenException | NoSuchSubjectProfileException e) {
-      throw new UnknownAccountException("No account found for subjectToken [" + tokenId + "]");
+    } catch (NoSuchSubjectProfileException e) {
+      throw new UnknownAccountException("No account found for personal access token");
+    } catch (NoSuchSubjectTokenException e) {
+      throw new UnknownAccountException("No such personal access token");
     }
   }
 

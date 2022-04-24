@@ -429,7 +429,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "general");
-
     }
   },
 
@@ -437,7 +436,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies");
-
     }
   },
 
@@ -445,7 +443,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies", "import", "_default");
-
     }
   },
 
@@ -453,7 +450,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies", "tags", "_github");
-
     }
   },
 
@@ -461,7 +457,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies", "import", "_github");
-
     }
   },
 
@@ -469,7 +464,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies", "import", "_file");
-
     }
   },
 
@@ -477,7 +471,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomies", "summaries");
-
     }
   },
 
@@ -485,7 +478,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}");
-
     }
   },
 
@@ -493,7 +485,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}", "term", "{}");
-
     }
   },
 
@@ -501,7 +492,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}", "terms");
-
     }
   },
 
@@ -509,7 +499,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}");
-
     }
   },
 
@@ -517,7 +506,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "commits");
-
     }
   },
 
@@ -525,7 +513,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "commit", "{}", "{}");
-
     }
   },
 
@@ -540,7 +527,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabularies");
-
     }
   },
 
@@ -562,7 +548,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "name");
-
     }
   },
 
@@ -570,7 +555,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "charset");
-
     }
   },
 
@@ -742,7 +726,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-credential", "_current", "password");
-
     }
   },
 
@@ -750,7 +733,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "groups");
-
     }
   },
 
@@ -758,7 +740,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-credential", "{}");
-
     }
   },
 
@@ -766,7 +747,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "group", "{}");
-
     }
   },
 
@@ -774,7 +754,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profiles");
-
     }
   },
 
@@ -782,7 +761,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profile", "{}");
-
     }
   },
 
@@ -790,7 +768,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profile", "{}", "otp");
-
     }
   },
 
@@ -798,7 +775,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profile", "{}", "otp", "qr");
-
     }
   },
 
@@ -806,7 +782,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-token", "_current", "tokens");
-
     }
   },
 
@@ -814,7 +789,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-token", "_current", "token", "{}");
+    }
+  },
 
+  CURRENT_SUBJECT_TOKEN_RENEW {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-token", "_current", "token", "{}", "_renew");
     }
   },
 
@@ -822,7 +803,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "idproviders");
-
     }
   },
 
@@ -830,7 +810,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "idprovider", "{}");
-
     }
   },
 
@@ -838,7 +817,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "idprovider", "{}", "_enable");
-
     }
   },
 
@@ -846,7 +824,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases");
-
     }
   },
 
@@ -854,7 +831,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases").query("settings", "true");
-
     }
   },
 
@@ -862,7 +838,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases").query("usage", "storage");
-
     }
   },
 
@@ -870,7 +845,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases").query("usage", "import").query("settings", "true");
-
     }
   },
 
@@ -878,7 +852,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases").query("usage", "export").query("settings", "true");
-
     }
   },
 
@@ -886,7 +859,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases", "sql");
-
     }
   },
 
@@ -894,7 +866,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases", "mongodb");
-
     }
   },
 
@@ -902,7 +873,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases", "identifiers");
-
     }
   },
 
@@ -910,7 +880,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "database", "{}");
-
     }
   },
 
@@ -918,7 +887,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "database", "{}", "connections");
-
     }
   },
 
@@ -926,14 +894,12 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "database", "_identifiers", "connections");
-
     }
   },
   DATABASE_IDENTIFIERS_HAS_ENTITIES {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "database", "_identifiers", "hasEntities");
-
     }
   },
 
@@ -941,7 +907,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "status", "databases");
-
     }
   },
 
@@ -949,7 +914,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "databases", "jdbc-drivers");
-
     }
 
   },
@@ -1028,7 +992,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugin", "{}");
-
     }
   },
 
@@ -1036,7 +999,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugin", "{}", "cfg");
-
     }
   },
 
@@ -1044,7 +1006,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugin", "{}", "service");
-
     }
   },
 
@@ -1052,7 +1013,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datasource-plugins");
-
     }
   },
 
@@ -1060,7 +1020,6 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datasource-plugin", "{}", "form");
-
     }
   },
 

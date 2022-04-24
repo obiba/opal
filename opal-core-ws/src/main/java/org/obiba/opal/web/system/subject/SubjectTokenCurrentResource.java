@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Component
@@ -39,6 +36,15 @@ public class SubjectTokenCurrentResource {
   public Response delete() {
     checkSubjectNotToken();
     subjectTokenService.deleteToken(getPrincipal(), name);
+    return Response.ok().build();
+  }
+
+  @PUT
+  @Path("/_renew")
+  @NoAuthorization
+  public Response renew() {
+    checkSubjectNotToken();
+    subjectTokenService.renewToken(getPrincipal(), name);
     return Response.ok().build();
   }
 

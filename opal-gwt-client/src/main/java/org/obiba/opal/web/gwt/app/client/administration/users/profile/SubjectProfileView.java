@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
+import com.gwtplatform.dispatch.annotation.In;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -33,6 +34,8 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.SubjectTokenDto;
 
 import java.util.ArrayList;
@@ -265,23 +268,30 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
         return services;
       }
     }, translations.servicesLabel());
+
+    tokensTable.addColumn(new InactiveColumn(), "Inactive");
+    tokensTable.addColumn(new ExpiresColumn(), "Expires");
+
     tokensTable.addColumn(actionsColumn = new ActionsColumn<SubjectTokenDto>(new ActionsProvider<SubjectTokenDto>() {
 
       @Override
       public String[] allActions() {
-        return new String[]{REMOVE_ACTION};
+        return new String[]{ REMOVE_ACTION, RENEW_ACTION };
       }
 
       @Override
       public String[] getActions(SubjectTokenDto value) {
-        return new String[]{REMOVE_ACTION};
+        return value.getInactive() ? new String[]{ REMOVE_ACTION, RENEW_ACTION } : new String[]{ REMOVE_ACTION };
       }
     }), translations.actionsLabel());
 
     actionsColumn.setActionHandler(new ActionHandler<SubjectTokenDto>() {
       @Override
       public void doAction(SubjectTokenDto object, String actionName) {
-        getUiHandlers().onRemoveToken(object);
+        if (REMOVE_ACTION.equals(actionName))
+          getUiHandlers().onRemoveToken(object);
+        else
+          getUiHandlers().onRenewToken(object);
       }
     });
 
@@ -291,4 +301,35 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
     renderTokens(new ArrayList<SubjectTokenDto>());
   }
 
+  private static final class InactiveColumn extends TextColumn<SubjectTokenDto> {
+
+    private InactiveColumn() {
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public String getValue(SubjectTokenDto object) {
+      return object.hasInactiveAt()
+          ? Moment.create(object.getInactiveAt()).fromNow() //
+          : "-";
+
+    }
+  }
+
+  private static final class ExpiresColumn extends TextColumn<SubjectTokenDto> {
+
+    private ExpiresColumn() {
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public String getValue(SubjectTokenDto object) {
+      return object.hasExpiresAt()
+          ? Moment.create(object.getExpiresAt()).fromNow() //
+          : "-";
+
+    }
+  }
 }
