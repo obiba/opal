@@ -25,6 +25,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,8 @@ import java.util.Optional;
 public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   private static final Logger log = LoggerFactory.getLogger(SubjectTokenServiceImpl.class);
+
+  private static final String LEGACY_DATE = "2022-05-01";
 
   /**
    * Number of times the user password is hashed for attack resiliency
@@ -56,10 +61,19 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   private final OpalConfigurationService opalConfigurationService;
 
+  private final Date legacyDate;
+
   @Autowired
   public SubjectTokenServiceImpl(OrientDbService orientDbService, OpalConfigurationService opalConfigurationService) {
     this.orientDbService = orientDbService;
     this.opalConfigurationService = opalConfigurationService;
+    Date legacyDate;
+    try {
+      legacyDate = new SimpleDateFormat("yyyy-MM-dd").parse(LEGACY_DATE);
+    } catch (ParseException e) {
+      legacyDate = new Date();
+    }
+    this.legacyDate = legacyDate;
   }
 
   @Override
@@ -131,9 +145,16 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   }
 
   @Override
+  public void touchToken(SubjectToken token) {
+    token.setUpdated(new Date());
+    orientDbService.save(token, token);
+  }
+
+  @Override
   public SubjectTokenTimestamps getTokenTimestamps(SubjectToken token) {
-    Date inactiveAt = activityTimeout>0 ? DateUtils.addDays(token.getUpdated(), activityTimeout) : null;
-    Date expiresAt = expiresIn>0 ? DateUtils.addDays(token.getCreated(), expiresIn) : null;
+    Date updated = token.getUpdated().before(legacyDate) ? legacyDate : token.getUpdated();
+    Date inactiveAt = activityTimeout > 0 ? DateUtils.addDays(updated, activityTimeout) : null;
+    Date expiresAt = expiresIn > 0 ? DateUtils.addDays(token.getCreated(), expiresIn) : null;
     return new SubjectTokenTimestamps(inactiveAt, expiresAt);
   }
 
@@ -171,7 +192,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
    */
   @Scheduled(cron = "0 0 1 * * *")
   public void removeExpiredTokens() {
-    if (expiresIn<=0) return;
+    if (expiresIn <= 0) return;
     Iterable<SubjectToken> tokens = orientDbService.list(SubjectToken.class);
     Date now = new Date();
     for (SubjectToken token : tokens) {

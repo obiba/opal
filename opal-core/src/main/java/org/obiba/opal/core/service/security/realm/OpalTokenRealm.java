@@ -68,6 +68,7 @@ public class OpalTokenRealm extends AuthorizingRealm {
       if (!subjectTokenService.getTokenTimestamps(subToken).isActive()) {
         throw new ExpiredCredentialsException("Personal access token is inactive");
       }
+      subjectTokenService.touchToken(subToken);
       SubjectProfile subProfile = subjectProfileService.getProfile(subToken.getPrincipal());
       SimplePrincipalCollection principals = new SimplePrincipalCollection();
       principals.add(subToken.getPrincipal(), subProfile.getFirstRealm());

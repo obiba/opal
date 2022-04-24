@@ -59,6 +59,13 @@ public interface SubjectTokenService extends SystemService {
   SubjectToken getToken(String id) throws NoSuchSubjectTokenException;
 
   /**
+   * Update last access date.
+   *
+   * @param token
+   */
+  void touchToken(SubjectToken token);
+
+  /**
    * Get token inactive and expire dates.
    *
    * @param token
