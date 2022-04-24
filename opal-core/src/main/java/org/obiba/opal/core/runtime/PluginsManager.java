@@ -44,6 +44,9 @@ public class PluginsManager {
   @Value("${org.obiba.opal.plugins.site}")
   private String repo;
 
+  @Value("${productionMode}")
+  private boolean productionMode;
+
   private Collection<PluginResources> registeredPlugins;
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
@@ -80,7 +83,7 @@ public class PluginsManager {
   }
 
   void initPlugins() {
-    getPlugins(true).forEach(PluginResources::init);
+    getPlugins(true).forEach(p -> p.init(productionMode));
   }
 
   /**
