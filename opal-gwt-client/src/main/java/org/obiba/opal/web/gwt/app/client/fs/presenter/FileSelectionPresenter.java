@@ -32,6 +32,8 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
 
   private FileSelectorPresenter.FileSelectionType fileSelectionType = FileSelectorPresenter.FileSelectionType.FILE;
 
+  private String fileFilter;
+
   private FileSelectorPresenter.FileSelectionType fileTypeSelected;
 
   //
@@ -51,7 +53,7 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
 
   @Override
   public void onBrowse() {
-    fireEvent(new FileSelectionRequestEvent(this, fileSelectionType));
+    fireEvent(new FileSelectionRequestEvent(this, fileSelectionType, null, fileFilter));
   }
 
   //
@@ -66,12 +68,12 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
     getView().setFile(selectedFile);
   }
 
-  public FileSelectorPresenter.FileSelectionType getFileSelectionType() {
-    return fileSelectionType;
-  }
-
   public void setFileSelectionType(FileSelectorPresenter.FileSelectionType fileSelectionType) {
     this.fileSelectionType = fileSelectionType;
+  }
+
+  public void setFileFilter(String fileFilter) {
+    this.fileFilter = fileFilter;
   }
 
   public FileSelectorPresenter.FileSelectionType getFileTypeSelected() {

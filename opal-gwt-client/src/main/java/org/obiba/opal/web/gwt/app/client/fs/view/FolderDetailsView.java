@@ -11,12 +11,14 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -48,12 +50,14 @@ import java.util.*;
 
 public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandlers> implements Display {
 
-  private final Translations translations;
-
   interface Binder extends UiBinder<Widget, FolderDetailsView> {}
 
   @UiField
   Table<FileDto> table;
+
+  private final Translations translations;
+
+  private String fileFilter;
 
   private CheckboxColumn<FileDto> checkColumn;
 
@@ -73,6 +77,11 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   @Override
   public void setDisplaysFiles(boolean display) {
     displaysFiles = display;
+  }
+
+  @Override
+  public void setFileFilter(String fileFilter) {
+    this.fileFilter = fileFilter;
   }
 
   @Override
@@ -113,10 +122,41 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
 
   @SuppressWarnings("unchecked")
   private JsArray<FileDto> filterChildren(JsArray<FileDto> children) {
-    if(displaysFiles) {
-      return children;
+    if(!displaysFiles)
+      return filterChildrenFolder(children);
+    else if (Strings.isNullOrEmpty(fileFilter))
+        return children;
+    else
+      return filterChildrenWithFilter(children);
+  }
+
+  /**
+   * Any folders or only files which name matches filter regexp.
+   * @param children
+   * @return
+   */
+  private JsArray<FileDto> filterChildrenWithFilter(JsArray<FileDto> children) {
+    RegExp regExp = RegExp.compile(fileFilter, "i");
+    JsArray<FileDto> foldersOnly = (JsArray<FileDto>) JsArray.createArray();
+    for(int i = 0; i < children.length(); i++) {
+      FileDto child = children.get(i);
+      if(child.getType().isFileType(FileType.FOLDER)) {
+        foldersOnly.push(child);
+      } else if (regExp.test(child.getName())) {
+        foldersOnly.push(child);
+      }
     }
 
+    return foldersOnly;
+  }
+
+  /**
+   * Folders only children.
+   *
+   * @param children
+   * @return
+   */
+  private JsArray<FileDto> filterChildrenFolder(JsArray<FileDto> children) {
     JsArray<FileDto> foldersOnly = (JsArray<FileDto>) JsArray.createArray();
     for(int i = 0; i < children.length(); i++) {
       FileDto child = children.get(i);

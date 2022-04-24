@@ -92,7 +92,7 @@
         <ui:msg description="Password label">Password</ui:msg>
         <o:RequiredIcon/>
       </b:ControlLabel>
-      <b:PasswordTextBox ui:field="password" b:id="password"/>
+      <o:NewPasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>
 
     <o:CollapsiblePanel ui:field="jdbcOptions">

@@ -64,7 +64,7 @@
       <b:ControlLabel for="password">
         <ui:msg description="Password label">Password</ui:msg>
       </b:ControlLabel>
-      <b:PasswordTextBox ui:field="password" b:id="password"/>
+      <o:NewPasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>
 
     <o:CollapsiblePanel ui:field="advancedOptions">

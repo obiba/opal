@@ -71,11 +71,6 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
   }
 
   @Override
-  public void onViewPassword() {
-
-  }
-
-  @Override
   public String onGeneratePassword() {
     String generated = "";
 

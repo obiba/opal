@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright (c) 2022 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel>
+
+      <!-- File Path -->
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Restore Folder label">Backup Folder or Archive</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:OpalSimplePanel ui:field="filePanel"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Restore Folder help">Backup folder or zip archive file from which tables/views, resources, files and report templates are to be restored.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Archive password label">Password</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:NewPasswordTextBox name="encryptPassword" ui:field="password" visibleLength="16"/>
+          <b:Button icon="EYE_OPEN" ui:field="viewPasswordButton" addStyleNames="bottom-margin"></b:Button>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Archive password help">Password to decrypt the archive. Leave empty if not applicable.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:CheckBox ui:field="overrideExisting">
+          <ui:msg description="Override existing items label">Override existing items</ui:msg>
+        </b:CheckBox>
+      </b:ControlGroup>
+
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button type="PRIMARY" ui:field="submit">
+        <ui:msg description="Submit label">Submit</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancel">
+        <ui:msg description="Cancel label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+</ui:UiBinder>

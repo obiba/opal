@@ -114,7 +114,11 @@ public interface Translations extends Constants {
 
   @Description("Backup Project label")
   @DefaultStringValue("Backup Project")
-  String backupProjectLabel();
+  String projectBackupLabel();
+
+  @Description("Restore Project label")
+  @DefaultStringValue("Restore Project")
+  String projectRestoreLabel();
   @Description("Scope label")
   @DefaultStringValue("Scope")
   String scopeLabel();
@@ -571,8 +575,8 @@ public interface Translations extends Constants {
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",
       "NoSuchProject", "No such project '{0}'.",
       "NoSuchVCFSamplesMapping", "No such VCF sample mapping '{0}'.",
-      "VCFFileImportTask", "Import task has been launched.  You can follow its progress in the task list.",
-      "VCFFileExportTask", "Export task has been launched.  You can follow its progress in the task list.",
+      "VCFFileImportTask", "Import task has been launched. You can follow its progress in the task list.",
+      "VCFFileExportTask", "Export task has been launched. You can follow its progress in the task list.",
       "NoSuchDatabase", "No such database '{0}'.",
       "SubjectPrincipalNotFound", "No such subject principal '{0}'.",
       "SubjectProfileNotFound", "No profile for subject '{0}'.",
@@ -778,7 +782,7 @@ public interface Translations extends Constants {
       "BannedUserSecs", "Too many login failures. Please try again in {0}secs.",
       "RServerRuntimeError", "An R operation failed. Please contact technical support.",
       "PluginTypeIsRequired", "Plugin type is required",
-      "AnalysisTask", "Analysis task has been launched.  You can follow its progress in the task list.",
+      "AnalysisTask", "Analysis task has been launched. You can follow its progress in the task list.",
       "InvalidAnalysisPluginData", "Analysis {0} has invalid plugin data, Please contact technical support.",
       "NoSuchAnalysis", "No such analysis '{0}.",
       "IDProviderNameIsRequired", "A name is required.",
@@ -800,6 +804,10 @@ public interface Translations extends Constants {
       "ResourceViewReconnectSuccess", "Connection to resource succeeded.",
       "ResourceViewReconnectFailed", "Connection to resource failed. Please verify that the resource is well described.",
       "TaxonomyFileIsRequired", "A valid taxonomy file is required (.yml).",
+      "ProjectBackupFolderIsRequired", "Backup folder is required.",
+      "ProjectBackupTask", "Project backup task has been launched. You can follow its progress in the task list.",
+      "ProjectRestoreFolderIsRequired", "Backup folder or archive is required.",
+      "ProjectRestoreTask", "Project restore task has been launched. You can follow its progress in the task list."
   })
   Map<String, String> userMessageMap();
 

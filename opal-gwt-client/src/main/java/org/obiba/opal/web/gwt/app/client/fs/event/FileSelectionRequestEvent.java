@@ -9,10 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.fs.event;
 
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 
 /**
  *
@@ -34,6 +33,8 @@ public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEven
 
   private final String project;
 
+  private final String fileFilter;
+
   //
   // Constructors
   //
@@ -43,8 +44,13 @@ public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEven
   }
 
   public FileSelectionRequestEvent(Object source, FileSelectionType fileSelectionType, String project) {
+    this(source, fileSelectionType, project, null);
+  }
+
+  public FileSelectionRequestEvent(Object source, FileSelectionType fileSelectionType, String project, String fileFilter) {
     this.source = source;
     this.fileSelectionType = fileSelectionType;
+    this.fileFilter = fileFilter;
     this.project = project;
   }
 
@@ -77,6 +83,10 @@ public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEven
 
   public FileSelectionType getFileSelectionType() {
     return fileSelectionType;
+  }
+
+  public String getFileFilter() {
+    return fileFilter;
   }
 
   public String getProject() {

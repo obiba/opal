@@ -170,6 +170,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
     void setDisplaysFiles(boolean include);
 
+    void setFileFilter(String fileFilter);
+
     void clearSelection();
 
     void renderRows(FileDto rows);
@@ -177,6 +179,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     void setSingleSelectionModel(boolean single);
 
     boolean isSingleSelectionModel();
+
   }
 
 }

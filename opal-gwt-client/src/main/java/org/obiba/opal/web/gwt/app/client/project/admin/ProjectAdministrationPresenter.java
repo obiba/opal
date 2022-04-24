@@ -69,6 +69,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final ModalProvider<ProjectBackupModalPresenter> projectBackupModalProvider;
 
+  private final ModalProvider<ProjectRestoreModalPresenter> projectRestoreModalProvider;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final Provider<ProjectKeyStorePresenter> projectDataExchangeProvider;
@@ -86,7 +88,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
                                         ModalProvider<EditProjectModalPresenter> editProjectModalProvider,
-                                        ModalProvider<ProjectBackupModalPresenter> projectBackupModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+                                        ModalProvider<ProjectBackupModalPresenter> projectBackupModalProvider, ModalProvider<ProjectRestoreModalPresenter> projectRestoreModalProvider, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
                                         Provider<ProjectKeyStorePresenter> projectDataExchangeProvider,
                                         Provider<ProjectIdentifiersMappingsPresenter> identifiersMappingsPresenterProvider,
                                         TranslationMessages translationMessages) {
@@ -96,6 +98,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     this.placeManager = placeManager;
     this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
     this.projectBackupModalProvider = projectBackupModalProvider.setContainer(this);
+    this.projectRestoreModalProvider = projectRestoreModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.projectDataExchangeProvider = projectDataExchangeProvider;
     this.identifiersMappingsPresenter = identifiersMappingsPresenterProvider.get();
@@ -253,7 +256,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   @Override
   public void onRestore() {
-
+    ProjectRestoreModalPresenter presenter = projectRestoreModalProvider.create();
+    presenter.setProjectName(project.getName());
+    projectRestoreModalProvider.show();
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {

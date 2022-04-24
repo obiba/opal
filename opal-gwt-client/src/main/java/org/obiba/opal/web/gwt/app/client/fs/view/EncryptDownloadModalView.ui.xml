@@ -34,7 +34,7 @@
         <ui:msg description="Encrypt file password label">Password</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <b:PasswordTextBox enabled="false" name="encryptPassword" ui:field="password" visibleLength="16"/>
+        <o:NewPasswordTextBox enabled="false" name="encryptPassword" ui:field="password" visibleLength="16"/>
         <b:Button enabled="false" icon="EYE_OPEN" ui:field="viewPasswordButton"></b:Button>
         <b:Button enabled="false" ui:field="generatePasswordButton">
           <ui:msg description="Encrypt generate password label">Generate</ui:msg>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2022 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -24,17 +24,17 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.BackupCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.RestoreCommandOptionsDto;
 
-public class ProjectBackupModalPresenter extends ModalPresenterWidget<ProjectBackupModalPresenter.Display>
-    implements ProjectBackupModalUiHandlers {
+public class ProjectRestoreModalPresenter extends ModalPresenterWidget<ProjectRestoreModalPresenter.Display>
+    implements ProjectRestoreModalUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String projectName;
 
   @Inject
-  public ProjectBackupModalPresenter(EventBus eventBus, Display display, FileSelectionPresenter fileSelectionPresenter) {
+  public ProjectRestoreModalPresenter(EventBus eventBus, Display display, FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
     getView().setUiHandlers(this);
@@ -43,32 +43,34 @@ public class ProjectBackupModalPresenter extends ModalPresenterWidget<ProjectBac
   @Override
   protected void onBind() {
     fileSelectionPresenter.bind();
-    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FOLDER);
+    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FILE_OR_FOLDER);
+    fileSelectionPresenter.setFileFilter("\\.zip$");
     getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
   }
 
   @Override
-  public void onBackup(boolean viewsAsTables) {
+  public void onRestore(String password, boolean override) {
     String path = fileSelectionPresenter.getSelectedFile();
     if (Strings.isNullOrEmpty(path)) {
-      getView().showError("ProjectBackupFolderIsRequired");
+      getView().showError("ProjectRestoreFolderIsRequired");
       return;
     }
 
-    BackupCommandOptionsDto dto = BackupCommandOptionsDto.create();
+    RestoreCommandOptionsDto dto = RestoreCommandOptionsDto.create();
     dto.setArchive(path);
-    dto.setViewsAsTables(viewsAsTables);
-    dto.setOverride(true);
+    if (!Strings.isNullOrEmpty(password))
+      dto.setPassword(password);
+    dto.setOverride(override);
 
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_COMMANDS_BACKUP.create().build(projectName))
+        .forResource(UriBuilders.PROJECT_COMMANDS_RESTORE.create().build(projectName))
         .post()
-        .withResourceBody(BackupCommandOptionsDto.stringify(dto))
+        .withResourceBody(RestoreCommandOptionsDto.stringify(dto))
         .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hide();
-            fireEvent(NotificationEvent.newBuilder().info("ProjectBackupTask").build());
+            fireEvent(NotificationEvent.newBuilder().info("ProjectRestoreTask").build());
           }
         })
         .send();
@@ -78,7 +80,7 @@ public class ProjectBackupModalPresenter extends ModalPresenterWidget<ProjectBac
     this.projectName = name;
   }
 
-  public interface Display extends PopupView, HasUiHandlers<ProjectBackupModalUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<ProjectRestoreModalUiHandlers> {
 
     void hideDialog();
 

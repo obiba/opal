@@ -61,7 +61,7 @@
                     <o:RequiredIcon/>
                 </b:ControlLabel>
                 <b:Controls>
-                    <b:PasswordTextBox ui:field="administratorPassword"/>
+                    <o:NewPasswordTextBox ui:field="administratorPassword"/>
                 </b:Controls>
                 <b:HelpBlock>
                     <ui:msg description="Rock administrator password help">Password of the Rock user with "administrator" role.</ui:msg>
@@ -90,7 +90,7 @@
                     <o:RequiredIcon/>
                 </b:ControlLabel>
                 <b:Controls>
-                    <b:PasswordTextBox ui:field="managerPassword"/>
+                    <o:NewPasswordTextBox ui:field="managerPassword"/>
                 </b:Controls>
                 <b:HelpBlock>
                     <ui:msg description="Rock manager password help">Password of the Rock user with "manager" role.</ui:msg>
@@ -116,7 +116,7 @@
                     <o:RequiredIcon/>
                 </b:ControlLabel>
                 <b:Controls>
-                    <b:PasswordTextBox ui:field="userPassword"/>
+                    <o:NewPasswordTextBox ui:field="userPassword"/>
                 </b:Controls>
                 <b:HelpBlock>
                     <ui:msg description="Rock user password help">Password of the Rock user with "user" role.</ui:msg>

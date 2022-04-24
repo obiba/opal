@@ -10,7 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.*;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +19,11 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HasEnabled;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -381,7 +382,7 @@ public class SchemaUiContainer extends ControlGroup {
       return createWidgetForStringWithEnum(enumItems);
     }
 
-    TextBox input = format.equals("password") ? new PasswordTextBox() : new TextBox();
+    TextBox input = format.equals("password") ? new NewPasswordTextBox() : new TextBox();
     input.setName(key);
     setStringSchemaValidations(input);
 

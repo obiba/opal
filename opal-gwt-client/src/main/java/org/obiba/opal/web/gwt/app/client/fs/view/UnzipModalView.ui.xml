@@ -24,7 +24,7 @@
         <ui:msg description="Archive password label">Password</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <b:PasswordTextBox name="encryptPassword" ui:field="password" visibleLength="16"/>
+        <o:NewPasswordTextBox name="encryptPassword" ui:field="password" visibleLength="16"/>
         <b:Button icon="EYE_OPEN" ui:field="viewPasswordButton"></b:Button>
       </b:Controls>
       <b:HelpBlock>

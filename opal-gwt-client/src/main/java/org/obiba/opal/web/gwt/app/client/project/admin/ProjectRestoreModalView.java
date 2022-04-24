@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2022 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,10 +27,10 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
 
-public class ProjectBackupModalView extends ModalPopupViewWithUiHandlers<ProjectBackupModalUiHandlers>
-    implements ProjectBackupModalPresenter.Display {
+public class ProjectRestoreModalView extends ModalPopupViewWithUiHandlers<ProjectRestoreModalUiHandlers>
+    implements ProjectRestoreModalPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, ProjectBackupModalView> {
+  interface ViewUiBinder extends UiBinder<Widget, ProjectRestoreModalView> {
   }
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -43,13 +44,16 @@ public class ProjectBackupModalView extends ModalPopupViewWithUiHandlers<Project
   OpalSimplePanel filePanel;
 
   @UiField
-  CheckBox viewsAsTables;
+  PasswordTextBox password;
+
+  @UiField
+  CheckBox overrideExisting;
 
   @Inject
-  public ProjectBackupModalView(EventBus eventBus) {
+  public ProjectRestoreModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
-    modal.setTitle(translations.projectBackupLabel());
+    modal.setTitle(translations.projectRestoreLabel());
   }
 
   @Override
@@ -57,10 +61,15 @@ public class ProjectBackupModalView extends ModalPopupViewWithUiHandlers<Project
     return modal;
   }
 
+  @UiHandler("viewPasswordButton")
+  public void onViewPassword(ClickEvent event) {
+    password.getElement().setAttribute("type", password.getElement().getAttribute("type").equalsIgnoreCase("text") ? "password" : "text");
+  }
+
   @UiHandler("submit")
   void onSave(ClickEvent event) {
     clearErrors();
-    getUiHandlers().onBackup(viewsAsTables.getValue());
+    getUiHandlers().onRestore(password.getText(), overrideExisting.getValue());
   }
 
   @UiHandler("cancel")

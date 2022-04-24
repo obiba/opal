@@ -10,10 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.project;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationView;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectBackupModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectBackupModalView;
+import org.obiba.opal.web.gwt.app.client.project.admin.*;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalView;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.*;
@@ -43,6 +40,8 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectAdministrationView.class);
     bindPresenterWidget(ProjectBackupModalPresenter.class, ProjectBackupModalPresenter.Display.class,
         ProjectBackupModalView.class);
+    bindPresenterWidget(ProjectRestoreModalPresenter.class, ProjectRestoreModalPresenter.Display.class,
+        ProjectRestoreModalView.class);
     bindPresenterWidget(EditProjectModalPresenter.class, EditProjectModalPresenter.Display.class,
         EditProjectModalView.class);
     bindPresenterWidget(ProjectKeyStorePresenter.class, ProjectKeyStorePresenter.Display.class,

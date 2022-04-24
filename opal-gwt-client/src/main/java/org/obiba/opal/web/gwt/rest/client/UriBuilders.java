@@ -124,6 +124,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS_RESTORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_restore");
+    }
+  },
+
   PROJECT_COMMANDS_COPY {
     @Override
     public UriBuilder create() {

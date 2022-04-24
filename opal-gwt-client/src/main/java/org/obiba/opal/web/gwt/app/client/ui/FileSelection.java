@@ -67,7 +67,7 @@ public class FileSelection extends Composite implements TakesValue<String> {
     browseButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new FileSelectionRequestEvent(FileSelection.this, format));
+        fireEvent(new FileSelectionRequestEvent(FileSelection.this, format));
       }
     });
 
@@ -76,7 +76,7 @@ public class FileSelection extends Composite implements TakesValue<String> {
       public void onFileSelection(FileSelectionEvent event) {
         if(FileSelection.this.equals(event.getSource())) {
           file.setValue(event.getSelectedFile().getSelectionPath());
-          eventBus.fireEvent(new FileSelectionUpdatedEvent(FileSelection.this));
+          fireEvent(new FileSelectionUpdatedEvent(FileSelection.this));
         }
       }
     });

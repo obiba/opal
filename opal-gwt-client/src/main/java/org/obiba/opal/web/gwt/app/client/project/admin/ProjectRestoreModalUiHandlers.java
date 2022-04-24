@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2022 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -8,13 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.fs.presenter;
+package org.obiba.opal.web.gwt.app.client.project.admin;
 
+import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface EncryptDownloadModalUiHandlers extends ModalUiHandlers {
-
-  void onDownload();
-
-  String onGeneratePassword();
+public interface ProjectRestoreModalUiHandlers extends UiHandlers, ModalUiHandlers {
+  void onRestore(String password, boolean override);
 }
