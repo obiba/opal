@@ -16,7 +16,7 @@ import com.google.common.base.Strings;
 import com.google.common.cache.*;
 import com.google.common.collect.*;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;

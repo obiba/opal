@@ -11,8 +11,8 @@ package org.obiba.opal.core.runtime.jdbc;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbcp.managed.BasicManagedDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -70,7 +70,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     dataSource.setUsername(username);
     dataSource.setPassword(password);
     dataSource.setInitialSize(MIN_POOL_SIZE);
-    dataSource.setMaxActive(maxPoolSize);
+    dataSource.setMaxTotal(maxPoolSize);
     dataSource.setMaxIdle(MAX_IDLE);
     dataSource.setTestOnBorrow(true);
     dataSource.setTestWhileIdle(false);
