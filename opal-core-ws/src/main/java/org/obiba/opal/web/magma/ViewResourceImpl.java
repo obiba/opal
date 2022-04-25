@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueView;
+import org.obiba.magma.*;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
@@ -115,7 +112,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Override
   public Response initView() {
     viewManager.initView(getDatasource().getName(), getValueTable().getName());
-    return Response.ok().build();
+    return ValueTableStatus.READY.equals(getValueTable().getStatus()) ? Response.ok().build() : Response.serverError().build();
   }
 
   @Override

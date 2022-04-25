@@ -504,10 +504,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             if (response.getStatusCode() == Response.SC_OK)
               fireEvent(NotificationEvent.newBuilder().success(translations.userMessageMap().get("ResourceViewReconnectSuccess")).build());
             else
-              fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceViewReconnectFailed") + response.getStatusText()).build());
+              fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceViewReconnectFailed")).build());
             getView().resourceViewReconnectCompleted();
           }
-        }, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
+        }, SC_OK, SC_INTERNAL_SERVER_ERROR).put().send();
   }
 
   @Override

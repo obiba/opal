@@ -168,6 +168,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
       initialised = true;
       status = ValueTableStatus.READY;
     } catch (Exception e) {
+      initialised = true;
       status = ValueTableStatus.ERROR;
       if (log.isDebugEnabled())
         log.error("Resource view '{}' init failed", name, e);
@@ -262,6 +263,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public synchronized List<VariableEntity> getVariableEntities() {
+    ensureInitialised();
+    if (isError()) return Lists.newArrayList();
+
     if (entitiesCache == null) {
       entitiesCache = CacheBuilder.newBuilder()
           .expireAfterWrite(60, TimeUnit.SECONDS)
@@ -286,6 +290,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public synchronized int getVariableEntityCount() {
+    ensureInitialised();
+    if (isError()) return 0;
+
     if (entitiesCountCache == null) {
       entitiesCountCache = CacheBuilder.newBuilder()
           .expireAfterWrite(60, TimeUnit.SECONDS)
@@ -434,6 +441,10 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   //
   // Private methods
   //
+
+  private boolean isError() {
+    return ValueTableStatus.ERROR.equals(status);
+  }
 
   private synchronized void ensureInitialised() {
     if (!initialised) {

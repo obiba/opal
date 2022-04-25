@@ -130,7 +130,7 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
   @Override
   public void initialise() {
     if (rSession != null) return;
-    // TODO R server profile
+
     lock.lock();
     try {
       RServerProfile rServerProfile;

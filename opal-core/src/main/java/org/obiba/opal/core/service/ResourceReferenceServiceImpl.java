@@ -73,14 +73,10 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public ResourceReference getResourceReference(String project, String name) throws NoSuchResourceReferenceException {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(ResourceReference.class.getSimpleName())
-        .whereClauses("project = ?", "name = ?")
-        .build();
-    ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
-    if (resourceReference == null || !canViewResourceReference(project, name))
+    ResourceReference resourceReference = getResourceReferenceInternal(project, name);
+    if (!canViewResourceReference(project, name))
       throw new NoSuchResourceReferenceException(project, name);
-    return decryptCredentials(resourceReference);
+    return resourceReference;
   }
 
   @Override
@@ -152,7 +148,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public ResourceAssignROperation asAssignOperation(String project, String name, String symbol) throws NoSuchResourceReferenceException {
-    ResourceReference ref = getResourceReference(project, name);
+    ResourceReference ref = getResourceReferenceInternal(project, name);
     Resource resource = createResource(ref);
     List<String> requiredPackages = getRequiredPackages(ref);
     if (resource == null) {
@@ -163,9 +159,14 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public String getProfile(String project, String name) {
-    ResourceReference ref = getResourceReference(project, name);
-    ResourceProvidersService.ResourceProvider provider = resourceProvidersService.getResourceProvider(ref.getProvider());
-    return provider.getProfile();
+    ResourceReference ref = getResourceReferenceInternal(project, name);
+    try {
+      ResourceProvidersService.ResourceProvider provider = resourceProvidersService.getResourceProvider(ref.getProvider());
+      return provider.getProfile();
+    } catch (Exception e) {
+      logger.warn("Failed at getting resource profile: {}", e.getMessage());
+      return "default";
+    }
   }
 
   @Override
@@ -183,6 +184,21 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   @Subscribe
   public void onProjectDeleted(DatasourceDeletedEvent event) {
     deleteAll(event.getDatasource().getName());
+  }
+
+  //
+  // Private methods
+  //
+
+  private ResourceReference getResourceReferenceInternal(String project, String name) throws NoSuchResourceReferenceException {
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+        .table(ResourceReference.class.getSimpleName())
+        .whereClauses("project = ?", "name = ?")
+        .build();
+    ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
+    if (resourceReference == null)
+      throw new NoSuchResourceReferenceException(project, name);
+    return decryptCredentials(resourceReference);
   }
 
   private ResourceReference encryptCredentials(ResourceReference resourceReference) {

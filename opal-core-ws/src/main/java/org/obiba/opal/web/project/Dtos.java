@@ -159,7 +159,6 @@ public class Dtos {
           viewCount++;
           derivedVariableCount = derivedVariableCount + tableVariableCount;
         }
-        table.getVariableEntityCount();
       }
     }
     builder.setTableCount(tableCount);
