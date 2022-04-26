@@ -15,10 +15,12 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
-import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ProjectsState;
@@ -29,12 +31,14 @@ import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableEvent;
 import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,7 +50,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -339,9 +342,54 @@ public class ProjectsServiceImpl implements ProjectService {
     }
   }
 
+  @Subscribe
+  public synchronized void onResourceProvidersServiceStarted(ResourceProvidersServiceStartedEvent event) {
+    log.info("Resource providers ready, scanning for views to initialise...");
+    // case some projects are still being loaded
+    if (datasourceLoadQueue.size()>0) return;
+    getSubject().execute(new Runnable() {
+      @Override
+      public void run() {
+        initViewsInError();
+      }
+    });
+  }
+
   //
   // Private methods
   //
+
+  /**
+   * Authenticate as background task user, needed to list secured datasources.
+   *
+   * @return
+   */
+  private Subject getSubject() {
+    try {
+      PrincipalCollection principals = SecurityUtils.getSecurityManager()
+          .authenticate(BackgroundJobServiceAuthToken.INSTANCE).getPrincipals();
+      return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
+    } catch(AuthenticationException e) {
+      log.warn("Failed to obtain system user credentials: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void initViewsInError() {
+    getProjects().forEach(project ->
+        project.getDatasource().getValueTables().stream()
+            .filter(ValueTable::isView)
+            .filter(view -> ValueTableStatus.ERROR.equals(view.getStatus()))
+            .forEach(view -> {
+              log.info("Initialise {}.{}", project.getName(), view.getName());
+              try {
+                viewManager.initView(project.getName(), view.getName());
+              } catch (Exception e) {
+                log.error("{}", e.getMessage());
+              }
+            })
+    );
+  }
 
   private void removeProjectsIdentifiersMappingByEntityType(ValueTable valueTable) {
     getProjects().forEach(project -> {
