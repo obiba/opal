@@ -439,7 +439,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setTableStatus(TableStatusDto status) {
-    statusText.setText(translations.tableStatusDescriptionsMap().get(status.getName()));
+    statusText.setText(translations.tableStatusDescriptionsMap().get("TABLE_" + status.getName()));
     statusAlert.setType(getAlertStatusType(status));
     statusAlert.setVisible(!TableStatusDto.READY.getName().equals(status.getName()));
     boolean loading = TableStatusDto.LOADING.getName().equals(status.getName());

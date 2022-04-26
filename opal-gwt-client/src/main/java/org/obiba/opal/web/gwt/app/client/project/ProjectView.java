@@ -168,7 +168,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     datasourceStatusIcon.removeStyleName("text-warning");
     datasourceStatusIcon.removeStyleName("text-error");
     datasourceStatusIcon.removeStyleName("text-info");
-    datasourceStatusText.setText(translations.datasourceStatusDescriptionsMap().get(status));
+    datasourceStatusText.setText(translations.datasourceStatusDescriptionsMap().get("PROJECT_" + status));
     switch (status) {
       case "READY":
         datasourceStatusIcon.addStyleName("text-success");

@@ -313,7 +313,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     @Override
     public String getValue(ProjectDto object) {
-      String title = translations.datasourceStatusDescriptionsMap().get(object.getDatasourceStatus().getName());
+      String title = translations.datasourceStatusDescriptionsMap().get("PROJECT_" + object.getDatasourceStatus().getName());
       return "<i class='icon-circle " + getStatusClass(object.getDatasourceStatus().getName()) + "' title='" + title + "'></i>";
     }
 

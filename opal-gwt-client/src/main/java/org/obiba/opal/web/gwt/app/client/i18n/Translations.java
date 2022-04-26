@@ -2434,17 +2434,17 @@ public interface Translations extends Constants {
   String projectLoadingText();
 
   @Description("Project Datasource Status Descriptions")
-  @DefaultStringMapValue({ "READY", "Ready",
-      "BUSY", "Busy: database has write commands that are pending or being processed.",
-      "LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",
-      "NONE", "No associated database, data cannot be imported, only views can be defined." })
+  @DefaultStringMapValue({ "PROJECT_READY", "Ready",
+      "PROJECT_BUSY", "Busy: database has write commands that are pending or being processed.",
+      "PROJECT_LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",
+      "PROJECT_NONE", "No associated database, data cannot be imported, only views can be defined." })
   Map<String, String> datasourceStatusDescriptionsMap();
 
   @Description("Project Table Status Descriptions")
-  @DefaultStringMapValue({ "READY", "Ready",
-      "LOADING", "Loading: the table is being loaded, tables operations are not accessible yet.",
-      "ERROR", "Error: the initialization of the table\'s data connection failed.",
-      "CLOSED", "Closed: the table\'s connection to data is closed." })
+  @DefaultStringMapValue({ "TABLE_READY", "Ready",
+      "TABLE_LOADING", "Loading: the table is being loaded, table operations are not accessible yet.",
+      "TABLE_ERROR", "Error: the initialization of the table\'s data connection failed.",
+      "TABLE_CLOSED", "Closed: the table\'s connection to data is closed." })
   Map<String, String> tableStatusDescriptionsMap();
 
   @Description("JVM Labels")

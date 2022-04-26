@@ -477,7 +477,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
     @Override
     public String getValue(TableDto object) {
-      String title = translations.tableStatusDescriptionsMap().get(object.getStatus().getName());
+      String title = translations.tableStatusDescriptionsMap().get("TABLE_" + object.getStatus().getName());
       return "<i class='icon-circle " + getStatusClass(object.getStatus().getName()) + "' title='" + title + "'></i>";
     }
 
