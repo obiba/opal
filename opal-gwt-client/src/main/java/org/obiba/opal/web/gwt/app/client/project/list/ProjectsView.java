@@ -322,9 +322,9 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         case "READY":
           return "text-success";
         case "BUSY":
-          return "text-warning";
+          return "text-primary";
         case "LOADING":
-          return "text-error";
+          return "text-warning";
         default:
           return "text-info";
       }

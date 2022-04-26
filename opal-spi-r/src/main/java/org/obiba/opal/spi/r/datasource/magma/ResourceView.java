@@ -160,6 +160,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
 
   @Override
   public synchronized void initialise() {
+    if (ValueTableStatus.LOADING.equals(status)) return;
     status = ValueTableStatus.LOADING;
     try {
       Initialisables.initialise(connector);
@@ -264,7 +265,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   @Override
   public synchronized List<VariableEntity> getVariableEntities() {
     ensureInitialised();
-    if (isError()) return Lists.newArrayList();
+    if (!isReady()) return Lists.newArrayList();
 
     if (entitiesCache == null) {
       entitiesCache = CacheBuilder.newBuilder()
@@ -291,7 +292,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   @Override
   public synchronized int getVariableEntityCount() {
     ensureInitialised();
-    if (isError()) return 0;
+    if (!isReady()) return 0;
 
     if (entitiesCountCache == null) {
       entitiesCountCache = CacheBuilder.newBuilder()
@@ -442,8 +443,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   // Private methods
   //
 
-  private boolean isError() {
-    return ValueTableStatus.ERROR.equals(status);
+  private boolean isReady() {
+    return ValueTableStatus.READY.equals(status);
   }
 
   private synchronized void ensureInitialised() {

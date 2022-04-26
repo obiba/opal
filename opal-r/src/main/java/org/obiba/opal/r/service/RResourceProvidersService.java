@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2022 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -8,10 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.resource;
+package org.obiba.opal.r.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
@@ -19,8 +20,8 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
 import org.obiba.opal.r.cluster.RServerCluster;
-import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
@@ -43,6 +44,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   @Autowired
   private RServerManagerService rServerManagerService;
+
+  @Autowired
+  private EventBus eventBus;
 
   private boolean running = false;
 
@@ -188,6 +192,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
         log.error("Resource packages discovery failed", e);
       }
     }
+    eventBus.post(new ResourceProvidersServiceStartedEvent());
   }
 
   /**

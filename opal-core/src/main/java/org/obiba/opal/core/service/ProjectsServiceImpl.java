@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.service;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
@@ -16,6 +17,8 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
+import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ProjectsState;
@@ -27,8 +30,8 @@ import org.obiba.opal.core.event.ValueTableEvent;
 import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -44,6 +46,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -69,8 +72,6 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private final ViewManager viewManager;
 
-  private final TransactionalThreadFactory transactionalThreadFactory;
-
   private final TransactionTemplate transactionTemplate;
 
   private final EventBus eventBus;
@@ -81,7 +82,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private final BlockingQueue<Project> datasourceLoadQueue = new LinkedBlockingQueue<>();
 
-  private DatasourceLoader datasourceLoader;
+  private List<DatasourceLoader> datasourceLoaders = Lists.newArrayList();
 
   @Autowired
   public ProjectsServiceImpl(OpalRuntime opalRuntime,
@@ -90,7 +91,7 @@ public class ProjectsServiceImpl implements ProjectService {
                              ProjectsKeyStoreService projectsKeyStoreService,
                              IdentifiersTableService identifiersTableService,
                              ViewManager viewManager,
-                             TransactionalThreadFactory transactionalThreadFactory, TransactionTemplate transactionTemplate,
+                             TransactionTemplate transactionTemplate,
                              EventBus eventBus, ResourceReferenceService resourceReferenceService, ProjectsState projectsState) {
     this.opalRuntime = opalRuntime;
     this.orientDbService = orientDbService;
@@ -98,7 +99,6 @@ public class ProjectsServiceImpl implements ProjectService {
     this.projectsKeyStoreService = projectsKeyStoreService;
     this.identifiersTableService = identifiersTableService;
     this.viewManager = viewManager;
-    this.transactionalThreadFactory = transactionalThreadFactory;
     this.transactionTemplate = transactionTemplate;
     this.eventBus = eventBus;
     this.resourceReferenceService = resourceReferenceService;
@@ -111,7 +111,7 @@ public class ProjectsServiceImpl implements ProjectService {
   public void start() {
     orientDbService.createUniqueIndex(Project.class);
 
-    startDatasourceLoaderThread();
+    startDatasourceLoaderThreads();
 
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
     // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
@@ -131,7 +131,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @Override
   @PreDestroy
   public void stop() {
-    terminateDatasourceLoaderThread();
+    terminateDatasourceLoaderThreads();
   }
 
   @Override
@@ -261,7 +261,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   public static DatasourceFactory registerDatasource(final Project project, final TransactionTemplate transactionTemplate, final DatabaseRegistry databaseRegistry) {
     return transactionTemplate.execute(status -> {
-      log.info("Datasource load start: {}", project.getName());
+      log.info("  Datasource load start: {}", project.getName());
       DatasourceFactory dataSourceFactory;
       if (project.hasDatabase()) {
         Database database = databaseRegistry.getDatabase(project.getDatabase());
@@ -339,6 +339,10 @@ public class ProjectsServiceImpl implements ProjectService {
     }
   }
 
+  //
+  // Private methods
+  //
+
   private void removeProjectsIdentifiersMappingByEntityType(ValueTable valueTable) {
     getProjects().forEach(project -> {
       project.removeIdentifiersMappingByEntityType(valueTable.getEntityType());
@@ -353,42 +357,53 @@ public class ProjectsServiceImpl implements ProjectService {
     });
   }
 
-  private void startDatasourceLoaderThread() {
-    datasourceLoader = new DatasourceLoader();
-    datasourceLoader.setName("Datasource Loader " + datasourceLoader);
-    datasourceLoader.setPriority(Thread.MIN_PRIORITY);
-    datasourceLoader.start();
+  private void startDatasourceLoaderThreads() {
+    datasourceLoaders.add(newDatasourceLoader("1"));
+    datasourceLoaders.add(newDatasourceLoader("2"));
+    datasourceLoaders.add(newDatasourceLoader("3"));
   }
 
-  public void terminateDatasourceLoaderThread() {
-    try {
-      if (datasourceLoader != null && datasourceLoader.isAlive()) datasourceLoader.interrupt();
-    } catch (Exception e) {
-      // ignore
-    }
+  private DatasourceLoader newDatasourceLoader(String id) {
+    DatasourceLoader datasourceLoader = new DatasourceLoader();
+    datasourceLoader.setName("Datasource Loader " + id);
+    datasourceLoader.setPriority(Thread.MIN_PRIORITY);
+    datasourceLoader.start();
+    return datasourceLoader;
+  }
+
+  public void terminateDatasourceLoaderThreads() {
+    datasourceLoaders.forEach(datasourceLoader -> {
+      try {
+        if (datasourceLoader != null && datasourceLoader.isAlive()) datasourceLoader.interrupt();
+      } catch (Exception e) {
+        // ignore
+      }
+    });
   }
 
   private class DatasourceLoader extends Thread {
 
     @Override
     public void run() {
+      log.info("{}: started", getName());
       try {
         //noinspection InfiniteLoopStatement
         while (true) {
           load(datasourceLoadQueue.take());
         }
       } catch (InterruptedException ignored) {
-        log.debug("Interrupting datasource loader");
+        log.debug("{}: interrupted", getName());
       }
-      log.info("Stopping datasource loader");
+      log.info("{}: Stopped", getName());
     }
 
     private void load(Project project) {
+      log.info("{}: loading datasource of project {}", getName(), project.getName());
       try {
         registerDatasource(project, transactionTemplate, databaseRegistry);
         projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
       } catch (Exception e) {
-        log.error("Loading datasource of project {} failed for database: {}", project.getName(), project.getDatabase(), e);
+        log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
       }
     }
   }
