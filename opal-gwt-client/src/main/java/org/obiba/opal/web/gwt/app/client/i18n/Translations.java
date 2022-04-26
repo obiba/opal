@@ -2440,6 +2440,13 @@ public interface Translations extends Constants {
       "NONE", "No associated database, data cannot be imported, only views can be defined." })
   Map<String, String> datasourceStatusDescriptionsMap();
 
+  @Description("Project Table Status Descriptions")
+  @DefaultStringMapValue({ "READY", "Ready",
+      "LOADING", "Loading: the table is being loaded, tables operations are not accessible yet.",
+      "ERROR", "Error: the initialization of the table\'s data connection failed.",
+      "CLOSED", "Closed: the table\'s connection to data is closed." })
+  Map<String, String> tableStatusDescriptionsMap();
+
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",
       "JAVA_VERSION", "Java Version",

@@ -35,10 +35,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HTMLCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -47,6 +49,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import java.util.Comparator;
 import java.util.List;
@@ -63,7 +66,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private static final int SORTABLE_COLUMN_LAST_UPDATED = 5;
 
-  interface Binder extends UiBinder<Widget, DatasourceView> {}
+  interface Binder extends UiBinder<Widget, DatasourceView> {
+  }
 
   @UiField
   NavLink downloadDictionary;
@@ -148,7 +152,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   @Inject
   public DatasourceView(Binder uiBinder, Translations translations, TranslationMessages translationMessages,
-      PlaceManager placeManager) {
+                        PlaceManager placeManager) {
     this.translationMessages = translationMessages;
     this.translations = translations;
     this.placeManager = placeManager;
@@ -162,10 +166,10 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     permissionsPanel.clear();
-    if(SQL_SLOT.equals(slot) && content != null) {
+    if (SQL_SLOT.equals(slot) && content != null) {
       sqlPanel.add(content.asWidget());
     }
-    if(PERMISSIONS_SLOT.equals(slot) && content != null) {
+    if (PERMISSIONS_SLOT.equals(slot) && content != null) {
       permissionsPanel.add(content.asWidget());
     }
   }
@@ -278,6 +282,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     table.addColumn(new VariablesColumn(), translations.variablesLabel());
     table.addColumn(new EntitiesColumn(), translations.entitiesLabel());
     table.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
+    table.addColumn(new StatusColumn(), translations.statusLabel());
   }
 
   private void initializeSortableColumns() {
@@ -348,10 +353,10 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     addTable.setDisabled(isNull);
     addUpdateTables.setDisabled(isNull);
 
-    if(isNull) addTable.setText(translations.addTableNoStorageLabel());
+    if (isNull) addTable.setText(translations.addTableNoStorageLabel());
     else addTable.setText(translations.addTableLabel());
 
-    if(isNull) addUpdateTables.setText(translations.addUpdateTablesNoStorageLabel());
+    if (isNull) addUpdateTables.setText(translations.addUpdateTablesNoStorageLabel());
     else addUpdateTables.setText(translations.addUpdateTablesLabel());
 
     checkColumn.clearSelection();
@@ -445,7 +450,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
     @Override
     public String getValue(TableDto object) {
-      if(object.hasVariableCount()) return Integer.toString(object.getVariableCount());
+      if (object.hasVariableCount()) return Integer.toString(object.getVariableCount());
       return "-";
     }
   }
@@ -459,8 +464,34 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
     @Override
     public String getValue(TableDto object) {
-      if(object.hasValueSetCount()) return Integer.toString(object.getValueSetCount());
+      if (object.hasValueSetCount()) return Integer.toString(object.getValueSetCount());
       return "-";
+    }
+  }
+
+  private class StatusColumn extends Column<TableDto, String> {
+
+    public StatusColumn() {
+      super(new HTMLCell());
+    }
+
+    @Override
+    public String getValue(TableDto object) {
+      String title = translations.tableStatusDescriptionsMap().get(object.getStatus().getName());
+      return "<i class='icon-circle " + getStatusClass(object.getStatus().getName()) + "' title='" + title + "'></i>";
+    }
+
+    private String getStatusClass(String status) {
+      switch (status) {
+        case "READY":
+          return "text-success";
+        case "LOADING":
+          return "text-warning";
+        case "ERROR":
+          return "text-error";
+        default:
+          return "text-info";
+      }
     }
   }
 
@@ -542,7 +573,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     public int compare(TableDto o1, TableDto o2) {
       Moment m1 = Moment.create(o1.getTimestamps().getLastUpdate());
       Moment m2 = Moment.create(o2.getTimestamps().getLastUpdate());
-      if(m1 == null) {
+      if (m1 == null) {
         return m2 == null ? 0 : 1;
       }
       return m2 == null ? -1 : m2.unix() - m1.unix();

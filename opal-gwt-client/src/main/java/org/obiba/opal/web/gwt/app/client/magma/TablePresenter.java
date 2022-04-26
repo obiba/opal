@@ -61,10 +61,7 @@ import org.obiba.opal.web.gwt.app.client.support.*;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.ResourceViewDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.magma.*;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
@@ -496,6 +493,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onReconnectResourceView() {
+    getView().setTableStatus(TableStatusDto.LOADING);
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
         .forResource(UriBuilders.DATASOURCE_VIEW_INIT.create().build(table.getDatasourceName(), table.getName()))//
         .withCallback(new ResponseCodeCallback() {
@@ -506,6 +504,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             else
               fireEvent(NotificationEvent.newBuilder().error(translations.userMessageMap().get("ResourceViewReconnectFailed")).build());
             getView().resourceViewReconnectCompleted();
+            updateDisplay(table.getDatasourceName(), table.getName(), true);
           }
         }, SC_OK, SC_INTERNAL_SERVER_ERROR).put().send();
   }
@@ -983,6 +982,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void clear(boolean cleanFilter);
 
     void initialize(TableDto dto, List<TaxonomyDto> taxonomies);
+
+    void setTableStatus(TableStatusDto status);
 
     void setTableSummary(String variableCount, String valueSetCount);
 

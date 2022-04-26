@@ -233,6 +233,7 @@ message TableDto {
   optional string viewLink = 8;
   optional TimestampsDto timestamps = 9;
   optional string viewType = 10;
+  optional TableStatusDto status = 11;
 }
 
 message VariableDto {

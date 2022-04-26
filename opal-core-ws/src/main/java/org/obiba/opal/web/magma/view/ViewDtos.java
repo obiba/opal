@@ -14,6 +14,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableStatus;
 import org.obiba.magma.ValueView;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -66,23 +67,10 @@ public final class ViewDtos {
     for (ValueViewDtoExtension extension : extensions) {
       if (extension.isDtoOf(view)) {
         return extension.asDto(view).toBuilder()
-            .setStatus(asDto(view.getStatus())).build();
+            .setStatus(Dtos.asDto(view.getStatus())).build();
       }
     }
     throw new IllegalStateException("Unknown view type");
-  }
-
-  private Magma.TableStatusDto asDto(ValueTableStatus status) {
-    switch (status) {
-      case CLOSED:
-        return Magma.TableStatusDto.CLOSED;
-      case ERROR:
-        return Magma.TableStatusDto.ERROR;
-      case LOADING:
-        return Magma.TableStatusDto.LOADING;
-      default:
-        return Magma.TableStatusDto.READY;
-    }
   }
 
   @NotNull

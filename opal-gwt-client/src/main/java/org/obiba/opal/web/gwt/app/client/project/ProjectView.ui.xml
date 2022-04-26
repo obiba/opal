@@ -25,6 +25,7 @@
       </b:Breadcrumbs>
       <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
       <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
+      <b:Heading ui:field="title" visible="false" size="5" addStyleNames="no-top-margin"/>
       <b:HelpBlock ui:field="description" visible="false" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="left" ui:field="tabPanel">

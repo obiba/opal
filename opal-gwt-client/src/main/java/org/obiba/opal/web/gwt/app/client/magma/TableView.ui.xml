@@ -18,7 +18,11 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-
+    <g:FlowPanel addStyleNames="top-margin">
+      <b:Alert ui:field="statusAlert" close="false" visible="false">
+        <g:Label ui:field="statusText"></g:Label>
+      </b:Alert>
+    </g:FlowPanel>
     <g:FlowPanel addStyleNames="pull-right">
       <b:ButtonGroup>
         <b:Button icon="GEARS" ui:field="sqlQuery">

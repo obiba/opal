@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.magma;
 
 import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
@@ -88,6 +87,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   CodeBlock whereScript;
+
+  @UiField
+  Alert statusAlert;
+
+  @UiField
+  Label statusText;
 
   @UiField
   Label timestamps;
@@ -213,16 +218,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Dropdown deleteAttributeButton;
 
   @UiField
-  Button clearCrossVariables;
-
-  @UiField
   DropdownButton downloadBtn;
 
   @UiField
-  NavLink addVariablesFromFile;
+  DropdownButton addVariablesButton;
 
   @UiField
-  DropdownButton addVariablesButton;
+  Button addTableVariable;
 
   @UiField
   ButtonGroup tableAddVariableGroup;
@@ -433,6 +435,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void initialize(TableDto dto, List<TaxonomyDto> taxonomies) {
     setTable(dto);
     setTaxonomies(taxonomies);
+  }
+
+  @Override
+  public void setTableStatus(TableStatusDto status) {
+    statusText.setText(translations.tableStatusDescriptionsMap().get(status.getName()));
+    statusAlert.setType(getAlertStatusType(status));
+    statusAlert.setVisible(!TableStatusDto.READY.getName().equals(status.getName()));
+    boolean loading = TableStatusDto.LOADING.getName().equals(status.getName());
+    sqlQuery.setEnabled(!loading);
+    exportData.setEnabled(!loading);
+    copyData.setEnabled(!loading);
+    addTableVariable.setEnabled(!loading);
+    addVariablesButton.setVisible(!loading);
+    downloadBtn.setVisible(!loading);
+    copyDataBtn.setVisible(!loading);
+    copyViewBtn.setVisible(!loading);
+    remove.setEnabled(!loading);
   }
 
   @Override
@@ -857,6 +876,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     clear(true);
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
+    setTableStatus(dto.getStatus());
     timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
     variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
     entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
@@ -877,6 +897,19 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     viewProperties.setVisible(false);
     initializeFilter();
+  }
+
+  private AlertType getAlertStatusType(TableStatusDto status) {
+    switch (status.getName()) {
+      case "READY":
+        return AlertType.SUCCESS;
+      case "LOADING":
+        return AlertType.WARNING;
+      case "ERROR":
+        return AlertType.ERROR;
+      default:
+        return AlertType.INFO;
+    }
   }
 
   private void setTaxonomies(List<TaxonomyDto> taxonomies) {

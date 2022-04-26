@@ -53,6 +53,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   FlowPanel tagsPanel;
 
   @UiField
+  Heading title;
+
+  @UiField
   HelpBlock description;
 
   @UiField
@@ -135,8 +138,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     if (titleCrumbs.getWidgetCount() > 1) {
       titleCrumbs.remove(1);
     }
-    titleCrumbs.add(new NavLink(project.getTitle()));
+    titleCrumbs.add(new NavLink(project.getName()));
     setTags(project);
+    title.setText(project.hasTitle() ? project.getTitle() : "");
+    title.setVisible(project.hasTitle() && !project.getTitle().equals(project.getName()));
     description.setVisible(project.hasDescription());
     description.setText(project.hasDescription() ? project.getDescription() : "");
     tableCount.setText("-");

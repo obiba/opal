@@ -195,7 +195,22 @@ public final class Dtos {
       builder.setViewType(innerTable.getClass().getSimpleName());
     }
 
+    builder.setStatus(asDto(valueTable.getStatus()));
+
     return builder;
+  }
+
+  public static Magma.TableStatusDto asDto(ValueTableStatus status) {
+    switch (status) {
+      case CLOSED:
+        return Magma.TableStatusDto.CLOSED;
+      case ERROR:
+        return Magma.TableStatusDto.ERROR;
+      case LOADING:
+        return Magma.TableStatusDto.LOADING;
+      default:
+        return Magma.TableStatusDto.READY;
+    }
   }
 
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
