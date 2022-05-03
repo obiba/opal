@@ -10,14 +10,11 @@
 package org.obiba.opal.shell.service.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.collect.Maps;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
@@ -48,6 +45,8 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private Executor executor;
 
+  private final Map<String, Executor> projectExecutors;
+
   private boolean isRunning;
 
   private final AtomicInteger lastJobId;
@@ -56,6 +55,8 @@ public class DefaultCommandJobService implements CommandJobService {
    * Jobs submitted for execution, but not yet executed.
    */
   private final BlockingQueue<Runnable> jobsNotStarted;
+
+  private final Map<String, BlockingQueue<Runnable>> projectJobsNotStarted;
 
   /**
    * Jobs in the process of being executed.
@@ -84,7 +85,10 @@ public class DefaultCommandJobService implements CommandJobService {
     jobsStarted = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
     jobsTerminated = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
 
-    executor = createExecutor();
+    executor = createExecutor(jobsNotStarted);
+
+    projectJobsNotStarted = Maps.newConcurrentMap();
+    projectExecutors = Maps.newConcurrentMap();
   }
 
   //
@@ -127,8 +131,20 @@ public class DefaultCommandJobService implements CommandJobService {
     commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
 
-    executor.execute(new FutureCommandJob(owner, commandJob));
+    if (commandJob.hasProject()) {
+      return launchProjectCommand(commandJob, owner);
+    } else {
+      executor.execute(new FutureCommandJob(owner, commandJob));
+      return commandJob.getId();
+    }
+  }
 
+  private Integer launchProjectCommand(CommandJob commandJob, Subject owner) {
+    if (!projectJobsNotStarted.containsKey(commandJob.getProject())) {
+      projectJobsNotStarted.put(commandJob.getProject(), new LinkedBlockingQueue<>());
+      projectExecutors.put(commandJob.getProject(), createExecutor(projectJobsNotStarted.get(commandJob.getProject())));
+    }
+    projectExecutors.get(commandJob.getProject()).execute(new FutureCommandJob(owner, commandJob));
     return commandJob.getId();
   }
 
@@ -210,8 +226,8 @@ public class DefaultCommandJobService implements CommandJobService {
     this.executor = executor;
   }
 
-  protected Executor createExecutor() {
-    return new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
+  protected Executor createExecutor(BlockingQueue<Runnable> queue) {
+    return new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, queue) {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
         log.info("Starting task {}", ((FutureCommandJob) r).commandJob.getId());
@@ -253,14 +269,13 @@ public class DefaultCommandJobService implements CommandJobService {
       for(Runnable runnable : getNotStartedJobs()) {
         allFutureCommandJobs.add((FutureCommandJob) runnable);
       }
-
-      for(FutureCommandJob futureCommandJob : getStartedJobs()) {
-        allFutureCommandJobs.add(futureCommandJob);
+      for (String project : projectJobsNotStarted.keySet()) {
+        for(Runnable runnable : projectJobsNotStarted.get(project)) {
+          allFutureCommandJobs.add((FutureCommandJob) runnable);
+        }
       }
-
-      for(FutureCommandJob futureCommandJob : getTerminatedJobs()) {
-        allFutureCommandJobs.add(futureCommandJob);
-      }
+      allFutureCommandJobs.addAll(getStartedJobs());
+      allFutureCommandJobs.addAll(getTerminatedJobs());
     }
 
     return allFutureCommandJobs;
