@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata;
 
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -40,11 +41,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -411,9 +407,13 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   private void updateHelpPanelsVisibility() {
     hideHelpPanels();
     PluginPackageDto foundPluginPackage = getPluginPackage(formatChooser.getSelectedValue());
+    helpOpalDatasourcePluginPanel.clear();
     if (foundPluginPackage != null) {
+      Label helpLabel = new Label();
+      helpLabel.getElement().setInnerHTML(foundPluginPackage.getDescription());
+      helpLabel.addStyleName("help-block");
+      helpOpalDatasourcePluginPanel.add(helpLabel);
       helpOpalDatasourcePluginPanel.setVisible(true);
-      helpOpalDatasourcePluginPanel.getElement().getFirstChildElement().setInnerHTML(foundPluginPackage.getDescription());
     } else {
       switch(ImportFormat.valueOf(getSelectedFormat())) {
         case CSV:
@@ -453,8 +453,10 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     helpJDBC.setVisible(false);
     helpOpalRest.setVisible(false);
     helpRSASHaven.setVisible(false);
+    helpRXPTHaven.setVisible(false);
     helpRSPSSHaven.setVisible(false);
     helpRStataHaven.setVisible(false);
+    helpRDSHaven.setVisible(false);
     helpHealthCanada.setVisible(false);
     helpGeonamesPostalCodes.setVisible(false);
     helpOpalDatasourcePluginPanel.setVisible(false);
