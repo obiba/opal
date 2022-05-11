@@ -27,9 +27,10 @@ import org.apache.http.message.BufferedHeader;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EncodingUtils;
-import org.obiba.opal.web.security.OpalAuth;
 
 public class OpalAuthScheme extends BasicScheme {
+
+  public static String SCHEME_NAME = "X-Opal-Auth";
 
   @Nullable
   @Override
@@ -39,7 +40,7 @@ public class OpalAuthScheme extends BasicScheme {
 
   @Override
   public String getSchemeName() {
-    return OpalAuth.CREDENTIALS_HEADER;
+    return SCHEME_NAME;
   }
 
   /**
@@ -80,7 +81,7 @@ public class OpalAuthScheme extends BasicScheme {
     CharArrayBuffer buffer = new CharArrayBuffer(32);
     buffer.append(proxy ? AUTH.PROXY_AUTH_RESP : AUTH.WWW_AUTH_RESP);
     buffer.append(": ");
-    buffer.append(OpalAuth.CREDENTIALS_HEADER);
+    buffer.append(SCHEME_NAME);
     buffer.append(" ");
     buffer.append(base64password, 0, base64password.length);
 
