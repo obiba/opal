@@ -94,7 +94,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
           public void onResource(Response response, SubjectProfileDto resource) {
             if (response.getStatusCode() == Response.SC_OK) {
               List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
-              boolean realmCandidate = realms.contains("opal-user-realm") || realms.contains("opal-ini-realm") || realms.contains("obiba-realm");
+              boolean realmCandidate = realms.contains("opal-user-realm") || realms.contains("opal-ini-realm");
               getView().showOtpAlert(!resource.getOtpEnabled() && realmCandidate);
             } else {
               getView().showOtpAlert(false);

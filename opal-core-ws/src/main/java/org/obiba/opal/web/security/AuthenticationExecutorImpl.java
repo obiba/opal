@@ -21,8 +21,8 @@ import org.obiba.opal.core.service.NoSuchSubjectProfileException;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.TotpService;
+import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.web.filter.AbstractAuthenticationExecutor;
-import org.obiba.shiro.web.filter.NoSuchOtpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.StreamSupport;
 
 /**
  * Perform the authentication, either by username-password token or by obiba ticket token.
@@ -101,9 +102,11 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
     String username = token.getPrincipal().toString();
     try {
       SubjectProfile profile = subjectProfileService.getProfile(username);
-      if (profile.hasSecret() && "TOTP".equals(strategy)) {
+      boolean otpRealm = StreamSupport.stream(profile.getRealms().spliterator(), false)
+          .anyMatch(realm -> realm.equals("opal-user-realm") || realm.equals("opal-ini-realm"));
+      if (profile.hasSecret() && "TOTP".equals(strategy) && otpRealm) {
         if (Strings.isNullOrEmpty(code)) {
-          throw new NoSuchOtpException(strategy, "X-Opal-");
+          throw new NoSuchOtpException("X-Opal-" + strategy);
         }
         if (!totpService.validateCode(code, profile.getSecret())) {
            throw new AuthenticationException("Wrong TOTP");

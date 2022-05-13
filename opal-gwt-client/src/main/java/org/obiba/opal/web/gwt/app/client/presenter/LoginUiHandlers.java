@@ -16,6 +16,6 @@ public interface LoginUiHandlers extends UiHandlers {
 
   void onSignIn(String username, String password);
 
-  void onSignIn(String username, String password, String code);
+  void onSignIn(String username, String password, String code, String otpHeader);
 
 }

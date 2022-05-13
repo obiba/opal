@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -47,7 +48,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
     void clear();
 
-    void showTotp();
+    void showTotp(String otpHeader);
 
     void showErrorMessageAndClearPassword();
 
@@ -123,9 +124,9 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
           @Override
           public void onResponseCode(Request request, Response response) {
             String authHeader = response.getHeader("WWW-Authenticate");
-            if ("X-Opal-TOTP".equals(authHeader)) {
+            if (!Strings.isNullOrEmpty(authHeader)) {
               getView().setBusy(false);
-              getView().showTotp();
+              getView().showTotp(authHeader);
             } else
               showLoginError(response);
           }
@@ -142,12 +143,12 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   @Override
-  public void onSignIn(String username, String password, String code) {
+  public void onSignIn(String username, String password, String code, String otpHeader) {
     getView().setBusy(true);
 
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.AUTH_SESSIONS.create().build())
-        .header("X-Opal-TOTP", code)
+        .header(otpHeader, code)
         .withFormBody("username", username, "password", password)
         .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
 

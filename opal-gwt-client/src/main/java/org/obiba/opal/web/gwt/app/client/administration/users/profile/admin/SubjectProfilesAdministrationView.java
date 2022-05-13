@@ -128,13 +128,16 @@ public class SubjectProfilesAdministrationView extends ViewWithUiHandlers<Subjec
     Column<SubjectProfileDto, Boolean> otp = new Column<SubjectProfileDto, Boolean>(new IconCell<Boolean>() {
       @Override
       public IconType getIconType(Boolean value) {
-        //return value ? IconType.CHECK : IconType.CHECK_EMPTY;
+        if (value == null)
+          return IconType.QUESTION;
         return value ? IconType.OK : null;
       }
     }) {
       @Override
       public Boolean getValue(SubjectProfileDto object) {
-        return object.getOtpEnabled();
+        if (object.getRealm().equals("opal-ini-realm") || object.getRealm().equals("opal-user-realm"))
+          return object.getOtpEnabled();
+        return null;
       }
     };
     profilesTable.addColumn(otp, "2FA");

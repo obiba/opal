@@ -9,21 +9,7 @@
  */
 package org.obiba.opal.web.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-
+import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -33,13 +19,19 @@ import org.apache.shiro.subject.Subject;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.shiro.NoSuchOtpException;
+import org.obiba.shiro.authc.UsernamePasswordOtpToken;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
-import org.obiba.shiro.web.filter.NoSuchOtpException;
 import org.obiba.shiro.web.filter.UserBannedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 
 @Component
 @Path("/auth")
@@ -56,21 +48,25 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Path("/sessions")
   @NotAuthenticated
   public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
-      @FormParam("username") String username, @FormParam("password") String password) {
+                                @FormParam("username") String username, @FormParam("password") String password) {
     try {
-      authenticationExecutor.login(servletRequest, new UsernamePasswordToken(username, password));
+      authenticationExecutor.login(servletRequest, makeUsernamePasswordToken(username, password, servletRequest));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' at ip: '{}': session ID is '{}'.", username,
-              servletRequest.getRemoteAddr(), sessionId);
+          servletRequest.getRemoteAddr(), sessionId);
       return Response.created(
-              UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-                      .build(sessionId)).build();
+          UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
+              .build(sessionId)).build();
     } catch (UserBannedException e) {
       log.info("Authentication failure: {}", e.getMessage());
       throw e;
     } catch (NoSuchOtpException e) {
-      return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", "X-Opal-" + e.getOtpStrategy()).build();
-    } catch(AuthenticationException e) {
+      return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", e.getOtpHeader()).build();
+    } catch (AuthenticationException e) {
+      if (e.getCause() instanceof NoSuchOtpException) {
+        NoSuchOtpException otpException = (NoSuchOtpException) e.getCause();
+        return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", otpException.getOtpHeader()).build();
+      }
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
           e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
@@ -103,14 +99,14 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       Object cookieValue = session.getAttribute(HttpHeaders.SET_COOKIE);
       SecurityUtils.getSubject().logout();
 
-      if(cookieValue != null) {
+      if (cookieValue != null) {
         NewCookie cookie = NewCookie.valueOf(cookieValue.toString());
         if (OBIBA_ID_COOKIE_NAME.equals(cookie.getName())) {
           return Response.ok().header(HttpHeaders.SET_COOKIE,
               new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", cookie.getDomain(), "Obiba session deleted", 0, true, true)).build();
         }
       }
-    } catch(InvalidSessionException e) {
+    } catch (InvalidSessionException e) {
       // Ignore
     }
     return Response.ok().build();
@@ -138,6 +134,16 @@ public class AuthenticationResource extends AbstractSecurityComponent {
         .setPrincipal(principal) //
         .setType(Opal.Subject.SubjectType.USER) //
         .build();
+  }
+
+  private UsernamePasswordToken makeUsernamePasswordToken(String username, String password, HttpServletRequest request) {
+    String otp = request.getHeader("X-Opal-TOTP");
+    if (!Strings.isNullOrEmpty(otp))
+      return new UsernamePasswordOtpToken(username, password, otp);
+    otp = request.getHeader("X-Obiba-TOTP");
+    if (!Strings.isNullOrEmpty(otp))
+      return new UsernamePasswordOtpToken(username, password, otp);
+    return new UsernamePasswordToken(username, password);
   }
 
 }
