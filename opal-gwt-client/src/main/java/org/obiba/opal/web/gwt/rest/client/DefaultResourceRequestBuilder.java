@@ -275,7 +275,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       setOpalVersion(response);
 
       String authHeader = response.getHeader("WWW-Authenticate");
-      if(credentials.hasExpired(builder) || (code == Response.SC_UNAUTHORIZED && !"X-Opal-TOTP".equals(authHeader))) {
+      if(credentials.hasExpired(builder) || (code == Response.SC_UNAUTHORIZED && !authHeader.endsWith("TOTP"))) {
         // this is fired even after a request for deleting the session
         eventBus.fireEvent(new RequestCredentialsExpiredEvent());
       } else {

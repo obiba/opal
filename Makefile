@@ -3,7 +3,7 @@
 ##
 version=4.4-SNAPSHOT
 magma_version=3.0-SNAPSHOT
-commons_version=2.0-SNAPSHOT
+commons_version=2.1-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
 #java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M"
 

@@ -24,6 +24,7 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -58,18 +59,24 @@ public class SubjectProfileCurrentResource {
   @Autowired
   private TotpService totpService;
 
+  @Value("${org.obiba.realm.publicUrl}")
+  private String obibaRealmPublicUrl;
+
   @GET
   @NoAuthorization
   public Response get() {
     SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
     String accountUrl = null;
     for (String realm : profile.getRealms()) {
-      try {
-        OIDCConfiguration config = idProvidersService.getConfiguration(realm);
-        accountUrl = config.getCustomParam("providerUrl");
-      } catch (Exception e) {
-        // ignored, does not apply
-      }
+      if ("obiba-realm".equals(realm) && !Strings.isNullOrEmpty(obibaRealmPublicUrl))
+        accountUrl = String.format("%s/profile", obibaRealmPublicUrl);
+      else
+        try {
+          OIDCConfiguration config = idProvidersService.getConfiguration(realm);
+          accountUrl = config.getCustomParam("providerUrl");
+        } catch (Exception e) {
+          // ignored, does not apply
+        }
       if (!Strings.isNullOrEmpty(accountUrl)) break;
     }
     return Response.ok().entity(Dtos.asDto(profile, accountUrl)).build();

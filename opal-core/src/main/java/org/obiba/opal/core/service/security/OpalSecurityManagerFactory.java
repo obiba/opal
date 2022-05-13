@@ -13,8 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AbstractAuthenticator;
-import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
@@ -36,6 +35,7 @@ import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
+import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.realm.ObibaRealm;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,7 +188,15 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
     ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
 
     if (dsm.getAuthenticator() instanceof ModularRealmAuthenticator) {
-      ((ModularRealmAuthenticator) dsm.getAuthenticator()).setAuthenticationStrategy(new FirstSuccessfulStrategy());
+      ((ModularRealmAuthenticator) dsm.getAuthenticator()).setAuthenticationStrategy(new OtpSuccessfulStrategy());
+    }
+  }
+
+  private class OtpSuccessfulStrategy extends FirstSuccessfulStrategy {
+    @Override
+    public AuthenticationInfo afterAttempt(Realm realm, AuthenticationToken token, AuthenticationInfo singleRealmInfo, AuthenticationInfo aggregateInfo, Throwable t) throws AuthenticationException {
+      if (t instanceof NoSuchOtpException) throw (NoSuchOtpException)t;
+      return super.afterAttempt(realm, token, singleRealmInfo, aggregateInfo, t);
     }
   }
 

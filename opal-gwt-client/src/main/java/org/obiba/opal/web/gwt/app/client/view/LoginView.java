@@ -83,6 +83,8 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   @UiField
   FlowPanel authClientsPanel;
 
+  private String otpHeader;
+
   private final Translations translations;
 
   @Inject
@@ -105,7 +107,7 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText());
+          getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText(), otpHeader);
         }
       }
     });
@@ -122,7 +124,7 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   public void onValidate(ClickEvent event) {
     if (Strings.isNullOrEmpty(otp.getText()))
       return;
-    getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText());
+    getUiHandlers().onSignIn(userName.getText(), password.getText(), otp.getText(), otpHeader);
   }
 
   @UiHandler("cancel")
@@ -138,7 +140,8 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   }
 
   @Override
-  public void showTotp() {
+  public void showTotp(String otpHeader) {
+    this.otpHeader = otpHeader;
     credentialsWell.setVisible(false);
     otpWell.setVisible(true);
     otp.setFocus(true);

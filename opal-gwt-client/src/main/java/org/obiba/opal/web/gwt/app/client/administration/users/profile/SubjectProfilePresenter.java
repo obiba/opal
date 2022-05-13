@@ -133,7 +133,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
               profile = resource;
               List<String> realms = Splitter.on(",").splitToList(resource.getRealm());
               getView().enableChangePassword(realms.contains("opal-user-realm"), resource.getRealm(), resource.getAccountUrl());
-              getView().showOtpSwitch(realms.contains("opal-user-realm") || realms.contains("opal-ini-realm") || realms.contains("obiba-realm"));
+              getView().showOtpSwitch(realms.contains("opal-user-realm") || realms.contains("opal-ini-realm"));
               getView().setOtpSwitchState(profile.getOtpEnabled());
               if (!Strings.isNullOrEmpty(imageUri))
                 getView().showQrCode(imageUri);
