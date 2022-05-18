@@ -9,16 +9,13 @@
  */
 package org.obiba.opal.core.cfg;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
+import com.google.common.base.Strings;
+import org.apache.shiro.codec.CodecSupport;
+import org.apache.shiro.codec.Hex;
+import org.apache.shiro.crypto.AesCipherService;
+import org.apache.shiro.crypto.DefaultBlockCipherService;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.util.ByteSource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.GlobalMethodProvider;
 import org.obiba.magma.js.MagmaContextFactory;
@@ -31,10 +28,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.security.Key;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
-public class DefaultOpalConfigurationService implements OpalConfigurationService {
+public class DefaultOpalConfigurationService implements OpalConfigurationService, CryptoService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultOpalConfigurationService.class);
 
@@ -43,8 +47,10 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   @Autowired
   private OpalConfigurationIo opalConfigIo;
 
-  @Autowired
-  private CryptoService cryptoService;
+  private final AesCipherService cipherService = new AesCipherService();
+
+  private final LegacyAesCipherService legacyCipherService = new LegacyAesCipherService();
+
 
   private final Lock opalConfigurationLock = new ReentrantLock();
 
@@ -76,25 +82,25 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   }
 
   private void configureSecretKey() {
-    if(Strings.isNullOrEmpty(opalConfiguration.getSecretKey())) {
+    if (Strings.isNullOrEmpty(opalConfiguration.getSecretKey())) {
       log.info("Generate new secret key");
       modifyConfiguration(new ConfigModificationTask() {
         @Override
         public void doWithConfig(OpalConfiguration config) {
-          config.setSecretKey(cryptoService.generateSecretKey());
+          config.setSecretKey(generateSecretKey());
         }
       });
     }
   }
 
   private void configureDatabasePassword() {
-    if(Strings.isNullOrEmpty(opalConfiguration.getDatabasePassword())) {
+    if (Strings.isNullOrEmpty(opalConfiguration.getDatabasePassword())) {
       log.info("Generate new database password");
       modifyConfiguration(new ConfigModificationTask() {
         @Override
         public void doWithConfig(OpalConfiguration config) {
           String password = new SecureRandomNumberGenerator().nextBytes(DATABASE_PASSWORD_LENGTH).toString();
-          config.setDatabasePassword(cryptoService.encrypt(password));
+          config.setDatabasePassword(encrypt(password));
         }
       });
     }
@@ -121,11 +127,11 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   public OpalConfiguration getOpalConfiguration() {
     opalConfigurationLock.lock();
     try {
-      while(opalConfiguration == null) {
+      while (opalConfiguration == null) {
         opalConfigAvailable.await();
       }
       return opalConfiguration;
-    } catch(InterruptedException e) {
+    } catch (InterruptedException e) {
       throw new RuntimeException(e);
     } finally {
       opalConfigurationLock.unlock();
@@ -140,6 +146,43 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
       opalConfigIo.writeConfiguration(opalConfiguration);
     } finally {
       opalConfigurationLock.unlock();
+    }
+  }
+
+  @Override
+  public String encrypt(String plain) {
+    ByteSource encrypted = cipherService.encrypt(CodecSupport.toBytes(plain), getSecretKey());
+    return encrypted.toHex();
+  }
+
+  @Override
+  public String decrypt(String encrypted) {
+    ByteSource decrypted;
+    try {
+      decrypted = cipherService.decrypt(Hex.decode(encrypted), getSecretKey());
+    } catch (Exception e) {
+      if (log.isDebugEnabled()) {
+        log.warn("Falling back on legacy crypto service", e);
+      }
+      decrypted = legacyCipherService.decrypt(Hex.decode(encrypted), getSecretKey());
+    }
+    return CodecSupport.toString(decrypted.getBytes());
+  }
+
+  @Override
+  public String generateSecretKey() {
+    Key key = cipherService.generateNewKey();
+    return Hex.encodeToString(key.getEncoded());
+  }
+
+  private byte[] getSecretKey() {
+    return Hex.decode(getOpalConfiguration().getSecretKey());
+  }
+
+  private static class LegacyAesCipherService extends DefaultBlockCipherService {
+
+    public LegacyAesCipherService() {
+      super("AES");
     }
   }
 

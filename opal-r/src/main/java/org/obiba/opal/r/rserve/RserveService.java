@@ -81,12 +81,17 @@ public class RserveService implements RServerService, ROperationTemplate {
   private TransactionalThreadFactory transactionalThreadFactory;
 
   @Autowired
-  private OpalRuntime opalRuntime;
-
-  @Autowired
   private EventBus eventBus;
 
+  private OpalRuntime opalRuntime;
+
   private final List<RserveSession> sessions = Collections.synchronizedList(Lists.newArrayList());
+
+  // lazy injection
+  @Autowired
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
+  }
 
   //
   // ROperationTemplate methods
@@ -257,7 +262,7 @@ public class RserveService implements RServerService, ROperationTemplate {
   }
 
   @Override
-  public void installLocalPackage(String path) throws RServerException {
+  public void installLocalPackage(String path) {
     InstallLocalPackageOperation rop = new InstallLocalPackageOperation(opalRuntime.getFileSystem().resolveLocalFile(path));
     execute(rop);
   }

@@ -36,8 +36,6 @@
 
   <bean id="upgradeOpalConfigurationIo" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationIo"/>
 
-  <bean id="cryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
-
   <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
