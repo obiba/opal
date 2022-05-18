@@ -124,11 +124,13 @@ public class IndexSynchronizationManager {
       try {
         for(Datasource ds : MagmaEngine.get().getDatasources()) {
           for(ValueTable table : ds.getValueTables()) {
-            log.debug("Check index for table: {}.{}", ds.getName(), table.getName());
-            IndexManager indexManager = opalSearchService.getVariablesIndexManager();
-            checkIndexable(indexManager, table, indexManager.isReady() && !indexManager.getIndex(table).isUpToDate());
-            indexManager = opalSearchService.getValuesIndexManager();
-            checkIndexable(indexManager, table, indexManager.isReady() && indexConfig.getConfig().isReadyForIndexing(table, indexManager.getIndex(table)));
+            if (ValueTableStatus.READY.equals(table.getStatus())) {
+              log.debug("Check index for table: {}.{}", ds.getName(), table.getName());
+              IndexManager indexManager = opalSearchService.getVariablesIndexManager();
+              checkIndexable(indexManager, table, indexManager.isReady() && !indexManager.getIndex(table).isUpToDate());
+              indexManager = opalSearchService.getValuesIndexManager();
+              checkIndexable(indexManager, table, indexManager.isReady() && indexConfig.getConfig().isReadyForIndexing(table, indexManager.getIndex(table)));
+            }
           }
         }
       } catch(Exception ignored) {
