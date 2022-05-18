@@ -172,13 +172,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   public void onSearchValueSets(final List<VariableDto> variables, List<String> query, final int offset, final int limit) {
     setCurrentVariablesFilterSelect(variables);
+    UriBuilder builder = UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()
+            .query("select", currentVariablesFilterSelect)
+            .query("offset", "" + offset)
+            .query("limit", "" + limit);
+
+    if (!variables.isEmpty())
+      builder.query("query", Joiner.on(",").join(query));
+
     ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()//
-            .query("query", Joiner.on(",").join(query))//
-            .query("select", currentVariablesFilterSelect)//
-            .query("offset", "" + offset)//
-            .query("limit", "" + limit)//
-            .build(originalTable.getDatasourceName(), originalTable.getName()))
+        .forResource(builder.build(originalTable.getDatasourceName(), originalTable.getName()))
         .withCallback(new ResourceCallback<ValueSetsResultDto>() {
           @Override
           public void onResource(Response response, ValueSetsResultDto resource) {
@@ -321,7 +324,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   public void onRequestValueSets(List<VariableDto> variables, int offset, int limit) {
     StringBuilder link = getLinkBuilder(offset, limit);
-    if (originalTable.getVariableCount() > variables.size()) {
+    if (!variables.isEmpty() && originalTable.getVariableCount() > variables.size()) {
       link.append("&select=");
       setCurrentVariablesFilterSelect(variables);
       link.append(currentVariablesFilterSelect);
@@ -334,7 +337,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void setCurrentVariablesFilterSelect(List<VariableDto> variables) {
     StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
     if (variables.isEmpty()) {
-      GWT.log("variables is empty!!!");
       script.append(".*");
     } else {
       for (int i = 0; i < variables.size(); i++) {
