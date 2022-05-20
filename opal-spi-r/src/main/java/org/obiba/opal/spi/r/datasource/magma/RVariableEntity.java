@@ -10,6 +10,7 @@
 
 package org.obiba.opal.spi.r.datasource.magma;
 
+import org.obiba.magma.Value;
 import org.obiba.magma.support.VariableEntityBean;
 
 import javax.validation.constraints.NotNull;
@@ -22,15 +23,21 @@ public class RVariableEntity extends VariableEntityBean {
   private final boolean numeric;
 
   RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier) {
-    super(entityType, normalizeId(entityIdentifier));
-    this.rEntityIdentifier = entityIdentifier;
-    this.numeric = false;
+    this(entityType, entityIdentifier, false);
   }
 
   RVariableEntity(@NotNull String entityType, @NotNull double entityIdentifier) {
+    this(entityType, Double.toString(entityIdentifier), true);
+  }
+
+  RVariableEntity(@NotNull String entityType, @NotNull Value entityIdentifier) {
+    this(entityType, entityIdentifier.toString(), entityIdentifier.getValueType().isNumeric());
+  }
+
+  RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier, boolean numeric) {
     super(entityType, normalizeId(entityIdentifier));
-    this.rEntityIdentifier = Double.toString(entityIdentifier);
-    this.numeric = true;
+    this.rEntityIdentifier = entityIdentifier;
+    this.numeric = numeric;
   }
 
   public String getRIdentifier() {

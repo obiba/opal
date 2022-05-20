@@ -58,6 +58,8 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   // the column that identifies the entities
   private String idColumn;
 
+  private ValueType idValueType;
+
   // R server profile where the resource should be created
   private String profile;
 
@@ -251,7 +253,7 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
   @Override
   public RVariableEntity getRVariableEntity(VariableEntity entity) {
     if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
-    return new RVariableEntity(entity.getType(), entity.getIdentifier());
+    return new RVariableEntity(entity.getType(), entity.getIdentifier(), getIdValueType() != null && getIdValueType().isNumeric());
   }
 
   private ValueSetBatch getValueSetsBatch(List<VariableEntity> entities) {
@@ -274,11 +276,9 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
     }
     List<VariableEntity> entities = entitiesCache.getIfPresent("entities");
     if (entities != null) return entities;
-
     if (connector.hasColumn(idColumn)) {
-      entities = connector.getColumn(idColumn).asVector(TextType.get(), true, 0, -1).stream()
+      entities = connector.getColumn(idColumn).asVector(getIdValueType(), true, 0, -1).stream()
           .filter(val -> val != null && !val.isNull())
-          .map(Value::toString)
           .distinct()
           .map(id -> new RVariableEntity(getEntityType(), id))
           .collect(Collectors.toList());
@@ -287,6 +287,14 @@ public class ResourceView implements ValueView, TibbleTable, Initialisable, Disp
     } else {
       return Lists.newArrayList();
     }
+  }
+
+  private ValueType getIdValueType() {
+    if (idValueType == null) {
+      TabularResourceConnector.Column idColumnConn = connector.getColumn(idColumn);
+      idValueType = idColumnConn.asVariable(getEntityType(), true).getValueType();
+    }
+    return idValueType;
   }
 
   @Override
