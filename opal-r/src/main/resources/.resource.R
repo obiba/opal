@@ -34,11 +34,12 @@
       min = min({{ column }}, na.rm = TRUE),
       max = max({{ column }}, na.rm = TRUE),
       geomean = exp(mean(log({{ column }}), na.rm = TRUE)),
-      stddev = sd({{ column }}, na.rm = TRUE),
+      stddev = sd({{ column }}),
       sum = sum({{ column }}, na.rm = TRUE),
       sumsq = sum(({{ column }})^2, na.rm = TRUE),
-      variance = var({{ column }}, na.rm = TRUE)
-    )
+      variance = var({{ column }})
+    ) %>%
+    collect()
 }
 
 # get extended summary statistics
@@ -51,7 +52,8 @@
       median = median({{ column }}, na.rm = TRUE),
       skewness = moments::skewness({{ column }}),
       kurtosis = moments::kurtosis({{ column }})
-    )
+    ) %>%
+    collect()
 }
 
 # get default frequencies: na or not
@@ -61,7 +63,8 @@
     dplyr::select({{ column }}) %>%
     dplyr::summarise(
       n = n(),
-    )
+    ) %>%
+    collect()
 }
 
 # get detailed frequencies: for each observed value
@@ -71,6 +74,7 @@
     dplyr::group_by({{ column }}) %>%
     dplyr::summarise(
       n = n(),
-    )
+    ) %>%
+    collect()
 }
 

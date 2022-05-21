@@ -344,7 +344,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private List<RServerResult> queryDescriptiveStatistics(String columnName, Set<Category> categories) {
-    String cmd = String.format("as_tibble(%s %s %%>%% .resource.get_descriptive_stats(`%s`))",
+    String cmd = String.format("%s %s %%>%% .resource.get_descriptive_stats(`%s`)",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
         columnName);
@@ -353,7 +353,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   }
 
   private RNamedList<RServerResult> queryExtendedDescriptiveStatistics(String columnName, Set<Category> categories) {
-    String cmd = String.format("as_tibble(%s %s %%>%% .resource.get_ext_descriptive_stats(`%s`))",
+    String cmd = String.format("%s %s %%>%% .resource.get_ext_descriptive_stats(`%s`)",
         getTibbleStatement(columnName),
         getFilterMissingsStatement(columnName, categories),
         columnName);
@@ -365,7 +365,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
   private List<RServerResult> queryDefaultFrequencies(String columnName, Set<Category> categories) {
     // TODO include missing categories
-    String cmd = String.format("as_tibble(%s %%>%% .resource.get_default_frequencies(`%s`))",
+    String cmd = String.format("%s %%>%% .resource.get_default_frequencies(`%s`)",
         getTibbleStatement(columnName), columnName);
     RServerResult result = execute(cmd);
     return result.asList();
@@ -373,7 +373,7 @@ class ResourceVectorSummarySource implements VectorSummarySource {
 
   private List<RServerResult> queryDetailedFrequencies(String columnName) {
     assignIds();
-    String cmd = String.format("as_tibble(%s %%>%% .resource.get_detailed_frequencies(`%s`))",
+    String cmd = String.format("%s %%>%% .resource.get_detailed_frequencies(`%s`)",
         getTibbleStatement(columnName),
         columnName);
     RServerResult result = execute(cmd);
