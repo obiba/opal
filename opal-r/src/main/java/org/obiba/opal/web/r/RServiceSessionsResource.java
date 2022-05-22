@@ -18,9 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("request")
@@ -31,12 +37,29 @@ public class RServiceSessionsResource {
   private OpalRSessionManager opalRSessionManager;
 
   @GET
-  public List<OpalR.RSessionDto> getRSessionIds() {
-    List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
-    for (RServerSession rSession : opalRSessionManager.getRSessions()) {
-      rSessions.add(Dtos.asDto(rSession));
-    }
-    return rSessions;
+  public List<OpalR.RSessionDto> getRSessions() {
+    return opalRSessionManager.getRSessions().stream()
+        .sorted((rSession1, rSession2) -> {
+          Date date1 = rSession1.getTimestamp();
+          Date date2 = rSession2.getTimestamp();
+          if (date1.equals(date2)) return 0;
+          return date1.before(date2) ? 1 : -1;
+        })
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
 
+  @DELETE
+  public Response removeRSessions(@QueryParam("id") List<String> ids) {
+    if (ids != null) {
+      for (String id : ids) {
+        try {
+          opalRSessionManager.removeRSession(id);
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+    }
+    return Response.ok().build();
+  }
 }

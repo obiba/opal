@@ -14,9 +14,13 @@ import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
+import java.util.List;
+
 public interface RSessionsUiHandlers extends UiHandlers {
 
   void onTerminate(RSessionDto session);
+
+  void onTerminate(List<RSessionDto> sessions);
 
   void onRefresh();
 

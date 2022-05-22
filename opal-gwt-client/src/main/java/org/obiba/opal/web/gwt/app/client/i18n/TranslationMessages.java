@@ -56,6 +56,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Terminate Session")
   String terminateSession();
 
+  @Description("Terminate Session label")
+  @DefaultMessage("Terminate Sessions")
+  String terminateSessions();
+
   @Description("Remove Workspace label")
   @DefaultMessage("Remove Workspace")
   String removeWorkspace();
@@ -388,6 +392,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage(
       "The R session will be terminated. Any pending computation will be stopped. Any data structure in R memory will be lost.<br/><br/>Please confirm that you want to terminate this R session.")
   String confirmTerminateRSession();
+
+  @Description(
+      "Terminate R sessions confirm message")
+  @DefaultMessage(
+      "The R sessions will be terminated. Any pending computation will be stopped. Any data structure in R memory will be lost.<br/><br/>Please confirm that you want to terminate these R sessions.")
+  String confirmTerminateRSessions();
 
   @Description(
       "Remove R workspace confirm message")

@@ -440,6 +440,7 @@ public interface Translations extends Constants {
       "jobCancelled", "Job cancelled.",
       "jobDeleted", "Job removed.",
       "rSessionTerminated", "R session terminated.",
+      "rSessionsTerminated", "R sessions terminated.",
       "rWorkspaceRemoved", "R workspace removed.",
       "completedJobsDeleted", "All completed jobs removed.",
       "SetCommandStatus_NotFound", "Job could not be cancelled (not found).",
