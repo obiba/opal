@@ -56,10 +56,10 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   @Override
-  public List<OpalR.RSessionDto> getRSessionIds() {
-    List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
-    rSessions.addAll(opalRSessionManager.getSubjectRSessions().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    return rSessions;
+  public List<OpalR.RSessionDto> getRSessions() {
+    return opalRSessionManager.getSubjectRSessions().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
 
   @Override

@@ -12,21 +12,48 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:ButtonGroup>
-      <b:Button ui:field="refreshButton" icon="REFRESH">
-        <ui:msg description="Refresh list">Refresh</ui:msg>
-      </b:Button>
-    </b:ButtonGroup>
-    <g:InlineLabel ui:field="noRSessions">
-      <ui:msg description="No R sessions label">No R sessions.</ui:msg>
-    </g:InlineLabel>
-    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-    <o:Table ui:field="table" addStyleNames="pull-left small-top-margin"/>
+    <g:FlowPanel addStyleNames="small-bottom-margin">
+      <b:ButtonGroup>
+        <b:Button ui:field="refreshButton" icon="REFRESH">
+          <ui:msg description="Refresh list">Refresh</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <g:InlineLabel ui:field="noRSessions">
+        <ui:msg description="No R sessions label">No R sessions.</ui:msg>
+      </g:InlineLabel>
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+
+    <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+
+      <g:FlowPanel addStyleNames="pull-left">
+        <b2:IconAnchor icon="TRASH" ui:field="deleteSessions" addStyleNames="inline small-indent">
+          <ui:msg description="Remove label">Remove</ui:msg>
+        </b2:IconAnchor>
+      </g:FlowPanel>
+
+      <g:FlowPanel addStyleNames="pull-right">
+        <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+        <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
+        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
+          <ui:msg description="Clear label">Clear</ui:msg>
+        </b2:IconAnchor>
+      </g:FlowPanel>
+    </b:Alert>
+
+    <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+      <g:Label>
+        <ui:msg description="Select R sessions tips label">Select R sessions to remove.</ui:msg>
+      </g:Label>
+    </b:Alert>
+
+    <o:Table ui:field="table"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

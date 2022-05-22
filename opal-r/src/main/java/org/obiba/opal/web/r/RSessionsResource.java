@@ -26,7 +26,7 @@ import java.util.List;
 public interface RSessionsResource {
 
   @GET
-  List<OpalR.RSessionDto> getRSessionIds();
+  List<OpalR.RSessionDto> getRSessions();
 
   @DELETE
   Response removeRSessions();

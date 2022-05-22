@@ -48,8 +48,10 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   private OpalConfigurationService configurationService;
 
   @Override
-  public List<OpalR.RSessionDto> getRSessionIds() {
-    return super.getRSessionIds().stream().filter(s -> DS_CONTEXT.equals(s.getContext())).collect(Collectors.toList());
+  public List<OpalR.RSessionDto> getRSessions() {
+    return super.getRSessions().stream()
+        .filter(s -> DS_CONTEXT.equals(s.getContext()))
+        .collect(Collectors.toList());
   }
 
   @Override

@@ -29,6 +29,8 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
+import java.util.List;
+
 import static com.google.gwt.http.client.Response.*;
 
 /**
@@ -115,6 +117,43 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
     getEventBus().fireEvent(ConfirmationRequiredEvent
         .createWithMessages(actionRequiringConfirmation, translationMessages.terminateSession(),
             translationMessages.confirmTerminateRSession()));
+  }
+
+  @Override
+  public void onTerminate(final List<RSessionDto> sessions) {
+
+    actionRequiringConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
+            if (response.getStatusCode() == SC_OK) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("rSessionsTerminated").build());
+            } else {
+              String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                  ? "Forbidden"
+                  : "UnknownError" : response.getText();
+              fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+            }
+            onRefresh();
+          }
+        };
+        UriBuilder uriBuilder = UriBuilder.create();
+        uriBuilder.segment("service", "r", "sessions");
+        for (RSessionDto session : sessions) {
+          uriBuilder.query("id", session.getId());
+        }
+        ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).delete()
+            .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_NOT_FOUND).send();
+      }
+    };
+
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.terminateSessions(),
+            translationMessages.confirmTerminateRSessions()));
   }
 
   //
