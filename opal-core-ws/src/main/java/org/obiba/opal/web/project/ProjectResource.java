@@ -13,13 +13,10 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
-import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.domain.ProjectsState;
+import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -37,13 +34,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

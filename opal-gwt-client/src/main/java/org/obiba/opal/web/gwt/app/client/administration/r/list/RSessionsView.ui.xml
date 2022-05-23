@@ -34,7 +34,7 @@
 
       <g:FlowPanel addStyleNames="pull-left">
         <b2:IconAnchor icon="TRASH" ui:field="deleteSessions" addStyleNames="inline small-indent">
-          <ui:msg description="Remove label">Remove</ui:msg>
+          <ui:msg description="Terminate label">Terminate</ui:msg>
         </b2:IconAnchor>
       </g:FlowPanel>
 
@@ -49,7 +49,7 @@
 
     <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
       <g:Label>
-        <ui:msg description="Select R sessions tips label">Select R sessions to remove.</ui:msg>
+        <ui:msg description="Select R sessions tips label">Select R sessions to terminate.</ui:msg>
       </g:Label>
     </b:Alert>
 
