@@ -168,7 +168,7 @@ public class RVariableHelper {
 
   private List<Attribute> extractAttributes() {
     List<Attribute> attributes = Lists.newArrayList();
-    if (colAttr == null) return attributes;
+    if (colAttr == null || !colAttr.isNamedList()) return attributes;
     try {
       RNamedList<RServerResult> rList = colAttr.asNamedList();
       if (rList.isEmpty()) return attributes;

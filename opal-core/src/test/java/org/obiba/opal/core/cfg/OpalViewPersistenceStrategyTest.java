@@ -46,7 +46,7 @@ public class OpalViewPersistenceStrategyTest {
   public void setUp() throws Exception {
     System.setProperty(OPAL_HOME, getTestFilesRoot());
     System.out.println(System.getProperty(OPAL_HOME));
-    viewPersistenceStrategy = new OpalViewPersistenceStrategy(null, null);
+    viewPersistenceStrategy = new OpalViewPersistenceStrategy();
     new MagmaEngine().extend(new MagmaXStreamExtension());
   }
 
@@ -59,7 +59,7 @@ public class OpalViewPersistenceStrategyTest {
   public void testReadWithNonExistentDirectory() throws Exception {
     System.setProperty(OPAL_HOME, getTestFilesRoot() + File.separator + EMPTY_DIRECTORY);
     // Re-initialise to pick up the the OPAL_HOME specified for this test.
-    viewPersistenceStrategy = new OpalViewPersistenceStrategy(null, null);
+    viewPersistenceStrategy = new OpalViewPersistenceStrategy();
     Set<ValueView> result = viewPersistenceStrategy.readViews("datasourceName");
     assertThat(result).isEmpty();
   }

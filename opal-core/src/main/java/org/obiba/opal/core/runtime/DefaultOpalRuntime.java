@@ -49,31 +49,55 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
 
-  @Autowired
   private TransactionTemplate transactionTemplate;
 
-  @Autowired
-  private Set<Service> services;
-
-  @Autowired
   private OpalConfigurationService opalConfigurationService;
 
-  @Autowired
-  private ViewManager viewManager;
-
-  @Autowired
   private CacheManager cacheManager;
 
-  @Autowired
   private PluginsManager pluginsManager;
 
   private OpalFileSystem opalFileSystem;
+
+  private Set<Service> services;
+
+  private ViewManager viewManager;
 
   private final Object syncFs = new Object();
 
   @Value("${org.obiba.magma.readDataPointsCount}")
   private Integer readDataPointsCount;
-  
+
+  @Autowired
+  public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+    this.transactionTemplate = transactionTemplate;
+  }
+
+  @Autowired
+  public void setOpalConfigurationService(OpalConfigurationService opalConfigurationService) {
+    this.opalConfigurationService = opalConfigurationService;
+  }
+
+  @Autowired
+  public void setCacheManager(CacheManager cacheManager) {
+    this.cacheManager = cacheManager;
+  }
+
+  @Autowired
+  public void setPluginsManager(PluginsManager pluginsManager) {
+    this.pluginsManager = pluginsManager;
+  }
+
+  @Autowired
+  public void setServices(Set<Service> services) {
+    this.services = services;
+  }
+
+  @Autowired
+  public void setViewManager(ViewManager viewManager) {
+    this.viewManager = viewManager;
+  }
+
   @Override
   @PostConstruct
   public void start() {

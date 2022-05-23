@@ -20,13 +20,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class RTabularResourceConnectorFactory implements TabularResourceConnectorFactory {
 
-  private final ResourceReferenceService resourceReferenceService;
+  private ResourceReferenceService resourceReferenceService;
 
-  private final OpalRSessionManager rSessionManager;
+  private OpalRSessionManager rSessionManager;
 
   @Autowired
-  public RTabularResourceConnectorFactory(ResourceReferenceService resourceReferenceService, OpalRSessionManager rSessionManager) {
+  public void setResourceReferenceService(ResourceReferenceService resourceReferenceService) {
     this.resourceReferenceService = resourceReferenceService;
+  }
+
+  @Autowired
+  public void setRSessionManager(OpalRSessionManager rSessionManager) {
     this.rSessionManager = rSessionManager;
   }
 

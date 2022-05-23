@@ -47,13 +47,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private static final Logger log = LoggerFactory.getLogger(OpalViewPersistenceStrategy.class);
 
-  private final GitCommandHandler handler;
+  private GitCommandHandler gitCommandHandler;
 
-  private final TabularResourceConnectorFactory tabularResourceConnectorFactory;
+  private TabularResourceConnectorFactory tabularResourceConnectorFactory;
 
   @Autowired
-  public OpalViewPersistenceStrategy(GitCommandHandler handler, TabularResourceConnectorFactory tabularResourceConnectorFactory) {
-    this.handler = handler;
+  public void setGitCommandHandler(GitCommandHandler gitCommandHandler) {
+    this.gitCommandHandler = gitCommandHandler;
+  }
+
+  @Autowired
+  public void setTabularResourceConnectorFactory(TabularResourceConnectorFactory tabularResourceConnectorFactory) {
     this.tabularResourceConnectorFactory = tabularResourceConnectorFactory;
   }
 
@@ -64,7 +68,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
         OpalGitUtils.getGitViewsRepoFolder(datasourceName), views, comment, context);
 
-    handler.execute(builder.build());
+    gitCommandHandler.execute(builder.build());
   }
 
   @Override
@@ -76,7 +80,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
-    handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+    gitCommandHandler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
         OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
   }
 
@@ -137,7 +141,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private Set<ValueView> readGitViews(File datasourceRepo) {
-    Set<InputStream> files = handler
+    Set<InputStream> files = gitCommandHandler
         .execute(new ReadFilesCommand.Builder(datasourceRepo, OpalGitUtils.getGitViewsWorkFolder()).recursive(true).filter("View\\.xml$").build());
 
     return files.stream()
