@@ -54,6 +54,30 @@ public class OpalRSessionManager {
   @Value("${org.obiba.opal.r.sessionTimeout}")
   private Long rSessionTimeout;
 
+  @Value("${org.obiba.opal.r.sessionTimeout.R}")
+  private Long rSessionTimeoutR;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.DataSHIELD}")
+  private Long rSessionTimeoutDataSHIELD;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.Import}")
+  private Long rSessionTimeoutImport;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.Export}")
+  private Long rSessionTimeoutExport;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.Report}")
+  private Long rSessionTimeoutReport;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.Analyse}")
+  private Long rSessionTimeoutAnalyse;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.SQL}")
+  private Long rSessionTimeoutSQL;
+
+  @Value("${org.obiba.opal.r.sessionTimeout.View}")
+  private Long rSessionTimeoutView;
+
   @Autowired
   private RServerManagerService rServerManagerService;
 
@@ -262,15 +286,42 @@ public class OpalRSessionManager {
     log.debug("clearRSessions({})", principal);
     SubjectRSessions subjectRSessions = rSessionMap.get(principal);
     for (RServerSession rSession : subjectRSessions) {
-      if (rSession.hasExpired(rSessionTimeout)) {
-        try {
-          rSession.close();
-        } catch (Exception e) {
-          log.warn("Failed closing R session: {}", rSession.getId(), e);
+      if (!rSession.isBusy()) {
+        Long contextTimeout = getRSessionTimeoutByContext(rSession);
+        long timeout = contextTimeout == null ? rSessionTimeout : contextTimeout;
+        if (rSession.hasExpired(timeout)) {
+          try {
+            rSession.close();
+          } catch (Exception e) {
+            log.warn("Failed closing R session: {}", rSession.getId(), e);
+          }
         }
       }
     }
     subjectRSessions.clean();
+  }
+
+  private Long getRSessionTimeoutByContext(RServerSession rSession) {
+    String context = rSession.getExecutionContext();
+    switch (context) {
+      case "DataSHIELD":
+        return rSessionTimeoutDataSHIELD;
+      case "R":
+        return rSessionTimeoutR;
+      case "Import":
+        return rSessionTimeoutImport;
+      case "Export":
+        return rSessionTimeoutExport;
+      case "Report":
+        return rSessionTimeoutReport;
+      case "SQL":
+        return rSessionTimeoutSQL;
+      case "Analyse":
+        return rSessionTimeoutAnalyse;
+    }
+    if (context.startsWith("View"))
+      return rSessionTimeoutView;
+    return rSessionTimeout;
   }
 
   private void doClearRSessions(String principal) {
