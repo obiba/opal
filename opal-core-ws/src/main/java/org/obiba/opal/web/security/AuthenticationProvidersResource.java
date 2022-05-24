@@ -10,14 +10,17 @@
 
 package org.obiba.opal.web.security;
 
+import com.google.common.base.Strings;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +37,14 @@ public class AuthenticationProvidersResource {
 
   @GET
   @NotAuthenticated
-  public List<Opal.AuthProviderDto> list() {
+  public List<Opal.AuthProviderDto> list(@Context HttpServletRequest request) {
+    String entryPoint = request.getScheme() + "://" + request.getHeader("Host");
     return authConfigurationProvider.getConfigurations().stream()
+        .filter(provider -> {
+          if (Strings.isNullOrEmpty(entryPoint)) return true;
+          if (!provider.hasCallbackURL()) return true;
+          return provider.getCallbackURL().startsWith(entryPoint);
+        })
         .map(Dtos::asSummaryDto)
         .collect(Collectors.toList());
   }
