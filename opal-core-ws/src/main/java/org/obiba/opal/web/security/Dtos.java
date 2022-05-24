@@ -193,6 +193,8 @@ public class Dtos {
     builder.setUseNonce(configuration.isUseNonce());
     builder.setConnectTimeout(configuration.getConnectTimeout());
     builder.setReadTimeout(configuration.getReadTimeout());
+    if (configuration.hasCallbackURL())
+      builder.setCallbackURL(configuration.getCallbackURL());
     return builder.build();
   }
 
@@ -222,6 +224,12 @@ public class Dtos {
     configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
     if (dto.getParametersCount() > 0)
       dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
+    if (dto.hasCallbackURL()) {
+      String cbUrl = dto.getCallbackURL();
+      if (!cbUrl.endsWith("/auth/callback"))
+        cbUrl = cbUrl + "/auth/callback";
+      configuration.setCallbackURL(cbUrl);
+    }
     return configuration;
   }
 

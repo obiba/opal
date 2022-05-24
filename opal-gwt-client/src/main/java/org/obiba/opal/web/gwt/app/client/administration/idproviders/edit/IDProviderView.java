@@ -115,6 +115,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   @UiField
   NumericTextBox readTimeout;
 
+  @UiField
+  TextBox callbackUrl;
+
   private IDProviderDto provider;
 
   @Inject
@@ -181,6 +184,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     }
     connectTimeout.setValue(provider.getConnectTimeout());
     readTimeout.setValue(provider.getReadTimeout());
+    callbackUrl.setValue(provider.getCallbackURL());
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
       name.setEnabled(false);
     } else {
@@ -252,6 +256,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setUseNonce(useNonce.getValue());
     provider.setConnectTimeout(connectTimeout.hasValue() ? connectTimeout.getNumberValue().intValue() : 0);
     provider.setReadTimeout(readTimeout.hasValue() ? readTimeout.getNumberValue().intValue() : 0);
+    provider.setCallbackURL(callbackUrl.getText());
     getUiHandlers().save(provider);
   }
 
