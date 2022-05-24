@@ -224,11 +224,15 @@ public class Dtos {
     configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
     if (dto.getParametersCount() > 0)
       dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
-    if (dto.hasCallbackURL()) {
+    if (dto.hasCallbackURL() && !Strings.isNullOrEmpty(dto.getCallbackURL().trim())) {
       String cbUrl = dto.getCallbackURL();
+      if (cbUrl.endsWith("/"))
+        cbUrl = cbUrl.substring(0, cbUrl.length() - 1);
       if (!cbUrl.endsWith("/auth/callback"))
         cbUrl = cbUrl + "/auth/callback";
-      configuration.setCallbackURL(cbUrl);
+      configuration.setCallbackURL(cbUrl + "/");
+    } else {
+      configuration.setCallbackURL(null);
     }
     return configuration;
   }
