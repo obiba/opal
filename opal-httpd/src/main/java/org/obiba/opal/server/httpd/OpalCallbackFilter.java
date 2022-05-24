@@ -17,6 +17,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.obiba.oidc.*;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
+import org.obiba.oidc.utils.OIDCHelper;
+import org.obiba.oidc.web.J2EContext;
 import org.obiba.oidc.web.filter.OIDCCallbackFilter;
 import org.obiba.opal.core.event.OpalGeneralConfigUpdatedEvent;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
@@ -90,8 +92,28 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
     try {
       super.doFilterInternal(request, response, filterChain);
     } catch (OIDCException e) {
-      response.sendRedirect(opalPublicUrl);
+      J2EContext context = new J2EContext(request, response);
+      String provider = OIDCHelper.extractProviderName(context, getProviderParameter());
+      OIDCConfiguration config = oidcConfigurationProvider.getConfiguration(provider);
+      if (config.hasCallbackURL()) {
+         String[] tokens = config.getCallbackURL().split("/auth/callback");
+         response.sendRedirect(tokens.length>0 ? tokens[0] : opalPublicUrl);
+      } else
+        response.sendRedirect(opalPublicUrl);
     }
+  }
+
+  @Override
+  protected void onRedirect(OIDCSession session, J2EContext context, String provider) throws IOException {
+    if (!Strings.isNullOrEmpty(provider)) {
+      OIDCConfiguration config = oidcConfigurationProvider.getConfiguration(provider);
+      if (config != null && config.hasCallbackURL()) {
+        String[] tokens = config.getCallbackURL().split("/auth/callback");
+        context.getResponse().sendRedirect(tokens.length>0 ? tokens[0] : opalPublicUrl);
+        return;
+      }
+    }
+    super.onRedirect(session, context, provider);
   }
 
   @Override
