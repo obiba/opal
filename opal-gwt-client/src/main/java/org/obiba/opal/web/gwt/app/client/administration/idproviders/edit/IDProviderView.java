@@ -116,7 +116,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   NumericTextBox readTimeout;
 
   @UiField
-  TextBox callbackUrl;
+  TextBox publicUrl;
 
   private IDProviderDto provider;
 
@@ -184,7 +184,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     }
     connectTimeout.setValue(provider.getConnectTimeout());
     readTimeout.setValue(provider.getReadTimeout());
-    callbackUrl.setValue(provider.getCallbackURL());
+    if (!Strings.isNullOrEmpty(provider.getCallbackURL())) {
+      publicUrl.setValue(provider.getCallbackURL().replace("/auth/callback", ""));
+    }
     if (IDProviderPresenter.Mode.UPDATE.equals(dialogMode)) {
       name.setEnabled(false);
     } else {
@@ -256,7 +258,11 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setUseNonce(useNonce.getValue());
     provider.setConnectTimeout(connectTimeout.hasValue() ? connectTimeout.getNumberValue().intValue() : 0);
     provider.setReadTimeout(readTimeout.hasValue() ? readTimeout.getNumberValue().intValue() : 0);
-    provider.setCallbackURL(callbackUrl.getText());
+    if (!Strings.isNullOrEmpty(publicUrl.getText().trim())) {
+      String cbUrl = publicUrl.getText().trim();
+      cbUrl = cbUrl + (cbUrl.endsWith("/") ? "" : "/") + "auth/callback/";
+      provider.setCallbackURL(cbUrl);
+    }
     getUiHandlers().save(provider);
   }
 

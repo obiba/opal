@@ -231,15 +231,15 @@
 
             <b:ControlGroup>
                 <b:ControlLabel>
-                    <ui:msg description="Callback URL label">Callback URL</ui:msg>
+                    <ui:msg description="Public URL label">Public URL</ui:msg>
                 </b:ControlLabel>
                 <b:Controls>
-                    <b:TextBox ui:field="callbackUrl"/>
+                    <b:TextBox ui:field="publicUrl"/>
                     <b:HelpBlock>
-                        <ui:msg description="Callback URL help label">
+                        <ui:msg description="Public URL help label">
                             In case Opal is accessible from different public URLs, it is possible to specify which one is to be used for this ID provider.
                             When not specified, the system's public URL applies. Note that this ID provider will be only visible when Opal base URL matches
-                            this callback URL.
+                            this public URL.
                         </ui:msg>
                     </b:HelpBlock>
                 </b:Controls>
