@@ -587,6 +587,10 @@ public class FilesResource {
   }
 
   private Response getFileDetails(FileObject file) throws FileSystemException {
+    return Response.ok(getFileDto(file)).build();
+  }
+
+  private Opal.FileDto getFileDto(FileObject file) throws FileSystemException {
     Opal.FileDto.Builder fileBuilder;
 
     fileBuilder = Opal.FileDto.newBuilder();
@@ -601,7 +605,7 @@ public class FilesResource {
 
     fileBuilder.setLastModifiedTime(file.getContent().getLastModifiedTime());
 
-    return Response.ok(fileBuilder.build()).build();
+    return fileBuilder.build();
   }
 
   private Response getFolderDetails(FileObject folder) throws FileSystemException {
@@ -636,27 +640,21 @@ public class FilesResource {
 
     Collections.sort(children, (arg0, arg1) -> arg0.getName().compareTo(arg1.getName()));
 
+    String parentPath = parentFolder.getName().getPath();
+
     // Loop through all children.
     for (FileObject child : children) {
-      // Build a FileDto representing the child.
-      fileBuilder = Opal.FileDto.newBuilder();
-      fileBuilder.setName(child.getName().getBaseName()).setPath(child.getName().getPath());
-      fileBuilder.setType(child.getType() == FileType.FILE ? Opal.FileDto.FileType.FILE : Opal.FileDto.FileType.FOLDER);
-      fileBuilder.setReadable(child.isReadable()).setWritable(child.isWriteable());
+      // #3730 Hide users in file system
+      if (!child.isReadable() || !"/home".equals(parentPath)) {
+        // Build a FileDto representing the child.
+        fileBuilder = getFileDto(child).toBuilder();
+        if (child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
+          addChildren(fileBuilder, child, level - 1);
+        }
 
-      // Set size on files only, not folders.
-      if (child.getType() == FileType.FILE) {
-        fileBuilder.setSize(child.getContent().getSize());
+        // Add the current child to the parent FileDto (folder).
+        folderBuilder.addChildren(fileBuilder.build());
       }
-
-      fileBuilder.setLastModifiedTime(child.getContent().getLastModifiedTime());
-
-      if (child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
-        addChildren(fileBuilder, child, level - 1);
-      }
-
-      // Add the current child to the parent FileDto (folder).
-      folderBuilder.addChildren(fileBuilder.build());
     }
   }
 
