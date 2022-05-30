@@ -1,4 +1,4 @@
-# Opal [![Build Status](https://travis-ci.org/obiba/opal.svg?branch=master)](https://travis-ci.org/obiba/opal)
+# Opal [![Build Status](https://app.travis-ci.com/obiba/opal.svg?branch=master)](https://app.travis-ci.com/github/obiba/opal)
 
 Opal is OBiBa’s core database application for biobanks or epidemiological studies.
 
