@@ -645,7 +645,7 @@ public class FilesResource {
     // Loop through all children.
     for (FileObject child : children) {
       // #3730 Hide users in file system
-      if (!child.isReadable() || !"/home".equals(parentPath)) {
+      if (child.isReadable() || !"/home".equals(parentPath)) {
         // Build a FileDto representing the child.
         fileBuilder = getFileDto(child).toBuilder();
         if (child.getType().hasChildren() && child.getChildren().length > 0 && level - 1 > 0 && child.isReadable()) {
