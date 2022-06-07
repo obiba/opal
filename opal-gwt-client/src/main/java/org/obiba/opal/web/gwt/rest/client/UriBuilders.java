@@ -1186,6 +1186,13 @@ public enum UriBuilders {
     }
   },
 
+  R_SESSIONS_TEST {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("r", "sessions", "_test");
+    }
+  },
+
   DATASHIELD_PROFILES {
     @Override
     public UriBuilder create() {

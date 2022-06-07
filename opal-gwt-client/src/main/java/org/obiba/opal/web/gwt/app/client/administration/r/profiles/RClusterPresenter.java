@@ -93,8 +93,8 @@ public class RClusterPresenter extends PresenterWidget<RClusterPresenter.Display
   protected void onReveal() {
     super.onReveal();
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.R_SESSIONS.create().query("profile", cluster.getName()).build())
-        .post().authorize(getView().getTestAuthorizer())
+        .forResource(UriBuilders.R_SESSIONS_TEST.create().query("profile", cluster.getName()).build())
+        .put().authorize(getView().getTestAuthorizer())
         .send();
   }
 
@@ -177,10 +177,19 @@ public class RClusterPresenter extends PresenterWidget<RClusterPresenter.Display
   @Override
   public void onTest() {
     ResourceRequestBuilderFactory.<RSessionDto>newBuilder()
-        .forResource(UriBuilders.R_SESSIONS.create().query("profile", cluster.getName()).build())
-        .post()
-        .withCallback(new RSessionCreatedCallback())//
-        .withCallback(SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
+        .forResource(UriBuilders.R_SESSIONS_TEST.create().query("profile", cluster.getName()).build())
+        .put()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getStatusCode() == SC_OK) {
+              fireEvent(NotificationEvent.newBuilder().info("RIsAlive").build());
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
+            }
+          }
+        }, SC_OK, SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN)
+        .send();
   }
 
   @Override
@@ -297,24 +306,5 @@ public class RClusterPresenter extends PresenterWidget<RClusterPresenter.Display
     void renderPackages(List<RPackageDto> packages);
 
     HasAuthorization getTestAuthorizer();
-  }
-
-  private final class RSessionCreatedCallback implements ResourceCallback<RSessionDto> {
-
-    @Override
-    public void onResource(Response response, RSessionDto resource) {
-      fireEvent(NotificationEvent.newBuilder().info("RIsAlive").build());
-      ResourceRequestBuilderFactory.newBuilder() //
-          .forResource("/r/session/" + resource.getId()) //
-          .withCallback(ResponseCodeCallback.NO_OP, SC_OK, SC_INTERNAL_SERVER_ERROR) //
-          .delete().send();
-    }
-  }
-
-  private final class RConnectionFailedCallback implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
-    }
   }
 }

@@ -14,10 +14,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -33,6 +30,10 @@ public interface RSessionsResource {
 
   @POST
   Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile);
+
+  @PUT
+  @Path("/_test")
+  Response testNewRSession(@QueryParam("profile") String profile);
 
   @Autowired
   void setOpalRSessionManager(OpalRSessionManager opalRSessionManager);
