@@ -82,6 +82,17 @@ public class RSessionsResourceImpl implements RSessionsResource {
         .build();
   }
 
+  @Override
+  public Response testNewRSession(String profile) {
+    try {
+      RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
+      opalRSessionManager.removeRSession(rSession.getId());
+    } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+    return Response.ok().build();
+  }
+
   protected RServerProfile createProfile(String profileName) {
     if (Strings.isNullOrEmpty(profileName))
       return rServerManagerService.getDefaultRServerProfile();
