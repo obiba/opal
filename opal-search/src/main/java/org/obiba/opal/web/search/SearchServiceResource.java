@@ -51,8 +51,12 @@ public class SearchServiceResource extends IndexResource {
       return tableStatusDtos;
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
-      for(ValueTable valueTable : datasource.getValueTables()) {
-        tableStatusDtos.add(getTableStatusDto(datasource, valueTable));
+      try {
+        for (ValueTable valueTable : datasource.getValueTables()) {
+          tableStatusDtos.add(getTableStatusDto(datasource, valueTable));
+        }
+      } catch (Exception e) {
+        // ignore
       }
     }
     sortByName(tableStatusDtos);

@@ -10,23 +10,13 @@
 
 package org.obiba.opal.web.shell.reporting;
 
-import java.io.File;
-import java.util.List;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.domain.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.web.model.Opal;
@@ -36,8 +26,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.File;
+import java.util.List;
 
 @Component
 @Transactional
@@ -54,7 +48,7 @@ public class ProjectReportTemplateResource {
   @Nullable
   private ReportTemplate reportTemplate;
 
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private ReportTemplateScheduler reportTemplateScheduler;
 
@@ -79,8 +73,8 @@ public class ProjectReportTemplateResource {
   }
 
   @Autowired
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
+  public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   @GET
@@ -154,7 +148,7 @@ public class ProjectReportTemplateResource {
     for(FileObject reportFile : reportFolder.getChildren()) {
       if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-") &&
           reportFile.isReadable()) {
-        File report = opalRuntime.getFileSystem().getLocalFile(reportFile);
+        File report = opalFileSystemService.getFileSystem().getLocalFile(reportFile);
         if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
           lastReport = report;
           lastReportFile = reportFile;
@@ -168,7 +162,7 @@ public class ProjectReportTemplateResource {
   }
 
   private Opal.ReportDto getReportDto(FileObject reportFile) throws FileSystemException {
-    String publicLink = "/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile) + "?project=" +
+    String publicLink = "/report/public/" + opalFileSystemService.getFileSystem().getObfuscatedPath(reportFile) + "?project=" +
         getReportTemplate().getProject();
 
     return Opal.ReportDto.newBuilder()//
@@ -180,7 +174,7 @@ public class ProjectReportTemplateResource {
   }
 
   private FileObject getReportFolder() throws FileSystemException {
-    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
+    OpalFileSystem fileSystem = opalFileSystemService.getFileSystem();
     return fileSystem.getRoot().resolveFile("/reports/" + getReportTemplate().getProject() + "/" + name);
   }
 

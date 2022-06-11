@@ -22,6 +22,8 @@
 
   <bean id="opalRuntime" class="org.obiba.opal.core.upgrade.support.OpalRuntimeMock"/>
 
+  <bean id="opalFileSystemService" class="org.obiba.opal.core.upgrade.support.OpalFileSystemServiceMock"/>
+
   <bean id="eventBus" class="com.google.common.eventbus.EventBus"/>
 
   <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>

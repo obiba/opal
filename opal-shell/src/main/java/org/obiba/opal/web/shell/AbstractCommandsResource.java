@@ -11,6 +11,7 @@ package org.obiba.opal.web.shell;
 
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
@@ -23,6 +24,8 @@ public abstract class AbstractCommandsResource {
 
   protected OpalRuntime opalRuntime;
 
+  protected OpalFileSystemService opalFileSystemService;
+
   @Autowired
   public void setCommandJobService(CommandJobService commandJobService) {
     this.commandJobService = commandJobService;
@@ -31,6 +34,11 @@ public abstract class AbstractCommandsResource {
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
+  }
+
+  @Autowired
+  public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   protected Response launchCommand(Command<?> command) {

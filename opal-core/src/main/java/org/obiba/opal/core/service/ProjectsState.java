@@ -48,7 +48,9 @@ public class ProjectsState {
   public enum State {
     BUSY, // project has read, write and refresh commands that are pending or being processed
     READY,
-    LOADING // project's datasource is not ready
+    LOADING, // project's datasource is not ready
+
+    ERRORS // project's datasource has errors
   }
 
 }

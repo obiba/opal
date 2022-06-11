@@ -15,7 +15,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
@@ -27,19 +27,19 @@ public abstract class AbstractIdentifiersResource {
 
   protected abstract IdentifiersTableService getIdentifiersTableService();
 
-  protected abstract OpalRuntime getOpalRuntime();
+  protected abstract OpalFileSystemService getOpalFileSystemService();
 
   protected File resolveLocalFile(String path) {
     try {
       // note: does not ensure that file exists
-      return getOpalRuntime().getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+      return getOpalFileSystemService().getFileSystem().getLocalFile(resolveFileInFileSystem(path));
     } catch (FileSystemException e) {
       throw new IllegalArgumentException(e);
     }
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return getOpalRuntime().getFileSystem().getRoot().resolveFile(path);
+    return getOpalFileSystemService().getFileSystem().getRoot().resolveFile(path);
   }
 
   /**

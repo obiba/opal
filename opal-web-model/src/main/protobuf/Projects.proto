@@ -32,6 +32,7 @@ enum ProjectDatasourceStatusDto {
   READY = 2;
   BUSY = 3;
   NONE = 4;
+  ERRORS = 5;
 }
 
 message ProjectFactoryDto {

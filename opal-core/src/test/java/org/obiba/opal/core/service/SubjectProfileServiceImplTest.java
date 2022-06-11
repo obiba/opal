@@ -10,9 +10,8 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.Properties;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.easymock.EasyMock;
@@ -22,9 +21,10 @@ import org.junit.Test;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.TotpService;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,8 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -197,6 +197,13 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public OpalRuntime opalRuntime() {
       OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      EasyMock.replay(mock);
+      return mock;
+    }
+
+    @Bean
+    public OpalFileSystemService opalFileSystemService() {
+      OpalFileSystemService mock = EasyMock.createMock(OpalFileSystemService.class);
       EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
       EasyMock.replay(mock);
       return mock;

@@ -9,7 +9,15 @@
  */
 package org.obiba.opal.web.reporting;
 
-import java.io.File;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
+import org.obiba.opal.fs.OpalFileSystem;
+import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.GET;
@@ -19,16 +27,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.web.ws.security.NotAuthenticated;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import java.io.File;
 
 @Component
 @Transactional
@@ -39,7 +38,7 @@ public class ReportResource {
 //  private static final Logger log = LoggerFactory.getLogger(ReportResource.class);
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
@@ -48,7 +47,7 @@ public class ReportResource {
   @NotAuthenticated
   public Response getReport(@PathParam("obfuscated-file") String obfuscatedFile, @QueryParam("project") String project)
       throws FileSystemException {
-    OpalFileSystem fileSystem = opalRuntime.getFileSystem();
+    OpalFileSystem fileSystem = opalFileSystemService.getFileSystem();
     FileObject reportFolder = fileSystem.getRoot().resolveFile(project == null ? "/reports" : "/reports/" + project);
     FileObject reportFile = fileSystem.resolveFileFromObfuscatedPath(reportFolder, obfuscatedFile);
     if(reportFile == null) {

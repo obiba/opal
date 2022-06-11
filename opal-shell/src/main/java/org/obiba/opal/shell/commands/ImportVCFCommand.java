@@ -16,13 +16,14 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.shell.commands.options.ImportVCFCommandOptions;
-import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreException;
 import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 @CommandUsage(description = "Import VCF file into a project.",
     syntax = "Syntax: import-vcf --project PROJECT --name NAME --file FILE")
@@ -39,10 +39,13 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
   private static final Logger log = LoggerFactory.getLogger(ImportVCFCommand.class);
 
   @Autowired
+  private OpalRuntime opalRuntime;
+
+  @Autowired
   private ProjectService projectService;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private VCFStore store;
 
@@ -98,7 +101,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
         throw new IllegalArgumentException("Not a valid path to VCF/BCF file: " + vcfFilePath);
       if (!vcfFileObject.isReadable())
         throw new IllegalArgumentException("VCF/BCF file is not readable: " + vcfFilePath);
-      File vcfFile = opalRuntime.getFileSystem().getLocalFile(vcfFileObject);
+      File vcfFile = opalFileSystemService.getFileSystem().getLocalFile(vcfFileObject);
       store.writeVCF(vcfFile.getName(), new FileInputStream(vcfFile));
       count++;
     }
@@ -107,7 +110,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     if (Strings.isNullOrEmpty(path)) return null;
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
   @Override

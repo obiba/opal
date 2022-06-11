@@ -2438,7 +2438,8 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "PROJECT_READY", "Ready",
       "PROJECT_BUSY", "Busy: database has write commands that are pending or being processed.",
       "PROJECT_LOADING", "Loading: the database is being loaded, tables operations are not accessible yet.",
-      "PROJECT_NONE", "No associated database, data cannot be imported, only views can be defined." })
+      "PROJECT_NONE", "No associated database, data cannot be imported, only views can be defined.",
+      "PROJECT_ERRORS", "Errors: the database could not be loaded because of errors." })
   Map<String, String> datasourceStatusDescriptionsMap();
 
   @Description("Project Table Status Descriptions")

@@ -15,6 +15,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
@@ -42,11 +43,14 @@ public class PluginDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
   private final OpalRuntime opalRuntime;
 
+  private final OpalFileSystemService opalFileSystemService;
+
   private final OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  public PluginDatasourceFactoryDtoParser(OpalRuntime opalRuntime, OpalRSessionManager opalRSessionManager) {
+  public PluginDatasourceFactoryDtoParser(OpalRuntime opalRuntime, OpalFileSystemService opalFileSystemService, OpalRSessionManager opalRSessionManager) {
     this.opalRuntime = opalRuntime;
+    this.opalFileSystemService = opalFileSystemService;
     this.opalRSessionManager = opalRSessionManager;
   }
 
@@ -65,12 +69,12 @@ public class PluginDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
     datasourceService.setOpalFileSystemPathResolver(path -> {
       try {
-        FileObject fileObject = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+        FileObject fileObject = opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
         // check security
         if (!fileObject.exists() || !fileObject.isReadable()) {
           throw new IllegalArgumentException("File cannot be read: " + path);
         }
-        return opalRuntime.getFileSystem().getLocalFile(fileObject);
+        return opalFileSystemService.getFileSystem().getLocalFile(fileObject);
       } catch (FileSystemException e) {
         throw new IllegalArgumentException("Failed resolving file path: " + path);
       }

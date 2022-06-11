@@ -17,7 +17,7 @@ import org.obiba.magma.support.BatchDatasourceFactory;
 import org.obiba.magma.support.IncrementalDatasourceFactory;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
@@ -29,7 +29,7 @@ import java.io.File;
 public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFactoryDtoParser {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
@@ -66,18 +66,18 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   protected abstract DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy);
 
   @SuppressWarnings("UnusedDeclaration")
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalFileSystemService getOpalFileSystemService() {
+    return opalFileSystemService;
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
   protected File resolveLocalFile(String path) {
     try {
       // note: does not ensure that file exists
-      return opalRuntime.getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+      return opalFileSystemService.getFileSystem().getLocalFile(resolveFileInFileSystem(path));
     } catch (FileSystemException e) {
       throw new IllegalArgumentException(e);
     }

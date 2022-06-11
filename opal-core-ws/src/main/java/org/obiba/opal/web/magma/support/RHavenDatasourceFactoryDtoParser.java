@@ -11,7 +11,7 @@ package org.obiba.opal.web.magma.support;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.r.datasource.RDatasourceFactoryImpl;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
@@ -32,11 +32,11 @@ public class RHavenDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
   private final OpalRSessionManager opalRSessionManager;
 
-  private final OpalRuntime opalRuntime;
+  private final OpalFileSystemService opalFileSystemService;
 
   @Autowired
-  public RHavenDatasourceFactoryDtoParser(OpalRuntime opalRuntime, OpalRSessionManager opalRSessionManager) {
-    this.opalRuntime = opalRuntime;
+  public RHavenDatasourceFactoryDtoParser(OpalFileSystemService opalFileSystemService, OpalRSessionManager opalRSessionManager) {
+    this.opalFileSystemService = opalFileSystemService;
     this.opalRSessionManager = opalRSessionManager;
   }
 
@@ -50,7 +50,7 @@ public class RHavenDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     factory.setName(dto.getName());
     factory.setSymbol(rDto.getSymbol());
     factory.setFile(rDto.getFile());
-    factory.setOpalRuntime(opalRuntime);
+    factory.setOpalFileSystemService(opalFileSystemService);
     factory.setRSessionHandler(new RSessionHandler() {
       @Override
       public ROperationTemplate getSession() {

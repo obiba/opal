@@ -156,7 +156,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
       ensureFileWriteAccess(options.getOut());
     }
 
-    CopyCommandOptions copyOptions = new ExportCommandOptionsDtoImpl(opalRuntime, options);
+    CopyCommandOptions copyOptions = new ExportCommandOptionsDtoImpl(opalFileSystemService, options);
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
     copyCommand.setOptions(copyOptions);
 

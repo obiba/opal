@@ -20,6 +20,8 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.ProjectsServiceImpl;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.shell.commands.options.ReloadDatasourceCommandOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -27,6 +29,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @CommandUsage(description = "Reload a project's underlying datasource.", syntax = "Syntax: reload --project PROJECT")
 public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand<ReloadDatasourceCommandOptions> {
+
+  private static final Logger log = LoggerFactory.getLogger(ReloadDatasourceCommand.class);
 
   @Autowired
   private TransactionTemplate transactionTemplate;
@@ -58,12 +62,16 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
           MagmaEngine.get().removeDatasource(datasource);
           viewManager.unregisterDatasource(datasource.getName());
 
-          ProjectsServiceImpl.registerDatasource(project, transactionTemplate, databaseRegistry);
+          try {
+            ProjectsServiceImpl.registerDatasource(project, transactionTemplate, databaseRegistry);
+            projectsState.updateProjectState(projectName, State.READY);
+          } catch (Exception e) {
+            log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
+            projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
+          }
         }
       });
     }
-
-    projectsState.updateProjectState(projectName, State.READY);
     return CommandResultCode.SUCCESS;
   }
 }

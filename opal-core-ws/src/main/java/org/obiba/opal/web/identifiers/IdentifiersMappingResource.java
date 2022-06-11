@@ -10,43 +10,16 @@
 
 package org.obiba.opal.web.identifiers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
+import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.identifiers.IdentifiersMaps;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -59,10 +32,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import au.com.bytecode.opencsv.CSVWriter;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional
@@ -71,7 +48,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
@@ -91,8 +68,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   }
 
   @Override
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalFileSystemService getOpalFileSystemService() {
+    return opalFileSystemService;
   }
 
   @GET

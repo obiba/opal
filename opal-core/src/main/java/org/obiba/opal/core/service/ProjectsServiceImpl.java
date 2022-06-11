@@ -29,7 +29,7 @@ import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableEvent;
 import org.obiba.opal.core.event.VariableDeletedEvent;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
@@ -61,7 +61,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectsServiceImpl.class);
 
-  private final OpalRuntime opalRuntime;
+  private final OpalFileSystemService opalFileSystemService;
 
   private final OrientDbService orientDbService;
 
@@ -86,7 +86,7 @@ public class ProjectsServiceImpl implements ProjectService {
   private List<DatasourceLoader> datasourceLoaders = Lists.newArrayList();
 
   @Autowired
-  public ProjectsServiceImpl(OpalRuntime opalRuntime,
+  public ProjectsServiceImpl(OpalFileSystemService opalFileSystemService,
                              OrientDbService orientDbService,
                              DatabaseRegistry databaseRegistry,
                              ProjectsKeyStoreService projectsKeyStoreService,
@@ -94,7 +94,7 @@ public class ProjectsServiceImpl implements ProjectService {
                              ViewManager viewManager,
                              TransactionTemplate transactionTemplate,
                              EventBus eventBus, ResourceReferenceService resourceReferenceService, ProjectsState projectsState) {
-    this.opalRuntime = opalRuntime;
+    this.opalFileSystemService = opalFileSystemService;
     this.orientDbService = orientDbService;
     this.databaseRegistry = databaseRegistry;
     this.projectsKeyStoreService = projectsKeyStoreService;
@@ -238,7 +238,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @Override
   public FileObject getProjectDirectory(@NotNull Project project)
       throws NoSuchIdentifiersMappingException, FileSystemException {
-    FileObject projectDir = opalRuntime.getFileSystem().getRoot().resolveFile(PROJECTS_DIR)
+    FileObject projectDir = opalFileSystemService.getFileSystem().getRoot().resolveFile(PROJECTS_DIR)
         .resolveFile(project.getName());
     projectDir.createFolder();
     return projectDir;
@@ -450,6 +450,7 @@ public class ProjectsServiceImpl implements ProjectService {
         projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
       } catch (Exception e) {
         log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
+        projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
       }
     }
   }

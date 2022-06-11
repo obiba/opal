@@ -21,6 +21,7 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
@@ -64,6 +65,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @Autowired
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private ProjectService projectService;
@@ -258,7 +262,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     @Override
     public File resolve(String path) {
       try {
-        FileObject fileObject = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+        FileObject fileObject = opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
         // check security
         if (fileObject.exists()) {
           if (!fileObject.isWriteable()) {
@@ -267,7 +271,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         } else if (!fileObject.getParent().isWriteable()) {
           throw new IllegalArgumentException("File cannot be written: " + path);
         }
-        return opalRuntime.getFileSystem().getLocalFile(fileObject);
+        return opalFileSystemService.getFileSystem().getLocalFile(fileObject);
       } catch (FileSystemException e) {
         throw new IllegalArgumentException("Failed resolving file path: " + path);
       }

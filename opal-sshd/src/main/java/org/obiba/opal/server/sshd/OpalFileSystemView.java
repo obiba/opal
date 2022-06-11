@@ -22,6 +22,7 @@ import org.apache.commons.vfs2.NameScope;
 import org.apache.sshd.server.FileSystemView;
 import org.apache.sshd.server.SshFile;
 import org.apache.sshd.server.filesystem.NativeSshFile;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
 
@@ -35,8 +36,8 @@ public class OpalFileSystemView implements FileSystemView {
 
   private final String user;
 
-  public OpalFileSystemView(OpalRuntime runtime, String user) {
-    opalfs = runtime.getFileSystem();
+  public OpalFileSystemView(OpalFileSystemService opalFileSystemService, String user) {
+    opalfs = opalFileSystemService.getFileSystem();
     this.user = user;
   }
 

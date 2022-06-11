@@ -33,24 +33,6 @@ public interface OpalRuntime extends SystemService {
   String WEBAPP_EXTENSION = EXTENSIONS_DIR + File.separator + "webapp";
 
   //
-  // File system
-  //
-
-  /**
-   * For test purpose.
-   *
-   * @return
-   */
-  boolean hasFileSystem();
-
-  /**
-   * Get the opal file system.
-   *
-   * @return
-   */
-  OpalFileSystem getFileSystem();
-
-  //
   // Core services
   //
 

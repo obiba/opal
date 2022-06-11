@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -42,7 +43,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 @SuppressWarnings({"OverlyLongMethod", "PMD.NcssMethodCount"})
 public class FilesResourceTest {
 
-  private OpalRuntime opalRuntimeMock;
+  private OpalFileSystemService opalFileSystemServiceMock;
 
   private SubjectAclService subjectAclServiceMock;
 
@@ -63,7 +64,7 @@ public class FilesResourceTest {
 
   @Before
   public void setUp() throws URISyntaxException {
-    opalRuntimeMock = createMock(OpalRuntime.class);
+    opalFileSystemServiceMock = createMock(OpalFileSystemService.class);
     subjectAclServiceMock = createMock(SubjectAclService.class);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
@@ -73,7 +74,7 @@ public class FilesResourceTest {
     }
     fileSystem = new DefaultOpalFileSystem(rootDir);
     filesResource = new FilesResource();
-    filesResource.setOpalRuntime(opalRuntimeMock);
+    filesResource.setOpalFileSystemService(opalFileSystemServiceMock);
     filesResource.setSubjectAclService(subjectAclServiceMock);
 
     fileItemMock = createMock(FileItem.class);
@@ -96,12 +97,12 @@ public class FilesResourceTest {
   @Test
   public void testGetFileSystem() throws IOException {
 
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     FileSystemResource fsResource = new FileSystemResource();
-    fsResource.setOpalRuntime(opalRuntimeMock);
+    fsResource.setOpalFileSystemService(opalFileSystemServiceMock);
     FileDto rootFileDto = fsResource.getFileSystem();
 
     assertThat(rootFileDto.getName()).isEqualTo("root");
@@ -113,12 +114,12 @@ public class FilesResourceTest {
   @Test
   @Ignore
   public void verifyThatAllFilesAndFoldersInDtoStructureExistInFileSystem() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     FileSystemResource fsResource = new FileSystemResource();
-    fsResource.setOpalRuntime(opalRuntimeMock);
+    fsResource.setOpalFileSystemService(opalFileSystemServiceMock);
 
     FileDto rootFileDto = fsResource.getFileSystem();
 
@@ -128,7 +129,7 @@ public class FilesResourceTest {
     // File count in Dto structure should be the same as file count in file system.
     assertThat(childrenCounter).isEqualTo(20);
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
   }
 
   private int verifyThatChildrenExistInFileSystem(FileDto folder, int childrenCounter) throws IOException {
@@ -148,9 +149,9 @@ public class FilesResourceTest {
   @Ignore("SecurityManager dependency not satisfied")
   @Test
   public void testGetFoldersDetailsInFileSystem() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     checkGetFileDetailsResponse("/", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11",
         "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt");
@@ -161,7 +162,7 @@ public class FilesResourceTest {
     checkGetFileDetailsResponse("/folder4", "folder41", "file41.txt", "file42.txt", "file43.txt");
     checkGetFileDetailsResponse("/folder5", "file51.txt");
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
 
   }
 
@@ -197,8 +198,8 @@ public class FilesResourceTest {
   @Ignore("SecurityManager dependency not satisfied")
   @Test
   public void testGetFile_GetCompressedFolderFromFileSystem() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
-    replay(opalRuntimeMock);
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
+    replay(opalFileSystemServiceMock);
 
     checkCompressedFolder("/folder1", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
         "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
@@ -214,7 +215,7 @@ public class FilesResourceTest {
         "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
         "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt");
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
 
   }
 
@@ -244,9 +245,9 @@ public class FilesResourceTest {
 
   @Test
   public void testGetPathThatDoesNotExist() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     try {
       filesResource.getFileDetails("/folder1/folder2");
@@ -254,14 +255,14 @@ public class FilesResourceTest {
     } catch (NoSuchFileException e) {
     }
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
 
   }
 
   @Test
   @Ignore
   public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
     expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
     expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
         .once();
@@ -273,10 +274,10 @@ public class FilesResourceTest {
         return Lists.newArrayList(fileItemMock);
       }
     };
-    fileResource.setOpalRuntime(opalRuntimeMock);
+    fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
     fileResource.setSubjectAclService(subjectAclServiceMock);
 
-    replay(opalRuntimeMock, fileItemMock, uriInfoMock);
+    replay(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
     String destinationPath = "/folder1/folder11/folder111";
@@ -286,7 +287,7 @@ public class FilesResourceTest {
     // Verify that the service response is CREATED.
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
-    verify(opalRuntimeMock, fileItemMock, uriInfoMock);
+    verify(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
 
     // Verify that the file was uploaded at the right path in the file system.
     assertThat(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").exists()).isTrue();
@@ -297,9 +298,9 @@ public class FilesResourceTest {
   @Test
   public void testUploadFileNoContentSubmitted() throws IOException, FileUploadException, URISyntaxException {
 
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     FilesResource fileResource = new FilesResource() {
       @Override
@@ -307,20 +308,20 @@ public class FilesResourceTest {
         return Lists.newArrayList();
       }
     };
-    fileResource.setOpalRuntime(opalRuntimeMock);
+    fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
     fileResource.setSubjectAclService(subjectAclServiceMock);
 
     Response response = fileResource.uploadFile("/", uriInfoMock, null);
     assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
 
   }
 
   @Test
   public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist()
       throws IOException, FileUploadException, URISyntaxException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
     FilesResource fileResource = new FilesResource() {
       @Override
@@ -328,10 +329,10 @@ public class FilesResourceTest {
         return Lists.newArrayList(fileItemMock);
       }
     };
-    fileResource.setOpalRuntime(opalRuntimeMock);
+    fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
     filesResource.setSubjectAclService(subjectAclServiceMock);
 
-    replay(opalRuntimeMock, fileItemMock, uriInfoMock);
+    replay(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
     String destinationPath = "/folder1/folder11/folder111/patate";
@@ -342,14 +343,14 @@ public class FilesResourceTest {
 
     }
 
-    verify(opalRuntimeMock, fileItemMock, uriInfoMock);
+    verify(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
   }
 
   @Test
   public void testDeleteFile_FileDoesNotExist() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     try {
       filesResource.deleteFile("/folder1/folder2/filethatdoesnotexist.txt");
@@ -357,20 +358,20 @@ public class FilesResourceTest {
     } catch (NoSuchFileException e) {
     }
 
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
   }
 
   @Test
   @Ignore
   public void testDeleteFile_CannotDeleteFolderWithContent() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
+    expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
-    replay(opalRuntimeMock);
+    replay(opalFileSystemServiceMock);
 
     Response response = filesResource.deleteFile("/folder1");
     assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
     assertThat(response.getEntity()).isEqualTo("cannotDeleteNotEmptyFolder");
-    verify(opalRuntimeMock);
+    verify(opalFileSystemServiceMock);
   }
 
   @Test
@@ -426,7 +427,7 @@ public class FilesResourceTest {
         return fileObjectMock;
       }
     };
-    resource.setOpalRuntime(opalRuntimeMock);
+    resource.setOpalFileSystemService(opalFileSystemServiceMock);
     resource.setSubjectAclService(subjectAclServiceMock);
     return resource;
   }

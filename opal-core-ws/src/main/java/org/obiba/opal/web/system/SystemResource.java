@@ -73,9 +73,9 @@ public class SystemResource {
   @NoAuthorization
   @Path("/news")
   public Opal.NewsDto getNews() {
+    Opal.NewsDto.Builder builder = Opal.NewsDto.newBuilder();
     try {
       ObibaNews news = ObibaNewsYaml.loadNews();
-      Opal.NewsDto.Builder builder = Opal.NewsDto.newBuilder();
       for (ObibaNewsDatum datum : news.getData()) {
         if (datum.getTitle().toLowerCase().contains("opal") || (datum.hasSummary() && datum.getSummary().toLowerCase().contains("opal"))) {
           Opal.NewsDto.NoteDto.Builder note = builder.addNotesBuilder()
@@ -86,10 +86,10 @@ public class SystemResource {
             note.setSummary(datum.getSummary());
         }
       }
-      return builder.build();
     } catch (Exception e) {
-      throw new InternalServerErrorException(e);
+      // ignore
     }
+    return builder.build();
   }
 
 

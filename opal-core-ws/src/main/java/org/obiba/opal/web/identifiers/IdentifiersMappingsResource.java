@@ -22,7 +22,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
@@ -68,8 +68,8 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   private IdentifiersImportService identifiersImportService;
 
   @Override
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalFileSystemService getOpalFileSystemService() {
+    return opalFileSystemService;
   }
 
   @Override
