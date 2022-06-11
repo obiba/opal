@@ -10,14 +10,9 @@
 
 package org.obiba.opal.web.identifiers;
 
-import java.util.Locale;
-import java.util.Set;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
+import com.google.common.collect.Sets;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.magma.DatasourceTablesResource;
@@ -29,7 +24,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Sets;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import java.util.Locale;
+import java.util.Set;
 
 @Component
 @Transactional
@@ -38,7 +36,7 @@ import com.google.common.collect.Sets;
 public class IdentifiersResource extends AbstractIdentifiersResource {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private OpalGeneralConfigService serverService;
@@ -50,8 +48,8 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
   private ApplicationContext applicationContext;
 
   @Override
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalFileSystemService getOpalFileSystemService() {
+    return opalFileSystemService;
   }
 
   @Override

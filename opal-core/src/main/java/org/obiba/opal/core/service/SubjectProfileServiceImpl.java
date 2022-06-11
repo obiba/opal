@@ -23,7 +23,7 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.TotpService;
@@ -58,7 +58,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   private SubjectAclService subjectAclService;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private EventBus eventBus;
@@ -222,8 +222,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private void ensureUserHomeExists(String username) {
     try {
-      if (!opalRuntime.hasFileSystem()) return;
-      FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
+      if (!opalFileSystemService.hasFileSystem()) return;
+      FileObject home = opalFileSystemService.getFileSystem().getRoot().resolveFile("/home/" + username);
       if (!home.exists()) {
         log.info("Creating user home: /home/{}", username);
         home.createFolder();

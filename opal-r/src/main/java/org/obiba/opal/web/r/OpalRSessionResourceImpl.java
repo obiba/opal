@@ -13,7 +13,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * Handles web services on a particular R session of the invoking Opal user.
@@ -37,7 +36,7 @@ import java.io.Serializable;
 public class OpalRSessionResourceImpl extends AbstractRSessionResource implements OpalRSessionResource {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Override
   public Response executeBinary(String script, boolean async, String body) {
@@ -76,7 +75,7 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
           .entity("Destination file must be relative to R workspace.").build();
     String dest = prepareDestinationInR(destination, file.getName().getBaseName());
     try {
-      FileWriteROperation rop = new FileWriteROperation(dest, opalRuntime.getFileSystem().getLocalFile(file));
+      FileWriteROperation rop = new FileWriteROperation(dest, opalFileSystemService.getFileSystem().getLocalFile(file));
       getRServerSession().execute(rop);
     } catch (Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Cannot write file to R workspace: " + source).build();
@@ -135,13 +134,13 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
   }
 
   private File prepareDestinationInOpal(FileObject file, String defaultName) throws FileSystemException {
-    File destination = opalRuntime.getFileSystem().getLocalFile(file);
+    File destination = opalFileSystemService.getFileSystem().getLocalFile(file);
     if (file.exists() && file.getType() == FileType.FOLDER) destination = new File(destination, defaultName);
     return destination;
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
 }

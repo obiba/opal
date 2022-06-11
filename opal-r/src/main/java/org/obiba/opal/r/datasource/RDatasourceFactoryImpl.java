@@ -14,7 +14,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.r.DataReadROperation;
 import org.obiba.opal.spi.r.datasource.AbstractRDatasourceFactory;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
@@ -27,7 +27,7 @@ import java.io.File;
  */
 public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
 
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private String symbol;
 
@@ -45,8 +45,8 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
 
   private String categoryFile;
 
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
+  public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   public void setSymbol(String symbol) {
@@ -106,9 +106,9 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
           catFileObj = resolveFileInFileSystem(categoryFile);
         }
 
-        File file = opalRuntime.getFileSystem().getLocalFile(fileObj);
+        File file = opalFileSystemService.getFileSystem().getLocalFile(fileObj);
         File categoryFile =
-            catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalRuntime.getFileSystem().getLocalFile(catFileObj) : null;
+            catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalFileSystemService.getFileSystem().getLocalFile(catFileObj) : null;
 
         // create tibble if file is provided
         if (file != null && file.exists()) {
@@ -131,6 +131,6 @@ public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     if (Strings.isNullOrEmpty(path)) return null;
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 }

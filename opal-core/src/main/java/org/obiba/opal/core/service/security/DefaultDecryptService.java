@@ -9,8 +9,7 @@
  */
 package org.obiba.opal.core.service.security;
 
-import java.io.IOException;
-
+import com.google.common.collect.Iterables;
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -20,7 +19,7 @@ import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionSt
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.NoSuchProjectException;
@@ -29,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Iterables;
+import java.io.IOException;
 
 /**
  * Default implementation of {@link DecryptService}.
@@ -39,7 +38,7 @@ import com.google.common.collect.Iterables;
 public class DefaultDecryptService implements DecryptService {
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private ProjectsKeyStoreService projectsKeyStoreService;
@@ -58,7 +57,7 @@ public class DefaultDecryptService implements DecryptService {
 
     // Create an FsDatasource for the specified file.
     Datasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),
-        opalRuntime.getFileSystem().getLocalFile(file),
+        opalFileSystemService.getFileSystem().getLocalFile(file),
         projectName != null ? getProjectEncryptionStrategy(projectName) : getSystemEncryptionStrategy());
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);

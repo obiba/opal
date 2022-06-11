@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.web.model.Commands;
@@ -38,7 +39,7 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
 
   protected final Commands.ExportCommandOptionsDto dto;
 
-  private final OpalRuntime opalRuntime;
+  private final OpalFileSystemService opalFileSystemService;
 
   private String pathWithExtension;
 
@@ -46,8 +47,8 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   // Constructors
   //
 
-  public ExportCommandOptionsDtoImpl(OpalRuntime opalRuntime, Commands.ExportCommandOptionsDto dto) {
-    this.opalRuntime = opalRuntime;
+  public ExportCommandOptionsDtoImpl(OpalFileSystemService opalFileSystemService, Commands.ExportCommandOptionsDto dto) {
+    this.opalFileSystemService = opalFileSystemService;
     this.dto = dto;
 
     if(dto.hasOut() && dto.hasFormat()) {
@@ -199,7 +200,7 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   //
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
   private String addFileExtensionIfMissing(String outputFilePath, String outputFileFormat) {

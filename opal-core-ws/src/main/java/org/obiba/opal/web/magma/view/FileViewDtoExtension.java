@@ -21,7 +21,7 @@ import org.obiba.magma.views.View.Builder;
 import org.obiba.magma.views.support.AllClause;
 import org.obiba.magma.views.support.NoneClause;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.FileViewDto;
@@ -42,12 +42,12 @@ import java.io.InputStream;
 @Component
 public class FileViewDtoExtension extends TableViewDtoExtension {
 
-  private final OpalRuntime opalRuntime;
+  private final OpalFileSystemService opalFileSystemService;
 
   @Autowired
-  public FileViewDtoExtension(OpalRuntime opalRuntime) {
-    if (opalRuntime == null) throw new IllegalArgumentException("opalRuntime cannot be null");
-    this.opalRuntime = opalRuntime;
+  public FileViewDtoExtension(OpalFileSystemService opalFileSystemService) {
+    if (opalFileSystemService == null) throw new IllegalArgumentException("opalRuntime cannot be null");
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   @Override
@@ -71,7 +71,7 @@ public class FileViewDtoExtension extends TableViewDtoExtension {
     Builder viewBuilder = getBuilder(viewDto);
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
-      FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
+      FileObject file = opalFileSystemService.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
       if (file.exists()) {
         try (InputStream is = file.getContent().getInputStream()) {
           return makeViewFromFile(viewBuilder, fileDto, is);
@@ -118,7 +118,7 @@ public class FileViewDtoExtension extends TableViewDtoExtension {
   public TableDto asTableDto(ViewDto viewDto, Magma.TableDto.Builder tableDtoBuilder) {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
-      FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
+      FileObject file = opalFileSystemService.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
       if (file.exists()) {
         try (InputStream is = file.getContent().getInputStream()) {
           return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);

@@ -10,17 +10,16 @@
 
 package org.obiba.opal.core.upgrade.support;
 
-import java.util.Collection;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.plugins.spi.ServicePlugin;
+
+import java.util.Collection;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Upgrade purpose only to fix injection dependencies.
@@ -29,16 +28,6 @@ public class OpalRuntimeMock implements OpalRuntime {
 
   @Override
   public Set<Service> getServices() {
-    return null;
-  }
-
-  @Override
-  public boolean hasFileSystem() {
-    return false;
-  }
-
-  @Override
-  public OpalFileSystem getFileSystem() {
     return null;
   }
 

@@ -31,14 +31,15 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
-import org.obiba.opal.core.service.ProjectsState;
-import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.magma.QueryWhereClause;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
+import org.obiba.opal.core.service.ProjectsState;
+import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.datasource.RExportDatasource;
@@ -108,6 +109,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @Autowired
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private EventBus eventBus;
@@ -334,7 +338,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     datasourceService.setOpalFileSystemPathResolver(path -> {
       try {
-        FileObject fileObject = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+        FileObject fileObject = opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
         // check security
         if (fileObject.exists()) {
           if (!fileObject.isWriteable()) {
@@ -343,7 +347,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         } else if (!fileObject.getParent().isWriteable()) {
           throw new IllegalArgumentException("File cannot be written: " + path);
         }
-        return opalRuntime.getFileSystem().getLocalFile(fileObject);
+        return opalFileSystemService.getFileSystem().getLocalFile(fileObject);
       } catch (FileSystemException e) {
         throw new IllegalArgumentException("Failed resolving file path: " + path);
       }

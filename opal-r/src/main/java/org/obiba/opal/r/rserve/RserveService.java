@@ -15,7 +15,7 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.InstallLocalPackageOperation;
 import org.obiba.opal.r.service.*;
@@ -83,15 +83,10 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Autowired
   private EventBus eventBus;
 
-  private OpalRuntime opalRuntime;
+  @Autowired
+  private OpalFileSystemService opalFileSystemService;
 
   private final List<RserveSession> sessions = Collections.synchronizedList(Lists.newArrayList());
-
-  // lazy injection
-  @Autowired
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
 
   //
   // ROperationTemplate methods
@@ -263,7 +258,7 @@ public class RserveService implements RServerService, ROperationTemplate {
 
   @Override
   public void installLocalPackage(String path) {
-    InstallLocalPackageOperation rop = new InstallLocalPackageOperation(opalRuntime.getFileSystem().resolveLocalFile(path));
+    InstallLocalPackageOperation rop = new InstallLocalPackageOperation(opalFileSystemService.getFileSystem().resolveLocalFile(path));
     execute(rop);
   }
 

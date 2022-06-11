@@ -12,17 +12,12 @@ package org.obiba.opal.core.runtime;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import net.sf.ehcache.CacheManager;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.tx.TransactionalThread;
-import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
-import org.obiba.opal.fs.security.SecuredOpalFileSystem;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +42,7 @@ import java.util.Set;
 @Component
 public class DefaultOpalRuntime implements OpalRuntime {
 
-  private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultOpalRuntime.class);
 
   private TransactionTemplate transactionTemplate;
 
@@ -57,13 +52,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private PluginsManager pluginsManager;
 
-  private OpalFileSystem opalFileSystem;
-
   private Set<Service> services;
 
   private ViewManager viewManager;
-
-  private final Object syncFs = new Object();
 
   @Value("${org.obiba.magma.readDataPointsCount}")
   private Integer readDataPointsCount;
@@ -103,7 +94,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   public void start() {
     initExtensions();
     initPlugins();
-    initFileSystem();
     initServicePlugins();
     initServices();
     initMagmaEngine();
@@ -170,24 +160,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   public Set<Service> getServices() {
     return ImmutableSet.copyOf(services);
-  }
-
-  @Override
-  public boolean hasFileSystem() {
-    return true;
-  }
-
-  @Override
-  public OpalFileSystem getFileSystem() {
-    synchronized (syncFs) {
-      while (opalFileSystem == null) {
-        try {
-          syncFs.wait();
-        } catch (InterruptedException ignored) {
-        }
-      }
-    }
-    return opalFileSystem;
   }
 
   @Override
@@ -295,32 +267,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
         log.warn("Error starting service " + service.getClass(), e);
       }
     }
-  }
-
-  private void initFileSystem() {
-    synchronized (syncFs) {
-      try {
-        opalFileSystem = new SecuredOpalFileSystem(
-            new DefaultOpalFileSystem(opalConfigurationService.getOpalConfiguration().getFileSystemRoot()));
-
-        // Create some system folders, if they do not exist.
-        ensureFolder("home");
-        ensureFolder("projects");
-        ensureFolder("reports");
-        ensureFolder("tmp");
-      } catch (RuntimeException e) {
-        log.error("The opal filesystem cannot be started.");
-        throw e;
-      } catch (FileSystemException e) {
-        log.error("Error creating a system directory in the Opal File System.", e);
-      }
-      syncFs.notifyAll();
-    }
-  }
-
-  private void ensureFolder(String path) throws FileSystemException {
-    FileObject folder = getFileSystem().getRoot().resolveFile(path);
-    folder.createFolder();
   }
 
 }

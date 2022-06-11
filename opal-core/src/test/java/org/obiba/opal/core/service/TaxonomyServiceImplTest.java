@@ -10,10 +10,6 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,6 +22,7 @@ import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +32,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -257,7 +258,13 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public OpalRuntime opalRuntime() {
       OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
-      EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
+      EasyMock.replay(mock);
+      return mock;
+    }
+
+    @Bean
+    public OpalFileSystemService opalFileSystemService() {
+      OpalFileSystemService mock = EasyMock.createMock(OpalFileSystemService.class);
       EasyMock.replay(mock);
       return mock;
     }

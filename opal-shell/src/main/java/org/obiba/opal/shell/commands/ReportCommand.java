@@ -193,7 +193,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     Map<String, Object> model = new HashMap<>();
     model.put("report_template", reportTemplate.getName());
     model.put("report_public_link",
-        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) +
+        opalPublicUrl + "/ws/report/public/" + getOpalFileSystemService().getFileSystem().getObfuscatedPath(reportOutput) +
             "?project=" + reportTemplate.getProject());
     return getMergedVelocityTemplate(model);
   }

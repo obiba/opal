@@ -21,27 +21,28 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.*;
+import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.NoSuchSystemIdentifierMappingException;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.shell.commands.options.ExportVCFCommandOptions;
-import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreException;
 import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 @CommandUsage(description = "Export one or more VCF files from a project into a destination folder.",
@@ -53,10 +54,13 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
   @Autowired
+  private OpalRuntime opalRuntime;
+
+  @Autowired
   private ProjectService projectService;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private VCFSamplesMappingService vcfSamplesMappingService;
@@ -125,7 +129,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     if (!fileObject.isWriteable()) throw new IllegalArgumentException("Export destination is not writable: " + options.getDestination());
     String timestamp = DATE_FORMAT.format(new Date());
     String destinationFolderName = store.getName() + "-vcf-" + timestamp;
-    File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(fileObject), destinationFolderName);
+    File destinationFolder = new File(opalFileSystemService.getFileSystem().getLocalFile(fileObject), destinationFolderName);
     destinationFolder.mkdirs();
     getShell().printf(String.format("Exporting VCF/BCF files in: %s", options.getDestination() + File.separator + destinationFolderName));
 
@@ -231,7 +235,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     if (Strings.isNullOrEmpty(path)) return null;
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
   @Override

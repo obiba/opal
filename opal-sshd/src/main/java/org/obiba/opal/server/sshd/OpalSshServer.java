@@ -10,8 +10,7 @@
 
 package org.obiba.opal.server.sshd;
 
-import java.io.IOException;
-
+import com.google.common.collect.ImmutableList;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -27,6 +26,7 @@ import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.sftp.SftpSubsystem;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 
 @Component
 public class OpalSshServer implements Service {
@@ -45,7 +45,8 @@ public class OpalSshServer implements Service {
 
   private final SshServer sshd;
 
-  private OpalRuntime opalRuntime;
+  @Autowired
+  private OpalFileSystemService opalFileSystemService;
 
   @Autowired
   private SubjectProfileService subjectProfileService;
@@ -89,7 +90,7 @@ public class OpalSshServer implements Service {
 
       @Override
       public FileSystemView createFileSystemView(Session session) throws IOException {
-        return new OpalFileSystemView(opalRuntime, session.getUsername());
+        return new OpalFileSystemView(opalFileSystemService, session.getUsername());
       }
     });
     sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>>of(new SftpSubsystem.Factory()));
@@ -97,7 +98,6 @@ public class OpalSshServer implements Service {
 
   @Override
   public void initialize(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
   }
 
   @Override

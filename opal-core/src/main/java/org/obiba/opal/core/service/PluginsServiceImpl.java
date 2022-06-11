@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.PluginsService;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.runtime.PluginsManager;
@@ -42,7 +43,7 @@ public class PluginsServiceImpl implements PluginsService {
   private PluginsManager pluginsManager;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private VersionProvider opalVersionProvider;
 
@@ -142,7 +143,7 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public void installPlugin(String filePath) {
-    installPlugin(opalRuntime.getFileSystem().resolveLocalFile(filePath), false);
+    installPlugin(opalFileSystemService.getFileSystem().resolveLocalFile(filePath), false);
   }
 
   @Override

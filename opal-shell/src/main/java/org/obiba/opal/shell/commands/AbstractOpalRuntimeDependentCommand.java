@@ -15,6 +15,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,13 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCommand<T> {
 
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private OpalConfigurationService configService;
 
   @Autowired
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
+  public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   @Autowired
@@ -37,12 +38,12 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
     this.configService = configService;
   }
 
-  protected OpalRuntime getOpalRuntime() {
-    return opalRuntime;
+  protected OpalFileSystemService getOpalFileSystemService() {
+    return opalFileSystemService;
   }
 
   public FileObject getFileSystemRoot() {
-    return getOpalRuntime().getFileSystem().getRoot();
+    return getOpalFileSystemService().getFileSystem().getRoot();
   }
 
   public FileObject getFile(String path) throws FileSystemException {
@@ -54,7 +55,7 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
   }
 
   public File getLocalFile(FileObject vsfFile) {
-    return getOpalRuntime().getFileSystem().getLocalFile(vsfFile);
+    return getOpalFileSystemService().getFileSystem().getLocalFile(vsfFile);
   }
 
   protected OpalConfiguration getOpalConfiguration() {

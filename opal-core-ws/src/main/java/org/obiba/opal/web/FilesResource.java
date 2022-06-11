@@ -22,7 +22,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.domain.security.SubjectAcl;
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
@@ -58,7 +58,7 @@ public class FilesResource {
 
   private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
 
-  private OpalRuntime opalRuntime;
+  private OpalFileSystemService opalFileSystemService;
 
   private SubjectAclService subjectAclService;
 
@@ -67,8 +67,8 @@ public class FilesResource {
   private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
   @Autowired
-  public void setOpalRuntime(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
+  public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
+    this.opalFileSystemService = opalFileSystemService;
   }
 
   @Autowired
@@ -493,9 +493,9 @@ public class FilesResource {
     if (!destination.isWriteable())
       throw new ForbiddenException("Destination folder is not writable.");
 
-    File archiveFile = opalRuntime.getFileSystem().getLocalFile(archive);
+    File archiveFile = opalFileSystemService.getFileSystem().getLocalFile(archive);
     String archiveBasename = archiveFile.getName().replace(".zip", "");
-    File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(destination), archiveBasename);
+    File destinationFolder = new File(opalFileSystemService.getFileSystem().getLocalFile(destination), archiveBasename);
     int inc = 1;
     while (destinationFolder.exists()) {
       destinationFolder = new File(destinationFolder.getParentFile(), archiveBasename + "-" + inc);
@@ -521,18 +521,18 @@ public class FilesResource {
   //
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+    return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
   FileObject resolveFileInFileSystem(File localFile) throws FileSystemException {
-    FileObject root = opalRuntime.getFileSystem().getRoot();
-    File localRoot = opalRuntime.getFileSystem().getLocalFile(root);
+    FileObject root = opalFileSystemService.getFileSystem().getRoot();
+    File localRoot = opalFileSystemService.getFileSystem().getLocalFile(root);
     String path = localFile.getAbsolutePath().replace(localRoot.getAbsolutePath(), "");
     return root.resolveFile(path);
   }
 
   private Response getFile(FileObject file, String key) throws IOException {
-    final File localFile = opalRuntime.getFileSystem().getLocalFile(file);
+    final File localFile = opalFileSystemService.getFileSystem().getLocalFile(file);
     String fileName = Strings.isNullOrEmpty(key) ? localFile.getName() : localFile.getName() + ".zip";
     String mimeType = mimeTypes.getContentType(fileName);
 
@@ -554,8 +554,8 @@ public class FilesResource {
         .header("Content-Disposition", getContentDispositionOfAttachment(fileName)).build();
   }
 
-  private Response getFolder(FileObject folder, Collection<String> children, String key) throws IOException {
-    final File localFolder = opalRuntime.getFileSystem().getLocalFile(folder);
+  private Response getFolder(FileObject folder, Collection<String> children, String key) {
+    final File localFolder = opalFileSystemService.getFileSystem().getLocalFile(folder);
     final String fileName = localFolder.getName() + ".zip";
     String mimeType = mimeTypes.getContentType(fileName);
 
