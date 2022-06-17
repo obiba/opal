@@ -86,4 +86,8 @@ public interface RSessionResource {
   @POST
   @Path("/workspaces")
   Response saveWorkspace(@QueryParam("save") String saveId);
+
+  @PUT
+  @Path("/workspace/{wid}")
+  Response restoreWorkspace(@PathParam("wid") String workspaceId);
 }
