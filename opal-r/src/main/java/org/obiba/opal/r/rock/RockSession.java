@@ -12,6 +12,7 @@ package org.obiba.opal.r.rock;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,8 +51,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   private String rockSessionId;
 
-  protected RockSession(String clusterName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory) throws RServerException {
-    super(clusterName, app.getName(), UUID.randomUUID().toString(), user, transactionalThreadFactory);
+  protected RockSession(App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(app.getName(), UUID.randomUUID().toString(), user, transactionalThreadFactory, eventBus);
     this.app = app;
     this.credentials = credentials;
     openSession();
@@ -197,6 +198,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   @Override
   public void close() {
     if (isClosed()) return;
+    super.close();
     closeSession();
   }
 

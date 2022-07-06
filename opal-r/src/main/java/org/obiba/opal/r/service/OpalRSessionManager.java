@@ -18,6 +18,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
+import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;

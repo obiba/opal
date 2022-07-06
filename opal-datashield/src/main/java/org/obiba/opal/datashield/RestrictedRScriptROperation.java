@@ -31,7 +31,7 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     super.doWithConnection();
     setResult(null);
     String script = restricted();
-    DataShieldLog.userLog("evaluating '{}'", script);
+    DataShieldLog.userLog(null, DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
     setResult(eval(script, serialize));
   }
 }

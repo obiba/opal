@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.datashield;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.obiba.datashield.core.DSEnvironment;
@@ -19,6 +20,7 @@ import org.obiba.datashield.r.expr.RScriptGeneratorFactory;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
+import org.slf4j.MDC;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,11 +43,20 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
     this.script = script;
     this.environment = environment;
-    DataShieldLog.userLog("parsing '{}'", script);
+    MDC.put("ds_script_in", script);
+    MDC.put("ds_script_out", null);
+    MDC.put("ds_func", null);
     try {
       this.rScriptGenerator = RScriptGeneratorFactory.make(rParserVersion, environment, script);
+      String toScript = rScriptGenerator.toScript();
+      String mapped = Joiner.on(";").join(rScriptGenerator.getMappedFunctions().entrySet().stream()
+          .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+          .collect(Collectors.toList()));
+      MDC.put("ds_script_out", toScript);
+      MDC.put("ds_func", mapped);
+      DataShieldLog.userLog(null, DataShieldLog.Action.PARSED, "parsed '{}'", toScript);
     } catch (Throwable e) {
-      DataShieldLog.userLog("Script failed validation: " + e.getMessage());
+      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE_ERROR,"Script failed validation: {}", e.getMessage());
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);

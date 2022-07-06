@@ -18,6 +18,7 @@ import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -43,31 +44,43 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   @Override
   public Response putTable(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName, String identifiersMapping, String rClass, boolean async) {
-    DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
+    DataShieldLog.init();
+    MDC.put("ds_symbol", getName());
+    MDC.put("ds_table", path);
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.ASSIGN,"creating symbol '{}' from opal data '{}'", getName(), path);
     return super.putTable(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
   }
 
   @Override
   public Response putResource(UriInfo uri, String path, boolean async) {
-    DataShieldLog.userLog("creating symbol '{}' from opal resource '{}'", getName(), path);
+    DataShieldLog.init();
+    MDC.put("ds_symbol", getName());
+    MDC.put("ds_resource", path);
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.ASSIGN, "creating symbol '{}' from opal resource '{}'", getName(), path);
     return super.putResource(uri, path, async);
   }
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) throws Exception {
-    DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
+    DataShieldLog.init();
+    MDC.put("ds_symbol", getName());
+    MDC.put("ds_expr", script);
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.ASSIGN, "creating symbol '{}' from R script '{}'", getName(), script);
     return putRestrictedRScript(uri, script, async);
   }
 
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
-    DataShieldLog.userLog("creating text symbol '{}' as '{}'", getName(), content);
+    DataShieldLog.init();
+    MDC.put("ds_symbol", getName());
+    MDC.put("ds_expr", String.format("\"%s\"", content));
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.ASSIGN,"creating text symbol '{}' as '{}'", getName(), content);
     return super.putString(uri, content, async);
   }
 
   @Override
   public Response rm() {
-    DataShieldLog.userLog("deleting symbol '{}'", getName());
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.RM,"deleting symbol '{}'", getName());
     return super.rm();
   }
 

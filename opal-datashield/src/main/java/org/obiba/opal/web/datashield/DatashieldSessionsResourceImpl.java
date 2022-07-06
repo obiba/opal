@@ -91,6 +91,6 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
           new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
     }
     rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", configurationService.getOpalConfiguration().getSeed())));
-    DataShieldLog.userLog("created a datashield session {}", rSession.getId());
+    DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
   }
 }

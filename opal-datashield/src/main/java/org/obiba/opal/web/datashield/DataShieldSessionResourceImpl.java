@@ -13,6 +13,7 @@ import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -58,6 +59,12 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   @Override
   public Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException {
     return aggregate(async, body, RSerialize.JSON);
+  }
+
+  @Override
+  public Response removeRSession(String saveId) {
+    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.CLOSE, "closing a datashield session {}", getRServerSession().getId());
+    return super.removeRSession(saveId);
   }
 
   private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {

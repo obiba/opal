@@ -316,13 +316,13 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    return new RockSession(clusterName, app, getUserCredentials(), user, transactionalThreadFactory);
+    return new RockSession(app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
   }
 
   @Override
   public void execute(ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RServerSession rSession = newRServerSession(principal == null ? "opal" : principal.toString());
+    RServerSession rSession = newRServerSession(principal == null ? "opal/system" : principal.toString());
     try {
       rSession.execute(rop);
     } finally {

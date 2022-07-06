@@ -64,8 +64,7 @@ public interface OrientDbService {
    * <li>update existing <b>template key</b> document with <b>hasUniqueProperties value</b> properties</li>
    * </ul>
    *
-   * @param template
-   * @param hasUniqueProperties
+   * @param beansByTemplate
    * @throws ConstraintViolationException
    */
   void save(@NotNull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) throws ConstraintViolationException;

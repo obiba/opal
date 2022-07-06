@@ -32,7 +32,6 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     super.doWithConnection();
     setResult(null);
     String script = restricted();
-    DataShieldLog.userLog("assigning '{}' with {}", symbol, script);
     setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
   }
 

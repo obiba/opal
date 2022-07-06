@@ -10,6 +10,7 @@
 package org.obiba.opal.r.rserve;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.r.service.NoSuchRSessionException;
@@ -41,8 +42,8 @@ class RserveSession extends AbstractRServerSession {
    *
    * @param connection
    */
-  RserveSession(String serverName, RserveConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
-    super(RServerManagerService.DEFAULT_CLUSTER_NAME, serverName, UUID.randomUUID().toString(), user, transactionalThreadFactory);
+  RserveSession(String serverName, RserveConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user, EventBus eventBus) {
+    super(serverName, UUID.randomUUID().toString(), user, transactionalThreadFactory, eventBus);
     this.rConnection = connection;
     initDirectories();
   }
@@ -80,6 +81,7 @@ class RserveSession extends AbstractRServerSession {
   @Override
   public void close() {
     if (isClosed()) return;
+    super.close();
     cleanDirectories();
     closeConnection();
     closeRCommandsQueue();
