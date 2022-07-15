@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Basic CSRF detection.
@@ -39,17 +40,17 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   private static final String REFERER_HEADER = "Referer";
 
-  private final String serverPort;
+  private static final Pattern localhostPattern = Pattern.compile("^http[s]?://localhost:");
+
+  private static final Pattern loopbackhostPattern = Pattern.compile("^http[s]?://127\\.0\\.0\\.1:");
 
   private final boolean productionMode;
 
   private final List<String> csrfAllowed;
 
   @Autowired
-  public CSRFInterceptor(@Value("${org.obiba.opal.http.port:8080}") String port,
-                         @Value("${productionMode}") boolean productionMode,
+  public CSRFInterceptor(@Value("${productionMode}") boolean productionMode,
                          @Value("${csrf.allowed}") String csrfAllowed) {
-    serverPort = port;
     this.productionMode = productionMode;
     this.csrfAllowed = Strings.isNullOrEmpty(csrfAllowed) ? Lists.newArrayList() : Splitter.on(",").splitToList(csrfAllowed.trim());
   }
@@ -72,13 +73,8 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
       // explicitly ok
       if (csrfAllowed.contains(refererHostPort)) return null;
 
-      String localhost = String.format("localhost:%s", serverPort);
-      String loopbackhost = String.format("127.0.0.1:%s", serverPort);
       boolean forbidden = false;
-      if (localhost.equals(host) || loopbackhost.equals(host)) {
-        if (!referer.startsWith(String.format("http://%s/", host)))
-          forbidden = true;
-      } else if (!referer.startsWith(String.format("https://%s/", host))) {
+      if (!localhostPattern.matcher(host).matches() && !loopbackhostPattern.matcher(host).matches() && !referer.startsWith(String.format("https://%s/", host))) {
         forbidden = true;
       }
 
