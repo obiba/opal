@@ -12,10 +12,10 @@ package org.obiba.opal.web.gwt.app.client.project;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -55,6 +55,7 @@ import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ProjectDatasourceStatusDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
@@ -176,6 +177,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private final DataExportFolderService dataExportFolderService;
 
   private BookmarkIconPresenter bookmarkIconPresenter;
+
+  private Timer summaryTimer;
 
   @Inject
   @SuppressWarnings({"PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters"})
@@ -345,6 +348,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onDashboardTabSelected() {
+    updateProjectSummary();
+  }
+
+  private void updateProjectSummary() {
     ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
         .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName))
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
@@ -352,6 +359,19 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {
             getView().setProjectSummary(resource);
+            if (ProjectDatasourceStatusDto.LOADING.getName().equals(resource.getDatasourceStatus().getName())) {
+              if (summaryTimer == null) {
+                summaryTimer = new Timer() {
+                  @Override
+                  public void run() {
+                    updateProjectSummary();
+                  }
+                };
+                summaryTimer.scheduleRepeating(1000);
+              }
+            } else {
+              cancelSummaryTimer();
+            }
           }
         })
         .withCallback(new ResponseCodeCallback() {
@@ -363,6 +383,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .get().send();
   }
 
+  private void cancelSummaryTimer() {
+    if (summaryTimer != null) {
+      summaryTimer.cancel();
+      summaryTimer = null;
+    }
+  }
+
   private void onTablesTabSelected(String path) {
     if (magmaPresenter == null) {
       magmaPresenter = magmaPresenterProvider.get();
@@ -371,6 +398,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     fireEvent(Strings.isNullOrEmpty(path)
         ? new MagmaPathSelectionEvent(this, project.getDatasource().getName())
         : new MagmaPathSelectionEvent(this, path));
+    cancelSummaryTimer();
   }
 
   private void onFilesTabSelected(String path) {
@@ -382,6 +410,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     fireEvent(Strings.isNullOrEmpty(path)
         ? new FolderRequestEvent(FileDtos.project(projectName))
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
+    cancelSummaryTimer();
   }
 
   private void onResourcesTabSelected(String path) {
@@ -398,6 +427,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       }
     }
     fireEvent(new ResourceSelectionChangedEvent(projectName, resourceName));
+    cancelSummaryTimer();
   }
 
   private void onGenotypesTabSelected() {
@@ -407,6 +437,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
 
     projectGenotypesPresenter.initialize(project);
+    cancelSummaryTimer();
   }
 
   private void onReportsTabSelected() {
@@ -415,6 +446,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(REPORTS_PANE, reportsPresenter);
     }
     reportsPresenter.showProject(projectName);
+    cancelSummaryTimer();
   }
 
   private void onTasksTabSelected() {
@@ -423,6 +455,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(TASKS_PANE, tasksPresenter);
     }
     tasksPresenter.showProject(projectName);
+    cancelSummaryTimer();
   }
 
   private void onPermissionsTabSelected() {
@@ -431,6 +464,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(PERMISSION_PANE, projectPermissionsPresenter);
     }
     projectPermissionsPresenter.initialize(project);
+    cancelSummaryTimer();
   }
 
   private void onAdminTabSelected() {
@@ -439,6 +473,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
     projectAdministrationPresenter.setProject(project);
+    cancelSummaryTimer();
   }
 
   @Override
