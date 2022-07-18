@@ -60,6 +60,8 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   private final ItemSelectorPresenter emailSelectorPresenter;
 
+  private final ItemSelectorPresenter failureEmailSelectorPresenter;
+
   private final ItemSelectorPresenter parametersSelectorPresenter;
 
   private final Collection<FieldValidator> validators = new LinkedHashSet<>();
@@ -79,6 +81,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     super(eventBus, display);
     fileSelectionPresenter = fileSelectionPresenterProvider.get();
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
+    failureEmailSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter = itemSelectorPresenterProvider.get();
     Map<String, List<String>> suggestions = Maps.newLinkedHashMap();
     suggestions.put("opal.username", new ArrayList<String>());
@@ -95,6 +98,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
       }
     });
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
+    failureEmailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
     getView().setUiHandlers(this);
   }
 
@@ -164,6 +168,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   protected void initDisplayComponents() {
     setInSlot(Display.Slots.EMAIL, emailSelectorPresenter);
+    setInSlot(Display.Slots.FAILURE_EMAIL, failureEmailSelectorPresenter);
     setInSlot(Display.Slots.REPORT_PARAMS, parametersSelectorPresenter);
 
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
@@ -266,6 +271,9 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     for(String email : emailSelectorPresenter.getView().getItems()) {
       dto.addEmailNotification(email);
     }
+    for(String email : failureEmailSelectorPresenter.getView().getItems()) {
+      dto.addFailureEmailNotification(email);
+    }
     String format = "html";
     if (getView().getFormat().getText() != null && !getView().getFormat().getText().trim().isEmpty()) {
       format = getView().getFormat().getText();
@@ -312,6 +320,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
   public void setReportTemplate(ReportTemplateDto reportTemplate) {
     getView().clear();
     emailSelectorPresenter.getView().clear();
+    failureEmailSelectorPresenter.getView().clear();
     parametersSelectorPresenter.getView().clear();
     if(reportTemplate == null) {
       setDialogMode(Mode.CREATE);
@@ -320,6 +329,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
       project = reportTemplate.getProject();
       getView().setReportTemplate(reportTemplate);
       emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
+      failureEmailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getFailureEmailNotificationArray()));
       parametersSelectorPresenter.getView().setItems(Iterables
           .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
 
@@ -346,7 +356,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     }
 
     enum Slots {
-      EMAIL, REPORT_PARAMS
+      EMAIL, FAILURE_EMAIL, REPORT_PARAMS
     }
 
     void showErrors(List<String> messages);

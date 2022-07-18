@@ -77,6 +77,9 @@ implements Display {
   SimplePanel notificationEmailsPanel;
 
   @UiField
+  SimplePanel failureNotificationEmailsPanel;
+
+  @UiField
   SimplePanel reportParametersPanel;
 
   @UiField
@@ -107,6 +110,9 @@ implements Display {
       case EMAIL:
         notificationEmailsPanel.add(content);
         break;
+      case FAILURE_EMAIL:
+        failureNotificationEmailsPanel.add(content);
+        break;
       case REPORT_PARAMS:
         reportParametersPanel.add(content);
         break;
@@ -119,6 +125,9 @@ implements Display {
     switch(s) {
       case EMAIL:
         notificationEmailsPanel.remove(content);
+        break;
+      case FAILURE_EMAIL:
+        failureNotificationEmailsPanel.remove(content);
         break;
       case REPORT_PARAMS:
         reportParametersPanel.remove(content);

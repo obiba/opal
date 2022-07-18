@@ -84,7 +84,7 @@
           </b:HelpBlock>
         </b:ControlGroup>
       </b:ControlGroup>
-      <b:ControlGroup ui:field="emailsGroup">
+      <b:ControlGroup ui:field="emailsGroup" addStyleNames="bottom-margin">
         <b:ControlLabel>
           <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
         </b:ControlLabel>
@@ -92,6 +92,17 @@
         <b:HelpBlock>
           <ui:msg description="Report EMails help">
             Each time a new report is available, an email will be sent to the listed email addresses.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+      <b:ControlGroup ui:field="failureEmailsGroup">
+        <b:ControlLabel>
+          <ui:msg description="Failure Notification Emails label">Failure Notification Emails</ui:msg>
+        </b:ControlLabel>
+        <g:SimplePanel ui:field="failureNotificationEmailsPanel"/>
+        <b:HelpBlock>
+          <ui:msg description="Report Failure EMails help">
+            Each time report production fails, an email will be sent to the listed email addresses.
           </ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>

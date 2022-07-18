@@ -44,6 +44,7 @@ public class Dtos {
       builder.parameter(param.getKey(), value);
     }
     builder.emailNotificationAddresses(dto.getEmailNotificationList());
+    builder.failureEmailNotificationAddresses(dto.getFailureEmailNotificationList());
     return builder.build();
   }
 
@@ -62,6 +63,7 @@ public class Dtos {
     }
     if (reportTemplate.hasSchedule()) builder.setCron(reportTemplate.getSchedule());
     builder.addAllEmailNotification(reportTemplate.getEmailNotificationAddresses());
+    builder.addAllFailureEmailNotification(reportTemplate.getFailureEmailNotificationAddresses());
     return builder.build();
   }
 

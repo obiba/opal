@@ -1,0 +1,8 @@
+The report generation about "${report_template}" has failed.
+
+${report_error}
+
+---
+You received this email because you are one of the people to be notified when a report about "${report_template}" has failed to be produced.
+
+This email was automatically sent, please do not reply.

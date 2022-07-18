@@ -19,6 +19,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.velocity.app.VelocityEngine;
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.service.NoSuchReportTemplateException;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
@@ -45,6 +46,9 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   private static final Map<String, String> formatFileExtension = ImmutableMap
       .of("HTML", "html", "PDF", "pdf", "EXCEL", "xls");
+
+  @Autowired
+  private OpalGeneralConfigService configService;
 
   @Autowired
   private ReportService reportService;
@@ -76,7 +80,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     ReportTemplate reportTemplate;
     try {
       reportTemplate = reportTemplateService.getReportTemplate(name, getOptions().getProject());
-    } catch(NoSuchReportTemplateException e) {
+    } catch (NoSuchReportTemplateException e) {
       getShell().printf("Report template '%s' does not exist.\n", name);
       return 1;
     }
@@ -85,7 +89,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     try {
       FileObject reportOutput = getReportOutput(reportTemplate, reportDate);
       return renderAndSendEmail(reportTemplate, reportOutput);
-    } catch(FileSystemException e) {
+    } catch (FileSystemException e) {
       getShell().printf("Cannot create report output: '/reports/%s/%s'", name,
           getReportFileName(name, reportTemplate.getFormat(), reportDate));
       return 1;
@@ -123,16 +127,17 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     try {
       reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(),
           getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
-    } catch(ReportException ex) {
+    } catch (Exception ex) {
+      getShell().progress("Sending emails about failure", 2, 3, 90);
+      String message = ex.getMessage();
+      sendFailureEmailNotification(reportTemplate, message);
       getShell().printf("Error rendering report: '%s'\n", ex.getMessage());
       deleteFileSilently(reportOutput);
       return 1;
     }
 
     getShell().progress("Sending emails", 2, 3, 90);
-    if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
-      sendEmailNotification(reportTemplate, reportOutput);
-    }
+    sendEmailNotification(reportTemplate, reportOutput);
     getShell().progress(reportTemplate.getName(), 3, 3, 100);
     return 0;
 
@@ -162,29 +167,52 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   private void deleteFileSilently(FileObject file) {
     try {
-      if(file.exists()) {
+      if (file.exists()) {
         file.delete();
       }
-    } catch(FileSystemException ex) {
+    } catch (FileSystemException ex) {
       log.error("Could not delete file: {}", file.getName().getPath());
     }
   }
 
   private void sendEmailNotification(ReportTemplate reportTemplate, FileObject reportOutput) {
+    if (reportTemplate.getEmailNotificationAddresses().isEmpty()) return;
+
     String reportTemplateName = reportTemplate.getName();
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom(fromAddress);
-    message.setSubject("[Opal] Report: " + reportTemplateName);
+    message.setSubject(String.format("[%s] %s", configService.getConfig().getName(), reportTemplateName));
     message.setText(getEmailNotificationText(reportTemplate, reportOutput));
 
-    for(String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
+    for (String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
       message.setTo(emailAddress);
       try {
         mailSender.send(message);
-      } catch(MailException ex) {
+      } catch (MailException ex) {
         getShell().printf("Email notification not sent: %s", ex.getMessage());
         log.error("Email notification not sent: {}", ex.getMessage());
+      }
+    }
+  }
+
+  private void sendFailureEmailNotification(ReportTemplate reportTemplate, String errorMessage) {
+    if (reportTemplate.getFailureEmailNotificationAddresses().isEmpty()) return;
+
+    String reportTemplateName = reportTemplate.getName();
+
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(fromAddress);
+    message.setSubject(String.format("[%s] %s", configService.getConfig().getName(), reportTemplateName));
+    message.setText(getFailureEmailNotificationText(reportTemplate, errorMessage));
+
+    for (String emailAddress : reportTemplate.getFailureEmailNotificationAddresses()) {
+      message.setTo(emailAddress);
+      try {
+        mailSender.send(message);
+      } catch (MailException ex) {
+        getShell().printf("Failure email notification not sent: %s", ex.getMessage());
+        log.error("Failure email notification not sent: {}", ex.getMessage());
       }
     }
   }
@@ -195,13 +223,20 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     model.put("report_public_link",
         opalPublicUrl + "/ws/report/public/" + getOpalFileSystemService().getFileSystem().getObfuscatedPath(reportOutput) +
             "?project=" + reportTemplate.getProject());
-    return getMergedVelocityTemplate(model);
+    return getMergedVelocityTemplate("report-email-notification.vm", model);
+  }
+
+  private String getFailureEmailNotificationText(ReportTemplate reportTemplate, String errorMessage) {
+    Map<String, Object> model = new HashMap<>();
+    model.put("report_template", reportTemplate.getName());
+    model.put("report_error", errorMessage);
+    return getMergedVelocityTemplate("report-failure-email-notification.vm", model);
   }
 
   @VisibleForTesting
-  String getMergedVelocityTemplate(Map<String, Object> model) {
+  String getMergedVelocityTemplate(String templateName, Map<String, Object> model) {
     return VelocityEngineUtils
-        .mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", "UTF-8",
+        .mergeTemplateIntoString(velocityEngine, String.format("velocity/opal-reporting/%s", templateName), "UTF-8",
             model);
   }
 

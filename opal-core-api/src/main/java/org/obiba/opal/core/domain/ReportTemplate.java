@@ -51,6 +51,9 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
   @NotNull
   private final Set<String> emailNotificationAddresses = new HashSet<>();
 
+  @NotNull
+  private final Set<String> failureEmailNotificationAddresses = new HashSet<>();
+
   public ReportTemplate() {
   }
 
@@ -147,6 +150,17 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
     }
   }
 
+  public Set<String> getFailureEmailNotificationAddresses() {
+    return failureEmailNotificationAddresses;
+  }
+
+  public void setFailureEmailNotificationAddresses(@Nullable Collection<String> failureEmailNotificationAddresses) {
+    this.failureEmailNotificationAddresses.clear();
+    if(failureEmailNotificationAddresses != null) {
+      this.failureEmailNotificationAddresses.addAll(failureEmailNotificationAddresses);
+    }
+  }
+
   @Override
   public int compareTo(@NotNull ReportTemplate other) {
     return ComparisonChain.start().compare(project, other.project).compare(name, other.name).result();
@@ -198,6 +212,7 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
       builder.reportTemplate.schedule  = reportTemplate.schedule;
       builder.reportTemplate.setParameters(reportTemplate.parameters);
       builder.reportTemplate.setEmailNotificationAddresses(reportTemplate.emailNotificationAddresses);
+      builder.reportTemplate.setFailureEmailNotificationAddresses(reportTemplate.failureEmailNotificationAddresses);
       return builder;
     }
 
@@ -245,6 +260,16 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
 
     public Builder emailNotificationAddress(String email) {
       reportTemplate.getEmailNotificationAddresses().add(email);
+      return this;
+    }
+
+    public Builder failureEmailNotificationAddresses(Collection<String> emails) {
+      reportTemplate.setFailureEmailNotificationAddresses(emails);
+      return this;
+    }
+
+    public Builder failureEmailNotificationAddress(String email) {
+      reportTemplate.getFailureEmailNotificationAddresses().add(email);
       return this;
     }
 

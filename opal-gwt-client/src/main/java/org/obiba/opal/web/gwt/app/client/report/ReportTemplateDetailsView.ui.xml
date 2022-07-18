@@ -78,6 +78,12 @@
         </g:Label>
         <g:Label ui:field="emails"/>
       </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Failure notification emails label">Failure Notifications Emails</ui:msg>
+        </g:Label>
+        <g:Label ui:field="failureEmails"/>
+      </g:FlowPanel>
     </o:PropertiesTable>
 
     <g:FlowPanel ui:field="reportsPanel">

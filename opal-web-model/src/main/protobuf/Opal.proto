@@ -69,6 +69,7 @@ message ReportTemplateDto {
   optional string cron = 5;
   repeated string emailNotification = 6;
   required string project = 7;
+  repeated string failureEmailNotification = 8;
 }
 
 message ReportDto {

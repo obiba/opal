@@ -116,6 +116,9 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   @UiField
   Label emails;
 
+  @UiField
+  Label failureEmails;
+
   JsArrayDataProvider<ReportDto> dataProvider = new JsArrayDataProvider<ReportDto>();
 
   private HasActionHandler<ReportDto> actionsColumn;
@@ -199,6 +202,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     format.setText(reportTemplate.getFormat());
     parameters.setText(getReportParamsList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
     emails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
+    failureEmails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getFailureEmailNotificationArray())));
     reportTemplateName.setText(reportTemplate.getName());
   }
 
