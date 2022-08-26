@@ -60,7 +60,7 @@ public class MongoDBGridFSUpgradeStep extends AbstractUpgradeStep {
       String dbName = factory.getMongoDbDatabaseName();
       MongoDatabase db = factory.getMongoDBFactory().getMongoClient().getDatabase(dbName);
       MongoCollection<Document> filesColl = db.getCollection("fs.files");
-      try (MongoCursor<Document> cursor = filesColl.find(Filters.ne("filename", "")).cursor()) {
+      try (MongoCursor<Document> cursor = filesColl.find(Filters.eq("filename", null)).cursor()) {
         List<ReplaceOneModel<Document>> toReplace = Lists.newArrayList();
         while (cursor.hasNext()) {
           Document file = cursor.next();
