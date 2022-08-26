@@ -9,19 +9,16 @@
  */
 package org.obiba.opal.shell.commands;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.service.NoSuchReportTemplateException;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ReportTemplateService;
-import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.slf4j.Logger;
@@ -31,10 +28,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @CommandUsage(description = "Generate a report based on the specified report template.",
     syntax = "Syntax: report --project PROJECT --name TEMPLATE")
@@ -235,14 +234,17 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   @VisibleForTesting
   String getMergedVelocityTemplate(String templateName, Map<String, Object> model) {
-    return VelocityEngineUtils
-        .mergeTemplateIntoString(velocityEngine, String.format("velocity/opal-reporting/%s", templateName), "UTF-8",
-            model);
+    StringWriter result = new StringWriter();
+    VelocityContext velocityContext = new VelocityContext(model);
+    velocityEngine.mergeTemplate(String.format("velocity/opal-reporting/%s", templateName), "UTF-8", velocityContext, result);
+    return result.toString();
   }
 
   @VisibleForTesting
   Date getCurrentTime() {
     return new Date();
   }
+
+
 
 }

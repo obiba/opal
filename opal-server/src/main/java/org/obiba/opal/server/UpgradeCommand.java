@@ -11,8 +11,6 @@ package org.obiba.opal.server;
 
 import com.google.common.base.Strings;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.upgrade.v2_0_x.ConfigFolderUpgrade;
-import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2PropertiesConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
 import org.slf4j.Logger;
@@ -45,15 +43,9 @@ public class UpgradeCommand {
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
-  private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.0.xml" };
-
   private String opalConfigPath = Paths.get(System.getenv("OPAL_HOME"), "data", "orientdb", "opal-config").toString();
 
   public void execute() {
-    if(needToUpgradeToOpal2()) {
-      opal2Upgrade();
-    }
-
     standardUpgrade();
   }
 
@@ -65,10 +57,6 @@ public class UpgradeCommand {
         throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
       }
     }
-  }
-
-  private boolean needToUpgradeToOpal2() {
-    return !hasVersionInConfigXml() && hasDatasourceInConfigProperties();
   }
 
   /**
@@ -99,24 +87,6 @@ public class UpgradeCommand {
       return properties.containsKey("org.obiba.opal.datasource.opal.driver");
     } catch(IOException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  private void opal2Upgrade() {
-    log.info("Prepare upgrade to Opal 2.0.0");
-
-    prepareConfigFiles();
-
-    // need to be run out of Spring context
-    new Opal2PropertiesConfigurator().upgrade();
-    ConfigFolderUpgrade.cleanDirectories();
-
-    try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS)) {
-      try {
-        ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
-      } catch(UpgradeException upgradeFailed) {
-        throw new RuntimeException("An error occurred while running the opal-2.0.0 upgrade manager", upgradeFailed);
-      }
     }
   }
 

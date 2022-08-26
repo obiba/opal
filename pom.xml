@@ -62,7 +62,7 @@
     <gwtopenlayers.version>1.0</gwtopenlayers.version>
     <gwtp.version>1.5.3</gwtp.version>
     <gwtquery.version>1.4.3</gwtquery.version>
-    <hibernate.version>4.3.11.Final</hibernate.version>
+    <hibernate.version>5.6.10.Final</hibernate.version>
     <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
     <hsqldb.version>2.3.3</hsqldb.version>
     <httpclient.version>4.5.13</httpclient.version>
@@ -90,22 +90,21 @@
     <logback.version>1.2.9</logback.version>
     <logstash-logback.version>6.6</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>3.0.1</magma.version>
+    <magma.version>4.0-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>2.2.5</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
-    <mongeez.version>0.9.4</mongeez.version>
-    <mongodb-driver.version>3.12.8</mongodb-driver.version>
-    <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
+    <mongodb-driver.version>4.7.1</mongodb-driver.version>
+    <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>2.1.3</obiba-commons.version>
+    <obiba-commons.version>3.0-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
-    <postgresql.version>42.3.4</postgresql.version>
+    <postgresql.version>42.4.1</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
     <protostuff.version>1.0.9</protostuff.version>
@@ -118,7 +117,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.12</slf4j.version>
     <snakeyaml.version>1.16</snakeyaml.version>
-    <spring.version>4.3.30.RELEASE</spring.version>
+    <spring.version>5.3.22</spring.version>
     <spring-batch.version>3.0.10.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
     <totp.version>1.7.1</totp.version>
@@ -1417,28 +1416,8 @@
 
       <dependency>
         <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-driver</artifactId>
+        <artifactId>mongodb-driver-sync</artifactId>
         <version>${mongodb-driver.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.mongeez</groupId>
-        <artifactId>mongeez</artifactId>
-        <version>${mongeez.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>

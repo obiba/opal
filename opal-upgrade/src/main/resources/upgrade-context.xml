@@ -108,84 +108,6 @@
 
     <property name="upgradeSteps">
       <list>
-        <!-- 1.14.0 / clear ES indexes -->
-        <bean parent="clearElasticSearchIndexes">
-          <property name="appliesTo" value="1.14.0"/>
-        </bean>
-
-        <!-- 1.14.4 / clear ES indexes -->
-        <bean parent="clearElasticSearchIndexes">
-          <property name="appliesTo" value="1.14.4"/>
-        </bean>
-
-        <!-- 1.14.5 / clear ES indexes -->
-        <bean parent="clearElasticSearchIndexes">
-          <property name="appliesTo" value="1.14.5"/>
-        </bean>
-
-        <!-- 1.14.6 / clear ES indexes -->
-        <bean parent="clearElasticSearchIndexes">
-          <property name="appliesTo" value="1.14.6"/>
-        </bean>
-
-        <!-- 2.0.2 / drop version table from legacy opal-data database -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.DropVersionTableUpgradeStep">
-          <property name="description" value="Drop version table from legacy opal-data database"/>
-          <property name="appliesTo" value="2.0.2"/>
-        </bean>
-
-        <!-- 2.0.2 / Fix Hibernate Datasource attributes join table mapping -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.FixAttributeJoinTableUpgradeStep">
-          <property name="description" value="Fix Hibernate Datasource attributes join table mapping"/>
-          <property name="appliesTo" value="2.0.2"/>
-        </bean>
-
-        <!-- 2.2.3 / MongoDB datasource schema update -->
-        <bean class="org.obiba.opal.core.upgrade.v2_2_x.MongoDBDatasourceUpgradeStep">
-          <property name="description" value="Add datasource name field in datasource collection"/>
-          <property name="appliesTo" value="2.2.3"/>
-        </bean>
-
-        <!-- 2.2.13 / Restore missing subject credentials certificate alias in OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.v2_2_x.SubjectCredentialsCertificateAliasUpgradeStep">
-          <property name="description" value="Restore missing subject credentials certificate alias"/>
-          <property name="appliesTo" value="2.2.13"/>
-        </bean>
-
-        <!-- 2.3.0 / Variable weight property added to SQL schema -->
-        <bean class="org.obiba.opal.core.upgrade.v2_3_x.database.VariableTableUpgradeStep">
-          <property name="description" value="Add index column to variable tables"/>
-          <property name="appliesTo" value="2.3.0"/>
-        </bean>
-
-        <!-- 2.10.0 / clear ES indexes -->
-        <bean parent="clearElasticSearchWorkspace">
-          <property name="appliesTo" value="2.10.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.upgrade.v2_10_x.DefaultPluginsUpgradeStep">
-          <property name="description" value="Install the default plugins from the OBiBa plugins repository"/>
-          <property name="appliesTo" value="2.10.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.upgrade.v2_10_x.DefaultPermissionsUpgradeStep">
-          <property name="description" value="Apply default permissions to be consistent with Agate default settings"/>
-          <property name="appliesTo" value="2.10.0"/>
-        </bean>
-
-        <!-- 2.12.0 / Move limesurvey database to plugin -->
-        <bean class="org.obiba.opal.core.upgrade.v2_12_x.LimeSurveyPluginUpgradeStep">
-          <property name="description" value="Remove LimeSurvey databases"/>
-          <property name="appliesTo" value="2.12.0"/>
-        </bean>
-
-        <!-- 2.14.0 / Magma API 2.0, R-Haven 2.0 -->
-        <bean class="org.obiba.opal.core.upgrade.DatasourcePluginsUpgradeStep">
-          <property name="description" value="Upgrade datasource plugins"/>
-          <property name="appliesTo" value="2.14.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.upgrade.AnalysisRPluginsUpgradeStep">
-          <property name="description" value="Upgrade R analysis plugins"/>
-          <property name="appliesTo" value="2.14.0"/>
-        </bean>
 
         <!-- 4.0.0 / R SPI -->
         <bean class="org.obiba.opal.core.upgrade.DatasourcePluginsUpgradeStep">
@@ -195,6 +117,12 @@
         <bean class="org.obiba.opal.core.upgrade.AnalysisRPluginsUpgradeStep">
           <property name="description" value="Upgrade R analysis plugins"/>
           <property name="appliesTo" value="4.0.0"/>
+        </bean>
+
+        <!-- 4.5.0 -->
+        <bean class="org.obiba.opal.core.upgrade.v4_5_x.MongoDBGridFSUpgradeStep">
+          <property name="description" value="Upgrade MongoDB GridFS metadata"/>
+          <property name="appliesTo" value="4.5.0"/>
         </bean>
 
       </list>

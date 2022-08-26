@@ -13,6 +13,8 @@ package org.obiba.opal.web.system.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -22,6 +24,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import com.mongodb.client.MongoDatabase;
 import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.magma.datasource.mongodb.MongoDBFactory;
@@ -40,8 +43,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.mongodb.DB;
 
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
@@ -131,16 +132,14 @@ public class DatabaseResource {
   private Response testMongoConnection(MongoDbSettings mongoDbSettings) {
     try {
       MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test", socketFactoryProvider);
-      List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
+      List<String> dbs = StreamSupport.stream(datasourceFactory.getMongoDBFactory().getMongoClient().listDatabaseNames().spliterator(), false)
+          .collect(Collectors.toList());
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
       }
-      return datasourceFactory.getMongoDBFactory().execute(new MongoDBFactory.MongoDBCallback<Response>() {
-        @Override
-        public Response doWithDB(DB db) {
-          db.getCollection("_coll_test").drop();
-          return Response.ok().build();
-        }
+      return datasourceFactory.getMongoDBFactory().execute(db -> {
+        db.getCollection("_coll_test").drop();
+        return Response.ok().build();
       });
     } catch(RuntimeException e) {
       return databaseConnectionFailed();

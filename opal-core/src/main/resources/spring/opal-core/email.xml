@@ -29,7 +29,7 @@
     </property>
   </bean>
 
-  <bean class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+  <bean class="org.obiba.opal.core.runtime.velocity.VelocityEngineFactoryBean">
     <property name="velocityProperties">
       <value>
         resource.loader=class

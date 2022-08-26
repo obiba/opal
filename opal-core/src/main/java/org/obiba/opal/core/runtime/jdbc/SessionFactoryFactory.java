@@ -9,22 +9,21 @@
  */
 package org.obiba.opal.core.runtime.jdbc;
 
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.hibernate.SessionFactory;
-import org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl;
+import org.obiba.core.service.impl.hibernate.PhysicalNamingStrategyImpl;
 import org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper;
 import org.obiba.magma.datasource.hibernate.cfg.MagmaDialectResolver;
-import org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.jta.JtaTransactionManager;
+
+import javax.sql.DataSource;
+import java.util.Set;
 
 import static org.hibernate.cfg.AvailableSettings.*;
 
@@ -45,14 +44,13 @@ public class SessionFactoryFactory {
     factory.setDataSource(dataSource);
     factory.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
     factory.setJtaTransactionManager(jtaTransactionManager);
-    factory.setNamingStrategy(new MagmaNamingStrategy());
+    factory.setImplicitNamingStrategy(ImplicitNamingStrategyLegacyHbmImpl.INSTANCE);
+    factory.setPhysicalNamingStrategy(PhysicalNamingStrategyImpl.INSTANCE);
     factory.getHibernateProperties().setProperty(HBM2DDL_AUTO, "update");
     factory.getHibernateProperties().setProperty(GENERATE_STATISTICS, "false");
     factory.getHibernateProperties().setProperty(USE_STRUCTURED_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_QUERY_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_SECOND_LEVEL_CACHE, "true");
-    factory.getHibernateProperties()
-        .setProperty(CACHE_REGION_FACTORY, NoShutdownSingletonEhCacheRegionFactory.class.getName());
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
@@ -60,19 +58,6 @@ public class SessionFactoryFactory {
 
     return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
         .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
-  }
-
-  /**
-   * Never shutdown CacheManager
-   */
-  public static class NoShutdownSingletonEhCacheRegionFactory extends SingletonEhCacheRegionFactory {
-
-    private static final long serialVersionUID = 4004496611012448022L;
-
-    @Override
-    public void stop() {
-      if(manager != null) manager = null;
-    }
   }
 
 }

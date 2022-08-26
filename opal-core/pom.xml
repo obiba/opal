@@ -244,7 +244,7 @@
     </dependency>
     <dependency>
       <groupId>org.mongodb</groupId>
-      <artifactId>mongodb-driver</artifactId>
+      <artifactId>mongodb-driver-sync</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -288,6 +288,10 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
     </dependency>
 
     <dependency>
