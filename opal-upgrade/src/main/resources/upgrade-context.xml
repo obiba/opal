@@ -124,6 +124,10 @@
           <property name="description" value="Upgrade MongoDB GridFS metadata"/>
           <property name="appliesTo" value="4.5.0"/>
         </bean>
+        <bean class="org.obiba.opal.core.upgrade.v4_5_x.EhCacheFolderUpgradeStep">
+          <property name="description" value="Upgrade EhCache folder"/>
+          <property name="appliesTo" value="4.5.0"/>
+        </bean>
 
       </list>
     </property>
