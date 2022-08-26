@@ -46,7 +46,7 @@
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.0.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
-    <ehcache-core.version>2.6.11</ehcache-core.version>
+    <ehcache.version>2.10.6</ehcache.version>
     <fest.version>2.0M10</fest.version>
     <findbugs.version>3.0.1</findbugs.version>
     <gin.version>2.1.2</gin.version>
@@ -937,6 +937,12 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-ehcache</artifactId>
         <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>eu.flatwhite.shiro</groupId>
@@ -1271,8 +1277,8 @@
 
       <dependency>
         <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>${ehcache-core.version}</version>
+        <artifactId>ehcache</artifactId>
+        <version>${ehcache.version}</version>
       </dependency>
 
       <dependency>
