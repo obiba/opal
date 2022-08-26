@@ -63,7 +63,7 @@
     <gwtp.version>1.5.3</gwtp.version>
     <gwtquery.version>1.4.3</gwtquery.version>
     <hibernate.version>5.6.10.Final</hibernate.version>
-    <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
+    <hibernate-validator.version>5.1.2.Final</hibernate-validator.version>
     <hsqldb.version>2.3.3</hsqldb.version>
     <httpclient.version>4.5.13</httpclient.version>
     <jackson.version>2.11.0</jackson.version>
@@ -116,7 +116,7 @@
     <shiro.version>1.5.0</shiro.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.12</slf4j.version>
-    <snakeyaml.version>1.16</snakeyaml.version>
+    <snakeyaml.version>1.26</snakeyaml.version>
     <spring.version>5.3.22</spring.version>
     <spring-batch.version>3.0.10.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>

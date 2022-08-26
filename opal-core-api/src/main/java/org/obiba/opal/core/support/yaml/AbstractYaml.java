@@ -10,12 +10,7 @@
 
 package org.obiba.opal.core.support.yaml;
 
-import java.beans.IntrospectionException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableSet;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -25,7 +20,10 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
-import com.google.common.collect.ImmutableSet;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractYaml<T> extends Yaml {
 
@@ -52,8 +50,7 @@ public abstract class AbstractYaml<T> extends Yaml {
 
   private static class TPropertyUtils extends PropertyUtils {
     @Override
-    protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess)
-        throws IntrospectionException {
+    protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess) {
       Map<String, Property> propertyMap = getPropertiesMap(type, BeanAccess.DEFAULT);
 
       ImmutableSet.Builder<Property> builder = ImmutableSet.builder();
