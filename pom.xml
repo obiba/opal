@@ -566,6 +566,17 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>2.0.1.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.el</groupId>
+        <artifactId>javax.el-api</artifactId>
+        <version>3.0.0</version>
+      </dependency>
+
       <!-- Spring batch has a different release cycle than Spring itself -->
       <dependency>
         <groupId>org.springframework.batch</groupId>

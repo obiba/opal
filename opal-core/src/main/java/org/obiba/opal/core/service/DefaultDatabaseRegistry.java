@@ -164,7 +164,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       persist(database);
     } else {
       ConstraintViolation<Database> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Database.class,
+          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique", Database.class,
               database, database, database, PathImpl.createPathFromString("name"), null, null);
 
       throw new ConstraintViolationException(ImmutableSet.of(violation));

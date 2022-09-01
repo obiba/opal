@@ -59,7 +59,7 @@ public class GroupsResource {
     Group group = new Group(dto.getName());
     if(subjectCredentialsService.getGroup(dto.getName()) != null) {
       ConstraintViolation<Group> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Group.class, group,
+          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique", Group.class, group,
               group, group, PathImpl.createPathFromString("name"), null, null);
       throw new ConstraintViolationException(ImmutableSet.of(violation));
     }

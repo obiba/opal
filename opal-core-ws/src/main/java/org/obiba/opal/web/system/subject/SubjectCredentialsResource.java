@@ -53,7 +53,7 @@ public class SubjectCredentialsResource {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if (subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
       ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique",
+          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique",
               SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
               PathImpl.createPathFromString("name"), null, null);
       throw new ConstraintViolationException(ImmutableSet.of(violation));
@@ -70,7 +70,7 @@ public class SubjectCredentialsResource {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         } else {
           ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
-              .forBeanValidation("{javax.validation.constraints.NotNull.message}", "may not be null",
+              .forBeanValidation("{javax.validation.constraints.NotNull.message}", null, null,"may not be null",
                   SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
                   PathImpl.createPathFromString("certificate"), null, null);
           throw new ConstraintViolationException(ImmutableSet.of(violation));
