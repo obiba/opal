@@ -13,7 +13,6 @@ import com.google.common.base.Strings;
 import org.apache.shiro.codec.CodecSupport;
 import org.apache.shiro.codec.Hex;
 import org.apache.shiro.crypto.AesCipherService;
-import org.apache.shiro.crypto.DefaultBlockCipherService;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.util.ByteSource;
 import org.obiba.magma.MagmaEngine;
@@ -23,6 +22,7 @@ import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
 import org.obiba.opal.core.service.security.CryptoService;
+import org.obiba.shiro.crypto.LegacyAesCipherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,13 +177,6 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private byte[] getSecretKey() {
     return Hex.decode(getOpalConfiguration().getSecretKey());
-  }
-
-  private static class LegacyAesCipherService extends DefaultBlockCipherService {
-
-    public LegacyAesCipherService() {
-      super("AES");
-    }
   }
 
 }
