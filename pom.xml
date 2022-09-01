@@ -808,14 +808,6 @@
         <version>${slf4j.version}</version>
       </dependency>
 
-      <!-- Use commons-logging over slf4j in order to remove it completely from the runtime classpath -->
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-jdk14</artifactId>
@@ -959,6 +951,12 @@
         <groupId>eu.flatwhite.shiro</groupId>
         <artifactId>shiro-extras</artifactId>
         <version>${shiro-extras.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4jcsrf</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro.tools</groupId>
@@ -1037,6 +1035,10 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1051,6 +1053,14 @@
           <exclusion>
             <groupId>javax.xml.stream</groupId>
             <artifactId>stax-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1307,6 +1317,12 @@
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>${mail.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
@@ -1441,6 +1457,12 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-server</artifactId>
         <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.orientechnologies</groupId>
@@ -1458,6 +1480,12 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
         <version>${hibernate-validator.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>javax.el</groupId>
@@ -1508,10 +1536,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -40,9 +40,9 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   private static final String REFERER_HEADER = "Referer";
 
-  private static final Pattern localhostPattern = Pattern.compile("^http[s]?://localhost:");
+  private static final Pattern localhostPattern = Pattern.compile("^http[s]?://localhost:.*");
 
-  private static final Pattern loopbackhostPattern = Pattern.compile("^http[s]?://127\\.0\\.0\\.1:");
+  private static final Pattern loopbackhostPattern = Pattern.compile("^http[s]?://127\\.0\\.0\\.1:.*");
 
   private final boolean productionMode;
 
@@ -74,7 +74,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
       if (csrfAllowed.contains(refererHostPort)) return null;
 
       boolean forbidden = false;
-      if (!localhostPattern.matcher(host).matches() && !loopbackhostPattern.matcher(host).matches() && !referer.startsWith(String.format("https://%s/", host))) {
+      if (!matchesLocalhost(host) && !referer.startsWith(String.format("https://%s/", host))) {
         forbidden = true;
       }
 
@@ -85,6 +85,13 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
       }
     }
     return null;
+  }
+
+  private boolean matchesLocalhost(String host) {
+    return localhostPattern.matcher(host).matches()
+        || loopbackhostPattern.matcher(host).matches()
+        || host.startsWith("localhost:")
+        || host.startsWith("127.0.0.1:");
   }
 
   static String asHeader(Iterable<String> values) {
