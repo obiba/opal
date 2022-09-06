@@ -91,7 +91,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
-        requestSummary();
+        //requestSummary();
       }
     });
   }
@@ -102,8 +102,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     handlerRegistration.removeHandler();
   }
 
-  @Override
-  public void onReset() {
+  public void onResetSummary() {
     if(!hasSummaryOrPendingRequest()) {
       requestSummary();
     }
@@ -127,7 +126,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     }
 
     limit = entitiesCount;
-    onReset();
+    onResetSummary();
   }
 
   @Override
@@ -160,7 +159,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
       resourceRequestBuilder.get();
     }
 
-    onReset();
+    onResetSummary();
   }
 
   public void forgetSummary() {
@@ -198,7 +197,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private void requestSummary() {
     if(resourceRequestBuilder == null) return;
-    if (blockSummaryRequests()) return;
 
     getView().requestingSummary(limit, entitiesCount);
 
@@ -218,24 +216,12 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
             getView().renderNoSummary();
             ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
             checkMessageFlooding(error);
-            NotificationEvent event;
-            if (blockSummaryRequests()) {
-              onCancelSummary();
-              event = NotificationEvent.newBuilder().error(translations.tooManyRepeatedErrorsLabel()).build();
-            } else {
-              event = new JSErrorNotificationEventBuilder().build(error);
-            }
+            NotificationEvent event = new JSErrorNotificationEventBuilder().build(error);
+            onCancelSummary();
             getEventBus().fireEvent(event);
           }
         }, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR)//
         .send();
-  }
-
-  /**
-   * @return true if further summary requests should be blocked
-   */
-  private boolean blockSummaryRequests() {
-    return currentErrorCount >= 3;
   }
 
   /**
@@ -286,7 +272,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     latestClientError = null;
     currentErrorCount = 0;
     this.variableDto = variableDto;
-    onReset();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
