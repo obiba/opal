@@ -58,15 +58,16 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
   }
 
   @Override
-  public void save() {
+  public void save(String name, String defaultCharSet, JsArrayString languages, String publicUrl, String logoutUrl) {
     opalSystemCache.clearGeneralConf();
     getView().clearErrors();
     if(validationHandler.validate()) {
       GeneralConf dto = GeneralConf.create();
-      dto.setName(getView().getName().getText());
-      dto.setDefaultCharSet(getView().getDefaultCharSet().getText());
-      dto.setLanguagesArray(getView().getLanguages());
-      dto.setPublicURL(getView().getPublicUrl().getText());
+      dto.setName(name);
+      dto.setDefaultCharSet(defaultCharSet);
+      dto.setLanguagesArray(languages);
+      dto.setPublicURL(publicUrl);
+      dto.setLogoutURL(logoutUrl);
 
       ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
           .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
@@ -84,10 +85,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
   }
 
   public void setGeneralConf(GeneralConf conf) {
-    getView().getName().setText(conf.getName());
-    getView().getPublicUrl().setText(conf.getPublicURL());
-    getView().setSelectedCharset(conf.getDefaultCharSet());
-    getView().setSelectedLanguages(conf.getLanguagesArray());
+    getView().setGeneralConf(conf);
   }
 
   private class GeneralConfValidationHandler extends ViewValidationHandler {
@@ -130,18 +128,13 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
       DEFAULT_CHARSET,
       LANGUAGES,
     }
+    void setGeneralConf(GeneralConf conf);
 
     HasText getName();
 
-    HasText getPublicUrl();
-
     HasText getDefaultCharSet();
 
-    void setSelectedCharset(String charset);
-
     JsArrayString getLanguages();
-
-    void setSelectedLanguages(JsArrayString languages);
 
     void showError(@Nullable FormField formField, String message);
 

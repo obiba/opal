@@ -40,6 +40,8 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   private String publicUrl;
 
+  private String logoutUrl;
+
   // One time password strategy
   private String otpStrategy = "TOTP";
 
@@ -83,6 +85,14 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public void setPublicUrl(String publicUrl) {
     this.publicUrl = publicUrl;
+  }
+
+  public String getLogoutUrl() {
+    return logoutUrl;
+  }
+
+  public void setLogoutUrl(String logoutUrl) {
+    this.logoutUrl = logoutUrl;
   }
 
   public String getOtpStrategy() {

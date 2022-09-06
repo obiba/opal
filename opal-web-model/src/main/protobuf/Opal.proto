@@ -347,6 +347,7 @@ message GeneralConf {
   repeated string languages = 2; // replaces the property org.obiba.opal.languages
   required string defaultCharSet = 3 [default = "ISO-8859-1"]; // replaces the property org.obiba.opal.charset.default
   optional string publicURL = 4;
+  optional string logoutURL = 5;
 }
 
 message AttributeConf {

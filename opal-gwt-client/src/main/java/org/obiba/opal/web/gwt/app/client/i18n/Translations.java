@@ -2644,6 +2644,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Public URL")
   String publicUrl();
 
+  @Description("Logout URL label")
+  @DefaultStringValue("Logout URL")
+  String logoutUrl();
+
   @Description("Terms label")
   @DefaultStringValue("Terms")
   String termsLabel();

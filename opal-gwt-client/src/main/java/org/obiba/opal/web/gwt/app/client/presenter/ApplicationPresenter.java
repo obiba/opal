@@ -16,7 +16,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -45,18 +44,18 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
+import org.obiba.opal.web.gwt.app.client.magma.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.sql.event.SQLQueryCreationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
@@ -361,9 +360,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void authorize() {
-    // Edit system config
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/system/conf/general").put()
-//        .authorize(getView().getAdministrationAuthorizer()).send();
     fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 
       @Override

@@ -10,9 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
+import com.google.gwt.core.client.JsArrayString;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface GeneralConfModalUiHandlers extends ModalUiHandlers {
 
-  void save();
+  void save(String name, String defaultCharSet, JsArrayString languages, String publicUrl, String logoutUrl);
 }

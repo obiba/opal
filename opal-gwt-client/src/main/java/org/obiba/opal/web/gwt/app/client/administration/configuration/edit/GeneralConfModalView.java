@@ -9,15 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
-import org.obiba.opal.web.gwt.app.client.ui.LocaleChooser;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -31,6 +22,14 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
+import org.obiba.opal.web.gwt.app.client.ui.LocaleChooser;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
+
+import javax.annotation.Nullable;
 
 public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralConfModalUiHandlers>
     implements GeneralConfModalPresenter.Display {
@@ -40,12 +39,6 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
   @UiField
   Modal modal;
-
-  @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
 
   @UiField
   TextBox name;
@@ -68,6 +61,9 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @UiField
   TextBox publicUrl;
 
+  @UiField
+  TextBox logoutUrl;
+
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
@@ -77,7 +73,7 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
-    getUiHandlers().save();
+    getUiHandlers().save(getName().getText(), getDefaultCharSet().getText(), getLanguages(), publicUrl.getText(), logoutUrl.getText());
   }
 
   @UiHandler("cancelButton")
@@ -86,13 +82,17 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   }
 
   @Override
-  public HasText getName() {
-    return name;
+  public void setGeneralConf(GeneralConf conf) {
+    name.setText(conf.getName());
+    publicUrl.setText(conf.getPublicURL());
+    logoutUrl.setText(conf.getLogoutURL());
+    characterSet.setDefaultCharset(conf.getDefaultCharSet());
+    setSelectedLanguages(conf.getLanguagesArray());
   }
 
   @Override
-  public HasText getPublicUrl() {
-    return publicUrl;
+  public HasText getName() {
+    return name;
   }
 
   @Override
@@ -109,13 +109,7 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
     return languages;
   }
 
-  @Override
-  public void setSelectedCharset(String charset) {
-    characterSet.setDefaultCharset(charset);
-  }
-
-  @Override
-  public void setSelectedLanguages(JsArrayString languages) {
+  private void setSelectedLanguages(JsArrayString languages) {
     int length = languages.length();
     for(int i = 0; i < length; i++) {
       locales.setSelectedValue(languages.get(i));

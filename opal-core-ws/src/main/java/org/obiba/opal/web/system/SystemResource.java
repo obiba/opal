@@ -10,8 +10,7 @@
 
 package org.obiba.opal.web.system;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -33,10 +32,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.lang.management.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
@@ -189,7 +192,7 @@ public class SystemResource {
 
   @GET
   @Path("/conf/general")
-  @NotAuthenticated // allow anonymous to be able to retrive Opal instance name
+  @NotAuthenticated // allow anonymous to be able to retrieve Opal instance name
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = serverService.getConfig();
     Opal.GeneralConf.Builder builder = Opal.GeneralConf.newBuilder()//
@@ -197,8 +200,12 @@ public class SystemResource {
         .addAllLanguages(conf.getLocalesAsString())//
         .setDefaultCharSet(conf.getDefaultCharacterSet());
 
-    if (conf.getPublicUrl() != null) {
+    if (!Strings.isNullOrEmpty(conf.getPublicUrl())) {
       builder.setPublicURL(conf.getPublicUrl());
+    }
+
+    if (!Strings.isNullOrEmpty(conf.getLogoutUrl())) {
+      builder.setLogoutURL(conf.getLogoutUrl());
     }
 
     return builder.build();
@@ -210,16 +217,12 @@ public class SystemResource {
     OpalGeneralConfig conf = serverService.getConfig();
     conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
     conf.setPublicUrl(dto.getPublicURL());
+    conf.setLogoutUrl(dto.getLogoutURL());
 
     if (dto.getLanguagesList().isEmpty()) {
       conf.setLocales(Lists.newArrayList(OpalGeneralConfig.DEFAULT_LOCALE));
     } else {
-      conf.setLocales(Lists.newArrayList(Iterables.transform(dto.getLanguagesList(), new Function<String, Locale>() {
-        @Override
-        public Locale apply(String locale) {
-          return new Locale(locale);
-        }
-      })));
+      conf.setLocales(Lists.newArrayList(dto.getLanguagesList().stream().map(Locale::new).collect(Collectors.toList())));
     }
 
     conf.setDefaultCharacterSet(

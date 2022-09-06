@@ -83,6 +83,7 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
     generalProperties.addProperty(translations.nameLabel(), resource.getName());
     generalProperties.addProperty(translations.defaultCharsetLabel(), resource.getDefaultCharSet());
     generalProperties.addProperty(translations.publicUrl(), resource.getPublicURL());
+    generalProperties.addProperty(translations.logoutUrl(), resource.getLogoutURL());
     generalProperties.addProperty(new Label(translations.languageLabel()), getLanguages(resource));
   }
 

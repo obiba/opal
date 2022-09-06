@@ -44,7 +44,7 @@
       </b:Controls>
     </b:ControlGroup>
 
-    <!--Public URL -->
+    <!-- Public URL -->
     <b:ControlGroup ui:field="publicUrlGroup">
       <b:ControlLabel>
         <ui:msg description="Public URL label">Public URL</ui:msg>
@@ -54,6 +54,20 @@
         <b:HelpBlock>
           <ui:msg description="Public URL help">Public base URL of the server (not the web-interface one) that will be
             used when sending notification emails on report generation
+          </ui:msg>
+        </b:HelpBlock>
+      </b:Controls>
+    </b:ControlGroup>
+
+    <!-- Logout URL -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Logout URL label">Logout URL</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="logoutUrl"/>
+        <b:HelpBlock>
+          <ui:msg description="Logout URL help">Optional redirection URL after user has logged out
           </ui:msg>
         </b:HelpBlock>
       </b:Controls>

@@ -10,7 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client;
 
+import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.service.FileService;
@@ -22,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.common.base.Strings;
@@ -63,6 +67,8 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   @Inject
   ResourceProvidersService resourceProvidersService;
 
+  private GeneralConf generalConf;
+
   @Inject
   public OpalBootstrapperImpl(PlaceManager placeManager) {
     this.placeManager = placeManager;
@@ -94,15 +100,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   private void initUserSession() {
     initUsernameFromSession();
-    /*String username = requestCredentials.getUsername();
-    if(!requestCredentials.hasCredentials()) {
-      GWT.log("OpalBootstrapperImpl.initUserSession");
-      placeManager.revealUnauthorizedPlace(Places.LOGIN);
-    } else if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
-      initUsernameFromSession();
-    } else {
-      revealCurrentPlace();
-    }*/
+    refreshGeneralConfig();
   }
 
   private void initUsernameFromSession() {
@@ -145,20 +143,32 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
       @Override
       public void onSessionEnded(SessionEndedEvent event) {
-        Window.Location.replace("/");
+        if (generalConf != null && generalConf.hasLogoutURL())
+          Window.Location.replace(generalConf.getLogoutURL());
+        else
+          Window.Location.replace("/");
       }
     });
 
-    // Kills the session if the browser is closed or when navigating to another page.
-    Window.addWindowClosingHandler(new ClosingHandler() {
-
+    eventBus.addHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
       @Override
-      public void onWindowClosing(ClosingEvent arg0) {
-        //eventBus.fireEvent(new SessionEndedEvent());
+      public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+        refreshGeneralConfig();
       }
-
     });
 
+  }
+
+  private void refreshGeneralConfig() {
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
+
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            generalConf = resource;
+          }
+        }).get().send();
   }
 
   private void revealCurrentPlace() {
