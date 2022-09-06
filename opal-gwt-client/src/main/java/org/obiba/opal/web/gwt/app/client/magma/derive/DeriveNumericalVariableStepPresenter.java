@@ -76,7 +76,7 @@ public class DeriveNumericalVariableStepPresenter
         originalTable.getValueSetCount(), originalTable.getDatasourceName(), originalTable.getName(),
         originalVariable.getName());
     summaryTabPresenter.forgetSummary();
-    summaryTabPresenter.onReset();
+    summaryTabPresenter.onResetSummary();
   }
 
   @Override
