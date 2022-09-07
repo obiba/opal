@@ -54,4 +54,5 @@ public interface ProjectService extends SystemService {
 
   List<ResourceReference> getResourceReferences(Project project);
 
+  void initialize();
 }

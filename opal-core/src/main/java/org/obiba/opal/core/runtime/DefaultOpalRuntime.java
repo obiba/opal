@@ -17,6 +17,7 @@ import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
@@ -44,49 +45,35 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultOpalRuntime.class);
 
-  private TransactionTemplate transactionTemplate;
+  private final TransactionTemplate transactionTemplate;
 
-  private OpalConfigurationService opalConfigurationService;
+  private final OpalConfigurationService opalConfigurationService;
 
-  private CacheManager cacheManager;
+  private final CacheManager cacheManager;
 
-  private PluginsManager pluginsManager;
+  private final PluginsManager pluginsManager;
 
-  private Set<Service> services;
+  private final Set<Service> services;
 
-  private ViewManager viewManager;
+  private final ViewManager viewManager;
 
-  @Value("${org.obiba.magma.readDataPointsCount}")
+  private final ProjectService projectService;
+
   private Integer readDataPointsCount;
 
   @Autowired
-  public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+  public DefaultOpalRuntime(TransactionTemplate transactionTemplate, OpalConfigurationService opalConfigurationService,
+                            CacheManager cacheManager, PluginsManager pluginsManager, Set<Service> services,
+                            ViewManager viewManager, ProjectService projectService,
+                            @Value("${org.obiba.magma.readDataPointsCount}") Integer readDataPointsCount) {
     this.transactionTemplate = transactionTemplate;
-  }
-
-  @Autowired
-  public void setOpalConfigurationService(OpalConfigurationService opalConfigurationService) {
     this.opalConfigurationService = opalConfigurationService;
-  }
-
-  @Autowired
-  public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  public void setPluginsManager(PluginsManager pluginsManager) {
     this.pluginsManager = pluginsManager;
-  }
-
-  @Autowired
-  public void setServices(Set<Service> services) {
     this.services = services;
-  }
-
-  @Autowired
-  public void setViewManager(ViewManager viewManager) {
     this.viewManager = viewManager;
+    this.projectService = projectService;
+    this.readDataPointsCount = readDataPointsCount;
   }
 
   @Override
@@ -250,6 +237,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
         MagmaParametersExtension paramsExt = new MagmaParametersExtension();
         paramsExt.setParameter(AbstractValueTable.READ_DATA_POINTS_COUNT_KEY, readDataPointsCount);
         MagmaEngine.get().extend(paramsExt);
+        projectService.initialize();
       };
       new TransactionalThread(transactionTemplate, magmaEngineInit).start();
     } catch (RuntimeException e) {
