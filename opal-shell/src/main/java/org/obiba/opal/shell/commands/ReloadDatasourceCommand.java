@@ -14,11 +14,10 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.service.DatasourceLoaderService;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
-import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.ProjectsServiceImpl;
-import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.shell.commands.options.ReloadDatasourceCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +41,10 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
   private OrientDbService orientDbService;
 
   @Autowired
-  private DatabaseRegistry databaseRegistry;
+  private ProjectsState projectsState;
 
   @Autowired
-  private ProjectsState projectsState;
+  private DatasourceLoaderService datasourceLoaderService;
 
   @Override
   public int execute() {
@@ -63,7 +62,7 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
           viewManager.unregisterDatasource(datasource.getName());
 
           try {
-            ProjectsServiceImpl.registerDatasource(project, transactionTemplate, databaseRegistry);
+            datasourceLoaderService.reloadDatasource(project);
             projectsState.updateProjectState(projectName, State.READY);
           } catch (Exception e) {
             log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);

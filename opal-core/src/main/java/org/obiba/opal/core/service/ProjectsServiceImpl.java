@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.service;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.vfs2.FileObject;
@@ -20,11 +19,9 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.*;
-import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ResourceReference;
-import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableEvent;
@@ -49,8 +46,6 @@ import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -81,9 +76,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private final ProjectsState projectsState;
 
-  private final BlockingQueue<Project> datasourceLoadQueue = new LinkedBlockingQueue<>();
-
-  private List<DatasourceLoader> datasourceLoaders = Lists.newArrayList();
+  private final DatasourceLoaderService datasourceLoaderService;
 
   @Autowired
   public ProjectsServiceImpl(OpalFileSystemService opalFileSystemService,
@@ -93,7 +86,8 @@ public class ProjectsServiceImpl implements ProjectService {
                              IdentifiersTableService identifiersTableService,
                              ViewManager viewManager,
                              TransactionTemplate transactionTemplate,
-                             EventBus eventBus, ResourceReferenceService resourceReferenceService, ProjectsState projectsState) {
+                             EventBus eventBus, ResourceReferenceService resourceReferenceService,
+                             ProjectsState projectsState, DatasourceLoaderService datasourceLoaderService) {
     this.opalFileSystemService = opalFileSystemService;
     this.orientDbService = orientDbService;
     this.databaseRegistry = databaseRegistry;
@@ -104,16 +98,22 @@ public class ProjectsServiceImpl implements ProjectService {
     this.eventBus = eventBus;
     this.resourceReferenceService = resourceReferenceService;
     this.projectsState = projectsState;
+    this.datasourceLoaderService = datasourceLoaderService;
   }
-
 
   @Override
   @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(Project.class);
+  }
 
-    startDatasourceLoaderThreads();
+  @Override
+  @PreDestroy
+  public void stop() {
+  }
 
+  @Override
+  public void initialize() {
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
     // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
     // Add all project datasources to MagmaEngine
@@ -122,17 +122,10 @@ public class ProjectsServiceImpl implements ProjectService {
         try {
           registerDatasource(project);
         } catch (Exception e) {
-          databaseRegistry.unregister(project.getDatabase(), project.getName());
           log.error("Failed initializing project: {}", project.getName(), e);
         }
       }
     }
-  }
-
-  @Override
-  @PreDestroy
-  public void stop() {
-    terminateDatasourceLoaderThreads();
   }
 
   @Override
@@ -260,29 +253,6 @@ public class ProjectsServiceImpl implements ProjectService {
     return projectsState.getProjectState(project.getName());
   }
 
-  public static DatasourceFactory registerDatasource(final Project project, final TransactionTemplate transactionTemplate, final DatabaseRegistry databaseRegistry) {
-    return transactionTemplate.execute(status -> {
-      log.info("  Datasource load start: {}", project.getName());
-      DatasourceFactory dataSourceFactory;
-      if (project.hasDatabase()) {
-        Database database = databaseRegistry.getDatabase(project.getDatabase());
-        dataSourceFactory = databaseRegistry.createDatasourceFactory(project.getName(), database);
-      } else {
-        dataSourceFactory = new NullDatasourceFactory();
-        dataSourceFactory.setName(project.getName());
-      }
-
-      if (MagmaEngine.get().hasDatasource(project.getName())) {
-        // not supposed to be here
-        MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(project.getName()));
-      }
-
-      MagmaEngine.get().addDatasource(dataSourceFactory);
-      log.info("Datasource load end: {} ({})", project.getName(), dataSourceFactory.getClass().getSimpleName());
-      return dataSourceFactory;
-    });
-  }
-
   /**
    * Create DatasourceFactory and add it to MagmaEngine
    *
@@ -292,7 +262,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @NotNull
   private void registerDatasource(@NotNull final Project project) {
     projectsState.updateProjectState(project.getName(), ProjectsState.State.LOADING);
-    datasourceLoadQueue.offer(project);
+    datasourceLoaderService.registerDatasource(project);
   }
 
   private void deleteFolder(FileObject folder) throws FileSystemException {
@@ -344,7 +314,7 @@ public class ProjectsServiceImpl implements ProjectService {
   public synchronized void onResourceProvidersServiceStarted(ResourceProvidersServiceStartedEvent event) {
     log.info("Resource providers ready, scanning for views to initialise...");
     // case some projects are still being loaded
-    if (datasourceLoadQueue.size()>0) return;
+    //if (datasourceLoadQueue.size()>0) return;
     getSubject().execute(new Runnable() {
       @Override
       public void run() {
@@ -403,55 +373,4 @@ public class ProjectsServiceImpl implements ProjectService {
     });
   }
 
-  private void startDatasourceLoaderThreads() {
-    datasourceLoaders.add(newDatasourceLoader("1"));
-    datasourceLoaders.add(newDatasourceLoader("2"));
-    datasourceLoaders.add(newDatasourceLoader("3"));
-  }
-
-  private DatasourceLoader newDatasourceLoader(String id) {
-    DatasourceLoader datasourceLoader = new DatasourceLoader();
-    datasourceLoader.setName("Datasource Loader " + id);
-    datasourceLoader.setPriority(Thread.MIN_PRIORITY);
-    datasourceLoader.start();
-    return datasourceLoader;
-  }
-
-  public void terminateDatasourceLoaderThreads() {
-    datasourceLoaders.forEach(datasourceLoader -> {
-      try {
-        if (datasourceLoader != null && datasourceLoader.isAlive()) datasourceLoader.interrupt();
-      } catch (Exception e) {
-        // ignore
-      }
-    });
-  }
-
-  private class DatasourceLoader extends Thread {
-
-    @Override
-    public void run() {
-      log.info("{}: started", getName());
-      try {
-        //noinspection InfiniteLoopStatement
-        while (true) {
-          load(datasourceLoadQueue.take());
-        }
-      } catch (InterruptedException ignored) {
-        log.debug("{}: interrupted", getName());
-      }
-      log.info("{}: Stopped", getName());
-    }
-
-    private void load(Project project) {
-      log.info("{}: loading datasource of project {}", getName(), project.getName());
-      try {
-        registerDatasource(project, transactionTemplate, databaseRegistry);
-        projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
-      } catch (Exception e) {
-        log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
-        projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
-      }
-    }
-  }
 }
