@@ -12,10 +12,16 @@ package org.obiba.opal.web.system;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.obiba.oidc.OIDCConfiguration;
+import org.obiba.oidc.utils.OIDCHelper;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.security.AuthConfigurationProvider;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
@@ -28,7 +34,10 @@ import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.runtime.upgrade.VersionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +46,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.lang.management.*;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,11 +58,13 @@ import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 @Path("/system")
 public class SystemResource {
 
+  private static final Logger log = LoggerFactory.getLogger(SystemResource.class);
+
   @Autowired
   private VersionProvider opalVersionProvider;
 
   @Autowired
-  private OpalGeneralConfigService serverService;
+  private OpalGeneralConfigService opalGeneralConfigService;
 
   @Autowired
   private TaxonomyService taxonomyService;
@@ -64,6 +77,12 @@ public class SystemResource {
 
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private AuthConfigurationProvider authConfigurationProvider;
+
+  @Value("${org.obiba.opal.public.url}")
+  private String defaultOpalPublicUrl;
 
   @GET
   @NoAuthorization
@@ -194,7 +213,7 @@ public class SystemResource {
   @Path("/conf/general")
   @NotAuthenticated // allow anonymous to be able to retrieve Opal instance name
   public Opal.GeneralConf getOpalGeneralConfiguration() {
-    OpalGeneralConfig conf = serverService.getConfig();
+    OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     Opal.GeneralConf.Builder builder = Opal.GeneralConf.newBuilder()//
         .setName(conf.getName())//
         .addAllLanguages(conf.getLocalesAsString())//
@@ -204,8 +223,9 @@ public class SystemResource {
       builder.setPublicURL(conf.getPublicUrl());
     }
 
-    if (!Strings.isNullOrEmpty(conf.getLogoutUrl())) {
-      builder.setLogoutURL(conf.getLogoutUrl());
+    String logoutUrl = getLogoutUrl();
+    if (!Strings.isNullOrEmpty(logoutUrl)) {
+      builder.setLogoutURL(logoutUrl);
     }
 
     return builder.build();
@@ -214,7 +234,7 @@ public class SystemResource {
   @PUT
   @Path("/conf/general")
   public Response updateGeneralConfigurations(Opal.GeneralConf dto) {
-    OpalGeneralConfig conf = serverService.getConfig();
+    OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
     conf.setPublicUrl(dto.getPublicURL());
     conf.setLogoutUrl(dto.getLogoutURL());
@@ -228,7 +248,7 @@ public class SystemResource {
     conf.setDefaultCharacterSet(
         dto.getDefaultCharSet().isEmpty() ? OpalGeneralConfig.DEFAULT_CHARSET : dto.getDefaultCharSet());
 
-    serverService.save(conf);
+    opalGeneralConfigService.save(conf);
 
     return Response.ok().build();
   }
@@ -238,7 +258,7 @@ public class SystemResource {
   @Produces("text/plain")
   @NotAuthenticated
   public Response getApplicationName() {
-    OpalGeneralConfig conf = serverService.getConfig();
+    OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     return Response.ok().entity(conf.getName()).build();
   }
 
@@ -247,7 +267,7 @@ public class SystemResource {
   @Produces("text/plain")
   @NoAuthorization
   public Response getDefaultCharset() {
-    return Response.ok().entity(serverService.getConfig().getDefaultCharacterSet()).build();
+    return Response.ok().entity(opalGeneralConfigService.getConfig().getDefaultCharacterSet()).build();
   }
 
   @Path("/keystore")
@@ -255,6 +275,53 @@ public class SystemResource {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     resource.setKeyStore(systemKeyStoreService.getKeyStore());
     return resource;
+  }
+
+  private String getLogoutUrl() {
+    OpalGeneralConfig opalConfig = opalGeneralConfigService.getConfig();
+    if (SecurityUtils.getSubject().isAuthenticated()) {
+      PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+
+      if (principals != null) {
+        for (String realmName : principals.getRealmNames()) {
+          OIDCConfiguration oidcConfig = authConfigurationProvider.getConfiguration(realmName);
+          if (oidcConfig != null) {
+            boolean useLogout = true;
+            if (oidcConfig.getCustomParams().containsKey("useLogout")) {
+              try {
+                useLogout = Boolean.parseBoolean(oidcConfig.getCustomParam("useLogout"));
+              } catch (Exception e) {
+                // ignore
+              }
+            }
+
+            try {
+              OIDCProviderMetadata metadata = OIDCHelper.discoverProviderMetaData(oidcConfig);
+              URI logoutEndpoint = metadata.getEndSessionEndpointURI();
+              if (useLogout && logoutEndpoint != null) {
+                log.debug("Using {} logout endpoint: {}", realmName, logoutEndpoint);
+                String logoutRedirect = opalConfig.getLogoutUrl();
+                if (Strings.isNullOrEmpty(logoutRedirect)) {
+                  logoutRedirect = opalConfig.getPublicUrl();
+                }
+                if (Strings.isNullOrEmpty(logoutRedirect)) {
+                  logoutRedirect = defaultOpalPublicUrl;
+                }
+                UriBuilder logoutURIBuilder = UriBuilder.fromUri(logoutEndpoint);
+                if (!Strings.isNullOrEmpty(logoutRedirect)) {
+                  logoutURIBuilder.queryParam("post_logout_redirect_uri", logoutRedirect);
+                }
+                return logoutURIBuilder.build().toString();
+              }
+            } catch (Exception e) {
+              log.error("Error when getting OIDC logout URL {}", realmName, e);
+            }
+          }
+        }
+      }
+    }
+
+    return opalConfig.getLogoutUrl();
   }
 
 }

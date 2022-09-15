@@ -457,6 +457,7 @@ message IDProviderDto {
   optional string usernameClaim = 15;
   optional string groupsScript = 16;
   optional string callbackURL = 17;
+  optional bool useLogout = 18;
 }
 
 message AuthProviderDto {

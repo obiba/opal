@@ -110,6 +110,9 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
   CheckBox useNonce;
 
   @UiField
+  CheckBox useLogout;
+
+  @UiField
   NumericTextBox connectTimeout;
 
   @UiField
@@ -167,6 +170,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     scope.setValue(provider.getScope());
     discoveryUri.setValue(provider.getDiscoveryURI());
     useNonce.setValue(provider.getUseNonce());
+    useLogout.setValue(!provider.hasUseLogout() || provider.getUseLogout());
     label.setValue(provider.getLabel());
     providerUrl.setValue(provider.getProviderUrl());
     usernameClaim.setValue(provider.getUsernameClaim());
@@ -256,6 +260,7 @@ public class IDProviderView extends ModalPopupViewWithUiHandlers<IDProviderUiHan
     provider.setProviderUrl(providerUrl.getValue());
     provider.setLabel(label.getValue());
     provider.setUseNonce(useNonce.getValue());
+    provider.setUseLogout(useLogout.getValue());
     provider.setConnectTimeout(connectTimeout.hasValue() ? connectTimeout.getNumberValue().intValue() : 0);
     provider.setReadTimeout(readTimeout.hasValue() ? readTimeout.getNumberValue().intValue() : 0);
     if (!Strings.isNullOrEmpty(publicUrl.getText().trim())) {

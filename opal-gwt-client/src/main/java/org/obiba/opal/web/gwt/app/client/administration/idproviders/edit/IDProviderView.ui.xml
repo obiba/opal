@@ -200,6 +200,17 @@
             </b:ControlGroup>
 
             <b:ControlGroup>
+                <b:CheckBox ui:field="useLogout" value="true">
+                    <ui:msg description="Provider Logout label">
+                        <a href="https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout" target="_blank">Use
+                            Logout Endpoint
+                        </a>
+                        to logout from both Opal and the ID provider.
+                    </ui:msg>
+                </b:CheckBox>
+            </b:ControlGroup>
+
+            <b:ControlGroup>
                 <b:ControlLabel>
                     <ui:msg description="Provider Connect Timeout label">Connect Timeout</ui:msg>
                 </b:ControlLabel>

@@ -177,6 +177,12 @@ public class Dtos {
         builder.setGroupsClaim(entry.getValue());
       else if ("groupsJS".equals(entry.getKey()))
         builder.setGroupsScript(entry.getValue());
+      else if ("useLogout".equals(entry.getKey()))
+        try {
+          builder.setUseLogout(Boolean.parseBoolean(entry.getValue()));
+        } catch (Exception e) {
+          // ignore
+        }
       else if ("enabled".equals(entry.getKey())) {
         try {
           builder.setEnabled(Boolean.parseBoolean(entry.getValue()));
@@ -221,6 +227,8 @@ public class Dtos {
       configuration.getCustomParams().put("label", dto.getLabel());
     if (dto.hasProviderUrl())
       configuration.getCustomParams().put("providerUrl", dto.getProviderUrl());
+    if (dto.hasUseLogout())
+      configuration.getCustomParams().put("useLogout", Boolean.toString(dto.getUseLogout()));
     configuration.getCustomParams().put("enabled", "" + dto.getEnabled());
     if (dto.getParametersCount() > 0)
       dto.getParametersList().forEach(parameterDto -> configuration.getCustomParams().put(parameterDto.getKey(), parameterDto.getValue()));
