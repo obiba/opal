@@ -203,6 +203,7 @@ public class OpalJettyServer {
   private Handler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath(Strings.isNullOrEmpty(contextPath) ? "/" : contextPath);
+    servletContextHandler.getSessionHandler().setSessionCookie("JSESSIONID_" + ("-1".equals(httpPort) ? httpsPort : httpPort));
     servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
     servletContextHandler.getSessionHandler().setHttpOnly(true);
