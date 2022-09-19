@@ -20,6 +20,7 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.NoSuchResourceFactoryException;
 import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
+import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.event.*;
@@ -29,6 +30,7 @@ import org.obiba.opal.spi.r.RServerResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -55,6 +57,8 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private final Map<String, List<ResourceProvider>> resourceProviders = Maps.newHashMap();
 
   private final Object resourceProvidersTask = new Object();
+
+  private boolean applicationStarted = false;
 
   //
   // Service methods
@@ -164,6 +168,13 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
     }
   }
 
+  @EventListener
+  public void onOpalStarted(OpalStartedEvent event) {
+    log.info("Opal started, R services to be finalized...");
+    applicationStarted = true;
+    eventBus.post(new ResourceProvidersServiceStartedEvent());
+  }
+
   private void loadResourceProviders() {
     synchronized (resourceProvidersTask) {
       resourceProviders.clear();
@@ -192,7 +203,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
         log.error("Resource packages discovery failed", e);
       }
     }
-    eventBus.post(new ResourceProvidersServiceStartedEvent());
+    if (applicationStarted) {
+      eventBus.post(new ResourceProvidersServiceStartedEvent());
+    }
   }
 
   /**
