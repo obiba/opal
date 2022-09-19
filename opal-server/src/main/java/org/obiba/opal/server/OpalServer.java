@@ -13,6 +13,8 @@ package org.obiba.opal.server;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Strings;
+import org.obiba.opal.core.service.ApplicationContextProvider;
+import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +111,7 @@ public class OpalServer {
     try {
       jettyServer.start();
       logAndSystemOut("Opal Server successfully started.");
+      ApplicationContextProvider.getApplicationContext().publishEvent(new OpalStartedEvent());
     } catch(Exception e) {
       log.error("Exception while starting Opal", e);
       System.out.println(

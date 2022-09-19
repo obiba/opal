@@ -46,6 +46,9 @@ import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -313,14 +316,12 @@ public class ProjectsServiceImpl implements ProjectService {
   @Subscribe
   public synchronized void onResourceProvidersServiceStarted(ResourceProvidersServiceStartedEvent event) {
     log.info("Resource providers ready, scanning for views to initialise...");
-    // case some projects are still being loaded
-    //if (datasourceLoadQueue.size()>0) return;
-    getSubject().execute(new Runnable() {
-      @Override
-      public void run() {
-        initViewsInError();
-      }
+    Callable<Object> callable = getSubject().associateWith(() -> {
+      initViewsInError();
+      return null;
     });
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    executorService.submit(callable);
   }
 
   //
@@ -344,18 +345,22 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   private void initViewsInError() {
-    getProjects().forEach(project ->
-        project.getDatasource().getValueTables().stream()
-            .filter(ValueTable::isView)
-            .filter(view -> ValueTableStatus.ERROR.equals(view.getStatus()))
-            .forEach(view -> {
-              log.info("Initialise {}.{}", project.getName(), view.getName());
-              try {
-                viewManager.initView(project.getName(), view.getName());
-              } catch (Exception e) {
-                log.error("{}", e.getMessage());
-              }
-            })
+    getProjects().forEach(project -> {
+          if (ProjectsState.State.READY.name().equals(getProjectState(project))) {
+            project.getDatasource()
+                .getValueTables().stream()
+                .filter(ValueTable::isView)
+                .filter(view -> ValueTableStatus.ERROR.equals(view.getStatus()))
+                .forEach(view -> {
+                  log.info("Initialise {}.{}", project.getName(), view.getName());
+                  try {
+                    viewManager.initView(project.getName(), view.getName());
+                  } catch (Exception e) {
+                    log.error("{}", e.getMessage());
+                  }
+                });
+          }
+        }
     );
   }
 
