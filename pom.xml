@@ -106,7 +106,7 @@
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <postgresql.version>42.5.0</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
-    <protobuf.version>2.5.0</protobuf.version>
+    <protobuf.version>3.16.3</protobuf.version>
     <protostuff.version>1.0.9</protostuff.version>
     <quartz.version>2.3.2</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
