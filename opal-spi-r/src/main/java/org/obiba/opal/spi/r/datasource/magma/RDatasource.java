@@ -64,7 +64,7 @@ public class RDatasource extends AbstractDatasource {
     super(name, "r");
     this.rSessionHandler = rSessionHandler;
     if (symbols != null && !symbols.isEmpty())
-      symbols.forEach(symbol -> tableSymbolNames.put(symbol.replaceAll(" ", "_"), symbol));
+      symbols.forEach(symbol -> tableSymbolNames.put(symbol, symbol));
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumnName = idColumnName;
   }
