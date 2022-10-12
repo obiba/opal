@@ -104,6 +104,7 @@
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
+    <poi-ooxml.version>3.9</poi-ooxml.version>
     <postgresql.version>42.5.0</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
@@ -1411,6 +1412,28 @@
         <version>${xmlunit.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>${poi-ooxml.version}</version>
+        <exclusions>
+          <!-- STAX is available in Java 6 -->
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+          <!-- Available in Java 6 -->
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
