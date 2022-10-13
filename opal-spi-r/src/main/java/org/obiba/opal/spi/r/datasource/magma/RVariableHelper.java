@@ -157,7 +157,7 @@ public class RVariableHelper {
       for (String key : rList.keySet()) {
         if (property.equals(key)) {
           RServerResult value = rList.get(key);
-          return value.isNull() || value.isNA()[0] ? null : value.asStrings()[0];
+          return value.isNull() ? null : value.asStrings()[0];
         }
       }
     } catch (Exception e) {
