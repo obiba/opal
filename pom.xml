@@ -110,7 +110,7 @@
     <protostuff.version>1.0.9</protostuff.version>
     <quartz.version>2.3.2</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>3.0.12.Final</resteasy.version>
+    <resteasy.version>3.0.20.Final</resteasy.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
     <shiro.version>1.10.0</shiro.version>
