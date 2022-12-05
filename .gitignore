@@ -3,6 +3,7 @@ target/
 .idea/*
 .idea/**/*.*
 *.iml
+.history
 atlassian-ide-plugin.xml
 .classpath
 .project
