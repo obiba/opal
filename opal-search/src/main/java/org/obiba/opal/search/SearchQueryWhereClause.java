@@ -12,8 +12,6 @@ package org.obiba.opal.search;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
