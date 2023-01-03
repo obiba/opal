@@ -90,7 +90,7 @@
     <logback.version>1.2.9</logback.version>
     <logstash-logback.version>6.6</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>4.0.0</magma.version>
+    <magma.version>4.0.2</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
@@ -104,7 +104,7 @@
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
-    <postgresql.version>42.5.0</postgresql.version>
+    <postgresql.version>42.5.1</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
     <protostuff.version>1.0.9</protostuff.version>
