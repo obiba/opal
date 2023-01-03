@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.domain.security.SubjectAcl;
@@ -461,7 +462,11 @@ public class FilesResource {
       names.add(charSet.name());
       names.addAll(charSet.aliases());
     }
-    return Response.ok(new JSONArray(names).toString()).build();
+    try {
+      return Response.ok(new JSONArray(names).toString()).build();
+    } catch (JSONException e) {
+      return Response.ok().build();
+    }
   }
 
   private Response unzipArchive(String archivePath, String destinationPath, String archiveKey, UriInfo uriInfo) throws IOException {
