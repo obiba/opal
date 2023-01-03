@@ -21,7 +21,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlets.GzipFilter;
+import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -39,7 +39,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -242,8 +244,6 @@ public class OpalJettyServer {
     authenticationFilterHolder.setName("authenticationFilter");
     authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
     servletContextHandler.addFilter(authenticationFilterHolder, "/ws/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-
-    servletContextHandler.addFilter(GzipFilter.class, "/*", EnumSet.of(REQUEST));
   }
 
   private void initOIDCFilter(Properties properties) {
@@ -279,8 +279,9 @@ public class OpalJettyServer {
     ResourceHandler resourceHandler = new ResourceHandler();
     resourceHandler.setBaseResource(new PathResource(new URL(fileUrl)));
     resourceHandler.setRedirectWelcome(true);
+    resourceHandler.setDirectoriesListed(false);
 
-    GzipHandler gzipHandler = new GzipHandler();
+    GzipHandler gzipHandler = new SecureGzipHandler();
     gzipHandler.setHandler(resourceHandler);
     gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
 
@@ -323,6 +324,23 @@ public class OpalJettyServer {
                                     ConfigurableWebApplicationContext configurableWebApplicationContext) {
       super.customizeContext(servletContext, configurableWebApplicationContext);
       springContextLoaderSupport.customizeContext(servletContext, configurableWebApplicationContext);
+    }
+  }
+
+  static class SecureGzipHandler extends GzipHandler {
+    public SecureGzipHandler() {
+      super();
+    }
+
+    @Override
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+      ServletContext context = baseRequest.getServletContext();
+      String path = context == null ? baseRequest.getRequestURI() : URIUtil.addPaths(baseRequest.getServletPath(), baseRequest.getPathInfo());
+      if (path.startsWith("/WEB-INF") || path.startsWith("/META-INF")) {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
+      super.handle(target, baseRequest, request, response);
     }
   }
 
