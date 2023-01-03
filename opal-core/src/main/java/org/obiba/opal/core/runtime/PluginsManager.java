@@ -41,9 +41,6 @@ public class PluginsManager {
 
   private final File archiveDir = new File(OpalRuntime.PLUGINS_DIR, ".archive");
 
-  @Value("${org.obiba.opal.plugins.site}")
-  private String repo;
-
   @Value("${productionMode}")
   private boolean productionMode;
 
