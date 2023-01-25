@@ -48,6 +48,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.google.common.base.Predicate;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.expect;
@@ -415,6 +416,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     @Bean
     public JtaTransactionManager jtaTransactionManager() {
       return EasyMock.createMock(JtaTransactionManager.class);
+    }
+
+    @Bean
+    public TransactionTemplate transactionTemplate() {
+      return EasyMock.createMock(TransactionTemplate.class);
     }
 
     @Bean(name = "hibernate")

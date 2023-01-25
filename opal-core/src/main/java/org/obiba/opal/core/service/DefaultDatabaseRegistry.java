@@ -40,10 +40,16 @@ import org.obiba.opal.core.service.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -75,6 +81,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Autowired
   private SocketFactoryProvider socketFactoryProvider;
 
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
       .build(new DataSourceCacheLoader());
@@ -90,6 +99,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(Database.class);
+    processHibernate5Upgrade();
   }
 
   @Override
@@ -344,6 +354,87 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     for(String key : keys) {
       registrations.remove(key, event.getDatasource().getName());
     }
+  }
+
+  //
+  // Private methods and classes
+  //
+
+
+  /**
+   * Hibernate5 has changed the GeneratedValue AUTO strategy used for identifiers.
+   * See <a href="https://github.com/obiba/opal/issues/3777">Problem with hibernate_sequence in Opal 4.5.2/3 </a>.
+   */
+  private void processHibernate5Upgrade() {
+    try {
+      listSqlDatabases().forEach(database -> {
+        if (database.getSqlSettings().getSqlSchema().equals(SqlSettings.SqlSchema.HIBERNATE)) {
+          String driverClass = database.getSqlSettings().getDriverClass();
+          if ("com.mysql.jdbc.Driver".equals(driverClass) || "org.mariadb.jdbc.Driver".equals(driverClass)) {
+            processHibernate5Upgrade(database);
+          }
+        }
+      });
+    } catch (Exception e) {
+      if (log.isDebugEnabled())
+        log.warn("Hibernate5 upgrade failure", e);
+      else
+        log.warn("Hibernate5 upgrade failure: {}", e.getMessage());
+    }
+  }
+
+  private void processHibernate5Upgrade(Database database) {
+    log.info("Checking if database {} is to be upgraded...", database.getName());
+
+    JdbcOperations jdbcTemplate = new JdbcTemplate(getDataSource(database.getName(), null));
+
+    long nextVal = queryForLong(jdbcTemplate, "select next_val from hibernate_sequence");
+    if (nextVal >= 0) {
+      // obiba/opal#3777 check nextVal is big enough after hibernate5 upgrade
+      long max = queryForLong(jdbcTemplate, "select max(id) from datasource");
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from value_table"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from value_table"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from variable"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from category"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from variable_entity"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from value_set"));
+      max = Math.max(max, queryForLong(jdbcTemplate, "select max(id) from value_set_binary_value"));
+
+      if (max > nextVal) {
+        log.info("Updating hibernate_sequence.next_val of database {}", database.getName());
+        nextVal = max + 1;
+        execute(jdbcTemplate, "update hibernate_sequence set next_val = " + nextVal);
+      }
+    }
+  }
+
+  private long queryForLong(final JdbcOperations jdbcTemplate, final String sql) {
+    Long rval = transactionTemplate.execute(status -> {
+      try {
+        return jdbcTemplate.queryForObject(sql, Long.class);
+      } catch(Exception e) {
+        log.warn("SQL execution error '{}': {}", sql, e.getMessage());
+      }
+      return null;
+    });
+    return rval == null ? -1 : rval;
+  }
+
+  private void execute(final JdbcOperations jdbcTemplate, final String sql) {
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        try {
+          jdbcTemplate.execute(sql);
+          log.info("SQL executed '{}'", sql);
+        } catch(Exception e) {
+          if (log.isDebugEnabled())
+            log.warn("SQL execution error '{}'", sql, e);
+          else
+            log.warn("SQL execution error '{}': {}", sql, e.getMessage());
+        }
+      }
+    });
   }
 
   private class DataSourceCacheLoader extends CacheLoader<String, DataSource> {
