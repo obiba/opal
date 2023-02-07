@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.net.URI;
@@ -57,7 +58,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   @Nullable
   @Override
-  public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
+  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method) {
     if (!productionMode || csrfAllowed.contains("*")) return null;
 
     String host = request.getHttpHeaders().getHeaderString(HOST_HEADER);

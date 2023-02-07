@@ -12,6 +12,7 @@ package org.obiba.opal.datashield;
 import com.google.common.base.Preconditions;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.r.expr.ParseException;
+import org.slf4j.MDC;
 
 /**
  * Parses a restricted R script, executes it and assigns the result to a symbol.
@@ -20,9 +21,8 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
 
   private final String symbol;
 
-  public RestrictedAssignmentROperation(String symbol, String script, DSEnvironment environment,
-                                        String rParserVersion) throws ParseException {
-    super(script, environment, rParserVersion);
+  public RestrictedAssignmentROperation(String symbol, String script, DataShieldContext context) throws ParseException {
+    super(script, context);
     Preconditions.checkArgument(symbol != null, "symbol cannot be null");
     this.symbol = symbol;
   }
@@ -32,6 +32,11 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     super.doWithConnection();
     setResult(null);
     String script = restricted();
+    MDC.put("ds_eval", script);
+    MDC.put("profile", getContext().getProfile());
+    MDC.put("ip", getContext().getClientIP());
+    MDC.put("ds_symbol", symbol);
+    DataShieldLog.userLog(null, DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
     setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
   }
 

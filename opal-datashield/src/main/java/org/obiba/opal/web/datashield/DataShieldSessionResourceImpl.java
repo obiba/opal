@@ -13,6 +13,7 @@ import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.datashield.DataShieldContext;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
@@ -22,6 +23,7 @@ import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -63,16 +65,26 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
 
   @Override
   public Response removeRSession(String saveId) {
-    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.CLOSE, "closing a datashield session {}", getRServerSession().getId());
+    DataShieldLog.init();
+    RServerSession rSession = getRServerSession();
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    MDC.put("profile", profile.getName());
+    DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.CLOSE, "closing a datashield session {}", rSession.getId());
     return super.removeRSession(saveId);
   }
 
   private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {
     RServerSession rSession = getRServerSession();
     DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    DataShieldLog.init();
+    MDC.put("rid", rSession.getId());
+    MDC.put("profile", profile.getName());
     ROperationWithResult operation = new RestrictedRScriptROperation(body,
-        profile.getEnvironment(DSMethodType.AGGREGATE),
-        datashieldProfileService.getRParserVersionOrDefault(profile),
+        new DataShieldContext(
+            profile.getEnvironment(DSMethodType.AGGREGATE),
+            profile.getName(),
+            datashieldProfileService.getRParserVersionOrDefault(profile),
+            MDC.get("ip")),
         serialize);
     if (async) {
       String id = rSession.executeAsync(operation);

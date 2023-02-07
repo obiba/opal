@@ -42,13 +42,9 @@ public class DataShieldLog {
   }
 
   public static void init() {
-    MDC.put("ds_symbol", null);
-    MDC.put("ds_table", null);
-    MDC.put("ds_resource", null);
-    MDC.put("ds_expr", null);
-    MDC.put("ds_script_in", null);
-    MDC.put("ds_script_out", null);
-    MDC.put("ds_func", null);
+    String ip = MDC.get("ip");
+    MDC.clear();
+    MDC.put("ip", ip);
   }
   public static void userLog(String id, Action action, String format, Object... arguments) {
     if (!Strings.isNullOrEmpty(id)) MDC.put("rid", id);
@@ -56,9 +52,10 @@ public class DataShieldLog {
     MDC.put("ds_action", action == null ? "?" : action.name());
     //MDC.put("profile", profile);
     if (Action.PARSE_ERROR.equals(action))
-        logError(userLog, format, arguments);
+      logError(userLog, format, arguments);
     else
       log(userLog, format, arguments);
+    init();
   }
 
   private static void log(Logger log, String format, Object... arguments) {

@@ -29,25 +29,22 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   private final String script;
 
-
-  private final DSEnvironment environment;
-
   private final RScriptGenerator rScriptGenerator;
 
+  private final DataShieldContext context;
+
   @SuppressWarnings("ConstantConditions")
-  public AbstractRestrictedRScriptROperation(String script, DSEnvironment environment,
-                                             String rParserVersion) throws ParseException {
+  public AbstractRestrictedRScriptROperation(String script, DataShieldContext context) throws ParseException {
     Preconditions.checkArgument(script != null, "script cannot be null");
-    Preconditions.checkArgument(environment != null, "environment cannot be null");
-    Preconditions.checkArgument(rParserVersion != null, "R parser version cannot be null");
+    Preconditions.checkArgument(context.getEnvironment() != null, "environment cannot be null");
+    Preconditions.checkArgument(context.getRParserVersion() != null, "R parser version cannot be null");
 
     this.script = script;
-    this.environment = environment;
+    this.context = context;
+    String rid = MDC.get("rid");
     MDC.put("ds_script_in", script);
-    MDC.put("ds_script_out", null);
-    MDC.put("ds_func", null);
     try {
-      this.rScriptGenerator = RScriptGeneratorFactory.make(rParserVersion, environment, script);
+      this.rScriptGenerator = RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script);
       String toScript = rScriptGenerator.toScript();
       String mapped = Joiner.on(";").join(rScriptGenerator.getMappedFunctions().entrySet().stream()
           .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
@@ -56,20 +53,28 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
       MDC.put("ds_func", mapped);
       DataShieldLog.userLog(null, DataShieldLog.Action.PARSED, "parsed '{}'", toScript);
     } catch (Throwable e) {
-      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE_ERROR,"Script failed validation: {}", e.getMessage());
+      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE_ERROR, "Script failed validation: {}", e.getMessage());
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);
+    } finally {
+      MDC.put("rid", rid);
+      MDC.put("profile", context.getProfile());
+      MDC.put("ip", context.getClientIP());
     }
   }
 
   @Override
   protected void doWithConnection() {
-    prepareOps(environment).forEach(op -> op.doWithConnection(getConnection()));
+    prepareOps(context.getEnvironment()).forEach(op -> op.doWithConnection(getConnection()));
   }
 
   protected String restricted() {
     return rScriptGenerator.toScript();
+  }
+
+  public DataShieldContext getContext() {
+    return context;
   }
 
   /**

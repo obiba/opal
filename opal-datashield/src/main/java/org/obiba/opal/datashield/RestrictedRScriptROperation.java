@@ -9,9 +9,9 @@
  */
 package org.obiba.opal.datashield;
 
-import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.spi.r.RSerialize;
+import org.slf4j.MDC;
 
 /**
  * Parses a restricted R script, executes it and stores the result.
@@ -20,9 +20,8 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
 
   private final RSerialize serialize;
 
-  public RestrictedRScriptROperation(String script, DSEnvironment environment,
-                                     String rParserVersion, RSerialize serialize) throws ParseException {
-    super(script, environment, rParserVersion);
+  public RestrictedRScriptROperation(String script, DataShieldContext context, RSerialize serialize) throws ParseException {
+    super(script, context);
     this.serialize = serialize;
   }
 
@@ -31,6 +30,9 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     super.doWithConnection();
     setResult(null);
     String script = restricted();
+    MDC.put("ds_eval", script);
+    MDC.put("profile", getContext().getProfile());
+    MDC.put("ip", getContext().getClientIP());
     DataShieldLog.userLog(null, DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
     setResult(eval(script, serialize));
   }

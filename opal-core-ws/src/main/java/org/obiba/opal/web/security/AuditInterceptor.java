@@ -18,19 +18,22 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.audit.OpalUserProvider;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
+import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 
 @Component
-public class AuditInterceptor implements RequestCyclePostProcess {
+public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePreProcess {
 
   private static final Logger log = LoggerFactory.getLogger(AuditInterceptor.class);
 
@@ -52,6 +55,13 @@ public class AuditInterceptor implements RequestCyclePostProcess {
   @Autowired
   private OpalUserProvider opalUserProvider;
 
+  @Nullable
+  @Override
+  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod) {
+    MDC.put("ip", getClientIP(servletRequest, request));
+    return null;
+  }
+
   @Override
   public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     logServerError(servletRequest, request, response);
@@ -63,7 +73,8 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     MDC.put("username", opalUserProvider.getUsername());
     MDC.put("status", response.getStatus() + "");
     MDC.put("method", request.getHttpMethod());
-    MDC.put("ip", getClientIP(servletRequest, request));
+    if (Strings.isNullOrEmpty(MDC.get("ip")))
+      MDC.put("ip", getClientIP(servletRequest, request));
 
     StringBuilder sb = new StringBuilder(request.getUri().getPath(true));
     MultivaluedMap<String, String> params = request.getUri().getQueryParameters();
@@ -74,7 +85,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     return sb.toString();
   }
 
-  private String getClientIP(HttpServletRequest servletRequest, HttpRequest request) {
+  private String getClientIP(@Nullable HttpServletRequest servletRequest, HttpRequest request) {
     String ip = "";
 
     for (String ipHeader : VALID_IP_HEADER_CANDIDATES) {
@@ -85,7 +96,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
       if (!Strings.isNullOrEmpty(ip)) break;
     }
 
-    if (Strings.isNullOrEmpty(ip))
+    if (Strings.isNullOrEmpty(ip) && servletRequest != null)
       ip = servletRequest.getRemoteAddr();
 
     return ip;
