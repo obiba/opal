@@ -50,10 +50,10 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
           .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
           .collect(Collectors.toList()));
       MDC.put("ds_script_out", toScript);
-      MDC.put("ds_func", mapped);
-      DataShieldLog.userLog(null, DataShieldLog.Action.PARSED, "parsed '{}'", toScript);
+      MDC.put("ds_map", mapped);
+      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE, "parsed '{}'", toScript);
     } catch (Throwable e) {
-      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE_ERROR, "Script failed validation: {}", e.getMessage());
+      DataShieldLog.userErrorLog(null, DataShieldLog.Action.PARSE, "Script failed validation: {}", e.getMessage());
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);

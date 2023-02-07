@@ -82,6 +82,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     ROperationWithResult operation = new RestrictedRScriptROperation(body,
         new DataShieldContext(
             profile.getEnvironment(DSMethodType.AGGREGATE),
+            rSession.getId(),
             profile.getName(),
             datashieldProfileService.getRParserVersionOrDefault(profile),
             MDC.get("ip")),

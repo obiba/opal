@@ -32,16 +32,28 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     super.doWithConnection();
     setResult(null);
     String script = restricted();
-    MDC.put("ds_eval", script);
-    MDC.put("profile", getContext().getProfile());
-    MDC.put("ip", getContext().getClientIP());
-    MDC.put("ds_symbol", symbol);
-    DataShieldLog.userLog(null, DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
-    setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
+    beforeLog(script);
+    DataShieldLog.userDebugLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
+    try {
+      setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
+      beforeLog(script);
+      DataShieldLog.userLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
+    } catch (Throwable e) {
+      beforeLog(script);
+      DataShieldLog.userErrorLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluation failure '{}'", script);
+      throw e;
+    }
   }
 
   @Override
   public boolean isIgnoreResult() {
     return true;
+  }
+
+  private void beforeLog(String script) {
+    MDC.put("ds_eval", script);
+    MDC.put("profile", getContext().getProfile());
+    MDC.put("ip", getContext().getClientIP());
+    MDC.put("ds_symbol", symbol);
   }
 }

@@ -96,6 +96,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     ROperation rop = new RestrictedAssignmentROperation(getName(), content,
         new DataShieldContext(
             profile.getEnvironment(DSMethodType.ASSIGN),
+            getRServerSession().getId(),
             profile.getName(),
             datashieldProfileService.getRParserVersionOrDefault(profile),
             MDC.get("ip")));

@@ -26,7 +26,7 @@ public class DataShieldLog {
     ASSIGN,
     RM,
     CLOSE,
-    PARSED,
+    PARSE,
     PARSE_ERROR
   }
 
@@ -38,7 +38,7 @@ public class DataShieldLog {
   }
 
   public static void adminLog(String format, Object... arguments) {
-    log(adminLog, format, arguments);
+    adminLog.info(format, arguments);
   }
 
   public static void init() {
@@ -46,25 +46,30 @@ public class DataShieldLog {
     MDC.clear();
     MDC.put("ip", ip);
   }
-  public static void userLog(String id, Action action, String format, Object... arguments) {
-    if (!Strings.isNullOrEmpty(id)) MDC.put("rid", id);
-    MDC.put("username", SecurityUtils.getSubject().getPrincipal().toString());
-    MDC.put("ds_action", action == null ? "?" : action.name());
-    //MDC.put("profile", profile);
-    if (Action.PARSE_ERROR.equals(action))
-      logError(userLog, format, arguments);
-    else
-      log(userLog, format, arguments);
+
+  public static void userDebugLog(String id, Action action, String format, Object... arguments) {
+    if (!userLog.isDebugEnabled()) return;
+    prepare(id, action);
+    userLog.debug(format, arguments);
     init();
   }
 
-  private static void log(Logger log, String format, Object... arguments) {
-    //noinspection StringConcatenationArgumentToLogCall
-    log.info(format, arguments);
+  public static void userLog(String id, Action action, String format, Object... arguments) {
+    prepare(id, action);
+    userLog.info(format, arguments);
+    init();
   }
-  private static void logError(Logger log, String format, Object... arguments) {
-    //noinspection StringConcatenationArgumentToLogCall
-    log.error(format, arguments);
+
+  public static void userErrorLog(String id, Action action, String format, Object... arguments) {
+    prepare(id, action);
+    userLog.error(format, arguments);
+    init();
+  }
+
+  private static void prepare(String id, Action action) {
+    if (!Strings.isNullOrEmpty(id)) MDC.put("rid", id);
+    MDC.put("username", SecurityUtils.getSubject().getPrincipal().toString());
+    MDC.put("ds_action", action == null ? "?" : action.name());
   }
 
 }

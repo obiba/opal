@@ -59,23 +59,25 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
   @Override
   public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod) {
     MDC.put("ip", getClientIP(servletRequest, request));
+    MDC.put("method", request.getHttpMethod());
     return null;
   }
 
   @Override
   public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
-    logServerError(servletRequest, request, response);
-    logClientError(servletRequest, request, response);
-    logInfo(servletRequest, request, response);
-  }
-
-  private String getArguments(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
     MDC.put("username", opalUserProvider.getUsername());
     MDC.put("status", response.getStatus() + "");
     MDC.put("method", request.getHttpMethod());
     if (Strings.isNullOrEmpty(MDC.get("ip")))
       MDC.put("ip", getClientIP(servletRequest, request));
 
+    logServerError(servletRequest, request, response);
+    logClientError(servletRequest, request, response);
+    logInfo(servletRequest, request, response);
+    MDC.clear();
+  }
+
+  private String getArguments(HttpRequest request) {
     StringBuilder sb = new StringBuilder(request.getUri().getPath(true));
     MultivaluedMap<String, String> params = request.getUri().getQueryParameters();
     if (!params.isEmpty()) {
@@ -106,7 +108,7 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
     if (!log.isErrorEnabled()) return;
     if (response.getStatus() < HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
 
-    log.error(LOG_FORMAT, getArguments(servletRequest, request, response));
+    log.error(LOG_FORMAT, getArguments(request));
   }
 
   private void logClientError(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
@@ -114,7 +116,7 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
     if (response.getStatus() < HttpStatus.SC_BAD_REQUEST) return;
     if (response.getStatus() >= HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
 
-    log.warn(LOG_FORMAT, getArguments(servletRequest, request, response));
+    log.warn(LOG_FORMAT, getArguments(request));
   }
 
   private void logInfo(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
@@ -127,13 +129,13 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
       if (resourceUri != null) {
         String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
         MDC.put("created", path);
-        log.info(LOG_FORMAT, getArguments(servletRequest, request, response));
+        log.info(LOG_FORMAT, getArguments(request));
         logged = true;
       }
     }
 
     if (!logged) {
-      log.info(LOG_FORMAT, getArguments(servletRequest, request, response));
+      log.info(LOG_FORMAT, getArguments(request));
     }
   }
 

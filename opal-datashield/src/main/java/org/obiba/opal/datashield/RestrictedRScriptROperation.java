@@ -30,10 +30,22 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     super.doWithConnection();
     setResult(null);
     String script = restricted();
+    beforeLog(script);
+    DataShieldLog.userDebugLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
+    try {
+      setResult(eval(script, serialize));
+      beforeLog(script);
+      DataShieldLog.userLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", script);
+    } catch (Throwable e) {
+      beforeLog(script);
+      DataShieldLog.userErrorLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluation failure '{}'", script);
+      throw e;
+    }
+  }
+
+  private void beforeLog(String script) {
     MDC.put("ds_eval", script);
     MDC.put("profile", getContext().getProfile());
     MDC.put("ip", getContext().getClientIP());
-    DataShieldLog.userLog(null, DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
-    setResult(eval(script, serialize));
   }
 }
