@@ -130,8 +130,8 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     DataShieldLog.init();
     RServerSession rSession = getRServerSession();
     DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
-    MDC.put("rid", rSession.getId());
-    MDC.put("profile", profile.getName());
+    MDC.put("ds_id", rSession.getId());
+    MDC.put("ds_profile", profile.getName());
     MDC.put("ds_symbol", getName());
   }
 }

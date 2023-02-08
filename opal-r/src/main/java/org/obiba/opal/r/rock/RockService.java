@@ -25,6 +25,7 @@ import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.InstallLocalPackageOperation;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
@@ -316,7 +317,19 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    return new RockSession(app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    RServerSession session = new RockSession(app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    session.setProfile(new RServerProfile() {
+      @Override
+      public String getName() {
+        return app.getCluster();
+      }
+
+      @Override
+      public String getCluster() {
+        return app.getCluster();
+      }
+    });
+    return session;
   }
 
   @Override

@@ -41,7 +41,6 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
     this.script = script;
     this.context = context;
-    String rid = MDC.get("rid");
     MDC.put("ds_script_in", script);
     try {
       this.rScriptGenerator = RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script);
@@ -51,16 +50,12 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
           .collect(Collectors.toList()));
       MDC.put("ds_script_out", toScript);
       MDC.put("ds_map", mapped);
-      DataShieldLog.userLog(null, DataShieldLog.Action.PARSE, "parsed '{}'", toScript);
+      DataShieldLog.userLog(context, DataShieldLog.Action.PARSE, "parsed '{}'", toScript);
     } catch (Throwable e) {
-      DataShieldLog.userErrorLog(null, DataShieldLog.Action.PARSE, "Script failed validation: {}", e.getMessage());
+      DataShieldLog.userErrorLog(context, DataShieldLog.Action.PARSE, "Script failed validation: {}", e.getMessage());
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);
-    } finally {
-      MDC.put("rid", rid);
-      MDC.put("profile", context.getProfile());
-      MDC.put("ip", context.getClientIP());
     }
   }
 

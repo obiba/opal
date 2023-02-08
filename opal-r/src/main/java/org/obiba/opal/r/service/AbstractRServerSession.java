@@ -332,7 +332,6 @@ public abstract class AbstractRServerSession implements RServerSession {
     private void consume(RCommand rCommand) {
       try {
         rCommand.inProgress();
-        MDC.put("rid", getId());
         execute(rCommand.getROperation());
         rCommand.completed();
       } catch (Exception e) {

@@ -45,7 +45,7 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
 
   private void beforeLog(String script) {
     MDC.put("ds_eval", script);
-    MDC.put("profile", getContext().getProfile());
+    MDC.put("ds_profile", getContext().getProfile());
     MDC.put("ip", getContext().getClientIP());
   }
 }

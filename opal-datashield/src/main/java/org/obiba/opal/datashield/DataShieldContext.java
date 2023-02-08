@@ -15,9 +15,13 @@ import org.obiba.datashield.core.DSEnvironment;
 public class DataShieldContext {
 
   private final DSEnvironment environment;
+
   private final String rid;
+
   private final String profile;
+
   private final String rParserVersion;
+
   private final String clientIP;
 
   public DataShieldContext(DSEnvironment environment, String rid, String profile, String rParserVersion, String clientIP) {

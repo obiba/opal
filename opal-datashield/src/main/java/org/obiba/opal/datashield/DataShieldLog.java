@@ -24,10 +24,12 @@ public class DataShieldLog {
     OPEN,
     AGGREGATE,
     ASSIGN,
-    RM,
     CLOSE,
     PARSE,
-    PARSE_ERROR
+    WS_SAVE,
+    WS_RESTORE,
+    RM,
+    LS
   }
 
   private static final Logger adminLog = LoggerFactory.getLogger("datashield.admin");
@@ -54,9 +56,21 @@ public class DataShieldLog {
     init();
   }
 
+  public static void userLog(DataShieldContext context, Action action, String format, Object... arguments) {
+    prepare(context, action);
+    userLog.info(format, arguments);
+    init();
+  }
+
   public static void userLog(String id, Action action, String format, Object... arguments) {
     prepare(id, action);
     userLog.info(format, arguments);
+    init();
+  }
+
+  public static void userErrorLog(DataShieldContext context, Action action, String format, Object... arguments) {
+    prepare(context, action);
+    userLog.error(format, arguments);
     init();
   }
 
@@ -66,8 +80,14 @@ public class DataShieldLog {
     init();
   }
 
+  private static void prepare(DataShieldContext context, Action action) {
+    prepare(context.getRId(), action);
+    MDC.put("ds_profile", context.getProfile());
+    MDC.put("ip", context.getClientIP());
+  }
+
   private static void prepare(String id, Action action) {
-    if (!Strings.isNullOrEmpty(id)) MDC.put("rid", id);
+    if (!Strings.isNullOrEmpty(id)) MDC.put("ds_id", id);
     MDC.put("username", SecurityUtils.getSubject().getPrincipal().toString());
     MDC.put("ds_action", action == null ? "?" : action.name());
   }
