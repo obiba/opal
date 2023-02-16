@@ -44,11 +44,9 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
 
   private static final String RESOURCE_JS_FILE = "resources/resource.js";
 
-  @Autowired
-  private RServerManagerService rServerManagerService;
+  private final RServerManagerService rServerManagerService;
 
-  @Autowired
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   private boolean running = false;
 
@@ -59,6 +57,12 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private final Object resourceProvidersTask = new Object();
 
   private boolean applicationStarted = false;
+
+  @Autowired
+  public RResourceProvidersService(RServerManagerService rServerManagerService, EventBus eventBus) {
+    this.rServerManagerService = rServerManagerService;
+    this.eventBus = eventBus;
+  }
 
   //
   // Service methods

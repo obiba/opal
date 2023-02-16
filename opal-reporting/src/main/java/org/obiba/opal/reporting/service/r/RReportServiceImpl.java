@@ -45,14 +45,18 @@ public class RReportServiceImpl implements ReportService {
 
   private static final Logger log = LoggerFactory.getLogger(RReportServiceImpl.class);
 
-  @Value("${org.obiba.opal.r.repos}")
-  private String defaultRepos;
+  private final String defaultRepos;
+
+  private final OpalRSessionManager opalRSessionManager;
+
+  private final RServerManagerService rServerManagerService;
 
   @Autowired
-  private OpalRSessionManager opalRSessionManager;
-
-  @Autowired
-  private RServerManagerService rServerManagerService;
+  public RReportServiceImpl(@Value("${org.obiba.opal.r.repos}") String defaultRepos, OpalRSessionManager opalRSessionManager, RServerManagerService rServerManagerService) {
+    this.defaultRepos = defaultRepos;
+    this.opalRSessionManager = opalRSessionManager;
+    this.rServerManagerService = rServerManagerService;
+  }
 
   @Override
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput)

@@ -45,16 +45,16 @@ public class OpalSshServer implements Service {
 
   private final SshServer sshd;
 
-  @Autowired
-  private OpalFileSystemService opalFileSystemService;
+  private final OpalFileSystemService opalFileSystemService;
 
-  @Autowired
-  private SubjectProfileService subjectProfileService;
+  private final SubjectProfileService subjectProfileService;
 
   private boolean isRunning = false;
 
   @Autowired
-  public OpalSshServer(@Value("${org.obiba.opal.ssh.port}") Integer port) {
+  public OpalSshServer(@Value("${org.obiba.opal.ssh.port}") Integer port, OpalFileSystemService opalFileSystemService, SubjectProfileService subjectProfileService) {
+    this.opalFileSystemService = opalFileSystemService;
+    this.subjectProfileService = subjectProfileService;
 
     sshd = SshServer.setUpDefaultServer();
     sshd.setPort(port);
@@ -80,17 +80,17 @@ public class OpalSshServer implements Service {
       private void ensureProfile(Subject subject) {
         Object principal = subject.getPrincipal();
 
-        if(!subjectProfileService.supportProfile(principal)) {
+        if(!OpalSshServer.this.subjectProfileService.supportProfile(principal)) {
           return;
         }
-        subjectProfileService.ensureProfile(subject.getPrincipals());
+        OpalSshServer.this.subjectProfileService.ensureProfile(subject.getPrincipals());
       }
     });
     sshd.setFileSystemFactory(new FileSystemFactory() {
 
       @Override
       public FileSystemView createFileSystemView(Session session) throws IOException {
-        return new OpalFileSystemView(opalFileSystemService, session.getUsername());
+        return new OpalFileSystemView(OpalSshServer.this.opalFileSystemService, session.getUsername());
       }
     });
     sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>>of(new SftpSubsystem.Factory()));
