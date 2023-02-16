@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.search;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -17,6 +18,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.search.event.SynchronizeIndexEvent;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.spi.search.IndexManager;
 import org.obiba.opal.spi.search.IndexSynchronization;
@@ -45,14 +47,11 @@ public class IndexSynchronizationManager {
   // Grace period before reindexing (in seconds)
   private static final int GRACE_PERIOD = 30;
 
-  @Autowired
-  private OpalSearchService opalSearchService;
+  private final OpalSearchService opalSearchService;
 
-  @Autowired
-  private TransactionalThreadFactory transactionalThreadFactory;
+  private final TransactionalThreadFactory transactionalThreadFactory;
 
-  @Autowired
-  private IndexManagerConfigurationService indexConfig;
+  private final IndexManagerConfigurationService indexConfig;
 
   private final SyncProducer syncProducer = new SyncProducer();
 
@@ -63,6 +62,13 @@ public class IndexSynchronizationManager {
   private final BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<>();
 
   private Thread consumer;
+
+  @Autowired
+  public IndexSynchronizationManager(OpalSearchService opalSearchService, TransactionalThreadFactory transactionalThreadFactory, IndexManagerConfigurationService indexConfig) {
+    this.opalSearchService = opalSearchService;
+    this.transactionalThreadFactory = transactionalThreadFactory;
+    this.indexConfig = indexConfig;
+  }
 
   // Every minute
   @Scheduled(fixedDelay = 60 * 1000)
@@ -104,6 +110,15 @@ public class IndexSynchronizationManager {
   public void terminateConsumerThread() {
     if(consumer != null && consumer.isAlive()) consumer.interrupt();
   }
+
+  @Subscribe
+  public void onSynchronizeIndex(SynchronizeIndexEvent event) {
+    synchronizeIndex(event.getIndexManager(), event.getValueTable());
+  }
+
+  //
+  // Private methods
+  //
 
   private Subject getSubject() {
     // Login as background task user

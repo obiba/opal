@@ -59,26 +59,30 @@ public class RSQLService implements Service, SQLService {
 
   private static final int SQLITE_MAX_COLUMN = 2000;
 
-  @Autowired
-  private SystemLogService systemLogService;
+  private final SystemLogService systemLogService;
 
-  @Autowired
-  private RServerManagerService rServerManagerService;
+  private final RServerManagerService rServerManagerService;
 
-  @Autowired
-  private OpalRSessionManager opalRSessionManager;
+  private final OpalRSessionManager opalRSessionManager;
 
-  @Autowired
-  protected IdentifiersTableService identifiersTableService;
+  protected final IdentifiersTableService identifiersTableService;
 
-  @Autowired
-  protected DataExportService dataExportService;
+  protected final DataExportService dataExportService;
 
   private boolean running = false;
 
   private boolean ensureSqldfDone;
 
   private List<String> userRSessions = Collections.synchronizedList(Lists.newArrayList());
+
+  @Autowired
+  public RSQLService(SystemLogService systemLogService, RServerManagerService rServerManagerService, OpalRSessionManager opalRSessionManager, IdentifiersTableService identifiersTableService, DataExportService dataExportService) {
+    this.systemLogService = systemLogService;
+    this.rServerManagerService = rServerManagerService;
+    this.opalRSessionManager = opalRSessionManager;
+    this.identifiersTableService = identifiersTableService;
+    this.dataExportService = dataExportService;
+  }
 
   @Override
   public File execute(@Nullable String datasource, String query, String idName, Output output) {

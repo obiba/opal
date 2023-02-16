@@ -10,6 +10,7 @@
 package org.obiba.opal.search.service;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
@@ -18,9 +19,9 @@ import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
-import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.search.event.SynchronizeIndexEvent;
 import org.obiba.opal.spi.search.*;
 import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
@@ -41,22 +42,26 @@ public class OpalSearchService implements Service {
 
   static final String SERVICE_NAME = "search";
 
-  @Autowired
-  private ElasticSearchConfigurationService configService;
+  private final ElasticSearchConfigurationService configService;
+
+  private final OpalGeneralConfigService opalGeneralConfigService;
+
+  private final VariableSummaryHandler variableSummaryHandler;
+
+  private final ThreadFactory threadFactory;
+
+  private final EventBus eventBus;
 
   private OpalRuntime opalRuntime;
 
   @Autowired
-  private OpalGeneralConfigService opalGeneralConfigService;
-
-  @Autowired
-  private VariableSummaryHandler variableSummaryHandler;
-
-  @Autowired
-  private ThreadFactory threadFactory;
-
-  @Autowired
-  protected IndexSynchronizationManager synchroManager;
+  public OpalSearchService(ElasticSearchConfigurationService configService, OpalGeneralConfigService opalGeneralConfigService, VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory, EventBus eventBus) {
+    this.configService = configService;
+    this.opalGeneralConfigService = opalGeneralConfigService;
+    this.variableSummaryHandler = variableSummaryHandler;
+    this.threadFactory = threadFactory;
+    this.eventBus = eventBus;
+  }
 
   public boolean isEnabled() {
     return configService.getConfig().isEnabled();
@@ -270,7 +275,7 @@ public class OpalSearchService implements Service {
     // to ensure variable search is correct
     getVariablesIndexManager().getIndex(event.getValueTable()).delete();
     // synchronize variable index
-    synchroManager.synchronizeIndex(getVariablesIndexManager(), event.getValueTable());
+    eventBus.post(new SynchronizeIndexEvent(getVariablesIndexManager(), event.getValueTable()));
   }
 
   private void remove(@NotNull ValueTable vt) {

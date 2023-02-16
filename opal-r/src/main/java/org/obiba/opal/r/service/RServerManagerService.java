@@ -53,21 +53,25 @@ public class RServerManagerService implements Service {
 
   private static final String ROCK_APP_TYPE = "rock";
 
-  @Autowired
-  private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
-  @Autowired
-  private EventBus eventBus;
+  private final EventBus eventBus;
 
   // legacy
-  @Autowired
-  private RserveService rserveService;
+  private final RserveService rserveService;
 
   private boolean rserveServiceInDefaultCluster;
 
   private final Map<String, RServerCluster> rClusters = Maps.newConcurrentMap();
 
   private boolean running;
+
+  @Autowired
+  public RServerManagerService(ApplicationContext applicationContext, EventBus eventBus, RserveService rserveService) {
+    this.applicationContext = applicationContext;
+    this.eventBus = eventBus;
+    this.rserveService = rserveService;
+  }
 
   /**
    * Get the R server profile corresponding to the default R server.
