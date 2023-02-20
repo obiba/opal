@@ -75,7 +75,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
       return Response.ok().entity(operation.getResult().asBytes()).type(MediaType.APPLICATION_OCTET_STREAM).build();
     } else {
       rSession.execute(operation);
-      return Response.ok().entity(operation.getResult().asStrings()[0]).type(MediaType.APPLICATION_JSON).build();
+      return Response.ok().entity(operation.getResult().asJSON()).type(MediaType.APPLICATION_JSON).build();
     }
   }
 
