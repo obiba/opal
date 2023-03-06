@@ -9,21 +9,27 @@
  */
 package org.obiba.opal.web.datashield;
 
+import com.google.protobuf.GeneratedMessage;
 import org.obiba.datashield.core.NoSuchDSMethodException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Component
 @Provider
-public class NoSuchDSMethodExceptionMapper implements ExceptionMapper<NoSuchDSMethodException> {
+public class NoSuchDSMethodExceptionMapper extends ErrorDtoExceptionMapper<NoSuchDSMethodException> {
 
   @Override
-  public Response toResponse(NoSuchDSMethodException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+  protected Status getStatus() {
+    return Status.NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchDSMethodException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "DataShieldMethodError", exception);
   }
 
 }
