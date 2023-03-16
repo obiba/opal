@@ -6,6 +6,13 @@ case "`uname`" in
 CYGWIN*) cygwin=true;;
 esac
 
+if [ -z "$JAVA" ]
+then
+  # Set default JAVA
+  JAVA="java"
+  export JAVA
+fi
+
 if [ -z "$JAVA_OPTS" ]
 then
   # Set default JAVA_OPTS
@@ -22,6 +29,7 @@ export OPAL_DIST
 
 export OPAL_LOG=$OPAL_HOME/logs
 
+echo "JAVA=$JAVA"
 echo "JAVA_OPTS=$JAVA_OPTS"
 echo "OPAL_HOME=$OPAL_HOME"
 echo "OPAL_DIST=$OPAL_DIST"
@@ -36,8 +44,8 @@ if $cygwin; then
   # For Cygwin, ensure paths are in UNIX format before anything is touched
   [ -n "$OPAL_DIST" ] && OPAL_BIN=`cygpath --unix "$OPAL_DIST"`
   [ -n "$OPAL_HOME" ] && OPAL_HOME=`cygpath --unix "$OPAL_HOME"`
-  
-  # For Cygwin, switch paths to Windows format before running java  
+
+  # For Cygwin, switch paths to Windows format before running java
   export OPAL_DIST=`cygpath --absolute --windows "$OPAL_DIST"`
   export OPAL_HOME=`cygpath --absolute --windows "$OPAL_HOME"`
 fi
@@ -54,4 +62,4 @@ fi
 JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
 # Add $JAVA_DEBUG to this line to enable remote JVM debugging (for developers)
-java $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $@
+$JAVA $JAVA_OPTS $JAVA_DEBUG -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $@
