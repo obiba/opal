@@ -15,10 +15,10 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
 import org.obiba.shiro.authc.X509CertificateAuthenticationToken;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -28,7 +28,7 @@ import java.util.Map;
  * Realm for applications authenticated by SSL certificate.
  */
 @Component
-public class OpalApplicationRealm extends OpalBaseRealm {
+public class OpalApplicationRealm extends OpalBaseRealm implements InitializingBean {
 
 //  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
 
@@ -37,8 +37,8 @@ public class OpalApplicationRealm extends OpalBaseRealm {
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
 
-  @PostConstruct
-  public void postConstruct() {
+  @Override
+  public void afterPropertiesSet() {
     setAuthenticationTokenClass(X509CertificateAuthenticationToken.class);
   }
 

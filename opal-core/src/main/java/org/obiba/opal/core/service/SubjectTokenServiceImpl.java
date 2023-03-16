@@ -24,10 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +75,6 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(SubjectToken.class);
   }

@@ -183,6 +183,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public SubjectAclService subjectAclService() {
       SubjectAclService mock = EasyMock.createMock(SubjectAclService.class);
+      mock.afterPropertiesSet();
       SubjectAclService.Permissions permsMock = EasyMock.createMock(SubjectAclService.Permissions.class);
       EasyMock.expect(permsMock.getPermissions()).andReturn(Sets.newHashSet(SubjectProfileServiceImpl.FILES_SHARE_PERM))
           .anyTimes();
@@ -197,6 +198,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public OpalRuntime opalRuntime() {
       OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      mock.afterPropertiesSet();
       EasyMock.replay(mock);
       return mock;
     }
@@ -204,6 +206,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public OpalFileSystemService opalFileSystemService() {
       OpalFileSystemService mock = EasyMock.createMock(OpalFileSystemService.class);
+      mock.afterPropertiesSet();
       EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
       EasyMock.replay(mock);
       return mock;

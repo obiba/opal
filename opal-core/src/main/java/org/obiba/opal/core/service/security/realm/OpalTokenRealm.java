@@ -23,10 +23,10 @@ import org.obiba.opal.core.service.NoSuchSubjectTokenException;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.shiro.authc.HttpHeaderAuthenticationToken;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +35,7 @@ import java.util.Set;
  * A realm for handling personal access API tokens represented by {@link org.obiba.opal.core.domain.security.SubjectToken}.
  */
 @Component
-public class OpalTokenRealm extends AuthorizingRealm {
+public class OpalTokenRealm extends AuthorizingRealm implements InitializingBean {
 
   public static final String TOKEN_REALM = "opal-token-realm";
 
@@ -49,8 +49,8 @@ public class OpalTokenRealm extends AuthorizingRealm {
     this.subjectProfileService = subjectProfileService;
   }
 
-  @PostConstruct
-  public void postConstruct() {
+  @Override
+  public void afterPropertiesSet() {
     setAuthenticationTokenClass(HttpHeaderAuthenticationToken.class);
   }
 

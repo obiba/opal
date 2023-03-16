@@ -390,6 +390,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     @Bean
     public SubjectProfileService subjectProfileService() {
       SubjectProfileService subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
+      subjectProfileService.afterPropertiesSet();
       expect(subjectProfileService.getProfile("user1")).andReturn(new SubjectProfile("user1", OpalUserRealm.OPAL_REALM))
           .anyTimes();
       expect(subjectProfileService.getProfile("app1"))

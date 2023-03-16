@@ -26,7 +26,6 @@ import org.obiba.opal.core.event.VariableRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -40,7 +39,6 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(VCFSamplesMapping.class);
   }

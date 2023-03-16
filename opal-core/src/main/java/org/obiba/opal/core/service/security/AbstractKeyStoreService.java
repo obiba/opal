@@ -10,21 +10,6 @@
 
 package org.obiba.opal.core.service.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.UnrecoverableKeyException;
-
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.crypt.CacheablePasswordCallback;
 import org.obiba.crypt.CachingCallbackHandler;
@@ -34,6 +19,19 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Nullable;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.validation.constraints.NotNull;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
 
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
@@ -56,7 +54,6 @@ public abstract class AbstractKeyStoreService {
     this.orientDbService = orientDbService;
   }
 
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(KeyStoreState.class);
   }
