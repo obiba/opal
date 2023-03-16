@@ -258,6 +258,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public OpalRuntime opalRuntime() {
       OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      mock.afterPropertiesSet();
       EasyMock.replay(mock);
       return mock;
     }
@@ -265,6 +266,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public OpalFileSystemService opalFileSystemService() {
       OpalFileSystemService mock = EasyMock.createMock(OpalFileSystemService.class);
+      mock.afterPropertiesSet();
       EasyMock.replay(mock);
       return mock;
     }

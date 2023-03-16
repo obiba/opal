@@ -10,19 +10,9 @@
 
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.LinkedList;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.dao.DataAccessException;
@@ -32,9 +22,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedList;
+
 @Transactional
 @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
-public class QuartzTablesCreator {
+public class QuartzTablesCreator implements InitializingBean {
 
   private static final Logger log = LoggerFactory.getLogger(QuartzTablesCreator.class);
 
@@ -46,7 +45,11 @@ public class QuartzTablesCreator {
 
   private Resource script;
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() {
+    createTablesIfNeeded();
+  }
+
   public void createTablesIfNeeded() {
     if(quartzTablesExist()) {
       log.info("Don't Quartz tables as they already exist");

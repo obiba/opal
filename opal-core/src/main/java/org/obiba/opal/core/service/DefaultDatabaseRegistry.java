@@ -47,13 +47,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -96,14 +93,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(Database.class);
     processHibernate5Upgrade();
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     sessionFactoryCache.invalidateAll();
     dataSourceCache.invalidateAll();

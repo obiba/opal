@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -46,7 +45,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import java.io.*;
+import java.net.FileNameMap;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -63,7 +64,7 @@ public class FilesResource {
 
   private SubjectAclService subjectAclService;
 
-  private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
+  private final FileNameMap mimeTypes = URLConnection.getFileNameMap();;
 
   private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
@@ -539,7 +540,7 @@ public class FilesResource {
   private Response getFile(FileObject file, String key) throws IOException {
     final File localFile = opalFileSystemService.getFileSystem().getLocalFile(file);
     String fileName = Strings.isNullOrEmpty(key) ? localFile.getName() : localFile.getName() + ".zip";
-    String mimeType = mimeTypes.getContentType(fileName);
+    String mimeType = mimeTypes.getContentTypeFor(fileName);
 
     StreamingOutput stream = os -> {
       File output = localFile;
@@ -562,7 +563,7 @@ public class FilesResource {
   private Response getFolder(FileObject folder, Collection<String> children, String key) {
     final File localFolder = opalFileSystemService.getFileSystem().getLocalFile(folder);
     final String fileName = localFolder.getName() + ".zip";
-    String mimeType = mimeTypes.getContentType(fileName);
+    String mimeType = mimeTypes.getContentTypeFor(fileName);
 
     StreamingOutput stream = os -> {
       File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));

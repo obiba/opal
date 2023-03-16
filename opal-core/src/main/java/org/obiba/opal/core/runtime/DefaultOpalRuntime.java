@@ -30,8 +30,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collection;
@@ -77,7 +75,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     initExtensions();
     initPlugins();
@@ -87,7 +84,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     for (ServicePlugin service : pluginsManager.getServicePlugins()) {
       try {

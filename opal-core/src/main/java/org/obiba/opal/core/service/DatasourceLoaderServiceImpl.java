@@ -23,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,13 +50,11 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     startDatasourceLoaderThreads();
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     terminateDatasourceLoaderThreads();
   }

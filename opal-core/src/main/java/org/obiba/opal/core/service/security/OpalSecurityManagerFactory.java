@@ -37,19 +37,19 @@ import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.realm.ObibaRealm;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager> {
+public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager>, DisposableBean {
 
   private static final long SESSION_VALIDATION_INTERVAL = 300000l; // 5 minutes
 
@@ -114,7 +114,11 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
     return true;
   }
 
-  @PreDestroy
+  @Override
+  public void destroy() throws Exception {
+    destroySecurityManager();
+  }
+
   public void destroySecurityManager() {
     // Destroy the security manager.
     SecurityUtils.setSecurityManager(null);

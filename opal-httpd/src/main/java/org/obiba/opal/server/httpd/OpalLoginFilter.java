@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,8 +51,13 @@ public class OpalLoginFilter extends OIDCLoginFilter {
     this.opalGeneralConfigService = opalGeneralConfigService;
   }
 
-  @PostConstruct
-  public void init() {
+  @Override
+  public void afterPropertiesSet() throws ServletException {
+    super.afterPropertiesSet();
+  }
+
+  @Override
+  protected void initFilterBean() {
     setOIDCConfigurationProvider(oidcConfigurationProvider);
     setOIDCSessionManager(oidcSessionManager);
     initFilterUrls();
