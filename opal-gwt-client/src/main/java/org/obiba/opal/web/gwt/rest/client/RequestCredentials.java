@@ -9,16 +9,9 @@
  */
 package org.obiba.opal.web.gwt.rest.client;
 
-import java.util.Date;
-
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
-import org.obiba.opal.web.security.OpalAuth;
-
-import com.google.gwt.core.client.impl.Md5Digest;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.user.client.Cookies;
+import org.obiba.opal.web.security.OpalAuth;
 
 /**
  *
@@ -48,20 +41,7 @@ public class RequestCredentials {
    * @param url the URL to request (GET, POST)
    */
   public void provideCredentials(String url) {
-    /*if(hasCredentials()) {
-      Md5Digest digest = new Md5Digest();
-      digest.update(extractOpalCredentials().getBytes());
-      String urlToHash = url;
-      int queryIdx = url.indexOf('?');
-      if(queryIdx != -1) {
-        // remove query string
-        urlToHash = url.substring(0, queryIdx);
-      }
-      String urlHash = toHexString(digest.digest(urlToHash.getBytes()));
-      long time = new Date().getTime();
-      // Cookie will be valid for 1 second
-      Cookies.setCookie(OPALRID, urlHash, new Date(time + 1000), null, "/", false);
-    }*/
+
   }
 
   /**

@@ -48,7 +48,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.gwt.inject</groupId>
+      <groupId>io.github.gwtplus.gin</groupId>
       <artifactId>gin</artifactId>
     </dependency>
     <dependency>
@@ -183,7 +183,7 @@
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
           <includes>**/*Gwt*Suite.java</includes>
-          <sourceLevel>1.7</sourceLevel>
+          <sourceLevel>auto</sourceLevel>
           <!--<style>DETAILED</style>-->
         </configuration>
       </plugin>
