@@ -39,8 +39,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.ForbiddenException;
 import java.io.*;
 import java.text.Normalizer;
@@ -158,14 +156,12 @@ public class RSQLService implements Service, SQLService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     running = true;
     ensureSqldfDone = false;
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     running = false;
     userRSessions.forEach(rSessionId -> opalRSessionManager.removeRSession(rSessionId));

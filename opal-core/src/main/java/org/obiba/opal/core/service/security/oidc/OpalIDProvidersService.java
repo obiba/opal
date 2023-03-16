@@ -21,9 +21,9 @@ import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Component
-public class OpalIDProvidersService implements IDProvidersService {
+public class OpalIDProvidersService implements IDProvidersService, InitializingBean {
 
   private static final Logger log = LoggerFactory.getLogger(OpalIDProvidersService.class);
 
@@ -42,7 +42,6 @@ public class OpalIDProvidersService implements IDProvidersService {
 
   private final Map<String, OIDCConfiguration> configurations = Maps.newConcurrentMap();
 
-  @PostConstruct
   public void init() {
     File confDir = getConfigurationDirectory();
     File[] confFiles = confDir.listFiles(file -> file.isFile() && file.getName().endsWith(".json"));
@@ -59,6 +58,11 @@ public class OpalIDProvidersService implements IDProvidersService {
         }
       }
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    init();
   }
 
   @Override

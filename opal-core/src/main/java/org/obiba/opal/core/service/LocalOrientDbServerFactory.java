@@ -10,26 +10,24 @@
 
 package org.obiba.opal.core.service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.validation.constraints.NotNull;
-
-import com.orientechnologies.common.log.OLogManager;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 @Component
-public class LocalOrientDbServerFactory implements OrientDbServerFactory {
+public class LocalOrientDbServerFactory implements OrientDbServerFactory, InitializingBean, DisposableBean {
 
   private static final Logger log = LoggerFactory.getLogger(LocalOrientDbServerFactory.class);
 
@@ -65,7 +63,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     this.url = url;
   }
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    start();
+  }
+
   public void start() throws Exception {
     log.info("Start OrientDB server ({})", url);
 
@@ -82,7 +84,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     ensureDatabaseExists();
   }
 
-  @PreDestroy
+  @Override
+  public void destroy() {
+    stop();
+  }
+
   public void stop() {
     log.info("Stop OrientDB server ({})", url);
     if(server != null) server.shutdown();

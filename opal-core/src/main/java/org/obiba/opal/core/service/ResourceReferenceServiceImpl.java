@@ -21,7 +21,6 @@ import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
-import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.spi.resource.Resource;
 import org.slf4j.Logger;
@@ -29,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -170,15 +167,12 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(ResourceReference.class);
   }
 
   @Override
-  @PreDestroy
   public void stop() {
-
   }
 
   @Subscribe

@@ -26,12 +26,12 @@ import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * R session created or a R session explicitly set.
  */
 @Component
-public class OpalRSessionManager {
+public class OpalRSessionManager implements DisposableBean {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
@@ -90,7 +90,11 @@ public class OpalRSessionManager {
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
-  @PreDestroy
+  @Override
+  public void destroy() throws Exception {
+    stop();
+  }
+
   public void stop() {
     for (String principal : rSessionMap.keySet()) {
       doClearRSessions(principal);

@@ -13,10 +13,6 @@ package org.obiba.opal.core.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.sun.istack.NotNull;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.spi.analysis.Analysis;
@@ -26,14 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.annotation.Nonnull;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -51,7 +47,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
 
 
   @Override
-  public void exportProjectAnalyses(@NotNull String projectName,
+  public void exportProjectAnalyses(@Nonnull String projectName,
                                     OutputStream outputStream,
                                     boolean lastResult) throws IOException {
     Assert.isTrue(!Strings.isNullOrEmpty(projectName), "Project name cannot be empty or null.");
@@ -61,8 +57,8 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   }
 
   @Override
-  public void exportProjectTableAnalyses(@NotNull String projectName,
-                                         @NotNull String tableName,
+  public void exportProjectTableAnalyses(@Nonnull String projectName,
+                                         @Nonnull String tableName,
                                          OutputStream outputStream,
                                          boolean lastResult) throws IOException {
     Assert.isTrue(!Strings.isNullOrEmpty(projectName), "Project name cannot be empty or null.");
@@ -76,10 +72,10 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   }
 
   @Override
-  public void exportProjectAnalysis(@NotNull String projectName,
-                                    @NotNull String tableName,
-                                    @NotNull String analysisName,
-                                    @NotNull OutputStream outputStream,
+  public void exportProjectAnalysis(@Nonnull String projectName,
+                                    @Nonnull String tableName,
+                                    @Nonnull String analysisName,
+                                    @Nonnull OutputStream outputStream,
                                     boolean lastResult) throws IOException {
 
     Assert.isTrue(!Strings.isNullOrEmpty(analysisName), "Analysis ID cannot be empty or null.");
@@ -89,11 +85,11 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   }
 
   @Override
-  public void exportProjectAnalysisResult(@NotNull String projectName,
-                                          @NotNull String tableName,
-                                          @NotNull String analysisName,
-                                          @NotNull String resultId,
-                                          @NotNull OutputStream outputStream) throws IOException {
+  public void exportProjectAnalysisResult(@Nonnull String projectName,
+                                          @Nonnull String tableName,
+                                          @Nonnull String analysisName,
+                                          @Nonnull String resultId,
+                                          @Nonnull OutputStream outputStream) throws IOException {
 
     Assert.isTrue(!Strings.isNullOrEmpty(analysisName), "Analysis ID cannot be empty or null.");
     Assert.isTrue(!Strings.isNullOrEmpty(resultId), "Result ID cannot be empty or null.");
@@ -118,11 +114,11 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   }
 
   @Override
-  public void exportProjectAnalysisResultReport(@NotNull String projectName,
-                                                @NotNull String tableName,
-                                                @NotNull String analysisName,
-                                                @NotNull String resultId,
-                                                @NotNull OutputStream outputStream) throws IOException {
+  public void exportProjectAnalysisResultReport(@Nonnull String projectName,
+                                                @Nonnull String tableName,
+                                                @Nonnull String analysisName,
+                                                @Nonnull String resultId,
+                                                @Nonnull OutputStream outputStream) throws IOException {
     Path resultsPath = getResultsPath(projectName, tableName, analysisName, resultId);
 
       List<Path> tentativeReports = getTentativeReports(resultsPath);
@@ -147,7 +143,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
 
   }
 
-  private void createZip(@NotNull OutputStream outputStream, boolean lastResult, List<OpalAnalysis> analyses) throws IOException {
+  private void createZip(@Nonnull OutputStream outputStream, boolean lastResult, List<OpalAnalysis> analyses) throws IOException {
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 
       for (OpalAnalysis analyse : analyses) {
@@ -164,7 +160,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
     }
   }
 
-  private void createZip(@NotNull ZipOutputStream zipOutputStream, @NotNull String analysisName, @NotNull OpalAnalysisResult result) throws IOException {
+  private void createZip(@Nonnull ZipOutputStream zipOutputStream, @Nonnull String analysisName, @Nonnull OpalAnalysisResult result) throws IOException {
     String resultId = result.getId();
     String resultPath = Paths.get("analyses", result.getDatasource(), result.getTable(), analysisName, "results", resultId).toString();
 

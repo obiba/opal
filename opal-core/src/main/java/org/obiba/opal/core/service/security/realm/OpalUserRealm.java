@@ -16,17 +16,16 @@ import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Realm for users defined in opal's own users database.
  */
 @Component
-public class OpalUserRealm extends OpalBaseRealm {
+public class OpalUserRealm extends OpalBaseRealm implements InitializingBean {
 
   public static final String OPAL_REALM = "opal-user-realm";
 
@@ -41,9 +40,8 @@ public class OpalUserRealm extends OpalBaseRealm {
 
   private String salt;
 
-  @PostConstruct
-  public void postConstruct() {
-
+  @Override
+  public void afterPropertiesSet() {
     setCacheManager(new MemoryConstrainedCacheManager());
 
     HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher(Sha512Hash.ALGORITHM_NAME);

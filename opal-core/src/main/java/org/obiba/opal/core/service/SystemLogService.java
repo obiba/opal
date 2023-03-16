@@ -17,9 +17,9 @@ import org.apache.commons.io.input.TailerListener;
 import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component
-public class SystemLogService {
+public class SystemLogService implements InitializingBean {
 
   private static final Logger log = LoggerFactory.getLogger(SystemLogService.class);
 
@@ -43,7 +43,11 @@ public class SystemLogService {
 
   private TailBroadcaster opalLogBroadcaster;
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    initialize();
+  }
+
   public void initialize() {
     logsDir = new File(System.getenv().get("OPAL_LOG"));
     if (!logsDir.exists())

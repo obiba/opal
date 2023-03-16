@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -70,7 +69,6 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   private boolean multiProfile;
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(SubjectProfile.class);
   }

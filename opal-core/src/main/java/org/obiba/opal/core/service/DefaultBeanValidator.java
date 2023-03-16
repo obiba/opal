@@ -10,29 +10,28 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 
+import javax.validation.*;
+import java.util.Set;
+
 @Component
-public class DefaultBeanValidator {
+public class DefaultBeanValidator implements InitializingBean {
 
   @Autowired
   private ApplicationContext applicationContext;
 
   private Validator validator;
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    init();
+  }
+
   public void init() {
     ValidatorFactory validatorFactory = Validation.byDefaultProvider() //
         .configure() //
