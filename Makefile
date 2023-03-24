@@ -4,8 +4,6 @@
 version=4.6-SNAPSHOT
 magma_version=4.0-SNAPSHOT
 commons_version=3.0-SNAPSHOT
-java_home=/usr/lib/jvm/java-1.8.0-openjdk-amd64
-java=${java_home}/bin/java
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
 #java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M"
 
@@ -24,7 +22,7 @@ else
 endif
 
 skipTests=false
-mvn_exec=JAVA_HOME=${java_home} mvn -Dmaven.test.skip=${skipTests}
+mvn_exec=mvn -Dmaven.test.skip=${skipTests}
 orientdb_version=2.2.37
 hsqldb_version=2.3.3
 
@@ -77,7 +75,6 @@ server:
 # Launch Opal
 #
 run:
-	export JAVA=${java} && \
 	export OPAL_HOME=${opal_home} && \
 	export JAVA_OPTS=${java_opts} && \
 	sed -i 's/^java $$JAVA_OPTS $$JAVA_DEBUG/java $$JAVA_OPTS/g' ${opal_project}/opal-server/target/opal-server-${version}/bin/opal && \
@@ -87,7 +84,6 @@ run:
 # Launch Opal in debug mode
 #
 debug:
-	export JAVA=${java} && \
 	export OPAL_HOME=${opal_home} && \
 	export JAVA_OPTS=${java_opts} && \
 	sed -i 's/^java $$JAVA_OPTS $$JAVA_DEBUG/java $$JAVA_OPTS/g' ${opal_project}/opal-server/target/opal-server-${version}/bin/opal && \
