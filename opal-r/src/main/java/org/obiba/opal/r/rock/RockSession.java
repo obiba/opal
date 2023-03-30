@@ -14,8 +14,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
@@ -24,13 +22,13 @@ import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -112,7 +110,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         // accept application/octet-stream
         headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
         ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
-        log.debug("eval: {}ms", System.currentTimeMillis()-start);
+        log.debug("eval: {}ms", calculateDuration(start));
         return new RockResult(response.getBody());
       } else {
         // accept application/json
@@ -122,10 +120,11 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         log.trace("R expr: {}", expr);
         log.trace("JSON result: {}", jsonSource);
         RServerResult rval = new RockResult(jsonSource);
-        log.debug("eval: {}ms", System.currentTimeMillis()-start);
+        log.debug("eval: {}ms", calculateDuration(start));
         return rval;
       }
     } catch (RestClientException e) {
+      calculateDuration(start);
       throw new RockServerException("Error while evaluating '" + expr + "'", e);
     }
   }
@@ -133,6 +132,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   @Override
   public void writeFile(String fileName, InputStream in) throws RServerException {
     touch();
+    long start = System.currentTimeMillis();
     try {
       HttpHeaders headers = createHeaders();
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -147,11 +147,13 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
       RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<String> response = restTemplate.postForEntity(builder.toUriString(), requestEntity, String.class);
+      log.debug("write file: {}ms", calculateDuration(start));
       if (!response.getStatusCode().is2xxSuccessful()) {
         log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
         throw new RockServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
       }
     } catch (RestClientException e) {
+      calculateDuration(start);
       throw new RockServerException("File upload failed", e);
     }
   }
@@ -159,6 +161,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   @Override
   public void readFile(String fileName, OutputStream out) throws RServerException {
     touch();
+    long start = System.currentTimeMillis();
     try {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Collections.singletonList(MediaType.ALL));
@@ -171,6 +174,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       restTemplate.execute(builder.build().toUri(), HttpMethod.GET,
           request -> request.getHeaders().putAll(headers),
           (ResponseExtractor<Void>) response -> {
+            calculateDuration(start);
             if (!response.getStatusCode().is2xxSuccessful()) {
               log.error("File download from {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
               throw new RRuntimeException("File download failed: " + response.getStatusCode().getReasonPhrase());
@@ -182,6 +186,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
             return null;
           });
     } catch (RestClientException e) {
+      calculateDuration(start);
       throw new RockServerException("File download failed", e);
     }
   }
@@ -226,7 +231,14 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   // Private methods
   //
 
+  private long calculateDuration(long start) {
+    long elapsed = System.currentTimeMillis() - start;
+    MDC.put("r_duration", elapsed + "");
+    return elapsed;
+  }
+
   private void openSession() throws RServerException {
+    long start = System.currentTimeMillis();
     try {
       RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionsResourceUrl(), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
@@ -234,6 +246,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       this.rockSessionId = info.getId();
     } catch (RestClientException e) {
       throw new RockServerException("Failure when opening a Rock R session", e);
+    } finally {
+      calculateDuration(start);
     }
   }
 
@@ -248,6 +262,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   }
 
   private void closeSession() {
+    long start = System.currentTimeMillis();
     try {
       RestTemplate restTemplate = new RestTemplate();
       restTemplate.exchange(getRSessionResourceUrl(""), HttpMethod.DELETE, new HttpEntity<>(createHeaders()), Void.class);
@@ -258,6 +273,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         log.warn(msg, rockSessionId, e);
       else
         log.warn(msg, rockSessionId);
+    } finally {
+      calculateDuration(start);
     }
   }
 

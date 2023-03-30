@@ -39,11 +39,20 @@
         <b:NavLink ui:field="downloadOpalLogs">
           <ui:msg description="Server logs label">Server logs</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="downloadLatestOpalLogs">
+          <ui:msg description="Server latest logs label">Server logs (latest)</ui:msg>
+        </b:NavLink>
         <b:NavLink ui:field="downloadRestLogs">
           <ui:msg description="Web services logs label">Web services logs</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="downloadLatestRestLogs">
+          <ui:msg description="Web services latest logs label">Web services logs (latest)</ui:msg>
+        </b:NavLink>
         <b:NavLink ui:field="downloadSQLLogs">
           <ui:msg description="SQL logs label">SQL logs</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="downloadLatestSQLLogs">
+          <ui:msg description="SQL latest logs label">SQL logs (latest)</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
     </g:FlowPanel>

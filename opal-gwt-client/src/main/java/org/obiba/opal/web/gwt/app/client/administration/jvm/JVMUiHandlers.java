@@ -16,9 +16,9 @@ public interface JVMUiHandlers extends UiHandlers {
 
   void onGc();
 
-  void onDownloadOpalLogs();
+  void onDownloadOpalLogs(boolean all);
 
-  void onDownloadRestLogs();
+  void onDownloadRestLogs(boolean all);
 
-  void onDownloadSQLLogs();
+  void onDownloadSQLLogs(boolean all);
 }

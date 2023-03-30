@@ -141,18 +141,18 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
   }
 
   @Override
-  public void onDownloadOpalLogs() {
-    fireEvent(new FileDownloadRequestEvent("/system/log/opal.log"));
+  public void onDownloadOpalLogs(boolean all) {
+    fireEvent(new FileDownloadRequestEvent("/system/log/opal.log?all=" + all));
   }
 
   @Override
-  public void onDownloadRestLogs() {
-    fireEvent(new FileDownloadRequestEvent("/system/log/rest.log"));
+  public void onDownloadRestLogs(boolean all) {
+    fireEvent(new FileDownloadRequestEvent("/system/log/rest.log?all=" + all));
   }
 
   @Override
-  public void onDownloadSQLLogs() {
-    fireEvent(new FileDownloadRequestEvent("/system/log/sql.log"));
+  public void onDownloadSQLLogs(boolean all) {
+    fireEvent(new FileDownloadRequestEvent("/system/log/sql.log?all=" + all));
   }
 
   private final class ListEnvironmentAuthorization implements HasAuthorization {

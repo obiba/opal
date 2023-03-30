@@ -135,11 +135,14 @@ public class DataShieldAdministrationView extends ViewWithUiHandlers<DataShieldA
     getUiHandlers().onAddProfile();
   }
 
-
   @UiHandler("downloadLogs")
   void onDownloadLogs(ClickEvent event) {
-    getUiHandlers().onDownloadLogs();
+    getUiHandlers().onDownloadLogs(true);
   }
 
+  @UiHandler("downloadLatestLogs")
+  void onDownloadLatestLogs(ClickEvent event) {
+    getUiHandlers().onDownloadLogs(false);
+  }
 
 }
