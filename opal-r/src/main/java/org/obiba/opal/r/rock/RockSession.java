@@ -13,8 +13,6 @@ package org.obiba.opal.r.rock;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
@@ -25,16 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -114,6 +113,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         log.debug("eval: {}ms", System.currentTimeMillis()-start);
         return new RockResult(response.getBody());
       } else {
+        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
         // accept application/json
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), String.class);
