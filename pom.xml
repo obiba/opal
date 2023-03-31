@@ -70,7 +70,7 @@
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
-    <jettison.version>1.5.2</jettison.version>
+    <jettison.version>1.5.4</jettison.version>
     <jetty.version>9.4.48.v20220622</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
