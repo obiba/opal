@@ -83,8 +83,9 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   @Override
   public Response rm() {
     logInit();
-    DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.RM, "deleting symbol '{}'", getName());
-    return super.rm();
+    Response response = super.rm();
+    DataShieldLog.userLog(newDataShieldContext(), DataShieldLog.Action.RM, "deleted symbol '{}'", getName());
+    return response;
   }
 
   @Override
