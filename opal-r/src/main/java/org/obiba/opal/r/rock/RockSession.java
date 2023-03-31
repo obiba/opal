@@ -233,7 +233,13 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   private long calculateDuration(long start) {
     long elapsed = System.currentTimeMillis() - start;
-    MDC.put("r_duration", elapsed + "");
+    String durationStr = MDC.get("r_duration");
+    if (Strings.isNullOrEmpty(durationStr)) {
+      MDC.put("r_duration", elapsed + "");
+    } else {
+      long duration = Long.parseLong(durationStr) + elapsed;
+      MDC.put("r_duration", duration + "");
+    }
     return elapsed;
   }
 

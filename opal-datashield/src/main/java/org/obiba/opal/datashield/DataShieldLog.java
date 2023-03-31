@@ -49,6 +49,13 @@ public class DataShieldLog {
     MDC.put("ip", ip);
   }
 
+  public static void userDebugLog(DataShieldContext context, Action action, String format, Object... arguments) {
+    if (!userLog.isDebugEnabled()) return;
+    prepare(context, action);
+    userLog.debug(format, arguments);
+    init();
+  }
+
   public static void userDebugLog(String id, Action action, String format, Object... arguments) {
     if (!userLog.isDebugEnabled()) return;
     prepare(id, action);
@@ -83,7 +90,7 @@ public class DataShieldLog {
   private static void prepare(DataShieldContext context, Action action) {
     prepare(context.getRId(), action);
     MDC.put("ds_profile", context.getProfile());
-    MDC.put("ip", context.getClientIP());
+    context.getContextMap().forEach(MDC::put);
   }
 
   private static void prepare(String id, Action action) {

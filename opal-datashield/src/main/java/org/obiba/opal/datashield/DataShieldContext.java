@@ -12,6 +12,8 @@ package org.obiba.opal.datashield;
 
 import org.obiba.datashield.core.DSEnvironment;
 
+import java.util.Map;
+
 public class DataShieldContext {
 
   private final DSEnvironment environment;
@@ -22,14 +24,14 @@ public class DataShieldContext {
 
   private final String rParserVersion;
 
-  private final String clientIP;
+  private final Map<String, String> contextMap;
 
-  public DataShieldContext(DSEnvironment environment, String rid, String profile, String rParserVersion, String clientIP) {
+  public DataShieldContext(DSEnvironment environment, String rid, String profile, String rParserVersion, Map<String, String> contextMap) {
     this.environment = environment;
     this.rid = rid;
     this.profile = profile;
     this.rParserVersion = rParserVersion;
-    this.clientIP = clientIP;
+    this.contextMap = contextMap;
   }
 
   public DSEnvironment getEnvironment() {
@@ -48,7 +50,7 @@ public class DataShieldContext {
     return rParserVersion;
   }
 
-  public String getClientIP() {
-    return clientIP;
+  public Map<String, String> getContextMap() {
+    return contextMap;
   }
 }

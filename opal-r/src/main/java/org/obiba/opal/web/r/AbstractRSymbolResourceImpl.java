@@ -134,11 +134,12 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   Response assignSymbol(UriInfo uri, ROperation rop, boolean async) {
+    ROperation wrop = wrapROperation(rop);
     if (async) {
-      String id = rSession.executeAsync(rop);
+      String id = rSession.executeAsync(wrop);
       return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
     } else {
-      rSession.execute(rop);
+      rSession.execute(wrop);
       return Response.created(getSymbolURI(uri)).build();
     }
   }
@@ -150,6 +151,10 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     return assignSymbol(uri,
         new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, identifiersMapping,
             rClassToApply, identifiersTableService, dataExportService), async);
+  }
+
+  protected ROperation wrapROperation(ROperation rop) {
+    return rop;
   }
 
   protected URI getSymbolURI(UriInfo info) {

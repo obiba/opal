@@ -112,7 +112,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
             rSession.getId(),
             profile.getName(),
             datashieldProfileService.getRParserVersionOrDefault(profile),
-            MDC.get("ip")),
+            MDC.getCopyOfContextMap()),
         serialize);
     if (async) {
       String id = rSession.executeAsync(operation);

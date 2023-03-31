@@ -17,6 +17,7 @@ import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.datashield.r.expr.RScriptGenerator;
 import org.obiba.datashield.r.expr.RScriptGeneratorFactory;
+import org.obiba.opal.datashield.cfg.RestrictedROperation;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
@@ -25,7 +26,7 @@ import org.slf4j.MDC;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult {
+public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult implements RestrictedROperation {
 
   private final String script;
 
@@ -64,7 +65,8 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     prepareOps(context.getEnvironment()).forEach(op -> op.doWithConnection(getConnection()));
   }
 
-  protected String restricted() {
+  @Override
+  public String restrictedScript() {
     return rScriptGenerator.toScript();
   }
 

@@ -10,7 +10,6 @@
 package org.obiba.opal.datashield;
 
 import com.google.common.base.Preconditions;
-import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.r.expr.ParseException;
 import org.slf4j.MDC;
 
@@ -31,16 +30,16 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
   protected void doWithConnection() {
     super.doWithConnection();
     setResult(null);
-    String script = restricted();
+    String script = restrictedScript();
     beforeLog(script);
-    DataShieldLog.userDebugLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
+    DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
     try {
       setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
       beforeLog(script);
-      DataShieldLog.userLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
+      DataShieldLog.userLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
     } catch (Throwable e) {
       beforeLog(script);
-      DataShieldLog.userErrorLog(getContext().getRId(), DataShieldLog.Action.ASSIGN, "evaluation failure '{}'", script);
+      DataShieldLog.userErrorLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluation failure '{}'", script);
       throw e;
     }
   }
@@ -53,7 +52,7 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
   private void beforeLog(String script) {
     MDC.put("ds_eval", script);
     MDC.put("ds_profile", getContext().getProfile());
-    MDC.put("ip", getContext().getClientIP());
     MDC.put("ds_symbol", symbol);
+    getContext().getContextMap().forEach(MDC::put);
   }
 }

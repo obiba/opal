@@ -29,16 +29,16 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   protected void doWithConnection() {
     super.doWithConnection();
     setResult(null);
-    String script = restricted();
+    String script = restrictedScript();
     beforeLog(script);
-    DataShieldLog.userDebugLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
+    DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
     try {
       setResult(eval(script, serialize));
       beforeLog(script);
-      DataShieldLog.userLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", script);
+      DataShieldLog.userLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", script);
     } catch (Throwable e) {
       beforeLog(script);
-      DataShieldLog.userErrorLog(getContext().getRId(), DataShieldLog.Action.AGGREGATE, "evaluation failure '{}'", script);
+      DataShieldLog.userErrorLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluation failure '{}'", script);
       throw e;
     }
   }
@@ -46,6 +46,6 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   private void beforeLog(String script) {
     MDC.put("ds_eval", script);
     MDC.put("ds_profile", getContext().getProfile());
-    MDC.put("ip", getContext().getClientIP());
+    getContext().getContextMap().forEach(MDC::put);
   }
 }
