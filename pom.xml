@@ -66,7 +66,7 @@
     <hibernate-validator.version>6.2.4.Final</hibernate-validator.version>
     <hsqldb.version>2.3.3</hsqldb.version>
     <httpclient.version>4.5.13</httpclient.version>
-    <jackson.version>2.13.4</jackson.version>
+    <jackson.version>2.14.2</jackson.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
