@@ -80,7 +80,7 @@
     <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
     <json.version>20230227</json.version>
-    <json-smart.version>2.3.1</json-smart.version>
+    <json-smart.version>2.4.9</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.13.2</junit.version>
