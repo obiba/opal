@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +144,7 @@ public class RockResultTest {
     Map<String, Object> map = (Map<String, Object>) obj;
     Assert.assertTrue(map.get("string") instanceof String);
     Assert.assertTrue(map.get("integer") instanceof Integer);
-    Assert.assertTrue(map.get("numeric") instanceof Double);
+    Assert.assertTrue(map.get("numeric") instanceof BigDecimal);
     Assert.assertTrue(map.get("list") instanceof List);
     Assert.assertTrue(map.get("object") instanceof Map);
   }
