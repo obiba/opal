@@ -82,7 +82,7 @@ public class OpalRSessionManager {
   @Value("${org.obiba.opal.r.sessionTimeout.View}")
   private Long rSessionTimeoutView;
 
-  @Value("${org.obiba.opal.r.quota.workspaces.expires:365}")
+  @Value("${org.obiba.opal.r.workspaces.expires:365}")
   private long rWorkspaceExpires;
 
   @Autowired
