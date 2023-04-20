@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.datashield;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.obiba.datashield.core.DSEnvironment;
@@ -16,36 +17,43 @@ import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.datashield.r.expr.RScriptGenerator;
 import org.obiba.datashield.r.expr.RScriptGeneratorFactory;
+import org.obiba.opal.datashield.cfg.RestrictedROperation;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.ROperations;
+import org.slf4j.MDC;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult {
+public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult implements RestrictedROperation {
 
   private final String script;
 
-
-  private final DSEnvironment environment;
-
   private final RScriptGenerator rScriptGenerator;
 
+  private final DataShieldContext context;
+
   @SuppressWarnings("ConstantConditions")
-  public AbstractRestrictedRScriptROperation(String script, DSEnvironment environment,
-                                             String rParserVersion) throws ParseException {
+  public AbstractRestrictedRScriptROperation(String script, DataShieldContext context) throws ParseException {
     Preconditions.checkArgument(script != null, "script cannot be null");
-    Preconditions.checkArgument(environment != null, "environment cannot be null");
-    Preconditions.checkArgument(rParserVersion != null, "R parser version cannot be null");
+    Preconditions.checkArgument(context.getEnvironment() != null, "environment cannot be null");
+    Preconditions.checkArgument(context.getRParserVersion() != null, "R parser version cannot be null");
 
     this.script = script;
-    this.environment = environment;
-    DataShieldLog.userLog("parsing '{}'", script);
+    this.context = context;
+    MDC.put("ds_script_in", script);
     try {
-      this.rScriptGenerator = RScriptGeneratorFactory.make(rParserVersion, environment, script);
+      this.rScriptGenerator = RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script);
+      String toScript = rScriptGenerator.toScript();
+      String mapped = Joiner.on(";").join(rScriptGenerator.getMappedFunctions().entrySet().stream()
+          .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+          .collect(Collectors.toList()));
+      MDC.put("ds_script_out", toScript);
+      MDC.put("ds_map", mapped);
+      DataShieldLog.userLog(context, DataShieldLog.Action.PARSE, "parsed '{}'", toScript);
     } catch (Throwable e) {
-      DataShieldLog.userLog("Script failed validation: " + e.getMessage());
+      DataShieldLog.userErrorLog(context, DataShieldLog.Action.PARSE, "Script failed validation: {}", e.getMessage());
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);
@@ -54,11 +62,16 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   @Override
   protected void doWithConnection() {
-    prepareOps(environment).forEach(op -> op.doWithConnection(getConnection()));
+    prepareOps(context.getEnvironment()).forEach(op -> op.doWithConnection(getConnection()));
   }
 
-  protected String restricted() {
+  @Override
+  public String restrictedScript() {
     return rScriptGenerator.toScript();
+  }
+
+  public DataShieldContext getContext() {
+    return context;
   }
 
   /**

@@ -193,6 +193,9 @@ jennite:
 log:
 	tail -f ${opal_home}/logs/opal.log
 
+log-agent:
+	logagent --yaml -g '${opal_home}/logs/*.log'
+
 #
 # Delete all log files
 #

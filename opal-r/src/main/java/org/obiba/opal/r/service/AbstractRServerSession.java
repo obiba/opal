@@ -12,13 +12,18 @@ package org.obiba.opal.r.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.service.event.RServerSessionClosedEvent;
+import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
+import org.obiba.opal.r.service.event.RServerSessionUpdatedEvent;
 import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.util.Collections;
@@ -39,6 +44,8 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   protected final TransactionalThreadFactory transactionalThreadFactory;
 
+  protected final EventBus eventBus;
+
   protected final Lock lock = new ReentrantLock();
 
   private final String id;
@@ -52,8 +59,6 @@ public abstract class AbstractRServerSession implements RServerSession {
   private boolean busy = false;
 
   private String executionContext = DEFAULT_CONTEXT;
-
-  private final String clusterName;
 
   private final String serverName;
 
@@ -78,13 +83,17 @@ public abstract class AbstractRServerSession implements RServerSession {
    */
   private int commandId = 1;
 
-  protected AbstractRServerSession(String clusterName, String serverName, String id, String user, TransactionalThreadFactory transactionalThreadFactory) {
+  private long executionTimeMillis = 0;
+
+  private long startExecMillis = -1;
+
+  protected AbstractRServerSession(String serverName, String id, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
     this.id = id;
     this.user = user;
     this.transactionalThreadFactory = transactionalThreadFactory;
+    this.eventBus = eventBus;
     this.created = new Date();
     this.timestamp = created;
-    this.clusterName = clusterName;
     this.serverName = serverName;
   }
 
@@ -120,6 +129,19 @@ public abstract class AbstractRServerSession implements RServerSession {
   @Override
   public boolean isBusy() {
     return busy;
+  }
+
+  @Override
+  public long getTotalExecutionTimeMillis() {
+    if (busy && startExecMillis > 0)
+      return executionTimeMillis + (System.currentTimeMillis() - startExecMillis);
+    else
+      return executionTimeMillis;
+  }
+
+  @Override
+  public long getCurrentExecutionTimeMillis() {
+    return busy && startExecMillis > 0 ? System.currentTimeMillis() - startExecMillis : 0;
   }
 
   @Override
@@ -173,6 +195,10 @@ public abstract class AbstractRServerSession implements RServerSession {
     });
   }
 
+  @Override
+  public void close() {
+    eventBus.post(new RServerSessionClosedEvent(id, user));
+  }
 
   //
   // RASyncOperationTemplate
@@ -230,6 +256,16 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   protected synchronized void setBusy(boolean busy) {
     this.busy = busy;
+    if (busy) {
+      startExecMillis = System.currentTimeMillis();
+      if (executionTimeMillis == 0)
+        eventBus.post(new RServerSessionStartedEvent(id, user, executionContext, profile.getName(), created));
+    }
+    else if (startExecMillis > 0) {
+      executionTimeMillis = executionTimeMillis + (System.currentTimeMillis() - startExecMillis);
+      startExecMillis = -1;
+      eventBus.post(new RServerSessionUpdatedEvent(id, user, executionTimeMillis));
+    }
   }
 
   /**

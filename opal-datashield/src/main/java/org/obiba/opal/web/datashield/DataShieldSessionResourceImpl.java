@@ -13,6 +13,8 @@ import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.datashield.DataShieldContext;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -21,6 +23,7 @@ import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
 import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -60,12 +63,56 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     return aggregate(async, body, RSerialize.JSON);
   }
 
+  @Override
+  public Response lsBinary() {
+    beforeLog();
+    try {
+      Response response = super.lsBinary();
+      DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.LS, "list symbols");
+      return response;
+    } catch (Throwable e) {
+      DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.LS, "list symbols failed: {}", e.getMessage());
+      throw e;
+    }
+  }
+
+  @Override
+  public Response lsJSON() {
+    beforeLog();
+    try {
+      Response response = super.lsJSON();
+      DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.LS, "list symbols");
+      return response;
+    } catch (Throwable e) {
+      DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.LS, "list symbols failed: {}", e.getMessage());
+      throw e;
+    }
+  }
+
+  @Override
+  public Response removeRSession(String saveId) {
+    beforeLog();
+    try {
+      Response response = super.removeRSession(saveId);
+      DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.CLOSE, "closed datashield session {}", getRServerSession().getId());
+      return response;
+    } catch (Throwable e) {
+      DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.CLOSE, "close datashield session {} failed: {}", getRServerSession().getId(), e.getMessage());
+      throw e;
+    }
+  }
+
   private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {
     RServerSession rSession = getRServerSession();
     DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    DataShieldLog.init();
     ROperationWithResult operation = new RestrictedRScriptROperation(body,
-        profile.getEnvironment(DSMethodType.AGGREGATE),
-        datashieldProfileService.getRParserVersionOrDefault(profile),
+        new DataShieldContext(
+            profile.getEnvironment(DSMethodType.AGGREGATE),
+            rSession.getId(),
+            profile.getName(),
+            datashieldProfileService.getRParserVersionOrDefault(profile),
+            MDC.getCopyOfContextMap()),
         serialize);
     if (async) {
       String id = rSession.executeAsync(operation);
@@ -94,5 +141,46 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   @Override
   protected String getExecutionContext() {
     return DatashieldSessionsResourceImpl.DS_CONTEXT;
+  }
+
+  @Override
+  public Response saveWorkspace(String saveId) {
+    beforeLog();
+    try {
+      Response response = super.saveWorkspace(saveId);
+      if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+        DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.WS_SAVE, "workspace saved: {}", saveId);
+      } else {
+        DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.WS_SAVE, "workspace save failed: {}", saveId);
+      }
+      return response;
+    } catch (Throwable e) {
+      DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.WS_SAVE, "workspace save failed: {}, {}", saveId, e.getMessage());
+      throw e;
+    }
+  }
+
+  @Override
+  public Response restoreWorkspace(String workspaceId) {
+    beforeLog();
+    try {
+      Response response = super.restoreWorkspace(workspaceId);
+      if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+        DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.WS_RESTORE, "workspace restored: {}", workspaceId);
+      } else {
+        DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.WS_RESTORE, "workspace restore failed: {}", workspaceId);
+      }
+      return response;
+    } catch (Throwable e) {
+      DataShieldLog.userErrorLog(getRServerSession().getId(), DataShieldLog.Action.WS_RESTORE, "workspace restore failed: {}, {}", workspaceId, e.getMessage());
+      throw e;
+    }
+  }
+
+  private void beforeLog() {
+    DataShieldLog.init();
+    RServerSession rSession = getRServerSession();
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    MDC.put("ds_profile", profile.getName());
   }
 }

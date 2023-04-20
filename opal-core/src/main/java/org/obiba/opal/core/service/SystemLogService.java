@@ -21,6 +21,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -53,16 +56,32 @@ public class SystemLogService {
     return new File(logsDir, OPAL_LOG_FILE);
   }
 
+  public List<File> getOpalLogFiles() {
+    return getLogFiles("opal");
+  }
+
   public File getDatashieldLogFile() {
     return new File(logsDir, DATASHIELD_LOG_FILE);
+  }
+
+  public List<File> getDatashieldLogFiles() {
+    return getLogFiles("datashield");
   }
 
   public File getRestLogFile() {
     return new File(logsDir, REST_LOG_FILE);
   }
 
+  public List<File> getRestLogFiles() {
+    return getLogFiles("rest");
+  }
+
   public File getSQLLogFile() {
     return new File(logsDir, SQL_LOG_FILE);
+  }
+
+  public List<File> getSQLLogFiles() {
+    return getLogFiles("sql");
   }
 
   public void subscribeOpalLog(TailerListener tailer) {
@@ -71,6 +90,16 @@ public class SystemLogService {
 
   public void unSubscribeOpalLog(TailerListener tailer) {
     opalLogBroadcaster.unregister(tailer);
+  }
+
+  private List<File> getLogFiles(String prefix) {
+    List<File> logs = Lists.newArrayList();
+    File[] logFiles = logsDir.listFiles(f -> f.isFile() && f.getName().endsWith(".log") && f.getName().startsWith(prefix));
+    if (logFiles != null) {
+      Arrays.sort(logFiles, Comparator.comparingLong(File::lastModified));
+      logs = Arrays.asList(logFiles);
+    }
+    return logs;
   }
 
   private class TailBroadcaster extends TailerListenerAdapter {

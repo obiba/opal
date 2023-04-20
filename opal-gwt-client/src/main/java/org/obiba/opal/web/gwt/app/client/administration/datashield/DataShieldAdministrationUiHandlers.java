@@ -14,7 +14,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface DataShieldAdministrationUiHandlers extends UiHandlers {
 
-  void onDownloadLogs();
+  void onDownloadLogs(boolean all);
 
   void onAddProfile();
 }

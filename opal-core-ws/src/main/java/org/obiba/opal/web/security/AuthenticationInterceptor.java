@@ -44,7 +44,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   @Nullable
   @Override
-  public Response preProcess(HttpRequest request, ResourceMethodInvoker method)
+  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method)
       throws Failure, WebApplicationException {
     // Check authentication before processing.
     // If resource requires authentication and user is not authenticated, return "401: Unauthorized"

@@ -76,7 +76,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   @Nullable
   @Override
-  public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
+  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method) {
     if(OPTIONS.equals(request.getHttpMethod())) {
       // Allow header will be added on postProcess
       return Response.ok().build();

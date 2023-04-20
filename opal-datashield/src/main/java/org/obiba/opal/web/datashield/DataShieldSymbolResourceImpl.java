@@ -11,13 +11,20 @@ package org.obiba.opal.web.datashield;
 
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.r.expr.ParseException;
+import org.obiba.opal.core.service.NoSuchResourceReferenceException;
+import org.obiba.opal.core.service.ResourceAssignException;
+import org.obiba.opal.datashield.DataShieldContext;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
+import org.obiba.opal.datashield.cfg.RestrictedROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RServerConnection;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -43,32 +50,42 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   @Override
   public Response putTable(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName, String identifiersMapping, String rClass, boolean async) {
-    DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
+    logInit();
+    MDC.put("ds_table", path);
     return super.putTable(uri, path, variableFilter, withMissings, idName, identifiersMapping, rClass, async);
   }
 
   @Override
   public Response putResource(UriInfo uri, String path, boolean async) {
-    DataShieldLog.userLog("creating symbol '{}' from opal resource '{}'", getName(), path);
-    return super.putResource(uri, path, async);
+    logInit();
+    MDC.put("ds_resource", path);
+    try {
+      return super.putResource(uri, path, async);
+    } catch (NoSuchResourceReferenceException | ResourceAssignException e) {
+      DataShieldLog.userErrorLog(newDataShieldContext(), DataShieldLog.Action.ASSIGN, "assignment failure from '{} <- resource[{}]': {}", getName(), path, e.getMessage());
+      throw e;
+    }
   }
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) throws Exception {
-    DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
+    logInit();
     return putRestrictedRScript(uri, script, async);
   }
 
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
-    DataShieldLog.userLog("creating text symbol '{}' as '{}'", getName(), content);
+    logInit();
+    MDC.put("ds_expr", String.format("\"%s\"", content));
     return super.putString(uri, content, async);
   }
 
   @Override
   public Response rm() {
-    DataShieldLog.userLog("deleting symbol '{}'", getName());
-    return super.rm();
+    logInit();
+    Response response = super.rm();
+    DataShieldLog.userLog(newDataShieldContext(), DataShieldLog.Action.RM, "deleted symbol '{}'", getName());
+    return response;
   }
 
   @Override
@@ -82,10 +99,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   }
 
   protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) throws ParseException {
-    DataShieldProfile profile = (DataShieldProfile) getRServerSession().getProfile();
-    ROperation rop = new RestrictedAssignmentROperation(getName(), content,
-        profile.getEnvironment(DSMethodType.ASSIGN),
-        datashieldProfileService.getRParserVersionOrDefault(profile));
+    ROperation rop = new RestrictedAssignmentROperation(getName(), content, newDataShieldContext());
     if (async) {
       String id = getRServerSession().executeAsync(rop);
       return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -110,5 +124,60 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
       rClassToApply = MagmaAssignROperation.RClass.TIBBLE_WITH_FACTORS;
     }
     return rClassToApply;
+  }
+
+  @Override
+  protected ROperation wrapROperation(ROperation rop) {
+    if (!(rop instanceof RestrictedROperation)) {
+      return new DataShieldROperation(newDataShieldContext(), getName(), rop);
+    }
+    return super.wrapROperation(rop);
+  }
+
+  private DataShieldContext newDataShieldContext() {
+    DataShieldProfile profile = (DataShieldProfile) getRServerSession().getProfile();
+    return new DataShieldContext(
+        profile.getEnvironment(DSMethodType.ASSIGN),
+        getRServerSession().getId(),
+        profile.getName(),
+        datashieldProfileService.getRParserVersionOrDefault(profile),
+        MDC.getCopyOfContextMap());
+  }
+
+  private void logInit() {
+    DataShieldLog.init();
+    RServerSession rSession = getRServerSession();
+    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    MDC.put("ds_id", rSession.getId());
+    MDC.put("ds_profile", profile.getName());
+    MDC.put("ds_symbol", getName());
+  }
+
+  private class DataShieldROperation implements ROperation {
+
+    private final DataShieldContext context;
+
+    private final String symbol;
+
+    private final ROperation wrapped;
+
+    private DataShieldROperation(DataShieldContext context, String symbol, ROperation wrapped) {
+      this.context = context;
+      this.symbol = symbol;
+      this.wrapped = wrapped;
+    }
+
+    @Override
+    public void doWithConnection(RServerConnection connection) {
+      MDC.put("ds_symbol", symbol);
+      context.getContextMap().forEach(MDC::put);
+      try {
+        wrapped.doWithConnection(connection);
+        DataShieldLog.userLog(context, DataShieldLog.Action.ASSIGN, "created symbol '{}' from: '{}'", symbol, wrapped.toString());
+      } catch (Exception e) {
+        DataShieldLog.userErrorLog(context, DataShieldLog.Action.ASSIGN, "assignment failure from '{}': {}", wrapped.toString(), e.getMessage());
+        throw e;
+      }
+    }
   }
 }

@@ -31,6 +31,20 @@ public interface RServerSession extends RASyncOperationTemplate {
 
   boolean isBusy();
 
+  /**
+   * Cumulated execution time.
+   *
+   * @return
+   */
+  long getTotalExecutionTimeMillis();
+
+  /**
+   * When busy, get commands execution time otherwise returns 0.
+   *
+   * @return
+   */
+  long getCurrentExecutionTimeMillis();
+
   void setExecutionContext(String executionContext);
 
   String getExecutionContext();

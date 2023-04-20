@@ -21,12 +21,15 @@ public class ResourceAssignROperation extends AbstractROperation {
 
   private final String symbol;
 
+  private final String project;
+
   private final Resource resource;
 
   private final List<String> requiredPackages;
 
-  public ResourceAssignROperation(String symbol, Resource resource, List<String> requiredPackages) {
+  public ResourceAssignROperation(String symbol, String project, Resource resource, List<String> requiredPackages) {
     this.symbol = symbol;
+    this.project = project;
     this.resource = resource;
     this.requiredPackages = requiredPackages;
   }
@@ -58,9 +61,7 @@ public class ResourceAssignROperation extends AbstractROperation {
 
   @Override
   public String toString() {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(symbol).append(" <- resource(").append(resource.getName()).append(")\n");
-    return buffer.toString();
+    return String.format("%s <- resource[%s.%s]", symbol, project, resource.getName());
   }
 
 }

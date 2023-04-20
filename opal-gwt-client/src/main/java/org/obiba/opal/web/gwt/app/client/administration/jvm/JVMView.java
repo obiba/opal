@@ -214,17 +214,32 @@ public class JVMView extends ViewWithUiHandlers<JVMUiHandlers> implements JVMPre
 
   @UiHandler("downloadOpalLogs")
   void onDownloadOpalLogs(ClickEvent event) {
-    getUiHandlers().onDownloadOpalLogs();
+    getUiHandlers().onDownloadOpalLogs(true);
   }
 
   @UiHandler("downloadRestLogs")
   void onDownloadRestLogs(ClickEvent event) {
-    getUiHandlers().onDownloadRestLogs();
+    getUiHandlers().onDownloadRestLogs(true);
   }
 
   @UiHandler("downloadSQLLogs")
   void onDownloadSQLLogs(ClickEvent event) {
-    getUiHandlers().onDownloadSQLLogs();
+    getUiHandlers().onDownloadSQLLogs(true);
+  }
+
+  @UiHandler("downloadLatestOpalLogs")
+  void onDownloadLatestOpalLogs(ClickEvent event) {
+    getUiHandlers().onDownloadOpalLogs(false);
+  }
+
+  @UiHandler("downloadLatestRestLogs")
+  void onDownloadLatestRestLogs(ClickEvent event) {
+    getUiHandlers().onDownloadRestLogs(false);
+  }
+
+  @UiHandler("downloadLatestSQLLogs")
+  void onDownloadLatestSQLLogs(ClickEvent event) {
+    getUiHandlers().onDownloadSQLLogs(false);
   }
 
   private void updateGcChart(OpalStatus status, double timestamp) {// Garbage collectors

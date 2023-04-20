@@ -24,6 +24,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -61,8 +62,9 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
       throws Failure, WebApplicationException {
     new RequestCycle(request, method);
 
+    HttpServletRequest httpServletRequest = requestAttributesProvider.currentRequestAttributes().getRequest();
     for (RequestCyclePreProcess p : preProcesses) {
-      Response r = p.preProcess(request, method);
+      Response r = p.preProcess(httpServletRequest, request, method);
       if (r != null) {
         return r instanceof ServerResponse
             ? (ServerResponse) r
@@ -77,8 +79,9 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   public void postProcess(ServerResponse response) {
     RequestCycle cycle = getCurrentCycle();
     if (cycle != null) {
+      HttpServletRequest httpServletRequest = requestAttributesProvider.currentRequestAttributes().getRequest();
       for (RequestCyclePostProcess p : postProcesses) {
-        p.postProcess(requestAttributesProvider.currentRequestAttributes().getRequest(), cycle.request, cycle.resourceMethod, response);
+        p.postProcess(httpServletRequest, cycle.request, cycle.resourceMethod, response);
       }
     }
   }

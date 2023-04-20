@@ -46,6 +46,8 @@ message RSessionDto {
   required string profile = 8;
   required string cluster = 9;
   required string server = 10;
+  required int64 currentExecutionTimeMillis = 11;
+  required int64 totalExecutionTimeMillis = 12;
 }
 
 message RPackageDto {

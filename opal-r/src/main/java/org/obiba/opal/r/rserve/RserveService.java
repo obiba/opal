@@ -10,6 +10,7 @@
 package org.obiba.opal.r.rserve;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
@@ -97,7 +98,7 @@ public class RserveService implements RServerService, ROperationTemplate {
    */
   @Override
   public synchronized void execute(ROperation rop) {
-    String user = "opal";
+    String user = "opal/system";
     try {
       Object principal = SecurityUtils.getSubject().getPrincipal();
       if (principal != null) user = principal.toString();
@@ -155,7 +156,8 @@ public class RserveService implements RServerService, ROperationTemplate {
   @Override
   public RServerSession newRServerSession(String user) {
     RServerConnection rConnection = newConnection();
-    RserveSession session = new RserveSession(getName(), (RserveConnection) rConnection, transactionalThreadFactory, user);
+    RserveSession session = new RserveSession(getName(), (RserveConnection) rConnection, transactionalThreadFactory,
+        Strings.isNullOrEmpty(user) ? "opal/system" : user, eventBus);
     sessions.add(session);
     return session;
   }

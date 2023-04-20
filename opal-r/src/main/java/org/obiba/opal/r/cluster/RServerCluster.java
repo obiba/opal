@@ -13,11 +13,9 @@ package org.obiba.opal.r.cluster;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
+import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
-import org.obiba.opal.r.service.RServerClusterService;
-import org.obiba.opal.r.service.RServerService;
-import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RPackageInstalledEvent;
 import org.obiba.opal.r.service.event.RPackageRemovedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
@@ -142,12 +140,21 @@ public class RServerCluster implements RServerClusterService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    return getNextRServerService().newRServerSession(user);
+    RServerSession session = getNextRServerService().newRServerSession(user);
+    session.setProfile(asProfile());
+    return session;
   }
 
   @Override
   public void execute(ROperation rop) throws RServerException {
-    getNextRServerService().execute(rop);
+    Object principal = SecurityUtils.getSubject().getPrincipal();
+    RServerSession rSession = getNextRServerService().newRServerSession(principal == null ? "opal/system" : principal.toString());
+    rSession.setProfile(asProfile());
+    try {
+      rSession.execute(rop);
+    } finally {
+      rSession.close();
+    }
   }
 
   @Override
@@ -422,6 +429,20 @@ public class RServerCluster implements RServerClusterService {
     } catch (InterruptedException e) {
       log.error("Error while invoking all R servers", e);
     }
+  }
+
+  private RServerProfile asProfile() {
+    return new RServerProfile() {
+      @Override
+      public String getName() {
+        return name;
+      }
+
+      @Override
+      public String getCluster() {
+        return name;
+      }
+    };
   }
 
 }

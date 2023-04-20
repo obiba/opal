@@ -170,8 +170,8 @@ public class DataShieldAdministrationPresenter
   }
 
   @Override
-  public void onDownloadLogs() {
-    fireEvent(new FileDownloadRequestEvent("/system/log/datashield.log"));
+  public void onDownloadLogs(boolean all) {
+    fireEvent(new FileDownloadRequestEvent("/system/log/datashield.log?all=" + all));
   }
 
   @Override

@@ -10,8 +10,8 @@
 package org.obiba.opal.datashield;
 
 import com.google.common.base.Preconditions;
-import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.r.expr.ParseException;
+import org.slf4j.MDC;
 
 /**
  * Parses a restricted R script, executes it and assigns the result to a symbol.
@@ -20,9 +20,8 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
 
   private final String symbol;
 
-  public RestrictedAssignmentROperation(String symbol, String script, DSEnvironment environment,
-                                        String rParserVersion) throws ParseException {
-    super(script, environment, rParserVersion);
+  public RestrictedAssignmentROperation(String symbol, String script, DataShieldContext context) throws ParseException {
+    super(script, context);
     Preconditions.checkArgument(symbol != null, "symbol cannot be null");
     this.symbol = symbol;
   }
@@ -31,13 +30,29 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
   protected void doWithConnection() {
     super.doWithConnection();
     setResult(null);
-    String script = restricted();
-    DataShieldLog.userLog("assigning '{}' with {}", symbol, script);
-    setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
+    String script = restrictedScript();
+    beforeLog(script);
+    DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
+    try {
+      setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
+      beforeLog(script);
+      DataShieldLog.userLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
+    } catch (Throwable e) {
+      beforeLog(script);
+      DataShieldLog.userErrorLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluation failure '{}'", script);
+      throw e;
+    }
   }
 
   @Override
   public boolean isIgnoreResult() {
     return true;
+  }
+
+  private void beforeLog(String script) {
+    MDC.put("ds_eval", script);
+    MDC.put("ds_profile", getContext().getProfile());
+    MDC.put("ds_symbol", symbol);
+    getContext().getContextMap().forEach(MDC::put);
   }
 }

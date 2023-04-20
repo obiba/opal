@@ -76,9 +76,14 @@
                     raw form.
                 </ui:msg>
             </b:Paragraph>
-            <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
-                <ui:msg description="Download datashield logs label">Download</ui:msg>
-            </b:Button>
+            <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" type="INFO">
+                <b:NavLink ui:field="downloadLogs">
+                    <ui:msg description="Datashield logs label">DataSHIELD logs</ui:msg>
+                </b:NavLink>
+                <b:NavLink ui:field="downloadLatestLogs">
+                    <ui:msg description="Datashield latest logs label">DataSHIELD logs (latest)</ui:msg>
+                </b:NavLink>
+            </b:DropdownButton>
         </g:FlowPanel>
 
 

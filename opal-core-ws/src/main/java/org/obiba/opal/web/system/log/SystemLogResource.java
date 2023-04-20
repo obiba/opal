@@ -15,12 +15,16 @@ import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 @Component
 @Path("/system/log")
@@ -32,29 +36,29 @@ public class SystemLogResource {
   @GET
   @Path("opal.log")
   @AuthenticatedByCookie
-  public Response getOpalLog() {
-    return getLog(systemLogService.getOpalLogFile());
+  public Response getOpalLog(@QueryParam("all") @DefaultValue("true") boolean all) {
+    return all ? getLogs("opal.log", systemLogService.getOpalLogFiles()) : getLog(systemLogService.getOpalLogFile());
   }
 
   @GET
   @Path("datashield.log")
   @AuthenticatedByCookie
-  public Response getDatashieldLog() {
-    return getLog(systemLogService.getDatashieldLogFile());
+  public Response getDatashieldLog(@QueryParam("all") @DefaultValue("true") boolean all) {
+    return all ? getLogs("datashield.log", systemLogService.getDatashieldLogFiles()) : getLog(systemLogService.getDatashieldLogFile());
   }
 
   @GET
   @Path("rest.log")
   @AuthenticatedByCookie
-  public Response getRestLog() {
-    return getLog(systemLogService.getRestLogFile());
+  public Response getRestLog(@QueryParam("all") @DefaultValue("true") boolean all) {
+    return all ? getLogs("rest.log", systemLogService.getRestLogFiles()) : getLog(systemLogService.getRestLogFile());
   }
 
   @GET
   @Path("sql.log")
   @AuthenticatedByCookie
-  public Response getSQLLog() {
-    return getLog(systemLogService.getSQLLogFile());
+  public Response getSQLLog(@QueryParam("all") @DefaultValue("true") boolean all) {
+    return all ? getLogs("sql.log", systemLogService.getSQLLogFiles()) : getLog(systemLogService.getSQLLogFile());
   }
 
   private Response getLog(File file) {
@@ -63,4 +67,16 @@ public class SystemLogResource {
         .header("Content-Disposition", "attachment; filename=" + file.getName()).build();
   }
 
+  private Response getLogs(String filename, List<File> files) {
+    StreamingOutput stream = os ->
+        files.forEach(file -> {
+          try {
+            Files.copy(file.toPath(), os);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
+    return Response.ok(stream, "text/plain")
+        .header("Content-Disposition", "attachment; filename=" + filename).build();
+  }
 }

@@ -154,7 +154,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     if (resource == null) {
       throw new ResourceAssignException(project, name, requiredPackages);
     }
-    return new ResourceAssignROperation(symbol, resource, requiredPackages);
+    return new ResourceAssignROperation(symbol, project, resource, requiredPackages);
   }
 
   @Override
