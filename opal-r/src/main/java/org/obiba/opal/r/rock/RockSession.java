@@ -111,6 +111,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         headers.setAccept(Lists.newArrayList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
         ResponseEntity<byte[]> response = restTemplate.exchange(serverUrl, HttpMethod.POST, new HttpEntity<>(expr, headers), byte[].class);
         log.debug("eval: {}ms", calculateDuration(start));
+        MDC.put("r_size", String.format("%s", response.getBody() == null ? 0 : response.getBody().length));
         return new RockResult(response.getBody());
       } else {
         // accept application/json
@@ -121,6 +122,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
         log.trace("JSON result: {}", jsonSource);
         RServerResult rval = new RockResult(jsonSource);
         log.debug("eval: {}ms", calculateDuration(start));
+        MDC.put("r_size", String.format("%s", response.getBody() == null ? 0 : jsonSource.getBytes().length));
         return rval;
       }
     } catch (RestClientException e) {
