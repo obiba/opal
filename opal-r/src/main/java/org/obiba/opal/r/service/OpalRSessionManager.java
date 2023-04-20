@@ -35,6 +35,9 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.ForbiddenException;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +81,9 @@ public class OpalRSessionManager {
 
   @Value("${org.obiba.opal.r.sessionTimeout.View}")
   private Long rSessionTimeoutView;
+
+  @Value("${org.obiba.opal.r.quota.workspaces.expires:365}")
+  private long rWorkspaceExpires;
 
   @Autowired
   private RServerManagerService rServerManagerService;
@@ -278,9 +284,46 @@ public class OpalRSessionManager {
     return getWorkspaces("");
   }
 
+  /**
+   * Check for workspace folders that are older than allowed, every hour.
+   */
+  @Scheduled(fixedDelay = 3600 * 1000)
+  public void removeExpiredWorkspaces() {
+    File workspacesFolder = new File(String.format(WORKSPACES_FORMAT, ""));
+    if (!workspacesFolder.exists()) return;
+    File[] files = workspacesFolder.listFiles();
+    if (files == null) return;
+    for (File context : files) {
+      log.debug("Checking for expired R workspaces in context {}", context.getName());
+      File[] users = context.listFiles();
+      if (users != null) {
+        for (File userFolder : users) {
+          removeExpiredUserWorkspaces(userFolder);
+        }
+      }
+    }
+  }
+
   //
   // private methods
   //
+
+  private void removeExpiredUserWorkspaces(File userFolder) {
+    File[] workspaces = userFolder.listFiles();
+    if (workspaces == null) return;
+    for (File workspace : workspaces) {
+      LocalDate wsDate = new Date(workspace.lastModified()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+      int days = Period.between(wsDate, LocalDate.now()).getDays();
+      if (days > rWorkspaceExpires) {
+        log.info("R Workspace expired: {}/{}/{} ({}d old), removing...", userFolder.getParentFile().getName(), userFolder.getName(), workspace.getName(), days);
+        try {
+          FileUtil.delete(workspace);
+        } catch (IOException e) {
+          log.info("Workspace removal failed", e);
+        }
+      }
+    }
+  }
 
   private synchronized void checkRSessions(String principal) {
     if (!rSessionMap.containsKey(principal)) return;

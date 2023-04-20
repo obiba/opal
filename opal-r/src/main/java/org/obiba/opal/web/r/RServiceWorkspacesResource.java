@@ -44,21 +44,21 @@ public class RServiceWorkspacesResource {
   @GET
   public List<OpalR.RWorkspaceDto> getRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user) {
     List<OpalR.RWorkspaceDto> ws = Lists.newArrayList();
-    opalRSessionManager.getWorkspaces().stream() //
-        .filter(File::isDirectory) //
-        .filter(file -> Strings.isNullOrEmpty(context) || file.getName().equals(context)) //
+    opalRSessionManager.getWorkspaces().stream()
+        .filter(File::isDirectory)
+        .filter(file -> Strings.isNullOrEmpty(context) || file.getName().equals(context))
         .forEach(contextFile -> {
           File[] userFolders = contextFile.listFiles();
           if (userFolders != null) {
-            Lists.newArrayList(userFolders).stream() //
-                .filter(File::isDirectory) //
-                .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user)) //
-                .filter(file -> isUserHomeFolderReadable(file.getName())) //
+            Lists.newArrayList(userFolders).stream()
+                .filter(File::isDirectory)
+                .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user))
+                .filter(file -> isUserHomeFolderReadable(file.getName()))
                 .forEach(userFolder -> {
                   File[] workspaces = userFolder.listFiles();
                   if (workspaces != null) {
-                    ws.addAll(Lists.newArrayList(workspaces).stream().filter(File::isDirectory) //
-                        .map(folder -> Dtos.asDto(contextFile.getName(), userFolder.getName(), folder)) //
+                    ws.addAll(Lists.newArrayList(workspaces).stream().filter(File::isDirectory)
+                        .map(folder -> Dtos.asDto(contextFile.getName(), userFolder.getName(), folder))
                         .collect(Collectors.toList()));
                   }
                 });
@@ -69,22 +69,22 @@ public class RServiceWorkspacesResource {
 
   @DELETE
   public Response removeRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user, @QueryParam("name") String name) {
-    opalRSessionManager.getWorkspaces().stream() //
-        .filter(File::isDirectory) //
-        .filter(file -> Strings.isNullOrEmpty(context) || file.getName().equals(context)) //
+    opalRSessionManager.getWorkspaces().stream()
+        .filter(File::isDirectory)
+        .filter(file -> Strings.isNullOrEmpty(context) || file.getName().equals(context))
         .forEach(contextFile -> {
           File[] userFolders = contextFile.listFiles();
           if (userFolders != null) {
-            Lists.newArrayList(userFolders).stream() //
-                .filter(File::isDirectory) //
-                .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user)) //
-                .filter(file -> isUserHomeFolderReadable(file.getName())) //
+            Lists.newArrayList(userFolders).stream()
+                .filter(File::isDirectory)
+                .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user))
+                .filter(file -> isUserHomeFolderReadable(file.getName()))
                 .forEach(userFolder -> {
                   File[] workspaces = userFolder.listFiles();
                   if (workspaces != null) {
-                    Lists.newArrayList(workspaces).stream() ///
-                        .filter(File::isDirectory) //
-                        .filter(file -> Strings.isNullOrEmpty(name) || file.getName().equals(name)) //
+                    Lists.newArrayList(workspaces).stream()
+                        .filter(File::isDirectory)
+                        .filter(file -> Strings.isNullOrEmpty(name) || file.getName().equals(name))
                         .forEach(file -> {
                           try {
                             FileUtil.delete(file);
