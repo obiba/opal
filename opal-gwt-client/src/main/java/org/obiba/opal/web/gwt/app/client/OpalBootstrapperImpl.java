@@ -146,7 +146,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
         if (generalConf != null && generalConf.hasLogoutURL())
           Window.Location.replace(generalConf.getLogoutURL());
         else
-          Window.Location.replace("/");
+          Window.Location.replace("..");
       }
     });
 

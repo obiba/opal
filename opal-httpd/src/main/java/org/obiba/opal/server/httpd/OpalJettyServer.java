@@ -15,7 +15,7 @@ import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
@@ -39,7 +39,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import javax.annotation.Nullable;
-import javax.servlet.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -106,6 +107,7 @@ public class OpalJettyServer {
     if (!Strings.isNullOrEmpty(contextPath) && !contextPath.startsWith("/") || contextPath.endsWith("/")) {
       throw new IllegalArgumentException("ContextPath must start with '/' and not end with '/'");
     }
+    if (Strings.isNullOrEmpty(contextPath)) contextPath = "/";
 
     // OPAL-2687
     String excludedProtocols = properties.getProperty("org.obiba.opal.ssl.excludedProtocols");
@@ -204,9 +206,9 @@ public class OpalJettyServer {
 
   private Handler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
-    servletContextHandler.setContextPath(Strings.isNullOrEmpty(contextPath) ? "/" : contextPath);
+    servletContextHandler.setContextPath(contextPath);
     servletContextHandler.getSessionHandler().setSessionCookie("JSESSIONID_" + ("-1".equals(httpPort) ? httpsPort : httpPort));
-    servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
+    servletContextHandler.addAliasCheck(new SymlinkAllowedResourceAliasChecker(servletContextHandler));
 
     servletContextHandler.getSessionHandler().setHttpOnly(true);
     servletContextHandler.getSessionHandler().setSecureRequestOnly(true);
@@ -285,7 +287,11 @@ public class OpalJettyServer {
     gzipHandler.setHandler(resourceHandler);
     gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
 
-    return gzipHandler;
+    ContextHandler ctxHandler = new ContextHandler();
+    ctxHandler.setContextPath(contextPath);
+    ctxHandler.setHandler(gzipHandler);
+
+    return ctxHandler;
   }
 
   private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
