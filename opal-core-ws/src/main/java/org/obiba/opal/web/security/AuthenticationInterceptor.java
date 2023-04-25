@@ -20,6 +20,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,9 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     implements RequestCyclePreProcess, RequestCyclePostProcess {
 
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
+
+  @Value("${org.obiba.opal.server.context-path}")
+  private String contextPath;
 
   @Nullable
   @Override
@@ -77,7 +82,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
       response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
-          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, true, true));
+          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), getCookiePath(), null, null, timeout, true, true));
       Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
       if(cookieValue != null) {
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
@@ -87,9 +92,13 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       if(isWebServiceAuthenticated(response.getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
-            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, true, true));
+            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, getCookiePath(), null, "Opal session deleted", 0, true, true));
       }
     }
+  }
+
+  private String getCookiePath() {
+    return Strings.isNullOrEmpty(contextPath) ? "/" : contextPath;
   }
 
   private boolean isOpalCookieValid(HttpRequest request) {

@@ -48,6 +48,9 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
   @Value("${org.obiba.opal.security.login.banTime}")
   private int banTime;
 
+  @Value("${org.obiba.opal.server.context-path}")
+  private String contextPath;
+
   private static final Logger log = LoggerFactory.getLogger(AuthenticationExecutorImpl.class);
 
   private static final String ENSURED_PROFILE = "ensuredProfile";
@@ -64,6 +67,11 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
   @PostConstruct
   public void configure() {
     configureBan(maxTry, trialTime, banTime);
+  }
+
+  @Override
+  public String getContextPath() {
+    return contextPath;
   }
 
   @Override

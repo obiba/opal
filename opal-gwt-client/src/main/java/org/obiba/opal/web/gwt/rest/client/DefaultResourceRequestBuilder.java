@@ -88,7 +88,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       @SuppressWarnings("ParameterHidesMemberVariable") String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource.replaceAll("//", "/");
-    uri = resource.startsWith("http") ? this.resource : OPAL_WS_ROOT + this.resource;
+    uri = resource.startsWith("http") ? this.resource : ".." + OPAL_WS_ROOT + this.resource;
     return this;
   }
 
