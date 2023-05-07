@@ -9,18 +9,6 @@
  */
 package org.obiba.opal.web.ws.provider;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.jboss.resteasy.plugins.providers.jaxb.IgnoredMediaTypes;
-import org.jboss.resteasy.util.Types;
-import org.obiba.opal.web.ws.SortDir;
-import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -28,6 +16,15 @@ import com.google.common.collect.Ordering;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
+import org.jboss.resteasy.util.Types;
+import org.obiba.opal.web.ws.SortDir;
+import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 public class AbstractProtobufProvider {
 
@@ -43,17 +40,16 @@ public class AbstractProtobufProvider {
 
   @SuppressWarnings("unchecked")
   protected Class<Message> extractMessageType(Class<?> type, Type genericType, Annotation[] annotations,
-      MediaType mediaType) {
+                                              MediaType mediaType) {
     return isWrapped(type, genericType, annotations, mediaType)
         ? Types.getCollectionBaseType(type, genericType)
         : (Class<Message>) type;
   }
 
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    if((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
+    if ((Iterable.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      return baseType != null && Message.class.isAssignableFrom(baseType) &&
-          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Message.class.isAssignableFrom(baseType);
     }
     return false;
   }
@@ -68,16 +64,16 @@ public class AbstractProtobufProvider {
    * This method does nothing if the {@code sortField} parameter is missing.
    *
    * @param messageType the type of {@code Message} to sort
-   * @param msgs the {@code Iterable} to sort
+   * @param msgs        the {@code Iterable} to sort
    * @return sorted {@code Iterable} or the original instance untouched when the sort parameters are missing or invalid
    */
   protected Iterable<Message> sort(Class<Message> messageType, Iterable<Message> msgs) {
     MultivaluedMap<String, String> query = requestAttributesProvider.getUriInfo().getQueryParameters();
 
-    if(!query.containsKey("sortField") || Strings.isNullOrEmpty(query.getFirst("sortField"))) return msgs;
+    if (!query.containsKey("sortField") || Strings.isNullOrEmpty(query.getFirst("sortField"))) return msgs;
 
     String fieldName = query.getFirst("sortField");
-    if(Strings.isNullOrEmpty(fieldName)) return msgs;
+    if (Strings.isNullOrEmpty(fieldName)) return msgs;
     SortDir sortDir = Strings.isNullOrEmpty(query.getFirst("sortDir"))
         ? SortDir.ASC
         : SortDir.valueOf(query.getFirst("sortDir"));
@@ -91,26 +87,26 @@ public class AbstractProtobufProvider {
 
     FieldDescriptor sortField = descriptor.findFieldByName(field);
     // Can't sort on repeated fields
-    if(sortField.isRepeated()) return msgs;
+    if (sortField.isRepeated()) return msgs;
     // Can't sort on complex types
-    switch(sortField.getJavaType()) {
+    switch (sortField.getJavaType()) {
       case MESSAGE:
         return msgs;
     }
 
     // Default ordering is natural order with null values last
     Ordering<Comparable<?>> ordering = Ordering.natural().nullsLast();
-    if(sortDir == SortDir.DESC) ordering = ordering.reverse();
+    if (sortDir == SortDir.DESC) ordering = ordering.reverse();
     return sortMessages(msgs, sortField, ordering);
   }
 
   private Iterable<Message> sortMessages(Iterable<Message> msgs, final FieldDescriptor field,
-      Ordering<Comparable<?>> ordering) {
+                                         Ordering<Comparable<?>> ordering) {
     return ordering.onResultOf(new Function<Message, Comparable<?>>() {
       @Override
       public Comparable<?> apply(Message input) {
         Object value = input.getField(field);
-        if(value == null) return null;
+        if (value == null) return null;
         // This can throw a ClassCastException, but we tested JavaType earlier, so it shouldn't
         return Comparable.class.cast(value);
       }

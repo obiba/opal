@@ -9,12 +9,11 @@
  */
 package org.obiba.opal.web.ws.provider;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Collection;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.Message;
+import org.jboss.resteasy.util.Types;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -24,14 +23,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-
-import org.jboss.resteasy.plugins.providers.jaxb.IgnoredMediaTypes;
-import org.jboss.resteasy.util.Types;
-import org.springframework.stereotype.Component;
-
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.Message;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  *
@@ -82,8 +79,7 @@ public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufPr
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      return baseType != null && Message.class.isAssignableFrom(baseType) &&
-          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Message.class.isAssignableFrom(baseType);
     }
     return false;
   }

@@ -25,7 +25,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.plugins.providers.jaxb.IgnoredMediaTypes;
 import org.jboss.resteasy.util.Types;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -71,8 +70,7 @@ public class XStreamVariableReader implements MessageBodyReader<Object> {
   protected boolean isWrapped(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     if((Collection.class.isAssignableFrom(type) || type.isArray()) && genericType != null) {
       Class<?> baseType = Types.getCollectionBaseType(type, genericType);
-      return baseType != null && Variable.class.isAssignableFrom(baseType) &&
-          !IgnoredMediaTypes.ignored(baseType, annotations, mediaType);
+      return baseType != null && Variable.class.isAssignableFrom(baseType);
     }
     return false;
   }
