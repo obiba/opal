@@ -24,9 +24,9 @@ class RockNamedList implements RNamedList<RServerResult> {
   private final Map<String, RServerResult> map = Maps.newLinkedHashMap();
 
   public RockNamedList(JSONObject objectResult) {
-    Iterator keys = objectResult.keys();
+    Iterator<String> keys = objectResult.keys();
     while (keys.hasNext()) {
-      String key = keys.next().toString();
+      String key = keys.next();
       Object value = objectResult.get(key);
       if (value instanceof JSONArray) {
         map.put(key, new RockResult((JSONArray) value));
