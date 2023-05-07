@@ -66,12 +66,12 @@
     <hibernate-validator.version>6.2.4.Final</hibernate-validator.version>
     <hsqldb.version>2.3.3</hsqldb.version>
     <httpclient.version>4.5.13</httpclient.version>
-    <jackson.version>2.13.3</jackson.version>
+    <jackson.version>2.14.3</jackson.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
-    <jettison.version>1.5.2</jettison.version>
-    <jetty.version>9.4.48.v20220622</jetty.version>
+    <jettison.version>1.5.4</jettison.version>
+    <jetty.version>9.4.51.v20230217</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>3.6.2.201501210735-r</jgit.version>
@@ -79,18 +79,18 @@
     <joda-time.version>2.8.2</joda-time.version>
     <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
-    <json.version>20140107</json.version>
-    <json-smart.version>2.3.1</json-smart.version>
+    <json.version>20230227</json.version>
+    <json-smart.version>2.4.10</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.13.2</junit.version>
     <liquibase.version>4.15.0</liquibase.version>
     <liquibase-slf4j.version>4.1.0</liquibase-slf4j.version>
     <lang-tag.version>1.4.4</lang-tag.version>
-    <logback.version>1.2.9</logback.version>
-    <logstash-logback.version>6.6</logstash-logback.version>
+    <logback.version>1.2.11</logback.version>
+    <logstash-logback.version>7.2</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>4.0.3</magma.version>
+    <magma.version>4.0.4</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
@@ -99,7 +99,7 @@
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>3.0.3</obiba-commons.version>
+    <obiba-commons.version>3.0.4</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.2.37</orientdb.version>
@@ -113,18 +113,18 @@
     <resteasy.version>3.0.12.Final</resteasy.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
-    <shiro.version>1.9.1</shiro.version>
+    <shiro.version>1.11.0</shiro.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.12</slf4j.version>
-    <snakeyaml.version>1.32</snakeyaml.version>
-    <spring.version>5.3.26</spring.version>
+    <snakeyaml.version>1.33</snakeyaml.version>
+    <spring.version>5.3.27</spring.version>
     <spring-batch.version>4.3.6</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
     <xmlunit.version>1.6</xmlunit.version>
-    <xstream.version>1.4.19</xstream.version>
+    <xstream.version>1.4.20</xstream.version>
 
     <!-- maven plugins -->
     <github-release-plugin.version>1.2.0</github-release-plugin.version>
