@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.apache.shiro.SecurityUtils;
@@ -270,7 +271,7 @@ public class DefaultCommandJobService implements CommandJobService {
         allFutureCommandJobs.add((FutureCommandJob) runnable);
       }
       for (String project : projectJobsNotStarted.keySet()) {
-        for(Runnable runnable : projectJobsNotStarted.get(project)) {
+        for (Runnable runnable : projectJobsNotStarted.get(project)) {
           allFutureCommandJobs.add((FutureCommandJob) runnable);
         }
       }
@@ -278,7 +279,24 @@ public class DefaultCommandJobService implements CommandJobService {
       allFutureCommandJobs.addAll(getTerminatedJobs());
     }
 
-    return allFutureCommandJobs;
+    return allFutureCommandJobs.stream()
+        .filter(job -> isCommandJobReadable(job.getCommandJob()))
+        .collect(Collectors.toList());
+  }
+
+  private boolean isCommandJobReadable(CommandJob job) {
+    Subject subject = SecurityUtils.getSubject();
+    if (job.hasProject()) {
+      // case no access to project
+      if (!subject.isPermitted("rest:/project/" + job.getProject() + ":GET")) return false;
+      // project admin can see all about the project
+      if (subject.isPermitted("rest:/project/" + job.getProject() + ":POST")) return true;
+      // project regular user can only see own jobs
+      return subject.getPrincipal().toString().equals(job.getOwner());
+    } else {
+      // no project context, only for admins
+      return subject.isPermitted("rest:/" + ":POST");
+    }
   }
 
   BlockingQueue<Runnable> getNotStartedJobs() {
