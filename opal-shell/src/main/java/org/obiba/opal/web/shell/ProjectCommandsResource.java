@@ -313,13 +313,13 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   }
 
   private void ensureFileWriteAccess(String path) {
-    if(!SecurityUtils.getSubject().isPermitted("rest:/file" + path + ":POST")) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/files" + path + ":POST")) {
       throw new InvalidRequestException("FileWriteNotAuthorized", path);
     }
   }
 
   private void ensureFileReadAccess(String path) {
-    if(!SecurityUtils.getSubject().isPermitted("rest:/file" + path + ":GET")) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/files" + path + ":GET")) {
       throw new InvalidRequestException("FileReadNotAuthorized", path);
     }
   }
