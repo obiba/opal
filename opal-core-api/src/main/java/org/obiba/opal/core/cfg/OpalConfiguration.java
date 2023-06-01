@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
+import java.util.stream.Collectors;
 
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.runtime.Version;
@@ -54,9 +55,9 @@ public class OpalConfiguration {
     return secretKey;
   }
 
-  public int getSeed() {
-    int seed = getSecretKey().chars().sum();
-    return seed;
+  public long getSeed() {
+    String seed = getSecretKey().chars().mapToObj(c -> String.format("%s", c)).collect(Collectors.joining()).substring(0, 18);
+    return Long.parseLong(seed);
   }
 
   public void setFileSystemRoot(String fileSystemRoot) {
