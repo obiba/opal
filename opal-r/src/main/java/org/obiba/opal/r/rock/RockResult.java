@@ -39,7 +39,7 @@ class RockResult implements RServerResult {
   }
 
   public RockResult(String jsonSource) {
-    if (jsonSource.equals("{}"))
+    if (jsonSource == null || jsonSource.equals("{}"))
       jsonResult = null;
     else {
       if (jsonSource.startsWith("{"))
