@@ -11,6 +11,7 @@ package org.obiba.opal.web.datashield;
 
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -47,6 +48,9 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   @Autowired
   private OpalConfigurationService configurationService;
+
+  @Autowired
+  private CryptoService cryptoService;
 
   @Override
   public List<OpalR.RSessionDto> getRSessions() {
@@ -91,8 +95,19 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
       rSession.execute(
           new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
     }
-    rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", configurationService.getOpalConfiguration().getSeed())));
+    rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", getSeed())));
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
+  }
+
+  /**
+   * Large seed value, should be smaller than R maximum integer value: .Machine$integer.max.
+   *
+   * @return
+   */
+  private long getSeed() {
+    String seed = cryptoService.encrypt(configurationService.getOpalConfiguration().getSecretKey())
+        .chars().mapToObj(c -> String.format("%s", c)).collect(Collectors.joining()).substring(0, 9);
+    return Long.parseLong(seed) * 2;
   }
 }

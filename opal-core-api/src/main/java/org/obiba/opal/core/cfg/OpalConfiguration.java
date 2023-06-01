@@ -55,10 +55,6 @@ public class OpalConfiguration {
     return secretKey;
   }
 
-  public long getSeed() {
-    String seed = getSecretKey().chars().mapToObj(c -> String.format("%s", c)).collect(Collectors.joining()).substring(0, 18);
-    return Long.parseLong(seed);
-  }
 
   public void setFileSystemRoot(String fileSystemRoot) {
     this.fileSystemRoot = fileSystemRoot;
