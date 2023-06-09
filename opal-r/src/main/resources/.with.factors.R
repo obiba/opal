@@ -8,7 +8,7 @@
             attrs <- attributes(rval[[n]])
             if ("haven_labelled" %in% class(rval[[n]]) && !is.null(attrs$labels)) {
                 if (attrs$opal.nature == 'CATEGORICAL') {
-                    v <- factor(rval[[n]], levels = attrs$labels)
+                    v <- labelled::to_factor(rval[[n]], levels = "values")
                     # restore attributes (without conflicting with factor's ones)
                     for (attr in names(attrs)) {
                         if (!(attr %in% c("levels", "class"))) {
