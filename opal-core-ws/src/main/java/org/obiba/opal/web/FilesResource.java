@@ -120,7 +120,7 @@ public class FilesResource {
 
   private Response getFileInternal(String path, List<String> children, String fileKey) throws IOException {
     if (!Strings.isNullOrEmpty(fileKey) && fileKey.length() < 8) {
-      return Response.status(Status.BAD_REQUEST).entity("The file key is too short (minimum 8 characters).").build();
+      throw new BadRequestException("The file key is too short (minimum 8 characters).");
     }
     FileObject file = resolveFileInFileSystem(path);
     return file.exists()
