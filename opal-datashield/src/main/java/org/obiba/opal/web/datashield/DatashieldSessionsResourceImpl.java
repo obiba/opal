@@ -10,8 +10,8 @@
 package org.obiba.opal.web.datashield;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -21,7 +21,10 @@ import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.RSessionsResourceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,6 +43,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
+  private static final Logger log = LoggerFactory.getLogger(DatashieldSessionsResourceImpl.class);
+
   static final String DS_CONTEXT = "DataSHIELD";
 
   @Autowired
@@ -48,8 +53,8 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   @Autowired
   private OpalConfigurationService configurationService;
 
-  @Autowired
-  private CryptoService cryptoService;
+  @Value("${org.obiba.opal.security.password.nbHashIterations}")
+  private int nbHashIterations;
 
   @Override
   public List<OpalR.RSessionDto> getRSessions() {
@@ -105,8 +110,15 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
    * @return
    */
   private long getSeed() {
-    String seed = cryptoService.encrypt(configurationService.getOpalConfiguration().getSecretKey())
+    String seed = hashPassword(configurationService.getOpalConfiguration().getSecretKey())
         .chars().mapToObj(c -> String.format("%s", c)).collect(Collectors.joining()).substring(0, 9);
-    return Long.parseLong(seed) * 2;
+    long lseed = Long.parseLong(seed) * 2;
+    log.info("datashield.seed = {}", lseed);
+    return lseed;
+  }
+
+  private String hashPassword(String password) {
+    return new Sha512Hash(password, configurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
+        .toString();
   }
 }
