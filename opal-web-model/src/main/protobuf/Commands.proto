@@ -128,3 +128,14 @@ message RestoreCommandOptionsDto {
   optional string password = 2;
   optional bool override = 3 [default = false];
 }
+
+message RPackagesCommandOptionsDto {
+  required string cluster = 1;
+}
+
+message RPackageCommandOptionsDto {
+  required string cluster = 1;
+  required string name = 2;
+  required string manager = 3;
+  optional string ref = 4;
+}

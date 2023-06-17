@@ -70,7 +70,7 @@ public class StatusImageCell extends AbstractCell<String> {
   public void render(Context context, String value, SafeHtmlBuilder sb) {
     // TODO currently can only take a string value  containing one ':', make it more flexible
     if(value != null) {
-      String[] values = value.split(":");
+      String[] values = value.split("::");
       // The template will sanitize the URI.
       if(value.endsWith("%")) {
         sb.append(template.progress(values[0], values[1]));

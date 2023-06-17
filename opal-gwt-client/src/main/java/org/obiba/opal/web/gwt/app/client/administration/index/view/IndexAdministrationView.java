@@ -462,24 +462,24 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     public String getValue(TableIndexStatusDto dto) {
       // In progress
       if (dto.getStatus().getName().equals(IN_PROGRESS.getName())) {
-        return translations.indexInProgress() + ":" + (int) (dto.getProgress() * 100) + "%";
+        return translations.indexInProgress() + "::" + (int) (dto.getProgress() * 100) + "%";
       }
       // Up to date
       if (dto.getStatus().getName().equals(UPTODATE.getName())) {
-        return translations.indexUpToDate() + ":" + StatusImageCell.BULLET_GREEN;
+        return translations.indexUpToDate() + "::" + StatusImageCell.BULLET_GREEN;
       }
       // Out dated but scheduled
       if (dto.getStatus().getName().equals(OUTDATED.getName()) &&
           !dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-        return translations.indexOutdatedScheduled() + ":" + StatusImageCell.BULLET_ORANGE;
+        return translations.indexOutdatedScheduled() + "::" + StatusImageCell.BULLET_ORANGE;
       }
       // Out dated but not scheduled
       if (dto.getStatus().getName().equals(OUTDATED.getName()) &&
           dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-        return translations.indexOutdatedNotScheduled() + ":" + StatusImageCell.BULLET_RED;
+        return translations.indexOutdatedNotScheduled() + "::" + StatusImageCell.BULLET_RED;
       }
       // Unknown status
-      return translations.indexNotScheduled() + ":" + StatusImageCell.BULLET_BLACK;
+      return translations.indexNotScheduled() + "::" + StatusImageCell.BULLET_BLACK;
     }
   }
 }

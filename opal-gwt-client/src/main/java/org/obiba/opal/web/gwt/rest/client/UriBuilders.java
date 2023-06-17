@@ -1158,6 +1158,20 @@ public enum UriBuilders {
     }
   },
 
+  SERVICE_R_CLUSTER_PACKAGES_UPDATE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "commands", "_update");
+    }
+  },
+
+  SERVICE_R_CLUSTER_PACKAGE_INSTALL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r", "cluster", "{}", "commands", "_install");
+    }
+  },
+
   SERVICE_R_CLUSTER_LOG {
     @Override
     public UriBuilder create() {

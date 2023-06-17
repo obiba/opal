@@ -235,15 +235,17 @@ public class RClusterPresenter extends PresenterWidget<RClusterPresenter.Display
       @Override
       public void run() {
         ResourceRequestBuilderFactory.newBuilder()
-            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().build(cluster.getName()))
+            .forResource(UriBuilders.SERVICE_R_CLUSTER_PACKAGES_UPDATE.create().build(cluster.getName()))
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
                 fireEvent(ConfirmationTerminatedEvent.create());
-                refreshPackages();
+                String location = response.getHeader("Location");
+                String jobId = location.substring(location.lastIndexOf('/') + 1);
+                fireEvent(NotificationEvent.newBuilder().info("RPackagesUpdateTask").args(jobId).build());
               }
-            }, SC_OK, SC_INTERNAL_SERVER_ERROR)
-            .put().send();
+            }, SC_CREATED, SC_INTERNAL_SERVER_ERROR)
+            .post().send();
       }
     };
     String title = translations.updateRPackages();

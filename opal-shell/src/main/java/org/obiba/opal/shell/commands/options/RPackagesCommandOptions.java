@@ -7,16 +7,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.obiba.opal.shell.commands.options;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
+import uk.co.flamingpenguin.jewel.cli.Option;
 
 /**
- * This interface declares the options that may be used with the quit command.
- * <p/>
- * Note that there <bold>no</bold> options for this command.
+ * This interface declares the options that may be used with the R command.
  */
-@CommandLineInterface(application = "exit")
-public interface ExitCommandOptions extends HelpOption {
-  // no options
+@CommandLineInterface(application = "update-R-packages")
+public interface RPackagesCommandOptions extends HelpOption {
+  @Option(shortName = "r", description = "The R cluster name.")
+  String getRCluster();
 }

@@ -18,11 +18,13 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.r.event.RPackageInstalledEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.RPackageCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.r.RServerClusterDto;
 
 import static com.google.gwt.http.client.Response.SC_CREATED;
@@ -58,23 +60,29 @@ public class RPackageInstallModalPresenter extends ModalPresenterWidget<RPackage
   }
 
   private void doInstallPackage(final String name, String ref, String manager) {
-    UriBuilder builder = UriBuilders.SERVICE_R_CLUSTER_PACKAGES.create().query("name", name);
+    UriBuilder builder = UriBuilders.SERVICE_R_CLUSTER_PACKAGE_INSTALL.create().query("name", name);
+    RPackageCommandOptionsDto dto = RPackageCommandOptionsDto.create();
+    dto.setCluster(cluster.getName());
+    dto.setName(name);
     if (!Strings.isNullOrEmpty(ref)) {
-      builder.query("ref", ref);
+      dto.setRef(ref);
     }
     if (!Strings.isNullOrEmpty(manager)) {
-      builder.query("manager", manager);
+      dto.setManager(manager);
     }
     getView().setInProgress(true);
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(builder.build(cluster.getName())) //
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(builder.build(cluster.getName()))
+        .withResourceBody(RPackageCommandOptionsDto.stringify(dto))
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hideDialog();
-            fireEvent(new RPackageInstalledEvent(name));
+            String location = response.getHeader("Location");
+            String jobId = location.substring(location.lastIndexOf('/') + 1);
+            fireEvent(NotificationEvent.newBuilder().info("RPackageInstallTask").args(name, jobId).build());
           }
-        }, SC_CREATED, SC_INTERNAL_SERVER_ERROR) //
+        }, SC_CREATED, SC_INTERNAL_SERVER_ERROR)
         .post().send();
   }
 

@@ -53,7 +53,6 @@ public interface CommandRegistry {
    * Returns a new instance of the specified command using the specified arguments.
    *
    * @param name
-   * @param arguments
    * @return
    */
   <T> Command<T> newCommand(String name);

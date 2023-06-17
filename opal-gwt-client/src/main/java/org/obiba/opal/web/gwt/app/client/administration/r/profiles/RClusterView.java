@@ -416,8 +416,8 @@ public class RClusterView extends ViewWithUiHandlers<RClusterUiHandlers>
     @Override
     public String getValue(RServerDto dto) {
       String status = dto.getRunning() ?
-          translations.statusMap().get("RUNNING") + ":" + StatusImageCell.BULLET_GREEN
-          : "STOPPED:" + StatusImageCell.BULLET_RED;
+          translations.statusMap().get("RUNNING") + "::" + StatusImageCell.BULLET_GREEN
+          : translations.statusMap().get("STOPPED") + "::" + StatusImageCell.BULLET_RED;
       return status;
     }
   }

@@ -808,7 +808,9 @@ public interface Translations extends Constants {
       "ProjectBackupFolderIsRequired", "Backup folder is required.",
       "ProjectBackupTask", "Project backup task has been launched. You can follow its progress in the task list.",
       "ProjectRestoreFolderIsRequired", "Backup folder or archive is required.",
-      "ProjectRestoreTask", "Project restore task has been launched. You can follow its progress in the task list."
+      "ProjectRestoreTask", "Project restore task has been launched. You can follow its progress in the task list.",
+      "RPackagesUpdateTask", "The R packages update task can be followed using the Job ID: {0}.",
+      "RPackageInstallTask", "The R package '{0}' installation task can be followed using the Job ID: {1}.",
   })
   Map<String, String> userMessageMap();
 

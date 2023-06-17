@@ -232,16 +232,16 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     public String getValue(RSessionDto dto) {
       // Waiting
       if (dto.getStatus().getName().equals(RSessionStatus.WAITING.getName())) {
-        return translations.statusMap().get(RSessionStatus.WAITING.getName()) + ":" +
+        return translations.statusMap().get(RSessionStatus.WAITING.getName()) + "::" +
             StatusImageCell.BULLET_GREEN;
       }
       // Busy
       if (dto.getStatus().getName().equals(RSessionStatus.BUSY.getName())) {
-        return translations.statusMap().get(RSessionStatus.BUSY.getName()) + ":" +
+        return translations.statusMap().get(RSessionStatus.BUSY.getName()) + "::" +
             StatusImageCell.BULLET_ORANGE;
       }
       // Other
-      return "?:" + StatusImageCell.BULLET_BLACK;
+      return "?::" + StatusImageCell.BULLET_BLACK;
     }
   }
 
