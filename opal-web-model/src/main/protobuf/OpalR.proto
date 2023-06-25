@@ -81,3 +81,22 @@ message RRuntimeErrorDto {
     repeated RRuntimeErrorDto errors = 2001;
   }
 }
+
+message RSessionActivityDto {
+  required string user = 1;
+  required string context = 2;
+  required string profile = 3;
+  required string createdDate = 4;
+  required string updatedDate = 5;
+  required int64 executionTimeMillis = 6;
+}
+
+message RActivitySummaryDto {
+  required string user = 1;
+  required string context = 2;
+  required string profile = 3;
+  required string startDate = 4;
+  required string endDate = 5;
+  required int64 executionTimeMillis = 6;
+  required int32 sessionsCount = 7;
+}
