@@ -43,20 +43,25 @@ public class RActivityService implements SystemService {
   }
 
   public List<RSessionActivity> getActivities(String context, String user, String profile, Date fromDate, Date toDate) {
+    checkAlphanumeric(context);
     Iterable<RSessionActivity> records;
     if (Strings.isNullOrEmpty(user) && Strings.isNullOrEmpty(profile)) {
       String sql = String.format("select * from %s where context = ?", RSessionActivity.class.getSimpleName());
       records = orientDbService.list(RSessionActivity.class,
           sql, context);
     } else if (Strings.isNullOrEmpty(user)) {
+      checkAlphanumeric(profile);
       String sql = String.format("select * from %s where context = ? and profile = ?", RSessionActivity.class.getSimpleName());
       records = orientDbService.list(RSessionActivity.class,
           sql, context, profile);
     } else if (Strings.isNullOrEmpty(profile)) {
+      checkAlphanumeric(user);
       String sql = String.format("select * from %s where context = ? and user = ?", RSessionActivity.class.getSimpleName());
       records = orientDbService.list(RSessionActivity.class,
           sql, context, user);
     } else {
+      checkAlphanumeric(profile);
+      checkAlphanumeric(user);
       String sql = String.format("select * from %s where context = ? and user = ? and profile = ?", RSessionActivity.class.getSimpleName());
       records = orientDbService.list(RSessionActivity.class,
           sql, context, user, profile);
@@ -201,4 +206,15 @@ public class RActivityService implements SystemService {
   private boolean isOpalSystemUser(RServerSessionEvent event) {
     return "opal/system".equals(event.getUser());
   }
+
+  /**
+   * Minimal sanity check.
+   * 
+   * @param name
+   */
+  private void checkAlphanumeric(String name) {
+    if (!name.matches("[a-zA-Z0-9_@\\-\\\\.]+"))
+      throw new IllegalArgumentException("Invalid string: " + name);
+  }
+
 }
