@@ -44,7 +44,7 @@
     <commons-math.version>3.5</commons-math.version>
     <commons-vfs.version>2.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
-    <ds4j.version>2.1-SNAPSHOT</ds4j.version>
+    <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
     <ehcache.version>2.10.6</ehcache.version>
     <fest.version>2.0M10</fest.version>
