@@ -10,15 +10,19 @@
 
 package org.obiba.opal.spi.r.datasource.magma;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +30,8 @@ import java.util.Map;
  * The value set is the tibble subset for the entity identifier.
  */
 class RValueSet extends ValueSetBean {
+
+  private static final Logger log = LoggerFactory.getLogger(RValueSet.class);
 
   private final RValueSetFetcher fetcher;
 
@@ -98,6 +104,40 @@ class RValueSet extends ValueSetBean {
           }
         }
       }
+    } else {
+      log.warn("Not the expected jsonlite's tibble serialization format, suspecting a C stack usage limit issue in R server");
+      if (result.isNamedList()) {
+        // expecting a data frame structure
+        RNamedList<RServerResult> dataFrame = result.asNamedList();
+        List<RServerResult> vectors = dataFrame.get("value").asList();
+
+        String[] ids = vectors.get(getIdPosition()).asNamedList().get("value").asStrings();
+        List<Integer> rowIdx = Lists.newArrayList();
+        int row = 0;
+        for (String id : ids) {
+          if (getRVariableEntity().equals(new RVariableEntity(getTibbleTable().getEntityType(), id))) {
+            rowIdx.add(row);
+          }
+          row++;
+        }
+
+        for (int col = 0; col < vectors.size(); col++) {
+          if (getIdPosition() == col) continue;
+          columnValues.put(col, Lists.newArrayList());
+          RServerResult vector = vectors.get(col).asNamedList().get("value");
+          boolean[] nas = vector.isNA();
+          Object[] objectValues = asArrayOfObjects(vector);
+          // #3303 force NA representation
+          for (int i = 0; i < nas.length; i++) {
+            if (nas[i]) objectValues[i] = null;
+          }
+          for (int r = 0; r < objectValues.length; r++) {
+            if (rowIdx.contains(r)) {
+              columnValues.get(col).add(objectValues[r]);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -107,10 +147,17 @@ class RValueSet extends ValueSetBean {
 
   private Object[] asArrayOfObjects(RServerResult vector) {
     Object payload = vector.asNativeJavaObject();
-    int arrlength = Array.getLength(payload);
-    Object[] outputArray = new Object[arrlength];
-    for (int i = 0; i < arrlength; ++i) {
-      outputArray[i] = Array.get(payload, i);
+    Object[] outputArray;
+    if (payload instanceof List) {
+      List<Object> list = (List) payload;
+      outputArray = new Object[list.size()];
+      list.toArray(outputArray);
+    } else {
+      int arrlength = Array.getLength(payload);
+      outputArray = new Object[arrlength];
+      for (int i = 0; i < arrlength; ++i) {
+        outputArray[i] = Array.get(payload, i);
+      }
     }
     return outputArray;
   }

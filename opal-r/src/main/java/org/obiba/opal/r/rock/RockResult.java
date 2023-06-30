@@ -304,6 +304,14 @@ class RockResult implements RServerResult {
 
   @Override
   public boolean[] isNA() {
+    if (isList()) {
+      boolean[] nas = new boolean[listResult.size()];
+      List<Boolean> naobjs = listResult.stream().map(RServerResult::isNull).collect(Collectors.toList());
+      for (int i = 0; i<naobjs.size(); i++) {
+        nas[i] = naobjs.get(i);
+      }
+      return nas;
+    }
     return new boolean[0];
   }
 

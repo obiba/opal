@@ -20,6 +20,7 @@ import org.obiba.opal.spi.r.RUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,12 @@ import java.util.regex.Pattern;
 public class RVariableHelper {
 
   private static final Logger log = LoggerFactory.getLogger(RVariableHelper.class);
+
+  private static final String[] EXCLUDED_ATTRIBUTES = {
+      "labels", "labels_names", "class",
+      "valueType", "entityType", "mimeType", "referencedEntityType",
+      "repeatable", "occurrenceGroup", "unit"
+  };
 
   private final String entityType;
 
@@ -79,12 +86,14 @@ public class RVariableHelper {
       }
     }
 
+    String occurrenceGroup = extractProperty( "opal.occurrence_group");
+
     return VariableBean.Builder.newVariable(colName, extractValueType(), entityType)
         .unit(extractProperty("opal.unit"))
         .referencedEntityType(extractProperty( "opal.referenced_entity_type"))
         .mimeType(extractProperty( "opal.mime_type"))
         .repeatable(repeatable)
-        .occurrenceGroup(extractProperty( "opal.occurrence_group"))
+        .occurrenceGroup(Strings.isNullOrEmpty(occurrenceGroup) ? null : occurrenceGroup)
         .addAttributes(extractAttributes())
         .addCategories(extractCategories())
         .index(index)
@@ -173,7 +182,7 @@ public class RVariableHelper {
       RNamedList<RServerResult> rList = colAttr.asNamedList();
       if (rList.isEmpty()) return attributes;
       for (String key : rList.keySet()) {
-        if (key.equals("labels")) continue;
+        if (key.startsWith("opal.") || Arrays.asList(EXCLUDED_ATTRIBUTES).contains(key)) continue;
         RServerResult value = rList.get(key);
         String name = key;
         String namespace = null;
