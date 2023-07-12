@@ -158,6 +158,17 @@ public class RserveService implements RServerService, ROperationTemplate {
     RServerConnection rConnection = newConnection();
     RserveSession session = new RserveSession(getName(), (RserveConnection) rConnection, transactionalThreadFactory,
         Strings.isNullOrEmpty(user) ? "opal/system" : user, eventBus);
+    session.setProfile(new RServerProfile() {
+      @Override
+      public String getName() {
+        return RServerManagerService.DEFAULT_CLUSTER_NAME;
+      }
+
+      @Override
+      public String getCluster() {
+        return RServerManagerService.DEFAULT_CLUSTER_NAME;
+      }
+    });
     sessions.add(session);
     return session;
   }
