@@ -2,7 +2,7 @@
 .execute.SQL.JSON <- function(query, path = 'out.json') {
     if (!require('sqldf')) { install.packages('sqldf', repos = "https://cloud.r-project.org") }
     toJSON <- function(df) {
-        jsonlite::toJSON(list(columns = names(df), rows = df), dataframe = 'values', na = 'null')
+        jsonlite::toJSON(list(columns = names(df), rows = df), dataframe = 'values', na = 'null', digits = NA)
     }
     conn <- file(path)
     writeLines(toJSON(sqldf::sqldf(query)), conn)
