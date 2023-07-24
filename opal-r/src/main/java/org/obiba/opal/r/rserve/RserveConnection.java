@@ -72,7 +72,7 @@ class RserveConnection implements RServerConnection {
     if (RSerialize.RAW == serialize) {
       cmd = String.format("try(serialize({%s}, NULL))", expr);
     } else if (RSerialize.JSON == serialize) {
-      cmd = String.format("try(tryCatch(jsonlite::toJSON(%s, auto_unbox = T), error = function(e) { jsonlite::serializeJSON(%s) }))", expr, expr);
+      cmd = String.format("try(tryCatch(jsonlite::toJSON(%s, auto_unbox = T, digits = NA), error = function(e) { jsonlite::serializeJSON(%s) }))", expr, expr);
     } else {
       cmd = String.format("try(%s)", expr);
     }
