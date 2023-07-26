@@ -314,15 +314,17 @@ public class RVariableHelper {
     if (Strings.isNullOrEmpty(value)) return attributes;
 
     String[] strValues = value.split("\\|");
-    Pattern pattern = Pattern.compile("^\\(([a-z]{2})\\) (.+)");
+    Pattern pattern = Pattern.compile("^\\(([a-z]{2})\\) (.+)", Pattern.DOTALL);
     for (String strValue : strValues) {
       Matcher matcher = pattern.matcher(strValue.trim());
       if (matcher.find()) {
         String localeStr = matcher.group(1);
         if (!RUtils.isLocaleValid(localeStr))
           localeStr = defaultLocale;
+        int count = matcher.groupCount();
+        String attrValue = matcher.group(2);
         attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace)
-            .withLocale(localeStr).withValue(matcher.group(2)).build());
+            .withLocale(localeStr).withValue(attrValue).build());
       } else if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
         attributes.add(Attribute.Builder.newAttribute(name).withLocale(defaultLocale).withValue(strValue).build());
       else
