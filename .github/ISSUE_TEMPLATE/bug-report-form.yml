@@ -1,0 +1,78 @@
+name: Opal Bug Report
+description: File a bug report for Opal
+labels: ["bug", "issue"]
+assignees:
+  - ymarcon
+  - meek0
+  - kazoompa
+body:
+  - type: checkboxes
+    id: unique
+    attributes:
+      label: This issue is unique
+      options:
+        - label: I have used the [search tool](https://github.com/obiba/Opal/issues?q=) and did not find an issue describing my bug. 
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version information
+      placeholder: "Example: 4.6.3"
+      description: Please provide the exact version of Opal you are using. If you don't know it, ask your server administrator or if you have access to Opal administration section, retrieve the version at the bottom of the web page. Before submitting an issue, ensure you are using the [latest version](https://github.com/obiba/opal/releases/latest).
+  - type: textarea
+    id: expected-behvior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen? Did this work in previous versions of Opal.
+      placeholder: "Example: when a project is exported, a ZIP file should be placed in the project's export folder."
+  - type: textarea
+    id: actual-behvior
+    attributes:
+      label: Actual behavior
+      description: What did actually happen?
+      placeholder: "Example: The exported project file is no where to be found."
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide information on how to reproduce this bug. Make sure your instructions are clear and include screenshots when applicable.
+      placeholder: 
+        "Example:\n
+        1. Log in to Opal\n
+        2. Go to a project\n
+        3. Export the project in Opal Archive format\n
+        6. Observe that the exported file is not in the project's export folder"
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating System (OS)
+      description: If you know this bug occurs on multiple operating systems, select all you have tested.
+      multiple: true
+      options:
+        - Windows
+        - Mac OS
+        - Linux
+      default: 0
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: If you know this bug occurs on multiple browsers, select all you have tested.
+      multiple: true
+      options:
+        - Google Chrome
+        - Microssoft Edge
+        - Safari
+        - FireFox
+        - Brave
+        - Opera
+      default: 0      
+  - type: textarea
+    id: contact-onfo
+    attributes:
+      label: Contact info
+      description: OBiBa always appreciates knowing about its software users. Please provide the below information if you are a new user Of Opal or you are evaluating the software. 
+      placeholder: "
+        - Name of your organisation \n
+        - What does your organisation do\n
+        - Your organisation's website"
