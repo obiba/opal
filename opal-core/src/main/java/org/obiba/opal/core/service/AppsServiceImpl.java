@@ -114,7 +114,8 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public List<App> getApps() {
-    return Lists.newArrayList(orientDbService.list(App.class));
+    List<App> apps = Lists.newArrayList(orientDbService.list(App.class));
+    return apps;
   }
 
   @Override
@@ -129,6 +130,12 @@ public class AppsServiceImpl implements AppsService {
     App found = orientDbService.findUnique(new App(id));
     if (found != null) return found;
     throw new NoSuchElementException("No registered app with ID: " + id);
+  }
+
+  @Override
+  public boolean hasApp(String id) {
+    App app = orientDbService.findUnique(new App(id));
+    return app != null;
   }
 
   @Override

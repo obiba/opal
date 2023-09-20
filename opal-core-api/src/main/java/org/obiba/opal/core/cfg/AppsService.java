@@ -57,6 +57,14 @@ public interface AppsService extends SystemService {
   App getApp(String id);
 
   /**
+   * Get if it has the app from id.
+   *
+   * @param id
+   * @return
+   */
+  boolean hasApp(String id);
+
+  /**
    * Check self-registration token.
    *
    * @param value
