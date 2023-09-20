@@ -116,6 +116,10 @@ public class RockServerDiscoveryService {
   private boolean checkHost(String url) {
     log.debug("Checking {} ...", url);
     App app = hostsToCheck.get(url);
+    if (!appsService.hasApp(app.getId())) {
+      hostsToCheck.remove(url);
+      return false;
+    }
     try {
       RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<Void> response = restTemplate.getForEntity(url + "/_check", Void.class);
@@ -131,8 +135,8 @@ public class RockServerDiscoveryService {
       return false;
     } catch (Exception e) {
       log.debug("Failing Rock R server: {}", app);
-      appsService.unregisterApp(app);
       hostsToCheck.remove(url);
+      appsService.unregisterApp(app);
       return false;
     }
   }
