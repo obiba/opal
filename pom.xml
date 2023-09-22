@@ -42,11 +42,12 @@
     <commons-io.version>2.7</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
+    <commons-text.version>1.10.0</commons-text.version>
     <commons-vfs.version>2.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
-    <ehcache.version>2.10.6</ehcache.version>
+    <ehcache.version>2.10.9.2</ehcache.version>
     <fest.version>2.0M10</fest.version>
     <findbugs.version>3.0.1</findbugs.version>
     <gin.version>2.1.2</gin.version>
@@ -113,13 +114,12 @@
     <resteasy.version>3.0.20.Final</resteasy.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
-    <shiro.version>1.11.0</shiro.version>
+    <shiro.version>1.12.0</shiro.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.36</slf4j.version>
     <snakeyaml.version>1.33</snakeyaml.version>
-    <spring.version>5.3.27</spring.version>
-    <spring-batch.version>4.3.6</spring-batch.version>
-    <sshd.version>0.8.0</sshd.version>
+    <spring.version>5.3.30</spring.version>
+    <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
@@ -159,7 +159,6 @@
     <module>opal-core-ws</module>
     <module>opal-spi</module>
     <module>opal-spi-r</module>
-    <module>opal-sshd</module>
     <module>opal-shell</module>
     <module>opal-server</module>
     <module>opal-fs</module>
@@ -207,11 +206,6 @@
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-spi-r</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-sshd</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -739,6 +733,12 @@
         <version>${commons-math.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${commons-text.version}</version>
+      </dependency>
+
       <!-- If we need SQL drivers -->
       <dependency>
         <groupId>org.mariadb.jdbc</groupId>
@@ -1122,13 +1122,6 @@
         <groupId>com.dyuproject.protostuff</groupId>
         <artifactId>protostuff-core</artifactId>
         <version>${protostuff.version}</version>
-      </dependency>
-
-      <!-- SSHd dependencies -->
-      <dependency>
-        <groupId>org.apache.sshd</groupId>
-        <artifactId>sshd-core</artifactId>
-        <version>${sshd.version}</version>
       </dependency>
 
       <!-- GWT dependencies -->
