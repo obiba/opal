@@ -311,6 +311,7 @@ public class SystemResource {
                 if (!Strings.isNullOrEmpty(logoutRedirect)) {
                   logoutURIBuilder.queryParam("post_logout_redirect_uri", logoutRedirect);
                 }
+                logoutURIBuilder.queryParam("client_id", oidcConfig.getClientId());
                 return logoutURIBuilder.build().toString();
               }
             } catch (Exception e) {
