@@ -49,7 +49,6 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
 
   private void addTableBundles(CsvDatasourceFactory factory, CsvDatasourceFactoryDto csvDto) {
     for(CsvDatasourceTableBundleDto tableBundleDto : csvDto.getTablesList()) {
-      File variables = tableBundleDto.hasVariables() ? resolveLocalFile(tableBundleDto.getVariables()) : null;
       File data = tableBundleDto.hasData() ? resolveLocalFile(tableBundleDto.getData()) : null;
       ValueTable refTable = null;
       if(tableBundleDto.hasRefTable()) {
@@ -62,10 +61,14 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
       }
       if(refTable != null) {
         factory.addTable(refTable, data);
-      } else if(variables != null && variables.exists()) {
-        factory.addTable(tableBundleDto.getName(), variables, data);
       } else {
-        factory.addTable(tableBundleDto.getName(), data, tableBundleDto.getEntityType());
+        File variables = tableBundleDto.hasVariables() ? resolveLocalFile(tableBundleDto.getVariables()) :
+            (data == null ? null : new File(data.getParentFile(), "variables.csv"));
+        if (variables != null && variables.exists()) {
+          factory.addTable(tableBundleDto.getName(), variables, data);
+        } else {
+          factory.addTable(tableBundleDto.getName(), data, tableBundleDto.getEntityType());
+        }
       }
     }
   }
