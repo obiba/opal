@@ -26,7 +26,7 @@ public class DatetimeEntryPoint implements EntryPoint {
 
     Scripts INSTANCE = GWT.create(Scripts.class);
 
-    @Source("js/moment+langs.min.js")
+    @Source("js/moment-with-locales.min.js")
     TextResource scriptMoment();
   }
 
