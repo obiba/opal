@@ -12,7 +12,7 @@ package org.obiba.opal.core.identifiers;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;

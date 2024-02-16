@@ -13,10 +13,10 @@ package org.obiba.opal.web.r;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 public interface RSessionResource {

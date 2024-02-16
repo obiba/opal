@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Value;

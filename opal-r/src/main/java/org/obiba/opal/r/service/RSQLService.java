@@ -38,8 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.ForbiddenException;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.ForbiddenException;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;

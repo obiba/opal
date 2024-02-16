@@ -18,9 +18,9 @@ import org.obiba.opal.core.service.ResourceProvidersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import jakarta.script.ScriptEngine;
+import jakarta.script.ScriptEngineManager;
+import jakarta.script.ScriptException;
 import java.util.List;
 
 class RResourceProvider implements ResourceProvidersService.ResourceProvider {

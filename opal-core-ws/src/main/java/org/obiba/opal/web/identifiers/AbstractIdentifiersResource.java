@@ -19,8 +19,8 @@ import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 
 public abstract class AbstractIdentifiersResource {

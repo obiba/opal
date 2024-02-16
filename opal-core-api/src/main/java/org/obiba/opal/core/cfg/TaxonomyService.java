@@ -13,8 +13,8 @@ package org.obiba.opal.core.cfg;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;

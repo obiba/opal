@@ -16,8 +16,8 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 
 /**

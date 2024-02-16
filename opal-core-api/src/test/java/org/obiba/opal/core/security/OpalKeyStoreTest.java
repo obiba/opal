@@ -3,7 +3,7 @@ package org.obiba.opal.core.security;
 import com.google.common.base.Joiner;
 import org.junit.Test;
 
-import javax.net.ssl.*;
+import jakarta.net.ssl.*;
 import java.security.*;
 
 public class OpalKeyStoreTest {

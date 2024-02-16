@@ -10,9 +10,9 @@
 
 package org.obiba.opal.web.provider;
 
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;

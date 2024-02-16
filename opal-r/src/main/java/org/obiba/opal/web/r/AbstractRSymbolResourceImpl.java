@@ -20,10 +20,10 @@ import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.spi.r.RSerialize;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 
 /**

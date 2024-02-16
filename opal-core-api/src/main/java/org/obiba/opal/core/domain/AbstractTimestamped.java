@@ -12,9 +12,7 @@ package org.obiba.opal.core.domain;
 
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
-
-import org.obiba.magma.datasource.hibernate.domain.Timestamped;
+import jakarta.validation.constraints.NotNull;
 
 @SuppressWarnings("AssignmentToDateFieldFromParameter")
 public abstract class AbstractTimestamped implements Timestamped {

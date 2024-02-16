@@ -23,10 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.persistence.NonUniqueResultException;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.NonUniqueResultException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.slf4j.Logger;

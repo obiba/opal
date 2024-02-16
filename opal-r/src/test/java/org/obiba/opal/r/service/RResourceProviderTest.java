@@ -13,10 +13,10 @@ package org.obiba.opal.r.service;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import jakarta.script.Bindings;
+import jakarta.script.ScriptEngine;
+import jakarta.script.ScriptEngineManager;
+import jakarta.script.ScriptException;
 
 public class RResourceProviderTest {
 

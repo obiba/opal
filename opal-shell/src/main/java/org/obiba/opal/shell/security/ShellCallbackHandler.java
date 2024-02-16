@@ -14,10 +14,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextInputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import jakarta.security.auth.callback.Callback;
+import jakarta.security.auth.callback.PasswordCallback;
+import jakarta.security.auth.callback.TextInputCallback;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
 
 import org.obiba.crypt.CacheablePasswordCallback;
 import org.obiba.crypt.CachingCallbackHandler;

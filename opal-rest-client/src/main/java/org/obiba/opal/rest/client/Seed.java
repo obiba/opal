@@ -35,7 +35,6 @@ import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.FileViewDto;
 import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
-import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;

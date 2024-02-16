@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 

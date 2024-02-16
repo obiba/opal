@@ -12,8 +12,8 @@ package org.obiba.opal.core.service;
 
 import java.util.Set;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.cfg.GitService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;

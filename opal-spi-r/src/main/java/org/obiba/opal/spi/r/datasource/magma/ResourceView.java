@@ -27,7 +27,7 @@ import org.obiba.opal.spi.resource.TabularResourceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;

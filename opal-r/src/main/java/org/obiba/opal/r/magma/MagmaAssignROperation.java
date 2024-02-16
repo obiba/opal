@@ -18,7 +18,7 @@ import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerConnection;
 import org.obiba.opal.spi.r.RServerException;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.io.InputStream;
 

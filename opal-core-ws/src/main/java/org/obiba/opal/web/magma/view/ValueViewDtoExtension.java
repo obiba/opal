@@ -13,7 +13,7 @@ import org.obiba.magma.ValueView;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Contract for converting a View to a ViewDto and back.

@@ -12,7 +12,7 @@ package org.obiba.opal.core.service.security;
 
 import java.io.InputStream;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.security.OpalKeyStore;

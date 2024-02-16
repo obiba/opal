@@ -23,7 +23,7 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 
 public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFactoryDtoParser {

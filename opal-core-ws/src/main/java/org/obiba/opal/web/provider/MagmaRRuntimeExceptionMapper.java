@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import com.google.protobuf.GeneratedMessage;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;

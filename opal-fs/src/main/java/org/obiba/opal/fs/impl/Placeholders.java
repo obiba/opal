@@ -12,7 +12,7 @@ package org.obiba.opal.fs.impl;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 final class Placeholders {
 

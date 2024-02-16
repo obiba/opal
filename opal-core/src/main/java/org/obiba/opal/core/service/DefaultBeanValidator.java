@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 
-import javax.validation.*;
+import jakarta.validation.*;
 import java.util.Set;
 
 @Component

@@ -18,7 +18,7 @@ import org.obiba.magma.crypt.NoSuchKeyException;
 import org.obiba.security.KeyStoreManager;
 import org.obiba.ssl.X509ExtendedKeyManagerImpl;
 
-import javax.net.ssl.*;
+import jakarta.net.ssl.*;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.Certificate;

@@ -13,7 +13,7 @@ package org.obiba.opal.core;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public interface ValueTableUpdateListener extends org.obiba.magma.ValueTableUpdateListener {
 

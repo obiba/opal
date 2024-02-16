@@ -12,9 +12,9 @@ package org.obiba.opal.web.system.taxonomy;
 
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.core.Response;
 
 import org.obiba.opal.web.model.Opal;
 

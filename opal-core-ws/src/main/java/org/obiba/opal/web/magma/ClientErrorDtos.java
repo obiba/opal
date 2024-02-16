@@ -11,10 +11,10 @@ package org.obiba.opal.web.magma;
 
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.mozilla.javascript.RhinoException;

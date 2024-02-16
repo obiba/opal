@@ -13,8 +13,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
 
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;

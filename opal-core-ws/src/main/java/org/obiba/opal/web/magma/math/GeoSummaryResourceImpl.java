@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.magma.math;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.obiba.magma.math.summary.GeoVariableSummary;
 import org.obiba.magma.math.summary.GeoVariableSummaryFactory;

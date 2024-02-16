@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.tx;
 
-import javax.naming.NamingException;
-import javax.transaction.SystemException;
+import jakarta.naming.NamingException;
+import jakarta.transaction.SystemException;
 
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;

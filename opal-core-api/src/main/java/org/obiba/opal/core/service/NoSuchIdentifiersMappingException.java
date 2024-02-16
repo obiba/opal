@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Thrown when a method argument refers to a non-existing identifiers mapping.

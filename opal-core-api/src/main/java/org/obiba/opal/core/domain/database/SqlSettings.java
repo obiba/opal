@@ -10,8 +10,8 @@
 
 package org.obiba.opal.core.domain.database;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;

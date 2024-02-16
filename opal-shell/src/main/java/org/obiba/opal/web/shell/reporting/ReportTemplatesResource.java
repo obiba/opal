@@ -12,8 +12,8 @@ package org.obiba.opal.web.shell.reporting;
 
 import java.util.Set;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.service.ReportTemplateService;

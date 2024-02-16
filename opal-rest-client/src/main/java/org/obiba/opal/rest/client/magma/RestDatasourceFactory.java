@@ -11,7 +11,7 @@ package org.obiba.opal.rest.client.magma;
 
 import java.security.KeyStore;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.http.params.CoreConnectionPNames;
 import org.obiba.magma.AbstractDatasourceFactory;

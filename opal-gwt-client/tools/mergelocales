@@ -1,3 +1,0 @@
-#!/bin/sh
-
-java -jar jython-2.5.1-standalone.jar ./mergelocales.py ../target/extra/ui/ ../src/main/java/com/google/gwt/i18n/client/

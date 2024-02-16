@@ -12,8 +12,8 @@ package org.obiba.opal.web.system.subject;
 
 import java.util.Objects;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.service.SubjectProfileService;

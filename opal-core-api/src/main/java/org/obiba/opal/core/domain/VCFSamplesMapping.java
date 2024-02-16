@@ -13,7 +13,7 @@ package org.obiba.opal.core.domain;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class VCFSamplesMapping implements HasUniqueProperties {
