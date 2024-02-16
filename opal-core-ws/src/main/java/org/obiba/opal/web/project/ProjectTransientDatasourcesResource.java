@@ -12,10 +12,10 @@ package org.obiba.opal.web.project;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

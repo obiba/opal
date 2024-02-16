@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.8-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>opal-core-ws</artifactId>
   <name>opal-core-ws</name>
@@ -93,10 +93,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-jdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-hibernate</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>

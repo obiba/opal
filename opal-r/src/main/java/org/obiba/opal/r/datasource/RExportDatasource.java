@@ -16,7 +16,7 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * After a table has been assigned to a tibble symbol in R, this tibble can be exported to another media.

@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Thrown when a system identifier cannot be mapped to a private identifier.

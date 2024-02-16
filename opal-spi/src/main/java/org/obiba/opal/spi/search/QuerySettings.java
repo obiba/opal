@@ -14,7 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.math3.util.Pair;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

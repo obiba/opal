@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceCopierProgressListener;

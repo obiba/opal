@@ -10,11 +10,9 @@
 
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.SessionFactory;
 import org.obiba.magma.Disposable;
-import org.obiba.magma.datasource.hibernate.SessionFactoryProvider;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 

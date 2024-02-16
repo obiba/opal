@@ -21,8 +21,8 @@ import org.obiba.opal.web.ws.SortDir;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 

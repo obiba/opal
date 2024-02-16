@@ -13,7 +13,7 @@ package org.obiba.opal.core.service.security;
 import java.io.IOException;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.CallbackHandler;
 
 import com.google.common.eventbus.EventBus;
 import org.easymock.EasyMock;

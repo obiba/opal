@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.web.magma.ClientErrorDtos;

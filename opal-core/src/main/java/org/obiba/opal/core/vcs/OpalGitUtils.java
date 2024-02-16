@@ -12,7 +12,7 @@ package org.obiba.opal.core.vcs;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
 

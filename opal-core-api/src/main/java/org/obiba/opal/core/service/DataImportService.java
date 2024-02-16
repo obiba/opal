@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;

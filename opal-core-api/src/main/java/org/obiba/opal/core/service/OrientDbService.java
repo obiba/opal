@@ -14,9 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 

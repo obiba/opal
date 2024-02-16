@@ -24,8 +24,8 @@ import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
 import com.google.common.collect.ImmutableSet;
 import org.obiba.opal.core.service.IdentifiersTableService;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

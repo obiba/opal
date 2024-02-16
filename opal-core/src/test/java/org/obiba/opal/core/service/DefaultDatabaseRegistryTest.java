@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
+import jakarta.net.SocketFactory;
+import jakarta.net.ssl.SSLSocketFactory;
 import javax.sql.DataSource;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 import com.google.common.eventbus.EventBus;
 import org.easymock.EasyMock;

@@ -13,7 +13,7 @@ package org.obiba.opal.spi.r.datasource.magma;
 import org.obiba.magma.Value;
 import org.obiba.magma.support.VariableEntityBean;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.text.NumberFormat;
 
 public class RVariableEntity extends VariableEntityBean {

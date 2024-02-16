@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.8-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>opal-web-model</artifactId>
   <name>opal-web-model</name>
@@ -34,11 +34,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
     </dependency>
@@ -47,36 +42,38 @@
       <artifactId>commons-math3</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.dyuproject.protostuff</groupId>
-      <artifactId>protostuff-core</artifactId>
-      <scope>provided</scope>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.*</include>
-        </includes>
-      </resource>
-      <!-- Creating a GWT module requires that the .java files be in the JAR file. -->
-      <resource>
-        <directory>${project.build.directory}/generated-sources/protobuf-server</directory>
-        <includes>
-          <include>**/*.java</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${project.build.directory}/generated-sources/protobuf-gwt</directory>
-        <includes>
-          <include>**/*.java</include>
-        </includes>
-      </resource>
-    </resources>
     <plugins>
-
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>3.11.4</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <protocVersion>${protobuf.version}</protocVersion>
+              <inputDirectories>
+                <include>src/main/protobuf</include>
+              </inputDirectories>
+              <outputTargets>
+                <outputTarget>
+                  <type>java</type>
+                  <outputDirectory>${project.build.directory}/generated-sources/protobuf-java</outputDirectory>
+                </outputTarget>
+              </outputTargets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Add generated sources to the build path -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -90,370 +87,9 @@
             </goals>
             <configuration>
               <sources>
-                <source>${project.build.directory}/generated-sources/protobuf-server</source>
-                <source>${project.build.directory}/generated-sources/protobuf-gwt</source>
+                <source>${project.build.directory}/generated-sources/protobuf-java</source>
               </sources>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-sources</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>
-                <!-- Determine which protoc binary we can use -->
-                <condition property="os.protoc" value="${protobuf.version}-linux-x86_64">
-                  <or>
-                    <os name="linux" arch="amd64" />
-                    <os name="linux" arch="x86_64" />
-                  </or>
-                </condition>
-                <condition property="os.protoc" value="${protobuf.version}-win32">
-                  <os family="windows" />
-                </condition>
-
-                <condition property="os.protoc" value="${protobuf.version}-osx_64">
-                   <os name="Mac OS X" arch="x86_64" />
-                </condition>
-
-                <fail message="No protoc binary for your OS: ${os.name}, ${os.arch}." unless="os.protoc" />
-
-                <!-- Delete the wrapper.proto upfront, as post-compilation cleanup is not fail-safe -->
-		<!-- this must be deleted before, as any failure will prevent the deletion to be run in the end -->
-                <delete file="${basedir}/src/main/protobuf/wrapper.proto" quiet="true" failonerror="false" />
-
-                <path id="protofiles">
-                  <fileset dir="src/main/protobuf">
-                    <include name="*.proto" />
-                  </fileset>
-                </path>
-                <pathconvert pathsep=" " property="protofilesList" refid="protofiles">
-                  <map from="${basedir}/" to="" />
-                </pathconvert>
-
-                <!-- Compile our .proto file -->
-                <!-- Java -->
-                <mkdir dir="target/generated-sources/protobuf-server" />
-                <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
-                  <arg value="--java_out=target/generated-sources/protobuf-server" />
-                  <arg line="${protofilesList}" />
-                  <arg line="-Isrc/main/protobuf" />
-                </exec>
-                <!-- Python -->
-                <mkdir dir="target/generated-sources/protobuf-python" />
-                <exec dir="${basedir}" executable="${basedir}/tools/protoc-${os.protoc}" failonerror="true">
-                  <arg value="--python_out=target/generated-sources/protobuf-python" />
-                  <arg line="${protofilesList}" />
-                  <arg line="-Isrc/main/protobuf" />
-                </exec>
-                <delete file="${basedir}/src/main/protobuf/wrapper.proto" />
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- This will compile the .proto file and produce JavaScriptOverlay classes usable by a GWT client -->
-      <plugin>
-        <groupId>com.dyuproject.protostuff</groupId>
-        <artifactId>protostuff-maven-plugin</artifactId>
-        <configuration>
-          <protoModules>
-            <protoModule>
-              <source>src/main/protobuf/Ws.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.ws</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Identifiers.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.identifiers</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Magma.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.magma</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Math.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.math</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Opal.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Projects.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Plugins.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Apps.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Resources.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/OpalR.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal.r</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/DataShield.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>generate_helper_methods</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.datashield</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Commands.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.opal</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Search.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.search</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-            <protoModule>
-              <source>src/main/protobuf/Database.proto</source>
-              <output>${basedir}/src/main/protostuff/custom_gwt_overlay.java.stg</output>
-              <outputDir>${project.build.directory}/generated-sources/protobuf-gwt</outputDir>
-              <options>
-                <property>
-                  <!-- Override the package name -->
-                  <name>org.obiba.opal.web.model</name>
-                  <value>org.obiba.opal.web.model.client.database</value>
-                </property>
-                <property>
-                  <name>use_global_json</name>
-                  <value>true</value>
-                </property>
-              </options>
-            </protoModule>
-          </protoModules>
-        </configuration>
-        <executions>
-          <execution>
-            <id>generate-sources</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/protobuf-python.xml</descriptor>
-          </descriptors>
-          <filters />
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

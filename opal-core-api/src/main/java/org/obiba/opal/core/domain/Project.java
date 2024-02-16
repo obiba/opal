@@ -12,18 +12,16 @@ package org.obiba.opal.core.domain;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import com.google.common.collect.Sets;
-import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
-import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;

@@ -20,10 +20,10 @@ import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Nullable;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.security.auth.callback.CallbackHandler;
+import jakarta.security.auth.callback.UnsupportedCallbackException;
+import jakarta.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

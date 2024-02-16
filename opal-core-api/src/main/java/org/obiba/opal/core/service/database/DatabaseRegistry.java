@@ -10,10 +10,10 @@
 
 package org.obiba.opal.core.service.database;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.sql.DataSource;
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;

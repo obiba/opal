@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 
 import com.google.common.base.Preconditions;
 

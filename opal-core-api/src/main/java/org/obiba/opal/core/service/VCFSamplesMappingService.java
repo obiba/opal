@@ -12,8 +12,8 @@ package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

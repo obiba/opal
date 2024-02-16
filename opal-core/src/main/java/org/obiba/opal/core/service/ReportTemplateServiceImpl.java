@@ -14,8 +14,8 @@ import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;

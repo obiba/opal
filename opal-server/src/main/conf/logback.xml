@@ -13,7 +13,6 @@
 
   <!--hide verbose dependencies-->
   <logger name="jetty.util.log" level="error"/>
-  <logger name="org.hibernate.stat.Statistics" level="warn"/>
 
   <!--Uncomment the following line to see copy progress-->
   <!--<logger name="org.obiba.magma.support.DatasourceCopier" level="debug"/>-->
@@ -24,12 +23,6 @@
   <!--<logger name="org.obiba.opal.web.security" level="info"/>-->
   <!--<logger name="org.obiba.opal.server.httpd" level="info"/>-->
   <!--<logger name="org.obiba.opal.search.IndexSynchronizationManager" level="info"/>-->
-
-  <!--Uncomment this to enable SQL statement logging-->
-  <!--<logger name="org.hibernate.SQL" level="debug"/>-->
-
-  <!--Uncomment this to show the values used for replacement in Hibernate's prepared statements-->
-  <!--<logger name="org.hibernate.type" level="trace"/>-->
 
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
     <resetJUL>true</resetJUL>

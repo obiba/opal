@@ -12,7 +12,7 @@ package org.obiba.opal.core.domain.taxonomy;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.cfg.NoSuchTermException;
 

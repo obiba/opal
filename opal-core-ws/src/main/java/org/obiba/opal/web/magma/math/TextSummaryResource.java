@@ -9,11 +9,11 @@
  */
 package org.obiba.opal.web.magma.math;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 
 public interface TextSummaryResource extends SummaryResource {
 

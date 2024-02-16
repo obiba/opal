@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.search.support;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;

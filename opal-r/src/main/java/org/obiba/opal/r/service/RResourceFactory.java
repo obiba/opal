@@ -19,7 +19,7 @@ import org.obiba.opal.spi.resource.impl.DefaultResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.ScriptEngine;
+import jakarta.script.ScriptEngine;
 import java.util.List;
 
 class RResourceFactory implements ResourceProvidersService.ResourceFactory {

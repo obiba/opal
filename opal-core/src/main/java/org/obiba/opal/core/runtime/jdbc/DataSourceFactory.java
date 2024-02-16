@@ -9,8 +9,7 @@
  */
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.sql.DataSource;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
 
 @Component
 public class DataSourceFactory {

@@ -12,7 +12,7 @@ package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.sql.SQLExecution;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 

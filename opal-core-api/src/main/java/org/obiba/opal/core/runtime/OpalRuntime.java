@@ -13,7 +13,7 @@ import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.plugins.spi.ServicePlugin;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Set;

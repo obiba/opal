@@ -11,10 +11,10 @@
 package org.obiba.opal.r.service;
 
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class RSessionActivity extends RActivity implements HasUniqueProperties {

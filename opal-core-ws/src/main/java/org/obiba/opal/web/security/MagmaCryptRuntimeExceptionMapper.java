@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.security;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;

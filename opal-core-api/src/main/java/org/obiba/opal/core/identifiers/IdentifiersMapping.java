@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.identifiers;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 
