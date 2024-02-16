@@ -21,6 +21,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.util.security.Constraint;
@@ -239,6 +240,17 @@ public class OpalJettyServer {
 
   private void initFilters(Properties properties) {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
+
+    // Add the CrossOriginFilter
+    String corsAllowed = properties.getProperty("cors.allowed");
+    if (!Strings.isNullOrEmpty(corsAllowed)) {
+      FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(REQUEST));
+      cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, corsAllowed);
+      cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "Content-Type,Access-Control-Allow-Origin");
+      cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,PUT,DELETE,OPTIONS");
+      cors.setInitParameter(CrossOriginFilter.EXPOSED_HEADERS_PARAM, "X-Opal-Version,Location,X-TOTP");
+      cors.setInitParameter(CrossOriginFilter.ALLOW_CREDENTIALS_PARAM, "true");
+    }
 
     initOIDCFilter(properties);
 
