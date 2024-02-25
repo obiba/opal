@@ -16,3 +16,5 @@ opal-gwt-client/war/org.obiba.opal.web.gwt.*
 *.pyc
 *.log
 opal_home/
+opal_home.*/
+

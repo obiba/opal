@@ -10,15 +10,15 @@
 
 package org.obiba.opal.web.system.database;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -33,7 +33,7 @@ public class IdentifiersDatabaseNotFoundExceptionMapper
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(IdentifiersDatabaseNotFoundException exception) {
+  protected Ws.ClientErrorDto getErrorDto(IdentifiersDatabaseNotFoundException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "IdentifiersDatabaseNotFound").build();
   }
 

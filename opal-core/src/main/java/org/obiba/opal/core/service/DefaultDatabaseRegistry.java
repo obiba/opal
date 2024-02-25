@@ -16,16 +16,14 @@ import com.google.common.base.Strings;
 import com.google.common.cache.*;
 import com.google.common.collect.*;
 import com.google.common.eventbus.Subscribe;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.SocketFactoryProvider;
-import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -34,8 +32,6 @@ import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
-import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import jakarta.annotation.Nullable;
 import javax.sql.DataSource;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.NotNull;
 import java.sql.SQLException;
 
 @Component
@@ -62,9 +54,6 @@ import java.sql.SQLException;
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
-
-  @Autowired
-  private SessionFactoryFactory sessionFactoryFactory;
 
   @Autowired
   private DataSourceFactory dataSourceFactory;
@@ -85,10 +74,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       .removalListener(new DataSourceRemovalListener()) //
       .build(new DataSourceCacheLoader());
 
-  private final LoadingCache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder() //
-      .removalListener(new SessionFactoryRemovalListener()) //
-      .build(new SessionFactoryCacheLoader());
-
   private final SetMultimap<String, String> registrations = Multimaps
       .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
@@ -100,7 +85,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void stop() {
-    sessionFactoryCache.invalidateAll();
     dataSourceCache.invalidateAll();
     registrations.clear();
   }
@@ -156,23 +140,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  @Transactional
-  public SessionFactory getSessionFactory(@NotNull String name, @Nullable String usedByDatasource) {
-    register(name, usedByDatasource);
-    return sessionFactoryCache.getUnchecked(name);
-  }
-
-  @Override
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
     if(orientDbService.findUnique(database) == null) {
       persist(database);
     } else {
-      ConstraintViolation<Database> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique", Database.class,
-              database, database, database, PathImpl.createPathFromString("name"), null, null);
-
-      throw new ConstraintViolationException(ImmutableSet.of(violation));
+      throw new IllegalArgumentException("Database already exists");
     }
   }
 
@@ -267,7 +240,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   private void destroyCache(String name) {
-    sessionFactoryCache.invalidate(name);
     dataSourceCache.invalidate(name);
   }
 
@@ -311,10 +283,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
     if(sqlSettings != null) {
       switch(sqlSettings.getSqlSchema()) {
-        case HIBERNATE:
-          return new HibernateDatasourceFactory(datasourceName,
-              new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
-
         case JDBC:
           DataSource datasource = getDataSource(databaseName, datasourceName);
           JdbcDatasourceFactory dsFactory = new JdbcDatasourceFactory();
@@ -457,38 +425,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
           //noinspection StringConcatenationArgumentToLogCall
           log.warn("Ignoring exception during DataSource " + database + " shutdown: ", e);
         }
-      }
-    }
-  }
-
-  private class SessionFactoryCacheLoader extends CacheLoader<String, SessionFactory> {
-
-    @Override
-    public SessionFactory load(String databaseName) throws Exception {
-      log.info("Building SessionFactory {}", databaseName);
-      return sessionFactoryFactory.getSessionFactory(getDataSource(databaseName, null));
-    }
-  }
-
-  private class SessionFactoryRemovalListener implements RemovalListener<String, SessionFactory> {
-    @Override
-    public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
-      String database = notification.getKey();
-      log.info("Destroying SessionFactory {}", database);
-      if(database == null) return;
-      try {
-        SessionFactory sessionFactory = notification.getValue();
-        if(sessionFactory == null) {
-          log.info("Cannot close null SessionFactory {}", database);
-        } else {
-          sessionFactory.close();
-        }
-      } catch(HibernateException e) {
-        //noinspection StringConcatenationArgumentToLogCall
-        log.warn("Ignoring exception during SessionFactory " + database + " shutdown: ", e);
-      }
-      if(getDatabase(database).isUsedForIdentifiers()) {
-        identifiersTableService.stop();
       }
     }
   }

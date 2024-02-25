@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.*;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import java.io.PrintWriter;
 import java.util.List;
 

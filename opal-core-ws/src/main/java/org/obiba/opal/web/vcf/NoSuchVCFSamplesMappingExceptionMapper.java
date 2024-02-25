@@ -9,15 +9,15 @@
  */
 package org.obiba.opal.web.vcf;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.NoSuchVCFSamplesMappingException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -31,7 +31,7 @@ public class NoSuchVCFSamplesMappingExceptionMapper extends ErrorDtoExceptionMap
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchVCFSamplesMappingException exception) {
+  protected Ws.ClientErrorDto getErrorDto(NoSuchVCFSamplesMappingException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchVCFSamplesMapping").addArguments(exception.getName())
         .build();
   }

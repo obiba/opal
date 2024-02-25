@@ -27,7 +27,7 @@ import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;

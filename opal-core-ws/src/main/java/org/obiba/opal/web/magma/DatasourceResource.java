@@ -45,9 +45,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.core.Response.Status;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.net.URI;

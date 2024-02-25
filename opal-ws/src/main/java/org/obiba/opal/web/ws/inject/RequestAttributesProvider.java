@@ -11,7 +11,7 @@ package org.obiba.opal.web.ws.inject;
 
 import java.net.URI;
 
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.core.UriInfo;
 
 import org.springframework.web.context.request.ServletRequestAttributes;
 

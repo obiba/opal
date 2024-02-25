@@ -49,9 +49,10 @@
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
-    <ehcache.version>2.10.9.2</ehcache.version>
+    <ehcache.version>3.10.8</ehcache.version>
     <fest.version>2.0M10</fest.version>
     <findbugs.version>3.0.1</findbugs.version>
+    <graalvm.version>21.3.5</graalvm.version>
     <gson.version>2.8.9</gson.version>
     <guava.version>33.0.0-jre</guava.version>
     <hsqldb.version>2.7.1</hsqldb.version>
@@ -92,17 +93,19 @@
     <obiba-commons.version>4.0-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
-    <orientdb.version>2.2.37</orientdb.version>
+    <orientdb.version>3.2.27</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <postgresql.version>42.7.2</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>3.24.3</protobuf.version>
     <quartz.version>2.3.2</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>3.0.20.Final</resteasy.version>
+    <resteasy.version>3.15.6.Final</resteasy.version>
+    <resteasy-spring.version>4.7.9.Final</resteasy-spring.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
     <shiro.version>1.13.0</shiro.version>
+    <shiro-ehcache3.version>1.0.0</shiro-ehcache3.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.36</slf4j.version>
     <snakeyaml.version>1.33</snakeyaml.version>
@@ -893,15 +896,9 @@
         <version>${shiro.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-ehcache</artifactId>
-        <version>${shiro.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.ehcache.integrations.shiro</groupId>
+        <artifactId>shiro-ehcache3</artifactId>
+        <version>${shiro-ehcache3.version}</version>
       </dependency>
       <dependency>
         <groupId>eu.flatwhite.shiro</groupId>
@@ -934,7 +931,7 @@
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-ext-jdk18</artifactId>
+        <artifactId>bcprov-ext-jdk18on</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
 
@@ -982,6 +979,10 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
           <!-- Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). -->
           <exclusion>
             <groupId>javax.xml.stream</groupId>
@@ -1000,7 +1001,7 @@
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-spring</artifactId>
-        <version>${resteasy.version}</version>
+        <version>${resteasy-spring.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-httpclient</groupId>
@@ -1035,11 +1036,6 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlets</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-continuation</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
@@ -1089,7 +1085,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient-cache</artifactId>
-        <version>${httpclient.version}</version>
+        <version>4.5.14</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1100,7 +1096,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>${httpclient.version}</version>
+        <version>4.5.14</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1140,9 +1136,10 @@
       </dependency>
 
       <dependency>
-        <groupId>net.sf.ehcache</groupId>
+        <groupId>org.ehcache</groupId>
         <artifactId>ehcache</artifactId>
         <version>${ehcache.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
 
       <dependency>
@@ -1286,6 +1283,12 @@
         <groupId>org.eclipse.jgit</groupId>
         <artifactId>org.eclipse.jgit</artifactId>
         <version>${jgit.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -1304,17 +1307,22 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-server</artifactId>
         <version>${orientdb.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-core</artifactId>
         <version>${orientdb.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.graalvm.sdk</groupId>
+        <artifactId>graal-sdk</artifactId>
+        <version>${graalvm.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js</artifactId>
+        <version>${graalvm.version}</version>
       </dependency>
 
       <dependency>
@@ -1328,6 +1336,11 @@
         <artifactId>jakarta.annotation-api</artifactId>
         <version>2.1.1</version>
       </dependency>
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>3.1.0</version>
+      </dependency>
 
       <dependency>
         <groupId>javax.el</groupId>
@@ -1335,9 +1348,19 @@
         <version>${javax-el.version}</version>
       </dependency>
       <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>4.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.glassfish.web</groupId>
         <artifactId>javax.el</artifactId>
         <version>${javax-el.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>4.0.3</version>
       </dependency>
 
       <dependency>
@@ -1507,6 +1530,9 @@
           <version>${maven-surefire-plugin.version}</version>
           <configuration>
             <useSystemClassLoader>false</useSystemClassLoader>
+            <argLine>
+              --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED
+            </argLine>
           </configuration>
         </plugin>
 

@@ -10,7 +10,7 @@
 
 package org.obiba.opal.server;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Strings;
 import org.obiba.opal.core.service.ApplicationContextProvider;

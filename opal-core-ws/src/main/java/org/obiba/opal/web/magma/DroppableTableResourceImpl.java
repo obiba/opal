@@ -20,8 +20,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.core.Response;
 
 /**
  * A table resource that supports DELETE (drop)

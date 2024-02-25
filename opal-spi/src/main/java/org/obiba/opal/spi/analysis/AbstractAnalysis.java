@@ -12,7 +12,7 @@ package org.obiba.opal.spi.analysis;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.springframework.util.Assert;
 

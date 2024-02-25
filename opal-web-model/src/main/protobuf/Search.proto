@@ -1,8 +1,5 @@
 import "Opal.proto";
-
 import "Magma.proto";
-
-import "Math.proto";
 
 package Search;
 

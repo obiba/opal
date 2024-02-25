@@ -10,7 +10,7 @@
 package org.obiba.opal.web.search.support;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;

@@ -12,15 +12,16 @@ package org.obiba.opal.r.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.graalvm.polyglot.Context;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.script.ScriptEngine;
-import jakarta.script.ScriptEngineManager;
-import jakarta.script.ScriptException;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.List;
 
 class RResourceProvider implements ResourceProvidersService.ResourceProvider {
@@ -33,16 +34,12 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   private JSONObject settings;
 
-  private ScriptEngine engine;
-
   RResourceProvider(String profile, String name, String script) {
     this.profile = profile;
     this.name = name;
-    try {
-      ScriptEngineManager manager = new ScriptEngineManager(null);
-      this.engine = manager.getEngineByName("nashorn");
-      engine.eval(script);
-    } catch (ScriptException e) {
+    try (Context context = Context.create()) {
+      context.eval("js", script);
+    } catch (Exception e) {
       log.error("Resource javascript evaluation failed for package {}", name, e);
     }
   }
@@ -103,7 +100,7 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
     List<ResourceProvidersService.ResourceFactory> factories = Lists.newArrayList();
     if (types != null) {
       for (int i = 0; i < types.length(); i++) {
-        factories.add(new RResourceFactory(name, types.getJSONObject(i), engine));
+        factories.add(new RResourceFactory(name, types.getJSONObject(i)));
       }
     }
     return factories;
@@ -111,15 +108,13 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   public JSONObject getSettings() {
     if (settings == null) {
-      if (engine != null) {
-        String varName = name.replaceAll("\\.", "_");
-        try {
-          this.settings = new JSONObject(engine.eval(String.format("JSON.stringify(%s.settings)", varName)).toString());
-          log.trace("{} settings = {}", name, settings.toString(2));
-        } catch (ScriptException e) {
-          log.error("Unable to get resource settings from package: {}", name, e);
-          this.settings = new JSONObject();
-        }
+      String varName = name.replaceAll("\\.", "_");
+      try (Context context = Context.create()) {
+        this.settings = new JSONObject(context.eval("js", String.format("JSON.stringify(%s.settings)", varName)).toString());
+        log.trace("{} settings = {}", name, settings.toString(2));
+      } catch (Exception e) {
+        log.error("Unable to get resource settings from package: {}", name, e);
+        this.settings = new JSONObject();
       }
     }
     return settings;

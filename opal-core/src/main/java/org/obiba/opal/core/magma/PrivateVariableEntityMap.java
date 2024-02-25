@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.magma;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Disposable;
 import org.obiba.magma.VariableEntity;

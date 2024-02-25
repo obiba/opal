@@ -49,11 +49,6 @@ public abstract class AbstractOrientDbTestConfig {
   }
 
   @Bean
-  public DefaultBeanValidator defaultBeanValidator() {
-    return new DefaultBeanValidator();
-  }
-
-  @Bean
   public OrientDbServerFactory orientDbServerFactory() {
     OrientDbServerFactory factory = new LocalOrientDbServerFactory();
     factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));

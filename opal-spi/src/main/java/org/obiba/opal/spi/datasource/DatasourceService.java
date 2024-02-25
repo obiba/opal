@@ -11,7 +11,7 @@
 package org.obiba.opal.spi.datasource;
 
 import java.util.Collection;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.spi.OpalServicePlugin;

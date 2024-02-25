@@ -11,7 +11,7 @@ package org.obiba.opal.core.service;
 
 import java.util.Set;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.VariableEntity;
 import org.springframework.util.Assert;

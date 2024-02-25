@@ -10,10 +10,10 @@
 
 package org.obiba.opal.core.service;
 
-import jakarta.validation.constraints.NotNull;
-
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.google.common.annotations.VisibleForTesting;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.server.OServer;
+import javax.validation.constraints.NotNull;
 
 public interface OrientDbServerFactory {
 
@@ -21,7 +21,14 @@ public interface OrientDbServerFactory {
   OServer getServer();
 
   @NotNull
-  ODatabaseDocumentTx getDocumentTx();
+  ODatabaseDocument getDocumentTx();
 
+  @VisibleForTesting
   void setUrl(@NotNull String url);
+
+  @VisibleForTesting
+  void start() throws Exception;
+
+  @VisibleForTesting
+  void stop();
 }

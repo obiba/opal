@@ -10,10 +10,10 @@
 
 package org.obiba.opal.r.service;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 public class RActivity extends AbstractTimestamped {
 

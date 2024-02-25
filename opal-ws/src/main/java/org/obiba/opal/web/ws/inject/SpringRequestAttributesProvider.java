@@ -9,16 +9,16 @@
  */
 package org.obiba.opal.web.ws.inject;
 
-import java.net.URI;
-
-import jakarta.ws.rs.core.UriInfo;
-
-import org.jboss.resteasy.plugins.server.servlet.ServletUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.jboss.resteasy.spi.ResteasyUriInfo;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 @Component
 public class SpringRequestAttributesProvider implements RequestAttributesProvider {
@@ -26,7 +26,7 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
   @Override
   public ServletRequestAttributes currentRequestAttributes() {
     RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-    if(attributes instanceof ServletRequestAttributes) {
+    if (attributes instanceof ServletRequestAttributes) {
       return (ServletRequestAttributes) attributes;
     }
     throw new IllegalStateException("Not a servlet request");
@@ -34,7 +34,7 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
 
   @Override
   public UriInfo getUriInfo() {
-    return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), OpalWsConfig.WS_ROOT);
+    return extractUriInfo(currentRequestAttributes().getRequest(), OpalWsConfig.WS_ROOT);
   }
 
   @Override
@@ -42,4 +42,14 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
     return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
   }
 
+
+  public static ResteasyUriInfo extractUriInfo(HttpServletRequest request, String servletPrefix) {
+    String contextPath = request.getContextPath();
+    if (servletPrefix != null && !servletPrefix.isEmpty() && !servletPrefix.equals("/")) {
+      if (!contextPath.endsWith("/") && !servletPrefix.startsWith("/"))
+        contextPath += "/";
+      contextPath += servletPrefix;
+    }
+    return new ResteasyUriInfo(request.getRequestURL().toString(), request.getQueryString(), contextPath);
+  }
 }

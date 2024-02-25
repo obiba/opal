@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

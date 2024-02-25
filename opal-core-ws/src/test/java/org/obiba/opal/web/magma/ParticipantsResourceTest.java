@@ -18,8 +18,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;

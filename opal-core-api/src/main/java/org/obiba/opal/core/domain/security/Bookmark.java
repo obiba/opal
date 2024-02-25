@@ -10,13 +10,12 @@
 
 package org.obiba.opal.core.domain.security;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
-
-import jakarta.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 

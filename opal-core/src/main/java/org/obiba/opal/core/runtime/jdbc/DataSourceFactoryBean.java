@@ -9,17 +9,13 @@
  */
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.sql.DataSource;
-
+import com.google.common.base.Strings;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.jta.JtaTransactionManager;
 
-import com.google.common.base.Strings;
+import javax.sql.DataSource;
 
 public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
@@ -41,28 +37,12 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   protected int maxPoolSize = MAX_POOL_SIZE;
 
-  protected boolean managed;
-
   protected String connectionProperties;
-
-  private JtaTransactionManager jtaTransactionManager;
-
-  @Autowired
-  public void setJtaTransactionManager(JtaTransactionManager jtaTransactionManager) {
-    this.jtaTransactionManager = jtaTransactionManager;
-  }
 
   @Override
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
-    BasicDataSource dataSource;
-
-    if(managed) {
-      dataSource = new BasicManagedDataSource();
-      ((BasicManagedDataSource)dataSource).setTransactionManager(jtaTransactionManager.getTransactionManager());
-    } else {
-      dataSource = new BasicDataSource();
-    }
+    BasicDataSource dataSource = new BasicDataSource();
 
     dataSource.setDriverClassName(driverClass);
     dataSource.setUrl(url);
@@ -146,7 +126,4 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     return url;
   }
 
-  public void setManaged(boolean managed) {
-    this.managed = managed;
-  }
 }

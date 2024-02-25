@@ -12,7 +12,7 @@ package org.obiba.opal.core.service;
 import java.io.IOException;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;

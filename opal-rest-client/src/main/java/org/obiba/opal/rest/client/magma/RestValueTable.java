@@ -30,7 +30,7 @@ import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Search;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

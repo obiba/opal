@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisStatus;

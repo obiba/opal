@@ -10,16 +10,16 @@
 
 package org.obiba.opal.web.provider;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.core.service.SQLException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -35,7 +35,7 @@ public class SQLExceptionMapper extends ErrorDtoExceptionMapper<SQLException> {
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(SQLException exception) {
+  protected Ws.ClientErrorDto getErrorDto(SQLException exception) {
     log.debug("SQL exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "SQLError", exception);
   }

@@ -10,7 +10,10 @@
 
 package org.obiba.opal.core.domain;
 
+import com.google.common.collect.Maps;
+
 import java.util.List;
+import java.util.Map;
 
 public interface HasUniqueProperties {
 
@@ -18,4 +21,13 @@ public interface HasUniqueProperties {
 
   List<Object> getUniqueValues();
 
+  default Map<String, Object> getProperties() {
+    Map<String, Object> props = Maps.newHashMap();
+    List<String> uniqueProps = getUniqueProperties();
+    List<Object> uniqueValues = getUniqueValues();
+    for (int i = 0; i < uniqueProps.size(); i++) {
+      props.put(uniqueProps.get(i), uniqueValues.get(i));
+    }
+    return props;
+  }
 }

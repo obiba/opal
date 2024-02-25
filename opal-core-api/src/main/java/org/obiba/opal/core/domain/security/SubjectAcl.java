@@ -12,11 +12,11 @@ package org.obiba.opal.core.domain.security;
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 

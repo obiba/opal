@@ -20,7 +20,7 @@ import org.obiba.opal.spi.r.AbstractROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.service;
 
+import org.obiba.opal.core.domain.Timestamped;
+
 import java.util.Calendar;
 import java.util.Date;
 

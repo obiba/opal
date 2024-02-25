@@ -17,7 +17,7 @@ import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 
 /**

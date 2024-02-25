@@ -15,7 +15,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasourceWrapper;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;

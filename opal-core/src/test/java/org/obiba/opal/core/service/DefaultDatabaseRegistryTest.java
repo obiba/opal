@@ -10,21 +10,9 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import jakarta.net.SocketFactory;
-import jakarta.net.ssl.SSLSocketFactory;
-import javax.sql.DataSource;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-
+import com.google.common.base.Predicate;
 import com.google.common.eventbus.EventBus;
 import org.easymock.EasyMock;
-import org.hibernate.SessionFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -34,33 +22,27 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasourceException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-import org.springframework.transaction.jta.JtaTransactionManager;
-
-import com.google.common.base.Predicate;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.net.ssl.SSLSocketFactory;
+import javax.sql.DataSource;
+import java.util.List;
+
 import static com.google.common.collect.Lists.newArrayList;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 import static org.obiba.opal.core.domain.database.Database.Usage;
 
 @ContextConfiguration(classes = DefaultDatabaseRegistryTest.Config.class)
-public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTests {
+public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -71,17 +53,16 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Autowired
   private DataSourceFactory dataSourceFactory;
 
-  @Autowired
-  private SessionFactoryFactory sessionFactoryFactory;
-
-  @Before
-  public void clear() throws Exception {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     databaseRegistry.stop();
     orientDbService.deleteAll(Database.class);
   }
 
-  @After
-  public void shutdown() throws Exception {
+  @Override
+  public void stopDB() {
+    super.stopDB();
     MagmaEngine.get().shutdown();
   }
 
@@ -164,22 +145,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
   }
 
-  @Test
+  @Test(expected = IllegalArgumentException.class)
   public void test_create_database_with_same_name() {
     Database database = createSqlDatabase();
     databaseRegistry.create(database);
-
-    try {
-      databaseRegistry.create(database);
-      fail("Should throw ConstraintViolationException");
-    } catch(ConstraintViolationException e) {
-      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations).hasSize(1);
-      ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage()).isEqualTo("must be unique");
-      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
-      assertThat(violation.getPropertyPath().toString()).isEqualTo("name");
-    }
+    databaseRegistry.create(database);
   }
 
   @Test
@@ -293,26 +263,6 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
-  public void test_get_session_factory() {
-    Database database = createSqlDatabase();
-    databaseRegistry.create(database);
-
-    DataSource mockDatasource = EasyMock.createMock(DataSource.class);
-    SessionFactory mockSessionFactory = EasyMock.createMock(SessionFactory.class);
-
-    reset(dataSourceFactory, sessionFactoryFactory);
-    expect(dataSourceFactory.createDataSource(database)).andReturn(mockDatasource).once();
-    expect(sessionFactoryFactory.getSessionFactory(mockDatasource)).andReturn(mockSessionFactory).once();
-    replay(dataSourceFactory, sessionFactoryFactory);
-
-    SessionFactory sessionFactory = databaseRegistry.getSessionFactory(database.getName(), "hibernate-datasource");
-    verify(sessionFactoryFactory, dataSourceFactory);
-
-    assertThat(mockSessionFactory).isEqualTo(sessionFactory);
-    assertThat(databaseRegistry.hasDatasource(database)).isTrue();
-  }
-
-  @Test
   public void test_unregister() {
     Database database = createSqlDatabase();
     databaseRegistry.create(database);
@@ -409,23 +359,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     }
 
     @Bean
-    public SessionFactoryFactory sessionFactoryFactory() {
-      return EasyMock.createMock(SessionFactoryFactory.class);
-    }
-
-    @Bean
-    public JtaTransactionManager jtaTransactionManager() {
-      return EasyMock.createMock(JtaTransactionManager.class);
-    }
-
-    @Bean
     public TransactionTemplate transactionTemplate() {
       return EasyMock.createMock(TransactionTemplate.class);
-    }
-
-    @Bean(name = "hibernate")
-    public Properties hibernateProperties() {
-      return new Properties();
     }
 
     @Bean

@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.magma.math;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.obiba.magma.math.summary.TextVariableSummary;
 import org.obiba.magma.math.summary.TextVariableSummaryFactory;

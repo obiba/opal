@@ -13,10 +13,11 @@ package org.obiba.opal.core.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
+
+import java.beans.Transient;
 import java.util.List;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.springframework.util.Assert;

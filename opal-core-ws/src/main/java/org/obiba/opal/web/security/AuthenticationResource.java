@@ -33,9 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.core.Response.Status;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 
 @Component
 @Path("/auth")

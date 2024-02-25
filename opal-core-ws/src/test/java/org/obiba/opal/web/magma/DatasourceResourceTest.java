@@ -19,11 +19,9 @@ import java.util.List;
 import java.util.Locale;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriInfo;
-
-import net.sf.ehcache.CacheManager;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
@@ -77,6 +75,8 @@ import org.springframework.context.ApplicationContext;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+
+import javax.cache.CacheManager;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

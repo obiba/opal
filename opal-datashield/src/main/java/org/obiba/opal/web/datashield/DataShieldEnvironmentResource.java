@@ -12,10 +12,10 @@ package org.obiba.opal.web.datashield;
 
 import java.util.List;
 
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.web.model.DataShield;

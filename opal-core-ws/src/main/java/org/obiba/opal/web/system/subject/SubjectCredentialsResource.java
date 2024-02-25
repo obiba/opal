@@ -10,11 +10,8 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
@@ -22,12 +19,11 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Component
@@ -52,11 +48,7 @@ public class SubjectCredentialsResource {
   public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if (subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
-      ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique",
-              SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
-              PathImpl.createPathFromString("name"), null, null);
-      throw new ConstraintViolationException(ImmutableSet.of(violation));
+      throw new BadRequestException("Subject name must be unique");
     }
 
     switch (subjectCredentials.getAuthenticationType()) {
@@ -69,11 +61,7 @@ public class SubjectCredentialsResource {
         if (dto.hasCertificate()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         } else {
-          ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
-              .forBeanValidation("{javax.validation.constraints.NotNull.message}", null, null,"may not be null",
-                  SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
-                  PathImpl.createPathFromString("certificate"), null, null);
-          throw new ConstraintViolationException(ImmutableSet.of(violation));
+          throw new BadRequestException("Subject certificate must be unique");
         }
         break;
     }

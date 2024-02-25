@@ -12,7 +12,7 @@ package org.obiba.opal.fs;
 
 import java.io.File;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 

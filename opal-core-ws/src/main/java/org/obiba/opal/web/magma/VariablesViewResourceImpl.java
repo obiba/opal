@@ -30,8 +30,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.core.Response;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

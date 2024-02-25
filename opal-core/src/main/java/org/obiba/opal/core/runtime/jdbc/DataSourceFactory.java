@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.runtime.jdbc;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -29,6 +29,8 @@ public class DataSourceFactory {
   @Value("${org.obiba.opal.jdbc.maxPoolSize}")
   private Integer maxPoolSize;
 
+  public DataSourceFactory() {}
+
   public DataSource createDataSource(@NotNull Database database) {
     DataSourceFactoryBean factoryBean = applicationContext.getAutowireCapableBeanFactory()
         .createBean(DataSourceFactoryBean.class);
@@ -45,12 +47,6 @@ public class DataSourceFactory {
     factoryBean.setPassword(sqlSettings.getPassword());
     factoryBean.setConnectionProperties(sqlSettings.getProperties());
     factoryBean.setMaxPoolSize(maxPoolSize);
-
-    if(database.getSqlSettings().getSqlSchema() == SqlSettings.SqlSchema.HIBERNATE) {
-      factoryBean.setManaged(true);
-    } else {
-      factoryBean.setManaged(false);
-    }
 
     return factoryBean.getObject();
   }

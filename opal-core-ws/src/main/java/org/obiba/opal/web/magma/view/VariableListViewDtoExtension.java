@@ -28,7 +28,7 @@ import org.obiba.opal.web.model.Magma.VariableListViewDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;

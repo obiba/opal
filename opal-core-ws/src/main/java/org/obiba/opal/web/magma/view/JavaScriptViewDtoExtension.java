@@ -26,7 +26,7 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

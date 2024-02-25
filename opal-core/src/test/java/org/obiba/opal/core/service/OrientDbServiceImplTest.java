@@ -10,39 +10,40 @@
 
 package org.obiba.opal.core.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import com.google.common.base.Throwables;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.google.common.base.Throwables;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = OrientDbServiceImplTest.Config.class)
-public class OrientDbServiceImplTest  extends AbstractJUnit4SpringContextTests {
+public class OrientDbServiceImplTest  extends AbstractOrientdbServiceTest {
 
   @Autowired
   private OrientDbService orientDbService;
 
-  @Autowired
-  private OrientDbServerFactory orientDbServerFactory;
-
-  private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
   @Test
   public void testDateDeserialization () {
     Date date = parseDate("2015-01-01 00:00:00");
 
-    try(ODatabaseDocumentTx tx = orientDbServerFactory.getDocumentTx()) {
+    try(ODatabaseDocument tx = orientDbServerFactory.getDocumentTx()) {
       ODocument document = new ODocument(SubjectProfile.class.getSimpleName());
       SubjectProfile profile = orientDbService
           .fromDocument(SubjectProfile.class, document.fromJSON("{\"created\": \""+ df.format(date) +"\"}"));
@@ -50,7 +51,7 @@ public class OrientDbServiceImplTest  extends AbstractJUnit4SpringContextTests {
       assertThat(profile.getCreated().getTime()).isEqualTo(date.getTime());
 
       profile = orientDbService
-          .fromDocument(SubjectProfile.class, document.fromJSON("{\"created\": " + String.valueOf(date.getTime()) + " }"));
+          .fromDocument(SubjectProfile.class, document.fromJSON("{\"created\": " + date.getTime() + " }"));
 
       assertThat(profile.getCreated().getTime()).isEqualTo(date.getTime());
     }
@@ -62,7 +63,7 @@ public class OrientDbServiceImplTest  extends AbstractJUnit4SpringContextTests {
     SubjectProfile profile = new SubjectProfile();
     profile.setCreated(date);
 
-    try(ODatabaseDocumentTx tx = orientDbServerFactory.getDocumentTx()) {
+    try(ODatabaseDocument tx = orientDbServerFactory.getDocumentTx()) {
       ODocument document = new ODocument(SubjectProfile.class.getSimpleName());
       orientDbService.copyToDocument(profile, document);
       assertThat(document.toJSON())
@@ -74,7 +75,7 @@ public class OrientDbServiceImplTest  extends AbstractJUnit4SpringContextTests {
     try {
       return df.parse(date);
     } catch(ParseException e) {
-      throw Throwables.propagate(e);
+      throw new RuntimeException(e);
     }
   }
 
