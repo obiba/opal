@@ -30,7 +30,7 @@ import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.vcs.OpalGitUtils;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.util.Collection;
 import java.util.List;

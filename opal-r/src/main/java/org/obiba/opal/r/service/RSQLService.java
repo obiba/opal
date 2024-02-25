@@ -39,7 +39,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.ForbiddenException;
+import javax.ws.rs.ForbiddenException;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;

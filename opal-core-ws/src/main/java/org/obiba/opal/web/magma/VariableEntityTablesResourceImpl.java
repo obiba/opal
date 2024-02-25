@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.GET;
+import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

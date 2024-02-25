@@ -11,10 +11,10 @@ package org.obiba.opal.core.crypt;
 
 import java.io.IOException;
 
-import jakarta.security.auth.callback.Callback;
-import jakarta.security.auth.callback.CallbackHandler;
-import jakarta.security.auth.callback.PasswordCallback;
-import jakarta.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;

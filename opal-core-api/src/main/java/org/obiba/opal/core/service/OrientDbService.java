@@ -10,20 +10,18 @@
 
 package org.obiba.opal.core.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
-import jakarta.annotation.Nullable;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.NotNull;
-
-import org.obiba.opal.core.domain.HasUniqueProperties;
-
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
+import org.obiba.opal.core.domain.HasUniqueProperties;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 public interface OrientDbService {
 
@@ -93,18 +91,18 @@ public interface OrientDbService {
 
   interface WithinDocumentTxCallback<T> {
 
-    T withinDocumentTx(ODatabaseDocumentTx db);
+    T withinDocumentTx(ODatabaseDocument db);
 
   }
 
   abstract class WithinDocumentTxCallbackWithoutResult implements WithinDocumentTxCallback<Void> {
 
     @Override
-    public final Void withinDocumentTx(ODatabaseDocumentTx db) {
+    public final Void withinDocumentTx(ODatabaseDocument db) {
       withinDocumentTxWithoutResult(db);
       return null;
     }
 
-    protected abstract void withinDocumentTxWithoutResult(ODatabaseDocumentTx db);
+    protected abstract void withinDocumentTxWithoutResult(ODatabaseDocument db);
   }
 }

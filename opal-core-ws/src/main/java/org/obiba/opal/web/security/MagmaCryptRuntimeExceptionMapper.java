@@ -10,15 +10,15 @@
 
 package org.obiba.opal.web.security;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -32,7 +32,7 @@ public class MagmaCryptRuntimeExceptionMapper extends ErrorDtoExceptionMapper<Ma
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(MagmaCryptRuntimeException exception) {
+  protected Ws.ClientErrorDto getErrorDto(MagmaCryptRuntimeException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "InvalidCertificate", exception);
   }
 

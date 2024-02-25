@@ -151,8 +151,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       ResponseEntity<String> response = restTemplate.postForEntity(builder.toUriString(), requestEntity, String.class);
       log.debug("write file: {}ms", calculateDuration(start));
       if (!response.getStatusCode().is2xxSuccessful()) {
-        log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
-        throw new RockServerException("File upload failed: " + response.getStatusCode().getReasonPhrase());
+        log.error("File upload to {} failed: {}", serverUrl, response.getStatusCode());
+        throw new RockServerException("File upload failed: " + response.getStatusCode());
       }
     } catch (RestClientException e) {
       calculateDuration(start);
@@ -178,8 +178,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
           (ResponseExtractor<Void>) response -> {
             calculateDuration(start);
             if (!response.getStatusCode().is2xxSuccessful()) {
-              log.error("File download from {} failed: {}", serverUrl, response.getStatusCode().getReasonPhrase());
-              throw new RRuntimeException("File download failed: " + response.getStatusCode().getReasonPhrase());
+              log.error("File download from {} failed: {}", serverUrl, response.getStatusCode());
+              throw new RRuntimeException("File download failed: " + response.getStatusCode());
             } else {
               ByteStreams.copy(response.getBody(), out);
               out.flush();

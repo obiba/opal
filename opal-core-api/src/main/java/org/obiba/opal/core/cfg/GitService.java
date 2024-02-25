@@ -11,7 +11,7 @@
 package org.obiba.opal.core.cfg;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.git.CommitInfo;
 

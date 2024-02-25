@@ -12,7 +12,7 @@ package org.obiba.opal.web.magma;
 
 import java.util.List;
 
-import jakarta.ws.rs.GET;
+import javax.ws.rs.GET;
 
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.model.Magma;

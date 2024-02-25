@@ -14,10 +14,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jakarta.security.auth.callback.Callback;
-import jakarta.security.auth.callback.CallbackHandler;
-import jakarta.security.auth.callback.PasswordCallback;
-import jakarta.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

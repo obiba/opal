@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;

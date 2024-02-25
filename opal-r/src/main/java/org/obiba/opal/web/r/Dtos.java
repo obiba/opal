@@ -23,8 +23,8 @@ import org.obiba.opal.web.model.Apps;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.model.Ws;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
 import java.util.stream.Collectors;

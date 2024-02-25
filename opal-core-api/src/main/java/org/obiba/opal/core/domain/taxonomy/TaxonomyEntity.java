@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

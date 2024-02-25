@@ -12,8 +12,8 @@ package org.obiba.opal.web.plugins;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.analysis.AnalysisService;

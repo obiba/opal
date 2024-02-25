@@ -18,8 +18,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Strings;
 

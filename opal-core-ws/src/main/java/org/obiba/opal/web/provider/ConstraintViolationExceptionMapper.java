@@ -11,13 +11,12 @@
 package org.obiba.opal.web.provider;
 
 import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
-
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -31,7 +30,7 @@ public class ConstraintViolationExceptionMapper extends ErrorDtoExceptionMapper<
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(ConstraintViolationException exception) {
+  protected Ws.ClientErrorDto getErrorDto(ConstraintViolationException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "ConstraintViolation", exception);
   }
 

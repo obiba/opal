@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;

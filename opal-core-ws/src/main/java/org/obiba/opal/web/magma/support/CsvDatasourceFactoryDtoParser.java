@@ -11,7 +11,7 @@ package org.obiba.opal.web.magma.support;
 
 import java.io.File;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.NoSuchValueTableException;

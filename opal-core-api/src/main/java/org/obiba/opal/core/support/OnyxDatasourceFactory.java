@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.support;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;

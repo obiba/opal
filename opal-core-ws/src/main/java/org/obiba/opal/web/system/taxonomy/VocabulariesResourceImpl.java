@@ -13,7 +13,7 @@ package org.obiba.opal.web.system.taxonomy;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;

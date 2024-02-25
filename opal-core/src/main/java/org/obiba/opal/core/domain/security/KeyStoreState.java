@@ -10,8 +10,8 @@
 package org.obiba.opal.core.domain.security;
 
 import com.google.common.collect.Lists;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 

@@ -20,7 +20,7 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 
 public abstract class AbstractIdentifiersResource {

@@ -14,7 +14,7 @@ import java.util.Arrays;
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.mozilla.javascript.RhinoException;

@@ -11,8 +11,10 @@
 package org.obiba.opal.core.service;
 
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
+import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -68,11 +69,14 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
     start();
   }
 
+  @Override
   public void start() throws Exception {
+    stop();
     log.info("Start OrientDB server ({})", url);
 
     System.setProperty("ORIENTDB_HOME", url.replaceFirst("^" + DEFAULT_SCHEME + ":", ""));
     System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
+    System.setProperty("java.util.logging.manager", "com.orientechnologies.common.log.OLogManager$DebugLogManager");
 
     ensureSecurityConfig();
 
@@ -89,9 +93,13 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
     stop();
   }
 
+  @Override
   public void stop() {
-    log.info("Stop OrientDB server ({})", url);
-    if(server != null) server.shutdown();
+    if (server != null) {
+      log.info("Stop OrientDB server ({})", url);
+      server.shutdown();
+      server = null;
+    }
   }
 
   @NotNull
@@ -102,11 +110,10 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
 
   @NotNull
   @Override
-  public ODatabaseDocumentTx getDocumentTx() {
+  public ODatabaseDocument getDocumentTx() {
     //TODO cache password
 //    String password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
     log.trace("Open OrientDB connection with username: {}", USERNAME);
-
     return poolFactory.get(url, USERNAME, PASSWORD).acquire();
   }
 
@@ -120,13 +127,13 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
       JSONObject securityObject = new JSONObject();
       securityObject.put("enabled", false);
       try (PrintWriter out = new PrintWriter(securityFile.getAbsolutePath())) {
-        out.println(securityObject.toString());
+        out.println(securityObject);
       }
     }
   }
 
   private void ensureDatabaseExists() {
-    try(ODatabaseDocumentTx database = new ODatabaseDocumentTx(url)) {
+    try(ODatabaseDocument database = new ODatabaseDocumentTx(url)) {
       if(!database.exists()) {
         database.create();
       }

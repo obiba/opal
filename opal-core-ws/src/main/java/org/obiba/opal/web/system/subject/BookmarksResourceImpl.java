@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.service.SubjectProfileService;

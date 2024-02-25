@@ -21,12 +21,12 @@ import org.obiba.opal.web.ws.SortDir;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-public class AbstractProtobufProvider {
+public abstract class AbstractProtobufProvider {
 
   @Autowired
   private final ProtobufProviderHelper helper = new ProtobufProviderHelper();

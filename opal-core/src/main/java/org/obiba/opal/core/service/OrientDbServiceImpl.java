@@ -10,24 +10,35 @@
 
 package org.obiba.opal.core.service;
 
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.gson.*;
+import com.orientechnologies.common.exception.OException;
+import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
+import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
+import com.orientechnologies.orient.core.index.OCompositeKey;
+import com.orientechnologies.orient.core.index.OIndex;
+import com.orientechnologies.orient.core.index.OIndexManager;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.OElement;
+import com.orientechnologies.orient.core.record.ORecord;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.orientechnologies.orient.core.tx.OTransaction;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.NonUniqueResultException;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.NotNull;
-
+import javax.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,35 +46,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.orientechnologies.orient.core.index.OCompositeKey;
-import com.orientechnologies.common.exception.OException;
-import com.orientechnologies.orient.core.command.OCommandOutputListener;
-
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.record.OIdentifiable;
-import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
-import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
-import com.orientechnologies.orient.core.index.OIndex;
-import com.orientechnologies.orient.core.index.OIndexManagerProxy;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OProperty;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.ORecord;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.core.tx.OTransaction;
+import java.beans.PropertyDescriptor;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class OrientDbServiceImpl implements OrientDbService {
@@ -71,17 +61,6 @@ public class OrientDbServiceImpl implements OrientDbService {
   private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
   private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-  public DefaultBeanValidator getDefaultBeanValidator() {
-    return defaultBeanValidator;
-  }
-
-  public void setDefaultBeanValidator(DefaultBeanValidator defaultBeanValidator) {
-    this.defaultBeanValidator = defaultBeanValidator;
-  }
-
-  @Autowired
-  private DefaultBeanValidator defaultBeanValidator;
 
   public OrientDbServerFactory getServerFactory() {
     return serverFactory;
@@ -101,10 +80,10 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> T execute(WithinDocumentTxCallback<T> callback) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       try {
         return callback.withinDocumentTx(db);
-      } catch(OException e) {
+      } catch (OException e) {
         db.rollback();
         throw e;
       }
@@ -114,9 +93,8 @@ public class OrientDbServiceImpl implements OrientDbService {
   public <T> void saveNonUnique(@NotNull T t) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(t != null, "t cannot be null");
-    defaultBeanValidator.validate(t);
 
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       ODocument document = toDocument(t);
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       log.debug("save {}", document);
@@ -141,15 +119,11 @@ public class OrientDbServiceImpl implements OrientDbService {
     Preconditions.checkArgument(beansByTemplate != null, "beansByTemplate cannot be null");
     Preconditions.checkArgument(!beansByTemplate.isEmpty(), "beansByTemplate cannot be empty");
 
-    for(HasUniqueProperties bean : beansByTemplate.values()) {
-      defaultBeanValidator.validate(bean);
-    }
-
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       Iterable<ODocument> documents = getDocuments(db, beansByTemplate);
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
 
-      for(ODocument document : documents) {
+      for (ODocument document : documents) {
         log.debug("save {}", document);
         document.save();
       }
@@ -158,12 +132,12 @@ public class OrientDbServiceImpl implements OrientDbService {
     }
   }
 
-  private Iterable<ODocument> getDocuments(ODatabaseDocumentTx db,
-      Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) {
+  private Iterable<ODocument> getDocuments(ODatabaseDocument db,
+                                           Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) {
     Collection<ODocument> documents = new ArrayList<>(beansByTemplate.size());
-    for(Map.Entry<HasUniqueProperties, HasUniqueProperties> entry : beansByTemplate.entrySet()) {
+    for (Map.Entry<HasUniqueProperties, HasUniqueProperties> entry : beansByTemplate.entrySet()) {
       ODocument document = findUniqueDocument(db, entry.getKey());
-      if(document == null) {
+      if (document == null) {
         document = toDocument(entry.getValue());
       } else {
         copyToDocument(entry.getValue(), document);
@@ -176,7 +150,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends HasUniqueProperties> T findUnique(@NotNull HasUniqueProperties template) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       ODocument document = findUniqueDocument(db, template);
       return document == null ? null : (T) fromDocument(template.getClass(), document);
     }
@@ -192,17 +166,30 @@ public class OrientDbServiceImpl implements OrientDbService {
     return gson.fromJson(json, classOfT);
   }
 
-  private ODocument findUniqueDocument(ODatabaseDocumentTx db, HasUniqueProperties template) {
-    OIndex<?> index = getIndex(db, template);
-    OIdentifiable identifiable = (OIdentifiable) index.get(getKey(template));
-    return identifiable == null ? null : identifiable.<ODocument>getRecord();
+  private ODocument findUniqueDocument(ODatabaseDocument db, HasUniqueProperties template) {
+    String stm = String.format("SELECT FROM %s WHERE %s", template.getClass().getSimpleName(), makeWhere(template));
+    try(OResultSet rs = db.query(stm, template.getProperties())) {
+      if (rs.hasNext()) {
+        OResult row = rs.next();
+        OElement el = row.getElement().orElse(null);
+        log.trace("Element class = {}", el == null ? null : el.getClass().getSimpleName());
+        return (ODocument) el;
+      }
+    }
+    return null;
   }
 
-  private OIndex<?> getIndex(ODatabaseDocumentTx db, HasUniqueProperties template) {
+  private String makeWhere(HasUniqueProperties template) {
+    return template.getUniqueProperties().stream()
+        .map(prop -> String.format("%s = :%s", prop, prop))
+        .collect(Collectors.joining(" AND "));
+  }
+
+  private OIndex getIndex(ODatabaseDocument db, HasUniqueProperties template) {
     return db.getMetadata().getIndexManager().getIndex(getIndexName(template));
   }
 
-  private OIndex<?> getIndex(ODatabaseDocumentTx db, Class<? extends HasUniqueProperties> clazz) {
+  private OIndex getIndex(ODatabaseDocument db, Class<? extends HasUniqueProperties> clazz) {
     String indexName = getIndexName(clazz);
     return db.getMetadata().getIndexManager().getIndex(indexName);
   }
@@ -231,8 +218,8 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void exportDatabase(File target) throws IOException {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
-      ODatabaseExport export = new ODatabaseExport(db, target.getAbsolutePath(), new OCommandOutputListener() {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
+      ODatabaseExport export = new ODatabaseExport((ODatabaseDocumentTx) db, target.getAbsolutePath(), new OCommandOutputListener() {
         @Override
         public void onMessage(String s) {
           log.info(s);
@@ -246,8 +233,8 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void importDatabase(File source) throws IOException {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
-      ODatabaseImport importDb = new ODatabaseImport(db, source.getAbsolutePath(), new OCommandOutputListener() {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
+      ODatabaseImport importDb = new ODatabaseImport((ODatabaseDocumentTx) db, source.getAbsolutePath(), new OCommandOutputListener() {
         @Override
         public void onMessage(String s) {
           log.info(s);
@@ -269,14 +256,14 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       return fromDocuments(db.browseClass(clazz.getSimpleName()), clazz);
     }
   }
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz, String sql, Object... params) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       return fromDocuments(db.<List<ODocument>>query(new OSQLSynchQuery<ODocument>(sql), params), clazz);
     }
   }
@@ -286,14 +273,14 @@ public class OrientDbServiceImpl implements OrientDbService {
   public <T> T uniqueResult(Class<T> clazz, String sql, Object... params) {
     try {
       return Iterables.getOnlyElement(list(clazz, sql, params), null);
-    } catch(IllegalArgumentException e) {
-      throw new NonUniqueResultException(
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
           "Non unique result for query '" + sql + "' with args: " + Arrays.asList(params));
     }
   }
 
   private <T> Iterable<T> fromDocuments(Iterable<ODocument> documents, final Class<T> clazz) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       Iterable<T> res = Iterables.transform(documents, new Function<ODocument, T>() {
         @Override
         public T apply(ODocument document) {
@@ -307,32 +294,32 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> long count(Class<T> clazz) {
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       return db.countClass(clazz.getSimpleName());
     }
   }
 
   @Override
   public void delete(@NotNull HasUniqueProperties... templates) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    ODatabaseDocument db = serverFactory.getDocumentTx();
     try {
 
       Collection<ODocument> documents = new ArrayList<>(templates.length);
-      for(HasUniqueProperties template : templates) {
+      for (HasUniqueProperties template : templates) {
         documents.add(findUniqueDocument(db, template));
       }
 
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-      for(ODocument document : documents) {
+      for (ODocument document : documents) {
         if (document != null)
-          db.delete(document);
+          document.delete();
       }
-      for(HasUniqueProperties template : templates) {
+      for (HasUniqueProperties template : templates) {
         getIndex(db, template).remove(getKey(template));
       }
       db.commit();
 
-    } catch(OException e) {
+    } catch (OException e) {
       db.rollback();
       throw e;
     } finally {
@@ -342,17 +329,16 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void deleteAll(@NotNull Class<? extends HasUniqueProperties> clazz) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    ODatabaseDocument db = serverFactory.getDocumentTx();
     try {
 
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-      for(ODocument document : db.browseClass(clazz.getSimpleName())) {
-        db.delete(document);
+      for (ODocument document : db.browseClass(clazz.getSimpleName())) {
+        document.delete();
       }
-      getIndex(db, clazz).clear();
       db.commit();
 
-    } catch(OException e) {
+    } catch (OException e) {
       db.rollback();
       throw e;
     } finally {
@@ -364,37 +350,35 @@ public class OrientDbServiceImpl implements OrientDbService {
   public void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz) {
     HasUniqueProperties bean = BeanUtils.instantiate(clazz);
 
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
-      OIndexManagerProxy ixManager = db.getMetadata().getIndexManager();
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
+      OIndexManager ixManager = db.getMetadata().getIndexManager();
 
-      if(ixManager.existsIndex(getIndexName(bean))) {
+      if (ixManager.existsIndex(getIndexName(bean))) {
         db.getMetadata().getIndexManager().dropIndex(getIndexName(bean));
       }
     }
 
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       String className = clazz.getSimpleName();
 
       OClass indexClass;
       OSchema schema = db.getMetadata().getSchema();
 
-      if(schema.existsClass(className)) {
+      if (schema.existsClass(className)) {
         indexClass = schema.getClass(className);
       } else {
         indexClass = schema.createClass(className);
-        schema.save();
       }
 
       List<String> uniqueProperties = bean.getUniqueProperties();
 
-      for(String propertyPath : uniqueProperties) {
+      for (String propertyPath : uniqueProperties) {
         OProperty property = indexClass.getProperty(propertyPath);
-        if(property == null) {
+        if (property == null) {
           PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(clazz, propertyPath);
           Class<?> propertyType = propertyDescriptor.getPropertyType();
           indexClass
               .createProperty(propertyPath, OType.getTypeByClass(propertyType.isEnum() ? String.class : propertyType));
-          schema.save();
         }
       }
 
@@ -408,32 +392,30 @@ public class OrientDbServiceImpl implements OrientDbService {
     //noinspection ConstantConditions
     Preconditions.checkArgument(propertyPath != null, "PropertyPath cannot be null");
 
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
-      OIndexManagerProxy ixManager = db.getMetadata().getIndexManager();
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
+      OIndexManager ixManager = db.getMetadata().getIndexManager();
 
-      if(ixManager.existsIndex(getIndexName(clazz, Lists.newArrayList(propertyPath)))) {
+      if (ixManager.existsIndex(getIndexName(clazz, Lists.newArrayList(propertyPath)))) {
         db.getMetadata().getIndexManager().dropIndex(getIndexName(clazz, Lists.newArrayList(propertyPath)));
       }
     }
 
-    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+    try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
       String className = clazz.getSimpleName();
 
       OClass indexClass;
       OSchema schema = db.getMetadata().getSchema();
 
-      if(schema.existsClass(className)) {
+      if (schema.existsClass(className)) {
         indexClass = schema.getClass(className);
       } else {
         indexClass = schema.createClass(className);
-        schema.save();
       }
 
-      for(String prop : propertyPath) {
+      for (String prop : propertyPath) {
         OProperty property = indexClass.getProperty(prop);
-        if(property == null) {
+        if (property == null) {
           indexClass.createProperty(prop, type);
-          schema.save();
         }
       }
 
@@ -452,13 +434,13 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private String getIndexName(Class<?> clazz, @NotNull Iterable<String> uniqueProperties) {
     StringBuilder indexName = new StringBuilder(clazz.getSimpleName());
-    for(String prop : uniqueProperties) {
+    for (String prop : uniqueProperties) {
       indexName.append(".").append(prop);
     }
     return indexName.toString();
   }
 
-  private class DateDeserializer implements JsonDeserializer<Date> {
+  private static class DateDeserializer implements JsonDeserializer<Date> {
 
     @Override
     public Date deserialize(JsonElement jsonElement, Type typeOF, JsonDeserializationContext context)
@@ -466,12 +448,12 @@ public class OrientDbServiceImpl implements OrientDbService {
 
       try {
         return new SimpleDateFormat(DATE_PATTERN).parse(jsonElement.getAsString());
-      } catch(ParseException e) {
+      } catch (ParseException e) {
       }
 
       try {
         return new Date(jsonElement.getAsLong());
-      } catch(NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new JsonParseException("Unparseable date: " + jsonElement.getAsString());
       }
     }

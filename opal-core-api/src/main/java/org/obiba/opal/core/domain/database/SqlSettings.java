@@ -10,13 +10,11 @@
 
 package org.obiba.opal.core.domain.database;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
-
 import com.google.common.base.MoreObjects;
+import jakarta.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 
 public class SqlSettings {
 

@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.web.provider;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class MagmaRRuntimeExceptionMapper extends ErrorDtoExceptionMapper<MagmaR
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(MagmaRRuntimeException exception) {
+  protected Ws.ClientErrorDto getErrorDto(MagmaRRuntimeException exception) {
     log.warn("Magma R exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "MagmaRRuntimeException", exception.getMessage()).build();
   }

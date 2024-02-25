@@ -42,7 +42,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 
 @ContextConfiguration(classes = TaxonomyServiceImplTest.Config.class)
-public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
+public class TaxonomyServiceImplTest extends AbstractOrientdbServiceTest {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImplTest.class);
 
@@ -57,8 +57,9 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     }
   };
 
-  @Before
-  public void clear() {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     ((TaxonomyServiceImpl)taxonomyService).clear();
   }
 

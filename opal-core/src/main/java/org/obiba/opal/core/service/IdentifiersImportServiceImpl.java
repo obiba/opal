@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;

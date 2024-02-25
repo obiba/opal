@@ -31,10 +31,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

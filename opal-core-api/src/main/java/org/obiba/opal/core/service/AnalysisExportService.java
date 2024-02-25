@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.service;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 

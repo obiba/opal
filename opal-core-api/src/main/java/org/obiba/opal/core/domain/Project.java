@@ -9,15 +9,15 @@
  */
 package org.obiba.opal.core.domain;
 
+import java.beans.Transient;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.google.common.collect.Sets;
 import org.obiba.magma.*;
@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 /**
  * Description of a project in Opal.
  */
-public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project>, Timestamped {
+public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project>, org.obiba.magma.Timestamped {
 
   @NotNull
   @NotBlank

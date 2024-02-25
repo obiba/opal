@@ -62,7 +62,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;

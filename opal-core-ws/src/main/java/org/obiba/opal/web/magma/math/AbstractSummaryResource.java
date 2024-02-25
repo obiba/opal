@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.magma.math;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;

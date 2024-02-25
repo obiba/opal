@@ -10,15 +10,14 @@
 
 package org.obiba.opal.web.magma.provider;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
-
 import org.obiba.magma.js.validation.CircularVariableDependencyException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -33,7 +32,7 @@ public class CircularVariableDependencyExceptionMapper
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(CircularVariableDependencyException exception) {
+  protected Ws.ClientErrorDto getErrorDto(CircularVariableDependencyException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "CircularVariableDependency")
         .addArguments(exception.getVariableRef()).addArguments(exception.getHierarchy()).build();
   }

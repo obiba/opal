@@ -25,10 +25,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Component("opalRSymbolResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

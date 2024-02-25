@@ -15,7 +15,7 @@ import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.opal.spi.r.RServerConnection;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 public class RAssignDatasourceFactory extends AbstractDatasourceFactory {
 

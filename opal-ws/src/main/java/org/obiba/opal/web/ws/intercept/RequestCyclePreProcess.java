@@ -11,7 +11,7 @@ package org.obiba.opal.web.ws.intercept;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.spi.HttpRequest;

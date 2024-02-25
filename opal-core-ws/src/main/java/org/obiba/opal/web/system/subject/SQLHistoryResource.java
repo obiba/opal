@@ -12,9 +12,9 @@ package org.obiba.opal.web.system.subject;
 
 import org.obiba.opal.web.model.SQL;
 
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.QueryParam;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 
 public interface SQLHistoryResource {

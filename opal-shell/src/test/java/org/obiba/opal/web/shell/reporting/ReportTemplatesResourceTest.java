@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.Subject;

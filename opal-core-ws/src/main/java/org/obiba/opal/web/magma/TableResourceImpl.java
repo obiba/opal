@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.core.Request;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;

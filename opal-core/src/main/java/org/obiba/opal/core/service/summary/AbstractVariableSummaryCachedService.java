@@ -14,12 +14,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
-import jakarta.validation.constraints.NotNull;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import javax.validation.constraints.NotNull;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 
 import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Timestamped;
@@ -54,15 +55,16 @@ public abstract class AbstractVariableSummaryCachedService< //
 
   private static final Logger log = LoggerFactory.getLogger(AbstractVariableSummaryCachedService.class);
 
+  private final Cache<String, VariableSummary> summaryCache = CacheBuilder.newBuilder().build();
+
   // Map<TableReference, Map<VariableName, TVariableSummaryBuilder>>
   private final Map<String, Map<String, TVariableSummaryBuilder>> summaryBuilders = Collections
       .synchronizedMap(new HashMap<String, Map<String, TVariableSummaryBuilder>>());
 
   @NotNull
-  protected abstract Cache getCache();
-
-  @NotNull
   protected abstract TVariableSummaryBuilder newVariableSummaryBuilder(@NotNull Variable variable);
+
+  protected abstract String getCacheName();
 
   @NotNull
   protected TVariableSummaryBuilder getSummaryBuilder(@NotNull ValueTable valueTable, @NotNull Variable variable) {
@@ -85,7 +87,6 @@ public abstract class AbstractVariableSummaryCachedService< //
   }
 
   protected void computeAndCacheSummaries(ValueTable table) {
-    Cache cache = getCache();
     Iterable<TVariableSummaryBuilder> variableSummaryBuilders = getSummaryBuilders(table);
     for(TVariableSummaryBuilder summaryBuilder : variableSummaryBuilders) {
       String variableName = summaryBuilder.getVariable().getName();
@@ -93,7 +94,7 @@ public abstract class AbstractVariableSummaryCachedService< //
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
       log.trace("Cache {} {} summary with key '{}'", variableName, getSummaryType(summary), key);
-      cache.put(new Element(key, summary));
+      summaryCache.put(key, summary);
     }
   }
 
@@ -123,7 +124,7 @@ public abstract class AbstractVariableSummaryCachedService< //
 
   public boolean isSummaryCached(@NotNull TVariableSummaryFactory summaryFactory) {
     String key = summaryFactory.getCacheKey();
-    boolean inCache = getCache().get(key) != null;
+    boolean inCache = summaryCache.getIfPresent(key) != null;
     log.trace("{} summary {} cache {} ({})", StringUtils.capitalize(getSummaryType(summaryFactory)),
         inCache ? "IN" : "NOT IN", summaryFactory.getVariable().getName(), key);
     return inCache;
@@ -135,43 +136,27 @@ public abstract class AbstractVariableSummaryCachedService< //
   }
 
   private void clearVariableSummaryCache(@NotNull TVariableSummaryFactory summaryFactory) {
-    Cache cache = getCache();
     String key = summaryFactory.getCacheKey();
-    cache.remove(key);
+    summaryCache.invalidate(key);
   }
 
   @SuppressWarnings("unchecked")
   private TVariableSummary getCached(TVariableSummaryFactory summaryFactory) {
-    Cache cache = getCache();
     String key = summaryFactory.getCacheKey();
-    Element element = cache.get(key);
-    String variableName = summaryFactory.getVariable().getName();
-
-    String summaryType = getSummaryType(summaryFactory);
-    if(element == null) {
-      log.debug("No {} summary in cache for {} ({})", summaryType, variableName, key);
-      return cacheSummary(summaryFactory, cache, key);
+    try {
+      return (TVariableSummary) summaryCache.get(key, (Callable) () -> {
+        String variableName = summaryFactory.getVariable().getName();
+        String summaryType = getSummaryType(summaryFactory);
+        log.debug("No {} summary in cache for {} ({})", summaryType, variableName, key);
+        return summaryFactory.getSummary();
+      });
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e);
     }
-
-    // check timestamps
-    if(isCacheObsolete(element, summaryFactory.getTable())) {
-      log.trace("Cache is obsolete for {} ({})", variableName, key);
-      return cacheSummary(summaryFactory, cache, key);
-    }
-    log.debug("Use cached {} summary for {} ({})", summaryType, variableName, key);
-    return (TVariableSummary) element.getObjectValue();
   }
 
-  private TVariableSummary cacheSummary(TVariableSummaryFactory summaryFactory, Ehcache cache, String key) {
-    TVariableSummary summary = summaryFactory.getSummary();
-
-    log.trace("Cache {} summary for {} ({})", getSummaryType(summaryFactory), summary.getVariableName(), key);
-    cache.put(new Element(key, summary));
-    return summary;
-  }
-
-  private boolean isCacheObsolete(Element element, Timestamped table) {
-    Date creationTime = new Date(element.getCreationTime());
+  // TODO eviction strategy
+  private boolean isCacheObsolete(Date creationTime, Timestamped table) {
     Value lastUpdate = table.getTimestamps().getLastUpdate();
     return !lastUpdate.isNull() && ((Date) lastUpdate.getValue()).after(creationTime);
   }

@@ -13,13 +13,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
@@ -45,6 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.cache.Cache;
+import javax.cache.CacheManager;
 
 @Component
 @Scope("request")

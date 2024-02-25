@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.core.*;
+import javax.ws.rs.core.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;

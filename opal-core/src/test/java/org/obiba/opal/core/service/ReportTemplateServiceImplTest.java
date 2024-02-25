@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = ReportTemplateServiceImplTest.Config.class)
-public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTests {
+public class ReportTemplateServiceImplTest extends AbstractOrientdbServiceTest {
 
   @Autowired
   private ReportTemplateService reportTemplateService;
@@ -31,8 +31,9 @@ public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTe
   @Autowired
   private OrientDbService orientDbService;
 
-  @Before
-  public void clear() {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     orientDbService.deleteAll(ReportTemplate.class);
   }
 

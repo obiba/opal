@@ -104,7 +104,7 @@ public class RockServerDiscoveryService {
         hostsToCheck.put(url, app);
         return true;
       } else {
-        log.debug(">> Down! {}: {}", response.getStatusCodeValue(), response.getStatusCode().getReasonPhrase());
+        log.debug(">> Down! {}", response.getStatusCode());
         return false;
       }
     } catch (Exception e) {

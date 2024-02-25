@@ -32,10 +32,6 @@
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
-  <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
-
-  <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.DefaultBeanValidator"/>
-
   <bean id="orientDbService" class="org.obiba.opal.core.service.OrientDbServiceImpl"/>
 
   <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.LocalOrientDbServerFactory"/>

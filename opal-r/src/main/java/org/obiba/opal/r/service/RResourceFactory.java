@@ -11,6 +11,8 @@
 package org.obiba.opal.r.service;
 
 import com.google.common.collect.Lists;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Value;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.service.ResourceProvidersService;
@@ -19,7 +21,7 @@ import org.obiba.opal.spi.resource.impl.DefaultResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.script.ScriptEngine;
+import javax.script.ScriptEngine;
 import java.util.List;
 
 class RResourceFactory implements ResourceProvidersService.ResourceFactory {
@@ -30,12 +32,9 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
 
   private final JSONObject factoryObj;
 
-  private final ScriptEngine engine;
-
-  RResourceFactory(String provider, JSONObject factoryObj, ScriptEngine engine) {
+  RResourceFactory(String provider, JSONObject factoryObj) {
     this.provider = provider;
     this.factoryObj = factoryObj;
-    this.engine = engine;
   }
 
   @Override
@@ -84,9 +83,9 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
   public Resource createResource(String name, JSONObject parameters, JSONObject credentials) {
     try {
       JSONObject resource = new JSONObject();
-      if (engine != null) {
+      try (Context context = Context.create()) {
         String varName = provider.replaceAll("\\.", "_");
-        Object rsrc = engine.eval(String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), name,
+        Value rsrc = context.eval("js", String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), name,
             parameters == null ? "undefined" : parameters.toString(),
             credentials == null ? "undefined" : credentials.toString()));
         if (rsrc != null)

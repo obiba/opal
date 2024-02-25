@@ -23,10 +23,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.core.PathSegment;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;

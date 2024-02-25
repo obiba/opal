@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.core.util.FileUtil;
 import org.obiba.git.CommitInfo;

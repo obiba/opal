@@ -18,8 +18,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 @Component
 @Transactional

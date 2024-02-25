@@ -17,7 +17,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.WhereClause;
 import org.obiba.opal.web.model.Magma;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

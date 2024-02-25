@@ -9,15 +9,15 @@
  */
 package org.obiba.opal.web.project;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -31,7 +31,7 @@ public class NoSuchProjectExceptionMapper extends ErrorDtoExceptionMapper<NoSuch
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchProjectException exception) {
+  protected Ws.ClientErrorDto getErrorDto(NoSuchProjectException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchProject").addArguments(exception.getProjectName())
         .build();
   }

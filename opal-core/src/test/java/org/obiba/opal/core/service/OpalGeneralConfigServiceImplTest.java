@@ -10,9 +10,10 @@
 
 package org.obiba.opal.core.service;
 
-import java.util.Locale;
-
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -22,14 +23,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.google.common.collect.Lists;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import java.util.Locale;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.Config.class)
-public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContextTests {
+public class OpalGeneralConfigServiceImplTest extends AbstractOrientdbServiceTest {
 
   @Autowired
   private OpalGeneralConfigService opalGeneralConfigService;
@@ -37,14 +36,12 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
   @Autowired
   private OrientDbService orientDbService;
 
-  @Autowired
-  private EventBus eventBus;
-
-  @Before
-  public void setUp() throws Exception {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
       @Override
-      protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
+      protected void withinDocumentTxWithoutResult(ODatabaseDocument db) {
         String className = OpalGeneralConfig.class.getSimpleName();
         OSchema schema = db.getMetadata().getSchema();
         if(schema.getClass(className) != null) {

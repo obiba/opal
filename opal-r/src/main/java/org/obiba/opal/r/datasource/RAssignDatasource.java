@@ -32,7 +32,7 @@ import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.util.Collection;
 import java.util.List;

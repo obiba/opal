@@ -1,17 +1,9 @@
-<!--
-  ~ Copyright (c) 2021 OBiBa. All rights reserved.
-  ~
-  ~ This program and the accompanying materials
-  ~ are made available under the terms of the GNU Public License v3.0.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <context:annotation-config/>
 
@@ -29,10 +21,17 @@
 
   <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
 
-  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+  <bean id="cacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
     <property name="cacheManagerName" value="opal"/>
     <property name="configLocation" value="classpath:ehcache.xml"/>
     <property name="shared" value="true"/>
   </bean>
+
+  <bean id="cacheManager"
+        class="org.springframework.cache.jcache.JCacheCacheManager"
+        p:cache-manager-ref="jCacheManager"/>
+
+  <!-- JSR-107 cache manager setup  -->
+  <bean id="jCacheManager" />
 
 </beans>

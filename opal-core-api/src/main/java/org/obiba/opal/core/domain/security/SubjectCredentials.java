@@ -10,12 +10,12 @@
 package org.obiba.opal.core.domain.security;
 
 import com.google.common.collect.Lists;
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
