@@ -132,16 +132,18 @@
       <artifactId>spring-orm</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.ow2.jotm</groupId>
-      <artifactId>jotm-core</artifactId>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-connector-1.5-spec</artifactId>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-jdbc</artifactId>
+      <classifier>jakarta</classifier>
     </dependency>
     <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-jta-1.1-spec</artifactId>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-jta</artifactId>
+      <classifier>jakarta</classifier>
     </dependency>
     <dependency>
       <groupId>dev.samstevens.totp</groupId>
@@ -186,7 +188,7 @@
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-ext-jdk18on</artifactId>
+      <artifactId>bcprov-jdk18on</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
@@ -195,7 +197,13 @@
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <classifier>jakarta</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-spring</artifactId>
+      <classifier>jakarta</classifier>
     </dependency>
     <dependency>
       <groupId>org.ehcache.integrations.shiro</groupId>

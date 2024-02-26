@@ -76,6 +76,10 @@
       <artifactId>jetty-server</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.resteasy.spring</groupId>
       <artifactId>resteasy-spring</artifactId>
     </dependency>

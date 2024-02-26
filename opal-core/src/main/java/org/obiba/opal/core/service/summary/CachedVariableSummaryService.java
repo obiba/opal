@@ -22,13 +22,9 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.service.VariableSummaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-
-import javax.cache.Cache;
-import javax.cache.CacheManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,9 +35,6 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
   @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.cache.variableSummaries}")
   private boolean cacheSummaries;
-
-  @Autowired
-  private CacheManager cacheManager;
 
   private final Map<Class<? extends VariableSummaryFactory<?>>, AbstractVariableSummaryCachedService<?, ?, ?>>
       summaryServices = new HashMap<>();
