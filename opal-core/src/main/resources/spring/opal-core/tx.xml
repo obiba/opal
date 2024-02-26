@@ -10,19 +10,64 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:tx="http://www.springframework.org/schema/tx"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    xsi:schemaLocation="
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx.xsd">
 
   <tx:annotation-driven/>
 
-  <bean id="jotm" class="org.obiba.opal.core.tx.JotmFactoryBean"/>
+  <bean id="userTransactionService"
+        class="com.atomikos.icatch.config.UserTransactionServiceImp"
+        init-method="init" destroy-method="shutdownForce">
+    <constructor-arg>
+      <!-- IMPORTANT: specify all Atomikos properties here -->
+      <props>
+        <prop key="com.atomikos.icatch.service">
+          com.atomikos.icatch.standalone.UserTransactionServiceFactory
+        </prop>
+      </props>
+    </constructor-arg>
+  </bean>
 
-  <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-    <property name="transactionManager" ref="jotm"/>
-    <property name="userTransaction" ref="jotm"/>
-    <!-- Set a very high timeout (10 days) -->
-    <property name="defaultTimeout" value="864000"/>
-    <property name="allowCustomIsolationLevels" value="true"/>
+  <!--
+       Construct Atomikos UserTransactionManager,
+       needed to configure Spring
+  -->
+  <bean id="atomikosTransactionManager"
+        class="com.atomikos.icatch.jta.UserTransactionManager"
+        init-method="init" destroy-method="close"
+        depends-on="userTransactionService">
+
+    <!-- IMPORTANT: disable startup because the userTransactionService above does this -->
+    <property name="startupTransactionService" value="false"/>
+
+    <!--
+          when close is called,
+          should we force transactions to terminate or not?
+    -->
+    <property name="forceShutdown" value="false" />
+  </bean>
+
+  <!--
+       Also use Atomikos UserTransactionImp,
+       needed to configure Spring
+  -->
+  <bean id="atomikosUserTransaction"
+        class="com.atomikos.icatch.jta.UserTransactionImp"
+        depends-on="userTransactionService">
+    <property name="transactionTimeout" value="300" />
+  </bean>
+
+  <!--
+     Configure the Spring framework to use JTA transactions from Atomikos
+  -->
+  <bean id="transactionManager"
+        class="org.springframework.transaction.jta.JtaTransactionManager"
+        depends-on="userTransactionService">
+    <property name="transactionManager" ref="atomikosTransactionManager" />
+    <property name="userTransaction" ref="atomikosUserTransaction" />
   </bean>
 
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">

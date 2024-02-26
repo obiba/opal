@@ -10,7 +10,7 @@
   -->
 <config xmlns='http://www.ehcache.org/v3'>
 
-  <persistence directory="${AGATE_HOME}/work/ehcache"/>
+  <persistence directory="${OPAL_HOME}/work/ehcache"/>
 
   <cache alias="shiro-activeSessionCache">
     <key-type serializer="org.ehcache.impl.serialization.CompactJavaSerializer">

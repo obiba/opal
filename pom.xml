@@ -31,6 +31,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <antlr.version>4.7.1</antlr.version>
+    <atomikos.version>6.0.0</atomikos.version>
     <bouncycastle.version>1.76</bouncycastle.version>
     <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
@@ -67,15 +68,14 @@
     <jgit.version>3.6.2.201501210735-r</jgit.version>
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.8.2</joda-time.version>
-    <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
     <json.version>20231013</json.version>
     <json-smart.version>2.4.10</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.13.2</junit.version>
-    <liquibase.version>4.15.0</liquibase.version>
-    <liquibase-slf4j.version>4.1.0</liquibase-slf4j.version>
+    <liquibase.version>4.26.0</liquibase.version>
+    <liquibase-slf4j.version>5.0.0</liquibase-slf4j.version>
     <lang-tag.version>1.4.4</lang-tag.version>
     <logback.version>1.4.14</logback.version>
     <logstash-logback.version>7.2</logstash-logback.version>
@@ -99,9 +99,9 @@
     <protobuf.version>3.24.3</protobuf.version>
     <quartz.version>2.3.2</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>3.15.6.Final</resteasy.version>
+    <resteasy.version>6.2.7.Final</resteasy.version>
+    <resteasy-jaxrs.version>3.15.6.Final</resteasy-jaxrs.version>
     <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
-    <resteasy-multipart.version>6.2.7.Final</resteasy-multipart.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
     <shiro.version>1.13.0</shiro.version>
@@ -578,59 +578,23 @@
       </dependency>
 
       <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>jta</artifactId>
-        <version>${jta.version}</version>
+        <groupId>jakarta.transaction</groupId>
+        <artifactId>jakarta.transaction-api</artifactId>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.ow2.jotm</groupId>
-        <artifactId>jotm-core</artifactId>
-        <version>${jotm.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.ow2.carol.irmi</groupId>
-            <artifactId>irmi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.objectweb.howl</groupId>
-            <artifactId>howl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-admin</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-jndi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb-idl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>com.atomikos</groupId>
+        <artifactId>transactions-jdbc</artifactId>
+        <version>${atomikos.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-connector-1.5-spec</artifactId>
-        <version>${ow2-spec.version}</version>
+        <groupId>com.atomikos</groupId>
+        <artifactId>transactions-jta</artifactId>
+        <version>${atomikos.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
-      <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-jta-1.1-spec</artifactId>
-        <version>${ow2-spec.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-dbcp2</artifactId>
@@ -894,6 +858,17 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-spring</artifactId>
         <version>${shiro.version}</version>
+        <classifier>jakarta</classifier>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.ehcache.integrations.shiro</groupId>
@@ -908,6 +883,10 @@
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -931,7 +910,7 @@
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-ext-jdk18on</artifactId>
+        <artifactId>bcprov-jdk18on</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
       <dependency>
@@ -962,72 +941,35 @@
       <!-- RESTEasy dependencies -->
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
+        <artifactId>resteasy-core</artifactId>
         <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${resteasy-jaxrs.version}</version>
         <exclusions>
-<!--          <exclusion>-->
-<!--            <groupId>org.slf4j</groupId>-->
-<!--            <artifactId>slf4j-simple</artifactId>-->
-<!--          </exclusion>-->
-<!--          &lt;!&ndash; Ideally we would exclude org.scannotation:scannotation, but that's not possible due to ConfigurationBootstrap &ndash;&gt;-->
-<!--          <exclusion>-->
-<!--            <groupId>javassist</groupId>-->
-<!--            <artifactId>javassist</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>commons-httpclient</groupId>-->
-<!--            <artifactId>commons-httpclient</artifactId>-->
-<!--          </exclusion>-->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
-<!--          &lt;!&ndash; Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). &ndash;&gt;-->
-<!--          <exclusion>-->
-<!--            <groupId>javax.xml.stream</groupId>-->
-<!--            <artifactId>stax-api</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>org.apache.httpcomponents.client5</groupId>-->
-<!--            <artifactId>httpclient5</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>javax.activation</groupId>-->
-<!--            <artifactId>activation</artifactId>-->
-<!--          </exclusion>-->
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy.spring</groupId>
         <artifactId>resteasy-spring</artifactId>
         <version>${resteasy-spring.version}</version>
-<!--        <exclusions>-->
-<!--          <exclusion>-->
-<!--            <groupId>commons-httpclient</groupId>-->
-<!--            <artifactId>commons-httpclient</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>commons-logging</groupId>-->
-<!--            <artifactId>commons-logging</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>javax.xml.stream</groupId>-->
-<!--            <artifactId>stax-api</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>com.sun.xml.bind</groupId>-->
-<!--            <artifactId>jaxb-impl</artifactId>-->
-<!--          </exclusion>-->
-<!--          <exclusion>-->
-<!--            <groupId>javax.activation</groupId>-->
-<!--            <artifactId>activation</artifactId>-->
-<!--          </exclusion>-->
-<!--        </exclusions>-->
+        <exclusions>
+          <exclusion>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-multipart-provider</artifactId>
-        <version>${resteasy-multipart.version}</version>
+        <version>${resteasy.version}</version>
       </dependency>
 
       <!-- Jetty dependencies -->
@@ -1320,6 +1262,12 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-core</artifactId>
         <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
