@@ -12,9 +12,9 @@ package org.obiba.opal.server.ssl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import jakarta.net.ssl.KeyManager;
-import jakarta.net.ssl.SSLContext;
-import jakarta.net.ssl.TrustManager;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;

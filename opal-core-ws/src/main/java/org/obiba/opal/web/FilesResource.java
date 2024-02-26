@@ -10,17 +10,15 @@
 package org.obiba.opal.web;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import jakarta.annotation.Nullable;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.jboss.resteasy.annotations.cache.Cache;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
@@ -36,8 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -287,9 +283,9 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  public Response uploadFile(@Context UriInfo uriInfo, @Context HttpServletRequest request)
-      throws IOException, FileUploadException {
-    return uploadFile("/", uriInfo, request);
+  public Response uploadFile(@Context UriInfo uriInfo, @MultipartForm MultipartFormDataInput input)
+      throws IOException {
+    return uploadFile("/", uriInfo, input);
   }
 
   // The POST method is required here to be compatible with Html forms which do not support the PUT method.
@@ -299,7 +295,7 @@ public class FilesResource {
   @Produces("text/html")
   @AuthenticatedByCookie
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo,
-                             @Context HttpServletRequest request) throws IOException, FileUploadException {
+                             @MultipartForm MultipartFormDataInput input) throws IOException {
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -311,7 +307,7 @@ public class FilesResource {
       return Response.status(Status.FORBIDDEN).entity("Not a folder: " + path).build();
     }
 
-    List<FileItem> uploadedFiles = getUploadedFiles(request);
+    List<InputPart> uploadedFiles = getUploadedFiles(input);
     if (uploadedFiles.isEmpty()) {
       return Response.status(Status.BAD_REQUEST)
           .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
@@ -321,11 +317,11 @@ public class FilesResource {
     return doUploadFiles(folderPath, folder, uploadedFiles, uriInfo);
   }
 
-  private Response doUploadFiles(String folderPath, FileObject folder, List<FileItem> uploadedFiles, UriInfo uriInfo)
+  private Response doUploadFiles(String folderPath, FileObject folder, List<InputPart> uploadedFiles, UriInfo uriInfo)
       throws FileSystemException {
 
-    for (FileItem uploadedFile : uploadedFiles) {
-      String fileName = uploadedFile.getName();
+    for (InputPart uploadedFile : uploadedFiles) {
+      String fileName = uploadedFile.getFileName();
       // #3275 make sure file name is valid
       if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
         return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
@@ -677,24 +673,22 @@ public class FilesResource {
    * Returns the first {@code FileItem} that is represents a file upload field. If no such field exists, this method
    * returns null
    *
-   * @param request
+   * @param input
    * @return
-   * @throws FileUploadException
+   * @throws IOException
    */
-  List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
-    FileItemFactory factory = new DiskFileItemFactory();
-    ServletFileUpload upload = new ServletFileUpload(factory);
-    List<FileItem> files = Lists.newArrayList();
-    for (FileItem fileItem : upload.parseRequest(request)) {
-      if (!fileItem.isFormField()) {
-        files.add(fileItem);
-      }
-    }
-    return files;
+  List<InputPart> getUploadedFiles(MultipartFormDataInput input) throws IOException {
+    // Get API input data
+    Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+
+    // Get file name
+    String fileName = uploadForm.get("fileName").get(0).getBodyAsString();
+
+    // Get file data to save
+    return uploadForm.get("attachment");
   }
 
-  private void writeUploadedFileToFileSystem(FileItem uploadedFile, FileObject fileToWriteTo) {
-
+  private void writeUploadedFileToFileSystem(InputPart uploadedFile, FileObject fileToWriteTo) {
     // OPAL-919: We need to wrap the OutputStream returned by commons-vfs into another OutputStream
     // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
     // when copying large files.
@@ -706,7 +700,7 @@ public class FilesResource {
       }
 
     };
-         InputStream uploadedFileStream = uploadedFile.getInputStream()) {
+         InputStream uploadedFileStream = uploadedFile.getBody(InputStream.class, null)) {
 
       StreamUtil.copy(uploadedFileStream, localFileStream);
     } catch (IOException couldNotWriteUploadedFile) {

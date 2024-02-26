@@ -33,7 +33,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.KeyStoreService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -205,7 +205,7 @@ public class KeyStoreResource {
     if(certificates == null || certificates.length == 0) throw new IllegalArgumentException("Cannot find certificate for alias: " + alias);
 
     StringWriter writer = new StringWriter();
-    PEMWriter pemWriter = new PEMWriter(writer);
+    JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
     for (Certificate certificate : certificates) {
       pemWriter.writeObject(certificate);
     }
