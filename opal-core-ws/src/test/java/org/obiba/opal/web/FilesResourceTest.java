@@ -10,9 +10,9 @@
 package org.obiba.opal.web;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.vfs2.*;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -23,13 +23,13 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
 
-import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
@@ -52,7 +52,7 @@ public class FilesResourceTest {
 
   private FileObject fileObjectMock;
 
-  private FileItem fileItemMock;
+  private InputPart fileItemMock;
 
   private UriInfo uriInfoMock;
 
@@ -76,7 +76,7 @@ public class FilesResourceTest {
     filesResource.setOpalFileSystemService(opalFileSystemServiceMock);
     filesResource.setSubjectAclService(subjectAclServiceMock);
 
-    fileItemMock = createMock(FileItem.class);
+    fileItemMock = createMock(InputPart.class);
     fileObjectMock = createMock(FileObject.class);
 
     uriInfoMock = createMock(UriInfo.class);
@@ -260,16 +260,16 @@ public class FilesResourceTest {
 
   @Test
   @Ignore
-  public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
+  public void testUploadFileToFileSystem() throws IOException {
     expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
-    expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
-    expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
+    expect(fileItemMock.getFileName()).andReturn("fileToUpload.txt").atLeastOnce();
+    expect(fileItemMock.getBody(InputStream.class, null)).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
         .once();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+      protected List<InputPart> getUploadedFiles(MultipartFormDataInput input) {
         return Lists.newArrayList(fileItemMock);
       }
     };
@@ -295,7 +295,7 @@ public class FilesResourceTest {
   }
 
   @Test
-  public void testUploadFileNoContentSubmitted() throws IOException, FileUploadException, URISyntaxException {
+  public void testUploadFileNoContentSubmitted() throws IOException {
 
     expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -303,7 +303,7 @@ public class FilesResourceTest {
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+      protected List<InputPart> getUploadedFiles(MultipartFormDataInput input) {
         return Lists.newArrayList();
       }
     };
@@ -319,12 +319,12 @@ public class FilesResourceTest {
 
   @Test
   public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist()
-      throws IOException, FileUploadException, URISyntaxException {
+      throws IOException {
     expect(opalFileSystemServiceMock.getFileSystem()).andReturn(fileSystem).once();
 
     FilesResource fileResource = new FilesResource() {
       @Override
-      protected List<FileItem> getUploadedFiles(HttpServletRequest request) throws FileUploadException {
+      protected List<InputPart> getUploadedFiles(MultipartFormDataInput input) {
         return Lists.newArrayList(fileItemMock);
       }
     };

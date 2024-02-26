@@ -14,7 +14,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import jakarta.net.ssl.X509TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;

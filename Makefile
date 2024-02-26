@@ -4,8 +4,8 @@
 version=5.0-SNAPSHOT
 magma_version=4.0-SNAPSHOT
 commons_version=3.0-SNAPSHOT
-java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
-#java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M"
+java_opts="-Xms1G -Xmx4G -XX:+UseG1GC"
+#java_opts="-Xms1G -Xmx4G"
 
 projects=$(CURDIR)/..
 opal_project=$(CURDIR)
