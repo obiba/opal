@@ -61,6 +61,7 @@
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
+    <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
     <jettison.version>1.5.4</jettison.version>
     <jetty.version>11.0.20</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
@@ -1316,7 +1317,7 @@
       <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-runtime</artifactId>
-        <version>4.0.3</version>
+        <version>${jaxb-runtime.version}</version>
       </dependency>
 
       <dependency>
