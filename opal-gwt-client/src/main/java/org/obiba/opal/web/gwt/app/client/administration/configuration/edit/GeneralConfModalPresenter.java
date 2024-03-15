@@ -58,7 +58,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
   }
 
   @Override
-  public void save(String name, String defaultCharSet, JsArrayString languages, String publicUrl, String logoutUrl) {
+  public void save(String name, String defaultCharSet, JsArrayString languages, String publicUrl, String logoutUrl, boolean enforced2FA) {
     opalSystemCache.clearGeneralConf();
     getView().clearErrors();
     if(validationHandler.validate()) {
@@ -68,6 +68,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
       dto.setLanguagesArray(languages);
       dto.setPublicURL(publicUrl);
       dto.setLogoutURL(logoutUrl);
+      dto.setEnforced2FA(enforced2FA);
 
       ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
           .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {

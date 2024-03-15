@@ -57,6 +57,12 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   PasswordTextBox password;
 
   @UiField
+  Well enforcedOtpWell;
+
+  @UiField
+  com.google.gwt.user.client.ui.Image qrImage;
+
+  @UiField
   Well otpWell;
 
   @UiField
@@ -120,6 +126,16 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
     getUiHandlers().onSignIn(userName.getText(), password.getText());
   }
 
+  @UiHandler("continueOtp")
+  public void onContinueOtp(ClickEvent event) {
+    getUiHandlers().onContinueOtpSetup();
+  }
+
+  @UiHandler("cancelOtp")
+  public void onCancelOtp(ClickEvent event) {
+    getUiHandlers().onCancelOtpSetup();
+  }
+
   @UiHandler("validate")
   public void onValidate(ClickEvent event) {
     if (Strings.isNullOrEmpty(otp.getText()))
@@ -140,9 +156,18 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   }
 
   @Override
+  public void showEnforcedTotp(String imageUri) {
+    credentialsWell.setVisible(false);
+    enforcedOtpWell.setVisible(true);
+    qrImage.setUrl(imageUri);
+    otpWell.setVisible(false);
+  }
+
+  @Override
   public void showTotp(String otpHeader) {
     this.otpHeader = otpHeader;
     credentialsWell.setVisible(false);
+    enforcedOtpWell.setVisible(false);
     otpWell.setVisible(true);
     otp.setFocus(true);
   }

@@ -18,4 +18,8 @@ public interface LoginUiHandlers extends UiHandlers {
 
   void onSignIn(String username, String password, String code, String otpHeader);
 
+  void onCancelOtpSetup();
+
+  void onContinueOtpSetup();
+
 }

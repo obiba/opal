@@ -2650,6 +2650,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Logout URL")
   String logoutUrl();
 
+  @Description("Enforced 2FA label")
+  @DefaultStringValue("Enforced 2FA")
+  String enforced2FALabel();
+
   @Description("Terms label")
   @DefaultStringValue("Terms")
   String termsLabel();

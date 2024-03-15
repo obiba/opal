@@ -27,6 +27,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -37,7 +38,6 @@ import org.obiba.opal.web.model.client.opal.Subject;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy>
     implements LoginUiHandlers {
@@ -47,6 +47,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     void focusOnUserName();
 
     void clear();
+
+    void showEnforcedTotp(String imageUri);
 
     void showTotp(String otpHeader);
 
@@ -72,6 +74,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   private final ResourceAuthorizationCache authorizationCache;
 
   private final Translations translations;
+
+  private String location;
 
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
@@ -175,6 +179,17 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
         .post().send();
   }
 
+  @Override
+  public void onContinueOtpSetup() {
+    fireEvent(new SessionCreatedEvent(this.location));
+  }
+
+  @Override
+  public void onCancelOtpSetup() {
+    // clear secret and signout
+    deleteSubjectProfileSecret();
+  }
+
   private void refreshApplicationName() {
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(UriBuilders.SYSTEM_NAME.create().build()) //
@@ -238,6 +253,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   private void initUsername(final String location) {
+    this.location = location;
     // try to get the username
     ResourceRequestBuilderFactory.<Subject>newBuilder()
         .forResource(UriBuilders.AUTH_SESSION_CURRENT_USERNAME.create().build())
@@ -246,7 +262,11 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
           public void onResource(Response response, Subject resource) {
             if (response.getStatusCode() == Response.SC_OK) {
               credentials.setUsername(resource.getPrincipal());
-              fireEvent(new SessionCreatedEvent(location));
+              if (resource.hasOtpRequired() && resource.getOtpRequired()) {
+                updateSubjectProfileSecret();
+              } else {
+                fireEvent(new SessionCreatedEvent(location));
+              }
             } else {
               getView().setBusy(false);
               getView().showErrorMessageAndClearPassword();
@@ -255,4 +275,42 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
         })
         .get().send();
   }
+
+  private void updateSubjectProfileSecret() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SUBJECT_PROFILE_OTP.create().build("_current"))
+        .accept("text/plain")
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if (response.getStatusCode() == Response.SC_OK) {
+                getView().setBusy(false);
+                getView().showEnforcedTotp(response.getText());
+              }
+            }
+          }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_GATEWAY)
+          .put().send();
+  }
+
+  private void deleteSubjectProfileSecret() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SUBJECT_PROFILE_OTP.create().build("_current"))
+        .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              endSession();
+            }
+          }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_GATEWAY)
+          .delete().send();
+  }
+
+  private void endSession() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.AUTH_SESSION_CURRENT.create().build())
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(new SessionEndedEvent());
+          }
+        }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST, Response.SC_BAD_GATEWAY, Response.SC_INTERNAL_SERVER_ERROR)
+        .delete().send();
+  }
+
 }

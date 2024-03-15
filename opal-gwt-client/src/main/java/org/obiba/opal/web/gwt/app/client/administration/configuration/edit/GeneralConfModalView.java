@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -64,6 +65,9 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @UiField
   TextBox logoutUrl;
 
+  @UiField
+  CheckBox enforced2FA;
+
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
@@ -73,7 +77,7 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
-    getUiHandlers().save(getName().getText(), getDefaultCharSet().getText(), getLanguages(), publicUrl.getText(), logoutUrl.getText());
+    getUiHandlers().save(getName().getText(), getDefaultCharSet().getText(), getLanguages(), publicUrl.getText(), logoutUrl.getText(), enforced2FA.getValue());
   }
 
   @UiHandler("cancelButton")
@@ -87,6 +91,7 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
     publicUrl.setText(conf.getPublicURL());
     logoutUrl.setText(conf.getLogoutURL());
     characterSet.setDefaultCharset(conf.getDefaultCharSet());
+    enforced2FA.setValue(conf.getEnforced2FA());
     setSelectedLanguages(conf.getLanguagesArray());
   }
 

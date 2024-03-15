@@ -85,6 +85,7 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
     generalProperties.addProperty(translations.publicUrl(), resource.getPublicURL());
     generalProperties.addProperty(translations.logoutUrl(), resource.getLogoutURL());
     generalProperties.addProperty(new Label(translations.languageLabel()), getLanguages(resource));
+    generalProperties.addProperty(translations.enforced2FALabel(), resource.getEnforced2FA() ? translations.yesLabel() : translations.noLabel());
   }
 
   @Override

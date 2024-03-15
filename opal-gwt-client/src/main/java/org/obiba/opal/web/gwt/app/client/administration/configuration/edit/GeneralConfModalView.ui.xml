@@ -88,6 +88,19 @@
       </b:Controls>
     </b:ControlGroup>
 
+    <!--Repeatable-->
+    <b:ControlGroup>
+      <b:Controls>
+        <b:CheckBox ui:field="enforced2FA">
+          <ui:msg description="Enforced 2FA label">Enforced 2FA</ui:msg>
+        </b:CheckBox>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Enforced 2FA help">Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save button label">Save</ui:msg>

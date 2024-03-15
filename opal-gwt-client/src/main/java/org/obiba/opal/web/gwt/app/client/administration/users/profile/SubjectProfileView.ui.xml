@@ -71,7 +71,6 @@
       </b:Paragraph>
 
       <b:Button ui:field="otpSwitch" type="INFO" addStyleNames="bottom-margin">
-        <ui:msg description="User account label">User Account</ui:msg>
       </b:Button>
 
       <g:FlowPanel ui:field="qrPanel" visible="false">
