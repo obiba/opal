@@ -16,6 +16,9 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.util.stream.StreamSupport;
 
 @Component
 @Path("/auth")
@@ -43,6 +47,12 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   @Autowired
   private AuthenticationExecutor authenticationExecutor;
+
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
+  @Autowired
+  private SubjectProfileService subjectProfileService;
 
   @POST
   @Path("/sessions")
@@ -119,9 +129,10 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     // Find the Shiro username
     Subject subject = SecurityUtils.getSubject();
     String principal = subject.getPrincipal() == null ? "" : subject.getPrincipal().toString();
-    return Opal.Subject.newBuilder() //
-        .setPrincipal(principal) //
-        .setType(Opal.Subject.SubjectType.USER) //
+    return Opal.Subject.newBuilder()
+        .setPrincipal(principal)
+        .setType(Opal.Subject.SubjectType.USER)
+        .setOtpRequired(isSubjectProfileSecretRequired(principal))
         .build();
   }
 
@@ -130,10 +141,22 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   public Opal.Subject getSubject(@PathParam("id") String sessionId) {
     // Find the Shiro username
     String principal = isValidSessionId(sessionId) ? SecurityUtils.getSubject().getPrincipal().toString() : null;
-    return Opal.Subject.newBuilder() //
-        .setPrincipal(principal) //
-        .setType(Opal.Subject.SubjectType.USER) //
+    return Opal.Subject.newBuilder()
+        .setPrincipal(principal)
+        .setType(Opal.Subject.SubjectType.USER)
+        .setOtpRequired(isSubjectProfileSecretRequired(principal))
         .build();
+  }
+
+  private boolean isSubjectProfileSecretRequired(String principal) {
+    boolean secretRequired = false;
+    if (opalGeneralConfigService.getConfig().isEnforced2FA()) {
+      SubjectProfile profile = subjectProfileService.getProfile(principal);
+      boolean otpRealm = StreamSupport.stream(profile.getRealms().spliterator(), false)
+          .anyMatch(realm -> realm.equals("opal-user-realm") || realm.equals("opal-ini-realm"));
+      secretRequired = otpRealm && !profile.hasSecret();
+    }
+    return secretRequired;
   }
 
   private UsernamePasswordToken makeUsernamePasswordToken(String username, String password, HttpServletRequest request) {

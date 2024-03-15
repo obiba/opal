@@ -18,6 +18,7 @@ import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.obiba.opal.core.service.security.TotpService;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.SQL;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -35,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static org.obiba.opal.web.model.Opal.BookmarkDto;
 
@@ -79,7 +81,11 @@ public class SubjectProfileCurrentResource {
         }
       if (!Strings.isNullOrEmpty(accountUrl)) break;
     }
-    return Response.ok().entity(Dtos.asDto(profile, accountUrl)).build();
+    Opal.SubjectProfileDto dto = Dtos.asDto(profile, accountUrl)
+        .toBuilder()
+        .setOtpRequired(true)
+        .build();
+    return Response.ok().entity(dto).build();
   }
 
   @PUT
@@ -166,6 +172,17 @@ public class SubjectProfileCurrentResource {
     }
 
     return decodedResources;
+  }
+
+  private boolean isSubjectProfileSecretRequired(String principal) {
+    boolean secretRequired = false;
+    if (opalGeneralConfigService.getConfig().isEnforced2FA()) {
+      SubjectProfile profile = subjectProfileService.getProfile(principal);
+      boolean otpRealm = StreamSupport.stream(profile.getRealms().spliterator(), false)
+          .anyMatch(realm -> realm.equals("opal-user-realm") || realm.equals("opal-ini-realm"));
+      secretRequired = otpRealm && !profile.hasSecret();
+    }
+    return secretRequired;
   }
 
 }

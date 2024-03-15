@@ -45,6 +45,8 @@ public class OpalGeneralConfig extends AbstractTimestamped {
   // One time password strategy
   private String otpStrategy = "TOTP";
 
+  private boolean enforced2FA = false;
+
   @NotNull
   public String getName() {
     return name;
@@ -105,6 +107,14 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public boolean hasOtpStrategy() {
     return !Strings.isNullOrEmpty(otpStrategy);
+  }
+
+  public void setEnforced2FA(boolean enforced2FA) {
+    this.enforced2FA = enforced2FA;
+  }
+
+  public boolean isEnforced2FA() {
+    return enforced2FA;
   }
 
   @Override
