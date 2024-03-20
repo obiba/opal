@@ -16,6 +16,9 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -50,7 +53,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
     void showEnforcedTotp(String imageUri);
 
-    void showTotp(String otpHeader);
+    void showTotp(String otpHeader, String imageUri);
 
     void showErrorMessageAndClearPassword();
 
@@ -129,8 +132,14 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
           public void onResponseCode(Request request, Response response) {
             String authHeader = response.getHeader("WWW-Authenticate");
             if (!Strings.isNullOrEmpty(authHeader)) {
+              String imageUri = null;
+              if (!Strings.isNullOrEmpty(response.getText())) {
+                JSONObject jsonObject = (JSONObject) JSONParser.parseLenient(response.getText());
+                if (jsonObject.containsKey("image"))
+                  imageUri = ((JSONString)jsonObject.get("image")).stringValue();
+              }
               getView().setBusy(false);
-              getView().showTotp(authHeader);
+              getView().showTotp(authHeader, imageUri);
             } else
               showLoginError(response);
           }

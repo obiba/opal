@@ -21,6 +21,7 @@ import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style;
@@ -61,6 +62,9 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
 
   @UiField
   com.google.gwt.user.client.ui.Image qrImage;
+
+  @UiField
+  Panel qrButtons;
 
   @UiField
   Well otpWell;
@@ -133,6 +137,8 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
 
   @UiHandler("cancelOtp")
   public void onCancelOtp(ClickEvent event) {
+    otpWell.setVisible(false);
+    enforcedOtpWell.setVisible(false);
     getUiHandlers().onCancelOtpSetup();
   }
 
@@ -146,8 +152,6 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   @UiHandler("cancel")
   public void onCancel(ClickEvent event) {
     clearPassword();
-    otpWell.setVisible(false);
-    credentialsWell.setVisible(true);
   }
 
   @Override
@@ -160,14 +164,21 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
     credentialsWell.setVisible(false);
     enforcedOtpWell.setVisible(true);
     qrImage.setUrl(imageUri);
+    qrButtons.setVisible(true);
     otpWell.setVisible(false);
   }
 
   @Override
-  public void showTotp(String otpHeader) {
+  public void showTotp(String otpHeader, String imageUri) {
     this.otpHeader = otpHeader;
     credentialsWell.setVisible(false);
-    enforcedOtpWell.setVisible(false);
+    if (!Strings.isNullOrEmpty(imageUri)) {
+      enforcedOtpWell.setVisible(true);
+      qrImage.setUrl(imageUri);
+      qrButtons.setVisible(false);
+    } else {
+      enforcedOtpWell.setVisible(false);
+    }
     otpWell.setVisible(true);
     otp.setFocus(true);
   }
@@ -250,7 +261,9 @@ public class LoginView extends ViewWithUiHandlers<LoginUiHandlers> implements Lo
   private void clearPassword() {
     password.setValue("");
     otp.setValue("");
+    qrImage.setUrl("");
     otpWell.setVisible(false);
+    enforcedOtpWell.setVisible(false);
     credentialsWell.setVisible(true);
   }
 

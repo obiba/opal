@@ -70,7 +70,7 @@
               <g:Image ui:field="qrImage">
               </g:Image>
             </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-top-margin">
+            <g:FlowPanel ui:field="qrButtons" addStyleNames="large-top-margin">
               <b:Button ui:field="continueOtp" type="INFO">
                 <ui:msg description="Continue button label">Continue</ui:msg>
               </b:Button>
