@@ -16,6 +16,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.json.JSONObject;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -71,7 +72,15 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       log.info("Authentication failure: {}", e.getMessage());
       throw e;
     } catch (NoSuchOtpException e) {
-      return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", e.getOtpHeader()).build();
+      Response.ResponseBuilder builder =  Response.status(Status.UNAUTHORIZED)
+          .header("WWW-Authenticate", e.getOtpHeader());
+      if (e.hasQrImage()) {
+        JSONObject respObject = new JSONObject();
+        respObject.put("image", e.getQrImage());
+        builder.header("Content-type", "application/json")
+            .entity(respObject.toString());
+      }
+      return builder.build();
     } catch (AuthenticationException e) {
       if (e.getCause() instanceof NoSuchOtpException) {
         NoSuchOtpException otpException = (NoSuchOtpException) e.getCause();
