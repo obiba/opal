@@ -197,7 +197,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
     Date now = new Date();
     for (SubjectToken token : tokens) {
       Date expiresAt = DateUtils.addDays(token.getCreated(), expiresIn);
-      if (expiresAt.after(now)) {
+      if (now.after(expiresAt)) {
         log.info("Removing expired personal access token: {}:{}", token.getPrincipal(), token.getName());
         orientDbService.delete(token);
       }
