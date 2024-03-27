@@ -26,10 +26,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.URLColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.model.client.opal.AppDto;
 import org.obiba.opal.web.model.client.opal.AppsConfigDto;
 import org.obiba.opal.web.model.client.opal.RockAppConfigDto;
@@ -112,10 +109,10 @@ public class AppsAdministrationView extends ViewWithUiHandlers<AppsAdministratio
   }
 
   private void initAppsTable() {
-    appsTable.addColumn(new TextColumn<AppDto>() {
+    appsTable.addColumn(new NameColumn<AppDto>() {
       @Override
-      public String getValue(AppDto dto) {
-        return dto.getName();
+      protected String getName(AppDto object) {
+        return object.getName() + "~" + object.getId();
       }
     }, translations.nameLabel());
 

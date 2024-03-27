@@ -260,10 +260,10 @@ public class RClusterView extends ViewWithUiHandlers<RClusterUiHandlers>
   }
 
   private void initServersTable() {
-    serversTable.addColumn(new TextColumn<RServerDto>() {
+    serversTable.addColumn(new NameColumn<RServerDto>() {
       @Override
-      public String getValue(RServerDto rServerDto) {
-        return rServerDto.getName();
+      protected String getName(RServerDto object) {
+        return object.getName();
       }
     }, translations.nameLabel());
 
@@ -363,9 +363,9 @@ public class RClusterView extends ViewWithUiHandlers<RClusterUiHandlers>
       }
     }, translations.versionLabel());
 
-    packagesTable.addColumn(new TextColumn<RPackageDto>() {
+    packagesTable.addColumn(new NameColumn<RPackageDto>() {
       @Override
-      public String getValue(RPackageDto object) {
+      protected String getName(RPackageDto object) {
         return object.getRserver();
       }
     }, translations.rServerLabel());

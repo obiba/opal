@@ -35,10 +35,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.EntryDto;
@@ -193,9 +190,9 @@ public class DataShieldPackagesView extends ViewWithUiHandlers<DataShieldPackage
       }
     }, translations.versionLabel());
 
-    packagesTable.addColumn(new TextColumn<RPackageDto>() {
+    packagesTable.addColumn(new NameColumn<RPackageDto>() {
       @Override
-      public String getValue(RPackageDto object) {
+      protected String getName(RPackageDto object) {
         return object.getRserver();
       }
     }, translations.rServerLabel());
