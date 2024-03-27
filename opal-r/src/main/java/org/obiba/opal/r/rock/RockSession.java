@@ -49,8 +49,8 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
 
   private String rockSessionId;
 
-  protected RockSession(App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(app.getName(), UUID.randomUUID().toString(), user, transactionalThreadFactory, eventBus);
+  protected RockSession(String serverName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, UUID.randomUUID().toString(), user, transactionalThreadFactory, eventBus);
     this.app = app;
     this.credentials = credentials;
     openSession();

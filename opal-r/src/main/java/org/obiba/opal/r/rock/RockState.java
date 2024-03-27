@@ -16,15 +16,18 @@ import java.util.List;
 
 public class RockState implements RServerState {
 
+  private final String name;
+
   private final RockServerStatus info;
 
-  public RockState(RockServerStatus info) {
+  public RockState(RockServerStatus info, String name) {
     this.info = info;
+    this.name = name;
   }
 
   @Override
   public String getName() {
-    return info.getId();
+    return name;
   }
 
   @Override

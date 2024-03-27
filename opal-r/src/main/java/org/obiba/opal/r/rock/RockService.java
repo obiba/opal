@@ -111,7 +111,7 @@ public class RockService implements RServerService {
 
   @Override
   public String getName() {
-    return app.getName();
+    return app.getName() + "~" + app.getId();
   }
 
   @Override
@@ -153,7 +153,7 @@ public class RockService implements RServerService {
       RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<RockServerStatus> response =
           restTemplate.exchange(getRServerResourceUrl("/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerStatus.class);
-      return new RockState(response.getBody());
+      return new RockState(response.getBody(), getName());
     } catch (RestClientException e) {
       log.error("Error when reading R server state", e);
       throw new RockServerException("R server state not accessible", e);
@@ -317,7 +317,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    RServerSession session = new RockSession(app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    RServerSession session = new RockSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     session.setProfile(new RServerProfile() {
       @Override
       public String getName() {
