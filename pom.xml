@@ -43,7 +43,7 @@
     <commons-lang.version>3.1</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <commons-vfs.version>2.0</commons-vfs.version>
+    <commons-vfs.version>2.6.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
@@ -65,7 +65,7 @@
     <gwtquery.version>1.4.3</gwtquery.version>
     <hibernate.version>5.6.10.Final</hibernate.version>
     <hibernate-validator.version>6.2.4.Final</hibernate-validator.version>
-    <hsqldb.version>2.7.1</hsqldb.version>
+    <hsqldb.version>2.5.2</hsqldb.version>
     <httpclient.version>4.5.13</httpclient.version>
     <jackson.version>2.14.3</jackson.version>
     <janino.version>2.5.10</janino.version>
@@ -118,7 +118,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>1.7.36</slf4j.version>
     <snakeyaml.version>1.33</snakeyaml.version>
-    <spring.version>5.3.30</spring.version>
+    <spring.version>5.3.33</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
@@ -1328,6 +1328,10 @@
         <artifactId>commons-vfs2</artifactId>
         <version>${commons-vfs.version}</version>
         <exclusions>
+          <exclusion>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs-client</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
