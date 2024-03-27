@@ -98,7 +98,7 @@
     <mockito.version>1.10.8</mockito.version>
     <mongodb-driver.version>4.7.1</mongodb-driver.version>
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
-    <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+    <nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
     <obiba-commons.version>3.0.7</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
