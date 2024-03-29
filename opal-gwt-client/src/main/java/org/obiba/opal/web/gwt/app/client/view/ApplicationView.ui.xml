@@ -70,7 +70,7 @@
       <b:FluidContainer addStyleNames="container" ui:field="footerContainer">
         <b:FluidRow>
           <b:Column size="9">
-            <g:InlineLabel>© 2023</g:InlineLabel>
+            <g:InlineLabel>© 2024</g:InlineLabel>
             <b:NavLink target="_blank" href="http://obiba.org" addStyleNames="inline-block xsmall-indent">OBiBa</b:NavLink>
             <b:NavLink target="_blank" href="http://opaldoc.obiba.org" addStyleNames="inline-block small-indent">
               <ui:msg description="Documentation label">Documentation</ui:msg>
