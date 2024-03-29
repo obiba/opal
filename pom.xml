@@ -35,17 +35,17 @@
     <bouncycastle.version>1.76</bouncycastle.version>
     <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
-    <commons-codec.version>1.10</commons-codec.version>
-    <commons-collections.version>3.2.2</commons-collections.version>
-    <commons-configuration.version>1.10</commons-configuration.version>
+    <commons-codec.version>1.16.1</commons-codec.version>
+    <commons-collections.version>4.4</commons-collections.version>
+    <commons-configuration.version>2.10.1</commons-configuration.version>
     <commons-daemon.version>1.0.15</commons-daemon.version>
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
     <commons-io.version>2.15.1</commons-io.version>
-    <commons-lang.version>3.1</commons-lang.version>
+    <commons-lang.version>3.14.0</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <commons-vfs.version>2.6.0</commons-vfs.version>
+    <commons-vfs.version>2.9.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
@@ -626,14 +626,14 @@
 
       <!-- Set commons collections version because Spring declares it as optional -->
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
         <version>${commons-collections.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>commons-configuration</groupId>
-        <artifactId>commons-configuration</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-configuration2</artifactId>
         <version>${commons-configuration.version}</version>
         <exclusions>
           <exclusion>

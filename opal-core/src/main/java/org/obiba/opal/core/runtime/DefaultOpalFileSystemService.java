@@ -42,7 +42,8 @@ public class DefaultOpalFileSystemService implements OpalFileSystemService {
 
   @Override
   public void stop() {
-
+    if (opalFileSystem != null)
+      opalFileSystem.close();
   }
 
   @Override

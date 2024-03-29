@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.util.stream.StreamSupport;
 
 @Component
 @Path("/auth")

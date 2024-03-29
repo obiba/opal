@@ -65,4 +65,8 @@ public interface OpalFileSystem {
    */
   FileObject resolveFileFromObfuscatedPath(FileObject baseFolder, String obfuscatedPath);
 
+  /**
+   * Clean file system resources.
+   */
+  void close();
 }
