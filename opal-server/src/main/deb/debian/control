@@ -10,7 +10,7 @@ Package: opal
 Architecture: all
 Pre-Depends: debconf, coreutils (>= 6.10)
 Depends: ${shlibs:Depends}, ${misc:Depends}, adduser
-Recommends: oracle-java8-installer | openjdk-8-jdk | openjdk-8-jdk-headless | openjdk-8-jre | openjdk-8-jre-headless
+Recommends: openjdk-21-jdk | openjdk-21-jdk-headless | openjdk-21-jre | openjdk-21-jre-headless
 Suggests: rock
 Description: OBiBa Data integration Web application for biobanks
  Opal is OBiBa’s core database application for biobanks. Participant data, once
