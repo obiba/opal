@@ -32,9 +32,12 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
 
   private final JSONObject factoryObj;
 
-  RResourceFactory(String provider, JSONObject factoryObj) {
+  private final String script;
+
+  RResourceFactory(String provider, JSONObject factoryObj, String script) {
     this.provider = provider;
     this.factoryObj = factoryObj;
+    this.script = script;
   }
 
   @Override
@@ -84,6 +87,7 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
     try {
       JSONObject resource = new JSONObject();
       try (Context context = Context.create()) {
+        context.eval("js", script);
         String varName = provider.replaceAll("\\.", "_");
         Value rsrc = context.eval("js", String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), name,
             parameters == null ? "undefined" : parameters.toString(),

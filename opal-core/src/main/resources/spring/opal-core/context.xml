@@ -31,11 +31,4 @@
 <!--    <property name="shared" value="true"/>-->
 <!--  </bean>-->
 
-  <bean id="cacheManager"
-        class="org.springframework.cache.jcache.JCacheCacheManager"
-        p:cache-manager-ref="jCacheManager"/>
-
-  <!-- JSR-107 cache manager setup  -->
-  <bean id="jCacheManager" />
-
 </beans>

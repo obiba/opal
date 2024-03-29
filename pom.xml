@@ -78,8 +78,8 @@
     <liquibase.version>4.26.0</liquibase.version>
     <liquibase-slf4j.version>5.0.0</liquibase-slf4j.version>
     <lang-tag.version>1.4.4</lang-tag.version>
-    <logback.version>1.4.14</logback.version>
-    <logstash-logback.version>7.2</logstash-logback.version>
+    <logback.version>1.5.3</logback.version>
+    <logstash-logback.version>7.4</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
     <magma.version>5.0-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
@@ -108,9 +108,9 @@
     <shiro.version>1.13.0</shiro.version>
     <shiro-ehcache3.version>1.0.0</shiro-ehcache3.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
-    <slf4j.version>1.7.36</slf4j.version>
+    <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>1.33</snakeyaml.version>
-    <spring.version>6.0.16</spring.version>
+    <spring.version>6.0.18</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>

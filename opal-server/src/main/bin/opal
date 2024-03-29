@@ -61,5 +61,7 @@ fi
 
 JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
+echo "CLASSPATH=$CLASSPATH"
+
 # Add $JAVA_DEBUG to this line to enable remote JVM debugging (for developers)
 $JAVA $JAVA_OPTS $JAVA_DEBUG -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $@

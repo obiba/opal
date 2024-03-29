@@ -161,7 +161,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   private void initializeCacheManager(DefaultSecurityManager dsm) {
     if (dsm.getCacheManager() == null) {
       EhcacheShiroManager ehCacheManager = new EhCache3ShiroManager();
-      ehCacheManager.setCacheManagerConfigFile("classpath:ehcache.xml");
+      ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
       dsm.setCacheManager(ehCacheManager);
     }
   }

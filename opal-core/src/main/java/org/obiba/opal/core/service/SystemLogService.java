@@ -45,15 +45,11 @@ public class SystemLogService implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    initialize();
-  }
-
-  public void initialize() {
     logsDir = new File(System.getenv().get("OPAL_LOG"));
     if (!logsDir.exists())
       logsDir = new File(System.getenv().get("OPAL_HOME") + File.separatorChar + "logs");
     this.opalLogBroadcaster = new TailBroadcaster();
-    Tailer.create(getOpalLogFile(), opalLogBroadcaster);
+    Tailer.builder().setFile(getOpalLogFile()).setTailerListener(opalLogBroadcaster).get();
   }
 
   public File getOpalLogFile() {
@@ -106,11 +102,11 @@ public class SystemLogService implements InitializingBean {
     return logs;
   }
 
-  private class TailBroadcaster extends TailerListenerAdapter {
+  private static class TailBroadcaster extends TailerListenerAdapter {
 
-    private EvictingQueue<String> queue = EvictingQueue.create(1000);
+    private final EvictingQueue<String> queue = EvictingQueue.create(1000);
 
-    private List<TailerListener> tailers = Lists.newArrayList();
+    private final List<TailerListener> tailers = Lists.newArrayList();
 
     public void register(TailerListener tailer) {
       if (tailers.contains(tailer)) return;
