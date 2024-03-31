@@ -83,7 +83,7 @@ public class SubjectProfileCurrentResource {
     }
     Opal.SubjectProfileDto dto = Dtos.asDto(profile, accountUrl)
         .toBuilder()
-        .setOtpRequired(true)
+        .setOtpRequired(isSubjectProfileSecretRequired(profile.getPrincipal()))
         .build();
     return Response.ok().entity(dto).build();
   }
