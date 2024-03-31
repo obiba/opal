@@ -173,6 +173,9 @@
                   <prefix>/usr/share</prefix>
                   <changelogFile>/usr/share/changelog</changelogFile>
                   <targetOS>Linux</targetOS>
+                  <requires>
+                    <require>unzip</require>
+                  </requires>
                   <mappings>
                     <mapping>
                       <directory>/usr/lib/systemd/system</directory>
