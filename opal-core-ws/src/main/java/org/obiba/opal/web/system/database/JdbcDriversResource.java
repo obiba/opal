@@ -14,8 +14,8 @@ import org.obiba.opal.web.model.Database;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 

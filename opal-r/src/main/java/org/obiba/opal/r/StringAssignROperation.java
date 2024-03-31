@@ -12,7 +12,7 @@ package org.obiba.opal.r;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.obiba.opal.spi.r.AbstractROperation;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.List;
 import java.util.Map.Entry;
 

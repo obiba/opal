@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.magma.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 import org.obiba.opal.web.model.Ws;
 
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider

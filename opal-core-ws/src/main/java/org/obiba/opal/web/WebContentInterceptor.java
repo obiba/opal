@@ -10,14 +10,14 @@
 
 package org.obiba.opal.web;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 
 /**
@@ -27,9 +27,9 @@ import java.util.Collections;
 public class WebContentInterceptor implements RequestCyclePostProcess {
 
     @Override
-    public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+    public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         try {
-            MultivaluedMap<String, Object> map = response.getHeaders();
+            MultivaluedMap<String, Object> map = responseContext.getHeaders();
             //making sure IE doesn't cache: https://support.microsoft.com/en-us/kb/234067
             map.put("Expires", Collections.singletonList("-1"));
             map.put("Cache-Control", Collections.singletonList("no-cache"));

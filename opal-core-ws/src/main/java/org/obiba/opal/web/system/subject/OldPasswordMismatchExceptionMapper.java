@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.system.subject;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.security.OldPasswordMismatchException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 import org.obiba.opal.web.model.Ws;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider

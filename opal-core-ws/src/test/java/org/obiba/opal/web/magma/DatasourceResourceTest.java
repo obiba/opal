@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Locale;
 
 import jakarta.annotation.Nullable;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;

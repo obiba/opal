@@ -15,15 +15,19 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.jboss.resteasy.core.ResourceInvoker;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -36,21 +40,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
-import static javax.ws.rs.HttpMethod.GET;
-import static javax.ws.rs.HttpMethod.OPTIONS;
+import static jakarta.ws.rs.HttpMethod.GET;
+import static jakarta.ws.rs.HttpMethod.OPTIONS;
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
@@ -74,35 +72,33 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   @Autowired
   private RequestAttributesProvider requestAttributeProvider;
 
-  @Nullable
   @Override
-  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method) {
-    if(OPTIONS.equals(request.getHttpMethod())) {
+  public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
+    if (OPTIONS.equals(requestContext.getMethod())) {
       // Allow header will be added on postProcess
-      return Response.ok().build();
+      //return Response.ok().build();
     }
-    if(!isWebServicePublic(method) && !isWebServiceWithoutAuthorization(method) && isUserAuthenticated() &&
-        !getSubject().isPermitted("rest:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
-      return Response.status(Status.FORBIDDEN).build();
+    if (!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) && isUserAuthenticated() &&
+        !getSubject().isPermitted("rest:" + getResourceMethodPath(requestContext) + ":" + requestContext.getMethod())) {
+      throw new ForbiddenException();
     }
-    return null;
   }
 
   @Override
-  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
-    if(GET.equals(request.getHttpMethod()) || OPTIONS.equals(request.getHttpMethod())) {
-      Set<String> allowed = allowed(request, resourceMethod);
+  public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+    if(GET.equals(requestContext.getMethod()) || OPTIONS.equals(requestContext.getMethod())) {
+      Set<String> allowed = allowed(requestContext, resourceMethod);
       if(allowed != null && !allowed.isEmpty()) {
-        response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
+        responseContext.getHeaders().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
-    } else if(HttpMethod.DELETE.equals(request.getHttpMethod()) && response.getStatus() == HttpStatus.SC_OK) {
+    } else if(HttpMethod.DELETE.equals(requestContext.getMethod()) && responseContext.getStatus() == HttpStatus.SC_OK) {
       // TODO delete all nodes starting with resource
-      String resource = requestAttributeProvider.getResourcePath(request.getUri().getRequestUri());
+      String resource = requestAttributeProvider.getResourcePath(requestContext.getUriInfo().getRequestUri());
       subjectAclService.deleteNodePermissions(resource);
     }
 
-    if(response.getStatus() == HttpStatus.SC_CREATED) {
-      addPermissions(response);
+    if(responseContext.getStatus() == HttpStatus.SC_CREATED) {
+      addPermissions(responseContext);
     }
 
     Subject subject = ThreadContext.getSubject();
@@ -128,20 +124,26 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     return sb.toString();
   }
 
-  protected String getResourceMethodUri(HttpRequest request) {
-    return request.getUri().getPath();
+  protected String getResourceMethodPath(ContainerRequestContext requestContext) {
+    return requestContext.getUriInfo().getPath();
   }
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
-  private void addPermissions(ServerResponse response) {
+  private void addPermissions(ContainerResponseContext responseContext) {
     // Add permissions
-    URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
-    if(resourceUri == null) {
+    String resourceUriStr = responseContext.getHeaderString(HttpHeaders.LOCATION);
+    if(resourceUriStr == null) {
       throw new IllegalStateException("Missing Location header in 201 response");
     }
-    List<?> permissions = response.getMetadata().get(ALT_PERMISSIONS);
+    URI resourceUri;
+    try {
+      resourceUri = new URI(resourceUriStr);
+    } catch (URISyntaxException e) {
+      throw new IllegalStateException("Malformed Location header in 201 response");
+    }
+    List<?> permissions = responseContext.getHeaders().get(ALT_PERMISSIONS);
     if(permissions == null) {
-      List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
+      List<?> altLocations = responseContext.getHeaders().get(ALT_LOCATION);
       Iterable<URI> locations = ImmutableList.of(resourceUri);
       if(altLocations != null) {
         locations = Iterables.concat(locations, (Iterable<URI>) altLocations);
@@ -149,7 +151,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       addPermissionUris(locations);
     } else {
       addPermission((Iterable<SubjectAclService.Permissions>) permissions);
-      response.getMetadata().remove(ALT_PERMISSIONS);
+      responseContext.getHeaders().remove(ALT_PERMISSIONS);
     }
   }
 
@@ -196,8 +198,8 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     }), ImmutableSet.of(OPTIONS)));
   }
 
-  private Set<String> allowed(HttpRequest request, ResourceMethodInvoker method) {
-    return allowed(request.getUri().getPath(), availableMethods(method));
+  private Set<String> allowed(ContainerRequestContext requestContext, ResourceMethodInvoker method) {
+    return allowed(getResourceMethodPath(requestContext), availableMethods(method));
   }
 
   private Iterable<String> availableMethods(ResourceMethodInvoker method) {
@@ -212,7 +214,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     return availableMethods;
   }
 
-  private String getPath(ResourceInvoker method) {
+  private String getPath(ResourceMethodInvoker method) {
     return getPath(method.getMethod());
   }
 

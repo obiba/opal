@@ -9,16 +9,12 @@
  */
 package org.obiba.opal.web.ws.intercept;
 
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.container.ContainerRequestContext;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.spi.HttpRequest;
 
 public interface RequestCyclePreProcess {
 
-  @Nullable
-  Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod);
+  void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext);
 
 }

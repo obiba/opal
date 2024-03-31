@@ -17,10 +17,10 @@ import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.obiba.shiro.web.filter.UserBannedException;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
 
 @Provider
 @Component

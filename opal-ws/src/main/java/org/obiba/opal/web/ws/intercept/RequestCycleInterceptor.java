@@ -9,25 +9,19 @@
  */
 package org.obiba.opal.web.ws.intercept;
 
-import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.ext.Provider;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.specimpl.BuiltResponse;
-import org.jboss.resteasy.spi.Failure;
-import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
-import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,9 +29,7 @@ import java.util.Set;
 
 @Component
 @Provider
-@ServerInterceptor
-@SecurityPrecedence
-public class RequestCycleInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
+public class RequestCycleInterceptor implements ContainerRequestFilter, ContainerResponseFilter {
 
   private static final String REQ_ATTR = "__" + RequestCycleInterceptor.class.getName();
 
@@ -58,52 +50,31 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   }
 
   @Override
-  public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
-      throws Failure, WebApplicationException {
-    new RequestCycle(request, method);
-
+  public void filter(ContainerRequestContext requestContext) throws IOException {
     HttpServletRequest httpServletRequest = requestAttributesProvider.currentRequestAttributes().getRequest();
+    ResourceMethodInvoker methodInvoker = getResourceMethodInvoker(requestContext);
     for (RequestCyclePreProcess p : preProcesses) {
-      Response r = p.preProcess(httpServletRequest, request, method);
-      if (r != null) {
-        return r instanceof ServerResponse
-            ? (ServerResponse) r
-            : new ServerResponse((BuiltResponse) Response.fromResponse(r).build());
-      }
+      p.preProcess(httpServletRequest, methodInvoker, requestContext);
     }
-
-    return null;
   }
 
   @Override
-  public void postProcess(ServerResponse response) {
-    RequestCycle cycle = getCurrentCycle();
-    if (cycle != null) {
-      HttpServletRequest httpServletRequest = requestAttributesProvider.currentRequestAttributes().getRequest();
-      for (RequestCyclePostProcess p : postProcesses) {
-        p.postProcess(httpServletRequest, cycle.request, cycle.resourceMethod, response);
-      }
+  public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    HttpServletRequest httpServletRequest = requestAttributesProvider.currentRequestAttributes().getRequest();
+    ResourceMethodInvoker methodInvoker = getResourceMethodInvoker(requestContext);
+    for (RequestCyclePostProcess p : postProcesses) {
+      p.postProcess(httpServletRequest, methodInvoker, requestContext, responseContext);
     }
   }
 
-  RequestCycle getCurrentCycle() {
-    return (RequestCycle) requestAttributesProvider.currentRequestAttributes()
-        .getAttribute(REQ_ATTR, RequestAttributes.SCOPE_REQUEST);
-  }
-
-  private final class RequestCycle {
-
-    private final HttpRequest request;
-
-    private final ResourceMethodInvoker resourceMethod;
-
-    private RequestCycle(HttpRequest request, ResourceMethodInvoker method) {
-      this.request = request;
-      resourceMethod = method;
-      requestAttributesProvider.currentRequestAttributes()
-          .setAttribute(REQ_ATTR, this, RequestAttributes.SCOPE_REQUEST);
+  private ResourceMethodInvoker getResourceMethodInvoker(ContainerRequestContext requestContext) {
+    ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
+    if (methodInvoker != null) {
+      String methodName = methodInvoker.getMethod().getName();
+      String className = methodInvoker.getMethod().getDeclaringClass().getName();
+      System.out.println("Intercepting incoming request to method: " + methodName + " in class: " + className);
     }
-
+    return methodInvoker;
   }
 
 }

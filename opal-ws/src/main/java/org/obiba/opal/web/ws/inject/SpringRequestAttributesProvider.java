@@ -10,14 +10,14 @@
 package org.obiba.opal.web.ws.inject;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.jboss.resteasy.spi.ResteasyUriInfo;
+import jakarta.ws.rs.core.UriInfo;
+import org.jboss.resteasy.specimpl.ResteasyUriInfo;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
 @Component
@@ -43,13 +43,13 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
   }
 
 
-  public static ResteasyUriInfo extractUriInfo(HttpServletRequest request, String servletPrefix) {
+  private static ResteasyUriInfo extractUriInfo(HttpServletRequest request, String servletPrefix) {
     String contextPath = request.getContextPath();
     if (servletPrefix != null && !servletPrefix.isEmpty() && !servletPrefix.equals("/")) {
       if (!contextPath.endsWith("/") && !servletPrefix.startsWith("/"))
         contextPath += "/";
       contextPath += servletPrefix;
     }
-    return new ResteasyUriInfo(request.getRequestURL().toString(), request.getQueryString(), contextPath);
+    return new ResteasyUriInfo(request.getRequestURL().toString(), contextPath);
   }
 }
