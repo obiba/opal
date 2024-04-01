@@ -333,7 +333,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   private Database createSqlDatabase() {
     return createDatabase().sqlSettings(SqlSettings.Builder.create() //
-        .sqlSchema(SqlSettings.SqlSchema.HIBERNATE) //
+        .sqlSchema(SqlSettings.SqlSchema.JDBC) //
         .driverClass("mysql") //
         .url("jdbc") //
         .username("root") //

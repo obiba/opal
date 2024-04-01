@@ -171,6 +171,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
     if(orientDbService.findUnique(database) == null) {
+      if (database.getSqlSettings() != null && SqlSettings.SqlSchema.HIBERNATE.equals(database.getSqlSettings().getSqlSchema())) {
+        throw new IllegalArgumentException("Database with Hibernate schema is deprecated.");
+      }
       persist(database);
     } else {
       ConstraintViolation<Database> violation = ConstraintViolationImpl
