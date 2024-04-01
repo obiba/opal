@@ -11,10 +11,12 @@ package org.obiba.opal.web;
 
 import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.*;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.eclipse.jetty.http.MimeTypes;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -35,11 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.StreamingOutput;
-import jakarta.ws.rs.core.UriInfo;
+import org.springframework.util.MimeType;
+
 import java.io.*;
 import java.net.FileNameMap;
 import java.net.URI;
@@ -537,6 +537,9 @@ public class FilesResource {
     final File localFile = opalFileSystemService.getFileSystem().getLocalFile(file);
     String fileName = Strings.isNullOrEmpty(key) ? localFile.getName() : localFile.getName() + ".zip";
     String mimeType = mimeTypes.getContentTypeFor(fileName);
+    if (Strings.isNullOrEmpty(mimeType)) {
+      mimeType = MediaType.APPLICATION_OCTET_STREAM;
+    }
 
     StreamingOutput stream = os -> {
       File output = localFile;
