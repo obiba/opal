@@ -61,8 +61,8 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   private void startDatasourceLoaderThreads() {
     datasourceLoaders.add(newDatasourceLoader("1"));
-    datasourceLoaders.add(newDatasourceLoader("2"));
-    datasourceLoaders.add(newDatasourceLoader("3"));
+    //datasourceLoaders.add(newDatasourceLoader("2"));
+    //datasourceLoaders.add(newDatasourceLoader("3"));
   }
 
   private DatasourceLoader newDatasourceLoader(String id) {
