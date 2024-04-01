@@ -69,11 +69,11 @@ public class RequestCycleInterceptor implements ContainerRequestFilter, Containe
 
   private ResourceMethodInvoker getResourceMethodInvoker(ContainerRequestContext requestContext) {
     ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
-    if (methodInvoker != null) {
-      String methodName = methodInvoker.getMethod().getName();
-      String className = methodInvoker.getMethod().getDeclaringClass().getName();
-      System.out.println("Intercepting incoming request to method: " + methodName + " in class: " + className);
-    }
+//    if (methodInvoker != null) {
+//      String methodName = methodInvoker.getMethod().getName();
+//      String className = methodInvoker.getMethod().getDeclaringClass().getName();
+//      System.out.println("Intercepting incoming request to method: " + methodName + " in class: " + className);
+//    }
     return methodInvoker;
   }
 
