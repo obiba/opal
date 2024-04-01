@@ -30,14 +30,18 @@ public class OpalServer {
 
   private OpalJettyServer jettyServer;
 
-  private OpalServer() {
-    asciiArt();
+  private OpalServer(boolean upgrade) {
     setProxy();
     setProperties();
     configureSLF4JBridgeHandler();
-    log.info("Starting Opal server!");
-    upgrade();
-    start();
+    if (upgrade) {
+      upgrade();
+    }
+    else {
+      asciiArt();
+      log.info("Starting Opal server!");
+      start();
+    }
   }
 
   // http://patorjk.com/software/taag/#p=display&f=Big&t=%3E%20%3E%20%3E%20OPAL
@@ -151,15 +155,25 @@ public class OpalServer {
     try {
       checkSystemProperty("OPAL_HOME", "OPAL_DIST");
 
-      final OpalServer opal = new OpalServer();
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          opal.shutdown();
+      if (args.length>0) {
+        if ("--upgrade".equals(args[0])) {
+          new OpalServer(true);
+          System.exit(0);
+        } else {
+          System.out.println("Unknown arguments, exiting");
+          System.exit(1);
         }
-      });
-      System.out.println("Opal is attached to this console. Press ctrl-c to stop.");
-      // We can exit the main thread because other non-daemon threads will keep the JVM alive
+      } else {
+        final OpalServer opal = new OpalServer(false);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+          @Override
+          public void run() {
+            opal.shutdown();
+          }
+        });
+        System.out.println("Opal is attached to this console. Press ctrl-c to stop.");
+        // We can exit the main thread because other non-daemon threads will keep the JVM alive
+      }
     } catch(Exception e) {
       log.error("Exception", e);
       throw e;
