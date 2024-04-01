@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class LocalOrientDbServerFactory implements OrientDbServerFactory, InitializingBean, DisposableBean {
@@ -41,6 +44,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
   public static final String PASSWORD = "admin";
 
   public static final String URL = DEFAULT_SCHEME + ":" + ORIENTDB_HOME;
+
+  private final Lock lock = new ReentrantLock();
+  private final Condition condition = lock.newCondition();
+
+  private boolean started = false;
 
   private String url;
 
@@ -76,7 +84,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
 
     System.setProperty("ORIENTDB_HOME", url.replaceFirst("^" + DEFAULT_SCHEME + ":", ""));
     System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
-    System.setProperty("java.util.logging.manager", "com.orientechnologies.common.log.OLogManager$DebugLogManager");
+    //System.setProperty("java.util.logging.manager", "com.orientechnologies.common.log.OLogManager$DebugLogManager");
 
     ensureSecurityConfig();
 
@@ -86,6 +94,8 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
     poolFactory = new OPartitionedDatabasePoolFactory();
 
     ensureDatabaseExists();
+    started = true;
+    signalCondition();
   }
 
   @Override
@@ -100,6 +110,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
       server.shutdown();
       server = null;
     }
+    started = false;
   }
 
   @NotNull
@@ -114,6 +125,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
     //TODO cache password
 //    String password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
     log.trace("Open OrientDB connection with username: {}", USERNAME);
+    try {
+      waitForCondition();
+    } catch (InterruptedException e) {
+      // ignore
+    }
     return poolFactory.get(url, USERNAME, PASSWORD).acquire();
   }
 
@@ -139,4 +155,28 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
       }
     }
   }
+
+  public void waitForCondition() throws InterruptedException {
+    lock.lock(); // Acquire the lock
+    try {
+      // Wait until the condition is met
+      while (!started) {
+        condition.await(); // Release the lock and wait
+      }
+    } finally {
+      lock.unlock(); // Release the lock
+    }
+  }
+
+  public void signalCondition() {
+    lock.lock(); // Acquire the lock
+    try {
+      // Update the condition and signal waiting threads
+      started = true;
+      condition.signalAll(); // Signal all waiting threads
+    } finally {
+      lock.unlock(); // Release the lock
+    }
+  }
+
 }

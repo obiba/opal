@@ -87,7 +87,6 @@ public class OpalServer {
   private void configureSLF4JBridgeHandler() {
     //  remove existing handlers attached to java.util.logging root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
-
     // add SLF4JBridgeHandler to java.util.logging's root logger
     SLF4JBridgeHandler.install();
   }
@@ -97,6 +96,7 @@ public class OpalServer {
     // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+    System.setProperty("com.atomikos.icatch.registered", "true");
   }
 
   private void upgrade() {
