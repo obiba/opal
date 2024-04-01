@@ -347,7 +347,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz) {
+  public synchronized void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz) {
     HasUniqueProperties bean = BeanUtils.instantiate(clazz);
 
     try (ODatabaseDocument db = serverFactory.getDocumentTx()) {
