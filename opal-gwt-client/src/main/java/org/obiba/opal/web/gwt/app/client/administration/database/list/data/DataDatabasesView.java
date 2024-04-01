@@ -9,6 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.list.data;
 
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.view.client.*;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
@@ -26,10 +31,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
+
+import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.TEST_ACTION;
 import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.UNREGISTER_ACTION;
@@ -50,6 +56,9 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
   @UiField
   DropdownButton registerDataDatabase;
+
+  @UiField
+  Alert hibernateAlertPanel;
 
   private final Translations translations;
 
@@ -141,11 +150,113 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   @UiHandler("table")
   public void onTableChange(RowCountChangeEvent event) {
     pager.setPagerVisible(table.getRowCount() > pager.getPageSize());
+    GWT.log("coucou");
   }
 
   @Override
   public HasData<DatabaseDto> getTable() {
-    return table;
+    return new TableWrapper();
   }
 
+  private class TableWrapper implements HasData<DatabaseDto> {
+
+    @Override
+    public SelectionModel<? super DatabaseDto> getSelectionModel() {
+      return table.getSelectionModel();
+    }
+
+    @Override
+    public DatabaseDto getVisibleItem(int indexOnPage) {
+      return table.getVisibleItem(indexOnPage);
+    }
+
+    @Override
+    public int getVisibleItemCount() {
+      return table.getVisibleItemCount();
+    }
+
+    @Override
+    public Iterable<DatabaseDto> getVisibleItems() {
+      return table.getVisibleItems();
+    }
+
+    @Override
+    public void setRowData(int start, List<? extends DatabaseDto> values) {
+      hibernateAlertPanel.setVisible(false);
+      if (values != null) {
+        for (DatabaseDto dto : values) {
+          if (dto.hasSqlSettings() && SqlSettingsDto.SqlSchema.HIBERNATE.toString().equals(dto.getSqlSettings().getSqlSchema().toString())) {
+            hibernateAlertPanel.setVisible(true);
+            break;
+          }
+        }
+      }
+      table.setRowData(start, values);
+    }
+
+    @Override
+    public void setSelectionModel(SelectionModel<? super DatabaseDto> selectionModel) {
+      table.setSelectionModel(selectionModel);
+    }
+
+    @Override
+    public void setVisibleRangeAndClearData(Range range, boolean forceRangeChangeEvent) {
+      table.setVisibleRangeAndClearData(range, forceRangeChangeEvent);
+    }
+
+    @Override
+    public HandlerRegistration addCellPreviewHandler(CellPreviewEvent.Handler<DatabaseDto> handler) {
+      return table.addCellPreviewHandler(handler);
+    }
+
+    @Override
+    public HandlerRegistration addRangeChangeHandler(RangeChangeEvent.Handler handler) {
+      return table.addRangeChangeHandler(handler);
+    }
+
+    @Override
+    public HandlerRegistration addRowCountChangeHandler(RowCountChangeEvent.Handler handler) {
+      return table.addRowCountChangeHandler(handler);
+    }
+
+    @Override
+    public int getRowCount() {
+      return table.getRowCount();
+    }
+
+    @Override
+    public Range getVisibleRange() {
+      return table.getVisibleRange();
+    }
+
+    @Override
+    public boolean isRowCountExact() {
+      return table.isRowCountExact();
+    }
+
+    @Override
+    public void setRowCount(int count) {
+      table.setRowCount(count);
+    }
+
+    @Override
+    public void setRowCount(int count, boolean isExact) {
+      table.setRowCount(count, isExact);
+    }
+
+    @Override
+    public void setVisibleRange(int start, int length) {
+      table.setVisibleRange(start, length);
+    }
+
+    @Override
+    public void setVisibleRange(Range range) {
+      table.setVisibleRange(range);
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+      table.fireEvent(event);
+    }
+  }
 }

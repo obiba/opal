@@ -52,7 +52,7 @@
         <ui:msg description="SQL Schema label">SQL Schema</ui:msg>
         <o:RequiredIcon/>
       </b:ControlLabel>
-      <o:Chooser ui:field="sqlSchema" name="magmaDatasourceType"/>
+      <o:Chooser ui:field="sqlSchema" name="magmaDatasourceType" enabled="false"/>
       <b:HelpBlock>
         <ui:msg description="SQL Schema help label">Specifies the expected structure of the database.
         </ui:msg>

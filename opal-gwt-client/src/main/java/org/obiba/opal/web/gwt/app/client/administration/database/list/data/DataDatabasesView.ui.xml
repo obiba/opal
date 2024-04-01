@@ -24,6 +24,16 @@
       <ui:msg description="Databases help">Databases can have different purposes: storage, import or export.</ui:msg>
     </b:Paragraph>
 
+    <b:Alert type="WARNING" close="false" visible="false" animation="true" ui:field="hibernateAlertPanel">
+      <ui:msg description="Deprecated database schema label">Some databases are using the <strong>Opal SQL</strong> schema. This database structure is deprecated and support will be removed in version 5.0.
+      </ui:msg>
+      <g:Label addStyleNames="top-margin no-bottom-margin help">
+        <ui:msg description="Deprecated database schema help">
+          Use the Project backup / restore service (either form the project's administration page or using the Python command-line) to migrate to another database schema. MongoDB is recommended for its versatility.
+        </ui:msg>
+      </g:Label>
+    </b:Alert>
+
     <b:DropdownButton ui:field="registerDataDatabase" addStyleNames="small-top-margin" icon="PLUS" type="INFO">
       <b:NavLink ui:field="createSql">
         <ui:msg description="Create SQL database label">SQL</ui:msg>
