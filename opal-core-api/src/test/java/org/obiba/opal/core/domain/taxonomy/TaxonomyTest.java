@@ -68,18 +68,29 @@ public class TaxonomyTest {
   }
 
   @Test
-  @Ignore
   public void test_yaml_read() {
-    try {
-      InputStream input = new URL(
-          "https://raw.githubusercontent.com/maelstrom-research/maelstrom-taxonomies/master/area-of-information/taxonomy.yml")
-          .openStream();
+    try (InputStream input = TaxonomyTest.class.getClassLoader().getResourceAsStream("taxonomy.yml")) {
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
       assertThat(taxonomy).isNotNull();
+      assertThat(taxonomy.hasVocabularies()).isTrue();
+      assertThat(taxonomy.getVocabularies().size()).isEqualTo(4);
     } catch(IOException e) {
       e.printStackTrace();
     }
   }
 
+  @Test
+  public void test_yaml_v1_read() {
+    // snakeyaml v1, global tag starts with !!
+    try (InputStream input = TaxonomyTest.class.getClassLoader().getResourceAsStream("taxonomy-v1.yml")) {
+      TaxonomyYaml yaml = new TaxonomyYaml();
+      Taxonomy taxonomy = yaml.load(input);
+      assertThat(taxonomy).isNotNull();
+      assertThat(taxonomy.hasVocabularies()).isTrue();
+      assertThat(taxonomy.getVocabularies().size()).isEqualTo(4);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

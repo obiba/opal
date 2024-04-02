@@ -1,0 +1,154 @@
+!org.obiba.opal.core.domain.taxonomy.Taxonomy
+"name": "Mlstr_harmo"
+"title":
+  "en": "Harmonization"
+  "fr": "Harmonisation"
+"description":
+  "en": "Harmonization qualification by Maelstrom"
+  "fr": "Qualification de l'harmonisation par Maelstrom"
+"attributes": {}
+"author": "Maelstrom Research"
+"keywords": {}
+"vocabularies":
+- "name": "status"
+  "title":
+    "en": "Harmonization Status"
+    "fr": "Statut d'harmonisation"
+  "description":
+    "en": "Harmonization Status"
+    "fr": "Statut d'harmonisation"
+  "attributes": {}
+  "keywords": {}
+  "terms":
+  - "name": "complete"
+    "title":
+      "en": "Complete"
+      "fr": "Complet"
+    "description":
+      "en": "Harmonization status is complete."
+      "fr": "Le statut d'harmonisation est complet."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "undetermined"
+    "title":
+      "en": "Undetermined"
+      "fr": "Indéterminé"
+    "description":
+      "en": "Harmonization status is undetermined (information pending)."
+      "fr": "Le statut d'harmonisation est indéterminé (en attente d'information)."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "impossible"
+    "title":
+      "en": "Impossible"
+      "fr": "Impossible"
+    "description":
+      "en": "Harmonization status is impossible."
+      "fr": "Le statut d'harmonisation est impossible."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "partial"
+    "title":
+      "en": "Partial"
+      "fr": "Partiel"
+    "description":
+      "en": "Harmonization status is partial."
+      "fr": "Le statut de l'harmonisation est partiel."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "na"
+    "title":
+      "en": "Not Applicable"
+      "fr": "N'est pas applicable"
+    "description":
+      "en": "Harmonization status is not relevant"
+      "fr": "Le statut d'harmonisation n'est pas pertinent."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+- "name": "status_detail"
+  "title":
+    "en": "Status Detail"
+    "fr": "Détail du statut"
+  "description":
+    "en": "Harmonization sub-status"
+    "fr": "Sous-statut d'harmonisation"
+  "attributes": {}
+  "keywords": {}
+  "terms":
+  - "name": "identical"
+    "title":
+      "en": "Identical"
+      "fr": "Identique"
+    "description":
+      "en": "Harmonization sub-status is qualified as identical information."
+      "fr": "Le sous-statut d’harmonisation est qualifié d’information identique."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "compatible"
+    "title":
+      "en": "Compatible"
+      "fr": "Compatible"
+    "description":
+      "en": "Harmonization sub-status is qualified as compatible information."
+      "fr": "Le sous-statut d’harmonisation est qualifié d'information compatible."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "incompatible"
+    "title":
+      "en": "Incompatible"
+      "fr": "Non compatible"
+    "description":
+      "en": "Harmonization sub-status is qualified as incompatible information."
+      "fr": "Le sous-statut d’harmonisation est qualifié d’information non       \
+        \    compatible."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "unavailable"
+    "title":
+      "en": "Unavailable"
+      "fr": "Non disponible"
+    "description":
+      "en": "Harmonization sub-status is qualified as unavailable information."
+      "fr": "Le sous-statut d’harmonisation est qualifié d’information non       \
+        \     disponible."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+  - "name": "undetermined"
+    "title":
+      "en": "Undetermined"
+      "fr": "Indéterminé"
+    "description":
+      "en": "Harmonization sub-status is qualified as undetermined."
+      "fr": "Le sous-statut d’harmonisation est qualifié d’indéterminé."
+    "attributes": {}
+    "keywords": {}
+    "terms": []
+- "name": "comment"
+  "title":
+    "en": "Comment"
+    "fr": "Commentaire"
+  "description":
+    "en": "Additional information about the harmonized variable."
+    "fr": "Information supplémentaire à propos de la variable harmonisée."
+  "attributes": {}
+  "keywords": {}
+  "terms": []
+- "name": "algorithm"
+  "title":
+    "en": "Algorithm"
+    "fr": "Algorithme"
+  "description":
+    "en": "Algorithm used to generate the harmonized variable."
+    "fr": "Algorithme utilisé pour générer la variable harmonisée."
+  "attributes": {}
+  "keywords": {}
+  "terms": []

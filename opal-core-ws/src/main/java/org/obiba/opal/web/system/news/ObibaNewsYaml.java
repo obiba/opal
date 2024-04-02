@@ -18,9 +18,8 @@ import java.net.URL;
 
 public class ObibaNewsYaml extends AbstractYaml<ObibaNews> {
 
-  @Override
-  protected Class<ObibaNews> getType() {
-    return ObibaNews.class;
+  public ObibaNewsYaml() {
+    super(ObibaNews.class);
   }
 
   public static ObibaNews loadNews() throws IOException {

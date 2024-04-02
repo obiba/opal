@@ -12,7 +12,10 @@ package org.obiba.opal.core.support.yaml;
 
 import com.google.common.collect.ImmutableSet;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.inspector.TagInspector;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
@@ -27,11 +30,16 @@ import java.util.Set;
 
 public abstract class AbstractYaml<T> extends Yaml {
 
-  protected AbstractYaml() {
-    super(new TRepresenter(), new TDumperOptions());
+  private final Class<T> type;
+
+  protected AbstractYaml(Class<T> type) {
+    super(new Constructor(new TLoaderOptions(tag -> tag.matches(type))), new TRepresenter(), new TDumperOptions());
+    this.type = type;
   }
 
-  protected abstract Class<T> getType();
+  protected Class<T> getType() {
+    return type;
+  }
 
   @Override
   public T load(InputStream io) {
@@ -72,6 +80,7 @@ public abstract class AbstractYaml<T> extends Yaml {
   private static class TRepresenter extends Representer {
 
     private TRepresenter() {
+      super(new TDumperOptions());
       setPropertyUtils(new TPropertyUtils());
     }
 
@@ -89,6 +98,15 @@ public abstract class AbstractYaml<T> extends Yaml {
       setDefaultFlowStyle(FlowStyle.BLOCK);
       setDefaultScalarStyle(ScalarStyle.DOUBLE_QUOTED);
     }
+  }
+
+  private static class TLoaderOptions extends LoaderOptions {
+
+    private TLoaderOptions(TagInspector inspector) {
+      super();
+      setTagInspector(inspector);
+    }
+
   }
 
 }

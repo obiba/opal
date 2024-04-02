@@ -15,10 +15,6 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 public class TaxonomyYaml extends AbstractYaml<Taxonomy> {
 
   public TaxonomyYaml() {
-  }
-
-  @Override
-  protected Class<Taxonomy> getType() {
-    return Taxonomy.class;
+    super(Taxonomy.class);
   }
 }
