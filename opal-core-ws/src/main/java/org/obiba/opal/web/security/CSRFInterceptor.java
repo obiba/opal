@@ -12,8 +12,10 @@ package org.obiba.opal.web.security;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -56,13 +55,12 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
     this.csrfAllowed = Strings.isNullOrEmpty(csrfAllowed) ? Lists.newArrayList() : Splitter.on(",").splitToList(csrfAllowed.trim());
   }
 
-  @Nullable
   @Override
-  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method) {
-    if (!productionMode || csrfAllowed.contains("*")) return null;
+  public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
+    if (!productionMode || csrfAllowed.contains("*")) return;
 
-    String host = request.getHttpHeaders().getHeaderString(HOST_HEADER);
-    String referer = request.getHttpHeaders().getHeaderString(REFERER_HEADER);
+    String host = requestContext.getHeaderString(HOST_HEADER);
+    String referer = requestContext.getHeaderString(REFERER_HEADER);
     if (referer != null) {
       String refererHostPort = "";
       try {
@@ -72,7 +70,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
         // malformed url
       }
       // explicitly ok
-      if (csrfAllowed.contains(refererHostPort)) return null;
+      if (csrfAllowed.contains(refererHostPort)) return;
 
       boolean forbidden = false;
       if (!matchesLocalhost(host) && !referer.startsWith(String.format("https://%s/", host))) {
@@ -82,10 +80,10 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
       if (forbidden) {
         log.warn("CSRF detection: Host={}, Referer={}", host, referer);
         log.info(">> You can add {} to csrf.allowed setting", refererHostPort);
-        return Response.status(Status.FORBIDDEN).build();
+        throw new ForbiddenException("CSRF error");
       }
     }
-    return null;
+    return;
   }
 
   private boolean matchesLocalhost(String host) {
@@ -98,7 +96,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
   static String asHeader(Iterable<String> values) {
     StringBuilder sb = new StringBuilder();
     for (String s : values) {
-      if (sb.length() > 0) sb.append(", ");
+      if (!sb.isEmpty()) sb.append(", ");
       sb.append(s);
     }
     return sb.toString();

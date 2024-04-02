@@ -16,17 +16,17 @@ import com.google.common.collect.Ordering;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
-import org.jboss.resteasy.util.Types;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import org.jboss.resteasy.spi.util.Types;
 import org.obiba.opal.web.ws.SortDir;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-public class AbstractProtobufProvider {
+public abstract class AbstractProtobufProvider {
 
   @Autowired
   private final ProtobufProviderHelper helper = new ProtobufProviderHelper();

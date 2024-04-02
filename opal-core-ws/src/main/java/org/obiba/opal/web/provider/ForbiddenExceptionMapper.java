@@ -10,17 +10,17 @@
 
 package org.obiba.opal.web.provider;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
 
 @Component
 @Provider
@@ -34,7 +34,7 @@ public class ForbiddenExceptionMapper extends ErrorDtoExceptionMapper<ForbiddenE
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(ForbiddenException exception) {
+  protected Ws.ClientErrorDto getErrorDto(ForbiddenException exception) {
     log.warn("Forbidden exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "Forbidden", exception);
   }

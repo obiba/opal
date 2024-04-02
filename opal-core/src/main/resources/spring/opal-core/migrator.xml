@@ -17,6 +17,5 @@
   <context:component-scan base-package="org.obiba.opal.core.service" use-default-filters="false">
     <context:include-filter type="assignable" expression="org.obiba.opal.core.service.OrientDbService" />
     <context:include-filter type="assignable" expression="org.obiba.opal.core.service.OrientDbServerFactory" />
-    <context:include-filter type="assignable" expression="org.obiba.opal.core.service.DefaultBeanValidator" />
   </context:component-scan>
 </beans>

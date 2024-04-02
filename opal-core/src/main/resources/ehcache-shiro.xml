@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<config xmlns='http://www.ehcache.org/v3'>
+
+  <persistence directory="${OPAL_HOME}/work/ehcache"/>
+
+  <cache alias="shiro-activeSessionCache">
+    <key-type serializer="org.ehcache.impl.serialization.CompactJavaSerializer">
+      java.lang.Object
+    </key-type>
+    <value-type serializer="org.ehcache.impl.serialization.CompactJavaSerializer">
+      java.lang.Object
+    </value-type>
+
+    <resources>
+      <heap unit="entries">10000</heap>
+      <disk unit="GB">1</disk>
+    </resources>
+  </cache>
+
+  <cache alias="org.apache.shiro.realm.text.PropertiesRealm-0-accounts">
+    <key-type serializer="org.ehcache.impl.serialization.CompactJavaSerializer">
+      java.lang.Object
+    </key-type>
+    <value-type serializer="org.ehcache.impl.serialization.CompactJavaSerializer">
+      java.lang.Object
+    </value-type>
+
+    <resources>
+      <heap unit="entries">1000</heap>
+      <disk unit="GB">1</disk>
+    </resources>
+  </cache>
+
+  <cache-template name="defaultCacheConfiguration">
+    <expiry>
+      <tti unit="seconds">120</tti>
+    </expiry>
+    <heap unit="entries">10000</heap>
+  </cache-template>
+
+</config>

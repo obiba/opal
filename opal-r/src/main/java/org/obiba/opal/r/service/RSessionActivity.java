@@ -11,7 +11,7 @@
 package org.obiba.opal.r.service;
 
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import javax.validation.constraints.NotNull;

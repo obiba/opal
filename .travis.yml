@@ -1,7 +1,8 @@
 sudo: required
+dist: focal
 language: java
 jdk:
-  - openjdk8
+  - openjdk21
 addons:
   apt:
     packages:

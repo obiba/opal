@@ -9,18 +9,16 @@
  */
 package org.obiba.opal.core.domain;
 
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import javax.validation.constraints.NotNull;
-
-import com.google.common.base.Strings;
-import org.hibernate.validator.constraints.NotBlank;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class OpalGeneralConfig extends AbstractTimestamped {
 

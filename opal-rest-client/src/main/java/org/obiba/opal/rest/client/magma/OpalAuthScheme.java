@@ -10,7 +10,7 @@
 
 package org.obiba.opal.rest.client.magma;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;

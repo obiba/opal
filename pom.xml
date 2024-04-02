@@ -16,7 +16,7 @@
   <groupId>org.obiba.opal</groupId>
   <artifactId>opal</artifactId>
   <packaging>pom</packaging>
-  <version>4.8-SNAPSHOT</version>
+  <version>5.0-SNAPSHOT</version>
 
   <name>opal</name>
   <description>Opal Application</description>
@@ -24,101 +24,92 @@
   <properties>
     <obiba.deploy.dir>unstable</obiba.deploy.dir>
 
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <antlr.version>4.7.1</antlr.version>
-    <bouncycastle.version>1.46</bouncycastle.version>
+    <atomikos.version>6.0.0</atomikos.version>
+    <bouncycastle.version>1.76</bouncycastle.version>
     <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
-    <commons-codec.version>1.10</commons-codec.version>
-    <commons-collections.version>3.2.2</commons-collections.version>
-    <commons-configuration.version>1.10</commons-configuration.version>
+    <commons-codec.version>1.16.1</commons-codec.version>
+    <commons-collections.version>4.4</commons-collections.version>
+    <commons-configuration.version>2.10.1</commons-configuration.version>
     <commons-daemon.version>1.0.15</commons-daemon.version>
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
-    <commons-fileupload.version>1.5</commons-fileupload.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
-    <commons-io.version>2.7</commons-io.version>
-    <commons-lang.version>3.1</commons-lang.version>
+    <commons-io.version>2.15.1</commons-io.version>
+    <commons-lang.version>3.14.0</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <commons-vfs.version>2.6.0</commons-vfs.version>
+    <commons-vfs.version>2.9.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
-    <ehcache.version>2.10.9.2</ehcache.version>
+    <ehcache.version>3.10.8</ehcache.version>
     <fest.version>2.0M10</fest.version>
     <findbugs.version>3.0.1</findbugs.version>
-    <gin.version>2.1.2</gin.version>
+    <graalvm.version>21.3.5</graalvm.version>
     <gson.version>2.8.9</gson.version>
-    <guava.version>19.0</guava.version>
-    <gwt.version>2.7.0</gwt.version>
-    <gwt-bootstrap.version>2.3.2.0</gwt-bootstrap.version>
-    <gwt-dnd.version>3.3.4</gwt-dnd.version>
-    <gwt-chosen.version>1.2.0</gwt-chosen.version>
-    <gwt-highcharts.version>1.5.0</gwt-highcharts.version>
-    <gwt-log.version>3.3.2</gwt-log.version>
-    <gwt-visualization.version>1.0.2</gwt-visualization.version>
-    <gwtopenlayers.version>1.0</gwtopenlayers.version>
-    <gwtp.version>1.5.3</gwtp.version>
-    <gwtquery.version>1.4.3</gwtquery.version>
-    <hibernate.version>5.6.10.Final</hibernate.version>
-    <hibernate-validator.version>6.2.4.Final</hibernate-validator.version>
-    <hsqldb.version>2.5.2</hsqldb.version>
-    <httpclient.version>4.5.13</httpclient.version>
-    <jackson.version>2.14.3</jackson.version>
+    <guava.version>33.0.0-jre</guava.version>
+    <hsqldb.version>2.7.1</hsqldb.version>
+    <httpclient.version>5.2.1</httpclient.version>
+    <jackson.version>2.16.1</jackson.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
+    <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
     <jettison.version>1.5.4</jettison.version>
-    <jetty.version>9.4.51.v20230217</jetty.version>
+    <jetty.version>11.0.20</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
-    <jgit.version>3.6.2.201501210735-r</jgit.version>
+    <jgit.version>6.7.0.202309050840-r</jgit.version>
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.8.2</joda-time.version>
-    <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
     <json.version>20231013</json.version>
     <json-smart.version>2.4.10</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.13.2</junit.version>
-    <liquibase.version>4.15.0</liquibase.version>
-    <liquibase-slf4j.version>4.1.0</liquibase-slf4j.version>
+    <liquibase.version>4.26.0</liquibase.version>
+    <liquibase-slf4j.version>5.0.0</liquibase-slf4j.version>
     <lang-tag.version>1.4.4</lang-tag.version>
-    <logback.version>1.2.13</logback.version>
-    <logstash-logback.version>7.2</logstash-logback.version>
+    <logback.version>1.5.3</logback.version>
+    <logstash-logback.version>7.4</logstash-logback.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>4.0.6</magma.version>
+    <magma.version>5.0-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
-    <mongodb-driver.version>4.7.1</mongodb-driver.version>
+    <mongodb-driver.version>4.9.1</mongodb-driver.version>
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
     <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>5.45</oauth-oidc-sdk.version>
-    <obiba-commons.version>3.0.7</obiba-commons.version>
+    <obiba-commons.version>4.0-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
-    <orientdb.version>2.2.37</orientdb.version>
+    <orientdb.version>3.2.27</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <postgresql.version>42.7.2</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
-    <protobuf.version>2.5.0</protobuf.version>
-    <protostuff.version>1.0.9</protostuff.version>
+    <protobuf.version>3.24.3</protobuf.version>
     <quartz.version>2.3.2</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>3.0.20.Final</resteasy.version>
+    <resteasy.version>6.2.8.Final</resteasy.version>
+    <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <rql-parser.version>0.3.1</rql-parser.version>
     <shiro.version>1.13.0</shiro.version>
+    <shiro-ehcache3.version>1.0.0</shiro-ehcache3.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
-    <slf4j.version>1.7.36</slf4j.version>
+    <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>1.33</snakeyaml.version>
-    <spring.version>5.3.33</spring.version>
+    <spring.version>6.0.18</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
@@ -128,18 +119,16 @@
 
     <!-- maven plugins -->
     <github-release-plugin.version>1.2.0</github-release-plugin.version>
-    <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
     <maven-build-helper-plugin.version>1.8</maven-build-helper-plugin.version>
     <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
     <maven-cobertura-plugin.version>2.6</maven-cobertura-plugin.version>
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
-    <maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
+    <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
     <maven.enforcer.plugin>1.2</maven.enforcer.plugin>
     <maven-findbugs-plugin.version>3.0.4</maven-findbugs-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
-    <maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
-    <maven-lesscss-plugin.version>1.3.3</maven-lesscss-plugin.version>
+    <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
     <maven-pmd-plugin.version>3.6</maven-pmd-plugin.version>
     <maven-processor-plugin.version>2.2.4</maven-processor-plugin.version>
     <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
@@ -147,13 +136,13 @@
     <maven-sonar-plugin.version>2.2</maven-sonar-plugin.version>
     <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     <maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
-    <maven-war-plugin.version>2.4</maven-war-plugin.version>
-    <rpm-maven-plugin.version>2.1.4</rpm-maven-plugin.version>
+    <rpm-maven-plugin.version>2.2.0</rpm-maven-plugin.version>
 
   </properties>
 
   <modules>
     <module>opal-sql</module>
+    <module>opal-web-model</module>
     <module>opal-core-api</module>
     <module>opal-core</module>
     <module>opal-core-ws</module>
@@ -166,8 +155,6 @@
     <module>opal-r</module>
     <module>opal-httpd</module>
     <module>opal-ws</module>
-    <module>opal-web-model</module>
-    <module>opal-gwt-client</module>
     <module>opal-rest-client</module>
     <module>opal-datashield</module>
     <module>opal-search</module>
@@ -255,12 +242,6 @@
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-web-model</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-gwt-client</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
       </dependency>
       <dependency>
         <groupId>org.obiba.opal</groupId>
@@ -409,12 +390,6 @@
       <dependency>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma-datasource-null</artifactId>
-        <version>${magma.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-datasource-hibernate</artifactId>
         <version>${magma.version}</version>
       </dependency>
 
@@ -596,24 +571,6 @@
         </exclusions>
       </dependency>
 
-      <!-- Hibernate Dependencies -->
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>${hibernate.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-ehcache</artifactId>
-        <version>${hibernate.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <dependency>
         <groupId>cglib</groupId>
         <artifactId>cglib-nodep</artifactId>
@@ -621,59 +578,23 @@
       </dependency>
 
       <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>jta</artifactId>
-        <version>${jta.version}</version>
+        <groupId>jakarta.transaction</groupId>
+        <artifactId>jakarta.transaction-api</artifactId>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.ow2.jotm</groupId>
-        <artifactId>jotm-core</artifactId>
-        <version>${jotm.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.ow2.carol.irmi</groupId>
-            <artifactId>irmi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.objectweb.howl</groupId>
-            <artifactId>howl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-admin</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-jndi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb-idl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>com.atomikos</groupId>
+        <artifactId>transactions-jdbc</artifactId>
+        <version>${atomikos.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-connector-1.5-spec</artifactId>
-        <version>${ow2-spec.version}</version>
+        <groupId>com.atomikos</groupId>
+        <artifactId>transactions-jta</artifactId>
+        <version>${atomikos.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
-      <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-jta-1.1-spec</artifactId>
-        <version>${ow2-spec.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-dbcp2</artifactId>
@@ -704,14 +625,14 @@
 
       <!-- Set commons collections version because Spring declares it as optional -->
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
         <version>${commons-collections.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>commons-configuration</groupId>
-        <artifactId>commons-configuration</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-configuration2</artifactId>
         <version>${commons-configuration.version}</version>
         <exclusions>
           <exclusion>
@@ -925,27 +846,34 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-web</artifactId>
         <version>${shiro.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-spring</artifactId>
         <version>${shiro.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-ehcache</artifactId>
-        <version>${shiro.version}</version>
+        <classifier>jakarta</classifier>
         <exclusions>
           <exclusion>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.ehcache.integrations.shiro</groupId>
+        <artifactId>shiro-ehcache3</artifactId>
+        <version>${shiro-ehcache3.version}</version>
       </dependency>
       <dependency>
         <groupId>eu.flatwhite.shiro</groupId>
@@ -955,6 +883,10 @@
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -978,14 +910,13 @@
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-ext-jdk16</artifactId>
+        <artifactId>bcprov-jdk18on</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
-
       <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>${commons-fileupload.version}</version>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
       </dependency>
 
       <dependency>
@@ -1010,59 +941,28 @@
       <!-- RESTEasy dependencies -->
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
+        <artifactId>resteasy-core</artifactId>
         <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy.spring</groupId>
+        <artifactId>resteasy-spring</artifactId>
+        <version>${resteasy-spring.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-          </exclusion>
-          <!-- Ideally we would exclude org.scannotation:scannotation, but that's not possible due to ConfigurationBootstrap -->
-          <exclusion>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-          </exclusion>
-          <!-- Exclude stax-api in favour of the newer version that poi-ooxml pulls in (transitively, via xmlbeans). -->
-          <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-spring</artifactId>
+        <artifactId>resteasy-multipart-provider</artifactId>
         <version>${resteasy.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Jetty dependencies -->
@@ -1083,11 +983,6 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-continuation</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-io</artifactId>
         <version>${jetty.version}</version>
       </dependency>
@@ -1101,11 +996,11 @@
         <artifactId>jetty-server</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty-util.version}</version>
-      </dependency>
+<!--      <dependency>-->
+<!--        <groupId>org.mortbay.jetty</groupId>-->
+<!--        <artifactId>jetty-util</artifactId>-->
+<!--        <version>${jetty-util.version}</version>-->
+<!--      </dependency>-->
 
       <!-- Protobuf dependencies -->
       <dependency>
@@ -1118,116 +1013,10 @@
         <artifactId>protobuf-java-format</artifactId>
         <version>${protobuf-java-format.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.dyuproject.protostuff</groupId>
-        <artifactId>protostuff-core</artifactId>
-        <version>${protostuff.version}</version>
-      </dependency>
-
-      <!-- GWT dependencies -->
-      <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-servlet</artifactId>
-        <version>${gwt.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-user</artifactId>
-        <version>${gwt.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-dev</artifactId>
-        <version>${gwt.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt.inject</groupId>
-        <artifactId>gin</artifactId>
-        <version>${gin.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt.google-apis</groupId>
-        <artifactId>gwt-visualization</artifactId>
-        <version>${gwt-visualization.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.gwtplatform</groupId>
-        <artifactId>gwtp-mvp-client</artifactId>
-        <version>${gwtp.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.gwtplatform</groupId>
-        <artifactId>gwtp-processors</artifactId>
-        <version>${gwtp.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.gwtplatform</groupId>
-        <artifactId>gwtp-dispatch-rest</artifactId>
-        <version>${gwtp.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava-gwt</artifactId>
-        <version>${guava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gwtopenmaps.openlayers</groupId>
-        <artifactId>gwt-openlayers-client</artifactId>
-        <version>${gwtopenlayers.version}</version>
-      </dependency>
-
-      <!-- GWT Bootstrap -->
-      <dependency>
-        <groupId>com.github.gwtbootstrap</groupId>
-        <artifactId>gwt-bootstrap</artifactId>
-        <version>${gwt-bootstrap.version}</version>
-      </dependency>
-
-      <!-- GWTQuery related dependencies -->
-      <dependency>
-        <groupId>com.googlecode.gwtquery</groupId>
-        <artifactId>gwtquery</artifactId>
-        <version>${gwtquery.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.github.jdramaix</groupId>
-        <artifactId>gwtchosen</artifactId>
-        <version>${gwt-chosen.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <!-- GWT HighCharts -->
-      <dependency>
-        <groupId>org.moxieapps</groupId>
-        <artifactId>gwt-highcharts</artifactId>
-        <version>${gwt-highcharts.version}</version>
-      </dependency>
-
-      <!-- GWT Drag-n-Drop -->
-      <dependency>
-        <groupId>com.allen-sauer.gwt.dnd</groupId>
-        <artifactId>gwt-dnd</artifactId>
-        <version>${gwt-dnd.version}</version>
-      </dependency>
-
-      <!--GWT Log-->
-      <dependency>
-        <groupId>com.allen-sauer.gwt.log</groupId>
-        <artifactId>gwt-log</artifactId>
-        <version>${gwt-log.version}</version>
-      </dependency>
 
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
         <version>${httpclient.version}</version>
         <exclusions>
           <exclusion>
@@ -1239,7 +1028,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient-cache</artifactId>
-        <version>${httpclient.version}</version>
+        <version>4.5.14</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1250,7 +1039,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>${httpclient.version}</version>
+        <version>4.5.14</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1290,9 +1079,10 @@
       </dependency>
 
       <dependency>
-        <groupId>net.sf.ehcache</groupId>
+        <groupId>org.ehcache</groupId>
         <artifactId>ehcache</artifactId>
         <version>${ehcache.version}</version>
+        <classifier>jakarta</classifier>
       </dependency>
 
       <dependency>
@@ -1436,6 +1226,12 @@
         <groupId>org.eclipse.jgit</groupId>
         <artifactId>org.eclipse.jgit</artifactId>
         <version>${jgit.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -1454,17 +1250,28 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-server</artifactId>
         <version>${orientdb.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-core</artifactId>
         <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.graalvm.sdk</groupId>
+        <artifactId>graal-sdk</artifactId>
+        <version>${graalvm.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js</artifactId>
+        <version>${graalvm.version}</version>
       </dependency>
 
       <dependency>
@@ -1474,25 +1281,35 @@
       </dependency>
 
       <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-validator</artifactId>
-        <version>${hibernate-validator.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>2.1.1</version>
       </dependency>
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>3.1.0</version>
+      </dependency>
+
       <dependency>
         <groupId>javax.el</groupId>
         <artifactId>javax.el-api</artifactId>
         <version>${javax-el.version}</version>
       </dependency>
       <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>4.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.glassfish.web</groupId>
         <artifactId>javax.el</artifactId>
         <version>${javax-el.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>${jaxb-runtime.version}</version>
       </dependency>
 
       <dependency>
@@ -1635,7 +1452,6 @@
           <artifactId>maven-pmd-plugin</artifactId>
           <version>${maven-pmd-plugin.version}</version>
           <configuration>
-            <linkXref>false</linkXref>
             <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
             <minimumTokens>30</minimumTokens>
             <targetJdk>${maven.compiler.target}</targetJdk>
@@ -1663,36 +1479,33 @@
           <version>${maven-surefire-plugin.version}</version>
           <configuration>
             <useSystemClassLoader>false</useSystemClassLoader>
+            <argLine>
+              --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED
+            </argLine>
           </configuration>
         </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-javadocs</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-              <configuration>
-                <additionalparam>-Xdoclint:none</additionalparam>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
+<!--        <plugin>-->
+<!--          <groupId>org.apache.maven.plugins</groupId>-->
+<!--          <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--          <version>${maven-javadoc-plugin.version}</version>-->
+<!--          <executions>-->
+<!--            <execution>-->
+<!--              <id>attach-javadocs</id>-->
+<!--              <goals>-->
+<!--                <goal>jar</goal>-->
+<!--              </goals>-->
+<!--              <configuration>-->
+<!--                <additionalparam>-Xdoclint:none</additionalparam>-->
+<!--              </configuration>-->
+<!--            </execution>-->
+<!--          </executions>-->
+<!--        </plugin>-->
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${maven-deploy-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>${maven-war-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -1704,18 +1517,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>${maven-build-helper-plugin.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>com.dyuproject.protostuff</groupId>
-          <artifactId>protostuff-maven-plugin</artifactId>
-          <version>${protostuff.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>gwt-maven-plugin</artifactId>
-          <version>${gwt.version}</version>
         </plugin>
 
         <plugin>
@@ -1796,12 +1597,6 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.lesscss</groupId>
-          <artifactId>lesscss-maven-plugin</artifactId>
-          <version>${maven-lesscss-plugin.version}</version>
         </plugin>
 
         <plugin>

@@ -13,7 +13,7 @@ package org.obiba.opal.core.domain;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.obiba.opal.spi.analysis.AnalysisResult;

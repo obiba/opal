@@ -10,17 +10,17 @@
 
 package org.obiba.opal.web.security;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.obiba.shiro.web.filter.UserBannedException;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
 
 @Provider
 @Component
@@ -32,7 +32,7 @@ public class UserBannedExceptionMapper extends ErrorDtoExceptionMapper<UserBanne
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(UserBannedException exception) {
+  protected Ws.ClientErrorDto getErrorDto(UserBannedException exception) {
     Ws.ClientErrorDto.Builder builder = ClientErrorDtos.getErrorMessage(getStatus(), "BannedUser", exception).toBuilder();
     return builder.clearArguments().addArguments(exception.getUser()).addArguments(exception.getRemainingBanTime() + "").build();
   }

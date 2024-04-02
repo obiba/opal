@@ -10,8 +10,8 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import org.obiba.magma.*;
+import org.obiba.magma.Timestamped;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.*;
 import org.obiba.opal.core.service.ProjectService;
@@ -28,11 +28,9 @@ import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilder;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;

@@ -12,13 +12,12 @@ package org.obiba.opal.core.domain.database;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.core.validator.Unique;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;

@@ -10,26 +10,28 @@
 
 package org.obiba.opal.core.service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.server.OServer;
 import javax.validation.constraints.NotNull;
-
-import com.orientechnologies.common.log.OLogManager;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
-import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.server.OServer;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
-public class LocalOrientDbServerFactory implements OrientDbServerFactory {
+public class LocalOrientDbServerFactory implements OrientDbServerFactory, InitializingBean, DisposableBean {
 
   private static final Logger log = LoggerFactory.getLogger(LocalOrientDbServerFactory.class);
 
@@ -42,6 +44,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   public static final String PASSWORD = "admin";
 
   public static final String URL = DEFAULT_SCHEME + ":" + ORIENTDB_HOME;
+
+  private final Lock lock = new ReentrantLock();
+  private final Condition condition = lock.newCondition();
+
+  private boolean started = false;
 
   private String url;
 
@@ -65,12 +72,19 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     this.url = url;
   }
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    start();
+  }
+
+  @Override
   public void start() throws Exception {
+    stop();
     log.info("Start OrientDB server ({})", url);
 
     System.setProperty("ORIENTDB_HOME", url.replaceFirst("^" + DEFAULT_SCHEME + ":", ""));
     System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
+    //System.setProperty("java.util.logging.manager", "com.orientechnologies.common.log.OLogManager$DebugLogManager");
 
     ensureSecurityConfig();
 
@@ -80,12 +94,23 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     poolFactory = new OPartitionedDatabasePoolFactory();
 
     ensureDatabaseExists();
+    started = true;
+    signalCondition();
   }
 
-  @PreDestroy
+  @Override
+  public void destroy() {
+    stop();
+  }
+
+  @Override
   public void stop() {
-    log.info("Stop OrientDB server ({})", url);
-    if(server != null) server.shutdown();
+    if (server != null) {
+      log.info("Stop OrientDB server ({})", url);
+      server.shutdown();
+      server = null;
+    }
+    started = false;
   }
 
   @NotNull
@@ -96,11 +121,15 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   @NotNull
   @Override
-  public ODatabaseDocumentTx getDocumentTx() {
+  public ODatabaseDocument getDocumentTx() {
     //TODO cache password
 //    String password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
     log.trace("Open OrientDB connection with username: {}", USERNAME);
-
+    try {
+      waitForCondition();
+    } catch (InterruptedException e) {
+      // ignore
+    }
     return poolFactory.get(url, USERNAME, PASSWORD).acquire();
   }
 
@@ -114,16 +143,40 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
       JSONObject securityObject = new JSONObject();
       securityObject.put("enabled", false);
       try (PrintWriter out = new PrintWriter(securityFile.getAbsolutePath())) {
-        out.println(securityObject.toString());
+        out.println(securityObject);
       }
     }
   }
 
   private void ensureDatabaseExists() {
-    try(ODatabaseDocumentTx database = new ODatabaseDocumentTx(url)) {
+    try(ODatabaseDocument database = new ODatabaseDocumentTx(url)) {
       if(!database.exists()) {
         database.create();
       }
     }
   }
+
+  public void waitForCondition() throws InterruptedException {
+    lock.lock(); // Acquire the lock
+    try {
+      // Wait until the condition is met
+      while (!started) {
+        condition.await(); // Release the lock and wait
+      }
+    } finally {
+      lock.unlock(); // Release the lock
+    }
+  }
+
+  public void signalCondition() {
+    lock.lock(); // Acquire the lock
+    try {
+      // Update the condition and signal waiting threads
+      started = true;
+      condition.signalAll(); // Signal all waiting threads
+    } finally {
+      lock.unlock(); // Release the lock
+    }
+  }
+
 }

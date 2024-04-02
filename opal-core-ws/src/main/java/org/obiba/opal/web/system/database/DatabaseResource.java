@@ -10,24 +10,10 @@
 
 package org.obiba.opal.web.system.database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
-import com.mongodb.client.MongoDatabase;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
-import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -44,7 +30,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 /**
@@ -133,7 +123,7 @@ public class DatabaseResource {
     try {
       MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test", socketFactoryProvider);
       List<String> dbs = StreamSupport.stream(datasourceFactory.getMongoDBFactory().getMongoClient().listDatabaseNames().spliterator(), false)
-          .collect(Collectors.toList());
+          .toList();
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
       }
@@ -147,8 +137,8 @@ public class DatabaseResource {
   }
 
   private Response databaseConnectionFailed() {
-    return Response.status(SERVICE_UNAVAILABLE)
-        .entity(ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build()).build();
+    return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+        .entity(ClientErrorDtos.getErrorMessage(Response.Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build()).build();
   }
 
 }

@@ -49,11 +49,6 @@ public abstract class AbstractOrientDbTestConfig {
   }
 
   @Bean
-  public DefaultBeanValidator defaultBeanValidator() {
-    return new DefaultBeanValidator();
-  }
-
-  @Bean
   public OrientDbServerFactory orientDbServerFactory() {
     OrientDbServerFactory factory = new LocalOrientDbServerFactory();
     factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));
@@ -70,6 +65,7 @@ public abstract class AbstractOrientDbTestConfig {
     OpalConfiguration configuration = new OpalConfiguration();
     configuration.setDatabasePassword("admin");
     OpalConfigurationService mock = EasyMock.createMock(OpalConfigurationService.class);
+    mock.afterPropertiesSet();
     EasyMock.expect(mock.getOpalConfiguration()).andReturn(configuration).anyTimes();
     EasyMock.replay(mock);
     return mock;

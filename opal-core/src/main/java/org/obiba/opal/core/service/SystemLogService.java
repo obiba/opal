@@ -17,9 +17,9 @@ import org.apache.commons.io.input.TailerListener;
 import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component
-public class SystemLogService {
+public class SystemLogService implements InitializingBean {
 
   private static final Logger log = LoggerFactory.getLogger(SystemLogService.class);
 
@@ -43,13 +43,13 @@ public class SystemLogService {
 
   private TailBroadcaster opalLogBroadcaster;
 
-  @PostConstruct
-  public void initialize() {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     logsDir = new File(System.getenv().get("OPAL_LOG"));
     if (!logsDir.exists())
       logsDir = new File(System.getenv().get("OPAL_HOME") + File.separatorChar + "logs");
     this.opalLogBroadcaster = new TailBroadcaster();
-    Tailer.create(getOpalLogFile(), opalLogBroadcaster);
+    Tailer.builder().setFile(getOpalLogFile()).setTailerListener(opalLogBroadcaster).get();
   }
 
   public File getOpalLogFile() {
@@ -102,11 +102,11 @@ public class SystemLogService {
     return logs;
   }
 
-  private class TailBroadcaster extends TailerListenerAdapter {
+  private static class TailBroadcaster extends TailerListenerAdapter {
 
-    private EvictingQueue<String> queue = EvictingQueue.create(1000);
+    private final EvictingQueue<String> queue = EvictingQueue.create(1000);
 
-    private List<TailerListener> tailers = Lists.newArrayList();
+    private final List<TailerListener> tailers = Lists.newArrayList();
 
     public void register(TailerListener tailer) {
       if (tailers.contains(tailer)) return;

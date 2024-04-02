@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Strings;
-import org.hibernate.validator.constraints.NotBlank;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;

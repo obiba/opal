@@ -10,7 +10,7 @@
 
 package org.obiba.opal.r.service;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import javax.validation.constraints.NotNull;

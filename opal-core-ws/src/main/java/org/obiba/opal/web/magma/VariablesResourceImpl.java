@@ -32,8 +32,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.core.*;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component("variablesResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

@@ -11,7 +11,7 @@ package org.obiba.opal.core.service;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;

@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.8-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>opal-core-ws</artifactId>
   <name>opal-core-ws</name>
@@ -67,6 +67,10 @@
       <artifactId>opal-search</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-xstream</artifactId>
     </dependency>
@@ -96,21 +100,28 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-hibernate</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-mongodb</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-null</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-multipart-provider</artifactId>
     </dependency>
-    <!-- required by commons-fileupload -->
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>

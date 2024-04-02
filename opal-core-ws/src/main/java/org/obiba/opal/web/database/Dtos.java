@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.database;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.collect.Sets;

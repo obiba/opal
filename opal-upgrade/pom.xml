@@ -16,7 +16,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>4.8-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -51,8 +51,8 @@
       <artifactId>obiba-password-hasher</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-configuration2</artifactId>
     </dependency>
   </dependencies>
 

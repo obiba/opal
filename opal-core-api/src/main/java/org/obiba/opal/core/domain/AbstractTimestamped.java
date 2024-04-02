@@ -14,8 +14,6 @@ import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.datasource.hibernate.domain.Timestamped;
-
 @SuppressWarnings("AssignmentToDateFieldFromParameter")
 public abstract class AbstractTimestamped implements Timestamped {
 

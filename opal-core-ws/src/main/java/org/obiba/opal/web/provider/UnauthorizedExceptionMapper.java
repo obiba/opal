@@ -10,17 +10,17 @@
 
 package org.obiba.opal.web.provider;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
 
 @Component
 @Provider
@@ -34,7 +34,7 @@ public class UnauthorizedExceptionMapper extends ErrorDtoExceptionMapper<Unautho
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(UnauthorizedException exception) {
+  protected Ws.ClientErrorDto getErrorDto(UnauthorizedException exception) {
     if (log.isDebugEnabled())
       log.warn("Unauthorized exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "Forbidden", exception);

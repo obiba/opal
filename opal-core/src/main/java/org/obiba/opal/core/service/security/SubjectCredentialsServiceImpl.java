@@ -34,9 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolationException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +78,6 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   private EventBus eventBus;
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(SubjectCredentials.class);
     orientDbService.createUniqueIndex(Group.class);

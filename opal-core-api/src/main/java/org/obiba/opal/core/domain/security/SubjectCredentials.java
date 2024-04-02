@@ -10,7 +10,7 @@
 package org.obiba.opal.core.domain.security;
 
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;

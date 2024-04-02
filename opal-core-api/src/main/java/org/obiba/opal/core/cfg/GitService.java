@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.cfg;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.git.CommitInfo;

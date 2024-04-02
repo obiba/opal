@@ -14,7 +14,7 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.SystemService;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 
 public interface SubjectCredentialsService extends SystemService {
 

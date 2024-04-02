@@ -13,7 +13,7 @@ package org.obiba.opal.core.domain.sql;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Date;
 
 public class SQLExecution {

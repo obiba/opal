@@ -23,17 +23,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
-import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.KeyStoreService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
@@ -47,8 +47,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
-import static javax.ws.rs.core.Response.ResponseBuilder;
-import static javax.ws.rs.core.Response.Status;
+import static jakarta.ws.rs.core.Response.ResponseBuilder;
+import static jakarta.ws.rs.core.Response.Status;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -205,7 +205,7 @@ public class KeyStoreResource {
     if(certificates == null || certificates.length == 0) throw new IllegalArgumentException("Cannot find certificate for alias: " + alias);
 
     StringWriter writer = new StringWriter();
-    PEMWriter pemWriter = new PEMWriter(writer);
+    JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
     for (Certificate certificate : certificates) {
       pemWriter.writeObject(certificate);
     }

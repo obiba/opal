@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
@@ -31,6 +29,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import javax.validation.constraints.NotNull;
 
 class RestValueTableWriter implements ValueTableWriter {
 

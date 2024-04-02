@@ -14,9 +14,7 @@ import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,13 +30,11 @@ public class ReportTemplateServiceImpl implements ReportTemplateService {
   private CryptoService cryptoService;
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(ReportTemplate.class);
   }
 
   @Override
-  @PreDestroy
   public void stop() {
   }
 

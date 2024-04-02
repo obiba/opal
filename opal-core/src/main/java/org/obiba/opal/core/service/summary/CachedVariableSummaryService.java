@@ -12,8 +12,6 @@ package org.obiba.opal.core.service.summary;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -24,7 +22,6 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.service.VariableSummaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -38,9 +35,6 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
   @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.cache.variableSummaries}")
   private boolean cacheSummaries;
-
-  @Autowired
-  private CacheManager cacheManager;
 
   private final Map<Class<? extends VariableSummaryFactory<?>>, AbstractVariableSummaryCachedService<?, ?, ?>>
       summaryServices = new HashMap<>();
@@ -126,8 +120,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-continuous");
+    protected String getCacheName() {
+      return "opal-variable-summary-continuous";
     }
 
     @NotNull
@@ -142,8 +136,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-categorical");
+    protected String getCacheName() {
+      return "opal-variable-summary-categorical";
     }
 
     @NotNull
@@ -159,8 +153,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-default");
+    protected String getCacheName() {
+      return "opal-variable-summary-default";
     }
 
     @NotNull
@@ -175,8 +169,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-binary");
+    protected String getCacheName() {
+      return "opal-variable-summary-binary";
     }
 
     @NotNull
@@ -191,8 +185,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-text");
+    protected String getCacheName() {
+      return "opal-variable-summary-text";
     }
 
     @NotNull
@@ -207,8 +201,8 @@ public class CachedVariableSummaryService implements VariableSummaryService {
 
     @NotNull
     @Override
-    protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-geo");
+    protected String getCacheName() {
+      return "opal-variable-summary-geo";
     }
 
     @NotNull

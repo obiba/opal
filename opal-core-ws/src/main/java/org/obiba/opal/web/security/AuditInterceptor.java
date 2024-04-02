@@ -11,10 +11,13 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.http.HttpStatus;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.audit.OpalUserProvider;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
@@ -25,15 +28,11 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 @Component
-public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePreProcess {
+public class AuditInterceptor implements RequestCyclePreProcess, RequestCyclePostProcess {
 
   private static final Logger log = LoggerFactory.getLogger(AuditInterceptor.class);
 
@@ -55,31 +54,29 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
   @Autowired
   private OpalUserProvider opalUserProvider;
 
-  @Nullable
   @Override
-  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod) {
-    MDC.put("ip", getClientIP(servletRequest, request));
-    MDC.put("method", request.getHttpMethod());
-    return null;
+  public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
+    MDC.put("ip", getClientIP(httpServletRequest, requestContext));
+    MDC.put("method", requestContext.getMethod());
   }
 
   @Override
-  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+  public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     MDC.put("username", opalUserProvider.getUsername());
-    MDC.put("status", response.getStatus() + "");
-    MDC.put("method", request.getHttpMethod());
+    MDC.put("status", responseContext.getStatus() + "");
+    MDC.put("method", requestContext.getMethod());
     if (Strings.isNullOrEmpty(MDC.get("ip")))
-      MDC.put("ip", getClientIP(servletRequest, request));
+      MDC.put("ip", getClientIP(httpServletRequest, requestContext));
 
-    logServerError(servletRequest, request, response);
-    logClientError(servletRequest, request, response);
-    logInfo(servletRequest, request, response);
+    logServerError(requestContext, responseContext);
+    logClientError(requestContext, responseContext);
+    logInfo(requestContext, responseContext);
     MDC.clear();
   }
 
-  private String getArguments(HttpRequest request) {
-    StringBuilder sb = new StringBuilder(request.getUri().getPath(true));
-    MultivaluedMap<String, String> params = request.getUri().getQueryParameters();
+  private String getArguments(ContainerRequestContext requestContext) {
+    StringBuilder sb = new StringBuilder(requestContext.getUriInfo().getPath(true));
+    MultivaluedMap<String, String> params = requestContext.getUriInfo().getQueryParameters();
     if (!params.isEmpty()) {
       sb.append(" queryParams:").append(params);
     }
@@ -87,55 +84,60 @@ public class AuditInterceptor implements RequestCyclePostProcess, RequestCyclePr
     return sb.toString();
   }
 
-  private String getClientIP(@Nullable HttpServletRequest servletRequest, HttpRequest request) {
+  private String getClientIP(HttpServletRequest httpServletRequest, ContainerRequestContext requestContext) {
     String ip = "";
 
     for (String ipHeader : VALID_IP_HEADER_CANDIDATES) {
-      ip = request.getHttpHeaders().getRequestHeaders().keySet().stream()
+      ip = requestContext.getHeaders().keySet().stream()
           .filter(ipHeader::equalsIgnoreCase)
-          .map(h -> request.getHttpHeaders().getHeaderString(h))
+          .map(requestContext::getHeaderString)
           .findFirst().orElse("");
       if (!Strings.isNullOrEmpty(ip)) break;
     }
 
-    if (Strings.isNullOrEmpty(ip) && servletRequest != null)
-      ip = servletRequest.getRemoteAddr();
+    if (Strings.isNullOrEmpty(ip))
+       ip = httpServletRequest.getRemoteAddr();
 
     return ip;
   }
 
-  private void logServerError(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+  private void logServerError(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     if (!log.isErrorEnabled()) return;
-    if (response.getStatus() < HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
+    if (responseContext.getStatus() < HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
 
-    log.error(LOG_FORMAT, getArguments(request));
+    log.error(LOG_FORMAT, getArguments(requestContext));
   }
 
-  private void logClientError(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+  private void logClientError(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     if (!log.isWarnEnabled()) return;
-    if (response.getStatus() < HttpStatus.SC_BAD_REQUEST) return;
-    if (response.getStatus() >= HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
+    if (responseContext.getStatus() < HttpStatus.SC_BAD_REQUEST) return;
+    if (responseContext.getStatus() >= HttpStatus.SC_INTERNAL_SERVER_ERROR) return;
 
-    log.warn(LOG_FORMAT, getArguments(request));
+    log.warn(LOG_FORMAT, getArguments(requestContext));
   }
 
-  private void logInfo(HttpServletRequest servletRequest, HttpRequest request, ServerResponse response) {
+  private void logInfo(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     if (!log.isInfoEnabled()) return;
-    if (response.getStatus() >= HttpStatus.SC_BAD_REQUEST) return;
+    if (responseContext.getStatus() >= HttpStatus.SC_BAD_REQUEST) return;
 
     boolean logged = false;
-    if (response.getStatus() == HttpStatus.SC_CREATED) {
-      URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
-      if (resourceUri != null) {
-        String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
-        MDC.put("created", path);
-        log.info(LOG_FORMAT, getArguments(request));
-        logged = true;
+    if (responseContext.getStatus() == HttpStatus.SC_CREATED) {
+      String resourceUriStr = responseContext.getHeaderString(HttpHeaders.LOCATION);
+      if (!Strings.isNullOrEmpty(resourceUriStr)) {
+        try {
+          URI resourceUri = new URI(resourceUriStr);
+          String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
+          MDC.put("created", path);
+          log.info(LOG_FORMAT, getArguments(requestContext));
+          logged = true;
+        } catch (URISyntaxException e) {
+          // ignore
+        }
       }
     }
 
     if (!logged) {
-      log.info(LOG_FORMAT, getArguments(request));
+      log.info(LOG_FORMAT, getArguments(requestContext));
     }
   }
 

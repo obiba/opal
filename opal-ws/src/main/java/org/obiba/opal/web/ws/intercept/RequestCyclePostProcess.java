@@ -9,14 +9,13 @@
  */
 package org.obiba.opal.web.ws.intercept;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.HttpRequest;
-
-import javax.servlet.http.HttpServletRequest;
 
 public interface RequestCyclePostProcess {
 
-  void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response);
+  void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext);
 
 }

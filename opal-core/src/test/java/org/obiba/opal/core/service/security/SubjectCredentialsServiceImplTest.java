@@ -10,24 +10,17 @@
 
 package org.obiba.opal.core.service.security;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.security.auth.callback.CallbackHandler;
-
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.io.Files;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.AbstractOrientDbTestConfig;
-import org.obiba.opal.core.service.Asserts;
-import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.core.service.security.realm.OpalApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,20 +28,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.util.ResourceUtils;
 
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
+import javax.security.auth.callback.CallbackHandler;
+import java.io.IOException;
+import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = SubjectCredentialsServiceImplTest.Config.class)
-public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringContextTests {
+public class SubjectCredentialsServiceImplTest extends AbstractOrientdbServiceTest {
 
 //  private static final Logger log = LoggerFactory.getLogger(SubjectCredentialsServiceImplTest.class);
 
@@ -61,8 +52,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
 
-  @Before
-  public void clear() {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     orientDbService.deleteAll(SubjectCredentials.class);
     orientDbService.deleteAll(Group.class);
     orientDbService.deleteAll(KeyStoreState.class);
@@ -390,6 +382,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     @Bean
     public SubjectProfileService subjectProfileService() {
       SubjectProfileService subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
+      subjectProfileService.afterPropertiesSet();
       expect(subjectProfileService.getProfile("user1")).andReturn(new SubjectProfile("user1", OpalUserRealm.OPAL_REALM))
           .anyTimes();
       expect(subjectProfileService.getProfile("app1"))

@@ -9,17 +9,8 @@
  */
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nullable;
-import javax.annotation.PreDestroy;
-import javax.validation.constraints.NotNull;
-
 import com.google.common.base.Strings;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
@@ -34,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -61,7 +55,6 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public void start() { }
 
-  @PreDestroy
   @Override
   public void stop() {
     if(datasource == null) return;

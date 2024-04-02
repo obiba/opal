@@ -13,7 +13,7 @@ package org.obiba.opal.core.service;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.subject.PrincipalCollection;

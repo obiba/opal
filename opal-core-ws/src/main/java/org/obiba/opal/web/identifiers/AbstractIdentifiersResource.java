@@ -19,7 +19,7 @@ import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 

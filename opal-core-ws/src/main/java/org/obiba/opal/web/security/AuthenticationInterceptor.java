@@ -9,19 +9,17 @@
  */
 package org.obiba.opal.web.security;
 
-import java.lang.annotation.Annotation;
-
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.session.Session;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -37,6 +35,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.Annotation;
+
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthenticationInterceptor extends AbstractSecurityComponent
@@ -47,51 +47,49 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   @Value("${org.obiba.opal.server.context-path}")
   private String contextPath;
 
-  @Nullable
+
   @Override
-  public Response preProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker method)
-      throws Failure, WebApplicationException {
+  public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
     // Check authentication before processing.
     // If resource requires authentication and user is not authenticated, return "401: Unauthorized"
 
     // If we have an authenticated user, let method through
     if(isUserAuthenticated()) {
-      return null;
+      return;
     }
 
     // If resource is public, let method through
-    if(isWebServicePublic(method)) {
-      return null;
+    if(isWebServicePublic(resourceMethod)) {
+      return;
     }
 
     // If method allows authentication using the cookie only and a valid cookie is present, let method through
-    if(isWebServiceAuthenticatedByCookie(method) && isOpalCookieValid(request)) {
-      return null;
+    if(isWebServiceAuthenticatedByCookie(resourceMethod) && isOpalCookieValid(requestContext)) {
+      return;
     }
 
     // Not authorized: method requires proper authentication, and no user is authenticated
-    return ServerResponse.status(Status.UNAUTHORIZED)
-        .header(HttpHeaders.WWW_AUTHENTICATE, OpalAuth.CREDENTIALS_HEADER + " realm=\"Opal\"").build();
+    throw new UnauthorizedException();
   }
 
   @Override
-  public void postProcess(HttpServletRequest servletRequest, HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
+  public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     // Set the cookie if the user is still authenticated
     if(isUserAuthenticated()) {
       Session session = SecurityUtils.getSubject().getSession();
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
-      response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
+      responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
           new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), getCookiePath(), null, null, timeout, true, true));
       Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
       if(cookieValue != null) {
-        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
+        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
       }
     } else {
       // Remove the cookie if the user is not/no longer authenticated
-      if(isWebServiceAuthenticated(response.getAnnotations())) {
+      if(isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
-        response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
+        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
             new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, getCookiePath(), null, "Opal session deleted", 0, true, true));
       }
     }
@@ -101,8 +99,8 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     return Strings.isNullOrEmpty(contextPath) ? "/" : contextPath;
   }
 
-  private boolean isOpalCookieValid(HttpRequest request) {
-    Cookie cookie = request.getHttpHeaders().getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
+  private boolean isOpalCookieValid(ContainerRequestContext requestContext) {
+    Cookie cookie = requestContext.getCookies().get(OPAL_SESSION_ID_COOKIE_NAME);
     return cookie != null && isValidSessionId(cookie.getValue());
   }
 

@@ -30,12 +30,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component("opalCallbackFilter")
@@ -67,8 +66,8 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
     this.opalGeneralConfigService = opalGeneralConfigService;
   }
 
-  @PostConstruct
-  public void init() {
+  @Override
+  protected void initFilterBean() throws ServletException {
     setOIDCConfigurationProvider(oidcConfigurationProvider);
     setOIDCSessionManager(oidcSessionManager);
     initFilterUrls();

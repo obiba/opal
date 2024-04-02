@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +66,6 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(SubjectAcl.class);
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");

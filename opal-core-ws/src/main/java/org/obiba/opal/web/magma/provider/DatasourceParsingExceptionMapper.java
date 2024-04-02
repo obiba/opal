@@ -9,17 +9,17 @@
  */
 package org.obiba.opal.web.magma.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
@@ -31,7 +31,7 @@ public class DatasourceParsingExceptionMapper extends ErrorDtoExceptionMapper<Da
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(DatasourceParsingException exception) {
+  protected Ws.ClientErrorDto getErrorDto(DatasourceParsingException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "DatasourceReadFailed", exception);
   }
 

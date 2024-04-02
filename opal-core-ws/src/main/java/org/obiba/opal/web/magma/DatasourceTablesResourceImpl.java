@@ -39,12 +39,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -167,7 +167,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     getEventBus().post(new ValueTableAddedEvent(datasource.getName(), table.getName()));
     URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable")
         .build(datasource.getName(), table.getName());
-    return Response.created(tableUri)//
+    return Response.created(tableUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL)).build();
   }
 

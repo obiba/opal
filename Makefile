@@ -1,11 +1,11 @@
 ##
 ## Makefile for Opal developers
 ##
-version=4.7-SNAPSHOT
-magma_version=4.0-SNAPSHOT
-commons_version=3.0-SNAPSHOT
-java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
-#java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M"
+version=5.0-SNAPSHOT
+magma_version=5.0-SNAPSHOT
+commons_version=4.0-SNAPSHOT
+java_opts="-Xms1G -Xmx4G -XX:+UseG1GC"
+#java_opts="-Xms1G -Xmx4G"
 
 projects=$(CURDIR)/..
 opal_project=$(CURDIR)
@@ -23,8 +23,8 @@ endif
 
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
-orientdb_version=2.2.37
-hsqldb_version=2.3.3
+orientdb_version=3.2.27
+hsqldb_version=2.7.1
 
 mysql_root=root
 mysql_password=1234
@@ -89,20 +89,6 @@ debug:
 	sed -i 's/^java $$JAVA_OPTS $$JAVA_DEBUG/java $$JAVA_OPTS/g' ${opal_project}/opal-server/target/opal-server-${version}/bin/opal && \
 	sed -i 's/^java $$JAVA_OPTS/java $$JAVA_OPTS $$JAVA_DEBUG/g' ${opal_project}/opal-server/target/opal-server-${version}/bin/opal && \
 	${opal_project}/opal-server/target/opal-server-${version}/bin/opal
-
-#
-# Launch Opal GWT
-#
-launch-gwt:
-	cd ${opal_project}/opal-gwt-client && \
-	${mvn_exec} gwt:run
-
-#
-# Launch Opal GWT in debug mode (port 8001)
-#
-launch-gwt-debug:
-	cd ${opal_project}/opal-gwt-client && \
-	${mvn_exec} gwt:debug -Dgwt.debugPort=8001
 
 #
 # Prepare opal home

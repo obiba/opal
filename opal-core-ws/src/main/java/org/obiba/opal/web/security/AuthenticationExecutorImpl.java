@@ -25,19 +25,20 @@ import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.web.filter.AbstractAuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.StreamSupport;
 
 /**
  * Perform the authentication, either by username-password token or by obiba ticket token.
  */
 @Component
-public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
+public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor implements InitializingBean {
 
   @Value("${org.obiba.opal.security.login.maxTry}")
   private int maxTry;
@@ -64,7 +65,11 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
   @Autowired
   private OpalGeneralConfigService configService;
 
-  @PostConstruct
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    configure();
+  }
+
   public void configure() {
     configureBan(maxTry, trialTime, banTime);
   }

@@ -11,8 +11,8 @@ package org.obiba.opal.core.validator;
 
 import java.util.Arrays;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.service.OrientDbService;

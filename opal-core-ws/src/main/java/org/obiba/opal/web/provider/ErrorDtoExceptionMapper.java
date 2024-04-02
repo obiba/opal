@@ -10,13 +10,12 @@
 
 package org.obiba.opal.web.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
+import org.obiba.opal.web.model.Ws;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.GeneratedMessage;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 public abstract class ErrorDtoExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
 
@@ -24,7 +23,7 @@ public abstract class ErrorDtoExceptionMapper<E extends Throwable> implements Ex
 
   protected abstract Response.Status getStatus();
 
-  protected abstract GeneratedMessage.ExtendableMessage<?> getErrorDto(E exception);
+  protected abstract Ws.ClientErrorDto getErrorDto(E exception);
 
   @Override
   public Response toResponse(E exception) {

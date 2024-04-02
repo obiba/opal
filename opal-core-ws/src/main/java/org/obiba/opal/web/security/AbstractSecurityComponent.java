@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.security;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;

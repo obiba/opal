@@ -10,13 +10,6 @@
 
 package org.obiba.opal.web.plugins;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
-import jdk.nashorn.internal.objects.annotations.Getter;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.datasource.DatasourceService;
@@ -26,6 +19,8 @@ import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import jakarta.ws.rs.*;
 
 @Component
 @Scope("request")

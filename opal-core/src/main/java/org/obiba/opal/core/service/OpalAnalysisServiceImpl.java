@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -118,13 +116,11 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(OpalAnalysis.class);
   }
 
   @Override
-  @PreDestroy
   public void stop() { }
 
   private void deleteAnalysisFiles(Path analysisDir) {

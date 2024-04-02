@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

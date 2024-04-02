@@ -25,7 +25,7 @@ import org.obiba.opal.core.service.OpalPrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.stream.Collectors;

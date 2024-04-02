@@ -29,8 +29,7 @@ import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +64,6 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   private List<Taxonomy> taxonomies = Lists.newArrayList();
 
   @Override
-  @PostConstruct
   public void start() {
     taxonomies = Collections.synchronizedList(Lists.newArrayList(taxonomyPersistence.readTaxonomies()));
     sort();

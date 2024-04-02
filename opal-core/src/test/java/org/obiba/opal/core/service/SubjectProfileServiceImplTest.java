@@ -16,7 +16,6 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.easymock.EasyMock;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
@@ -30,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import java.util.Properties;
 import java.util.Set;
@@ -38,7 +36,7 @@ import java.util.Set;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = SubjectProfileServiceImplTest.Config.class)
-public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTests {
+public class SubjectProfileServiceImplTest extends AbstractOrientdbServiceTest {
 
   private static final String PRINCIPAL = "principal";
 
@@ -48,8 +46,9 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
   @Autowired
   private OrientDbService orientDbService;
 
-  @Before
-  public void clear() throws Exception {
+  @Override
+  public void startDB() throws Exception {
+    super.startDB();
     orientDbService.deleteAll(SubjectProfile.class);
   }
 
@@ -183,6 +182,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public SubjectAclService subjectAclService() {
       SubjectAclService mock = EasyMock.createMock(SubjectAclService.class);
+      mock.afterPropertiesSet();
       SubjectAclService.Permissions permsMock = EasyMock.createMock(SubjectAclService.Permissions.class);
       EasyMock.expect(permsMock.getPermissions()).andReturn(Sets.newHashSet(SubjectProfileServiceImpl.FILES_SHARE_PERM))
           .anyTimes();
@@ -197,6 +197,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public OpalRuntime opalRuntime() {
       OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      mock.afterPropertiesSet();
       EasyMock.replay(mock);
       return mock;
     }
@@ -204,6 +205,7 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public OpalFileSystemService opalFileSystemService() {
       OpalFileSystemService mock = EasyMock.createMock(OpalFileSystemService.class);
+      mock.afterPropertiesSet();
       EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
       EasyMock.replay(mock);
       return mock;

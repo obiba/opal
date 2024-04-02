@@ -11,6 +11,11 @@ package org.obiba.opal.server.httpd;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -39,11 +44,6 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,7 +52,7 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.Properties;
 
-import static javax.servlet.DispatcherType.*;
+import static jakarta.servlet.DispatcherType.*;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
@@ -174,8 +174,8 @@ public class OpalJettyServer {
     return httpConfig;
   }
 
-  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites) {
-    SslContextFactory jettySsl = new SslContextFactory() {
+  private SslContextFactory.Server createSslContext(String excludedProtocols, String includedCipherSuites) {
+    SslContextFactory.Server jettySsl = new SslContextFactory.Server() {
 
       @Override
       protected void doStart() throws Exception {
@@ -185,7 +185,6 @@ public class OpalJettyServer {
         setSslContext(sslContextFactory.createSslContext());
         super.doStart();
       }
-
     };
     jettySsl.setTrustAll(true);
     jettySsl.setWantClientAuth(true);

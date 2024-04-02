@@ -12,8 +12,8 @@ package org.obiba.opal.web.vcf;
 
 import org.obiba.opal.web.model.Plugins;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 

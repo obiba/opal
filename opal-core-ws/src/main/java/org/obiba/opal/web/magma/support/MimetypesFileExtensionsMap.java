@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.activation.MimetypesFileTypeMap;
+import jakarta.activation.MimetypesFileTypeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -36,6 +36,11 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
     this.delegate = delegate;
   }
 
+  @Override
+  public void close() {
+    delegate.close();
+  }
+
   @NotNull
   @Override
   public FileObject getRoot() {

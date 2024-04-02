@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.security.Key;
 import java.util.Collection;
 import java.util.HashSet;
@@ -59,7 +57,6 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   protected OpalConfiguration opalConfiguration;
 
   @Override
-  @PostConstruct
   public void start() {
     configureMagma();
     readOpalConfiguration();
@@ -107,7 +104,6 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     MagmaEngine.get().shutdown();
   }

@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -201,7 +199,6 @@ public class AppsServiceImpl implements AppsService {
   }
 
   @Override
-  @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(AppsConfig.class);
     orientDbService.createUniqueIndex(App.class);
@@ -215,7 +212,6 @@ public class AppsServiceImpl implements AppsService {
   }
 
   @Override
-  @PreDestroy
   public void stop() {
     orientDbService.list(App.class).forEach(app -> eventBus.post(new AppUnregisteredEvent(app)));
   }

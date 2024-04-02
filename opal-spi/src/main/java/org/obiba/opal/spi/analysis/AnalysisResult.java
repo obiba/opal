@@ -10,7 +10,7 @@
 
 package org.obiba.opal.spi.analysis;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 

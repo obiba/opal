@@ -10,10 +10,10 @@
 
 package org.obiba.opal.core.service;
 
+import org.obiba.opal.core.domain.Timestamped;
+
 import java.util.Calendar;
 import java.util.Date;
-
-import org.obiba.magma.datasource.hibernate.domain.Timestamped;
 
 import static org.apache.commons.lang.time.DateUtils.round;
 import static org.fest.assertions.api.Assertions.assertThat;

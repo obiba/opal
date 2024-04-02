@@ -9,17 +9,17 @@
  */
 package org.obiba.opal.web.datashield;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.datashield.core.NoSuchDSMethodException;
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 @Component
 @Provider
@@ -31,7 +31,7 @@ public class ParseExceptionMapper extends ErrorDtoExceptionMapper<ParseException
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(ParseException exception) {
+  protected Ws.ClientErrorDto getErrorDto(ParseException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "DataShieldParseError", exception);
   }
 

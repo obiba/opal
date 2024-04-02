@@ -20,7 +20,7 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 
 abstract class AbstractValueTableResource {

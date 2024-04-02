@@ -10,17 +10,17 @@
 
 package org.obiba.opal.web.security;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.security.GeneralSecurityRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
-import com.google.protobuf.GeneratedMessage;
+import org.obiba.opal.web.model.Ws;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 @Component
@@ -33,7 +33,7 @@ public class MagmaGeneralSecurityRuntimeExceptionMapper
   }
 
   @Override
-  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(GeneralSecurityRuntimeException exception) {
+  protected Ws.ClientErrorDto getErrorDto(GeneralSecurityRuntimeException exception) {
     return ClientErrorDtos.getErrorMessage(getStatus(), "InvalidKeypair", exception);
   }
 

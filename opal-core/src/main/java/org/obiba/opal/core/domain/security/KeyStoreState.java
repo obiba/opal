@@ -9,16 +9,14 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Persisted keystore.

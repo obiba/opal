@@ -10,15 +10,14 @@
 
 package org.obiba.opal.core.service.database;
 
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
-import javax.validation.ConstraintViolationException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.service.SystemService;
+
+import javax.sql.DataSource;
 
 public interface DatabaseRegistry extends SystemService {
 
@@ -47,8 +46,6 @@ public interface DatabaseRegistry extends SystemService {
       throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException;
 
   DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource);
-
-  SessionFactory getSessionFactory(@NotNull String name, @Nullable String usedByDatasource);
 
   void unregister(@NotNull String databaseName, @Nullable String usedByDatasource);
 

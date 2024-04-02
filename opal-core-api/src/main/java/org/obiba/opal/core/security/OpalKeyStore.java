@@ -16,13 +16,12 @@ import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.magma.crypt.NoSuchKeyException;
 import org.obiba.security.KeyStoreManager;
-import org.obiba.ssl.X509ExtendedKeyManagerImpl;
 
-import javax.net.ssl.*;
 import java.io.InputStream;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class OpalKeyStore extends KeyStoreManager implements KeyProvider {

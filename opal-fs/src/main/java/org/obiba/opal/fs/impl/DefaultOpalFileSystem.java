@@ -22,18 +22,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.vfs2.FileName;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.cache.DefaultFilesCache;
 import org.apache.commons.vfs2.impl.DecoratedFileObject;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs2.provider.DelegateFileObject;
+import org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider;
 import org.apache.commons.vfs2.provider.local.LocalFile;
+import org.apache.commons.vfs2.provider.res.ResourceFileProvider;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,8 @@ import com.google.common.io.ByteStreams;
 public class DefaultOpalFileSystem implements OpalFileSystem {
 
   private static final Logger log = LoggerFactory.getLogger(OpalFileSystem.class);
+
+  private DefaultFileSystemManager fsm;
 
   @NotNull
   private final FileObject root;
@@ -74,7 +75,12 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     try {
       String rootWithPlaceholdersReplaced = Placeholders.replaceAll(fsRoot);
       log.info("Setting up Opal filesystem rooted at '{}'", rootWithPlaceholdersReplaced);
-      FileSystemManager fsm = VFS.getManager();
+      fsm = new DefaultFileSystemManager();
+      fsm.addProvider("file", new DefaultLocalFileProvider());
+      fsm.addProvider("res", new ResourceFileProvider());
+      fsm.setCacheStrategy(CacheStrategy.ON_RESOLVE);
+      fsm.setFilesCache(new DefaultFilesCache());
+      fsm.init();
       FileObject vfsRoot = fsm.resolveFile(rootWithPlaceholdersReplaced);
 
       if(!vfsRoot.exists()) {
@@ -100,6 +106,11 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     } catch(FileSystemException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public void close() {
+    fsm.close();
   }
 
   @NotNull

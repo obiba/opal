@@ -10,10 +10,22 @@
 
 package org.obiba.opal.core.service;
 
-public interface SystemService {
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+public interface SystemService extends InitializingBean, DisposableBean {
 
   void start();
 
   void stop();
 
+  @Override
+  default void afterPropertiesSet() {
+    start();
+  }
+
+  @Override
+  default void destroy() throws Exception {
+    stop();
+  }
 }

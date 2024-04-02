@@ -13,7 +13,7 @@ package org.obiba.opal.core.domain;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import org.json.JSONObject;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;

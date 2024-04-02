@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# OS specific support.
-cygwin=false
-case "`uname`" in
-CYGWIN*) cygwin=true;;
-esac
-
 if [ -z "$JAVA" ]
 then
   # Set default JAVA
@@ -40,26 +34,31 @@ then
   exit 2;
 fi
 
-if $cygwin; then
-  # For Cygwin, ensure paths are in UNIX format before anything is touched
-  [ -n "$OPAL_DIST" ] && OPAL_BIN=`cygpath --unix "$OPAL_DIST"`
-  [ -n "$OPAL_HOME" ] && OPAL_HOME=`cygpath --unix "$OPAL_HOME"`
+CLASSPATH="${OPAL_HOME}/conf:${OPAL_DIST}/lib/*"
 
-  # For Cygwin, switch paths to Windows format before running java
-  export OPAL_DIST=`cygpath --absolute --windows "$OPAL_DIST"`
-  export OPAL_HOME=`cygpath --absolute --windows "$OPAL_HOME"`
-fi
+PLUGINS_DIR="${OPAL_HOME}/plugins/"
+[ -e "${PLUGINS_DIR}/.archive" ] || mkdir -p "${PLUGINS_DIR}/.archive"
 
-# Java 6 supports wildcard classpath entries
-# http://download.oracle.com/javase/6/docs/technotes/tools/solaris/classpath.html
-CLASSPATH=$OPAL_HOME/conf:"$OPAL_DIST/lib/*"
-if $cygwin; then
-  CLASSPATH=$OPAL_HOME/conf;"$OPAL_DIST/lib/*"
-fi
+# Iterate over plugins zip files
+find "$PLUGINS_DIR" -type f -name "*-dist.zip" | grep -v ".archive" | while IFS= read -r zip_file; do
+    # Unzip each zip file
+    unzip -u "$zip_file" -d "${PLUGINS_DIR}"
+    # Move the zip file to archive folder
+    mv "$zip_file" "${PLUGINS_DIR}/.archive"
+done
+
+# Append plugins lib
+while IFS= read -r dir; do
+  CLASSPATH="$CLASSPATH:$dir"
+done < <(find "${OPAL_HOME}/plugins/" -type d -name lib | grep -v ".archive")
 
 [ -e "$OPAL_HOME/logs" ] || mkdir "$OPAL_HOME/logs"
 
 JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
+#echo "CLASSPATH=$CLASSPATH"
+
 # Add $JAVA_DEBUG to this line to enable remote JVM debugging (for developers)
-$JAVA $JAVA_OPTS $JAVA_DEBUG -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} org.obiba.opal.server.OpalServer $@
+APP_OPTS="${JAVA_OPTS} ${JAVA_DEBUG} -cp $CLASSPATH -DOPAL_HOME=${OPAL_HOME} -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} -Dpolyglot.log.file=${OPAL_LOG}/polyglot.log -Dpolyglot.engine.WarnInterpreterOnly=false"
+$JAVA $APP_OPTS  org.obiba.opal.server.OpalServer --upgrade
+$JAVA $APP_OPTS org.obiba.opal.server.OpalServer

@@ -9,17 +9,12 @@
  */
 package org.obiba.opal.web.system.subject;
 
-import java.util.List;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
@@ -27,10 +22,12 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 @Component
 @Path("/system/groups")
@@ -58,10 +55,7 @@ public class GroupsResource {
   public Response createGroup(Opal.GroupDto dto) {
     Group group = new Group(dto.getName());
     if(subjectCredentialsService.getGroup(dto.getName()) != null) {
-      ConstraintViolation<Group> violation = ConstraintViolationImpl
-          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", null, null,"must be unique", Group.class, group,
-              group, group, PathImpl.createPathFromString("name"), null, null);
-      throw new ConstraintViolationException(ImmutableSet.of(violation));
+      throw new BadRequestException("Group name must be unique");
     }
     subjectCredentialsService.createGroup(dto.getName());
     return Response.ok().build();

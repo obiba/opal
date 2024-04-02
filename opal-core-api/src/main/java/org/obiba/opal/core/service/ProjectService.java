@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.service;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;

@@ -11,7 +11,6 @@ package org.obiba.opal.core.service.security;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import net.sf.ehcache.CacheManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
@@ -19,7 +18,7 @@ import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.ehcache.integrations.shiro.EhcacheShiroManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SessionsSecurityManager;
@@ -35,21 +34,23 @@ import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
+import org.obiba.shiro.EhCache3ShiroManager;
 import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.realm.ObibaRealm;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager> {
+public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager>, DisposableBean {
 
   private static final long SESSION_VALIDATION_INTERVAL = 300000l; // 5 minutes
 
@@ -75,8 +76,6 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   @Value("${org.obiba.realm.service.key}")
   private String serviceKey;
 
-  private final CacheManager cacheManager;
-
   private final PermissionResolver permissionResolver = new OpalPermissionResolver();
 
   private final OIDCConfigurationProvider oidcConfigurationProvider;
@@ -85,13 +84,14 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
 
   @Autowired
   @Lazy
-  public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners, RolePermissionResolver rolePermissionResolver, SubjectTokenService subjectTokenService, CacheManager cacheManager, OIDCConfigurationProvider oidcConfigurationProvider) {
+  public OpalSecurityManagerFactory(Set<Realm> realms, Set<SessionListener> sessionListeners, Set<AuthenticationListener> authenticationListeners,
+                                    RolePermissionResolver rolePermissionResolver, SubjectTokenService subjectTokenService,
+                                    OIDCConfigurationProvider oidcConfigurationProvider) {
     this.realms = realms;
     this.sessionListeners = sessionListeners;
     this.authenticationListeners = authenticationListeners;
     this.rolePermissionResolver = rolePermissionResolver;
     this.subjectTokenService = subjectTokenService;
-    this.cacheManager = cacheManager;
     this.oidcConfigurationProvider = oidcConfigurationProvider;
   }
 
@@ -114,7 +114,11 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
     return true;
   }
 
-  @PreDestroy
+  @Override
+  public void destroy() throws Exception {
+    destroySecurityManager();
+  }
+
   public void destroySecurityManager() {
     // Destroy the security manager.
     SecurityUtils.setSecurityManager(null);
@@ -156,8 +160,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
 
   private void initializeCacheManager(DefaultSecurityManager dsm) {
     if (dsm.getCacheManager() == null) {
-      EhCacheManager ehCacheManager = new EhCacheManager();
-      ehCacheManager.setCacheManager(cacheManager);
+      EhcacheShiroManager ehCacheManager = new EhCache3ShiroManager();
+      ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
       dsm.setCacheManager(ehCacheManager);
     }
   }
@@ -195,7 +199,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
   private class OtpSuccessfulStrategy extends FirstSuccessfulStrategy {
     @Override
     public AuthenticationInfo afterAttempt(Realm realm, AuthenticationToken token, AuthenticationInfo singleRealmInfo, AuthenticationInfo aggregateInfo, Throwable t) throws AuthenticationException {
-      if (t instanceof NoSuchOtpException) throw (NoSuchOtpException)t;
+      if (t instanceof NoSuchOtpException) throw (NoSuchOtpException) t;
       return super.afterAttempt(realm, token, singleRealmInfo, aggregateInfo, t);
     }
   }

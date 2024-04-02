@@ -14,7 +14,7 @@ import org.apache.shiro.web.env.DefaultWebEnvironment;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.env.WebEnvironment;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class OpalEnvironmentLoaderListener extends EnvironmentLoaderListener {
 

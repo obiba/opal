@@ -9,44 +9,26 @@
  */
 package org.obiba.opal.rest.client;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Set;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
+import org.junit.*;
+import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.rest.client.magma.OpalJavaClient;
 import org.obiba.opal.rest.client.magma.RestDatasource;
 import org.obiba.opal.rest.client.magma.UriBuilder;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.client.magma.TimestampsDto;
 
-import com.google.protobuf.Message;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  *
