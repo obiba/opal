@@ -359,6 +359,9 @@ public class RAssignDatasource extends CsvDatasource {
             attributesList.add(String.format("na_values = c(%s)",
                 Joiner.on(", ").join(getLabelledCategories(variable, missingCats))));
           }
+          // obiba/opal#3829 enforce haven to read spss missings properly
+          attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
+              getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
         }
         labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
       }
