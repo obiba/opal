@@ -204,11 +204,13 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   private Iterable<String> availableMethods(ResourceMethodInvoker method) {
     Set<String> availableMethods = Sets.newHashSet();
-    String path = getPath(method);
-    for(Method otherMethod : method.getResourceClass().getMethods()) {
-      Set<String> httpMethods = IsHttpMethod.getHttpMethods(otherMethod);
-      if(httpMethods != null && isSamePath(otherMethod, path)) {
-        availableMethods.addAll(httpMethods);
+    if (method != null) {
+      String path = getPath(method);
+      for (Method otherMethod : method.getResourceClass().getMethods()) {
+        Set<String> httpMethods = IsHttpMethod.getHttpMethods(otherMethod);
+        if (httpMethods != null && isSamePath(otherMethod, path)) {
+          availableMethods.addAll(httpMethods);
+        }
       }
     }
     return availableMethods;

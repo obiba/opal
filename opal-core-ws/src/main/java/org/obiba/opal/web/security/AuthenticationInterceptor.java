@@ -87,7 +87,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       }
     } else {
       // Remove the cookie if the user is not/no longer authenticated
-      if(isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
+      if(resourceMethod == null || isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
         responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
             new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, getCookiePath(), null, "Opal session deleted", 0, true, true));
