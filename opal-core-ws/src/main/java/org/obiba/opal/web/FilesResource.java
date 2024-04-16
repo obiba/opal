@@ -685,7 +685,7 @@ public class FilesResource {
     Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 
     // Get file name
-    String fileName = uploadForm.get("fileName").get(0).getBodyAsString();
+    //String fileName = uploadForm.get("fileName").get(0).getBodyAsString();
 
     // Get file data to save
     return uploadForm.get("attachment");
