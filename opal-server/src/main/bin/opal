@@ -10,7 +10,7 @@ fi
 if [ -z "$JAVA_OPTS" ]
 then
   # Set default JAVA_OPTS
-  JAVA_OPTS="-Xmx2G -XX:MaxPermSize=128M"
+  JAVA_OPTS="-Xms1G -Xmx2G -XX:+UseG1GC"
   export JAVA_OPTS
 fi
 

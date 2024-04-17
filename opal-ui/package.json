@@ -1,7 +1,7 @@
 {
   "name": "opal-ui",
   "version": "0.0.1",
-  "description": "An interface to manage Opal content",
+  "description": "OBiBa data repository",
   "productName": "Opal",
   "author": "Yannick Marcon <yannick.marcon@obiba.org>",
   "private": true,
