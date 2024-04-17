@@ -684,11 +684,12 @@ public class FilesResource {
     // Get API input data
     Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 
-    // Get file name
-    //String fileName = uploadForm.get("fileName").get(0).getBodyAsString();
-
     // Get file data to save
-    return uploadForm.get("attachment");
+    List<InputPart> parts = uploadForm.get("attachment");
+    if (parts == null || parts.isEmpty()) {
+      parts = uploadForm.get("file");
+    }
+    return parts;
   }
 
   private void writeUploadedFileToFileSystem(InputPart uploadedFile, FileObject fileToWriteTo) {
