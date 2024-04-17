@@ -1,0 +1,98 @@
+export interface SubjectProfile {
+  principal: string;
+  realm: string;
+  created: string;
+  lastUpdate: string;
+  groups: string[];
+  otpEnabled: boolean;
+}
+
+export interface File {
+  name: string;
+  path: string;
+  type: 'FILE' | 'FOLDER';
+  children: File[] | undefined;
+  size: number | undefined;
+  lastModifiedTime: number | undefined;
+  readable: boolean;
+  writable: boolean;
+}
+
+export interface FileObject extends Blob {
+  readonly size: number;
+  readonly name: string;
+  readonly type: string;
+}
+
+export interface Timestamps {
+  created: string;
+  lastUpdate: string;
+}
+
+export interface Project {
+  name: string;
+  title: string;
+  description: string;
+  tags: string[];
+  directory: string;
+  archived: boolean;
+  database: string;
+  datasourceStatus: string;
+  datasource: Datasource;
+}
+
+export interface ProjectSummary {
+  name: string;
+  tableCount: number;
+  variableCount: number;
+  entityCount: number;
+  viewCount: number;
+  derivedVariableCount: number;
+  resourceCount: number;
+  datasourceStatus: string;
+  timestamps: Timestamps;
+}
+
+export interface Datasource {
+  name: string;
+  table: string[];
+  view: string[];
+  type: string;
+  timestamps: Timestamps;
+}
+
+export interface Table {
+  name: string;
+  entityType: string;
+  status: string;
+  viewType: string | undefined;
+  datasourceName: string;
+  timestamps: Timestamps;
+}
+
+export interface Variable {
+  name: string;
+  entityType: string;
+  valueType: string;
+  mimeType: string | undefined;
+  isRepeatable: boolean;
+  occurrenceGroup: string | undefined;
+  unit: string | undefined;
+  index: number;
+  referencedEntityType: string | undefined;
+  attributes: Attribute[] | undefined;
+  categories: Category[] | undefined;
+}
+
+export interface Category {
+  name: string;
+  isMissing: boolean;
+  attributes: Attribute[];
+}
+
+export interface Attribute {
+  name: string;
+  value: string;
+  locale: string | undefined;
+  namespace: string | undefined;
+}

@@ -71,6 +71,14 @@
       </includes>
     </fileSet>
 
+    <fileSet>
+      <directory>../opal-ui/dist/spa</directory>
+      <outputDirectory>webapp</outputDirectory>
+      <includes>
+        <include>**/*.*</include>
+      </includes>
+    </fileSet>
+
   </fileSets>
   <dependencySets>
 
