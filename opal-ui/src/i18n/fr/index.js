@@ -13,6 +13,7 @@ export default {
   projects: 'Projets',
   content: 'Contenu',
   tables: 'Tables',
+  tables_views: 'Tables (vues)',
   variables: 'Variables',
   resources: 'Ressources',
   files: 'Fichiers',

@@ -7,8 +7,8 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="row">
-        <div class="col-2">
-          <q-card class="on-left bg-primary text-white">
+        <div class="col-md-auto col-sm-auto col-xs-12">
+          <q-card class="on-left bg-primary text-white q-mb-md o-card">
             <q-card-section>
               <div class="text-subtitle2">
                 {{ $t('projects') }}
@@ -24,8 +24,8 @@
             </q-card-section>
           </q-card>
         </div>
-        <div class="col-2">
-          <q-card class="on-left bg-warning text-black">
+        <div class="col-md-auto col-sm-auto col-xs-12">
+          <q-card class="on-left bg-warning text-black q-mb-md o-card">
             <q-card-section>
               <div class="text-subtitle2">
                 {{ $t('files') }}

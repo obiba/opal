@@ -19,8 +19,8 @@
         ><span class="on-right">{{ name }}</span>
       </div>
       <div class="row">
-        <div class="col-2 col-md-2 col-sm-3">
-          <q-card class="on-left bg-primary text-white">
+        <div class="col-md-auto col-sm-auto col-xs-12">
+          <q-card flat bordered class="on-left bg-grey-4 q-mb-md o-card">
             <q-card-section>
               <div class="text-h4 text-center">
                 {{ projectsStore.summary.tableCount }}
@@ -32,21 +32,21 @@
             <q-separator />
             <q-card-section>
               <div class="text-subtitle2">
-                {{ $t('tables') }}
+                {{ $t('tables_views') }}
                 <q-btn
                   flat
                   rounded
                   icon="arrow_forward"
                   size="sm"
-                  class="q-pa-sm bg-grey-4 text-grey-10 q-ml-sm"
+                  class="q-pa-sm bg-grey-2 text-grey-10 q-ml-sm"
                   :to="`/project/${name}/tables`"
                 ></q-btn>
               </div>
             </q-card-section>
           </q-card>
         </div>
-        <div class="col-2 col-md-2 col-sm-3">
-          <q-card class="on-right bg-warning text-black">
+        <div class="col-md-auto col-sm-auto col-xs-12">
+          <q-card flat bordered class="on-left bg-grey-4 q-mb-md o-card">
             <q-card-section>
               <div class="text-h4 text-center">
                 {{ projectsStore.summary.resourceCount }}
@@ -61,7 +61,7 @@
                   rounded
                   icon="arrow_forward"
                   size="sm"
-                  class="q-pa-sm bg-grey-4 text-grey-10 q-ml-sm"
+                  class="q-pa-sm bg-grey-2 text-grey-10 q-ml-sm"
                   :to="`/project/${name}/resources`"
                 ></q-btn>
               </div>

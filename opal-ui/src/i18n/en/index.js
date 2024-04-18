@@ -13,6 +13,7 @@ export default {
   projects: 'Projects',
   content: 'Content',
   tables: 'Tables',
+  tables_views: 'Tables (views)',
   variables: 'Variables',
   resources: 'Resources',
   files: 'Files',
