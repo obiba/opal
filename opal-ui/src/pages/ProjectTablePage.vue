@@ -24,18 +24,16 @@
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
       </div>
       <div class="row q-mt-md q-mb-md">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
           <fields-list
             :items="items1"
             :dbobject="datasourceStore.table"
-            class="q-mr-md"
           />
         </div>
-        <div class="col-6">
+        <div class="col-12 col-md-6">
           <fields-list
             :items="items2"
             :dbobject="datasourceStore.table"
-            class="q-ml-md"
           />
         </div>
       </div>

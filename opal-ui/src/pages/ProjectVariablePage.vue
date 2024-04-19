@@ -58,18 +58,18 @@
         <q-tab-panel name="dictionary">
           <div class="text-h6">{{ $t('properties') }}</div>
           <div class="row q-mt-md q-mb-md">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
               <fields-list
                 :items="items1"
                 :dbobject="datasourceStore.variable"
-                class="q-mr-md"
+                class=""
               />
             </div>
-            <div class="col-6">
+            <div class="col-12 col-md-6">
               <fields-list
                 :items="items2"
                 :dbobject="datasourceStore.variable"
-                class="q-ml-md"
+                class=""
               />
             </div>
           </div>
