@@ -8,8 +8,11 @@ declare module '@vue/runtime-core' {
   }
 }
 
-const baseUrl = process.env.API;
-const contextPath = process.env.PATH_PREFIX || '/';
+// context path detection
+const locationContextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/',2));
+
+const baseUrl = process.env.API.startsWith('/') ? locationContextPath + process.env.API : process.env.API;
+const contextPath = locationContextPath || '/';
 const PROFILE_PATH = '/system/subject-profile/_current';
 
 const api = axios.create({

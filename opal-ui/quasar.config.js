@@ -61,7 +61,7 @@ module.exports = configure(function (ctx) {
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-      publicPath: process.env.PATH_PREFIX ? process.env.PATH_PREFIX : '/',
+      // publicPath,
       env: {
         API: ctx.dev
           ? 'http://localhost:8080/ws'
@@ -74,6 +74,11 @@ module.exports = configure(function (ctx) {
       // distDir
 
       // extendViteConf (viteConf) {},
+      // Needed to have relative assets in the index.html
+      // https://github.com/quasarframework/quasar/issues/8513#issuecomment-1127654470
+      extendViteConf(viteConf, { isServer, isClient }) {
+        viteConf.base = '';
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [
