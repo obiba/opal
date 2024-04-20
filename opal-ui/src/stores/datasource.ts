@@ -1,4 +1,3 @@
-import { as } from 'app/dist/spa/assets/index.72143f35';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { Datasource, Table, Variable } from 'src/components/models';
@@ -26,6 +25,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     table.value = {} as Table;
     variables.value = [];
     variable.value = {} as Variable;
+    perms.value = {} as DatasourcePerms;
   }
 
   // Initializers
