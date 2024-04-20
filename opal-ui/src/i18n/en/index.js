@@ -68,4 +68,7 @@ export default {
   delete_file_confirm: 'Are you sure you want to delete this file?',
   delete_files_confirm: 'Are you sure you want to delete these files?',
   confirm: 'Confirm',
+  error: {
+    Forbidden: 'This operation is forbidden'
+  }
 };

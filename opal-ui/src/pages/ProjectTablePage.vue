@@ -22,6 +22,7 @@
       <div class="text-h5">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
+        <q-btn v-if="datasourceStore.perms.table?.canDelete()" flat color="red" icon="delete" size="sm" @click="onDeleteTable" class="on-right"></q-btn>
       </div>
       <div class="row q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
@@ -82,6 +83,7 @@ import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
 
 const route = useRoute();
+const router = useRouter();
 const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
@@ -124,5 +126,9 @@ const tName = computed(() => route.params.tid as string);
 
 function init() {
   datasourceStore.initDatasourceTable(dsName.value, tName.value);
+}
+
+function onDeleteTable() {
+  datasourceStore.deleteTable(tName.value).then(() => router.push(`/project/${dsName.value}/tables`));
 }
 </script>

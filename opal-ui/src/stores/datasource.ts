@@ -1,6 +1,16 @@
+import { as } from 'app/dist/spa/assets/index.72143f35';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { Datasource, Table, Variable } from 'src/components/models';
+import { Perms, getPerms } from 'src/utils/authz';
+
+interface DatasourcePerms {
+  datasource: Perms;
+  tables: Perms
+  table: Perms;
+  variables: Perms;
+  variable: Perms;
+}
 
 export const useDatasourceStore = defineStore('datasource', () => {
   const datasource = ref({} as Datasource); // current datasource
@@ -8,6 +18,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   const table = ref({} as Table); // current table
   const variables = ref([] as Variable[]); // current table variables
   const variable = ref({} as Variable); // current variable
+  const perms = ref({} as DatasourcePerms);
 
   function reset() {
     datasource.value = {} as Datasource;
@@ -72,6 +83,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadDatasource(name: string) {
     datasource.value = {} as Datasource;
     return api.get(`/datasource/${name}`).then((response) => {
+      perms.value.datasource = getPerms(response);
       datasource.value = response.data;
       return response;
     });
@@ -82,6 +94,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api
       .get(`/datasource/${datasource.value.name}/tables`)
       .then((response) => {
+        perms.value.tables = getPerms(response);
         tables.value = response.data;
         return response;
       });
@@ -93,6 +106,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api
       .get(`/datasource/${datasource.value.name}/table/${name}`)
       .then((response) => {
+        perms.value.table = getPerms(response);
         table.value = response.data;
         return response;
       });
@@ -105,6 +119,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         `/datasource/${datasource.value.name}/table/${table.value.name}/variables`
       )
       .then((response) => {
+        perms.value.variables = getPerms(response);
         variables.value = response.data;
         return response;
       });
@@ -117,6 +132,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         `/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`
       )
       .then((response) => {
+        perms.value.variable = getPerms(response);
         variable.value = response.data;
         return response;
       });
@@ -134,7 +150,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
         entityType: entityType ? entityType.trim() : 'Participant'
       }
     )
-    .then(() => loadTables())
+  }
+
+  async function deleteTable(name: string) {
+    return api.delete(
+      `/datasource/${datasource.value.name}/table/${name}`)
   }
 
   return {
@@ -143,6 +163,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     table,
     variables,
     variable,
+    perms,
     initDatasourceTables,
     initDatasourceTable,
     initDatasourceTableVariables,
@@ -150,6 +171,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadTable,
     isNewTableNameValid,
     addTable,
+    deleteTable,
     reset,
   };
 });

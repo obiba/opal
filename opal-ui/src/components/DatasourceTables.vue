@@ -11,7 +11,8 @@
       @row-click="onRowClick"
     >
       <template v-slot:top>
-        <q-btn-dropdown color="primary" icon="add" :label="$t('add')" size="sm">
+        <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
+          class="on-left">
           <q-list>
             <q-item clickable v-close-popup @click="onShowAddTable">
               <q-item-section>
@@ -42,7 +43,6 @@
           icon="refresh"
           :label="$t('refresh')"
           size="sm"
-          class="on-right"
           @click="init"
         />
       </template>
@@ -118,6 +118,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { Timestamps } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
+import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
 const router = useRouter();
@@ -198,6 +199,10 @@ function onShowAddTable() {
 }
 
 function onAddTable() {
-  datasourceStore.addTable(tableName.value, entityType.value);
+  datasourceStore.addTable(tableName.value, entityType.value)
+    .then(() => datasourceStore.initDatasourceTables(dsName.value))
+    .catch((err) => {
+      notifyError(err);
+    });
 }
 </script>

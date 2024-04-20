@@ -11,7 +11,8 @@
       @row-click="onRowClick"
     >
       <template v-slot:top>
-        <q-btn-dropdown color="primary" icon="add" :label="$t('add')" size="sm">
+        <q-btn-dropdown v-if="datasourceStore.perms.variables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
+          class="on-left">
           <q-list> </q-list>
         </q-btn-dropdown>
         <q-btn
@@ -20,7 +21,6 @@
           icon="refresh"
           :label="$t('refresh')"
           size="sm"
-          class="on-right"
           @click="init"
         />
       </template>
