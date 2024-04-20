@@ -13,9 +13,9 @@
       <template v-slot:top>
         <q-btn-dropdown color="primary" icon="add" :label="$t('add')" size="sm">
           <q-list>
-            <q-item clickable v-close-popup @click="onAddTable">
+            <q-item clickable v-close-popup @click="onShowAddTable">
               <q-item-section>
-                <q-item-label>{{ $t('add_a_table') }}</q-item-label>
+                <q-item-label>{{ $t('add_table') }}</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -61,6 +61,51 @@
         </q-td>
       </template>
     </q-table>
+
+    <q-dialog v-model="showAddTable">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">{{ $t('add_table') }}</div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section>
+          <q-input
+            v-model="tableName"
+            dense
+            type="text"
+            :label="$t('name')"
+            style="width: 300px"
+          >
+          </q-input>
+        </q-card-section>
+        <q-card-section class="q-mb-md">
+          <q-input
+            v-model="entityType"
+            dense
+            type="text"
+            :label="$t('entity_type')"
+            style="width: 300px"
+          >
+          </q-input>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right" class="bg-grey-3">
+          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          <q-btn
+            flat
+            :label="$t('add')"
+            color="primary"
+            :disable="!isTableNameValid || !isEntityTypeValid"
+            @click="onAddTable"
+            v-close-popup
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -78,6 +123,10 @@ const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
+
+const showAddTable = ref(false);
+const tableName = ref('');
+const entityType = ref('Participant');
 
 const tableRef = ref();
 const loading = ref(false);
@@ -136,5 +185,19 @@ function init() {
 
 function onRowClick(evt: unknown, row: { name: string }) {
   router.push(`/project/${dsName.value}/table/${row.name}`);
+}
+
+const isTableNameValid = computed(() => datasourceStore.isNewTableNameValid(tableName.value));
+
+const isEntityTypeValid = computed(() => entityType.value.trim() !== '');
+
+function onShowAddTable() {
+  tableName.value = '';
+  entityType.value = 'Participant';
+  showAddTable.value = true;
+}
+
+function onAddTable() {
+  datasourceStore.addTable(tableName.value, entityType.value);
 }
 </script>

@@ -20,7 +20,7 @@
       </div>
       <div class="row">
         <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card flat bordered class="on-left bg-grey-4 q-mb-md o-card">
+          <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
             <q-card-section>
               <div class="text-h4 text-center">
                 {{ projectsStore.summary.tableCount }}
@@ -46,7 +46,7 @@
           </q-card>
         </div>
         <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card flat bordered class="on-left bg-grey-4 q-mb-md o-card">
+          <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
             <q-card-section>
               <div class="text-h4 text-center">
                 {{ projectsStore.summary.resourceCount }}

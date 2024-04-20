@@ -88,13 +88,18 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     if(GET.equals(requestContext.getMethod()) || OPTIONS.equals(requestContext.getMethod())) {
       Set<String> allowed = allowed(requestContext, resourceMethod);
-      if(allowed != null && !allowed.isEmpty()) {
+      if(!allowed.isEmpty()) {
         responseContext.getHeaders().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
     } else if(HttpMethod.DELETE.equals(requestContext.getMethod()) && responseContext.getStatus() == HttpStatus.SC_OK) {
       // TODO delete all nodes starting with resource
       String resource = requestAttributeProvider.getResourcePath(requestContext.getUriInfo().getRequestUri());
       subjectAclService.deleteNodePermissions(resource);
+    }
+
+    if (OPTIONS.equals(requestContext.getMethod())) {
+      // OK is always expected on that method
+      responseContext.setStatus(200);
     }
 
     if(responseContext.getStatus() == HttpStatus.SC_CREATED) {

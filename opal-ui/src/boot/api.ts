@@ -30,6 +30,7 @@ api.interceptors.response.use(
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     if (
+      error.response &&
       [401, 403, 404].includes(error.response.status) &&
       error.config.url !== PROFILE_PATH
     ) {

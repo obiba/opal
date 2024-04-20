@@ -122,6 +122,21 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  function isNewTableNameValid(name: string) {
+    return name && name.trim() !== '' && !tables.value.map((t) => t.name).includes(name.trim());
+  }
+
+  async function addTable(name: string, entityType: string) {
+    return api.post(
+      `/datasource/${datasource.value.name}/tables`,
+      {
+        name: name.trim(),
+        entityType: entityType ? entityType.trim() : 'Participant'
+      }
+    )
+    .then(() => loadTables())
+  }
+
   return {
     datasource,
     tables,
@@ -133,6 +148,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     initDatasourceTableVariables,
     initDatasourceTableVariable,
     loadTable,
+    isNewTableNameValid,
+    addTable,
     reset,
   };
 });

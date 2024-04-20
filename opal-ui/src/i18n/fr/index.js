@@ -42,7 +42,7 @@ export default {
   attributes: 'Attributs',
   add: 'Ajouter',
   refresh: 'Rafraîchir',
-  add_a_table: 'Ajouter une table...',
+  add_table: 'Ajouter une table...',
   add_tables: 'Ajouter/mettre à jour les tables à partir du dictionnaire...',
   add_a_view: 'Ajouter une vue...',
   restore_views: 'Restaurer des vues...',
