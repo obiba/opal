@@ -49,8 +49,8 @@
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
         <q-tab name="summary" :label="$t('summary')" />
-        <q-tab name="values" :label="$t('values')" />
-        <q-tab name="permissions" :label="$t('permissions')" />
+        <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
+        <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
       </q-tabs>
 
       <q-separator />
@@ -64,11 +64,11 @@
           <div class="text-h6">{{ $t('summary') }}</div>
         </q-tab-panel>
 
-        <q-tab-panel name="values">
+        <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
           <div class="text-h6">{{ $t('values') }}</div>
         </q-tab-panel>
 
-        <q-tab-panel name="permissions">
+        <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
         </q-tab-panel>
       </q-tab-panels>

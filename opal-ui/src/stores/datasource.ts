@@ -1,14 +1,18 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { Datasource, Table, Variable } from 'src/components/models';
-import { Perms, getPerms } from 'src/utils/authz';
+import { Perms } from 'src/utils/authz';
 
 interface DatasourcePerms {
-  datasource: Perms;
-  tables: Perms
-  table: Perms;
-  variables: Perms;
-  variable: Perms;
+  datasource: Perms | undefined;
+  datasourcePermissions: Perms | undefined;
+  tables: Perms | undefined;
+  table: Perms | undefined;
+  tablePermissions: Perms | undefined;
+  tableValueSets: Perms | undefined;
+  variables: Perms | undefined;
+  variable: Perms | undefined;
+  variablePermissions: Perms | undefined;
 }
 
 export const useDatasourceStore = defineStore('datasource', () => {
@@ -82,19 +86,24 @@ export const useDatasourceStore = defineStore('datasource', () => {
   // Loaders
   async function loadDatasource(name: string) {
     datasource.value = {} as Datasource;
+    delete perms.value.datasource;
     return api.get(`/datasource/${name}`).then((response) => {
-      perms.value.datasource = getPerms(response);
+      perms.value.datasource = new Perms(response);
       datasource.value = response.data;
-      return response;
+      return api.options(`/project/${name}/permissions/datasource`).then((response) => {
+        perms.value.datasourcePermissions = new Perms(response);
+        return response;
+      });
     });
   }
 
   async function loadTables() {
     tables.value = [];
+    delete perms.value.tables;
     return api
       .get(`/datasource/${datasource.value.name}/tables`)
       .then((response) => {
-        perms.value.tables = getPerms(response);
+        perms.value.tables = new Perms(response);
         tables.value = response.data;
         return response;
       });
@@ -102,24 +111,37 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTable(name: string) {
     table.value = {} as Table;
+    delete perms.value.table;
+    delete perms.value.tableValueSets;
     variables.value = [];
+    delete perms.value.variables;
     return api
       .get(`/datasource/${datasource.value.name}/table/${name}`)
       .then((response) => {
-        perms.value.table = getPerms(response);
+        perms.value.table = new Perms(response);
         table.value = response.data;
-        return response;
+        return Promise.all([
+          api.options(`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
+            perms.value.tableValueSets = new Perms(response);
+            return response;
+          }),
+          api.options(`/project/${datasource.value.name}/permissions/table/${name}`).then((response) => {
+            perms.value.tablePermissions = new Perms(response);
+            return response;
+          }),
+        ]);
       });
   }
 
   async function loadTableVariables() {
     variables.value = [];
+    delete perms.value.variables;
     return api
       .get(
         `/datasource/${datasource.value.name}/table/${table.value.name}/variables`
       )
       .then((response) => {
-        perms.value.variables = getPerms(response);
+        perms.value.variables = new Perms(response);
         variables.value = response.data;
         return response;
       });
@@ -127,14 +149,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTableVariable(name: string) {
     variable.value = {} as Variable;
+    delete perms.value.variable;
     return api
       .get(
         `/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`
       )
       .then((response) => {
-        perms.value.variable = getPerms(response);
+        perms.value.variable = new Perms(response);
         variable.value = response.data;
-        return response;
+        return api.options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`).then((response) => {
+          perms.value.variablePermissions = new Perms(response);
+          return response;
+        });
       });
   }
 

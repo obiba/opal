@@ -32,7 +32,7 @@
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
         <q-tab name="sql" :label="$t('sql')" />
-        <q-tab name="permissions" :label="$t('permissions')" />
+        <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.datasourcePermissions?.canRead()"/>
       </q-tabs>
 
       <q-separator />
@@ -46,7 +46,7 @@
           <div class="text-h6">{{ $t('sql') }}</div>
         </q-tab-panel>
 
-        <q-tab-panel name="permissions">
+        <q-tab-panel name="permissions" v-if="datasourceStore.perms.datasourcePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
         </q-tab-panel>
       </q-tab-panels>
@@ -59,6 +59,7 @@ import DatasourceTables from 'src/components/DatasourceTables.vue';
 
 const route = useRoute();
 const projectsStore = useProjectsStore();
+const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
 

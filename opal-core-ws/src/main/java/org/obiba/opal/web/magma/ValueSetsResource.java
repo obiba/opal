@@ -13,12 +13,7 @@ package org.obiba.opal.web.magma;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -26,8 +21,9 @@ import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.opal.web.magma.view.BaseResource;
 
-public interface ValueSetsResource {
+public interface ValueSetsResource extends BaseResource {
 
   void setValueTable(ValueTable valueTable);
 
@@ -42,9 +38,6 @@ public interface ValueSetsResource {
    * @return
    */
   @GET
-  // Required to allow passing parameters in the body
-  @POST
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
   Response getValueSets(@Context UriInfo uriInfo, //
       @QueryParam("select") String select, //
       @QueryParam("offset") @DefaultValue("0") int offset, //

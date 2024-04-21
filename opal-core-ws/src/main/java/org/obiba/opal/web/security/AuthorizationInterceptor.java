@@ -89,7 +89,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     if(GET.equals(requestContext.getMethod()) || OPTIONS.equals(requestContext.getMethod())) {
       Set<String> allowed = allowed(requestContext, resourceMethod);
       if(!allowed.isEmpty()) {
-        responseContext.getHeaders().add(ALLOW_HTTP_HEADER, asHeader(allowed));
+        responseContext.getHeaders().putSingle(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
     } else if(HttpMethod.DELETE.equals(requestContext.getMethod()) && responseContext.getStatus() == HttpStatus.SC_OK) {
       // TODO delete all nodes starting with resource
@@ -100,6 +100,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     if (OPTIONS.equals(requestContext.getMethod())) {
       // OK is always expected on that method
       responseContext.setStatus(200);
+      responseContext.setEntity(requestContext.getHeaders().getFirst(ALLOW_HTTP_HEADER));
     }
 
     if(responseContext.getStatus() == HttpStatus.SC_CREATED) {

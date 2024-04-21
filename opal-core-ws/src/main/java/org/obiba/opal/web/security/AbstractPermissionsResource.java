@@ -12,13 +12,14 @@ package org.obiba.opal.web.security;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.web.magma.view.BaseResource;
 import org.obiba.opal.web.support.InvalidRequestException;
 
 import java.util.Collection;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
-public abstract class AbstractPermissionsResource {
+public abstract class AbstractPermissionsResource implements BaseResource {
 
   public static final String DOMAIN = "opal";
 

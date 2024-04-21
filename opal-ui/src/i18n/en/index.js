@@ -28,6 +28,7 @@ export default {
   name: 'Name',
   full_name: 'Full name',
   entity_type: 'Entity type',
+  referenced_entity_type: 'Referenced entity type',
   created: 'Created on',
   last_update: 'Last update',
   status: 'Status',

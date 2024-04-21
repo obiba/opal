@@ -4,8 +4,8 @@ export class Perms {
 
   methods: string[];
 
-  constructor(methods: string[]) {
-    this.methods = methods;
+  constructor(response: AxiosResponse) {
+    this.methods = response && response.headers && response.headers.allow ? response.headers.allow.split(',').map((m: string) => m.trim()) : [];
   }
 
   canCreate() {
@@ -24,8 +24,4 @@ export class Perms {
     return this.methods.includes('DELETE');
   }
 
-}
-
-export function getPerms(response: AxiosResponse): Perms {
-  return new Perms(response ? response.headers.allow.split(',').map((m: string) => m.trim()) : []);
 }

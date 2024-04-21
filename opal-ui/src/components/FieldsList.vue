@@ -2,7 +2,7 @@
   <q-list v-if="dbobject" separator dense>
     <q-item v-for="item in visibleItems" :key="item.field">
       <q-item-section>
-        <q-item-label overline>
+        <q-item-label overline class="text-grey-6">
           {{ $t(item.label ? item.label : item.field) }}
         </q-item-label>
       </q-item-section>
