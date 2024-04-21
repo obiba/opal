@@ -101,7 +101,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tables.value = [];
     delete perms.value.tables;
     return api
-      .get(`/datasource/${datasource.value.name}/tables`)
+      .get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } } )
       .then((response) => {
         perms.value.tables = new Perms(response);
         tables.value = response.data;

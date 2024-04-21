@@ -24,7 +24,7 @@
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
         <q-btn v-if="datasourceStore.perms.table?.canDelete()" flat color="red" icon="delete" size="sm" @click="onDeleteTable" class="on-right"></q-btn>
       </div>
-      <div class="row q-mt-md q-mb-md">
+      <div class="row q-col-gutter-md q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
           <fields-list
             :items="items1"
@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import TableVariables from 'src/components/TableVariables.vue';
+import TableVariables from 'src/components/datasource/TableVariables.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';

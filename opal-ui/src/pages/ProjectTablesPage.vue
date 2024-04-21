@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import DatasourceTables from 'src/components/DatasourceTables.vue';
+import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
 
 const route = useRoute();
 const projectsStore = useProjectsStore();

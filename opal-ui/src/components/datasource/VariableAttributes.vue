@@ -19,17 +19,14 @@
           <span class="text-primary">{{ props.value }}</span>
         </q-td>
       </template>
-      <template v-slot:body-cell-label="props">
+      <template v-slot:body-cell-locale="props">
         <q-td :props="props">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
-            <span>{{ attr.value }}</span>
-          </div>
+          <q-badge
+            v-if="props.value"
+            color="grey-6"
+            :label="props.value"
+            class="on-left"
+          />
         </q-td>
       </template>
     </q-table>
@@ -38,7 +35,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { getLabels } from 'src/utils/attributes';
 export default defineComponent({
   name: 'VariableAttributes',
 });

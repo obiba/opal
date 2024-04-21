@@ -49,6 +49,7 @@
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <span class="text-primary">{{ props.value }}</span>
+          <q-icon v-if="props.row.viewType" name="visibility" size="xs" color="primary" class="on-right" />
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
@@ -62,50 +63,7 @@
       </template>
     </q-table>
 
-    <q-dialog v-model="showAddTable">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">{{ $t('add_table') }}</div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <q-input
-            v-model="tableName"
-            dense
-            type="text"
-            :label="$t('name')"
-            style="width: 300px"
-          >
-          </q-input>
-        </q-card-section>
-        <q-card-section class="q-mb-md">
-          <q-input
-            v-model="entityType"
-            dense
-            type="text"
-            :label="$t('entity_type')"
-            style="width: 300px"
-          >
-          </q-input>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('add')"
-            color="primary"
-            :disable="!isTableNameValid || !isEntityTypeValid"
-            @click="onAddTable"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <add-table-dialog v-model="showAddTable" />
   </div>
 </template>
 
@@ -117,8 +75,8 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { Timestamps } from 'src/components/models';
+import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
-import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
 const router = useRouter();
@@ -126,8 +84,6 @@ const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
 
 const showAddTable = ref(false);
-const tableName = ref('');
-const entityType = ref('Participant');
 
 const tableRef = ref();
 const loading = ref(false);
@@ -153,6 +109,20 @@ const columns = [
     label: t('entity_type'),
     align: 'left',
     field: 'entityType',
+  },
+  {
+    name: 'variableCount',
+    required: true,
+    label: t('variables'),
+    align: 'left',
+    field: 'variableCount',
+  },
+  {
+    name: 'valueSetCount',
+    required: true,
+    label: t('entities'),
+    align: 'left',
+    field: 'valueSetCount',
   },
   {
     name: 'lastUpdate',
@@ -188,21 +158,7 @@ function onRowClick(evt: unknown, row: { name: string }) {
   router.push(`/project/${dsName.value}/table/${row.name}`);
 }
 
-const isTableNameValid = computed(() => datasourceStore.isNewTableNameValid(tableName.value));
-
-const isEntityTypeValid = computed(() => entityType.value.trim() !== '');
-
 function onShowAddTable() {
-  tableName.value = '';
-  entityType.value = 'Participant';
   showAddTable.value = true;
-}
-
-function onAddTable() {
-  datasourceStore.addTable(tableName.value, entityType.value)
-    .then(() => datasourceStore.initDatasourceTables(dsName.value))
-    .catch((err) => {
-      notifyError(err);
-    });
 }
 </script>

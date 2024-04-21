@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import FileView from 'src/components/FileView.vue';
+import FileView from 'src/components/files/FileView.vue';
 
 const route = useRoute();
 const filesStore = useFilesStore();

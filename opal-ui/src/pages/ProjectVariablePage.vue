@@ -57,7 +57,7 @@
       <q-tab-panels v-model="tab">
         <q-tab-panel name="dictionary">
           <div class="text-h6">{{ $t('properties') }}</div>
-          <div class="row q-mt-md q-mb-md">
+          <div class="row q-col-gutter-md q-mt-md q-mb-md">
             <div class="col-12 col-md-6">
               <fields-list
                 :items="items1"
@@ -73,11 +73,17 @@
               />
             </div>
           </div>
-          <div class="text-h6">{{ $t('categories') }}</div>
-          <variable-categories />
-          <div class="text-h6">{{ $t('attributes') }}</div>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <div class="text-h6">{{ $t('categories') }}</div>
+              <variable-categories />
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-h6">{{ $t('attributes') }}</div>
           <variable-attribues />
-        </q-tab-panel>
+            </div>
+          </div>
+          </q-tab-panel>
 
         <q-tab-panel name="summary">
           <div class="text-h6">{{ $t('summary') }}</div>
@@ -97,8 +103,8 @@
 
 <script setup lang="ts">
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import VariableCategories from 'src/components/VariableCategories.vue';
-import VariableAttribues from 'src/components/VariableAttributes.vue';
+import VariableCategories from 'src/components/datasource/VariableCategories.vue';
+import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import { Variable } from 'src/components/models';
 import { getLabels } from 'src/utils/attributes';
 

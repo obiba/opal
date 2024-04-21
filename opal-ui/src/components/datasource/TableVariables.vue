@@ -63,7 +63,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Category } from './models';
+import { Category } from '../models';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
