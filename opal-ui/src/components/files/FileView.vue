@@ -92,9 +92,9 @@
             />
           </q-btn-group>
           <q-btn
-            rounded
+            outline
             color="red"
-            icon="delete_outline"
+            icon="delete"
             size="sm"
             class="on-right"
             @click="onShowDelete"
@@ -118,9 +118,9 @@
     <div v-if="props.file.type === 'FILE'">
       <div class="q-mb-md">
         <q-btn
-          rounded
+          outline
           color="red"
-          icon="delete_outline"
+          icon="delete"
           size="sm"
           @click="onShowDelete"
           :disable="props.file.writable === false"

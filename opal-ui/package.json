@@ -15,8 +15,9 @@
   "dependencies": {
     "@quasar/extras": "^1.16.9",
     "axios": "^1.6.7",
+    "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
-    "quasar": "^2.14.4",
+    "quasar": "^2.15.2",
     "vue": "^3.4.19",
     "vue-i18n": "^9.9.0",
     "vue-router": "^4.2.5",

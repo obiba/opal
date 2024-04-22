@@ -87,5 +87,5 @@ const columns = [
   },
 ];
 
-const rows = computed(() => datasourceStore.variable?.categories);
+const rows = computed(() => datasourceStore.variable?.categories ? datasourceStore.variable.categories : []);
 </script>

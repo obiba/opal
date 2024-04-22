@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { Datasource, Table, Variable } from 'src/components/models';
+import { Datasource, Table, View, Variable } from 'src/components/models';
 import { Perms } from 'src/utils/authz';
 
 interface DatasourcePerms {
@@ -19,6 +19,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   const datasource = ref({} as Datasource); // current datasource
   const tables = ref([] as Table[]); // current datasource tables
   const table = ref({} as Table); // current table
+  const view = ref({} as View); // current view
   const variables = ref([] as Variable[]); // current table variables
   const variable = ref({} as Variable); // current variable
   const perms = ref({} as DatasourcePerms);
@@ -27,6 +28,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     datasource.value = {} as Datasource;
     tables.value = [];
     table.value = {} as Table;
+    view.value = {} as View;
     variables.value = [];
     variable.value = {} as Variable;
     perms.value = {} as DatasourcePerms;
@@ -111,6 +113,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTable(name: string) {
     table.value = {} as Table;
+    view.value = {} as View;
     delete perms.value.table;
     delete perms.value.tableValueSets;
     variables.value = [];
@@ -121,6 +124,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         perms.value.table = new Perms(response);
         table.value = response.data;
         return Promise.all([
+          table.value.viewType === 'View' ? loadView(name) : Promise.resolve(),
           api.options(`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
             perms.value.tableValueSets = new Perms(response);
             return response;
@@ -130,6 +134,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
             return response;
           }),
         ]);
+      });
+  }
+
+  async function loadView(name: string) {
+    view.value = {} as View;
+    return api
+      .get(`/datasource/${datasource.value.name}/view/${name}`)
+      .then((response) => {
+        view.value = response.data;
+        return response;
       });
   }
 
@@ -225,6 +239,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     datasource,
     tables,
     table,
+    view,
     variables,
     variable,
     perms,

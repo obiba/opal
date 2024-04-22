@@ -70,6 +70,19 @@ export interface Table {
   timestamps: Timestamps;
 }
 
+export interface View {
+  name: string;
+  datasourceName: string;
+  status: string;
+  from: string[];
+  'Magma.VariableListViewDto.view': ViewVariables;
+}
+
+export interface ViewVariables {
+  variables: Variable[];
+}
+
+
 export interface Variable {
   name: string;
   entityType: string;

@@ -1,4 +1,6 @@
 import { File } from 'src/components/models';
+import { parseISO } from 'date-fns';
+import { Lang } from 'quasar';
 
 export function getSizeLabel(size: number | undefined) {
   if (size === undefined || isNaN(size)) {
@@ -20,9 +22,12 @@ export function getIconName(file: File) {
   return file.readable ? 'description' : 'insert_drive_file';
 }
 
-export function getDateLabel(date: number | undefined) {
-  if (date === undefined || isNaN(date)) {
+export function getDateLabel(date: string | number | undefined) {
+  //console.log(Lang.getLocale());
+  if (typeof date === 'string') {
+    return parseISO(date).toLocaleString(Lang.getLocale());
+  } else if (date === undefined || isNaN(date)) {
     return '-';
   }
-  return new Date(date).toLocaleString();
+  return new Date(date).toLocaleString(Lang.getLocale());
 }

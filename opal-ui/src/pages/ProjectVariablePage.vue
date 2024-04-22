@@ -80,7 +80,7 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-h6">{{ $t('attributes') }}</div>
-          <variable-attribues />
+              <variable-attribues />
             </div>
           </div>
           </q-tab-panel>

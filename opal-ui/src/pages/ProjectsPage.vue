@@ -47,6 +47,10 @@
 </template>
 
 <script setup lang="ts">
+import { Timestamps } from 'src/components/models';
+import { getDateLabel } from 'src/utils/files';
+
+const { t } = useI18n();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 
@@ -63,7 +67,7 @@ const columns = [
   {
     name: 'name',
     required: true,
-    label: 'Name',
+    label: t('name'),
     align: 'left',
     field: 'name',
     format: (val: string) => val,
@@ -71,16 +75,24 @@ const columns = [
   },
   {
     name: 'title',
-    label: 'Title',
+    label: t('title'),
     align: 'left',
     field: 'title',
     format: (val: string) => val,
   },
   {
     name: 'tags',
-    label: 'Tags',
+    label: t('tags'),
     align: 'left',
     field: 'tags',
+  },
+  {
+    name: 'lastUpdate',
+    required: true,
+    label: t('last_update'),
+    align: 'left',
+    field: 'timestamps',
+    format: (val: Timestamps) => getDateLabel(val.lastUpdate),
   },
 ];
 

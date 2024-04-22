@@ -100,6 +100,7 @@ import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
+import { getDateLabel } from 'src/utils/files';
 
 const route = useRoute();
 const router = useRouter();
@@ -156,7 +157,7 @@ const columns = [
     label: t('last_update'),
     align: 'left',
     field: 'timestamps',
-    format: (val: Timestamps) => val.lastUpdate,
+    format: (val: Timestamps) => getDateLabel(val.lastUpdate),
   },
   {
     name: 'status',

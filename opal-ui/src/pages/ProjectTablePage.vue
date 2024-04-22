@@ -98,6 +98,8 @@ import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
+import { getDateLabel } from 'src/utils/files';
+import { baseUrl } from 'src/boot/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -120,18 +122,24 @@ const items1: FieldItem<Table>[] = [
     field: 'entityType',
     label: 'entity_type',
   },
+  {
+    field: 'from',
+    label: 'table_references',
+    html: (val) => (val ? datasourceStore.view.from?.map((f) => `<a href="#/project/${f.split('.')[0]}/table/${f.split('.')[1]}">${f}</a>`).join(', ') : ''),
+    visible: (val) => val.viewType !== undefined,
+  },
 ];
 
 const items2: FieldItem<Table>[] = [
   {
     field: 'timestamps',
     label: 'created',
-    format: (val) => (val ? val.timestamps?.created : ''),
+    format: (val) => (val ? getDateLabel(val.timestamps?.created) : ''),
   },
   {
     field: 'timestamps',
     label: 'last_update',
-    format: (val) => (val ? val.timestamps?.lastUpdate : ''),
+    format: (val) => (val ? getDateLabel(val.timestamps?.lastUpdate) : ''),
   },
 ];
 
