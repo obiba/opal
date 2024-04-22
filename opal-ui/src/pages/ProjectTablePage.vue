@@ -36,7 +36,7 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onDeleteTable" class="on-right"></q-btn>
+        <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
@@ -86,6 +86,8 @@
           <div class="text-h6">{{ $t('permissions') }}</div>
         </q-tab-panel>
       </q-tab-panels>
+
+      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_table_confirm')" @confirm="onDeleteTable" />
     </q-page>
   </div>
 </template>
@@ -93,6 +95,7 @@
 <script setup lang="ts">
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
 
@@ -101,6 +104,7 @@ const router = useRouter();
 const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
+const showDelete = ref(false);
 
 const items1: FieldItem<Table>[] = [
   {
@@ -149,6 +153,10 @@ function onDownloadDictionary() {
 
 function onDownloadView() {
   datasourceStore.downloadView();
+}
+
+function onShowDelete() {
+  showDelete.value = true;
 }
 
 function onDeleteTable() {

@@ -152,35 +152,11 @@
 
     <add-folder-dialog v-model="showAddFolder" :file="props.file"/>
 
-    <q-dialog v-model="showDelete">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">{{ $t('delete') }}</div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <div v-if="props.file.type === 'FILE' || writables.length === 1">
-            {{ $t('delete_file_confirm') }}
-          </div>
-          <div v-else>{{ $t('delete_files_confirm') }}</div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('confirm')"
-            color="primary"
-            @click="onDelete"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="props.file.type === 'FILE' || writables.length === 1 ? $t('delete_file_confirm') : $t('delete_files_confirm')"
+      @confirm="onDelete" />
 
     <upload-file-dialog v-model="showUpload" :file="props.file" />
 
@@ -258,6 +234,7 @@ export default defineComponent({
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { File } from 'src/components/models';
 import { getSizeLabel, getDateLabel, getIconName } from 'src/utils/files';
 
@@ -425,6 +402,7 @@ function onGenerateDownloadPwd() {
 }
 
 function onShowDelete() {
+  console.log(showDelete.value);
   showDelete.value = true;
 }
 

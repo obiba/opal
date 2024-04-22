@@ -28,6 +28,8 @@ export default {
   dashboard: 'Dashboard',
   delete_file_confirm: 'Are you sure you want to delete this file?',
   delete_files_confirm: 'Are you sure you want to delete these files?',
+  delete_table_confirm: 'Are you sure you want to delete this table?',
+  delete_tables_confirm: 'Are you sure you want to delete these tables?',
   delete: 'Delete',
   dictionary: 'Dictionary',
   download: 'Download',

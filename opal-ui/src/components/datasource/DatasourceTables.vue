@@ -61,6 +61,7 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
+        <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables" class="on-right"></q-btn>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -82,6 +83,8 @@
     <add-table-dialog v-model="showAddTable" />
 
     <add-tables-dialog v-model="showAddTables" />
+
+    <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="removableTables.length === 1 ? $t('delete_table_confirm') : $t('delete_tables_confirm')" @confirm="onDeleteTables" />
   </div>
 </template>
 
@@ -95,6 +98,7 @@ export default defineComponent({
 import { Table, Timestamps } from 'src/components/models';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 
 const route = useRoute();
@@ -114,6 +118,7 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const selected = ref([] as Table[]);
+const showDeleteTables = ref(false);
 
 const columns = [
   {
@@ -167,6 +172,7 @@ onMounted(() => {
 });
 
 const dsName = computed(() => route.params.id as string);
+const removableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
 
 function init() {
   loading.value = true;
@@ -195,5 +201,16 @@ function onDownloadDictionary() {
 
 function onDownloadViews() {
   datasourceStore.downloadViews(selected.value ? selected.value.filter((t) => t.viewType).map((t) => t.name) : []);
+}
+
+function onShowDeleteTables() {
+  showDeleteTables.value = true;
+}
+
+function onDeleteTables() {
+  datasourceStore.deleteTables(removableTables.value.map((t) => t.name)).then(() => {
+    selected.value = [];
+    init();
+  });
 }
 </script>
