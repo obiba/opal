@@ -9,6 +9,8 @@
       :pagination="initialPagination"
       :loading="loading"
       @row-click="onRowClick"
+      selection="multiple"
+      v-model:selected="selected"
     >
       <template v-slot:top>
         <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
@@ -45,6 +47,20 @@
           size="sm"
           @click="init"
         />
+        <q-btn-dropdown outline no-caps color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
+          <q-list>
+            <q-item clickable v-close-popup @click="onDownloadDictionary">
+              <q-item-section>
+                <q-item-label>{{ $t('download_dictionaries') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item v-if="hasViews" clickable v-close-popup @click="onDownloadViews">
+              <q-item-section>
+                <q-item-label>{{ $t('download_views_backup') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -76,7 +92,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Timestamps } from 'src/components/models';
+import { Table, Timestamps } from 'src/components/models';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
@@ -97,6 +113,7 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
+const selected = ref([] as Table[]);
 
 const columns = [
   {
@@ -168,5 +185,15 @@ function onShowAddTable() {
 
 function onShowAddTables() {
   showAddTables.value = true;
+}
+
+const hasViews = computed(() => datasourceStore.tables.some((table) => table.viewType !== undefined));
+
+function onDownloadDictionary() {
+  datasourceStore.downloadTablesDictionary(selected.value ? selected.value.map((t) => t.name) : []);
+}
+
+function onDownloadViews() {
+  datasourceStore.downloadViews(selected.value ? selected.value.filter((t) => t.viewType).map((t) => t.name) : []);
 }
 </script>

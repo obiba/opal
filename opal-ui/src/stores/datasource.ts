@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, baseUrl } from 'src/boot/api';
 import { Datasource, Table, Variable } from 'src/components/models';
 import { Perms } from 'src/utils/authz';
 
@@ -183,6 +183,34 @@ export const useDatasourceStore = defineStore('datasource', () => {
       `/datasource/${datasource.value.name}/table/${name}`)
   }
 
+  function downloadTablesDictionary(tables: string[] | undefined) {
+    let uri = `${baseUrl}/datasource/${datasource.value.name}/tables/excel`;
+    if (tables && tables.length > 0) {
+      uri += '?';
+      tables.forEach((t) => (uri += `&table=${t}`));
+    }
+    window.open(uri, '_self');
+  }
+
+  function downloadTableDictionary() {
+    const uri = `${baseUrl}/datasource/${datasource.value.name}/table/${table.value.name}/variables/excel`;
+    window.open(uri, '_self');
+  }
+
+  function downloadViews(tables: string[] | undefined) {
+    let uri = `${baseUrl}/datasource/${datasource.value.name}/views`;
+    if (tables && tables.length > 0) {
+      uri += '?';
+      tables.forEach((t) => (uri += `&views=${t}`));
+    }
+    window.open(uri, '_self');
+  }
+
+  function downloadView() {
+    const uri = `${baseUrl}/datasource/${datasource.value.name}/view/${table.value.name}/xml`;
+    window.open(uri, '_self');
+  }
+
   return {
     datasource,
     tables,
@@ -198,6 +226,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     isNewTableNameValid,
     addTable,
     deleteTable,
+    downloadTablesDictionary,
+    downloadTableDictionary,
+    downloadViews,
+    downloadView,
     reset,
   };
 });

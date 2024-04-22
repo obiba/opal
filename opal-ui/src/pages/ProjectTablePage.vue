@@ -22,7 +22,21 @@
       <div class="text-h5">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
-        <q-btn v-if="datasourceStore.perms.table?.canDelete()" flat color="red" icon="delete" size="sm" @click="onDeleteTable" class="on-right"></q-btn>
+        <q-btn-dropdown outline no-caps color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
+          <q-list>
+            <q-item clickable v-close-popup @click="onDownloadDictionary">
+              <q-item-section>
+                <q-item-label>{{ $t('download_dictionary') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item v-if="isView" clickable v-close-popup @click="onDownloadView">
+              <q-item-section>
+                <q-item-label>{{ $t('download_view') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onDeleteTable" class="on-right"></q-btn>
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
@@ -123,9 +137,18 @@ onMounted(() => {
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
+const isView = computed(() => datasourceStore.table.viewType !== undefined);
 
 function init() {
   datasourceStore.initDatasourceTable(dsName.value, tName.value);
+}
+
+function onDownloadDictionary() {
+  datasourceStore.downloadTableDictionary();
+}
+
+function onDownloadView() {
+  datasourceStore.downloadView();
 }
 
 function onDeleteTable() {

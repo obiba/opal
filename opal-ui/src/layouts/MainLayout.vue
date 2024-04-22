@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout v-show="authStore.isAuthenticated" view="lHh Lpr lFf">
     <q-header elevated class="bg-dark text-white">
       <q-toolbar>
         <q-btn
@@ -86,7 +86,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>

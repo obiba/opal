@@ -13,18 +13,10 @@
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ $t('tables') }}</span>
       </div>
-      <q-card flat bordered class="bg-info text-white q-mt-md q-mb-md">
-        <q-card-section>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Et quos
-          officiis labore, illo odit sit voluptatibus atque modi quae tempore
-          soluta velit voluptatem adipisci nostrum repudiandae, ea molestiae
-          maiores quam.
-        </q-card-section>
-      </q-card>
       <q-tabs
         v-model="tab"
         dense
-        class="text-grey"
+        class="text-grey q-mt-md"
         active-color="primary"
         indicator-color="primary"
         align="justify"
