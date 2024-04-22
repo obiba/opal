@@ -53,7 +53,7 @@ const projectsStore = useProjectsStore();
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
-  sortBy: 'desc',
+  sortBy: 'name',
   descending: false,
   page: 1,
   rowsPerPage: 20,

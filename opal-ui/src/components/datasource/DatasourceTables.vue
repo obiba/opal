@@ -20,7 +20,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="onAddTables">
+            <q-item clickable v-close-popup @click="onShowAddTables">
               <q-item-section>
                 <q-item-label>{{ $t('add_tables') }}</q-item-label>
               </q-item-section>
@@ -64,6 +64,8 @@
     </q-table>
 
     <add-table-dialog v-model="showAddTable" />
+
+    <add-tables-dialog v-model="showAddTables" />
   </div>
 </template>
 
@@ -76,6 +78,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { Timestamps } from 'src/components/models';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
+import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 
 const route = useRoute();
@@ -84,11 +87,12 @@ const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
 
 const showAddTable = ref(false);
+const showAddTables = ref(false);
 
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
-  sortBy: 'desc',
+  sortBy: 'name',
   descending: false,
   page: 1,
   rowsPerPage: 20,
@@ -160,5 +164,9 @@ function onRowClick(evt: unknown, row: { name: string }) {
 
 function onShowAddTable() {
   showAddTable.value = true;
+}
+
+function onShowAddTables() {
+  showAddTables.value = true;
 }
 </script>

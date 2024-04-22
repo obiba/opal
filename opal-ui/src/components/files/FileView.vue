@@ -53,7 +53,7 @@
             color="secondary"
             icon="file_download"
             :label="$t('download')"
-            :disable="!isreadableselected"
+            :disable="!isReadableSelected"
             size="sm"
             class="on-right"
             @click="onShowDownload"
@@ -150,40 +150,7 @@
       </q-card>
     </div>
 
-    <q-dialog v-model="showAddFolder">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">{{ $t('add_folder') }}</div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <q-input
-            v-model="newFolderName"
-            dense
-            type="text"
-            :label="$t('name')"
-            style="width: 300px"
-          >
-          </q-input>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('add')"
-            color="primary"
-            :disable="newFolderName === ''"
-            @click="onAddFolder"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <add-folder-dialog v-model="showAddFolder" :file="props.file"/>
 
     <q-dialog v-model="showDelete">
       <q-card>
@@ -215,41 +182,7 @@
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="showUpload">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">{{ $t('upload') }}</div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <q-file
-            v-model="newFiles"
-            dense
-            multiple
-            append
-            :label="$t('select_files_to_upload')"
-            style="width: 300px"
-          >
-          </q-file>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('upload')"
-            color="primary"
-            :disable="newFiles.length === 0"
-            @click="onUpload"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <upload-file-dialog v-model="showUpload" :file="props.file" />
 
     <q-dialog v-model="showDownload">
       <q-card>
@@ -323,7 +256,10 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { File, FileObject } from 'src/components/models';
+import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
+import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
+import { File } from 'src/components/models';
+import { getSizeLabel, getDateLabel, getIconName } from 'src/utils/files';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
@@ -332,14 +268,11 @@ interface FolderViewProps {
   file: File;
 }
 
-const props = withDefaults(defineProps<FolderViewProps>(), {
-  file: { name: 'root', path: '/', type: 'FOLDER', files: [] },
-});
+const props = defineProps<FolderViewProps>();
 
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
-  sortBy: 'desc',
   descending: false,
   page: 1,
   rowsPerPage: 50,
@@ -351,9 +284,7 @@ const encryptContent = ref(false);
 const encryptPassword = ref('');
 const showPwd = ref(false);
 const showAddFolder = ref(false);
-const newFolderName = ref('');
 const showUpload = ref(false);
-const newFiles = ref<FileObject[]>([]);
 const showDelete = ref(false);
 
 const columns = [
@@ -435,34 +366,7 @@ const rows = computed(() => {
   return result;
 });
 
-function getSizeLabel(size: number | undefined) {
-  if (size === undefined || isNaN(size)) {
-    return '-';
-  }
-  if (size < 1024) {
-    return `${size} B`;
-  }
-  if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(2)} KB`;
-  }
-  return `${(size / 1024 / 1024).toFixed(2)} MB`;
-}
-
-function getIconName(file: File) {
-  if (file.type === 'FOLDER') {
-    return file.readable ? 'folder' : 'folder_off';
-  }
-  return file.readable ? 'description' : 'insert_drive_file';
-}
-
-function getDateLabel(date: number | undefined) {
-  if (date === undefined || isNaN(date)) {
-    return '-';
-  }
-  return new Date(date).toLocaleString();
-}
-
-const isreadableselected = computed(() => {
+const isReadableSelected = computed(() => {
   return readables.value.length > 0;
 });
 
@@ -486,21 +390,8 @@ function onShowAddFolder() {
   showAddFolder.value = true;
 }
 
-function onAddFolder() {
-  filesStore.addFolder(props.file.path, newFolderName.value).then(() => {
-    filesStore.loadFiles(props.file.path);
-  });
-}
-
 function onShowUpload() {
-  newFiles.value = [];
   showUpload.value = true;
-}
-
-function onUpload() {
-  filesStore
-    .uploadFiles(props.file.path, newFiles.value as FileObject[])
-    .then(() => filesStore.loadFiles(props.file.path));
 }
 
 function onShowDownload() {
@@ -590,11 +481,5 @@ function onRowClick(evt: unknown, row: File) {
     return;
   }
   filesStore.loadFiles(row.path);
-  // if (row.type === 'FOLDER') {
-  //   filesStore.loadFiles(row.path);
-  // } else {
-  //   selected.value = [row];
-  //   onShowDownload();
-  // }
 }
 </script>

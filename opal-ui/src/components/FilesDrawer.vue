@@ -17,15 +17,6 @@
         $t('content')
       }}</q-item-label>
 
-      <q-item to="/files/">
-        <q-item-section avatar>
-          <q-icon name="dns" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>{{ $t('file_system') }}</q-item-label>
-        </q-item-section>
-      </q-item>
-
       <q-item to="/files/home">
         <q-item-section avatar>
           <q-icon name="group" />
@@ -50,6 +41,15 @@
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ $t('reports') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-item to="/files/">
+        <q-item-section avatar>
+          <q-icon name="dns" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ $t('file_system') }}</q-item-label>
         </q-item-section>
       </q-item>
     </q-list>

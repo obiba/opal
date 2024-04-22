@@ -13,6 +13,11 @@ export const useFilesStore = defineStore('files', () => {
     cutSelection.value = [];
   }
 
+  async function initFiles(path: string) {
+    if (current.value.path) return Promise.resolve();
+    return loadFiles(path);
+  }
+
   async function loadFiles(path: string) {
     return api.get(`/files/_meta${path}`).then((response) => {
       current.value = response.data;
@@ -162,6 +167,7 @@ export const useFilesStore = defineStore('files', () => {
 
   return {
     current,
+    initFiles,
     loadFiles,
     downloadFile,
     downloadFiles,

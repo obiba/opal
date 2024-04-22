@@ -46,7 +46,6 @@ const datasourceStore = useDatasourceStore();
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
-  sortBy: 'desc',
   descending: false,
   page: 1,
   rowsPerPage: 20,
