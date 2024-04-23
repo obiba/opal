@@ -22,7 +22,7 @@
       <div class="text-h5">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
-        <q-btn-dropdown outline no-caps color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
+        <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
           <q-list>
             <q-item clickable v-close-popup @click="onDownloadDictionary">
               <q-item-section>

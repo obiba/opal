@@ -126,7 +126,7 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   @Override
-  public Integer launchCommand(CommandJob commandJob, Subject originalOwner) {
+  public CommandJob launchCommand(CommandJob commandJob, Subject originalOwner) {
     Subject owner = SessionDetachedSubject.asSessionDetachedSubject(originalOwner);
     commandJob.setId(nextJobId());
     commandJob.setOwner(owner.getPrincipal().toString());
@@ -136,21 +136,21 @@ public class DefaultCommandJobService implements CommandJobService {
       return launchProjectCommand(commandJob, owner);
     } else {
       executor.execute(new FutureCommandJob(owner, commandJob));
-      return commandJob.getId();
+      return commandJob;
     }
   }
 
-  private Integer launchProjectCommand(CommandJob commandJob, Subject owner) {
+  private CommandJob launchProjectCommand(CommandJob commandJob, Subject owner) {
     if (!projectJobsNotStarted.containsKey(commandJob.getProject())) {
       projectJobsNotStarted.put(commandJob.getProject(), new LinkedBlockingQueue<>());
       projectExecutors.put(commandJob.getProject(), createExecutor(projectJobsNotStarted.get(commandJob.getProject())));
     }
     projectExecutors.get(commandJob.getProject()).execute(new FutureCommandJob(owner, commandJob));
-    return commandJob.getId();
+    return commandJob;
   }
 
   @Override
-  public Integer launchCommand(CommandJob commandJob) {
+  public CommandJob launchCommand(CommandJob commandJob) {
     return launchCommand(commandJob, SecurityUtils.getSubject());
   }
 

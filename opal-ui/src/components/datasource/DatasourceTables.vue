@@ -14,7 +14,7 @@
     >
       <template v-slot:top>
         <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
-          class="on-left">
+          class="on-left q-mb-sm">
           <q-list>
             <q-item clickable v-close-popup @click="onShowAddTable">
               <q-item-section>
@@ -46,8 +46,9 @@
           :label="$t('refresh')"
           size="sm"
           @click="init"
+          class="q-mb-sm"
         />
-        <q-btn-dropdown outline no-caps color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
+        <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')" class="on-right q-mb-sm">
           <q-list>
             <q-item clickable v-close-popup @click="onDownloadDictionary">
               <q-item-section>
@@ -61,7 +62,10 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables" class="on-right"></q-btn>
+        <q-btn v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" :label="$t('import')" size="sm" @click="onShowImport" class="on-right q-mb-sm"></q-btn>
+        <q-btn v-if="projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport" class="on-right q-mb-sm"></q-btn>
+        <q-btn v-if="projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right q-mb-sm"></q-btn>
+        <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables" class="on-right q-mb-sm"></q-btn>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -84,6 +88,8 @@
 
     <add-tables-dialog v-model="showAddTables" />
 
+    <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
+
     <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="removableTables.length === 1 ? $t('delete_table_confirm') : $t('delete_tables_confirm')" @confirm="onDeleteTables" />
   </div>
 </template>
@@ -98,6 +104,7 @@ export default defineComponent({
 import { Table, Timestamps } from 'src/components/models';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
+import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -105,10 +112,12 @@ import { getDateLabel } from 'src/utils/dates';
 const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
+const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
 const showAddTable = ref(false);
 const showAddTables = ref(false);
+const showCopy = ref(false);
 
 const tableRef = ref();
 const loading = ref(false);
@@ -174,6 +183,8 @@ onMounted(() => {
 
 const dsName = computed(() => route.params.id as string);
 const removableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
+const readableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
+
 
 function init() {
   loading.value = true;
@@ -213,5 +224,9 @@ function onDeleteTables() {
     selected.value = [];
     init();
   });
+}
+
+function onShowCopy() {
+  showCopy.value = true;
 }
 </script>

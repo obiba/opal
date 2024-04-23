@@ -12,6 +12,9 @@ package org.obiba.opal.web.shell.reporting;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -24,17 +27,12 @@ import org.obiba.opal.web.reporting.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.util.List;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/project/{project}/report-template/{name}")
 public class ProjectReportTemplateResource {

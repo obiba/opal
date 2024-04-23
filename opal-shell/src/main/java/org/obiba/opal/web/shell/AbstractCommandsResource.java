@@ -10,15 +10,15 @@
 package org.obiba.opal.web.shell;
 
 import jakarta.ws.rs.core.Response;
-
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
+import org.obiba.opal.web.magma.view.BaseResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractCommandsResource {
+public abstract class AbstractCommandsResource implements BaseResource {
 
   protected CommandJobService commandJobService;
 
@@ -54,6 +54,6 @@ public abstract class AbstractCommandsResource {
     return new CommandJob(name, command);
   }
 
-  protected abstract Response buildLaunchCommandResponse(Integer jobId);
+  protected abstract Response buildLaunchCommandResponse(CommandJob commandJob);
 
 }

@@ -9,19 +9,10 @@
  */
 package org.obiba.opal.web.shell;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
-
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
@@ -36,13 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Opal Web Shell services.
  */
 @Component
-@Transactional
 @Path("/shell")
 public class WebShellResource extends AbstractCommandsResource {
 
@@ -142,9 +134,10 @@ public class WebShellResource extends AbstractCommandsResource {
   //
 
   @Override
-  protected Response buildLaunchCommandResponse(Integer jobId) {
+  protected Response buildLaunchCommandResponse(CommandJob commandJob) {
     return Response.created(
-        UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId))
+        UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(commandJob.getId()))
+        .entity(Dtos.asDto(commandJob))
         .build();
   }
 

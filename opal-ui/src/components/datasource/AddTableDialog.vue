@@ -13,7 +13,7 @@
             dense
             type="text"
             :label="$t('name')"
-            style="width: 300px"
+            style="min-width: 300px"
             class="q-mb-md"
           >
           </q-input>
@@ -22,7 +22,7 @@
             dense
             type="text"
             :label="$t('entity_type')"
-            style="width: 300px"
+            style="min-width: 300px"
             class="q-mb-md"
           >
           </q-input>
@@ -69,6 +69,9 @@ const showDialog = ref(props.modelValue);
 const newTable = ref<Table>({ name: '', entityType: 'Participant' } as Table);
 
 watch(() => props.modelValue, (value) => {
+  if (value) {
+    newTable.value = { name: '', entityType: 'Participant' } as Table;
+  }
   showDialog.value = value;
 });
 

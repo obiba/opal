@@ -10,11 +10,11 @@
 
 package org.obiba.opal.web.shell.reporting;
 
-import java.util.Set;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -22,14 +22,10 @@ import org.obiba.opal.web.reporting.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import java.util.Set;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/report-templates")
 public class ReportTemplatesResource {

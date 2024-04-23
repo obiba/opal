@@ -12,7 +12,7 @@
     >
       <template v-slot:top>
         <q-btn-dropdown v-if="datasourceStore.perms.variables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
-          class="on-left">
+          class="on-left q-mb-sm">
           <q-list> </q-list>
         </q-btn-dropdown>
         <q-btn
@@ -22,6 +22,7 @@
           :label="$t('refresh')"
           size="sm"
           @click="init"
+          class="q-mb-sm"
         />
       </template>
       <template v-slot:body-cell-name="props">

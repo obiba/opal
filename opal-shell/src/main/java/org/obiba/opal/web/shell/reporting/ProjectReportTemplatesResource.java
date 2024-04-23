@@ -10,16 +10,16 @@
 
 package org.obiba.opal.web.shell.reporting;
 
-import java.net.URI;
-import java.util.Set;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
-
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.ReportTemplateService;
@@ -30,15 +30,11 @@ import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.net.URI;
+import java.util.Set;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/project/{name}/report-templates")
 public class ProjectReportTemplatesResource {

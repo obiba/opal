@@ -15,7 +15,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.service.CommandJobService;
@@ -23,10 +22,8 @@ import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/project/{name}/command/{id}")
 public class ProjectCommandResource {

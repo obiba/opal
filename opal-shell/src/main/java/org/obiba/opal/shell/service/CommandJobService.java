@@ -27,7 +27,7 @@ public interface CommandJobService extends Service {
    * @param owner the command task's owner
    * @return the command task's id
    */
-  Integer launchCommand(CommandJob commandJob, Subject owner);
+  CommandJob launchCommand(CommandJob commandJob, Subject owner);
 
   /**
    * Assigns an id to a command task and submits it for asynchronous execution.
@@ -37,7 +37,7 @@ public interface CommandJobService extends Service {
    * @param commandJob the submitted command task
    * @return the command task's id
    */
-  Integer launchCommand(CommandJob commandJob);
+  CommandJob launchCommand(CommandJob commandJob);
 
   /**
    * Returns the specified command task.

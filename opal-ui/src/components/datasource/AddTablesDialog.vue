@@ -26,7 +26,7 @@
             <q-expansion-item
               switch-toggle-side
               dense
-              header-class="text-primary"
+              header-class="text-primary text-caption"
               :label="$t('advanced_options')"
             >
               <div class="q-mt-md">
@@ -105,6 +105,13 @@ const charSet = ref('ISO-8859-1');
 const entityType = ref('Participant');
 
 watch(() => props.modelValue, (value) => {
+  if (value) {
+    excelFile.value = undefined;
+    merge.value = false;
+    locale.value = 'en';
+    charSet.value = 'ISO-8859-1';
+    entityType.value = 'Participant';
+  }
   showDialog.value = value;
 });
 
