@@ -135,7 +135,8 @@ export default defineComponent({
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import { File } from 'src/components/models';
-import { getSizeLabel, getDateLabel, getIconName } from 'src/utils/files';
+import { getSizeLabel, getIconName } from 'src/utils/files';
+import { getDateLabel } from 'src/utils/dates';
 
 interface DialogProps {
   folder: File;

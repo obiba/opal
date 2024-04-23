@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { Timestamps } from 'src/components/models';
-import { getDateLabel } from 'src/utils/files';
+import { getDateLabel } from 'src/utils/dates';
 
 const { t } = useI18n();
 const router = useRouter();

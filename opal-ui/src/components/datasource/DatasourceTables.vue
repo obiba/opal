@@ -100,7 +100,7 @@ import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
-import { getDateLabel } from 'src/utils/files';
+import { getDateLabel } from 'src/utils/dates';
 
 const route = useRoute();
 const router = useRouter();

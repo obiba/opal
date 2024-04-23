@@ -98,8 +98,7 @@ import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
-import { getDateLabel } from 'src/utils/files';
-import { baseUrl } from 'src/boot/api';
+import { getDateLabel } from 'src/utils/dates';
 
 const route = useRoute();
 const router = useRouter();
