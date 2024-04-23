@@ -36,6 +36,7 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
+        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right"></q-btn>
         <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
@@ -87,6 +88,7 @@
         </q-tab-panel>
       </q-tab-panels>
 
+      <copy-tables-dialog v-model="showCopy" :tables="[datasourceStore.table]"/>
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_table_confirm')" @confirm="onDeleteTable" />
     </q-page>
   </div>
@@ -96,16 +98,19 @@
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import { Table } from 'src/components/models';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 
 const route = useRoute();
 const router = useRouter();
+const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
 const showDelete = ref(false);
+const showCopy = ref(false);
 
 const items1: FieldItem<Table>[] = [
   {
@@ -160,6 +165,10 @@ function onDownloadDictionary() {
 
 function onDownloadView() {
   datasourceStore.downloadView();
+}
+
+function onShowCopy() {
+  showCopy.value = true;
 }
 
 function onShowDelete() {

@@ -63,8 +63,8 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" :label="$t('import')" size="sm" @click="onShowImport" class="on-right q-mb-sm"></q-btn>
-        <q-btn v-if="projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport" class="on-right q-mb-sm"></q-btn>
-        <q-btn v-if="projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right q-mb-sm"></q-btn>
+        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport" class="on-right q-mb-sm"></q-btn>
+        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right q-mb-sm"></q-btn>
         <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables" class="on-right q-mb-sm"></q-btn>
       </template>
       <template v-slot:body-cell-name="props">

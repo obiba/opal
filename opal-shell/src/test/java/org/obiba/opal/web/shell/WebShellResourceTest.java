@@ -335,8 +335,9 @@ public class WebShellResourceTest {
         .atLeastOnce();
 
     CommandJobService mockCommandJobService = createMockCommandJobService();
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, reportCommand, null))))
-        .andReturn(jobId).atLeastOnce();
+    CommandJob job = createCommandJob(jobId, reportCommand, null);
+    expect(mockCommandJobService.launchCommand(eqCommandJob(job)))
+        .andReturn(job).atLeastOnce();
 
     WebShellResource sut = new WebShellResource();
     sut.setCommandJobService(mockCommandJobService);
