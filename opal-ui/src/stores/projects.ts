@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { Project, ProjectSummary } from 'src/components/models';
+import { Project, ProjectSummary, CommandState } from 'src/components/models';
 import { CopyCommandOptions } from 'src/components/projects/models';
 import { Perms } from 'src/utils/authz';
 
@@ -14,12 +14,14 @@ export const useProjectsStore = defineStore('projects', () => {
   const projects = ref([] as Project[]);
   const project = ref({} as Project);
   const summary = ref({} as ProjectSummary);
+  const commandStates = ref([] as CommandState[]);
   const perms = ref({} as ProjectPerms);
 
   function reset() {
     projects.value = [];
     project.value = {} as Project;
     summary.value = {} as ProjectSummary;
+    commandStates.value = [];
     perms.value = {} as ProjectPerms;
   }
 
@@ -84,14 +86,29 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function loadCommandStates() {
+    commandStates.value = [];
+    return api.get(`/project/${project.value.name}/commands`).then((response) => {
+      commandStates.value = response.data;
+      return response;
+    });
+  }
+
+  async function clearCommandStates() {
+    return api.delete(`/project/${project.value.name}/commands`, { params: { state: 'completed' }});
+  }
+
   return {
     projects,
     project,
     summary,
+    commandStates,
     perms,
     initProjects,
     initProject,
     loadSummary,
+    loadCommandStates,
+    clearCommandStates,
     copyCommand,
     reset,
   };

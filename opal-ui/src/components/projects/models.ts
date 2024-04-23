@@ -6,3 +6,4 @@ export interface CopyCommandOptions {
   copyNullValues: boolean;
   noVariables: boolean;
 }
+

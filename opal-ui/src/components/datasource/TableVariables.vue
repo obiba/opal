@@ -16,8 +16,7 @@
           <q-list> </q-list>
         </q-btn-dropdown>
         <q-btn
-          color="grey-6"
-          text-color="white"
+          color="secondary"
           icon="refresh"
           :label="$t('refresh')"
           size="sm"

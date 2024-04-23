@@ -1,13 +1,13 @@
 export function projectStatusColor(status: string) {
   switch (status) {
     case 'READY':
-      return 'green';
+      return 'positive';
     case 'ERRORS':
-      return 'red';
+      return 'negative';
     case 'LOADING':
-      return 'grey';
+      return 'secondary';
     case 'BUSY':
-      return 'orange';
+      return 'warning';
     case 'NONE':
       return 'black';
     default:
@@ -18,13 +18,32 @@ export function projectStatusColor(status: string) {
 export function tableStatusColor(status: string) {
   switch (status) {
     case 'READY':
-      return 'green';
+      return 'positive';
     case 'ERROR':
-      return 'red';
+      return 'negative';
     case 'LOADING':
-      return 'grey';
+      return 'secondary';
     case 'CLOSED':
       return 'black';
+    default:
+      return 'white';
+  }
+}
+
+export function commandStatusColor(status: string) {
+  switch (status) {
+    case 'NOT_STARTED':
+      return 'black';
+    case 'IN_PROGRESS':
+      return 'primary';
+    case 'SUCCEEDED':
+      return 'positive';
+    case 'FAILED':
+      return 'negative';
+    case 'CANCEL_PENDING':
+      return 'secondary';
+    case 'CANCELED':
+      return 'warning';
     default:
       return 'white';
   }

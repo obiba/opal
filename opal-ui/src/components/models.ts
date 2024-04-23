@@ -7,6 +7,32 @@ export interface SubjectProfile {
   otpEnabled: boolean;
 }
 
+export interface Message {
+  msg: string;
+  timestamp: number;
+}
+
+export interface Progress {
+  message: string;
+  current: number;
+  end: number;
+  percent: number;
+}
+
+export interface CommandState {
+  id: number;
+  command: string;
+  commandArgs: string;
+  owner: string;
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED' | 'CANCEL_PENDING' | 'CANCELED';
+  startTime: string | undefined;
+  endTime: string | undefined;
+  project: string | undefined;
+  name: string;
+  progress: Progress | undefined;
+  messages: Message[];
+}
+
 export interface File {
   name: string;
   path: string;

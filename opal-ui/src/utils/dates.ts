@@ -5,7 +5,6 @@ const { cookies } = useCookies();
 
 
 export function getDateLabel(date: string | number | undefined) {
-  //console.log(Lang.getLocale());
   const locale = cookies.get('locale');
   if (typeof date === 'string') {
     return parseISO(date).toLocaleString(locale);
