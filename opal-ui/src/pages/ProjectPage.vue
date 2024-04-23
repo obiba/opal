@@ -9,6 +9,7 @@
       <q-icon
         name="circle"
         :color="projectStatusColor(projectsStore.summary?.datasourceStatus)"
+        :title="projectsStore.summary?.datasourceStatus"
         size="sm"
         class="on-right"
       />
@@ -17,6 +18,7 @@
       <div class="text-h5 q-mb-md">
         <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ name }}</span>
+        <q-badge v-for="tag in tags" :key="tag" class="on-right">{{ tag }}</q-badge>
       </div>
       <div class="row">
         <div class="col-md-auto col-sm-auto col-xs-12">
@@ -80,6 +82,7 @@ const route = useRoute();
 const projectsStore = useProjectsStore();
 
 const name = computed(() => route.params.id as string);
+const tags = computed(() => projectsStore.project.tags ? projectsStore.project.tags : []);
 
 onMounted(() => {
   projectsStore.initProject(name.value).then(() => {

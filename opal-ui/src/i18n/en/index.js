@@ -19,6 +19,7 @@ export default {
   add: 'Add',
   advanced_options: 'Advanced options',
   administration: 'Administration',
+  all_projects: 'All',
   attributes: 'Attributes',
   cancel: 'Cancel',
   categories: 'Categories',

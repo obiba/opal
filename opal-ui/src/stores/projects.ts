@@ -14,6 +14,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function initProjects() {
+    projects.value = [];
     return api
       .get('/projects', { params: { digest: true } })
       .then((response) => {
@@ -32,6 +33,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function loadProject(name: string) {
+    project.value = {} as Project;
     return api.get(`/project/${name}`).then((response) => {
       project.value = response.data;
       return response;
@@ -39,6 +41,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function loadSummary() {
+    summary.value = {} as ProjectSummary;
     return api
       .get(`/project/${project.value.name}/summary`)
       .then((response) => {
