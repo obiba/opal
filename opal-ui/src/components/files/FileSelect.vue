@@ -20,21 +20,6 @@
                 :class="crumb.to !== props.folder.path ? 'cursor-pointer' : ''"
                 @click="onFolderSelection(crumb.to)"
               />
-              <q-btn-dropdown flat rounded icon="add" size="sm">
-                <q-list>
-                  <q-item clickable v-close-popup @click="onShowAddFolder">
-                    <q-item-section>
-                      <q-item-label>{{  $t('add_folder') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click="onShowUpload">
-                    <q-item-section>
-                      <q-item-label>{{  $t('upload') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-              <q-badge class="bg-warning text-black">{{ extensions ? extensions.join(', ') : '' }}</q-badge>
             </q-breadcrumbs>
 
         </q-card-section>
@@ -105,16 +90,37 @@
 
         <q-separator />
 
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('select')"
-            color="primary"
-            :disable="selected.length === 0"
-            @click="onSubmitSelection"
-            v-close-popup
-          />
+        <q-card-actions class="bg-grey-3">
+          <div>
+            <q-btn-dropdown outline icon="add" :label="$t('add')" size="sm">
+                <q-list>
+                  <q-item clickable v-close-popup @click="onShowAddFolder">
+                    <q-item-section>
+                      <q-item-label>{{  $t('add_folder') }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="onShowUpload">
+                    <q-item-section>
+                      <q-item-label>{{  $t('upload') }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+              <q-badge class="bg-warning text-black on-right">{{ extensions ? extensions.join(', ') : '' }}</q-badge>
+          </div>
+          <q-space />
+          <div>
+            <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+            <q-btn
+              flat
+              :label="$t('select')"
+              color="primary"
+              :disable="selected.length === 0"
+              @click="onSubmitSelection"
+              v-close-popup
+            />
+          </div>
+
         </q-card-actions>
       </q-card>
     </q-dialog>
