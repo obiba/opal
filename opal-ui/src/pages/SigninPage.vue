@@ -154,7 +154,7 @@
 
 <script setup lang="ts">
 import { useCookies } from 'vue3-cookies';
-import { locales } from '../boot/i18n';
+import { locales } from 'src/boot/i18n';
 
 const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();

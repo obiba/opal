@@ -10,20 +10,23 @@ const defaultLocales = ['en', 'fr'];
 
 const locales = defaultLocales;
 
-let detectedLocale = cookies.get('locale')
-  ? cookies.get('locale') // previously selected
-  : Quasar.lang.getLocale(); // browser
-if (!detectedLocale) {
-  detectedLocale = locales[0];
-} else if (!locales.includes(detectedLocale)) {
-  detectedLocale = detectedLocale.split('-')[0];
-  if (!locales.includes(detectedLocale)) {
+function getCurrentLocale() {
+  let detectedLocale = cookies.get('locale')
+    ? cookies.get('locale') // previously selected
+    : Quasar.lang.getLocale(); // browser
+  if (!detectedLocale) {
     detectedLocale = locales[0];
+  } else if (!locales.includes(detectedLocale)) {
+    detectedLocale = detectedLocale.split('-')[0];
+    if (!locales.includes(detectedLocale)) {
+      detectedLocale = locales[0];
+    }
   }
+  return detectedLocale;
 }
 
 const i18n = createI18n({
-  locale: detectedLocale,
+  locale: getCurrentLocale(),
   fallbackLocale: locales[0],
   globalInjection: true,
   legacy: false,
@@ -36,4 +39,4 @@ export default boot(({ app }) => {
   app.use(i18n);
 });
 
-export { i18n, t, locales };
+export { i18n, t, locales, getCurrentLocale };
