@@ -13,58 +13,60 @@
       v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
-          class="on-left q-mb-sm">
-          <q-list>
-            <q-item clickable v-close-popup @click="onShowAddTable">
-              <q-item-section>
-                <q-item-label>{{ $t('add_table') }}</q-item-label>
-              </q-item-section>
-            </q-item>
+        <div class="row q-gutter-sm">
+          <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
+           >
+            <q-list>
+              <q-item clickable v-close-popup @click="onShowAddTable">
+                <q-item-section>
+                  <q-item-label>{{ $t('add_table') }}</q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item clickable v-close-popup @click="onShowAddTables">
-              <q-item-section>
-                <q-item-label>{{ $t('add_tables') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="onAddView">
-              <q-item-section>
-                <q-item-label>{{ $t('add_a_view') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="onRestoreViews">
-              <q-item-section>
-                <q-item-label>{{ $t('restore_views') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-btn
-          color="secondary"
-          icon="refresh"
-          :label="$t('refresh')"
-          size="sm"
-          @click="init"
-          class="q-mb-sm"
-        />
-        <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')" class="on-right q-mb-sm">
-          <q-list>
-            <q-item clickable v-close-popup @click="onDownloadDictionary">
-              <q-item-section>
-                <q-item-label>{{ $t('download_dictionaries') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item v-if="hasViews" clickable v-close-popup @click="onDownloadViews">
-              <q-item-section>
-                <q-item-label>{{ $t('download_views_backup') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-btn v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" :label="$t('import')" size="sm" @click="onShowImport" class="on-right q-mb-sm"></q-btn>
-        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport" class="on-right q-mb-sm"></q-btn>
-        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right q-mb-sm"></q-btn>
-        <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables" class="on-right q-mb-sm"></q-btn>
+              <q-item clickable v-close-popup @click="onShowAddTables">
+                <q-item-section>
+                  <q-item-label>{{ $t('add_tables') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="onAddView">
+                <q-item-section>
+                  <q-item-label>{{ $t('add_a_view') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="onRestoreViews">
+                <q-item-section>
+                  <q-item-label>{{ $t('restore_views') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <q-btn
+            color="secondary"
+            icon="refresh"
+            :label="$t('refresh')"
+            size="sm"
+            @click="init"
+
+          />
+          <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')">
+            <q-list>
+              <q-item clickable v-close-popup @click="onDownloadDictionary">
+                <q-item-section>
+                  <q-item-label>{{ $t('download_dictionaries') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="hasViews" clickable v-close-popup @click="onDownloadViews">
+                <q-item-section>
+                  <q-item-label>{{ $t('download_views_backup') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <q-btn v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" :label="$t('import')" size="sm" @click="onShowImport"></q-btn>
+          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport"></q-btn>
+          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
+          <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables"></q-btn>
+        </div>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -89,7 +91,7 @@
 
     <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
 
-    <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="removableTables.length === 1 ? $t('delete_table_confirm') : $t('delete_tables_confirm')" @confirm="onDeleteTables" />
+    <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })" @confirm="onDeleteTables" />
   </div>
 </template>
 

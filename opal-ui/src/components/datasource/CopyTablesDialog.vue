@@ -138,9 +138,7 @@ function onCopyTables() {
     copyNullValues: nulls.value,
     noVariables: false,
   };
-  console.log(options);
   projectsStore.copyCommand(projectsStore.project.name, options).then((response) => {
-    console.log(response);
     notifySuccess(t('copy_tables_task_created', { id: response.data.id }));
   }).catch((err) => {
     console.error(err);

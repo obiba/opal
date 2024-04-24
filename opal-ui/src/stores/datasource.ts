@@ -207,6 +207,17 @@ export const useDatasourceStore = defineStore('datasource', () => {
       })
   }
 
+  async function deleteVariables(variables: string[] | undefined) {
+    const type = table.value.viewType ? 'view' : 'table';
+    return api.delete(
+      `/datasource/${datasource.value.name}/${type}/${table.value.name}/variables`, {
+        params: { variable: variables },
+        paramsSerializer: {
+          indexes: null, // no brackets at all
+        },
+      })
+  }
+
   function downloadTablesDictionary(tables: string[] | undefined) {
     let uri = `${baseUrl}/datasource/${datasource.value.name}/tables/excel`;
     if (tables && tables.length > 0) {
@@ -252,6 +263,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     addTable,
     deleteTable,
     deleteTables,
+    deleteVariables,
     downloadTablesDictionary,
     downloadTableDictionary,
     downloadViews,

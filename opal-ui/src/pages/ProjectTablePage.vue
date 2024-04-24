@@ -89,7 +89,7 @@
       </q-tab-panels>
 
       <copy-tables-dialog v-model="showCopy" :tables="[datasourceStore.table]"/>
-      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_table_confirm')" @confirm="onDeleteTable" />
+      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
     </q-page>
   </div>
 </template>

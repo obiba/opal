@@ -9,20 +9,23 @@
       :pagination="initialPagination"
       :loading="loading"
       @row-click="onRowClick"
+      selection="multiple"
+      v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="datasourceStore.perms.variables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
-          class="on-left q-mb-sm">
-          <q-list> </q-list>
-        </q-btn-dropdown>
-        <q-btn
-          color="secondary"
-          icon="refresh"
-          :label="$t('refresh')"
-          size="sm"
-          @click="init"
-          class="q-mb-sm"
-        />
+        <div class="row q-gutter-sm">
+          <q-btn-dropdown v-if="datasourceStore.perms.variables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm">
+            <q-list> </q-list>
+          </q-btn-dropdown>
+          <q-btn
+            color="secondary"
+            icon="refresh"
+            :label="$t('refresh')"
+            size="sm"
+            @click="init"
+          />
+          <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="red" icon="delete" size="sm" @click="onShowDeleteVariables"></q-btn>
+        </div>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -53,6 +56,8 @@
         </q-td>
       </template>
     </q-table>
+
+    <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
 </template>
 
@@ -63,7 +68,8 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Category } from '../models';
+import { Category, Variable } from '../models';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
@@ -78,6 +84,8 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
+const selected = ref([] as Variable[]);
+const showDeleteVariables = ref(false);
 
 const columns = [
   {
@@ -144,5 +152,19 @@ function onRowClick(evt: unknown, row: { name: string }) {
   router.push(
     `/project/${dsName.value}/table/${tName.value}/variable/${row.name}`
   );
+}
+
+function onShowDeleteVariables() {
+  showDeleteVariables.value = true;
+}
+
+function onDeleteVariables() {
+  const names = (selected.value.length === 0 ? rows.value : selected.value).map((v) => v.name);
+  datasourceStore
+    .deleteVariables(names)
+    .then(() => {
+      selected.value = [];
+      init();
+    });
 }
 </script>
