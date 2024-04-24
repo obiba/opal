@@ -10,6 +10,13 @@
         <q-item-label>
           <span v-if="item.html" v-html="item.html(dbobject)"></span>
           <span v-else-if="item.format">{{ item.format(dbobject) }}</span>
+          <span v-else-if="item.links">
+            <div v-for="link in item.links(dbobject)" :key="link.to" class="text-caption">
+              <router-link :to="link.to">
+                {{ link.label }}
+              </router-link>
+            </div>
+          </span>
           <span v-else>
             {{
               dbobject[item.field] !== undefined
@@ -38,6 +45,11 @@ export default defineComponent({
 import { withDefaults } from 'vue';
 import { Table, Variable } from 'src/components/models';
 
+export interface FieldLink {
+  label: string;
+  to: string;
+}
+
 export interface FieldItem<T> {
   field: string;
   label?: string;
@@ -45,6 +57,7 @@ export interface FieldItem<T> {
   format?: (val: T) => string;
   html?: (val: T) => string;
   visible?: (val: T) => boolean;
+  links?: (val: T) => FieldLink[];
 }
 
 export interface FieldsListProps {

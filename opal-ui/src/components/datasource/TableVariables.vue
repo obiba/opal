@@ -123,6 +123,10 @@ onMounted(() => {
   init();
 });
 
+watch([dsName, tName], () => {
+  init();
+});
+
 function init() {
   loading.value = true;
   datasourceStore

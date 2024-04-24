@@ -129,7 +129,12 @@ const items1: FieldItem<Table>[] = [
   {
     field: 'from',
     label: 'table_references',
-    html: (val) => (val ? datasourceStore.view.from?.map((f) => `<a href="#/project/${f.split('.')[0]}/table/${f.split('.')[1]}">${f}</a>`).join(', ') : ''),
+    links: (val) => (val ? datasourceStore.view.from?.map((f) => {
+      return {
+        label: f,
+        to: `/project/${f.split('.')[0]}/table/${f.split('.')[1]}`
+      };
+    }) : []),
     visible: (val) => val.viewType !== undefined,
   },
 ];
@@ -147,13 +152,13 @@ const items2: FieldItem<Table>[] = [
   },
 ];
 
-onMounted(() => {
-  init();
-});
-
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
+
+watch([dsName, tName], () => {
+  init();
+});
 
 function init() {
   datasourceStore.initDatasourceTable(dsName.value, tName.value);

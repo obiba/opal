@@ -39,10 +39,10 @@
       >
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
-            <vue-router-link
+            <router-link
               :to="`/project/${props.value}`"
               class="text-primary"
-              >{{ props.value }}</vue-router-link
+              >{{ props.value }}</router-link
             >
           </q-td>
         </template>
