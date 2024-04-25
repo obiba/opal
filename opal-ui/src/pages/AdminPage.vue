@@ -1,0 +1,135 @@
+<template>
+  <div>
+    <q-toolbar class="bg-grey-3">
+      <q-breadcrumbs>
+        <q-breadcrumbs-el icon="home" to="/" />
+        <q-breadcrumbs-el :label="$t('administration')" />
+      </q-breadcrumbs>
+    </q-toolbar>
+    <q-page class="q-pa-md">
+      <div class="row q-col-gutter-lg q-mb-lg">
+        <div class="col-6 col-sm-6 col-xs-12">
+          <q-list separator>
+            <q-item-label header class="text-uppercase">{{ $t('data_access') }}</q-item-label>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/users">{{ $t('users_and_groups') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('users_and_groups_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/profiles">{{ $t('profiles') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('profiles_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/idproviders">{{ $t('identity_providers') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('identity_providers_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+        <div class="col-6 col-sm-6 col-xs-12">
+          <q-list separator>
+            <q-item-label header class="text-uppercase">{{ $t('data_analysis') }}</q-item-label>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/rservers">{{ $t('rservers') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('rservers_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/datashield">{{ $t('datashield') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('datashield_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/search">{{ $t('search') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('search_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </div>
+      <div class="row q-col-gutter-lg">
+        <div class="col-6 col-sm-6 col-xs-12">
+          <q-list separator>
+            <q-item-label header class="text-uppercase">{{ $t('data_management') }}</q-item-label>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/files">{{ $t('files') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('files_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/tasks">{{ $t('tasks') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('tasks_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/reports">{{ $t('reports') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('reports_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/identifiers">{{ $t('id_mappings') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('id_mappings_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+        <div class="col-6 col-sm-6 col-xs-12">
+          <q-list separator>
+            <q-item-label header class="text-uppercase">{{ $t('system') }}</q-item-label>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/settings">{{ $t('general_settings') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('general_settings_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/taxonomies">{{ $t('taxonomies') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('taxonomies_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/databases">{{ $t('databases') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('databases_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/plugins">{{ $t('plugins') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('plugins_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/apps">{{ $t('apps') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('apps_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/jvm">{{ $t('jvm') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('jvm_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </div>
+    </q-page>
+  </div>
+</template>
+
+<script setup lang="ts">
+</script>

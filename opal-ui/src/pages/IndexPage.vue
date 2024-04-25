@@ -10,6 +10,10 @@
         <div class="col-md-auto col-sm-auto col-xs-12">
           <q-card class="on-left bg-primary text-white q-mb-md o-card">
             <q-card-section>
+              <div class="text-caption">{{  $t('projects_caption') }}</div>
+            </q-card-section>
+            <q-separator/>
+            <q-card-actions>
               <div class="text-subtitle2">
                 {{ $t('projects') }}
                 <q-btn
@@ -21,12 +25,16 @@
                   to="/projects"
                 ></q-btn>
               </div>
-            </q-card-section>
+            </q-card-actions>
           </q-card>
         </div>
         <div class="col-md-auto col-sm-auto col-xs-12">
           <q-card class="on-left bg-warning text-black q-mb-md o-card">
             <q-card-section>
+              <div class="text-caption">{{ $t('files_caption') }}</div>
+            </q-card-section>
+            <q-separator/>
+            <q-card-actions>
               <div class="text-subtitle2">
                 {{ $t('files') }}
                 <q-btn
@@ -38,9 +46,12 @@
                   :to="`/files/home/${username}`"
                 ></q-btn>
               </div>
-            </q-card-section>
+            </q-card-actions>
           </q-card>
         </div>
+      </div>
+      <div>
+        <q-btn outline no-caps icon="settings" color="secondary" to="/admin">{{ $t('administration') }}</q-btn>
       </div>
     </q-page>
   </div>
