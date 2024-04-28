@@ -51,7 +51,7 @@
         </div>
       </div>
       <div>
-        <q-btn outline no-caps icon="settings" color="secondary" to="/admin">{{ $t('administration') }}</q-btn>
+        <q-btn outline no-caps icon="admin_panel_settings" color="secondary" to="/admin">{{ $t('administration') }}</q-btn>
       </div>
     </q-page>
   </div>

@@ -88,6 +88,7 @@ export default {
   namespace: 'Namespace',
   new_name: 'New name',
   occurrence_group: 'Occurrence group',
+  other_links: 'Other links',
   owner: 'Owner',
   permissions: 'Permissions',
   plugins_caption: 'Manage system plugins',

@@ -30,77 +30,75 @@
         v-model:selected="selected"
       >
         <template v-slot:top>
-          <q-btn
-            color="primary"
-            icon="add"
-            :label="$t('add_folder')"
-            :disable="!props.file.writable"
-            size="sm"
-            @click="onShowAddFolder"
-          >
-          </q-btn>
-          <q-btn
-            color="secondary"
-            icon="file_upload"
-            :label="$t('upload')"
-            :disable="!props.file.writable"
-            size="sm"
-            class="on-right"
-            @click="onShowUpload"
-          >
-          </q-btn>
-          <q-btn
-            color="secondary"
-            icon="file_download"
-            :label="$t('download')"
-            :disable="!isReadableSelected"
-            size="sm"
-            class="on-right"
-            @click="onShowDownload"
-          >
-          </q-btn>
-          <q-btn
-            color="secondary"
-            icon="unarchive"
-            :label="$t('extract')"
-            :disable="!isArchiveSelected"
-            size="sm"
-            class="on-right"
-          >
-          </q-btn>
-          <q-btn-group class="on-right">
+          <div class="row q-gutter-sm">
+            <q-btn
+              color="primary"
+              icon="add"
+              :label="$t('add_folder')"
+              :disable="!props.file.writable"
+              size="sm"
+              @click="onShowAddFolder"
+            >
+            </q-btn>
             <q-btn
               color="secondary"
+              icon="file_upload"
+              :label="$t('upload')"
+              :disable="!props.file.writable"
               size="sm"
-              icon="content_copy"
-              :disable="readables.length === 0"
-              @click="onCopy"
-            />
+              @click="onShowUpload"
+            >
+            </q-btn>
             <q-btn
               color="secondary"
+              icon="file_download"
+              :label="$t('download')"
+              :disable="!isReadableSelected"
               size="sm"
-              icon="content_cut"
+              @click="onShowDownload"
+            >
+            </q-btn>
+            <q-btn
+              color="secondary"
+              icon="unarchive"
+              :label="$t('extract')"
+              :disable="!isArchiveSelected"
+              size="sm"
+            >
+            </q-btn>
+            <q-btn-group>
+              <q-btn
+                color="secondary"
+                size="sm"
+                icon="content_copy"
+                :disable="readables.length === 0"
+                @click="onCopy"
+              />
+              <q-btn
+                color="secondary"
+                size="sm"
+                icon="content_cut"
+                :disable="writables.length === 0"
+                @click="onCut"
+              />
+              <q-btn
+                color="secondary"
+                size="sm"
+                icon="content_paste"
+                :disable="!canPaste"
+                @click="onPaste"
+              />
+            </q-btn-group>
+            <q-btn
+              outline
+              color="red"
+              icon="delete"
+              size="sm"
+              @click="onShowDelete"
               :disable="writables.length === 0"
-              @click="onCut"
-            />
-            <q-btn
-              color="secondary"
-              size="sm"
-              icon="content_paste"
-              :disable="!canPaste"
-              @click="onPaste"
-            />
-          </q-btn-group>
-          <q-btn
-            outline
-            color="red"
-            icon="delete"
-            size="sm"
-            class="on-right"
-            @click="onShowDelete"
-            :disable="writables.length === 0"
-          >
-          </q-btn>
+            >
+            </q-btn>
+          </div>
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">

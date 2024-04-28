@@ -61,28 +61,57 @@
       <div v-else-if="filesPage">
         <files-drawer />
       </div>
-      <q-list v-else>
-        <q-item-label header> Essential Links </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-        <q-item class="fixed-bottom text-caption">
-          <div>
-            {{ $t('main.powered_by') }}
-            <a
-              class="text-weight-bold"
-              href="https://www.obiba.org/pages/products/opal"
-              target="_blank"
-              >OBiBa Opal</a
-            >
-            <span class="on-right" style="font-size: smaller">{{
-              authStore.version
-            }}</span>
-          </div>
-        </q-item>
-      </q-list>
+      <div v-else>
+        <h6 class="q-mt-none q-mb-none q-pa-md">
+          &nbsp;
+        </h6>
+        <q-list>
+          <q-item to="/projects">
+            <q-item-section avatar>
+              <q-icon name="table_chart" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ $t('projects') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item to="/files">
+            <q-item-section avatar>
+              <q-icon name="folder" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ $t('files') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item to="/admin">
+            <q-item-section avatar>
+              <q-icon name="admin_panel_settings" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ $t('administration') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item-label header>{{ $t('other_links') }}</q-item-label>
+          <EssentialLink
+            v-for="link in essentialLinks"
+            :key="link.title"
+            v-bind="link"
+          />
+          <q-item class="fixed-bottom text-caption">
+            <div>
+              {{ $t('main.powered_by') }}
+              <a
+                class="text-weight-bold"
+                href="https://www.obiba.org/pages/products/opal"
+                target="_blank"
+                >OBiBa Opal</a
+              >
+              <span class="on-right" style="font-size: smaller">{{
+                authStore.version
+              }}</span>
+            </div>
+          </q-item>
+        </q-list>
+      </div>
     </q-drawer>
 
     <q-page-container>

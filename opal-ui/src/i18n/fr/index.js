@@ -88,6 +88,7 @@ export default {
   namespace: 'Espace de noms',
   new_name: 'Nouveau nom',
   occurrence_group: "Groupe d'occurrence",
+  other_links: 'Autres liens',
   owner: 'Propriétaire',
   permissions: 'Permissions',
   plugins_caption: 'Gérer les greffons du système',
