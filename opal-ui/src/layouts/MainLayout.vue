@@ -41,6 +41,16 @@
               <q-item
                 clickable
                 v-close-popup
+                to="/profile"
+                v-if="authStore.isAuthenticated"
+              >
+                <q-item-section>
+                  <q-item-label>{{ $t('my_profile') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-close-popup
                 @click="onSignout"
                 v-if="authStore.isAuthenticated"
               >
@@ -62,55 +72,7 @@
         <files-drawer />
       </div>
       <div v-else>
-        <h6 class="q-mt-none q-mb-none q-pa-md">
-          &nbsp;
-        </h6>
-        <q-list>
-          <q-item to="/projects">
-            <q-item-section avatar>
-              <q-icon name="table_chart" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('projects') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item to="/files">
-            <q-item-section avatar>
-              <q-icon name="folder" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('files') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item to="/admin">
-            <q-item-section avatar>
-              <q-icon name="admin_panel_settings" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('administration') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item-label header>{{ $t('other_links') }}</q-item-label>
-          <EssentialLink
-            v-for="link in essentialLinks"
-            :key="link.title"
-            v-bind="link"
-          />
-          <q-item class="fixed-bottom text-caption">
-            <div>
-              {{ $t('main.powered_by') }}
-              <a
-                class="text-weight-bold"
-                href="https://www.obiba.org/pages/products/opal"
-                target="_blank"
-                >OBiBa Opal</a
-              >
-              <span class="on-right" style="font-size: smaller">{{
-                authStore.version
-              }}</span>
-            </div>
-          </q-item>
-        </q-list>
+        <main-drawer />
       </div>
     </q-drawer>
 
@@ -124,9 +86,8 @@
 import { useCookies } from 'vue3-cookies';
 import { locales } from 'boot/i18n';
 import { ref } from 'vue';
-import EssentialLink, {
-  EssentialLinkProps,
-} from 'components/EssentialLink.vue';
+
+import MainDrawer from 'src/components/MainDrawer.vue';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import { computed } from 'vue';
@@ -142,20 +103,6 @@ const localeOptions = computed(() => {
   }));
 });
 
-const essentialLinks: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'opal-doc',
-    icon: 'school',
-    link: 'https://opaldoc.obiba.org',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/obiba/opal',
-    icon: 'code',
-    link: 'https://github.com/obiba/opal',
-  },
-];
 
 const leftDrawerOpen = ref(false);
 
