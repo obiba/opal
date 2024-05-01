@@ -115,6 +115,7 @@ export default {
   rservers: 'R',
   search_caption: 'Configurer les paramètres de recherche',
   search: 'Recherche',
+  select_columns: 'Sélectionner des colonnes',
   select_dictionary_file_template: 'Utilisez le modèle Excel suivant pour ajouter de nouvelles variables ou mettre à jour des variables existantes:',
   select_dictionary_file: 'Sélectionner un fichier de dictionnaire de variables au format Excel ou un fichier XML de vue pour l\'édition en lot des tables et des variables.',
   select_files_to_upload: 'Sélectionner les fichiers à téléverser',

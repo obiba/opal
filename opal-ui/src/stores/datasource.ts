@@ -66,8 +66,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
       );
     } else if (table.value?.name !== tName) {
       return loadTable(tName).then(() => loadTableVariables());
-    } else {
+    } else if (variables.value.length === 0) {
       return loadTableVariables();
+    } else {
+      return Promise.resolve();
     }
   }
 
@@ -119,7 +121,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     variables.value = [];
     delete perms.value.variables;
     return api
-      .get(`/datasource/${datasource.value.name}/table/${name}`)
+      .get(`/datasource/${datasource.value.name}/table/${name}`, { params: { counts: true } })
       .then((response) => {
         perms.value.table = new Perms(response);
         table.value = response.data;
@@ -246,6 +248,14 @@ export const useDatasourceStore = defineStore('datasource', () => {
     window.open(uri, '_self');
   }
 
+  function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
+    return api
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params: { offset, limit } })
+      .then((response) => {
+        return response.data;
+      });
+  }
+
   return {
     datasource,
     tables,
@@ -268,6 +278,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadTableDictionary,
     downloadViews,
     downloadView,
+    loadValueSets,
     reset,
   };
 });

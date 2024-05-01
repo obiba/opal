@@ -63,7 +63,6 @@
         narrow-indicator
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="summary" :label="$t('summary')" />
         <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
         <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
       </q-tabs>
@@ -75,12 +74,8 @@
           <table-variables />
         </q-tab-panel>
 
-        <q-tab-panel name="summary">
-          <div class="text-h6">{{ $t('summary') }}</div>
-        </q-tab-panel>
-
         <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-          <div class="text-h6">{{ $t('values') }}</div>
+          <table-values />
         </q-tab-panel>
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
@@ -96,6 +91,7 @@
 
 <script setup lang="ts">
 import TableVariables from 'src/components/datasource/TableVariables.vue';
+import TableValues from 'src/components/datasource/TableValues.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';

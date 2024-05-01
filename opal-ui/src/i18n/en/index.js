@@ -115,6 +115,7 @@ export default {
   rservers: 'R',
   search_caption: 'Configure search engine, schedule table indexing',
   search: 'Search',
+  select_columns: 'Select columns',
   select_dictionary_file_template: 'Use the following Excel template to add new variables or update existing ones:',
   select_dictionary_file: 'Select a dictionary of variables in Excel file format or a View XML file for batch edition of tables and variables.',
   select_files_to_upload: 'Select files to upload',

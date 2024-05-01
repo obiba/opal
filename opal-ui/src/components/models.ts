@@ -94,6 +94,8 @@ export interface Table {
   viewType: string | undefined;
   datasourceName: string;
   timestamps: Timestamps;
+  variableCount: number | undefined;
+  valueSetCount: number | undefined;
 }
 
 export interface View {
