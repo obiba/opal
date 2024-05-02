@@ -10,24 +10,18 @@
 
 package org.obiba.opal.web.magma;
 
-import java.util.Locale;
-import java.util.Set;
-
 import jakarta.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+
+import javax.validation.constraints.NotNull;
+import java.util.Locale;
+import java.util.Set;
 
 public interface ValueSetResource {
 
@@ -46,7 +40,6 @@ public interface ValueSetResource {
    * @return
    */
   @GET
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   Response getValueSet(@Context UriInfo uriInfo, @QueryParam("select") String select,
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary);
 
@@ -63,6 +56,5 @@ public interface ValueSetResource {
    */
   @GET
   @Path("/value")
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
   Response getValue(@QueryParam("pos") Integer pos);
 }

@@ -79,6 +79,10 @@ export interface ProjectSummary {
   timestamps: Timestamps;
 }
 
+//
+// Datasource
+//
+
 export interface Datasource {
   name: string;
   table: string[];
@@ -136,4 +140,23 @@ export interface Attribute {
   value: string;
   locale: string | undefined;
   namespace: string | undefined;
+}
+
+export interface Value {
+  value: string | undefined;
+  link: string | undefined; // link to the value
+  values: Value[]; // value sequence
+  length: number | undefined; // length of the value
+}
+
+export interface ValueSet {
+  identifier: string;
+  values: Value[];
+  timestamps: Timestamps;
+}
+
+export interface ValueSets {
+  variables: string[];
+  valueSets: ValueSet[];
+  entityType: string;
 }

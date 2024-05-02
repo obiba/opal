@@ -90,7 +90,7 @@
         </q-tab-panel>
 
         <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-          <div class="text-h6">{{ $t('values') }}</div>
+          <table-values :variable="datasourceStore.variable"/>
         </q-tab-panel>
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
@@ -105,6 +105,7 @@
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import VariableCategories from 'src/components/datasource/VariableCategories.vue';
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
+import TableValues from 'src/components/datasource/TableValues.vue';
 import { Variable } from 'src/components/models';
 import { getLabels } from 'src/utils/attributes';
 

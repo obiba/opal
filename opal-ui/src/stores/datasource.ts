@@ -249,8 +249,12 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
+    const params = { offset, limit };
+    if (select && select.length > 0) {
+      params.select = `name().matches(/^${select.join('$|^')}$/)`
+    }
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params: { offset, limit } })
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
       .then((response) => {
         return response.data;
       });
