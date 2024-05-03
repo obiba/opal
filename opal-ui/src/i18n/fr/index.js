@@ -1,3 +1,5 @@
+import { all } from "axios";
+
 export default {
   auth: {
     password: 'Mot de passe',
@@ -20,6 +22,7 @@ export default {
   administration: 'Administration',
   advanced_options: 'Options avancées',
   all_projects: 'Tous',
+  all_categories: 'Toutes',
   apps_caption: 'Gérer les applications externes fournissants des services',
   apps: 'Apps',
   attributes: 'Attributs',
@@ -68,7 +71,10 @@ export default {
   file_system: 'Système',
   files_caption: 'Gérer le système de fichiers, téléverser et télécharger des fichiers',
   files: 'Fichiers',
+  frequencies: 'Fréquences',
+  frequency: 'Fréquence',
   full_name: 'Nom complet',
+  full_summary: 'Sommaire complet',
   general_settings_caption: 'Gérer la configuration générale du serveur',
   general_settings: 'Paramètres généraux',
   id_mappings_caption: 'Gérer les identifiants',
@@ -86,13 +92,17 @@ export default {
   merge_variables_hint: 'Si sélectionné, les variables avec le même nom seront fusionnées (les propriétés, les catégories et les attributs seront ajoutés ou mis à jour, pas de suppression). Sinon, les variables fournies remplaceront les existantes.',
   merge_variables: 'Fusionner les variables',
   mime_type: 'Type mime',
+  missings: 'Manquantes',
   my_profile: 'Mon profil',
   name: 'Nom',
   namespace: 'Espace de noms',
   new_name: 'Nouveau nom',
+  non_missings: 'Non manquantes',
   occurrence_group: "Groupe d'occurrence",
+  other: 'Autre',
   other_links: 'Autres liens',
   owner: 'Propriétaire',
+  percentage: 'Pourcentage',
   permissions: 'Permissions',
   plugins_caption: 'Gérer les greffons du système',
   plugins: 'Greffons',

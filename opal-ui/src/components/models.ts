@@ -114,7 +114,6 @@ export interface ViewVariables {
   variables: Variable[];
 }
 
-
 export interface Variable {
   name: string;
   entityType: string;
@@ -127,6 +126,7 @@ export interface Variable {
   referencedEntityType: string | undefined;
   attributes: Attribute[] | undefined;
   categories: Category[] | undefined;
+  parentLink: { link: string, rel: string } | undefined;
 }
 
 export interface Category {
@@ -159,4 +159,18 @@ export interface ValueSets {
   variables: string[];
   valueSets: ValueSet[];
   entityType: string;
+}
+
+export interface Frequency {
+  value: string;
+  freq: number;
+  pct: number;
+  missing: boolean;
+}
+
+export interface CategoricalSummary {
+  mode: string;
+  n: number;
+  frequencies: Frequency[];
+  otherFrequency: number;
 }

@@ -86,7 +86,7 @@
           </q-tab-panel>
 
         <q-tab-panel name="summary">
-          <div class="text-h6">{{ $t('summary') }}</div>
+          <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount"/>
         </q-tab-panel>
 
         <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
@@ -105,6 +105,7 @@
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import VariableCategories from 'src/components/datasource/VariableCategories.vue';
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
+import VariableSummary from 'src/components/datasource/VariableSummary.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { Variable } from 'src/components/models';
 import { getLabels } from 'src/utils/attributes';

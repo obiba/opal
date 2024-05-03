@@ -260,6 +260,21 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  function loadVariableSummary(localVar: Variable | undefined, fullIfCached: boolean, limit: number | undefined) {
+    const link = localVar ? `${localVar.parentLink.link}/variable/${localVar.name}` : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
+    const params = { fullIfCached };
+    if (limit) {
+      params.limit = limit;
+    } else {
+      params.resetCache = true;
+    }
+    return api
+      .get(`${link}/summary`, { params })
+      .then((response) => {
+        return response.data;
+      });
+  }
+
   return {
     datasource,
     tables,
@@ -283,6 +298,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadViews,
     downloadView,
     loadValueSets,
+    loadVariableSummary,
     reset,
   };
 });
