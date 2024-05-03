@@ -32,8 +32,19 @@
       <q-toggle toggle-indeterminate v-model="nonMissingsSelection" :label="missings"
         class="on-right"/>
     </div>
-    <div v-if="hasFrequencies" class="q-mt-md">
-      <vue-plotly :data="chartData" :layout="layout" :config="config"/>
+    <div class="row q-col-gutter-md">
+      <div class="col-md-6 col-xs-12">
+        <div v-if="hasFrequencies" class="q-mt-md">
+          <vue-plotly :data="chartData" :layout="layout" :config="config"/>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12">
+        <frequencies-table
+          :nonMissingFreq="nonMissingFreq"
+          :missingFreq="missingFreq"
+          :totalFreq="totalFreq"
+          :totalPct="totalPct" class="q-mt-md"/>
+      </div>
     </div>
   </div>
 </template>
@@ -47,6 +58,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { CategoricalSummary, Frequency } from 'src/components/models';
+import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
 
 const { t } = useI18n();
@@ -111,7 +123,7 @@ const frequencies = computed(() => {
     freqs.push({
       value: t('other'),
       freq: props.data.otherFrequency,
-      pct: (props.data.otherFrequency / props.data.n) * 100,
+      pct: props.data.otherFrequency / props.data.n,
       missing: false,
     });
   }
@@ -147,4 +159,9 @@ const chartData = computed(() => {
     },
   ];
 });
+
+const nonMissingFreq = computed(() => frequencies.value.filter((f: Frequency) => !f.missing && f.freq>0));
+const missingFreq = computed(() => frequencies.value.filter((f: Frequency) => f.missing));
+const totalFreq = computed(() => frequencies.value.reduce((acc, f: Frequency) => acc + f.freq, 0));
+const totalPct = computed(() => frequencies.value.reduce((acc, f: Frequency) => acc + f.pct, 0));
 </script>

@@ -35,24 +35,17 @@
   </div>
   <q-separator class="q-mt-md q-mb-md" />
   <div v-if="summary['Math.CategoricalSummaryDto.categorical']">
-    <div class="row">
-      <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md"/>
-    </div>
+    <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md"/>
   </div>
-  <div v-if="summary['Math.TextSummaryDto.textSummary']">
-    <div class="row">
-      <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md"/>
-    </div>
+  <div v-else-if="summary['Math.TextSummaryDto.textSummary']">
+    <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md"/>
   </div>
-  <div v-if="summary['Math.ContinuousSummaryDto.continuous']">
-    <div>
-      <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md"/>
-    </div>
+  <div v-else-if="summary['Math.ContinuousSummaryDto.continuous']">
+    <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md"/>
   </div>
   <div v-else>
     <pre>{{ summary }}</pre>
   </div>
-  <pre>{{ summary }}</pre>
 </template>
 
 <script lang="ts">
@@ -85,7 +78,7 @@ onMounted(() => {
 
 function init() {
   datasourceStore
-    .loadVariableSummary(props.variable, false, limit.value > props.total ? props.total : limit.value)
+    .loadVariableSummary(props.variable, true, limit.value > props.total ? props.total : limit.value)
     .then((data) => {
       summary.value = data;
     });

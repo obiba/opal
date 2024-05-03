@@ -185,7 +185,6 @@ function onRequest(props) {
     } else {
       rows.value = [];
     }
-    console.log(rows.value);
     // don't forget to update local pagination object
     pagination.value.page = page
     pagination.value.rowsPerPage = rowsPerPage
