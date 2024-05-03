@@ -47,15 +47,15 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { CategoricalSummary, Frequency } from 'src/components/models';
-import VuePlotly from './VuePlotly.vue';
+import VuePlotly from 'src/components/charts/VuePlotly.vue';
 
 const { t } = useI18n();
 
-interface FrequenciesChartProps {
+interface CategoricalSummaryChartProps {
   data: CategoricalSummary;
 }
 
-const props = defineProps<FrequenciesChartProps>();
+const props = defineProps<CategoricalSummaryChartProps>();
 
 const chartType = ref('pie');
 const valueType = ref('freq');
@@ -64,23 +64,33 @@ const nonMissingsSelection = ref<boolean>(null);
 const missings = computed(() => nonMissingsSelection.value === null ? t('all_categories') : nonMissingsSelection.value ? t('non_missings') : t('missings'));
 
 const layout = computed(() => {
-  return {
+  if (!props.data) return {};
+  if (isBar.value) return {
     //title: 'Frequencies',
     xaxis: {
       title: isFreq.value ? t('frequency') : t('percentage') + ' (%)',
     },
     yaxis: {
       title: t('categories'),
-      tickvals: props.data.frequencies.map((f: Frequency) => f.value),
-      ticktext: props.data.frequencies.map((f: Frequency) => f.value),
+      type: 'category',
     },
     margin: {
-    l: 80, // left margin
-    r: 80, // right margin
-    t: 80, // top margin
-    b: 50, // bottom margin
-    pad: 4 // padding around the plot area
+      l: 80, // left margin
+      r: 80, // right margin
+      t: 50, // top margin
+      b: 50, // bottom margin
+      pad: 4 // padding around the plot area
+    }
   }
+  return {
+    //title: 'Frequencies',
+    margin: {
+      l: 80, // left margin
+      r: 80, // right margin
+      t: 80, // top margin
+      b: 50, // bottom margin
+      pad: 4 // padding around the plot area
+    }
   }
 });
 
@@ -94,10 +104,20 @@ const isBar = computed(() => chartType.value === 'bar');
 
 const frequencies = computed(() => {
   if (!props.data) return [];
-  return props.data.frequencies
+  const freqs = props.data.frequencies
     .filter((f: Frequency) => nonMissingsSelection.value === null || (!nonMissingsSelection.value && f.missing) || (nonMissingsSelection.value && !f.missing));
-});
 
+  if (props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
+    freqs.push({
+      value: t('other'),
+      freq: props.data.otherFrequency,
+      pct: (props.data.otherFrequency / props.data.n) * 100,
+      missing: false,
+    });
+  }
+
+  return freqs;
+});
 
 const hasFrequencies = computed(() => frequencies.value.filter((f: Frequency) => f.freq>0).length > 0);
 
@@ -105,11 +125,6 @@ const chartData = computed(() => {
   if (!props.data) return [];
   const labels = frequencies.value.map((f: Frequency) => f.value);
   const values = frequencies.value.map((f: Frequency) => isFreq.value ? f.freq : f.pct * 100);
-
-  if (props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
-    labels.push(t('other'));
-    values.push(isFreq.value ? props.data.otherFrequency : ((props.data.otherFrequency / props.data.n) * 100));
-  }
 
   if (isBar.value) {
     return [

@@ -43,7 +43,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { withDefaults } from 'vue';
-import { Table, Variable } from 'src/components/models';
+import { Table, Variable, SummaryStatistics } from 'src/components/models';
 
 export interface FieldLink {
   label: string;
@@ -61,8 +61,8 @@ export interface FieldItem<T> {
 }
 
 export interface FieldsListProps {
-  dbobject: Table | Variable;
-  items: FieldItem<Table | Variable>[];
+  dbobject: Table | Variable | SummaryStatistics;
+  items: FieldItem<Table | Variable | SummaryStatistics>[];
 }
 
 const props = withDefaults(defineProps<FieldsListProps>(), {

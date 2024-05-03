@@ -1,3 +1,5 @@
+import { LanguageVariant } from "typescript";
+
 export interface SubjectProfile {
   principal: string;
   realm: string;
@@ -168,9 +170,39 @@ export interface Frequency {
   missing: boolean;
 }
 
+export interface IntervalFrequency {
+  lower: number;
+  upper: number;
+  freq: number;
+  density: number;
+}
+
+export interface SummaryStatistics {
+  min: number;
+  max: number;
+  mean: number;
+  geometricMean: number;
+  n: number;
+  sum: number;
+  sumsq: number;
+  stdDev: number;
+  variance: number;
+  percentiles: number[];
+  skewness: number;
+  kurtosis: number;
+  median: number;
+}
+
 export interface CategoricalSummary {
   mode: string;
   n: number;
   frequencies: Frequency[];
   otherFrequency: number;
+}
+
+export interface ContinuousSummary {
+  summary: SummaryStatistics;
+  distributionPercentiles: number[];
+  intervalFrequency: IntervalFrequency[];
+  frequencies: Frequency[];
 }

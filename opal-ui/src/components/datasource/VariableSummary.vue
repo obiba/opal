@@ -44,9 +44,15 @@
       <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md"/>
     </div>
   </div>
+  <div v-if="summary['Math.ContinuousSummaryDto.continuous']">
+    <div>
+      <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md"/>
+    </div>
+  </div>
   <div v-else>
     <pre>{{ summary }}</pre>
   </div>
+  <pre>{{ summary }}</pre>
 </template>
 
 <script lang="ts">
@@ -58,6 +64,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { Variable } from 'src/components/models';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
+import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
 const datasourceStore = useDatasourceStore();
 
 interface VariableSummaryProps {
@@ -67,7 +74,7 @@ interface VariableSummaryProps {
 
 const props = defineProps<VariableSummaryProps>();
 
-const STEP_COUNT = 100;
+const STEP_COUNT = 1000;
 
 const summary = ref({});
 const limit = ref(STEP_COUNT);

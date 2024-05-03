@@ -1,5 +1,3 @@
-import { all } from "axios";
-
 export default {
   auth: {
     password: 'Mot de passe',
@@ -52,6 +50,7 @@ export default {
   delete_tables_confirm: 'Aucune table à supprimer | Êtes-vous sûr de vouloir supprimer cette table ? | Êtes-vous sûr de vouloir supprimer ces {count} tables ?',
   delete_variables_confirm: 'Aucune variable à supprimer | Êtes-vous sûr de vouloir supprimer cette variable ? | Êtes-vous sûr de vouloir supprimer ces {count} variables ?',
   delete: 'Supprimer',
+  density: 'Densité',
   dictionary: 'Dictionnaire',
   docs: 'Docs',
   documentation_cookbook: 'Documentation et recettes',
@@ -77,12 +76,14 @@ export default {
   full_summary: 'Sommaire complet',
   general_settings_caption: 'Gérer la configuration générale du serveur',
   general_settings: 'Paramètres généraux',
+  histogram: 'Histogramme',
   id_mappings_caption: 'Gérer les identifiants',
   id_mappings: 'Identifiants',
   id: 'ID',
   identity_providers_caption: 'Gérer les fournisseurs d\'identité OpenID Connect',
   identity_providers: 'Fournisseurs d\'identité',
   index: 'Index',
+  intervals: 'Intervalles',
   is_missing: 'Manquante',
   jvm_caption: 'Monitorer la machine virtuelle Java',
   jvm: 'Machine virtuelle Java',
@@ -156,4 +157,15 @@ export default {
   value: 'Valeur',
   values: 'Valeurs',
   variables: 'Variables',
+  descriptive_statistics: 'Statistiques descriptives',
+  mean: 'Moyenne',
+  median: 'Médiane',
+  std_dev: 'Écart type',
+  min: 'Min',
+  max: 'Max',
+  sum: 'Somme',
+  sumsq: 'Somme des carrés',
+  variance: 'Variance',
+  skewness: 'Skewness',
+  kurtosis: 'Kurtosis',
 };
