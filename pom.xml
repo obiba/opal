@@ -109,7 +109,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
-    <spring.version>6.0.18</spring.version>
+    <spring.version>6.0.19</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
