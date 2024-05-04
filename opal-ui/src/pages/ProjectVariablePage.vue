@@ -47,6 +47,7 @@
         narrow-indicator
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
+        <q-tab name="script" :label="$t('script')" v-if="datasourceStore.table.viewType"/>
         <q-tab name="summary" :label="$t('summary')" />
         <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
         <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.variablePermissions?.canRead()"/>
@@ -83,7 +84,11 @@
               <variable-attribues />
             </div>
           </div>
-          </q-tab-panel>
+        </q-tab-panel>
+
+        <q-tab-panel name="script" v-if="datasourceStore.table.viewType">
+          <variable-script :variable="datasourceStore.variable" />
+        </q-tab-panel>
 
         <q-tab-panel name="summary">
           <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount"/>
@@ -106,6 +111,7 @@ import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import VariableCategories from 'src/components/datasource/VariableCategories.vue';
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
+import VariableScript from 'src/components/datasource/VariableScript.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { Variable } from 'src/components/models';
 import { getLabels } from 'src/utils/attributes';

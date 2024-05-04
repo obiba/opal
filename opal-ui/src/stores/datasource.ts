@@ -275,6 +275,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  function saveDerivedVariable(localVar: Variable, comment: string | undefined) {
+    const link = `/datasource/${datasource.value.name}/view/${table.value.name}`;
+    return api.put(`${link}/variable/${variable.value.name}`, localVar, { params: { comment } }).then(() => {
+      return Promise.all([
+        loadTableVariable(localVar.name),
+        loadTableVariables(),
+      ]);
+    });
+  }
+
   return {
     datasource,
     tables,
@@ -299,6 +309,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadView,
     loadValueSets,
     loadVariableSummary,
+    saveDerivedVariable,
     reset,
   };
 });

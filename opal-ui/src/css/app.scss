@@ -51,3 +51,16 @@ code {
     z-index: 1;
   }
 }
+
+.ace_editor {
+  font-size: 16px;
+}
+
+.ace_gutter {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ace_scroller {
+  padding: 10px;
+}
