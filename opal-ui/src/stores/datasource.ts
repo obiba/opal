@@ -217,7 +217,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         paramsSerializer: {
           indexes: null, // no brackets at all
         },
-      })
+      }).then(() => loadTableVariables());
   }
 
   function downloadTablesDictionary(tables: string[] | undefined) {
