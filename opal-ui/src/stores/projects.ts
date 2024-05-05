@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { Project, ProjectSummary, CommandState } from 'src/components/models';
-import { CopyCommandOptions } from 'src/components/projects/models';
+import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
+import { CommandStateDto, ImportCommandOptionsDto } from 'src/models/Commands';
+import { CopyCommandOptionsDto } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
 interface ProjectPerms {
@@ -11,16 +12,16 @@ interface ProjectPerms {
 }
 
 export const useProjectsStore = defineStore('projects', () => {
-  const projects = ref([] as Project[]);
-  const project = ref({} as Project);
-  const summary = ref({} as ProjectSummary);
-  const commandStates = ref([] as CommandState[]);
+  const projects = ref([] as ProjectDto[]);
+  const project = ref({} as ProjectDto);
+  const summary = ref({} as ProjectSummaryDto);
+  const commandStates = ref([] as CommandStateDto[]);
   const perms = ref({} as ProjectPerms);
 
   function reset() {
     projects.value = [];
-    project.value = {} as Project;
-    summary.value = {} as ProjectSummary;
+    project.value = {} as ProjectDto;
+    summary.value = {} as ProjectSummaryDto;
     commandStates.value = [];
     perms.value = {} as ProjectPerms;
   }
@@ -41,7 +42,7 @@ export const useProjectsStore = defineStore('projects', () => {
     return api
       .get('/projects', { params: { digest: true } })
       .then((response) => {
-        projects.value = response.data.sort((a: Project, b: Project) =>
+        projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) =>
           a.name.localeCompare(b.name)
         );
         return response;
@@ -49,7 +50,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function loadProject(name: string) {
-    project.value = {} as Project;
+    project.value = {} as ProjectDto;
     perms.value = {} as ProjectPerms;
     return api.get(`/project/${name}`).then((response) => {
       project.value = response.data;
@@ -71,7 +72,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function loadSummary() {
-    summary.value = {} as ProjectSummary;
+    summary.value = {} as ProjectSummaryDto;
     return api
       .get(`/project/${project.value.name}/summary`)
       .then((response) => {
@@ -80,8 +81,14 @@ export const useProjectsStore = defineStore('projects', () => {
       });
   }
 
-  async function copyCommand(name: string, options: CopyCommandOptions) {
+  async function copyCommand(name: string, options: CopyCommandOptionsDto) {
     return api.post(`/project/${name}/commands/_copy`, options).then((response) => {
+      return response;
+    });
+  }
+
+  async function importCommand(name: string, options: ImportCommandOptionsDto) {
+    return api.post(`/project/${name}/commands/_import`, options).then((response) => {
       return response;
     });
   }
@@ -110,6 +117,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadCommandStates,
     clearCommandStates,
     copyCommand,
+    importCommand,
     reset,
   };
 });

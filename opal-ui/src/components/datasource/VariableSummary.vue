@@ -11,27 +11,30 @@
       :max="total"
       :step="STEP_COUNT"
       debounce="500"
-      @update:model-value="init">
+      @update:model-value="init"
+      style="width: 200px;">
       <template v-slot:after>
-        <span class="on-right on-left text-body1">/ {{ total }}</span>
-        <q-btn
-          flat
-          class="bg-grey-6 text-white on-left"
-          icon="refresh"
-          :label="$t('refresh')"
-          size="sm"
-          @click="init"
-        />
-        <q-btn
-          flat
-          class="bg-primary text-white"
-          icon="analytics"
-          :label="$t('full_summary')"
-          size="sm"
-          @click="onFullSummary"
-        />
+        <span class="on-right text-body1">/ {{ total }}</span>
       </template>
     </q-input>
+    <q-btn
+      color="secondary"
+      icon="refresh"
+      :label="$t('refresh')"
+      size="sm"
+      @click="init"
+      class="q-mt-lg"
+      style="height: 2.5em;"
+    />
+    <q-btn
+      color="primary"
+      icon="analytics"
+      :label="$t('full_summary')"
+      size="sm"
+      @click="onFullSummary"
+      class="q-mt-lg"
+      style="height: 2.5em;"
+    />
   </div>
   <q-separator class="q-mt-md q-mb-md" />
   <div v-if="summary['Math.CategoricalSummaryDto.categorical']">
@@ -55,13 +58,13 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Variable } from 'src/components/models';
+import { VariableDto } from 'src/models/Magma';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
 import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
 const datasourceStore = useDatasourceStore();
 
 interface VariableSummaryProps {
-  variable: Variable;
+  variable: VariableDto;
   total: number;
 }
 

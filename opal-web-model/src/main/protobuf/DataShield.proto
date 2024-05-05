@@ -1,4 +1,4 @@
-import "Ws.proto";
+syntax = "proto2";
 
 package DataShield;
 

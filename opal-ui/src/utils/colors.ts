@@ -1,48 +1,55 @@
-export function projectStatusColor(status: string) {
-  switch (status) {
-    case 'READY':
+import { CommandStateDto_Status } from 'src/models/Commands';
+import { TableStatusDto } from 'src/models/Magma';
+import { ProjectDatasourceStatusDto } from 'src/models/Projects';
+
+export function projectStatusColor(status: string | ProjectDatasourceStatusDto) {
+  const statusEnum = typeof status === 'string' ? ProjectDatasourceStatusDto[status] : status;
+  switch (statusEnum) {
+    case ProjectDatasourceStatusDto.READY:
       return 'positive';
-    case 'ERRORS':
+    case ProjectDatasourceStatusDto.ERRORS:
       return 'negative';
-    case 'LOADING':
+    case ProjectDatasourceStatusDto.LOADING:
       return 'secondary';
-    case 'BUSY':
+    case ProjectDatasourceStatusDto.BUSY:
       return 'warning';
-    case 'NONE':
+    case ProjectDatasourceStatusDto.NONE:
       return 'black';
     default:
       return 'white';
   }
 }
 
-export function tableStatusColor(status: string) {
-  switch (status) {
-    case 'READY':
+export function tableStatusColor(status: string | TableStatusDto) {
+  const statusEnum = typeof status === 'string' ? TableStatusDto[status] : status;
+  switch (statusEnum) {
+    case TableStatusDto.READY:
       return 'positive';
-    case 'ERROR':
+    case TableStatusDto.ERROR:
       return 'negative';
-    case 'LOADING':
+    case TableStatusDto.LOADING:
       return 'secondary';
-    case 'CLOSED':
+    case TableStatusDto.CLOSED:
       return 'black';
     default:
       return 'white';
   }
 }
 
-export function commandStatusColor(status: string) {
-  switch (status) {
-    case 'NOT_STARTED':
+export function commandStatusColor(status: string | CommandStateDto_Status) {
+  const statusEnum = typeof status === 'string' ? CommandStateDto_Status[status] : status;
+  switch (statusEnum) {
+    case CommandStateDto_Status.NOT_STARTED:
       return 'black';
-    case 'IN_PROGRESS':
+    case CommandStateDto_Status.IN_PROGRESS:
       return 'primary';
-    case 'SUCCEEDED':
+    case CommandStateDto_Status.SUCCEEDED:
       return 'positive';
-    case 'FAILED':
+    case CommandStateDto_Status.FAILED:
       return 'negative';
-    case 'CANCEL_PENDING':
+    case CommandStateDto_Status.CANCEL_PENDING:
       return 'secondary';
-    case 'CANCELED':
+    case CommandStateDto_Status.CANCELED:
       return 'warning';
     default:
       return 'white';

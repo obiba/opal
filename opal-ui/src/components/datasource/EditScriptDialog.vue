@@ -73,11 +73,11 @@ export default defineComponent({
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
 import { valueTypes } from 'src/utils/magma';
-import { Variable, Attribute } from 'src/components/models';
+import { VariableDto, AttributeDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;
-  variable: Variable;
+  variable: VariableDto;
 }
 
 const props = defineProps<DialogProps>();
@@ -134,7 +134,7 @@ function makeNewVariable() {
 }
 
 function getScript() {
-  return props.variable.attributes?.find((a: Attribute) => a.name === 'script')?.value || '';
+  return props.variable.attributes?.find((a: AttributeDto) => a.name === 'script')?.value || '';
 }
 
 </script>

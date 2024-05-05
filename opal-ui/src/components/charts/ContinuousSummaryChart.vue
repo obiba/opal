@@ -49,7 +49,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { ContinuousSummary, IntervalFrequency } from 'src/components/models';
+import { ContinuousSummaryDto, IntervalFrequencyDto } from 'src/models/Math';
 import FieldsList from 'src/components/FieldsList.vue';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
@@ -57,7 +57,7 @@ import VuePlotly from 'src/components/charts/VuePlotly.vue';
 const { t } = useI18n();
 
 interface ContinuousSummaryChartProps {
-  data: ContinuousSummary;
+  data: ContinuousSummaryDto;
 }
 
 const props = defineProps<ContinuousSummaryChartProps>();
@@ -91,7 +91,7 @@ const intervalFrequencies = computed(() => {
   return freqs;
 });
 
-const hasIntervalFrequencies = computed(() => intervalFrequencies.value.filter((f: IntervalFrequency) => f.freq>0).length > 0);
+const hasIntervalFrequencies = computed(() => intervalFrequencies.value.filter((f: IntervalFrequencyDto) => f.freq>0).length > 0);
 
 const histoLayout = computed(() => {
   if (!props.data) return {};
@@ -117,8 +117,8 @@ const histoLayout = computed(() => {
 
 const histoChartData = computed(() => {
   if (!props.data) return [];
-  const labels = intervalFrequencies.value.map((f: IntervalFrequency) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`);
-  const values = intervalFrequencies.value.map((f: IntervalFrequency) => isFreq.value ? f.freq : f.density * 100);
+  const labels = intervalFrequencies.value.map((f: IntervalFrequencyDto) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`);
+  const values = intervalFrequencies.value.map((f: IntervalFrequencyDto) => isFreq.value ? f.freq : f.density * 100);
 
   return [
     {

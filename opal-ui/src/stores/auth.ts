@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SubjectProfile } from 'src/components/models';
+import { SubjectProfileDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
   const sid = ref('');
   const version = ref('');
-  const profile = ref<SubjectProfile>({} as SubjectProfile);
+  const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
 
   function reset() {
     sid.value = '';
     version.value = '';
-    profile.value = {} as SubjectProfile;
+    profile.value = {} as SubjectProfileDto;
   }
 
   const isAuthenticated = computed(() => {
@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
     return api.delete('/auth/session/_current').then((response) => {
       sid.value = '';
       version.value = '';
-      profile.value = {} as SubjectProfile;
+      profile.value = {} as SubjectProfileDto;
       return response;
     });
   }

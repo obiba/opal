@@ -75,13 +75,13 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Table } from 'src/components/models';
-import { CopyCommandOptions } from 'src/components/projects/models';
+import { TableDto } from 'src/models/Magma';
+import { CopyCommandOptionsDto } from 'src/models/Commands';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
-  tables: Table[];
+  tables: TableDto[];
 }
 
 const props = defineProps<DialogProps>();
@@ -130,7 +130,7 @@ function onHide() {
 }
 
 function onCopyTables() {
-  const options: CopyCommandOptions = {
+  const options: CopyCommandOptionsDto = {
     tables: props.tables.map((t) => `${t.datasourceName}.${t.name}`),
     destination: projectDestination.value,
     destinationTableName: newTableName.value ? newTableName.value : undefined,

@@ -57,14 +57,14 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { CategoricalSummary, Frequency } from 'src/components/models';
+import { CategoricalSummaryDto, FrequencyDto } from 'src/models/Math';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
 
 const { t } = useI18n();
 
 interface CategoricalSummaryChartProps {
-  data: CategoricalSummary;
+  data: CategoricalSummaryDto;
 }
 
 const props = defineProps<CategoricalSummaryChartProps>();
@@ -117,7 +117,7 @@ const isBar = computed(() => chartType.value === 'bar');
 const frequencies = computed(() => {
   if (!props.data) return [];
   const freqs = props.data.frequencies
-    .filter((f: Frequency) => nonMissingsSelection.value === null || (!nonMissingsSelection.value && f.missing) || (nonMissingsSelection.value && !f.missing));
+    .filter((f: FrequencyDto) => nonMissingsSelection.value === null || (!nonMissingsSelection.value && f.missing) || (nonMissingsSelection.value && !f.missing));
 
   if (props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
     freqs.push({
@@ -131,12 +131,12 @@ const frequencies = computed(() => {
   return freqs;
 });
 
-const hasFrequencies = computed(() => frequencies.value.filter((f: Frequency) => f.freq>0).length > 0);
+const hasFrequencies = computed(() => frequencies.value.filter((f: FrequencyDto) => f.freq>0).length > 0);
 
 const chartData = computed(() => {
   if (!props.data) return [];
-  const labels = frequencies.value.map((f: Frequency) => f.value);
-  const values = frequencies.value.map((f: Frequency) => isFreq.value ? f.freq : f.pct * 100);
+  const labels = frequencies.value.map((f: FrequencyDto) => f.value);
+  const values = frequencies.value.map((f: FrequencyDto) => isFreq.value ? f.freq : f.pct * 100);
 
   if (isBar.value) {
     return [
@@ -160,8 +160,8 @@ const chartData = computed(() => {
   ];
 });
 
-const nonMissingFreq = computed(() => frequencies.value.filter((f: Frequency) => !f.missing && f.freq>0));
-const missingFreq = computed(() => frequencies.value.filter((f: Frequency) => f.missing));
-const totalFreq = computed(() => frequencies.value.reduce((acc, f: Frequency) => acc + f.freq, 0));
-const totalPct = computed(() => frequencies.value.reduce((acc, f: Frequency) => acc + f.pct, 0));
+const nonMissingFreq = computed(() => frequencies.value.filter((f: FrequencyDto) => !f.missing && f.freq>0));
+const missingFreq = computed(() => frequencies.value.filter((f: FrequencyDto) => f.missing));
+const totalFreq = computed(() => frequencies.value.reduce((acc, f: FrequencyDto) => acc + f.freq, 0));
+const totalPct = computed(() => frequencies.value.reduce((acc, f: FrequencyDto) => acc + f.pct, 0));
 </script>

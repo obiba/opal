@@ -87,12 +87,12 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Variable } from 'src/components/models';
+import { VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { t } from 'src/boot/i18n';
 
 interface TableValuesProps {
-  variable: Variable | undefined;
+  variable: VariableDto | undefined;
 }
 
 const props = withDefaults(defineProps<TableValuesProps>(), {

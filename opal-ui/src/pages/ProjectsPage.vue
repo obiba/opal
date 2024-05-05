@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { Timestamps } from 'src/components/models';
+import { TimestampsDto } from 'src/models/Magma';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
 
@@ -120,7 +120,7 @@ const columns = [
     label: t('last_update'),
     align: 'left',
     field: 'timestamps',
-    format: (val: Timestamps) => getDateLabel(val.lastUpdate),
+    format: (val: TimestampsDto) => getDateLabel(val.lastUpdate),
   },
   {
     name: 'status',

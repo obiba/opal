@@ -44,11 +44,11 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { File } from 'src/components/models';
+import { FileDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
-  file: File;
+  file: FileDto;
 }
 
 const props = defineProps<DialogProps>();

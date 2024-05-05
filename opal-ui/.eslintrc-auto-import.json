@@ -81,6 +81,8 @@
     "useAuthStore": true,
     "useProjectsStore": true,
     "useDatasourceStore": true,
-    "useFilesStore": true
+    "useFilesStore": true,
+    "usePluginsStore": true,
+    "useTransientDatasourceStore": true
   }
 }

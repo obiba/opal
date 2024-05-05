@@ -1,6 +1,6 @@
-import { Attribute } from 'src/components/models';
+import { AttributeDto } from 'src/models/Magma';
 
-export function getLabels(attributes: Attribute[]) {
+export function getLabels(attributes: AttributeDto[]) {
   return attributes
     ? attributes.filter((a) => a.name === 'label' && a.namespace === undefined)
     : [];

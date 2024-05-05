@@ -68,7 +68,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Category, Variable } from '../models';
+import { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getLabels } from 'src/utils/attributes';
 
@@ -84,7 +84,7 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const selected = ref([] as Variable[]);
+const selected = ref([] as VariableDto[]);
 const showDeleteVariables = ref(false);
 
 const columns = [
@@ -144,7 +144,7 @@ function init() {
     });
 }
 
-function getCategoryNames(categories: Category[]) {
+function getCategoryNames(categories: CategoryDto[]) {
   return categories ? categories.map((c) => c.name).join(', ') : undefined;
 }
 

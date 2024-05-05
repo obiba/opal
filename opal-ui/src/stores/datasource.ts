@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { Datasource, Table, View, Variable } from 'src/components/models';
+import { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
 
 interface DatasourcePerms {
@@ -16,21 +16,21 @@ interface DatasourcePerms {
 }
 
 export const useDatasourceStore = defineStore('datasource', () => {
-  const datasource = ref({} as Datasource); // current datasource
-  const tables = ref([] as Table[]); // current datasource tables
-  const table = ref({} as Table); // current table
-  const view = ref({} as View); // current view
-  const variables = ref([] as Variable[]); // current table variables
-  const variable = ref({} as Variable); // current variable
+  const datasource = ref({} as DatasourceDto); // current datasource
+  const tables = ref([] as TableDto[]); // current datasource tables
+  const table = ref({} as TableDto); // current table
+  const view = ref({} as ViewDto); // current view
+  const variables = ref([] as VariableDto[]); // current table variables
+  const variable = ref({} as VariableDto); // current variable
   const perms = ref({} as DatasourcePerms);
 
   function reset() {
-    datasource.value = {} as Datasource;
+    datasource.value = {} as DatasourceDto;
     tables.value = [];
-    table.value = {} as Table;
-    view.value = {} as View;
+    table.value = {} as TableDto;
+    view.value = {} as ViewDto;
     variables.value = [];
-    variable.value = {} as Variable;
+    variable.value = {} as VariableDto;
     perms.value = {} as DatasourcePerms;
   }
 
@@ -89,7 +89,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   // Loaders
   async function loadDatasource(name: string) {
-    datasource.value = {} as Datasource;
+    datasource.value = {} as DatasourceDto;
     delete perms.value.datasource;
     return api.get(`/datasource/${name}`).then((response) => {
       perms.value.datasource = new Perms(response);
@@ -114,8 +114,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function loadTable(name: string) {
-    table.value = {} as Table;
-    view.value = {} as View;
+    table.value = {} as TableDto;
+    view.value = {} as ViewDto;
     delete perms.value.table;
     delete perms.value.tableValueSets;
     variables.value = [];
@@ -140,7 +140,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function loadView(name: string) {
-    view.value = {} as View;
+    view.value = {} as ViewDto;
     return api
       .get(`/datasource/${datasource.value.name}/view/${name}`)
       .then((response) => {
@@ -164,7 +164,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function loadTableVariable(name: string) {
-    variable.value = {} as Variable;
+    variable.value = {} as VariableDto;
     delete perms.value.variable;
     return api
       .get(
@@ -260,7 +260,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
-  function loadVariableSummary(localVar: Variable | undefined, fullIfCached: boolean, limit: number | undefined) {
+  function loadVariableSummary(localVar: VariableDto | undefined, fullIfCached: boolean, limit: number | undefined) {
     const link = localVar ? `${localVar.parentLink.link}/variable/${localVar.name}` : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
     const params = { fullIfCached };
     if (limit) {
@@ -275,7 +275,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
-  function saveDerivedVariable(localVar: Variable, comment: string | undefined) {
+  function saveDerivedVariable(localVar: VariableDto, comment: string | undefined) {
     const link = `/datasource/${datasource.value.name}/view/${table.value.name}`;
     return api.put(`${link}/variable/${variable.value.name}`, localVar, { params: { comment } }).then(() => {
       return Promise.all([

@@ -62,7 +62,20 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" :label="$t('import')" size="sm" @click="onShowImport"></q-btn>
+          <q-btn-dropdown v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" size="sm" :label="$t('import')">
+            <q-list>
+              <q-item clickable v-close-popup @click="onShowImportFile">
+                <q-item-section>
+                  <q-item-label>{{ $t('import_file') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="hasViews" clickable v-close-popup @click="onShowImportServer">
+                <q-item-section>
+                  <q-item-label>{{ $t('import_server') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport"></q-btn>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
           <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables"></q-btn>
@@ -89,6 +102,8 @@
 
     <add-tables-dialog v-model="showAddTables" />
 
+    <import-data-dialog v-model="showImport" :type="importType"/>
+
     <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
 
     <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })" @confirm="onDeleteTables" />
@@ -102,9 +117,10 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Table, Timestamps } from 'src/components/models';
+import { TableDto, TimestampsDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
+import ImportDataDialog from 'src/components/datasource/ImportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
@@ -118,7 +134,9 @@ const { t } = useI18n();
 
 const showAddTable = ref(false);
 const showAddTables = ref(false);
+const showImport = ref(false);
 const showCopy = ref(false);
+const importType = ref<'file' | 'server'>('file');
 
 const tableRef = ref();
 const loading = ref(false);
@@ -128,7 +146,7 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
-const selected = ref([] as Table[]);
+const selected = ref([] as TableDto[]);
 const showDeleteTables = ref(false);
 
 const columns = [
@@ -167,7 +185,7 @@ const columns = [
     label: t('last_update'),
     align: 'left',
     field: 'timestamps',
-    format: (val: Timestamps) => getDateLabel(val.lastUpdate),
+    format: (val: TimestampsDto) => getDateLabel(val.lastUpdate),
   },
   {
     name: 'status',
@@ -225,6 +243,16 @@ function onDeleteTables() {
     selected.value = [];
     init();
   });
+}
+
+function onShowImportFile() {
+  importType.value = 'file';
+  showImport.value = true;
+}
+
+function onShowImportServer() {
+  importType.value = 'server';
+  showImport.value = true;
 }
 
 function onShowCopy() {

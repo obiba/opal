@@ -113,7 +113,7 @@
         </template>
       </q-table>
     </div>
-    <div v-if="props.file.type === 'FILE'">
+    <div v-if="props.file.type === FileDto_FileType.FILE">
       <div class="q-mb-md">
         <q-btn
           outline
@@ -153,10 +153,10 @@
     <confirm-dialog
       v-model="showDelete"
       :title="$t('delete')"
-      :text="props.file.type === 'FILE' || writables.length === 1 ? $t('delete_file_confirm') : $t('delete_files_confirm')"
+      :text="props.file.type === FileDto_FileType.FILE || writables.length === 1 ? $t('delete_file_confirm') : $t('delete_files_confirm')"
       @confirm="onDelete" />
 
-    <upload-file-dialog v-model="showUpload" :file="props.file" />
+    <upload-file-dialog v-model="showUpload" :file="props.file" :extensions="[]" />
 
     <q-dialog v-model="showDownload">
       <q-card>
@@ -233,7 +233,7 @@ export default defineComponent({
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { File } from 'src/components/models';
+import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 
@@ -241,7 +241,7 @@ const { t } = useI18n();
 const filesStore = useFilesStore();
 
 interface FolderViewProps {
-  file: File;
+  file: FileDto;
 }
 
 const props = defineProps<FolderViewProps>();
@@ -254,7 +254,7 @@ const initialPagination = ref({
   rowsPerPage: 50,
 });
 
-const selected = ref<File[]>([]);
+const selected = ref<FileDto[]>([]);
 const showDownload = ref(false);
 const encryptContent = ref(false);
 const encryptPassword = ref('');
@@ -317,23 +317,25 @@ const rows = computed(() => {
       : [
           {
             name: '..',
-            type: 'FOLDER',
+            type: FileDto_FileType.FOLDER,
             path: filesStore.getParentFolder(props.file.path),
             readable: true,
+            writable: false,
+            children: [],
           },
         ];
   if (props.file.children === undefined) {
     return result;
   }
   props.file.children
-    .filter((file) => file.type === 'FOLDER')
+    .filter((file) => file.type === FileDto_FileType.FOLDER)
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
     });
 
   props.file.children
-    .filter((file) => file.type === 'FILE')
+    .filter((file) => file.type === FileDto_FileType.FILE)
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
@@ -349,7 +351,7 @@ const isReadableSelected = computed(() => {
 const isArchiveSelected = computed(() => {
   return (
     selected.value.length === 1 &&
-    selected.value[0].type === 'FILE' &&
+    selected.value[0].type === FileDto_FileType.FILE &&
     selected.value[0].name.endsWith('.zip')
   );
 });
@@ -401,12 +403,11 @@ function onGenerateDownloadPwd() {
 }
 
 function onShowDelete() {
-  console.log(showDelete.value);
   showDelete.value = true;
 }
 
 function onDelete() {
-  if (props.file.type === 'FOLDER') {
+  if (props.file.type === FileDto_FileType.FOLDER) {
     onDeleteSelections();
   } else {
     onDeleteFile();
@@ -452,7 +453,7 @@ function onFolderSelection(path: string) {
   filesStore.loadFiles(path);
 }
 
-function onRowClick(evt: unknown, row: File) {
+function onRowClick(evt: unknown, row: FileDto) {
   selected.value = [];
   if (!row.readable) {
     return;

@@ -1,3 +1,5 @@
+syntax = "proto2";
+
 package Plugins;
 
 option java_package = "org.obiba.opal.web.model";

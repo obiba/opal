@@ -9,10 +9,10 @@
 
         <q-card-section>
           <file-select
+            v-model="excelFile"
             :folder="filesStore.current"
             selection="single"
             :extensions="['.xlsx','.xls','.xml']"
-            @select="onFileSelection"
             class="q-mb-md"/>
           <div class="text-help q-mb-md">
             {{  $t('select_dictionary_file') }}
@@ -78,6 +78,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
+import { FileDto } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { baseUrl } from 'src/boot/api';
 // import { notifyError } from 'src/utils/notify';
@@ -89,7 +90,6 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
-// const datasourceStore = useDatasourceStore();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 
@@ -98,7 +98,7 @@ const username = computed(() =>
 );
 
 const showDialog = ref(props.modelValue);
-const excelFile = ref<File>();
+const excelFile = ref<FileDto>();
 const merge = ref(false);
 const locale = ref('en');
 const charSet = ref('ISO-8859-1');
@@ -124,11 +124,7 @@ function onHide() {
 }
 
 function onAddTables() {
-  console.log('Add Tables');
+  console.log('TODO: Add Tables from Excel File', excelFile.value);
 }
 
-function onFileSelection(file: File) {
-  console.log(file);
-  excelFile.value = file;
-}
 </script>

@@ -63,20 +63,20 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Frequency } from 'src/components/models';
+import { FrequencyDto } from 'src/models/Math';
 
 const { t } = useI18n();
 
 interface FrequenciesTableProps {
-  nonMissingFreq: Frequency[];
-  missingFreq: Frequency[];
+  nonMissingFreq: FrequencyDto[];
+  missingFreq: FrequencyDto[];
   totalFreq: number;
   totalPct: number;
 }
 
 const props = withDefaults(defineProps<FrequenciesTableProps>(), {
-  nonMissingFreq: [] as Frequency[],
-  missingFreq: [] as Frequency[],
+  nonMissingFreq: [] as FrequencyDto[],
+  missingFreq: [] as FrequencyDto[],
   totalFreq: 0,
   totalPct: 0,
 });

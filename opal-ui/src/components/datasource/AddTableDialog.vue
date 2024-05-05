@@ -53,7 +53,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Table } from 'src/components/models';
+import { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -66,11 +66,11 @@ const emit = defineEmits(['update:modelValue'])
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);
-const newTable = ref<Table>({ name: '', entityType: 'Participant' } as Table);
+const newTable = ref<TableDto>({ name: '', entityType: 'Participant' } as TableDto);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    newTable.value = { name: '', entityType: 'Participant' } as Table;
+    newTable.value = { name: '', entityType: 'Participant' } as TableDto;
   }
   showDialog.value = value;
 });

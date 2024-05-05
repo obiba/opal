@@ -68,10 +68,12 @@ declare global {
   const useFilesStore: typeof import('./stores/files')['useFilesStore']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useLink: typeof import('vue-router')['useLink']
+  const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
   const useProjectsStore: typeof import('./stores/projects')['useProjectsStore']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
+  const useTransientDatasourceStore: typeof import('./stores/transient-datasource')['useTransientDatasourceStore']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -150,10 +152,12 @@ declare module 'vue' {
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
+    readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
+    readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>
@@ -225,10 +229,12 @@ declare module '@vue/runtime-core' {
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
+    readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
+    readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>

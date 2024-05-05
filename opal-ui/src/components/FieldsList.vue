@@ -43,7 +43,8 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { withDefaults } from 'vue';
-import { Table, Variable, SummaryStatistics } from 'src/components/models';
+import { TableDto, VariableDto } from 'src/models/Magma';
+import { DescriptiveStatsDto } from 'src/models/Math';
 
 export interface FieldLink {
   label: string;
@@ -61,8 +62,8 @@ export interface FieldItem<T> {
 }
 
 export interface FieldsListProps {
-  dbobject: Table | Variable | SummaryStatistics;
-  items: FieldItem<Table | Variable | SummaryStatistics>[];
+  dbobject: TableDto | VariableDto | DescriptiveStatsDto;
+  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto>[];
 }
 
 const props = withDefaults(defineProps<FieldsListProps>(), {
@@ -79,4 +80,3 @@ const visibleItems = computed(() => {
   });
 });
 </script>
-./models

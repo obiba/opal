@@ -95,7 +95,7 @@ import TableValues from 'src/components/datasource/TableValues.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
-import { Table } from 'src/components/models';
+import { TableDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 
@@ -108,7 +108,7 @@ const tab = ref('dictionary');
 const showDelete = ref(false);
 const showCopy = ref(false);
 
-const items1: FieldItem<Table>[] = [
+const items1: FieldItem<TableDto>[] = [
   {
     field: 'name',
   },
@@ -135,7 +135,7 @@ const items1: FieldItem<Table>[] = [
   },
 ];
 
-const items2: FieldItem<Table>[] = [
+const items2: FieldItem<TableDto>[] = [
   {
     field: 'timestamps',
     label: 'created',

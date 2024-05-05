@@ -25,12 +25,12 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { Variable } from 'src/components/models';
+import { VariableDto } from 'src/models/Magma';
 import { VAceEditor } from 'vue3-ace-editor';
 import EditScriptDialog from 'src/components/datasource/EditScriptDialog.vue';
 
 interface VariableScriptProps {
-  variable: Variable;
+  variable: VariableDto;
 }
 
 const props = defineProps<VariableScriptProps>();
@@ -54,9 +54,7 @@ function onEditorInit(editor: any) {
   });
 }
 
-function onSave(newVariable: Variable, comment: string) {
-  console.log(newVariable);
-  console.log(comment);
+function onSave(newVariable: VariableDto, comment: string) {
   datasourceStore.saveDerivedVariable(newVariable, comment);
 }
 

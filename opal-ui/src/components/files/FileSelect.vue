@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="row">
-      <span v-if="selectedPaths" class="text-caption on-left q-pt-xs">{{ selectedPaths }}</span>
+    <div class="row q-gutter-sm">
+      <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
-    <q-dialog v-model="showDialog" @hide="onHide">
+    <q-dialog v-model="showDialog">
       <q-card style="width: 700px; max-width: 80vw;">
         <q-card-section>
           <q-breadcrumbs>
@@ -106,7 +106,7 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              <q-badge class="bg-warning text-black on-right">{{ extensions ? extensions.join(', ') : '' }}</q-badge>
+              <q-badge v-if="extensions && extensions.length>0" class="bg-warning text-black on-right">{{ extensions.join(', ') }}</q-badge>
           </div>
           <q-space />
           <div>
@@ -140,12 +140,13 @@ export default defineComponent({
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
-import { File } from 'src/components/models';
+import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 
 interface DialogProps {
-  folder: File;
+  modelValue: FileDto | FileDto[] | undefined;
+  folder: FileDto;
   selection: 'single' | 'multiple';
   extensions: string[] | undefined;
 }
@@ -159,7 +160,7 @@ const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
 
 const tableRef = ref();
-const selected = ref<File[]>([]);
+const selected = ref<FileDto[]>(props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]): []);
 const initialPagination = { descending: false, page: 1, rowsPerPage: 10 };
 const loading = ref(false);
 const showAddFolder = ref(false);
@@ -173,7 +174,9 @@ const projectName = computed(() =>
   projectsStore.project?.name ? projectsStore.project.name : ''
 );
 
-const selectedPaths = computed(() => selected.value.map((file) => file.path).join(', '));
+const selectedPaths = computed(() => {
+  return selected.value.map((file) => file.path).join(', ');
+});
 
 const showDialog = ref(false);
 
@@ -207,31 +210,37 @@ const columns = [
   },
 ];
 
+watch(() => props.modelValue, (value) => {
+  selected.value = value ? (Array.isArray(value) ? value : [value]) : [];
+});
+
 const rows = computed(() => {
-  const result =
+  const result: FileDto[] =
     props.folder.path === '/'
       ? []
       : [
           {
             name: '..',
-            type: 'FOLDER',
+            type: FileDto_FileType.FOLDER,
             path: filesStore.getParentFolder(props.folder.path),
             readable: true,
+            writable: false,
+            children: [],
           },
         ];
   if (props.folder.children === undefined) {
     return result;
   }
   props.folder.children
-    .filter((file) => file.type === 'FOLDER')
+    .filter((file) => file.type === FileDto_FileType.FOLDER)
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
     });
 
   props.folder.children
-    .filter((file) => file.type === 'FILE')
-    .filter((file) => props.extensions === undefined || props.extensions.some((ext) => file.name.endsWith(ext)))
+    .filter((file) => file.type === FileDto_FileType.FILE)
+    .filter((file) => props.extensions === undefined || props.extensions.length === 0 || props.extensions.some((ext) => file.name.endsWith(ext)))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
@@ -257,24 +266,20 @@ const crumbs = computed(() => {
   return result;
 });
 
-function onHide() {
-  emit('update:modelValue', false);
-}
-
 function onFolderSelection(path: string) {
   filesStore.loadFiles(path);
 }
 
 function onFileSelection() {
-  selected.value = selected.value.filter((file) => file.type === 'FILE' && file.readable);
+  selected.value = selected.value.filter((file) => file.type === FileDto_FileType.FILE && file.readable);
 }
 
-function onRowClick(evt: unknown, row: File) {
+function onRowClick(evt: unknown, row: FileDto) {
   selected.value = [];
   if (!row.readable) {
     return;
   }
-  if (row.type === 'FOLDER') {
+  if (row.type === FileDto_FileType.FOLDER) {
      filesStore.loadFiles(row.path);
   } else {
     selected.value = [row];
@@ -282,11 +287,12 @@ function onRowClick(evt: unknown, row: File) {
 }
 
 function onSubmitSelection() {
-  emit('select', unref(props.selection === 'multiple' ? selected.value : selected.value[0]));
+  const selection = unref(props.selection === 'multiple' ? selected.value : selected.value[0]);
+  emit('update:modelValue', selection);
+  emit('select', selection);
 }
 
 function onShowDialog() {
-  selected.value = [];
   showDialog.value = true;
 }
 

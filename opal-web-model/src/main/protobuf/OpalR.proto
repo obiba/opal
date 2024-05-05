@@ -1,3 +1,5 @@
+syntax = "proto2";
+
 import "Ws.proto";
 import "Opal.proto";
 import "Apps.proto";

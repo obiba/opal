@@ -113,7 +113,7 @@ import VariableAttribues from 'src/components/datasource/VariableAttributes.vue'
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
 import VariableScript from 'src/components/datasource/VariableScript.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
-import { Variable } from 'src/components/models';
+import { VariableDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
@@ -121,7 +121,7 @@ const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
 
-const items1: FieldItem<Variable>[] = [
+const items1: FieldItem<VariableDto>[] = [
   {
     field: 'name',
   },
@@ -145,7 +145,7 @@ const items1: FieldItem<Variable>[] = [
   },
 ];
 
-const items2: FieldItem<Variable>[] = [
+const items2: FieldItem<VariableDto>[] = [
   {
     field: 'isRepeatable',
     label: 'repeatable',

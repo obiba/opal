@@ -40,7 +40,13 @@ public class DatasourcePluginsResource {
     DatasourceUsage dsUsage = DatasourceUsage.valueOf(usage.toUpperCase());
     List<Plugins.PluginPackageDto> dsPackages = pluginsService.getInstalledPlugins().stream()
         .filter(p -> DatasourceService.SERVICE_TYPE.equals(p.getType()))
-        .filter(p -> ((DatasourceService) opalRuntime.getServicePlugin(p.getName())).getUsages().contains(dsUsage))
+        .filter(p -> {
+          try {
+            return ((DatasourceService) opalRuntime.getServicePlugin(p.getName())).getUsages().contains(dsUsage);
+          } catch (Exception e) {
+            return false;
+          }
+        })
         .map(p -> {
           Plugins.PluginPackageDto.Builder builder = Dtos.asDto(p, null).toBuilder();
           DatasourceService dsService = ((DatasourceService) opalRuntime.getServicePlugin(p.getName()));

@@ -81,12 +81,12 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { CommandState } from 'src/components/models';
+import { CommandStateDto } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 
 interface CommandStatesProps {
-  commands: CommandState[];
+  commands: CommandStateDto[];
   project: string | undefined;
 }
 
@@ -185,7 +185,7 @@ watch(() => props.commands, (value) => {
   loading.value = false;
 });
 
-function onRowClick(evt: unknown, row: CommandState) {
+function onRowClick(evt: unknown, row: CommandStateDto) {
   console.log(row);
 }
 

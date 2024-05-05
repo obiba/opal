@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { File, FileObject } from 'src/components/models';
+import { FileDto, FileDto_FileType } from 'src/models/Opal';
+import { FileObject } from 'src/components/models';
 
 export const useFilesStore = defineStore('files', () => {
-  const current = ref({} as File);
-  const copySelection = ref<File[]>([]);
-  const cutSelection = ref<File[]>([]);
+  const current = ref({} as FileDto);
+  const copySelection = ref<FileDto[]>([]);
+  const cutSelection = ref<FileDto[]>([]);
 
   function reset() {
-    current.value = {} as File;
+    current.value = {} as FileDto;
     copySelection.value = [];
     cutSelection.value = [];
   }
@@ -31,7 +32,7 @@ export const useFilesStore = defineStore('files', () => {
 
   function downloadFiles(
     path: string,
-    files: File[],
+    files: FileDto[],
     password: string | undefined
   ) {
     if (password) {
@@ -94,7 +95,7 @@ export const useFilesStore = defineStore('files', () => {
     return api.delete(`/files${path}`);
   }
 
-  function deleteFiles(files: File[]) {
+  function deleteFiles(files: FileDto[]) {
     return Promise.all(
       files.map((f) => {
         return api.delete(`/files${f.path}`);
@@ -102,12 +103,12 @@ export const useFilesStore = defineStore('files', () => {
     );
   }
 
-  function setCopySelection(files: File[]) {
+  function setCopySelection(files: FileDto[]) {
     copySelection.value = files;
     cutSelection.value = [];
   }
 
-  function setCutSelection(files: File[]) {
+  function setCutSelection(files: FileDto[]) {
     cutSelection.value = files;
     copySelection.value = [];
   }
@@ -141,11 +142,11 @@ export const useFilesStore = defineStore('files', () => {
 
   function canPasteSelection(path: string) {
     // selections not in own parent folder or in itself when is a folder
-    function canPaste(files: File[]) {
+    function canPaste(files: FileDto[]) {
       return files.every(
         (f) =>
           path !== getParentFolder(f.path) &&
-          (f.type === 'FILE' || !path.startsWith(f.path))
+          (f.type === FileDto_FileType.FILE || !path.startsWith(f.path))
       );
     }
     return (

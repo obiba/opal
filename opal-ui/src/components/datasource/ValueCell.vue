@@ -38,11 +38,11 @@ export default defineComponent({
 <script setup lang="ts">
 import { baseUrl } from 'src/boot/api';
 import { getSizeLabel } from 'src/utils/files';
-import { Value, Variable } from 'src/components/models';
+import { ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 
 interface ValueCellProps {
-  value: Value | undefined;
-  variable: Variable;
+  value: ValueSetsDto_ValueDto | undefined;
+  variable: VariableDto;
   occurrence: number | undefined;
 }
 
