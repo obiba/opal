@@ -7,6 +7,11 @@ export const usePluginsStore = defineStore('plugins', () => {
   const datasourceImportPlugins = ref([] as PluginPackage[]);
   const datasourceExportPlugins = ref([] as PluginPackage[]);
 
+  function reset() {
+    datasourceImportPlugins.value = [];
+    datasourceExportPlugins.value = [];
+  }
+
   async function initDatasourcePlugins(usage: 'import' | 'export') {
     if ((usage === 'import' && datasourceImportPlugins.value.length === 0) || (usage === 'export' && datasourceExportPlugins.value.length === 0)) {
       return loadDatasourcePlugins(usage);
@@ -33,6 +38,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   return {
     datasourceImportPlugins,
+    reset,
     initDatasourcePlugins,
   };
 

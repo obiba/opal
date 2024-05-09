@@ -83,6 +83,7 @@
     "useDatasourceStore": true,
     "useFilesStore": true,
     "usePluginsStore": true,
-    "useTransientDatasourceStore": true
+    "useTransientDatasourceStore": true,
+    "useCommandsStore": true
   }
 }

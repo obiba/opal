@@ -53,6 +53,10 @@ const routes: RouteRecordRaw[] = [
         path: '/files/:path*',
         component: () => import('pages/FilesPage.vue'),
       },
+      {
+        path: '/tasks/:path*',
+        component: () => import('pages/TasksPage.vue'),
+      },
     ],
   },
   {

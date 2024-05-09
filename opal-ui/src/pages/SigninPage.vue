@@ -160,6 +160,9 @@ const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();
 const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
+const commandsStore = useCommandsStore();
+const pluginsStore = usePluginsStore();
+const transientDatasourceStore = useTransientDatasourceStore();
 
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -181,9 +184,12 @@ const disableSubmit = computed(() => {
 
 onMounted(() => {
   authStore.reset();
+  commandsStore.reset();
   datasourceStore.reset();
   filesStore.reset();
+  pluginsStore.reset();
   projectsStore.reset();
+  transientDatasourceStore.reset();
 });
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
