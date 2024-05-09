@@ -98,7 +98,7 @@
       </template>
     </q-table>
 
-    <q-dialog v-model="showMessages" persistent>
+    <q-dialog v-model="showMessages">
       <q-card flat style="width: 500px; max-width: 80vw;">
         <q-card-section align="right" class="q-pb-none">
           <q-btn
