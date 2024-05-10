@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="showDialog" @hide="onHide">
+  <q-dialog v-model="showDialog" persistent @hide="onHide">
       <q-card>
         <q-card-section>
           <div class="text-h6">{{ props.title }}</div>
@@ -49,7 +49,7 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue', 'confirm'])
+const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
 
 const showDialog = ref(props.modelValue);
 
@@ -57,12 +57,15 @@ watch(() => props.modelValue, (value) => {
   showDialog.value = value;
 });
 
-function onCancel() {
+function onHide() {
   emit('update:modelValue', false);
 }
 
+function onCancel() {
+  emit('cancel', true);
+}
+
 function onConfirm() {
-  emit('update:modelValue', false);
   emit('confirm', true);
 }
 

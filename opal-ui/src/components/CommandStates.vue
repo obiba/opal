@@ -23,10 +23,10 @@
         <q-btn
           outline
           color="secondary"
-          icon="delete"
+          icon="cleaning_services"
           :label="$t('clear')"
           size="sm"
-          @click="onClear"
+          @click="onClear(undefined)"
           class="on-right q-mb-sm"
         />
       </template>
@@ -46,8 +46,9 @@
               :title="$t('messages')"
               :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
               @click="onShowMessages(props.row)"
-              class="on-right"></q-btn>
+              class="on-right" />
             <q-btn
+              v-if="isDeletable(props.row)"
               rounded
               dense
               flat
@@ -55,11 +56,26 @@
               color="secondary"
               :title="$t('delete')"
               :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
-              class="on-right"></q-btn>
+              class="q-ml-xs"
+              @click="onClear(props.row)" />
+            <q-btn
+              v-if="isCancelable(props.row)"
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('cancel')"
+              :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
+              class="q-ml-xs"
+              @click="onCancel(props.row)" />
           </q-td>
 
           <q-td key="project" :props="props">
-            <span class="text-caption">{{ props.row.project }}</span>
+            <router-link
+              v-if="props.row.project"
+              :to="`/project/${props.row.project}`">{{ props.row.project }}
+            </router-link>
           </q-td>
 
           <q-td key="owner" :props="props">
@@ -113,7 +129,7 @@
           <q-list separator dense>
             <q-item>
               <q-item-section>
-                <q-item-label class="text-caption text-bold">{{ $t('date') }}</q-item-label>
+                <q-item-label class="text-bold">{{ $t('date') }}</q-item-label>
               </q-item-section>
               <q-item-section>
                 <q-item-label class="text-bold">{{  $t('message') }}</q-item-label>
@@ -154,7 +170,7 @@ interface CommandStatesProps {
 }
 
 const props = defineProps<CommandStatesProps>();
-const emit = defineEmits(['refresh', 'clear'])
+const emit = defineEmits(['refresh', 'clear', 'cancel'])
 
 const { t } = useI18n();
 
@@ -191,7 +207,7 @@ const columns = computed(() => {
     {
       name: 'owner',
       required: true,
-      label: t('owner'),
+      label: t('user'),
       align: 'left',
       field: 'owner',
       sortable: true,
@@ -239,9 +255,17 @@ const columns = computed(() => {
 
 const rows = computed(() => props.commands ? props.commands : []);
 
-watch(() => props.commands, (value) => {
+watch(() => props.commands, () => {
   loading.value = false;
 });
+
+function isDeletable(row: CommandStateDto) {
+  return row.status !== CommandStateDto_Status.IN_PROGRESS && row.status !== CommandStateDto_Status.CANCEL_PENDING;
+}
+
+function isCancelable(row: CommandStateDto) {
+  return row.status === CommandStateDto_Status.IN_PROGRESS;
+}
 
 function onRowClick(evt: unknown, row: CommandStateDto) {
   console.log(row);
@@ -252,9 +276,14 @@ function onRefresh() {
   emit('refresh');
 }
 
-function onClear() {
+function onClear(row: CommandStateDto | undefined) {
   loading.value = true;
-  emit('clear');
+  emit('clear', row);
+}
+
+function onCancel(row: CommandStateDto) {
+  loading.value = true;
+  emit('cancel', row);
 }
 
 function onOverCommand(row: CommandStateDto) {

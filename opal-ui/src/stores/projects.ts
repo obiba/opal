@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
-import { CommandStateDto, ImportCommandOptionsDto } from 'src/models/Commands';
+import { CommandStateDto, CommandStateDto_Status, ImportCommandOptionsDto } from 'src/models/Commands';
 import { CopyCommandOptionsDto } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
@@ -101,8 +101,19 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
-  async function clearCommandStates() {
-    return api.delete(`/project/${project.value.name}/commands`, { params: { state: 'completed' }});
+  async function clearCommandStates(commands: CommandStateDto[]) {
+    if (commands.length === 0) {
+      return api.delete(`/project/${project.value.name}/commands/completed`).then((response) => {
+        commandStates.value = [];
+        return response;
+      });
+    } else {
+      return Promise.all(commands.map((cmd) => api.delete(`/project/${project.value.name}/command/${cmd.id}`)));
+    }
+  }
+
+  function cancelCommandState(command: CommandStateDto) {
+    return api.put(`/project/${project.value.name}/command/${command.id}/status`, { status: CommandStateDto_Status.CANCELED });
   }
 
   return {
@@ -116,6 +127,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadSummary,
     loadCommandStates,
     clearCommandStates,
+    cancelCommandState,
     copyCommand,
     importCommand,
     reset,

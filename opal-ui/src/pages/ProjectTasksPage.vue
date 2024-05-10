@@ -13,18 +13,29 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <command-states
-        :commands="projectsStore.commandStates ? projectsStore.commandStates : []"
+        :commands="commandStates"
         :project="projectsStore.project.name"
         @refresh="onRefresh"
-        @clear="onClear" />
+        @clear="onClear"
+        @cancel="onCancel" />
     </q-page>
+    <confirm-dialog v-model="showConfirmClear" :title="$t('clear')" :text="$t('clear_tasks_confirm', { count: selectedToClear.length })" @confirm="onClearConfirmed" @cancel="onClearCancel"/>
+    <confirm-dialog v-model="showConfirmCancel" :title="$t('cancel')" :text="$t('cancel_task_confirm')" @confirm="onCancelConfirmed" @cancel="onCancelCancel"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import CommandStates from 'src/components/CommandStates.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { CommandStateDto } from 'src/models/Commands';
+
 const route = useRoute();
 const projectsStore = useProjectsStore();
+
+const showConfirmClear = ref(false);
+const showConfirmCancel = ref(false);
+const selectedToClear = ref<CommandStateDto[]>([]);
+const selectedToCancel = ref<CommandStateDto | undefined>();
 
 onMounted(() => {
   const name = route.params.id as string;
@@ -37,13 +48,49 @@ onMounted(() => {
   })
 });
 
-const onRefresh = () => {
+const commandStates = computed(() => projectsStore.commandStates ? projectsStore.commandStates : []);
+
+function onRefresh() {
   projectsStore.loadCommandStates();
 };
 
-const onClear = () => {
-  projectsStore.clearCommandStates().then(() => {
+function onClear(command: CommandStateDto) {
+  selectedToClear.value = command ? [command] : commandStates.value;
+  console.log(selectedToClear.value);
+  showConfirmClear.value = true;
+};
+
+function onClearConfirmed() {
+  projectsStore.clearCommandStates(selectedToClear.value).then(() => {
+    projectsStore.loadCommandStates();
+  }).catch(() => {
     projectsStore.loadCommandStates();
   });
 };
+
+function onClearCancel() {
+  selectedToClear.value = [];
+  onRefresh();
+};
+
+function onCancel(command: CommandStateDto) {
+  selectedToCancel.value = command;
+  showConfirmCancel.value = true;
+};
+
+function onCancelConfirmed() {
+  if (!selectedToCancel.value) {
+    return;
+  }
+  projectsStore.cancelCommandState(selectedToCancel.value).then(() => {
+    projectsStore.loadCommandStates();
+  }).catch(() => {
+    projectsStore.loadCommandStates();
+  });
+};
+
+function onCancelCancel() {
+  selectedToCancel.value = undefined;
+  onRefresh();
+}
 </script>

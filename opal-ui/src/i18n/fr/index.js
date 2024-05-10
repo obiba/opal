@@ -206,4 +206,7 @@ export default {
   quotation_mark: 'Marque de citation',
   from_row: 'A partir de la ligne',
   char_set: 'Jeu de caractères',
+  clear_tasks_confirm: 'Aucune tâche à nettoyer | Êtes-vous sûr de vouloir nettoyer cette tâche ? | Êtes-vous sûr de vouloir nettoyer ces {count} tâches ?',
+  cancel_task_confirm: 'Êtes-vous sûr de vouloir annuler cette tâche ?',
+  clear: 'Nettoyer',
 };
