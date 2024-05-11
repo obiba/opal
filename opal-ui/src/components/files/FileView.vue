@@ -15,7 +15,7 @@
           @click="onFolderSelection(crumb.to)"
         />
         <q-btn
-          v-if="props.file.writable"
+          v-if="isEditable(props.file)"
           rounded
           dense
           flat
@@ -26,7 +26,7 @@
           class="q-ml-md"
           @click="onShowEditName(props.file)" />
         <q-btn
-          v-if="props.file.writable"
+          v-if="isEditable(props.file)"
           rounded
           dense
           flat
@@ -131,7 +131,7 @@
                 class="q-mr-sm"
               />
               <span>{{ props.row.name }}</span>
-              <div v-if="props.row.writable" class="float-right">
+              <div v-if="isEditable(props.row)" class="float-right">
                 <q-btn
                   rounded
                   dense
@@ -410,8 +410,12 @@ const readables = computed(() => {
 });
 
 const writables = computed(() => {
-  return selected.value.filter((file) => file.name !== '..' && file.writable);
+  return selected.value.filter((file) => file.name !== '..' && isEditable(file));
 });
+
+function isEditable(file: FileDto) {
+  return file.writable && ['/', '/home', '/projects', '/reports', '/tmp'].includes(file.path) === false;
+}
 
 function onShowAddFolder() {
   showAddFolder.value = true;
