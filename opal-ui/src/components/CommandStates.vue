@@ -31,44 +31,46 @@
         />
       </template>
       <template v-slot:body="props">
-        <q-tr :props="props" @mouseover="onOverCommand(props.row)" @mouseleave="onLeaveCommand(props.row)">
+        <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-td key="id" :props="props">
             <span class="text-primary">{{ props.row.id }}</span>
           </q-td>
           <q-td key="name" :props="props">
             <q-badge :label="props.row.name"/>
-            <q-btn
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('messages')"
-              :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
-              @click="onShowMessages(props.row)"
-              class="on-right" />
-            <q-btn
-              v-if="isDeletable(props.row)"
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('delete')"
-              :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
-              class="q-ml-xs"
-              @click="onClear(props.row)" />
-            <q-btn
-              v-if="isCancelable(props.row)"
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('cancel')"
-              :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
-              class="q-ml-xs"
-              @click="onCancel(props.row)" />
+            <div class="float-right">
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('messages')"
+                :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
+                @click="onShowMessages(props.row)"
+                class="on-right" />
+              <q-btn
+                v-if="isDeletable(props.row)"
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('delete')"
+                :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
+                class="q-ml-xs"
+                @click="onClear(props.row)" />
+              <q-btn
+                v-if="isCancelable(props.row)"
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('cancel')"
+                :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
+                class="q-ml-xs"
+                @click="onCancel(props.row)" />
+            </div>
           </q-td>
 
           <q-td key="project" :props="props">
@@ -286,11 +288,11 @@ function onCancel(row: CommandStateDto) {
   emit('cancel', row);
 }
 
-function onOverCommand(row: CommandStateDto) {
+function onOverRow(row: CommandStateDto) {
   toolsVisible.value[row.id] = true;
 }
 
-function onLeaveCommand(row: CommandStateDto) {
+function onLeaveRow(row: CommandStateDto) {
   toolsVisible.value[row.id] = false;
 }
 

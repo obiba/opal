@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { FileObject } from 'src/components/models';
+import { parse } from 'path';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);
@@ -155,6 +156,26 @@ export const useFilesStore = defineStore('files', () => {
     );
   }
 
+  function renameFile(path: string, newName: string) {
+    const parts = parsePath(path);
+    parts.pop();
+    parts.push(newName);
+    const newPath = `/${parts.join('/')}`;
+    // check if file exists
+    return api.head(`/files${newPath}`).then(
+      () => {
+        return Promise.reject('file_already_exists');
+      },
+      () => {
+        const params = {
+          action: 'move',
+          file: path,
+        };
+        return api.put(`/files${newPath}`, {}, { params });
+      }
+    );
+  }
+
   function getParentFolder(path: string) {
     if (path === undefined) return '/';
     const parts = path.split('/');
@@ -180,6 +201,7 @@ export const useFilesStore = defineStore('files', () => {
     setCutSelection,
     canPasteSelection,
     pasteFiles,
+    renameFile,
     getParentFolder,
     parsePath,
     reset,

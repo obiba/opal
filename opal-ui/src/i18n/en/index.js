@@ -209,4 +209,6 @@ export default {
   clear_tasks_confirm: 'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
   cancel_task_confirm: 'Are you sure you want to cancel this task?',
   clear: 'Clear',
+  file_already_exists: 'File already exists',
+  unknown_error: 'An unknown error occurred',
 };

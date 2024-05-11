@@ -209,4 +209,6 @@ export default {
   clear_tasks_confirm: 'Aucune tâche à nettoyer | Êtes-vous sûr de vouloir nettoyer cette tâche ? | Êtes-vous sûr de vouloir nettoyer ces {count} tâches ?',
   cancel_task_confirm: 'Êtes-vous sûr de vouloir annuler cette tâche ?',
   clear: 'Nettoyer',
+  file_already_exists: 'Ce fichier existe déjà',
+  unknown_error: 'Une erreur inconnue est survenue',
 };

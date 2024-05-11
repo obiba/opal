@@ -14,6 +14,28 @@
           :class="crumb.to !== props.file.path ? 'cursor-pointer' : ''"
           @click="onFolderSelection(crumb.to)"
         />
+        <q-btn
+          v-if="props.file.writable"
+          rounded
+          dense
+          flat
+          size="sm"
+          color="secondary"
+          :title="$t('edit')"
+          icon="edit"
+          class="q-ml-md"
+          @click="onShowEditName(props.file)" />
+        <q-btn
+          v-if="props.file.writable"
+          rounded
+          dense
+          flat
+          color="negative"
+          :title="$t('delete')"
+          icon="delete"
+          size="sm"
+          @click="onShowDelete"
+        />
       </q-breadcrumbs>
     </q-toolbar>
     <div v-if="props.file.type === 'FOLDER'">
@@ -25,7 +47,7 @@
         row-key="name"
         :pagination="initialPagination"
         :loading="loading"
-        @row-click="onRowClick"
+        @row-dblclick="onRowDblClick"
         selection="multiple"
         v-model:selected="selected"
       >
@@ -70,7 +92,7 @@
               <q-btn
                 color="secondary"
                 size="sm"
-                icon="content_copy"
+                icon="file_copy"
                 :disable="readables.length === 0"
                 @click="onCopy"
               />
@@ -101,31 +123,52 @@
           </div>
         </template>
         <template v-slot:body-cell-name="props">
-          <q-td :props="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <q-icon
-              :name="getIconName(props.row)"
-              :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
-              size="sm"
-              class="q-mr-sm"
-            />
-            <span>{{ props.value }}</span>
+                :name="getIconName(props.row)"
+                :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
+                size="sm"
+                class="q-mr-sm"
+              />
+              <span>{{ props.row.name }}</span>
+              <div v-if="props.row.writable" class="float-right">
+                <q-btn
+                  rounded
+                  dense
+                  flat
+                  size="sm"
+                  color="secondary"
+                  :title="$t('edit')"
+                  :icon="toolsVisible[props.row.path] ? 'edit' : 'none'"
+                  class="q-ml-xs"
+                  @click="onShowEditName(props.row)" />
+                <q-btn
+                  rounded
+                  dense
+                  flat
+                  size="sm"
+                  color="secondary"
+                  :title="$t('delete')"
+                  :icon="toolsVisible[props.row.path] ? 'delete' : 'none'"
+                  class="q-ml-xs"
+                  @click="onShowDeleteSingle(props.row)" />
+              </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-size="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              {{ getSizeLabel(props.value) }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-lastModifiedTime="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              {{ getDateLabel(props.row.lastModifiedTime) }}
           </q-td>
         </template>
       </q-table>
     </div>
     <div v-if="props.file.type === FileDto_FileType.FILE">
-      <div class="q-mb-md">
-        <q-btn
-          outline
-          color="red"
-          icon="delete"
-          size="sm"
-          @click="onShowDelete"
-          :disable="props.file.writable === false"
-        >
-        </q-btn>
-      </div>
-      <q-card flat bordered>
+      <q-card flat bordered class="q-mt-md">
         <q-card-section class="q-pt-sm q-pb-sm">
           <div class="text-subtitle1">{{ props.file.name }}</div>
         </q-card-section>
@@ -149,6 +192,8 @@
     </div>
 
     <add-folder-dialog v-model="showAddFolder" :file="props.file"/>
+
+    <edit-file-name-dialog v-if="selectedSingle" v-model="showEditName" :file="selectedSingle" />
 
     <confirm-dialog
       v-model="showDelete"
@@ -231,6 +276,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
+import EditFileNameDialog from 'src/components/files/EditFileNameDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
@@ -255,6 +301,7 @@ const initialPagination = ref({
 });
 
 const selected = ref<FileDto[]>([]);
+const selectedSingle = ref<FileDto>();
 const showDownload = ref(false);
 const encryptContent = ref(false);
 const encryptPassword = ref('');
@@ -262,6 +309,8 @@ const showPwd = ref(false);
 const showAddFolder = ref(false);
 const showUpload = ref(false);
 const showDelete = ref(false);
+const showEditName = ref(false);
+const toolsVisible = ref<{ [key: string]: boolean }>({});
 
 const columns = [
   {
@@ -368,6 +417,11 @@ function onShowAddFolder() {
   showAddFolder.value = true;
 }
 
+function onShowEditName(file: FileDto) {
+  selectedSingle.value = file;
+  showEditName.value = true;
+}
+
 function onShowUpload() {
   showUpload.value = true;
 }
@@ -400,6 +454,11 @@ function onGenerateDownloadPwd() {
     retVal += charset.charAt(Math.floor(Math.random() * n));
   }
   encryptPassword.value = retVal;
+}
+
+function onShowDeleteSingle(file: FileDto) {
+  selected.value = [file];
+  onShowDelete();
 }
 
 function onShowDelete() {
@@ -453,11 +512,19 @@ function onFolderSelection(path: string) {
   filesStore.loadFiles(path);
 }
 
-function onRowClick(evt: unknown, row: FileDto) {
+function onRowDblClick(evt: unknown, row: FileDto) {
   selected.value = [];
   if (!row.readable) {
     return;
   }
   filesStore.loadFiles(row.path);
+}
+
+function onOverRow(row: FileDto) {
+  toolsVisible.value[row.path] = true;
+}
+
+function onLeaveRow(row: FileDto) {
+  toolsVisible.value[row.path] = false;
 }
 </script>

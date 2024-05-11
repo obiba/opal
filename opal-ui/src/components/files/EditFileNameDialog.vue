@@ -2,14 +2,14 @@
   <q-dialog v-model="showDialog" @hide="onHide">
       <q-card>
         <q-card-section>
-          <div class="text-h6">{{ $t('add_folder') }}</div>
+          <div class="text-h6">{{ $t('edit') }}</div>
         </q-card-section>
 
         <q-separator />
 
         <q-card-section>
           <q-input
-            v-model="newFolder"
+            v-model="newName"
             dense
             autofocus
             type="text"
@@ -26,11 +26,10 @@
           <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
           <q-btn
             flat
-            :label="$t('add')"
+            :label="$t('save')"
             color="primary"
-            :disable="newFolder === ''"
-            @click="onAddFolder"
-            v-close-popup
+            :disable="newName === ''"
+            @click="onSave"
           />
         </q-card-actions>
       </q-card>
@@ -41,11 +40,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 export default defineComponent({
-  name: 'AddFolderDialog',
+  name: 'EditFileNameDialog',
 });
 </script>
 <script setup lang="ts">
 import { FileDto } from 'src/models/Opal';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -56,13 +56,14 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const filesStore = useFilesStore();
+const { t } = useI18n();
 
 const showDialog = ref(props.modelValue);
-const newFolder = ref<string>('');
+const newName = ref<string>(props.file.name);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    newFolder.value = '';
+    newName.value = props.file.name;
   }
   showDialog.value = value;
 });
@@ -71,9 +72,18 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-function onAddFolder() {
-  filesStore.addFolder(props.file.path, newFolder.value).then(() => {
-    filesStore.loadFiles(props.file.path);
+function onSave() {
+  console.log('Save ', props.file.name,' to ', newName.value);
+  filesStore.renameFile(props.file.path, newName.value).then(() => {
+    showDialog.value = false;
+    filesStore.loadFiles(filesStore.getParentFolder(props.file.path));
+  }).catch((error) => {
+    if (error === 'file_already_exists') {
+      notifyError(t('file_already_exists'));
+    } else {
+      console.error('Error renaming file', error);
+      notifyError(t('unknown_error'));
+    }
   });
 }
 
