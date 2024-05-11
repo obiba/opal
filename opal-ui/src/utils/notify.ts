@@ -23,11 +23,11 @@ export function notifyWarning(message: string) {
 }
 
 export function notifyError(error) {
-  console.log(error);
   let message = t('unknown_error');
   if (typeof error === 'string') {
     message = t(error);
   } else {
+    console.error(error);
     message = error.message;
     if (error.response?.data) {
       message = t(`error.${error.response?.data.status}`);

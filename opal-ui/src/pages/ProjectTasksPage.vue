@@ -56,7 +56,6 @@ function onRefresh() {
 
 function onClear(command: CommandStateDto) {
   selectedToClear.value = command ? [command] : commandStates.value;
-  console.log(selectedToClear.value);
   showConfirmClear.value = true;
 };
 

@@ -35,7 +35,7 @@ api.interceptors.response.use(
       error.config.url !== PROFILE_PATH
     ) {
       // verify that user is still logged in
-      console.log('error', error);
+      console.debug('error', error);
       api.get(PROFILE_PATH).catch(() => {
         // reload to redirect to sign in page (and reset app state)
         window.location.replace(contextPath);

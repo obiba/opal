@@ -8,7 +8,6 @@
       row-key="name"
       :pagination="initialPagination"
       :loading="loading"
-      @row-click="onRowClick"
     >
       <template v-slot:top>
         <q-btn
@@ -267,10 +266,6 @@ function isDeletable(row: CommandStateDto) {
 
 function isCancelable(row: CommandStateDto) {
   return row.status === CommandStateDto_Status.IN_PROGRESS;
-}
-
-function onRowClick(evt: unknown, row: CommandStateDto) {
-  console.log(row);
 }
 
 function onRefresh() {

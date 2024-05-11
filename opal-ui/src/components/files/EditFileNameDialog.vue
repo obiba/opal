@@ -73,17 +73,11 @@ function onHide() {
 }
 
 function onSave() {
-  console.log('Save ', props.file.name,' to ', newName.value);
   filesStore.renameFile(props.file.path, newName.value).then(() => {
     showDialog.value = false;
     filesStore.loadFiles(filesStore.getParentFolder(props.file.path));
   }).catch((error) => {
-    if (error === 'file_already_exists') {
-      notifyError(t('file_already_exists'));
-    } else {
-      console.error('Error renaming file', error);
-      notifyError(t('unknown_error'));
-    }
+    notifyError(error);
   });
 }
 
