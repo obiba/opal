@@ -13,7 +13,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <command-states
-        :commands="commandStates"
+        :commands="commands"
         :project="projectsStore.project.name"
         @refresh="onRefresh"
         @clear="onClear"
@@ -48,14 +48,14 @@ onMounted(() => {
   })
 });
 
-const commandStates = computed(() => projectsStore.commandStates ? projectsStore.commandStates : []);
+const commands = computed(() => projectsStore.commandStates ? projectsStore.commandStates : []);
 
 function onRefresh() {
   projectsStore.loadCommandStates();
 };
 
 function onClear(command: CommandStateDto) {
-  selectedToClear.value = command ? [command] : commandStates.value;
+  selectedToClear.value = command ? [command] : commands.value;
   showConfirmClear.value = true;
 };
 

@@ -96,19 +96,28 @@
               :title="$t('preview_import_source')"
               icon="table_chart"
             >
-              <q-select
-                v-show="transientDatasourceStore.datasource?.table?.length > 1"
-                v-model="selectedTable"
-                :options="transientDatasourceStore.datasource.table"
-                :label="$t('tables')"
-                dense
-                @update:model-value="onTableSelection"
-                class="q-mb-md"/>
-              <table-preview
-                v-if="transientDatasourceStore.datasource"
-                :table="transientDatasourceStore.table"
-                :variables="transientDatasourceStore.variables"
-                :loading="variablesLoading" />
+              <div v-if="transientDatasourceStore.datasource.table">
+                <q-select
+                  v-show="transientDatasourceStore.datasource?.table?.length > 1"
+                  v-model="selectedTable"
+                  :options="transientDatasourceStore.datasource.table"
+                  :label="$t('tables')"
+                  dense
+                  @update:model-value="onTableSelection"
+                  class="q-mb-md"/>
+                <table-preview
+                  v-if="transientDatasourceStore.datasource"
+                  :table="transientDatasourceStore.table"
+                  :variables="transientDatasourceStore.variables"
+                  :loading="variablesLoading" />
+              </div>
+              <div v-else>
+                <q-spinner
+                  color="grey-6"
+                  size="3em"
+                  :thickness="5"
+                />
+              </div>
             </q-step>
           </q-stepper>
         </q-card-section>
@@ -167,7 +176,7 @@ import FileSelect from 'src/components/files/FileSelect.vue';
 import ImportCsvForm from 'src/components/datasource/import/ImportCsvForm.vue';
 import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';
-import TablePreview from 'src/components/datasource/TablePreview.vue';
+import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 interface DialogProps {

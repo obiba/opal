@@ -18,7 +18,9 @@
           :variables="props.variables" :loading="props.loading" />
       </q-tab-panel>
       <q-tab-panel name="values">
-        <pre>{{ props.table }}</pre>
+        <values-list
+          :table="props.table"
+          :variables="props.variables" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -32,7 +34,8 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import VariablesList from 'src/components/datasource/VariablesList.vue';
+import VariablesList from 'src/components/datasource/preview/VariablesList.vue';
+import ValuesList from 'src/components/datasource/preview/ValuesList.vue';
 import { TableDto, VariableDto } from 'src/models/Magma';
 
 interface TablePreviewProps {

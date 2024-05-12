@@ -48,6 +48,19 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
       });
   }
 
+  function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
+    const params = { offset, limit };
+    if (select && select.length > 0) {
+      params.select = `name().matches(/^${select.join('$|^')}$/)`
+    }
+    return api
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+
   return {
     project,
     datasource,
@@ -58,5 +71,6 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
     deleteDatasource,
     loadTable,
     loadVariables,
+    loadValueSets,
   };
 });

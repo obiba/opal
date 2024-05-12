@@ -120,7 +120,7 @@ export default defineComponent({
 import { TableDto, TimestampsDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
-import ImportDataDialog from 'src/components/datasource/ImportDataDialog.vue';
+import ImportDataDialog from 'src/components/datasource/import/ImportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
