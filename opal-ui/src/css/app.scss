@@ -30,6 +30,11 @@ code {
   color: $grey-6;
 }
 
+.text-hint {
+  color: $grey-7;
+  font-size: 0.8em;
+}
+
 .table-values {
   /* specifying max-width so the example can
     highlight the sticky column on any browser window */

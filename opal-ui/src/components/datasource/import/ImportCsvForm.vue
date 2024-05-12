@@ -2,6 +2,7 @@
   <div>
     <q-input
       v-model="name"
+      autofocus
       :label="$t('table_name')"
       dense
       class="q-mb-md"

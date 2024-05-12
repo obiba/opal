@@ -211,4 +211,12 @@ export default {
   clear: 'Clear',
   file_already_exists: 'File already exists',
   unknown_error: 'An unknown error occurred',
+  import_limit_hint: 'The maximum number of rows to import. If there is no limit or the limit is 0, all the records will be imported.',
+  incremental_import: 'Incremental import',
+  incremental_import_hint: 'Import only new or updated data.',
+  merge_dictionaries: 'Merge dictionaries',
+  merge_dictionaries_hint: 'When a table already exists, the variable characteristics (properties, categories, attributes) will be merged with the imported ones instead of being simply overridden. This allows to preserve the variable annotations on subsequent imports.',
+  no_options: 'No options',
+  id_column: 'ID column',
+  id_column_hint: 'Name of the column that identifies the entity. If not provided, the first column will be selected as the entity IDs provider.',
 };

@@ -82,12 +82,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { QTableColumn } from 'quasar';
 export default defineComponent({
   name: 'TableValues',
 });
 </script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
+import { ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { t } from 'src/boot/i18n';
 
@@ -114,9 +115,9 @@ const pagination = ref({
 const COLUMNS_COUNT = 20;
 
 const rows = ref([]);
-const columns = ref([]);
+const columns = ref<QTableColumn[]>([]);
 const visibleColumns = ref<string[]>([]);
-const varFilter = ref<string>();
+const varFilter = ref<string>('');
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
@@ -173,11 +174,11 @@ function onRequest(props) {
   const limit = rowsPerPage;
   const select = visibleColumns.value;
   loading.value = true;
-  datasourceStore.loadValueSets(offset, limit, select).then((res) => {
+  datasourceStore.loadValueSets(offset, limit, select).then((res: ValueSetsDto) => {
     if (res.valueSets) {
       rows.value = res.valueSets.map((vs) => {
         const row = { _id: vs.identifier };
-        vs.values.forEach((val, idx) => {
+        vs.values.forEach((val, idx: number) => {
           row[res.variables[idx]] = val;
         });
         return row;

@@ -64,6 +64,7 @@
                     row-key="name"
                     :pagination="initialPagination"
                     :loading="loading"
+                    @row-dblclick="onRowDblClick"
                     @row-click="onRowClick"
                     :selection="props.selection ? props.selection : 'single'"
                     v-model:selected="selected"
@@ -274,7 +275,7 @@ function onFileSelection() {
   selected.value = selected.value.filter((file) => file.type === FileDto_FileType.FILE && file.readable);
 }
 
-function onRowClick(evt: unknown, row: FileDto) {
+function onRowDblClick(evt: unknown, row: FileDto) {
   selected.value = [];
   if (!row.readable) {
     return;
@@ -282,6 +283,13 @@ function onRowClick(evt: unknown, row: FileDto) {
   if (row.type === FileDto_FileType.FOLDER) {
      filesStore.loadFiles(row.path);
   } else {
+    selected.value = [row];
+  }
+}
+
+function onRowClick(evt: unknown, row: FileDto) {
+  selected.value = [];
+  if (row.type === FileDto_FileType.FILE) {
     selected.value = [row];
   }
 }

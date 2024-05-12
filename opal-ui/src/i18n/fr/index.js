@@ -211,4 +211,12 @@ export default {
   clear: 'Nettoyer',
   file_already_exists: 'Ce fichier existe déjà',
   unknown_error: 'Une erreur inconnue est survenue',
+  import_limit_hint: 'Le nombre maximum de lignes à importer. Si aucune limite n\'est définie ou si la limite est 0, tous les enregistrements seront importés.',
+  incremental_import: 'Importation incrémentale',
+  incremental_import_hint: 'Importer uniquement les données nouvelles ou mises à jour',
+  merge_dictionaries: 'Fusionner les dictionnaires',
+  merge_dictionaries_hint: 'Lorsqu\'une table existe déjà, les caractéristiques des variables (propriétés, catégories, attributs) seront fusionnées avec celles importées au lieu d\'être simplement remplacées. Cela permet de conserver les annotations des variables lors des importations ultérieures.',
+  no_options: 'Aucune option',
+  id_column: 'Colonne ID',
+  id_column_hint: 'Nom de la colonne des identifiants uniques. Si non fournie, la première colonne sera utilisée pour déterminer l\'identifiant de l\'entité.',
 };
