@@ -62,7 +62,7 @@ public final class TimestampedResponses {
 
   public static Response.ResponseBuilder with(Response.ResponseBuilder builder, Timestamped stamped) {
     Value lastModified = stamped.getTimestamps().getLastUpdate();
-    return builder.lastModified((Date) stamped.getTimestamps().getLastUpdate().getValue());
+    return builder.lastModified(lastModified.isNull() ? null : (Date) stamped.getTimestamps().getLastUpdate().getValue());
   }
 
 }
