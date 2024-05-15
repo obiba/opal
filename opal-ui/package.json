@@ -10,7 +10,8 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "clean": "quasar clean"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.9",
@@ -18,7 +19,7 @@
     "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
     "plotly.js-dist": "^2.32.0",
-    "quasar": "^2.15.4",
+    "quasar": "^2.16.4",
     "ts-proto": "^1.174.0",
     "vue": "^3.4.19",
     "vue-i18n": "^9.9.0",
@@ -28,7 +29,7 @@
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^2.0.0",
-    "@quasar/app-vite": "^1.4.3",
+    "@quasar/app-vite": "^1.9.3",
     "@types/node": "^12.20.21",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
