@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" :maximized="maximizedToggle" @hide="onHide">
-      <q-card :style="maximizedToggle ? '' : 'width: 700px; max-width: 80vw;'">
+      <q-card :class="maximizedToggle ? '' : 'dialog-lg'">
         <q-card-section>
           <div class="row">
             <div class="text-h6">{{ $t('edit_script') }}</div>

@@ -116,7 +116,7 @@
     </q-table>
 
     <q-dialog v-model="showMessages">
-      <q-card flat style="width: 500px; max-width: 80vw;">
+      <q-card flat class="dialog-sm">
         <q-card-section align="right" class="q-pb-none">
           <q-btn
             flat

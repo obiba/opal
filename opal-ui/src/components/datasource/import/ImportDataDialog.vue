@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
-      <q-card style="width: 700px; max-width: 80vw;">
+      <q-card class="dialog-md">
         <q-card-section>
           <div class="text-h6">{{ $t('import_data') }}</div>
         </q-card-section>

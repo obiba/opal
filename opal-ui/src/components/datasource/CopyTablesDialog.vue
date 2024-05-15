@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-      <q-card>
+      <q-card class="dialog-md">
         <q-card-section>
           <div class="text-h6">{{ $t('copy_tables') }}</div>
         </q-card-section>

@@ -5,7 +5,7 @@
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
     <q-dialog v-model="showDialog">
-      <q-card style="width: 700px; max-width: 80vw;">
+      <q-card class="dialog-lg">
         <q-card-section>
           <q-breadcrumbs>
               <q-breadcrumbs-el
