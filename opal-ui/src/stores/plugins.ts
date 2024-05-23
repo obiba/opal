@@ -19,6 +19,10 @@ export const usePluginsStore = defineStore('plugins', () => {
     return Promise.resolve();
   }
 
+  async function getDatasourcePluginForm(pluginId: string, usage: 'import' | 'export') {
+    return api.get(`datasource-plugin/${pluginId}/form`, { params: { usage }}).then((response) => response.data);
+  }
+
   async function loadDatasourcePlugins(usage: 'import' | 'export') {
     if (usage === 'import') {
       datasourceImportPlugins.value = [];
@@ -38,8 +42,10 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   return {
     datasourceImportPlugins,
+    datasourceExportPlugins,
     reset,
     initDatasourcePlugins,
+    getDatasourcePluginForm
   };
 
 });

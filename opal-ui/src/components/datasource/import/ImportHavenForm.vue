@@ -1,9 +1,17 @@
 <template>
   <div>
+    <file-select
+      v-model="dataFile"
+      :label="$t('data_file')"
+      :folder="filesStore.current"
+      selection="single"
+      :extensions="fileExtensions"
+      @select="onFileSelect"
+      class="q-mb-md"/>
     <q-input
       v-model="name"
-      autofocus
       :label="$t('table_name')"
+      :disable="dataFile === undefined"
       dense
       class="q-mb-md"
       :debounce="500"
@@ -48,50 +56,61 @@ export default defineComponent({
 <script setup lang="ts">
 import { DatasourceFactory } from 'src/components/models';
 import { FileDto } from 'src/models/Opal';
+import FileSelect from 'src/components/files/FileSelect.vue';
 
-interface ImportFsFormProps {
+interface ImportHavenFormProps {
   modelValue: DatasourceFactory | undefined;
-  file: FileDto;
+  type: string;
 }
 
-const props = defineProps<ImportFsFormProps>();
+const props = defineProps<ImportHavenFormProps>();
 const emit = defineEmits(['update:modelValue'])
 
+const filesStore = useFilesStore();
+
+const fileExtensions = computed(() => fileImporterExtensions[props.type]);
+
+const fileImporterExtensions: {
+  [key: string]: string[];
+} = {
+  rds: ['.rds', '.rdata'],
+  'haven-sas': ['.sas7bdat', '.sas7bcat'],
+  'haven-sast': ['.xpt'],
+  'haven-spss': ['.sav'],
+  'haven-stata': ['.dta'],
+};
+
+const dataFile = ref<FileDto>();
 const name = ref(initFileName());
 const entityType = ref('Participant');
 const idColumn = ref('');
 const locale = ref('');
 
-watch(() => props.file, (value) => {
-  if (value) {
-    onUpdate();
-  }
-});
-
-onMounted(() => {
+function onFileSelect() {
+  name.value = initFileName();
   onUpdate();
-});
+}
 
 function initFileName(): string {
   // base name on file name without extension
-  return props.file ? props.file.name.substring(0, props.file.name.lastIndexOf('.')) : '';
+  return dataFile.value ? dataFile.value.name.substring(0, dataFile.value.name.lastIndexOf('.')) : '';
 }
 
 function onUpdate() {
+  if (!dataFile.value) {
+    emit('update:modelValue', undefined);
+    return;
+  }
   if (name.value === '') {
     name.value = initFileName();
   }
   if (entityType.value === '') {
     entityType.value = 'Participant';
   }
-  updateModelValue();
-}
-
-function updateModelValue() {
   emit('update:modelValue', {
     'Magma.RHavenDatasourceFactoryDto.params': {
       entityType: entityType.value,
-      file: props.file.path,
+      file: dataFile.value.path,
       idColumn: idColumn.value,
       symbol: name.value,
       locale: locale.value,

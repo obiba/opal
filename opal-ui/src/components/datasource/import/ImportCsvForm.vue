@@ -1,12 +1,20 @@
 <template>
   <div>
+    <file-select
+      v-model="dataFile"
+      :label="$t('data_file')"
+      :folder="filesStore.current"
+      selection="single"
+      :extensions="fileExtensions"
+      @select="onFileSelect"
+      class="q-mb-md"/>
     <q-input
       v-model="name"
-      autofocus
       :label="$t('table_name')"
       dense
       class="q-mb-md"
       :debounce="500"
+      :disable="dataFile === undefined"
       @update:model-value="onUpdate"/>
     <div class="row q-gutter-md">
       <div class="col">
@@ -81,17 +89,21 @@ export default defineComponent({
 import { DatasourceFactory } from 'src/components/models';
 import { FileDto } from 'src/models/Opal';
 import { valueTypes } from 'src/utils/magma';
+import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ImportCsvFormProps {
   modelValue: DatasourceFactory | undefined;
-  file: FileDto;
 }
 
-const props = defineProps<ImportCsvFormProps>();
+defineProps<ImportCsvFormProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const projectsStore = useProjectsStore();
+const filesStore = useFilesStore();
 
+const fileExtensions = ['.csv', '.tsv'];
+
+const dataFile = ref<FileDto>();
 const name = ref(initFileName());
 const entityType = ref('Participant');
 const defaultValueType = ref('text');
@@ -100,23 +112,21 @@ const quotationMark = ref('"');
 const fromRow = ref(1);
 const charSet = ref('ISO-8859-1');
 
-watch(() => props.file, (value) => {
-  if (value) {
-    name.value = initFileName();
-    onUpdate();
-  }
-});
-
-onMounted(() => {
+function onFileSelect() {
+  name.value = initFileName();
   onUpdate();
-});
+}
 
 function initFileName(): string {
   // base name on file name without extension
-  return props.file ? props.file.name.substring(0, props.file.name.lastIndexOf('.')) : '';
+  return dataFile.value ? dataFile.value.name.substring(0, dataFile.value.name.lastIndexOf('.')) : '';
 }
 
 function onUpdate() {
+  if (!dataFile.value) {
+    emit('update:modelValue', undefined);
+    return;
+  }
   if (name.value === '') {
     name.value = initFileName();
   }
@@ -138,10 +148,6 @@ function onUpdate() {
   if (charSet.value === '') {
     charSet.value = 'ISO-8859-1';
   }
-  updateModelValue();
-}
-
-function updateModelValue() {
   emit('update:modelValue', {
     'Magma.CsvDatasourceFactoryDto.params': {
       defaultValueType: defaultValueType.value,
@@ -153,7 +159,7 @@ function updateModelValue() {
         {
           name: name.value,
           entityType: entityType.value,
-          data: props.file.path,
+          data: dataFile.value.path,
           refTable: `${projectsStore.project.name}.${name.value}`,
         }
       ],

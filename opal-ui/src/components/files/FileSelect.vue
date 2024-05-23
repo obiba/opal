@@ -1,8 +1,14 @@
 <template>
   <div>
+    <div v-if="label" class="text-grey-6 q-mb-sm">
+      {{ label }}
+    </div>
     <div class="row q-gutter-sm">
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
+    </div>
+    <div v-if="hint" class="text-grey-8 q-mb-sm q-mt-xs" style="font-size: x-small;">
+      {{ hint }}
     </div>
     <q-dialog v-model="showDialog">
       <q-card class="dialog-lg">
@@ -107,7 +113,12 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              <q-badge v-if="extensions && extensions.length>0" class="bg-warning text-black on-right">{{ extensions.join(', ') }}</q-badge>
+              <span v-if="extensions && extensions.length>0" class="q-ml-xs">
+                <q-badge
+                  v-for="ext in extensions"
+                  :key="ext"
+                  class="bg-warning text-black q-ml-xs">{{ ext }}</q-badge>
+              </span>
           </div>
           <q-space />
           <div>
@@ -147,6 +158,8 @@ import { getDateLabel } from 'src/utils/dates';
 
 interface DialogProps {
   modelValue: FileDto | FileDto[] | undefined;
+  label: string | undefined;
+  hint: string | undefined;
   folder: FileDto;
   selection: 'single' | 'multiple';
   extensions: string[] | undefined;

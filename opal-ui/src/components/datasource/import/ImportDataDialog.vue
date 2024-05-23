@@ -29,17 +29,10 @@
                   :options="fileImporters"
                   :label="$t('data_format')"
                   dense
-                  @update:model-value="onFileImporterChange"
                   class="q-mb-md"/>
                 <div class="text-help q-mb-md">
-                  {{  $t('select_dictionary_file') }}
+                  {{  fileImporterHint }}
                 </div>
-                <file-select
-                  v-model="dataFile"
-                  :folder="filesStore.current"
-                  selection="single"
-                  :extensions="fileExtensions"
-                  class="q-mb-md"/>
               </div>
             </q-step>
 
@@ -49,15 +42,18 @@
               icon="table_chart"
               :done="step > 2"
             >
-              <div v-if="dataFile">
+              <div>
                 <div v-if="fileImporter.value === 'csv'">
-                  <import-csv-form v-model="factory" :file="dataFile" />
+                  <import-csv-form v-model="factory" />
                 </div>
                 <div v-else-if="fileImporter.value === 'opal'">
-                  <import-fs-form v-model="factory" :file="dataFile" />
+                  <import-fs-form v-model="factory" />
+                </div>
+                <div v-else-if="fileImporter.value.startsWith('haven-')">
+                  <import-haven-form v-model="factory" :type="fileImporter.value" />
                 </div>
                 <div v-else>
-                  <import-haven-form v-model="factory" :file="dataFile" />
+                  <import-plugin-form v-model="factory" :type="fileImporter.value" />
                 </div>
               </div>
             </q-step>
@@ -170,12 +166,11 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { FileDto } from 'src/models/Opal';
 import { DatasourceFactory } from 'src/components/models';
-import FileSelect from 'src/components/files/FileSelect.vue';
 import ImportCsvForm from 'src/components/datasource/import/ImportCsvForm.vue';
 import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';
+import ImportPluginForm from 'src/components/datasource/import/ImportPluginForm.vue';
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
@@ -188,37 +183,24 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const pluginsStore = usePluginsStore();
-const filesStore = useFilesStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
-// TODO add plugins
-const fileImporters = [
+const builtinImporters = [
   { label: 'CSV', value: 'csv' },
   { label: 'Opal archive', value: 'opal' },
-  { label: 'RDS (R)', value: 'rds' },
+  { label: 'RDS (R)', value: 'haven-rds' },
   { label: 'SAS (R)', value: 'haven-sas' },
   { label: 'SAS Transport (R)', value: 'haven-sast' },
   { label: 'SPSS (R)', value: 'haven-spss' },
   { label: 'Stata (R)', value: 'haven-stata' },
 ];
 
-const fileImporterExtensions: {
-  [key: string]: string[];
-} = {
-  csv: ['.csv', '.tsv'],
-  opal: ['.zip'],
-  rds: ['.rds', '.rdata'],
-  'haven-sas': ['.sas7bdat', '.sas7bcat'],
-  'haven-sast': ['.xpt'],
-  'haven-spss': ['.sav'],
-  'haven-stata': ['.dta'],
-};
+const fileImporters = ref([...builtinImporters]);
 
 const showDialog = ref(props.modelValue);
 const step = ref(1);
-const dataFile = ref<FileDto>();
 const factory = ref<DatasourceFactory>();
 const merge = ref(false);
 const incremental = ref(false);
@@ -226,11 +208,10 @@ const limit = ref();
 const selectedTable = ref<string>();
 const variablesLoading = ref(false);
 
-const fileImporter = ref(fileImporters[0]);
+const fileImporter = ref();
 
-const fileExtensions = computed(() => {
-  const extensions = fileImporterExtensions[fileImporter.value.value];
-  return extensions ? fileImporterExtensions[fileImporter.value.value] : [];
+const fileImporterHint = computed(() => {
+  return fileImporter.value ? t(`import.${fileImporter.value.value}_hint`) : '';
 });
 
 watch(() => props.modelValue, (value) => {
@@ -239,9 +220,6 @@ watch(() => props.modelValue, (value) => {
 });
 
 const canNext = computed(() => {
-  if (step.value === 1) {
-    return !!dataFile.value;
-  }
   if (step.value === 2) {
     return factory.value !== undefined;
   }
@@ -251,8 +229,16 @@ const canNext = computed(() => {
 const isFile = computed(() => props.type === 'file');
 
 function onShow() {
-  pluginsStore.initDatasourcePlugins('import');
-  dataFile.value = undefined;
+  fileImporter.value = [...builtinImporters];
+  pluginsStore.initDatasourcePlugins('import').then(() => {
+    pluginsStore.datasourceImportPlugins
+    .filter((plugin) => plugin['Plugins.DatasourcePluginPackageDto.datasource'] && plugin['Plugins.DatasourcePluginPackageDto.datasource'].group === 'FILE')
+    .forEach((plugin) => {
+      if (!fileImporters.value.find((importer) => importer.value === plugin.name))
+        fileImporters.value.push({ label: plugin.title, value: plugin.name });
+    });
+  });
+  fileImporter.value = fileImporters.value[0];
 }
 
 function onHide() {
@@ -261,10 +247,6 @@ function onHide() {
 
 function onCancel() {
   transientDatasourceStore.deleteDatasource();
-}
-
-function onFileImporterChange() {
-  dataFile.value = undefined;
 }
 
 function onImportData() {

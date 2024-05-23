@@ -56,7 +56,6 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const filesStore = useFilesStore();
-const { t } = useI18n();
 
 const showDialog = ref(props.modelValue);
 const newName = ref<string>(props.file.name);

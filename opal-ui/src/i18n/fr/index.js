@@ -42,6 +42,7 @@ export default {
   date: 'Date',
   data_access: 'Accès aux données',
   data_analysis: 'Analyse de données',
+  data_file: 'Fichier de données',
   data_management: 'Gestion des données',
   databases_caption: 'Gérer les bases de données pour le stockage, l\'import et l\'export des données',
   databases: 'Base de données',

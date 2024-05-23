@@ -272,13 +272,17 @@ vcf-plugin: jennite
 search-plugin:
 	$(call install-plugin,opal-search-es)
 
-datasource-plugins:
+datasource-plugins: datasource-file-plugins datasource-server-plugins
+
+datasource-file-plugins:
 	$(call install-plugin,opal-datasource-spss)
+	$(call install-plugin,opal-datasource-readr)
+	$(call install-plugin,opal-datasource-readxl)
+
+datasource-server-plugins:
 	$(call install-plugin,opal-datasource-limesurvey)
 	$(call install-plugin,opal-datasource-redcap)
 	$(call install-plugin,opal-datasource-googlesheets4)
-	$(call install-plugin,opal-datasource-readr)
-	$(call install-plugin,opal-datasource-readxl)
 
 analysis-plugins:
 	$(call install-plugin,opal-analysis-validate)
