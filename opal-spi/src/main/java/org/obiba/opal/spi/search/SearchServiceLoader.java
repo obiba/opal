@@ -13,6 +13,7 @@ package org.obiba.opal.spi.search;
 
 import org.obiba.plugins.spi.ServicePluginLoader;
 
+import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 
 /**
@@ -22,10 +23,14 @@ public class SearchServiceLoader extends ServicePluginLoader<SearchService> {
 
   private static SearchServiceLoader loader;
 
-  private ServiceLoader<SearchService> serviceLoader = ServiceLoader.load(SearchService.class);
+  private final ServiceLoader<SearchService> serviceLoader;
 
-  public static synchronized SearchServiceLoader get() {
-    if (loader == null) loader = new SearchServiceLoader();
+  private SearchServiceLoader(URLClassLoader classLoader) {
+    this.serviceLoader = ServiceLoader.load(SearchService.class, classLoader);
+  }
+
+  public static synchronized SearchServiceLoader get(URLClassLoader classLoader) {
+    if (loader == null) loader = new SearchServiceLoader(classLoader);
     return loader;
   }
 

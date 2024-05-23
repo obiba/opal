@@ -17,6 +17,7 @@ import org.obiba.opal.spi.r.analysis.RAnalysisServiceLoader;
 import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.obiba.plugins.PluginResources;
+import org.obiba.plugins.PluginsClassLoader;
 import org.obiba.plugins.PluginsManagerHelper;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,6 +49,8 @@ public class PluginsManager {
   private Collection<PluginResources> registeredPlugins;
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
+
+  private PluginsClassLoader pluginsClassLoader;
 
   public boolean restartRequired() {
     File[] children = pluginsDir.listFiles(pathname -> !pathname.getName().startsWith("."));
@@ -80,7 +84,25 @@ public class PluginsManager {
   }
 
   void initPlugins() {
-    getPlugins(true).forEach(p -> p.init(productionMode));
+    pluginsClassLoader = new PluginsClassLoader();
+    getPlugins(true).forEach(p -> p.init(pluginsClassLoader, productionMode));
+    initServicePlugins();
+  }
+
+  void stopPlugins() {
+    for (ServicePlugin service : getServicePlugins()) {
+      try {
+        if (service.isRunning()) service.stop();
+      } catch (RuntimeException e) {
+        //noinspection StringConcatenationArgumentToLogCall
+        log.warn("Error stopping service plugin " + service.getClass(), e);
+      }
+    }
+    try {
+      pluginsClassLoader.close();
+    } catch (IOException e) {
+      log.warn("Error closing plugins class loader", e);
+    }
   }
 
   /**
@@ -122,25 +144,25 @@ public class PluginsManager {
     return service.get();
   }
 
-  void initServicePlugins() {
-    Map<String, PluginResources> pluginsMap = getPlugins().stream().collect(Collectors.toMap(PluginResources::getName, Function.identity()));
-    VCFStoreServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
-    SearchServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
-    DatasourceServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
-    RAnalysisServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
-  }
-
   //
   // Private methods
   //
+
+  private void initServicePlugins() {
+    Map<String, PluginResources> pluginsMap = getPlugins().stream().collect(Collectors.toMap(PluginResources::getName, Function.identity()));
+//    VCFStoreServiceLoader.get(pluginsClassLoader).getServices().stream()
+//        .filter(service -> pluginsMap.containsKey(service.getName()))
+//        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+    SearchServiceLoader.get(pluginsClassLoader).getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
+    DatasourceServiceLoader.get(pluginsClassLoader).getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+    RAnalysisServiceLoader.get(pluginsClassLoader).getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+  }
 
   private synchronized Collection<PluginResources> getPlugins(boolean extract) {
     Map<String, PluginResources> pluginsMap = Maps.newLinkedHashMap();

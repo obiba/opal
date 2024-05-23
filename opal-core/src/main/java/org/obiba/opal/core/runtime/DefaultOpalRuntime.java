@@ -73,21 +73,13 @@ public class DefaultOpalRuntime implements OpalRuntime {
   public void start() {
     initExtensions();
     initPlugins();
-    initServicePlugins();
     initServices();
     initMagmaEngine();
   }
 
   @Override
   public void stop() {
-    for (ServicePlugin service : pluginsManager.getServicePlugins()) {
-      try {
-        if (service.isRunning()) service.stop();
-      } catch (RuntimeException e) {
-        //noinspection StringConcatenationArgumentToLogCall
-        log.warn("Error stopping service plugin " + service.getClass(), e);
-      }
-    }
+    pluginsManager.stopPlugins();
 
     for (Service service : services) {
       try {
@@ -196,10 +188,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
     pluginsManager.initPlugins();
   }
 
-  private void initServicePlugins() {
-    pluginsManager.initServicePlugins();
-  }
-
   private void initExtensions() {
     // Make sure some extensions folder exists
     initDirectory(MAGMA_JS_EXTENSION);
@@ -241,9 +229,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
       try {
         service.initialize(this);
         service.start();
-      } catch (RuntimeException e) {
-        //noinspection StringConcatenationArgumentToLogCall
-        log.warn("Error starting service " + service.getClass(), e);
+      } catch (Exception | Error e) {
+        log.warn("Error starting service: {}", service.getClass(), e);
       }
     }
   }

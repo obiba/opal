@@ -13,6 +13,7 @@ package org.obiba.opal.spi.vcf;
 
 import org.obiba.plugins.spi.ServicePluginLoader;
 
+import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 
 /**
@@ -22,10 +23,14 @@ public class VCFStoreServiceLoader extends ServicePluginLoader<VCFStoreService> 
 
   private static VCFStoreServiceLoader loader;
 
-  private ServiceLoader<VCFStoreService> serviceLoader = ServiceLoader.load(VCFStoreService.class);
+  private final ServiceLoader<VCFStoreService> serviceLoader;
 
-  public static synchronized VCFStoreServiceLoader get() {
-    if (loader == null) loader = new VCFStoreServiceLoader();
+  private VCFStoreServiceLoader(URLClassLoader classLoader) {
+    this.serviceLoader = ServiceLoader.load(VCFStoreService.class, classLoader);
+  }
+
+  public static synchronized VCFStoreServiceLoader get(URLClassLoader classLoader) {
+    if (loader == null) loader = new VCFStoreServiceLoader(classLoader);
     return loader;
   }
 

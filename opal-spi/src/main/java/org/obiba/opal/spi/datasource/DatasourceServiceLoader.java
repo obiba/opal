@@ -12,6 +12,7 @@ package org.obiba.opal.spi.datasource;
 
 import org.obiba.plugins.spi.ServicePluginLoader;
 
+import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 
 /**
@@ -21,10 +22,14 @@ public class DatasourceServiceLoader extends ServicePluginLoader<DatasourceServi
 
   private static DatasourceServiceLoader loader;
 
-  private ServiceLoader<DatasourceService> serviceLoader = ServiceLoader.load(DatasourceService.class);
+  private final ServiceLoader<DatasourceService> serviceLoader;
 
-  public static synchronized DatasourceServiceLoader get() {
-    if (loader == null) loader = new DatasourceServiceLoader();
+  private DatasourceServiceLoader(URLClassLoader classLoader) {
+    this.serviceLoader = ServiceLoader.load(DatasourceService.class, classLoader);
+  }
+
+  public static synchronized DatasourceServiceLoader get(URLClassLoader classLoader) {
+    if (loader == null) loader = new DatasourceServiceLoader(classLoader);
     return loader;
   }
 

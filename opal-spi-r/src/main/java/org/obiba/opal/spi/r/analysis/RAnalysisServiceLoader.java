@@ -12,16 +12,21 @@ package org.obiba.opal.spi.r.analysis;
 
 import org.obiba.plugins.spi.ServicePluginLoader;
 
+import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 
 public class RAnalysisServiceLoader extends ServicePluginLoader<RAnalysisService> {
 
   private static RAnalysisServiceLoader loader;
 
-  private ServiceLoader<RAnalysisService> serviceLoader = ServiceLoader.load(RAnalysisService.class);
+  private final ServiceLoader<RAnalysisService> serviceLoader;
 
-  public static synchronized RAnalysisServiceLoader get() {
-    if (loader == null) loader = new RAnalysisServiceLoader();
+  public RAnalysisServiceLoader(URLClassLoader classLoader) {
+    this.serviceLoader = ServiceLoader.load(RAnalysisService.class, classLoader);;
+  }
+
+  public static synchronized RAnalysisServiceLoader get(URLClassLoader classLoader) {
+    if (loader == null) loader = new RAnalysisServiceLoader(classLoader);
     return loader;
   }
 
