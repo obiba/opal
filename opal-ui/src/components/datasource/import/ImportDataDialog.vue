@@ -29,7 +29,7 @@
                   :options="fileImporters"
                   :label="$t('data_format')"
                   dense
-                  @update:model-value="onFileImporterSelection"
+                  @update:model-value="onImporterSelection"
                   class="q-mb-md"/>
                 <div class="text-hint">
                   {{ fileImporterHint }}
@@ -41,7 +41,7 @@
                   :options="serverImporters"
                   :label="$t('data_server')"
                   dense
-                  @update:model-value="onServerImporterSelection"
+                  @update:model-value="onImporterSelection"
                   class="q-mb-md"/>
                 <div class="text-hint">
                   {{ serverImporterHint }}
@@ -348,7 +348,7 @@ function onTableSelection() {
   });
 }
 
-function onFileImporterSelection(value: string) {
+function onImporterSelection(value: string) {
   factory.value = undefined;
 }
 </script>

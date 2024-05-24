@@ -69,7 +69,7 @@
                   <q-item-label>{{ $t('import_file') }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item v-if="hasViews" clickable v-close-popup @click="onShowImportServer">
+              <q-item clickable v-close-popup @click="onShowImportServer">
                 <q-item-section>
                   <q-item-label>{{ $t('import_server') }}</q-item-label>
                 </q-item-section>
