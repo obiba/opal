@@ -42,7 +42,7 @@ PLUGINS_DIR="${OPAL_HOME}/plugins/"
 # Iterate over plugins zip files
 find "$PLUGINS_DIR" -type f -name "*-dist.zip" | grep -v ".archive" | while IFS= read -r zip_file; do
     # Unzip each zip file
-    unzip -u "$zip_file" -d "${PLUGINS_DIR}"
+    unzip -o "$zip_file" -d "${PLUGINS_DIR}"
     # Move the zip file to archive folder
     mv "$zip_file" "${PLUGINS_DIR}/.archive"
 done
