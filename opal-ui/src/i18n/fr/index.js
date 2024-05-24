@@ -9,13 +9,18 @@ export default {
     Forbidden: 'L\'operation est interdite'
   },
   importer : {
-    csv_hint: 'Ce format s\'attend à ce que le fichier utilise un format "valeurs séparées par des délimiteurs" (le délimiteur par défaut étant la virgule). La première colonne doit représenter les identifiants des participants et les noms de colonnes suivantes identifient les variables.',
-    opal_hint: 'Ce format se présente sous la forme d\'un fichier .zip contenant un dossier pour chaque table contenant : le dictionnaire de données complet dans un fichier XML, un fichier de données XML par entité.',
-    haven_rds_hint: 'Ce format s\'attend à ce que le fichier soit un fichier RDS valide contenant un objet R de classe tibble. Cette procédure d\'importation nécessite un serveur R fonctionnel avec le package tibble installé.',
-    haven_sas_hint: 'Ce format s\'attend à ce que le fichier soit un fichier SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
-    haven_sast_hint: 'Ce format s\'attend à ce que le fichier soit un fichier de transport SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
-    haven_spss_hint: 'Ce format s\'attend à ce que le fichier soit un fichier SPSS valide, éventuellement compressé, contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
-    haven_stata_hint: 'Ce format s\'attend à ce que le fichier soit un fichier Stata valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+    file: {
+      csv: 'Ce format s\'attend à ce que le fichier utilise un format "valeurs séparées par des délimiteurs" (le délimiteur par défaut étant la virgule). La première colonne doit représenter les identifiants des participants et les noms de colonnes suivantes identifient les variables.',
+      opal: 'Ce format se présente sous la forme d\'un fichier .zip contenant un dossier pour chaque table contenant : le dictionnaire de données complet dans un fichier XML, un fichier de données XML par entité.',
+      haven_rds: 'Ce format s\'attend à ce que le fichier soit un fichier RDS valide contenant un objet R de classe tibble. Cette procédure d\'importation nécessite un serveur R fonctionnel avec le package tibble installé.',
+      haven_sas: 'Ce format s\'attend à ce que le fichier soit un fichier SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+      haven_sast: 'Ce format s\'attend à ce que le fichier soit un fichier de transport SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+      haven_spss: 'Ce format s\'attend à ce que le fichier soit un fichier SPSS valide, éventuellement compressé, contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+      haven_stata: 'Ce format s\'attend à ce que le fichier soit un fichier Stata valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+    },
+    server: {
+      opal: 'Ce format importe des dictionnaires de variables et des données depuis un Opal distant.',
+    }
   },
   main: {
     brand: 'Opal',
@@ -209,6 +214,7 @@ export default {
   back: 'Retour',
   continue: 'Continuer',
   data_format: 'Format des données',
+  data_server: 'Serveur de données',
   table_name: 'Nom de la table',
   optional: 'Optionnel',
   default_value_type: 'Type de valeur par défaut',
@@ -229,4 +235,10 @@ export default {
   no_options: 'Aucune option',
   id_column: 'Colonne ID',
   id_column_hint: 'Nom de la colonne des identifiants uniques. Si non fournie, la première colonne sera utilisée pour déterminer l\'identifiant de l\'entité.',
+  opal_url: 'URL Opal',
+  token: 'Jeton',
+  personal_access_token: 'Jeton d\'accès personnel',
+  credentials: 'Informations d\'identification',
+  username: 'Nom d\'utilisateur',
+  password: 'Mot de passe',
 };

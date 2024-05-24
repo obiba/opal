@@ -12,6 +12,17 @@
           @select="onFileSelect(item.key)"
           class="q-mb-md"/>
       </div>
+      <div v-else-if="isPasswordItem(item)">
+        <q-input
+          v-model="data[item.key]"
+          :label="item.title"
+          :hint="item.description"
+          type="password"
+          dense
+          class="q-mb-md"
+          :debounce="500"
+          @update:model-value="onUpdate(item.key)"/>
+      </div>
       <div v-else-if="item.type === 'string'">
         <q-input
           v-model="data[item.key]"
@@ -32,6 +43,18 @@
           class="q-mb-md"
           :debounce="500"
           @update:model-value="onUpdate(item.key)"/>
+      </div>
+      <div v-else-if="item.type === 'boolean'">
+        <q-toggle
+          v-model="data[item.key]"
+          :label="item.title"
+          :hint="item.description"
+          dense
+          :class="item.description ? 'q-mb-xs': 'q-mb-md'"
+          @update:model-value="onUpdate(item.key)"/>
+        <div v-if="item.description" class="text-hint q-mb-md">
+          {{ item.description }}
+        </div>
       </div>
       <div v-else>
         {{ item }}
@@ -80,6 +103,10 @@ watch([() => props.modelValue, () => props.schema], () => {
 
 function isFileItem(item: SchemaFormField) {
   return item.type === 'string' && item.format === 'file';
+}
+
+function isPasswordItem(item: SchemaFormField) {
+  return item.type === 'string' && item.format === 'password';
 }
 
 function initDefaults() {

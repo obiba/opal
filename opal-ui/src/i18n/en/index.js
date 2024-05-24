@@ -9,13 +9,18 @@ export default {
     Forbidden: 'This operation is forbidden'
   },
   importer : {
-    csv_hint: 'This format expects the file to use a "delimiter separated values" format (default delimiter being comma). The first column should represent the participant identifiers and the subsequent column names identify variables.',
-    opal_hint: 'This format comes as a .zip file containing a folder for each table having: the full data dictionary in a XML file, a XML data file per entity.',
-    haven_rds_hint: 'This format expects the file to be a valid RDS file containing an R object of tibble class. This import procedure requires a functional R server with the tibble package installed.',
-    haven_sas_hint: 'This format expects the file to be a valid SAS file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
-    haven_sast_hint: 'This format expects the file to be a valid SAS Transport file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
-    haven_spss_hint: 'This format expects the file to be a valid SPSS file, optionally compressed, containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
-    haven_stata_hint: 'This format expects the file to be a valid Stata file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+    file: {
+      csv: 'This format expects the file to use a "delimiter separated values" format (default delimiter being comma). The first column should represent the participant identifiers and the subsequent column names identify variables.',
+      opal: 'This format comes as a .zip file containing a folder for each table having: the full data dictionary in a XML file, a XML data file per entity.',
+      haven_rds: 'This format expects the file to be a valid RDS file containing an R object of tibble class. This import procedure requires a functional R server with the tibble package installed.',
+      haven_sas: 'This format expects the file to be a valid SAS file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_sast: 'This format expects the file to be a valid SAS Transport file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_spss: 'This format expects the file to be a valid SPSS file, optionally compressed, containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_stata: 'This format expects the file to be a valid Stata file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+    },
+    server: {
+      opal: 'This format imports variable dictionaries and data from a remote Opal.',
+    }
   },
   main: {
     brand: 'Opal',
@@ -209,6 +214,7 @@ export default {
   back: 'Back',
   continue: 'Continue',
   data_format: 'Data format',
+  data_server: 'Data server',
   table_name: 'Table name',
   optional: 'Optional',
   default_value_type: 'Default value type',
@@ -229,4 +235,10 @@ export default {
   no_options: 'No options',
   id_column: 'ID column',
   id_column_hint: 'Name of the column that identifies the entity. If not provided, the first column will be selected as the entity IDs provider.',
+  opal_url: 'Opal URL',
+  token: 'Token',
+  personal_access_token: 'Personal access token',
+  credentials: 'Credentials',
+  username: 'User name',
+  password: 'Password',
 };

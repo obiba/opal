@@ -1,5 +1,5 @@
 import { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
-import { ViewDto, VariableListViewDto, DatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto } from 'src/models/Magma';
+import { ViewDto, VariableListViewDto, DatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto } from 'src/models/Magma';
 
 export interface Message {
   msg: string;
@@ -34,6 +34,7 @@ export interface DatasourceFactory extends DatasourceFactoryDto {
   'Magma.FsDatasourceFactoryDto.params': FsDatasourceFactoryDto | undefined;
   'Magma.RHavenDatasourceFactoryDto.params': RHavenDatasourceFactoryDto | undefined;
   'Magma.PluginDatasourceFactoryDto.params': PluginDatasourceFactoryDto | undefined;
+  'Magma.RestDatasourceFactoryDto.params': RestDatasourceFactoryDto | undefined;
 }
 
 export interface SchemaFormField {
