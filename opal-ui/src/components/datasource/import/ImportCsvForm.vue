@@ -31,6 +31,7 @@
           v-model="defaultValueType"
           :options="valueTypes"
           :label="$t('default_value_type')"
+          @update:model-value="onUpdate"
           dense/>
       </div>
     </div>
@@ -95,7 +96,7 @@ interface ImportCsvFormProps {
   modelValue: DatasourceFactory | undefined;
 }
 
-defineProps<ImportCsvFormProps>();
+const props = defineProps<ImportCsvFormProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const projectsStore = useProjectsStore();
@@ -111,6 +112,24 @@ const fieldSeparator = ref(',');
 const quotationMark = ref('"');
 const fromRow = ref(1);
 const charSet = ref('ISO-8859-1');
+
+onMounted(() => {
+  if (props.modelValue) {
+    const params = props.modelValue['Magma.CsvDatasourceFactoryDto.params'];
+    if (params) {
+      name.value = params.tables[0].name;
+      entityType.value = params.tables[0].entityType;
+      defaultValueType.value = params.defaultValueType;
+      fieldSeparator.value = params.separator;
+      quotationMark.value = params.quote;
+      fromRow.value = params.firstRow;
+      charSet.value = params.characterSet;
+      filesStore.getFile(params.tables[0].data).then((file) => {
+        dataFile.value = file;
+      });
+    }
+  }
+});
 
 function onFileSelect() {
   name.value = initFileName();

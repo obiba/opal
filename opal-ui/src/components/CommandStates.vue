@@ -104,7 +104,7 @@
                 <span>
                   {{ props.row.progress.message }}
                 </span>
-                <span class="on-right  text-help">
+                <span class="on-right text-help">
                   {{ `${props.row.progress.percent}% (${props.row.progress.current}/${props.row.progress.end})` }}
                 </span>
               </div>

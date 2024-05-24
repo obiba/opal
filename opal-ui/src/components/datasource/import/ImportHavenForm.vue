@@ -73,11 +73,11 @@ const fileExtensions = computed(() => fileImporterExtensions[props.type]);
 const fileImporterExtensions: {
   [key: string]: string[];
 } = {
-  rds: ['.rds', '.rdata'],
-  'haven-sas': ['.sas7bdat', '.sas7bcat'],
-  'haven-sast': ['.xpt'],
-  'haven-spss': ['.sav'],
-  'haven-stata': ['.dta'],
+  haven_rds: ['.rds', '.rdata'],
+  haven_sas: ['.sas7bdat', '.sas7bcat'],
+  haven_sast: ['.xpt'],
+  haven_spss: ['.sav'],
+  haven_stata: ['.dta'],
 };
 
 const dataFile = ref<FileDto>();
@@ -85,6 +85,28 @@ const name = ref(initFileName());
 const entityType = ref('Participant');
 const idColumn = ref('');
 const locale = ref('');
+
+onMounted(() => {
+  if (!props.modelValue || !props.modelValue['Magma.RHavenDatasourceFactoryDto.params']) return;
+  const params = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'];
+  if (params.file) {
+    filesStore.getFile(props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].file).then((file) => {
+      dataFile.value = file;
+    });
+  }
+  if (params.symbol) {
+    name.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].symbol;
+  }
+  if (params.entityType) {
+    entityType.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].entityType;
+  }
+  if (params.idColumn) {
+    idColumn.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].idColumn;
+  }
+  if (params.locale) {
+    locale.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].locale;
+  }
+});
 
 function onFileSelect() {
   name.value = initFileName();

@@ -31,6 +31,9 @@ onMounted(() => {
   pluginsStore.getDatasourcePluginForm(props.type, 'import').then((form) => {
     schema.value = form;
   });
+  if (props.modelValue && props.modelValue['Magma.PluginDatasourceFactoryDto.params']?.parameters) {
+    parameters.value = JSON.parse(props.modelValue['Magma.PluginDatasourceFactoryDto.params'].parameters);
+  }
 });
 
 function onUpdate() {

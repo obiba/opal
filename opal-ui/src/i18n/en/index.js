@@ -8,6 +8,15 @@ export default {
   error: {
     Forbidden: 'This operation is forbidden'
   },
+  importer : {
+    csv_hint: 'This format expects the file to use a "delimiter separated values" format (default delimiter being comma). The first column should represent the participant identifiers and the subsequent column names identify variables.',
+    opal_hint: 'This format comes as a .zip file containing a folder for each table having: the full data dictionary in a XML file, a XML data file per entity.',
+    haven_rds_hint: 'This format expects the file to be a valid RDS file containing an R object of tibble class. This import procedure requires a functional R server with the tibble package installed.',
+    haven_sas_hint: 'This format expects the file to be a valid SAS file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+    haven_sast_hint: 'This format expects the file to be a valid SAS Transport file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+    haven_spss_hint: 'This format expects the file to be a valid SPSS file, optionally compressed, containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+    haven_stata_hint: 'This format expects the file to be a valid Stata file containing the variables and the data. This import procedure requires a functional R server with the tibble and haven packages installed.',
+  },
   main: {
     brand: 'Opal',
     powered_by: 'Powered by',

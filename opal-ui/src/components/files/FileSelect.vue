@@ -7,7 +7,7 @@
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
-    <div v-if="hint" class="text-grey-8 q-mb-sm q-mt-xs" style="font-size: x-small;">
+    <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
       {{ hint }}
     </div>
     <q-dialog v-model="showDialog">
@@ -158,11 +158,11 @@ import { getDateLabel } from 'src/utils/dates';
 
 interface DialogProps {
   modelValue: FileDto | FileDto[] | undefined;
-  label: string | undefined;
-  hint: string | undefined;
+  label?: string | undefined;
+  hint?: string | undefined;
   folder: FileDto;
   selection: 'single' | 'multiple';
-  extensions: string[] | undefined;
+  extensions?: string[] | undefined;
 }
 
 const props = defineProps<DialogProps>();

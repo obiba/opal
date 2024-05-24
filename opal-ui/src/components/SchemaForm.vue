@@ -1,7 +1,7 @@
 <template>
   <div v-if="schema">
     <div v-for="item in schema.items" :key="item.key">
-      <div v-if="item.type === 'string' && item.format === 'file'">
+      <div v-if="isFileItem(item)">
         <file-select
           v-model="dataFiles[item.key]"
           :label="item.title"
@@ -48,7 +48,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { FileObject, FormObject, SchemaFormObject } from 'src/components/models';
+import { FileObject, FormObject, SchemaFormField, SchemaFormObject } from 'src/components/models';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface SchemaFormFormProps {
@@ -64,13 +64,26 @@ const filesStore = useFilesStore();
 const dataFiles = ref<{ [key: string]: FileObject }>({});
 const data = ref(props.modelValue || {});
 
-watch(() => props.schema, () => {
+watch([() => props.modelValue, () => props.schema], () => {
+  data.value = props.modelValue || {};
   if (props.schema) {
     initDefaults();
+    props.schema.items.filter((item) => isFileItem(item)).forEach((item) => {
+      if (data.value[item.key]) {
+        filesStore.getFile(data.value[item.key] as string).then((file) => {
+          dataFiles.value[item.key] = file;
+        });
+      }
+    });
   }
 });
 
+function isFileItem(item: SchemaFormField) {
+  return item.type === 'string' && item.format === 'file';
+}
+
 function initDefaults() {
+  if (!props.schema?.items) return;
   props.schema.items.forEach((item) => {
     if (item.default !== undefined && data.value[item.key] === undefined) {
       data.value[item.key] = item.default;

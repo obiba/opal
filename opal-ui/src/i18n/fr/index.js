@@ -8,6 +8,15 @@ export default {
   error: {
     Forbidden: 'L\'operation est interdite'
   },
+  importer : {
+    csv_hint: 'Ce format s\'attend à ce que le fichier utilise un format "valeurs séparées par des délimiteurs" (le délimiteur par défaut étant la virgule). La première colonne doit représenter les identifiants des participants et les noms de colonnes suivantes identifient les variables.',
+    opal_hint: 'Ce format se présente sous la forme d\'un fichier .zip contenant un dossier pour chaque table contenant : le dictionnaire de données complet dans un fichier XML, un fichier de données XML par entité.',
+    haven_rds_hint: 'Ce format s\'attend à ce que le fichier soit un fichier RDS valide contenant un objet R de classe tibble. Cette procédure d\'importation nécessite un serveur R fonctionnel avec le package tibble installé.',
+    haven_sas_hint: 'Ce format s\'attend à ce que le fichier soit un fichier SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+    haven_sast_hint: 'Ce format s\'attend à ce que le fichier soit un fichier de transport SAS valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+    haven_spss_hint: 'Ce format s\'attend à ce que le fichier soit un fichier SPSS valide, éventuellement compressé, contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+    haven_stata_hint: 'Ce format s\'attend à ce que le fichier soit un fichier Stata valide contenant les variables et les données. Cette procédure d\'importation nécessite un serveur R fonctionnel avec les paquets tibble et haven installés.',
+  },
   main: {
     brand: 'Opal',
     powered_by: 'Propulsé par',

@@ -27,7 +27,7 @@ code {
 }
 
 .text-help {
-  color: $grey-6;
+  color: $grey-7;
 }
 
 .text-hint {
@@ -71,16 +71,16 @@ code {
 }
 
 .dialog-sm {
-  width: 500px;
-  max-width: 80vw;
+  width: 500px !important;
+  max-width: 80vw !important;
 }
 
 .dialog-md {
-  width: 700px;
-  max-width: 80vw;
+  width: 700px !important;
+  max-width: 80vw !important;
 }
 
 .dialog-lg {
-  width: 900px;
-  max-width: 80vw;
+  width: 900px !important;
+  max-width: 80vw !important;
 }

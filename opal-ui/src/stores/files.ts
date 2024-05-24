@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { FileObject } from 'src/components/models';
+import { get } from 'http';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);
@@ -12,6 +13,12 @@ export const useFilesStore = defineStore('files', () => {
     current.value = {} as FileDto;
     copySelection.value = [];
     cutSelection.value = [];
+  }
+
+  async function getFile(path: string) {
+    return api.get(`/files/_meta${path}`).then((response) => {
+      return response.data;
+    });
   }
 
   async function initFiles(path: string) {
@@ -188,6 +195,7 @@ export const useFilesStore = defineStore('files', () => {
 
   return {
     current,
+    getFile,
     initFiles,
     loadFiles,
     downloadFile,

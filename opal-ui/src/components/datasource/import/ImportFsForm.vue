@@ -26,7 +26,7 @@ interface ImportFsFormProps {
   modelValue: DatasourceFactory | undefined;
 }
 
-defineProps<ImportFsFormProps>();
+const props = defineProps<ImportFsFormProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const filesStore = useFilesStore();
@@ -34,6 +34,14 @@ const filesStore = useFilesStore();
 const fileExtensions = ['.zip'];
 
 const dataFile = ref<FileDto>();
+
+onMounted(() => {
+  if (props.modelValue && props.modelValue['Magma.FsDatasourceFactoryDto.params']?.file) {
+    filesStore.getFile(props.modelValue['Magma.FsDatasourceFactoryDto.params'].file).then((file) => {
+      dataFile.value = file;
+    });
+  }
+});
 
 function onFileSelect() {
   if (!dataFile.value) {

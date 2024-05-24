@@ -29,9 +29,10 @@
                   :options="fileImporters"
                   :label="$t('data_format')"
                   dense
+                  @update:model-value="onFileImporterSelection"
                   class="q-mb-md"/>
-                <div class="text-help q-mb-md">
-                  {{  fileImporterHint }}
+                <div class="text-hint">
+                  {{ fileImporterHint }}
                 </div>
               </div>
             </q-step>
@@ -49,7 +50,7 @@
                 <div v-else-if="fileImporter.value === 'opal'">
                   <import-fs-form v-model="factory" />
                 </div>
-                <div v-else-if="fileImporter.value.startsWith('haven-')">
+                <div v-else-if="fileImporter.value.startsWith('haven_')">
                   <import-haven-form v-model="factory" :type="fileImporter.value" />
                 </div>
                 <div v-else>
@@ -187,14 +188,20 @@ const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
-const builtinImporters = [
+interface FileImporterOption {
+  label: string;
+  value: string;
+  hint?: string;
+}
+
+const builtinImporters: FileImporterOption[] = [
   { label: 'CSV', value: 'csv' },
   { label: 'Opal archive', value: 'opal' },
-  { label: 'RDS (R)', value: 'haven-rds' },
-  { label: 'SAS (R)', value: 'haven-sas' },
-  { label: 'SAS Transport (R)', value: 'haven-sast' },
-  { label: 'SPSS (R)', value: 'haven-spss' },
-  { label: 'Stata (R)', value: 'haven-stata' },
+  { label: 'RDS (R)', value: 'haven_rds' },
+  { label: 'SAS (R)', value: 'haven_sas' },
+  { label: 'SAS Transport (R)', value: 'haven_sast' },
+  { label: 'SPSS (R)', value: 'haven_spss' },
+  { label: 'Stata (R)', value: 'haven_stata' },
 ];
 
 const fileImporters = ref([...builtinImporters]);
@@ -211,7 +218,7 @@ const variablesLoading = ref(false);
 const fileImporter = ref();
 
 const fileImporterHint = computed(() => {
-  return fileImporter.value ? t(`import.${fileImporter.value.value}_hint`) : '';
+  return fileImporter.value ? (fileImporter.value.hint ? fileImporter.value.hint : t(`importer.${fileImporter.value.value}_hint`)) : '';
 });
 
 watch(() => props.modelValue, (value) => {
@@ -232,13 +239,14 @@ function onShow() {
   fileImporter.value = [...builtinImporters];
   pluginsStore.initDatasourcePlugins('import').then(() => {
     pluginsStore.datasourceImportPlugins
-    .filter((plugin) => plugin['Plugins.DatasourcePluginPackageDto.datasource'] && plugin['Plugins.DatasourcePluginPackageDto.datasource'].group === 'FILE')
+    .filter((plugin) => plugin['Plugins.DatasourcePluginPackageDto.datasource']?.group === 'FILE')
     .forEach((plugin) => {
       if (!fileImporters.value.find((importer) => importer.value === plugin.name))
-        fileImporters.value.push({ label: plugin.title, value: plugin.name });
+        fileImporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description});
     });
   });
   fileImporter.value = fileImporters.value[0];
+  factory.value = undefined;
 }
 
 function onHide() {
@@ -303,5 +311,9 @@ function onTableSelection() {
     variablesLoading.value = false;
     notifyError(err);
   });
+}
+
+function onFileImporterSelection(value: string) {
+  factory.value = undefined;
 }
 </script>
