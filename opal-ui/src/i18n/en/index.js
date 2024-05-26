@@ -242,4 +242,11 @@ export default {
   username: 'User name',
   password: 'Password',
   auth_method: 'Authentication method',
+  export_file: 'Export to file',
+  export_data: 'Export data',
+  export_tables_text: 'No tables to be exported | One table will be exported | {count} tables will be exported.',
+  destination_folder: 'Destination folder',
+  id_column_name: 'ID column name',
+  id_column_name_hint: 'Name of the column that identifies the entity. If not provided, the default name applies.',
+  export_tables_task_created: 'Export tables task created with identifier [ {id} ].',
 };

@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
-import { CommandStateDto, CommandStateDto_Status, ImportCommandOptionsDto } from 'src/models/Commands';
-import { CopyCommandOptionsDto } from 'src/models/Commands';
+import { CommandStateDto, CommandStateDto_Status, ImportCommandOptionsDto, ExportCommandOptionsDto, CopyCommandOptionsDto } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
 interface ProjectPerms {
@@ -87,6 +86,12 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function exportCommand(name: string, options: ExportCommandOptionsDto) {
+    return api.post(`/project/${name}/commands/_export`, options).then((response) => {
+      return response;
+    });
+  }
+
   async function importCommand(name: string, options: ImportCommandOptionsDto) {
     return api.post(`/project/${name}/commands/_import`, options).then((response) => {
       return response;
@@ -129,6 +134,7 @@ export const useProjectsStore = defineStore('projects', () => {
     clearCommandStates,
     cancelCommandState,
     copyCommand,
+    exportCommand,
     importCommand,
     reset,
   };

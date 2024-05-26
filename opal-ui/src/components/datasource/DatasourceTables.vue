@@ -76,7 +76,20 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" :label="$t('export')" size="sm" @click="onShowExport"></q-btn>
+          <q-btn-dropdown v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" size="sm" :label="$t('export')">
+            <q-list>
+              <q-item clickable v-close-popup @click="onShowExportFile">
+                <q-item-section>
+                  <q-item-label>{{ $t('export_file') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <!-- <q-item clickable v-close-popup @click="onShowExportServer">
+                <q-item-section>
+                  <q-item-label>{{ $t('export_server') }}</q-item-label>
+                </q-item-section>
+              </q-item> -->
+            </q-list>
+          </q-btn-dropdown>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
           <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables"></q-btn>
         </div>
@@ -104,6 +117,8 @@
 
     <import-data-dialog v-model="showImport" :type="importType"/>
 
+    <export-data-dialog v-model="showExport" :type="exportType" :tables="readableTables"/>
+
     <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
 
     <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })" @confirm="onDeleteTables" />
@@ -121,6 +136,7 @@ import { TableDto, TimestampsDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import ImportDataDialog from 'src/components/datasource/import/ImportDataDialog.vue';
+import ExportDataDialog from 'src/components/datasource/export/ExportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
@@ -134,9 +150,11 @@ const { t } = useI18n();
 
 const showAddTable = ref(false);
 const showAddTables = ref(false);
-const showImport = ref(false);
 const showCopy = ref(false);
+const showImport = ref(false);
 const importType = ref<'file' | 'server'>('file');
+const showExport = ref(false);
+const exportType = ref<'file' | 'server'>('file');
 
 const tableRef = ref();
 const loading = ref(false);
@@ -204,7 +222,6 @@ const dsName = computed(() => route.params.id as string);
 const removableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
 const readableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
 
-
 function init() {
   loading.value = true;
   datasourceStore.initDatasourceTables(dsName.value).then(() => {
@@ -253,6 +270,11 @@ function onShowImportFile() {
 function onShowImportServer() {
   importType.value = 'server';
   showImport.value = true;
+}
+
+function onShowExportFile() {
+  exportType.value = 'file';
+  showExport.value = true;
 }
 
 function onShowCopy() {

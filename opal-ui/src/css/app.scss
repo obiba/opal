@@ -26,6 +26,12 @@ code {
   width: 250px;
 }
 
+.box-info {
+  background-color: $info;
+  color: white;
+  padding: 0.5em;
+}
+
 .text-help {
   color: $grey-7;
 }

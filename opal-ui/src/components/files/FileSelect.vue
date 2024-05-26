@@ -106,7 +106,7 @@
                       <q-item-label>{{  $t('add_folder') }}</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup @click="onShowUpload">
+                  <q-item v-if="type !== 'folder'" clickable v-close-popup @click="onShowUpload">
                     <q-item-section>
                       <q-item-label>{{  $t('upload') }}</q-item-label>
                     </q-item-section>
@@ -163,6 +163,7 @@ interface DialogProps {
   folder: FileDto;
   selection: 'single' | 'multiple';
   extensions?: string[] | undefined;
+  type?: 'file' | 'folder';
 }
 
 const props = defineProps<DialogProps>();
@@ -253,7 +254,7 @@ const rows = computed(() => {
     });
 
   props.folder.children
-    .filter((file) => file.type === FileDto_FileType.FILE)
+    .filter((file) => props.type !== 'folder' && file.type === FileDto_FileType.FILE)
     .filter((file) => props.extensions === undefined || props.extensions.length === 0 || props.extensions.some((ext) => file.name.endsWith(ext)))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
@@ -294,7 +295,10 @@ function onRowDblClick(evt: unknown, row: FileDto) {
     return;
   }
   if (row.type === FileDto_FileType.FOLDER) {
-     filesStore.loadFiles(row.path);
+    filesStore.loadFiles(row.path);
+    if (props.type === 'folder' && row.name !== '..') {
+      selected.value = [row];
+    }
   } else {
     selected.value = [row];
   }
@@ -302,7 +306,11 @@ function onRowDblClick(evt: unknown, row: FileDto) {
 
 function onRowClick(evt: unknown, row: FileDto) {
   selected.value = [];
-  if (row.type === FileDto_FileType.FILE) {
+  if (props.type === 'folder' && row.type === FileDto_FileType.FOLDER) {
+    if (row.name !== '..') {
+      selected.value = [row];
+    }
+  } else if ( row.type === FileDto_FileType.FILE) {
     selected.value = [row];
   }
 }

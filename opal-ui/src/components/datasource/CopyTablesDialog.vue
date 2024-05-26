@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-      <q-card class="dialog-md">
+      <q-card class="dialog-sm">
         <q-card-section>
           <div class="text-h6">{{ $t('copy_tables') }}</div>
         </q-card-section>
@@ -8,7 +8,7 @@
         <q-separator />
 
         <q-card-section>
-          <div class="q-mb-md text-help">
+          <div class="q-mb-md box-info">
             <q-icon name="info" size="1.2rem"/>
             <span class="on-right">
               {{ copyTablesText }}

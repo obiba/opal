@@ -181,13 +181,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ImportCommandOptionsDto } from 'src/models/Commands';
 export default defineComponent({
   name: 'ImportDataDialog',
 });
 </script>
 <script setup lang="ts">
 import { DatasourceFactory } from 'src/components/models';
+import { ImportCommandOptionsDto } from 'src/models/Commands';
 import ImportCsvForm from 'src/components/datasource/import/ImportCsvForm.vue';
 import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';

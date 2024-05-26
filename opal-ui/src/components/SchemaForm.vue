@@ -8,6 +8,7 @@
           :hint="item.description"
           :folder="filesStore.current"
           selection="single"
+          :type="item.format"
           :extensions="item.fileFormats"
           @select="onFileSelect(item.key)"
           class="q-mb-md"/>
@@ -102,7 +103,7 @@ watch([() => props.modelValue, () => props.schema], () => {
 });
 
 function isFileItem(item: SchemaFormField) {
-  return item.type === 'string' && item.format === 'file';
+  return item.type === 'string' && (item.format === 'file' || item.format === 'folder');
 }
 
 function isPasswordItem(item: SchemaFormField) {
