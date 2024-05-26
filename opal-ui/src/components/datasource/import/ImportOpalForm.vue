@@ -9,9 +9,9 @@
       :debounce="500"
       @update:model-value="onUpdate"/>
     <q-select
-      v-model="authType"
+      v-model="authMethod"
       :options="authOptions"
-      :label="$t('auth_type')"
+      :label="$t('auth_method')"
       dense
       class="q-mb-md"
       @update:model-value="onAuthSelection"/>
@@ -78,10 +78,10 @@ const authOptions = [
   { label: t('token'), value: 'token' },
   { label: t('credentials'), value: 'credentials' },
 ];
-const authType = ref(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.token ? authOptions[0] : authOptions[1]);
+const authMethod = ref(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ? authOptions[1] : authOptions[0]);
 
 function onAuthSelection() {
-  if (authType.value.value === 'token') {
+  if (authMethod.value.value === 'token') {
     username.value = '';
     password.value = '';
   } else {
@@ -90,7 +90,7 @@ function onAuthSelection() {
   onUpdate();
 }
 
-const isCredentials = computed(() => authType.value.value === 'credentials');
+const isCredentials = computed(() => authMethod.value.value === 'credentials');
 
 function isValid() {
   return !!url.value && !!remoteDatasource.value && (!isCredentials.value || (!!username.value && !!password.value)) || (!!token.value);

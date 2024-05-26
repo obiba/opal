@@ -241,4 +241,5 @@ export default {
   credentials: 'Credentials',
   username: 'User name',
   password: 'Password',
+  auth_method: 'Authentication method',
 };
