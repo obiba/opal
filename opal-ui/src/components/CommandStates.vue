@@ -116,7 +116,7 @@
     </q-table>
 
     <q-dialog v-model="showMessages">
-      <q-card flat class="dialog-sm">
+      <q-card flat class="dialog-md">
         <q-card-section align="right" class="q-pb-none">
           <q-btn
             flat
@@ -129,7 +129,7 @@
         <q-card-section class="q-pt-none">
           <q-list separator dense>
             <q-item>
-              <q-item-section>
+              <q-item-section style="max-width: 200px;">
                 <q-item-label class="text-bold">{{ $t('date') }}</q-item-label>
               </q-item-section>
               <q-item-section>
@@ -137,7 +137,7 @@
               </q-item-section>
             </q-item>
             <q-item v-for="message in selected?.messages" :key="message.timestamp">
-              <q-item-section>
+              <q-item-section style="max-width: 200px;">
                 <q-item-label class="text-caption">{{ getDateLabel(message.timestamp) }}</q-item-label>
               </q-item-section>
               <q-item-section>
