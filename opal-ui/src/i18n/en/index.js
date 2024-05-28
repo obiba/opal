@@ -5,6 +5,11 @@ export default {
     signout: 'Sign out',
     username: 'User name',
   },
+  auth_types: {
+    PASSWORD: 'Password',
+    CERTIFICATE: 'Certificate',
+    UNRECOGNIZED: 'Unrecognized',
+  },
   error: {
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
@@ -114,7 +119,8 @@ export default {
   max: 'Max',
   mean: 'Mean',
   median: 'Median',
-  merge_variables_hint: 'If selected, variable with same name will be merged (properties, categories and attributes will be added or updated, no deletion). Else the provided variables will replace the existing ones.',
+  merge_variables_hint:
+    'If selected, variable with same name will be merged (properties, categories and attributes will be added or updated, no deletion). Else the provided variables will replace the existing ones.',
   merge_variables: 'Merge variables',
   message: 'Message',
   messages: 'Messages',
@@ -142,7 +148,8 @@ export default {
   progress: 'Progress',
   project_destination: 'Destination project',
   project: 'Project',
-  projects_caption: 'Browse tables and variables, create views, import/export data and dictionaries.',
+  projects_caption:
+    'Browse tables and variables, create views, import/export data and dictionaries.',
   projects: 'Projects',
   properties: 'Properties',
   referenced_entity_type: 'Referenced entity type',
@@ -159,8 +166,10 @@ export default {
   search_caption: 'Configure search engine, schedule table indexing',
   search: 'Search',
   select_columns: 'Select columns',
-  select_dictionary_file_template: 'Use the following Excel template to add new variables or update existing ones:',
-  select_dictionary_file: 'Select a dictionary of variables in Excel file format or a View XML file for batch edition of tables and variables.',
+  select_dictionary_file_template:
+    'Use the following Excel template to add new variables or update existing ones:',
+  select_dictionary_file:
+    'Select a dictionary of variables in Excel file format or a View XML file for batch edition of tables and variables.',
   select_files_to_upload: 'Select files to upload',
   select: 'Select',
   size: 'Size',
@@ -189,9 +198,24 @@ export default {
   unit: 'Unit',
   upload: 'Upload',
   user: 'User',
+  user_edit: 'Edit user',
+  user_delete: 'Delete user',
+  user_disable: 'Disable user',
+  user_enable: 'Enable user',
   users_and_groups_caption: 'Add, update, remove users and groups',
   users_and_groups: 'Users and groups',
   users: 'Users',
+  users_add: 'Add user',
+  users_info:
+    'Users can login using a password or programmatically by providing a certificate in a secured connection (HTTP).',
+  users_filter_placeholder:
+    'Filter users by name, group or authentication type...',
+  groups: 'Groups',
+  groups_info:
+    'Groups can only be defined through users. Removing a group removes users from this group.',
+  enabled: 'Enabled',
+  authentication: 'Authentication',
+  actions: 'Actions',
   value_type: 'Value type',
   value: 'Value',
   values: 'Values',
@@ -222,7 +246,8 @@ export default {
   quotation_mark: 'Quotation mark',
   from_row: 'From row',
   char_set: 'Character set',
-  clear_tasks_confirm: 'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
+  clear_tasks_confirm:
+    'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
   cancel_task_confirm: 'Are you sure you want to cancel this task?',
   clear: 'Clear',
   file_already_exists: 'File already exists',
