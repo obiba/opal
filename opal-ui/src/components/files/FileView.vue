@@ -157,12 +157,12 @@
         </template>
         <template v-slot:body-cell-size="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              {{ getSizeLabel(props.value) }}
+              {{ props.value }}
           </q-td>
         </template>
         <template v-slot:body-cell-lastModifiedTime="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              {{ getDateLabel(props.row.lastModifiedTime) }}
+              {{ props.value }}
           </q-td>
         </template>
       </q-table>
