@@ -13,8 +13,11 @@ export default {
   error: {
     Forbidden: 'L\'operation est interdite',
     NoSuchValueTableInDatasource: 'La table n\'existe pas ou vous n\'y avez pas accès',
+    PasswordTooWeak: 'Password is too weak',
+    IllegalArgument: 'Données non valides',
+    Conflict: "Détection d'un doublon",
   },
-  importer : {
+  importer: {
     file: {
       csv: 'Ce format s\'attend à ce que le fichier utilise un format "valeurs séparées par des délimiteurs" (le délimiteur par défaut étant la virgule). La première colonne doit représenter les identifiants des participants et les noms de colonnes suivantes identifient les variables.',
       opal: 'Ce format se présente sous la forme d\'un fichier .zip contenant un dossier pour chaque table contenant : le dictionnaire de données complet dans un fichier XML, un fichier de données XML par entité.',
@@ -26,7 +29,15 @@ export default {
     },
     server: {
       opal: 'Ce format importe des dictionnaires de variables et des données depuis un Opal distant.',
-    }
+    },
+  },
+  validation: {
+    user: {
+      name_required: 'Le nom est obligatoire',
+      password_required: 'Le mot de passe est obligatoire et doit comporter au moins 8 caractères',
+      confirm_password_required: 'La confirmation du mot de passe est obligatoire',
+      passwords_not_matching: 'Les mots de passe ne correspondent pas',
+    },
   },
   main: {
     brand: 'Opal',
@@ -37,6 +48,7 @@ export default {
   add_table: 'Ajouter une table',
   add_tables: 'Ajouter/mettre à jour des tables',
   add: 'Ajouter',
+  update: 'Mise à jour',
   administration: 'Administration',
   advanced_options: 'Options avancées',
   all_categories: 'Toutes',
@@ -71,6 +83,7 @@ export default {
   delete_files_confirm: '- | Êtes-vous sûr de vouloir supprimer ce fichier ? | Êtes-vous sûr de vouloir supprimer ces {count} fichiers ?',
   delete_tables_confirm: 'Aucune table à supprimer | Êtes-vous sûr de vouloir supprimer cette table ? | Êtes-vous sûr de vouloir supprimer ces {count} tables ?',
   delete_variables_confirm: 'Aucune variable à supprimer | Êtes-vous sûr de vouloir supprimer cette variable ? | Êtes-vous sûr de vouloir supprimer ces {count} variables ?',
+  delete_user_confirm: "Êtes-vous sûr de vouloir supprimer l'utilisateur '{user}'?",
   delete: 'Supprimer',
   density: 'Densité',
   derivation_script: 'Script de dérivation',
@@ -194,6 +207,9 @@ export default {
   unit: 'Unité',
   upload: 'Téléverser',
   user: 'Utilisateur',
+  user_add: 'Ajouter un utilisateur',
+  user_add_with_pwd: 'Ajouter un utilisateur avec un mot de passe',
+  user_add_with_crt: 'Ajouter un utilisateur avec un certificat',
   user_edit: "Modifier l'utilisateur",
   user_delete: "Supprimer l'utilisateur",
   user_disable: "Désactiver l'utilisateur",
@@ -206,7 +222,10 @@ export default {
   users_filter_placeholder: "Filtrer les utilisateurs par nom, groupe ou type d'authentification...",
   groups: 'Groupes',
   groups_info: "Les groupes ne peuvent être définis que par l'intermédiaire des utilisateurs. La suppression d'un groupe supprime les utilisateurs de ce groupe.",
+  groups_hint: "Appuyez sur la virgule (',') pour ajouter un groupe qui ne figure pas dans la liste des suggestions.",
+  enable: 'Activer',
   enabled: 'Activé',
+  disable: 'Désactiver',
   authentication: 'Authentification',
   actions: 'Actions',
   value_type: 'Type de valeur',
@@ -275,5 +294,13 @@ export default {
   categories_range_hint: 'Utilisez le trait d\'union \'-\' pour spécifier une plage de valeurs numériques et la virgule \',\' pour séparer les noms ou les plages de noms, par exemple : \'1-4, 9\' ou \'A, B, C \'. Les catégories existantes ne seront pas modifiées.',
   move_up: 'Monter',
   move_down: 'Descendre',
+  password_hint: "{'Le mot de passe doit comporter au moins 8 caractères, dont un chiffre, une lettre majuscule, une lettre minuscule, un caractère spécial (par exemple, @#$%^&+= !) et aucun espace blanc.'}",
+  password_confirm: 'Confirmer le mot de passe',
+  export_file: 'Exporter vers un fichier',
+  export_data: 'Exporter les données',
+  export_tables_text: 'Aucune table à exporter | Une table sera exportée | {count} tables seront exportées',
+  destination_folder: 'Dossier de destination',
+  id_column_name: 'Nom de la colonne ID',
+  id_column_name_hint: "Nom de la colonne qui identifie l'entité. S'il n'est pas fourni, le nom par défaut s'applique",
+  export_tables_task_created: "Tâche d'exportation de tables créée avec l'identifiant [ {id} ]",
 };
-

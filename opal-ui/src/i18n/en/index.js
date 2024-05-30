@@ -13,8 +13,11 @@ export default {
   error: {
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
+    PasswordTooWeak: 'Password is too weak',
+    IllegalArgument: 'Invalid data',
+    Conflict: 'Duplicate entry detected',
   },
-  importer : {
+  importer: {
     file: {
       csv: 'This format expects the file to use a "delimiter separated values" format (default delimiter being comma). The first column should represent the participant identifiers and the subsequent column names identify variables.',
       opal: 'This format comes as a .zip file containing a folder for each table having: the full data dictionary in a XML file, a XML data file per entity.',
@@ -26,7 +29,15 @@ export default {
     },
     server: {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
-    }
+    },
+  },
+  validation: {
+    user: {
+      name_required: 'Name is required',
+      password_required: 'Password is required and must be at least 8 characters long',
+      confirm_password_required: 'Confirm password is required',
+      passwords_not_matching: 'Passwords do not match',
+    },
   },
   main: {
     brand: 'Opal',
@@ -37,6 +48,7 @@ export default {
   add_table: 'Add table',
   add_tables: 'Add/update some tables',
   add: 'Add',
+  update: 'Update',
   administration: 'Administration',
   advanced_options: 'Advanced options',
   all_categories: 'All',
@@ -71,6 +83,7 @@ export default {
   delete_files_confirm: '- | Are you sure you want to delete this file? | Are you sure you want to delete these {count} files?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
   delete_variables_confirm: 'No variables to delete | Are you sure you want to delete this variable? | Are you sure you want to delete these {count} variables?',
+  delete_user_confirm: "Are you sure you want to delete user '{user}'?",
   delete: 'Delete',
   density: 'Density',
   derivation_script: 'Derivation script',
@@ -119,8 +132,7 @@ export default {
   max: 'Max',
   mean: 'Mean',
   median: 'Median',
-  merge_variables_hint:
-    'If selected, variable with same name will be merged (properties, categories and attributes will be added or updated, no deletion). Else the provided variables will replace the existing ones.',
+  merge_variables_hint: 'If selected, variable with same name will be merged (properties, categories and attributes will be added or updated, no deletion). Else the provided variables will replace the existing ones.',
   merge_variables: 'Merge variables',
   message: 'Message',
   messages: 'Messages',
@@ -148,8 +160,7 @@ export default {
   progress: 'Progress',
   project_destination: 'Destination project',
   project: 'Project',
-  projects_caption:
-    'Browse tables and variables, create views, import/export data and dictionaries.',
+  projects_caption: 'Browse tables and variables, create views, import/export data and dictionaries.',
   projects: 'Projects',
   properties: 'Properties',
   referenced_entity_type: 'Referenced entity type',
@@ -166,10 +177,8 @@ export default {
   search_caption: 'Configure search engine, schedule table indexing',
   search: 'Search',
   select_columns: 'Select columns',
-  select_dictionary_file_template:
-    'Use the following Excel template to add new variables or update existing ones:',
-  select_dictionary_file:
-    'Select a dictionary of variables in Excel file format or a View XML file for batch edition of tables and variables.',
+  select_dictionary_file_template: 'Use the following Excel template to add new variables or update existing ones:',
+  select_dictionary_file: 'Select a dictionary of variables in Excel file format or a View XML file for batch edition of tables and variables.',
   select_files_to_upload: 'Select files to upload',
   select: 'Select',
   size: 'Size',
@@ -198,6 +207,9 @@ export default {
   unit: 'Unit',
   upload: 'Upload',
   user: 'User',
+  user_add: 'Add user',
+  user_add_with_pwd: 'Add user with password',
+  user_add_with_crt: 'Add user with certificate',
   user_edit: 'Edit user',
   user_delete: 'Delete user',
   user_disable: 'Disable user',
@@ -205,15 +217,14 @@ export default {
   users_and_groups_caption: 'Add, update, remove users and groups',
   users_and_groups: 'Users and groups',
   users: 'Users',
-  users_add: 'Add user',
-  users_info:
-    'Users can login using a password or programmatically by providing a certificate in a secured connection (HTTP).',
-  users_filter_placeholder:
-    'Filter users by name, group or authentication type...',
+  users_info: 'Users can login using a password or programmatically by providing a certificate in a secured connection (HTTP).',
+  users_filter_placeholder: 'Filter users by name, group or authentication type...',
   groups: 'Groups',
-  groups_info:
-    'Groups can only be defined through users. Removing a group removes users from this group.',
+  groups_info: 'Groups can only be defined through users. Removing a group removes users from this group.',
+  groups_hint: "Press comma (',') to add a group that is not in the suggestion list.",
+  enable: 'Enable',
   enabled: 'Enabled',
+  disable: 'Disable',
   authentication: 'Authentication',
   actions: 'Actions',
   value_type: 'Value type',
@@ -246,8 +257,7 @@ export default {
   quotation_mark: 'Quotation mark',
   from_row: 'From row',
   char_set: 'Character set',
-  clear_tasks_confirm:
-    'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
+  clear_tasks_confirm: 'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
   cancel_task_confirm: 'Are you sure you want to cancel this task?',
   clear: 'Clear',
   file_already_exists: 'File already exists',
@@ -266,6 +276,8 @@ export default {
   credentials: 'Credentials',
   username: 'User name',
   password: 'Password',
+  password_hint: "{'The password must be at least 8 characters long, including one digit, one uppercase letter, one lowercase letter, one special character (e.g., @#$%^&+=!), and no white space.'}",
+  password_confirm: 'Confirm password',
   auth_method: 'Authentication method',
   export_file: 'Export to file',
   export_data: 'Export data',

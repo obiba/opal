@@ -10,19 +10,31 @@
 
 package org.obiba.opal.web.provider;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.support.ConflictingRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 @Provider
-public class ConflictingRequestExceptionMapper implements ExceptionMapper<ConflictingRequestException> {
+public class ConflictingRequestExceptionMapper extends ErrorDtoExceptionMapper<ConflictingRequestException> {
+  private static final Logger log = LoggerFactory.getLogger(ConflictingRequestExceptionMapper.class);
 
   @Override
-  public Response toResponse(ConflictingRequestException exception) {
-    return Response.status(Status.CONFLICT).build();
+  protected Response.Status getStatus() {
+    return Status.CONFLICT;
+  }
+
+
+  @Override
+  protected Ws.ClientErrorDto getErrorDto(ConflictingRequestException exception) {
+    log.warn("Conflict exception", exception);
+    return ClientErrorDtos.getErrorMessage(getStatus(), "Conflict", exception);
   }
 }

@@ -86,6 +86,7 @@
     "useTransientDatasourceStore": true,
     "useCommandsStore": true,
     "useUsersStore": true,
-    "useUsersGroupsStore": true
+    "useUsersGroupsStore": true,
+    "useGroupsStore": true
   }
 }
