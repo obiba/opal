@@ -107,7 +107,7 @@ const localeOptions = computed(() => {
 const leftDrawerOpen = ref(false);
 
 onMounted(() => {
-  authStore.userProfile().catch(() => {
+  authStore.userProfile().then(() => authStore.loadBookmarks()).catch(() => {
     router.push('/signin');
   });
 });

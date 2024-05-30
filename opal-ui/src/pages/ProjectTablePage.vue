@@ -17,6 +17,7 @@
         size="sm"
         class="on-right"
       />
+      <bookmark-icon :resource="`/datasource/${dsName}/table/${tName}`" />
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5">
@@ -90,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';

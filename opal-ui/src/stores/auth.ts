@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SubjectProfileDto } from 'src/models/Opal';
+import { BookmarkDto, SubjectProfileDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
   const sid = ref('');
   const version = ref('');
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
+  const bookmarks = ref<BookmarkDto[]>([]);
 
   function reset() {
     sid.value = '';
@@ -52,14 +53,41 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
+  function isBookmarked(resource: string) {
+    return bookmarks.value.find((b) => b.resource === resource) !== undefined;
+  }
+
+  async function toggleBookmark(resource: string) {
+    if (isBookmarked(resource)) {
+      return api.delete(`/system/subject-profile/_current/bookmark${resource}`).then(() => {
+        return loadBookmarks();
+      });
+    } else {
+      return api.post('/system/subject-profile/_current/bookmarks', {}, { params: { resource } }).then(() => {
+        return loadBookmarks();
+      });
+    }
+  }
+
+  async function loadBookmarks() {
+    return api.get('/system/subject-profile/_current/bookmarks').then((response) => {
+      bookmarks.value = response.data;
+      return response.data;
+    });
+  }
+
   return {
     sid,
     version,
     profile,
     isAuthenticated,
+    bookmarks,
     signin,
     signout,
     userProfile,
+    isBookmarked,
+    loadBookmarks,
+    toggleBookmark,
     reset,
   };
 });

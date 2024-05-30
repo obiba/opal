@@ -6,48 +6,32 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="row">
-        <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card class="on-left bg-primary text-white q-mb-md o-card">
-            <q-card-section>
-              <div class="text-caption">{{  $t('projects_caption') }}</div>
-            </q-card-section>
-            <q-separator/>
-            <q-card-actions>
-              <div class="text-subtitle2">
-                {{ $t('projects') }}
-                <q-btn
-                  flat
-                  rounded
-                  icon="arrow_forward"
-                  size="sm"
-                  class="q-pa-sm bg-grey-4 text-grey-10 q-ml-sm"
-                  to="/projects"
-                ></q-btn>
-              </div>
-            </q-card-actions>
-          </q-card>
+      <div class="row q-col-gutter-lg q-mb-lg">
+        <div class="col-6 col-sm-6 col-xs-12">
+          <q-list separator>
+            <q-item-label header class="text-uppercase">{{ $t('data_management') }}</q-item-label>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/projects">{{ $t('projects') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('projects_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/files">{{ $t('files') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('files_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label><router-link to="/tasks">{{ $t('tasks') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('tasks_caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
         </div>
-        <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card class="on-left bg-warning text-black q-mb-md o-card">
-            <q-card-section>
-              <div class="text-caption">{{ $t('files_caption') }}</div>
-            </q-card-section>
-            <q-separator/>
-            <q-card-actions>
-              <div class="text-subtitle2">
-                {{ $t('files') }}
-                <q-btn
-                  flat
-                  rounded
-                  icon="arrow_forward"
-                  size="sm"
-                  class="q-pa-sm bg-grey-4 text-grey-10 q-ml-sm"
-                  :to="`/files/home/${username}`"
-                ></q-btn>
-              </div>
-            </q-card-actions>
-          </q-card>
+        <div class="col-6 col-sm-6 col-xs-12">
+          <bookmarks-list/>
         </div>
       </div>
       <div>
@@ -58,9 +42,14 @@
 </template>
 
 <script setup lang="ts">
+import BookmarksList from 'src/components/BookmarksList.vue';
 const authStore = useAuthStore();
 
 const username = computed(() =>
   authStore.profile?.principal ? authStore.profile.principal : ''
 );
+
+onMounted(() => {
+  authStore.loadBookmarks();
+});
 </script>
