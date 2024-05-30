@@ -46,7 +46,7 @@ public class BookmarkResourceImpl implements BookmarkResource {
 
   @Override
   public void setPath(String path) {
-    this.path = path;
+    this.path = path.startsWith("/") ? path : "/" + path;
   }
 
   @Override

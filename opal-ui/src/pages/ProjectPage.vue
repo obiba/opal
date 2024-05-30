@@ -13,6 +13,7 @@
         size="sm"
         class="on-right"
       />
+      <bookmark-icon :resource="`/project/${name}`" />
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
@@ -76,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import { projectStatusColor } from 'src/utils/colors';
 
 const route = useRoute();

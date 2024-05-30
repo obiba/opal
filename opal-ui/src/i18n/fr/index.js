@@ -242,4 +242,7 @@ export default {
   username: 'Nom d\'utilisateur',
   password: 'Mot de passe',
   auth_method: 'Méthode d\'authentification',
+  bookmarks: 'Favoris',
+  bookmark_item: 'Ajouter aux favoris',
+  bookmarked_item: 'Favori enregistré',
 };
