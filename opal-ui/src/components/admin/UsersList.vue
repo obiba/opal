@@ -27,12 +27,11 @@
       flat
       bordered
       :filter="filter"
-      :filter-method="filterUsers"
-      :rows="users"
+      :rows="filteredUsers"
       :columns="columns"
       row-key="name"
       :pagination="initialPagination"
-      :hide-pagination="filteredUserCount <= initialPagination.rowsPerPage"
+      :hide-pagination="filteredUsers.length <= initialPagination.rowsPerPage"
       :loading="loading"
     >
       <template v-slot:top v-if="users.length > 10">
@@ -40,6 +39,7 @@
           <div class="col-6 self-end offset-6">
             <q-input
               dense
+              clearable
               debounce="400"
               color="primary"
               v-model="filter"
@@ -107,25 +107,31 @@
       @confirm="doDeleteUser"
     />
 
-    <add-user-dialog v-model="showAddUser" :user="selectedUser" @update:modelValue="onUserAdded"></add-user-dialog>
+    <add-user-dialog
+      v-model="showAddUser"
+      :user="selectedUser"
+      :authentication-type="authenticationType"
+      @update:modelValue="onUserAdded"
+    ></add-user-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { SubjectCredentialsDto } from 'src/models/Opal';
+import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddUserDialog from 'src/components/admin/AddUserDialog.vue';
 import { notifyError } from 'src/utils/notify';
 
 const usersStore = useUsersStore();
+const groupsStore = useGroupsStore();
 const users = computed(() => usersStore.users || []);
 const { t } = useI18n();
-const filteredUserCount = ref(0);
 const filter = ref('');
 const loading = ref(false);
 const showAddUser = ref(false);
 const showDelete = ref(false);
+const authenticationType = ref(SubjectCredentialsDto_AuthenticationType.PASSWORD);
 const selectedUser = ref<SubjectCredentialsDto | null>(null);
 
 const columns = [
@@ -170,8 +176,10 @@ const initialPagination = ref({
 });
 
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+const filteredUsers = computed(() => filterUsers(users.value, filter.value));
 
 const filterUsers = (rows: any[], terms: string) => {
+  console.log('Filter users', terms);
   const query = filter.value.length > 0 ? filter.value.toLowerCase() : '';
 
   const result = rows.filter((row) => {
@@ -179,8 +187,6 @@ const filterUsers = (rows: any[], terms: string) => {
       return String(val).toLowerCase().includes(query);
     });
   });
-
-  filteredUserCount.value = result.length;
 
   return result;
 };
@@ -196,6 +202,7 @@ function onLeaveRow(row: SubjectCredentialsDto) {
 function onEditUser(user: SubjectCredentialsDto) {
   showAddUser.value = true;
   selectedUser.value = user;
+  authenticationType.value = user.authenticationType;
 }
 
 async function onDeleteUser(user: SubjectCredentialsDto) {
@@ -229,16 +236,17 @@ async function onEnableUser(user: SubjectCredentialsDto) {
 }
 
 function onAddWithPassword() {
-  console.log('Add user with password');
   showAddUser.value = true;
+  authenticationType.value = SubjectCredentialsDto_AuthenticationType.PASSWORD;
 }
 
 function onAddWithCertificate() {
   showAddUser.value = true;
+  authenticationType.value = SubjectCredentialsDto_AuthenticationType.CERTIFICATE;
 }
 
 function onUserAdded() {
-  console.log('User added');
+  groupsStore.initGroups();
   selectedUser.value = null;
   showAddUser.value = false;
 }

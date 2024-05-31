@@ -19,9 +19,15 @@ export const useGroupsStore = defineStore('groups', () => {
     groups.value = response[1].data;
   }
 
+  async function deleteGroup(group: GroupDto) {
+    await api.delete(`/system/group/${group.name}`);
+    await loadGroups();
+  }
+
   return {
     groups,
     initGroups,
+    deleteGroup,
   };
 
 });

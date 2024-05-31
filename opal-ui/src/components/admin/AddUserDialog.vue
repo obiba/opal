@@ -20,32 +20,48 @@
           >
           </q-input>
 
-          <q-input
-            autocomplete="off"
-            type="password"
-            :label="$t('password') + '*'"
-            v-model="newUser.password"
-            color="grey-10"
-            :hint="$t('password_hint')"
-            lazy-rules
-            :rules="[validateRequiredPassword]"
-          >
-            <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="xs" />
-            </template>
-          </q-input>
+          <template v-if="authPassword">
+            <q-input
+              autocomplete="off"
+              type="password"
+              :label="$t('password') + '*'"
+              v-model="newUser.password"
+              color="grey-10"
+              :hint="$t('password_hint')"
+              lazy-rules
+              :rules="[validateRequiredPassword]"
+            >
+              <template v-slot:prepend>
+                <q-icon name="fas fa-lock" size="xs" />
+              </template>
+            </q-input>
 
-          <q-input
-            autocomplete="off"
-            v-model="confirmPassword"
-            dense
-            type="password"
-            :label="$t('password_confirm') + '*'"
-            class="q-mb-md"
-            lazy-rules
-            :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
-          >
-          </q-input>
+            <q-input
+              autocomplete="off"
+              v-model="confirmPassword"
+              dense
+              type="password"
+              :label="$t('password_confirm') + '*'"
+              class="q-mb-md"
+              lazy-rules
+              :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
+            >
+            </q-input>
+          </template>
+          <template v-else>
+            <q-input
+              v-model="userCertificate"
+              dense
+              rows="10"
+              type="textarea"
+              :label="$t('certificate') + '*'"
+              :placeholder="$t('certificate_placeholder')"
+              class="q-mb-md"
+              lazy-rules
+              :rules="[validateRequiredCertificate]"
+            >
+            </q-input>
+          </template>
 
           <!-- TODO: create a comp with q-input and q-chip -->
           <q-input
@@ -72,13 +88,14 @@
 </template>
 
 <script setup lang="ts">
-import { SubjectCredentialsDto } from 'src/models/Opal';
+import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { onMounted, onUnmounted } from 'vue';
 
 interface DialogProps {
   modelValue: boolean;
   user: SubjectCredentialsDto | null;
+  authenticationType: SubjectCredentialsDto_AuthenticationType;
 }
 
 const { t } = useI18n();
@@ -90,13 +107,14 @@ const showDialog = ref(props.modelValue);
 
 const newUser = ref<SubjectCredentialsDto>({
   name: '',
-  authenticationType: 'PASSWORD',
+  authenticationType: SubjectCredentialsDto_AuthenticationType.PASSWORD,
   enabled: true,
   groups: [],
 } as SubjectCredentialsDto);
 
 const confirmPassword = ref('');
 const groups = ref('');
+const certificate = ref('');
 
 const userGroups = computed({
   get() {
@@ -108,12 +126,28 @@ const userGroups = computed({
   },
 });
 
+const userCertificate = computed({
+  get() {
+    return certificate.value;
+  },
+  set(value) {
+    certificate.value = value;
+    // NOTE: need to send string and not bytes (Uint8Array)
+    newUser.value.certificate = value;
+  },
+});
+
+const authPassword = computed(() => props.authenticationType === SubjectCredentialsDto_AuthenticationType.PASSWORD);
 const editMode = computed(() => !!props.user && !!props.user.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('user_edit') : t('user_add')));
 
 // Validation rules
 const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.user.name_required');
+const validateRequiredCertificate = (val: string) =>
+  (editMode.value && (!val || val.length === 0)) ||
+  (val && val.trim().length > 0) ||
+  t('validation.user.certificate_required');
 const validateRequiredPassword = (val: string) =>
   (editMode.value && (!val || val.length === 0)) || (val && val.length >= 8) || t('password_hint');
 const validateMatchingPasswords = () =>
@@ -134,7 +168,7 @@ watch(
       } else {
         newUser.value = {
           name: '',
-          authenticationType: 'PASSWORD',
+          authenticationType: props.authenticationType,
           enabled: true,
           groups: [],
         } as SubjectCredentialsDto;
@@ -156,7 +190,7 @@ function onHide() {
   confirmPassword.value = '';
   newUser.value = {
     name: '',
-    authenticationType: 'PASSWORD',
+    authenticationType: props.authenticationType,
     enabled: true,
     groups: [],
   } as SubjectCredentialsDto;
@@ -171,6 +205,7 @@ async function onAddUser() {
       editMode.value ? await usersStore.updateUser(newUser.value) : await usersStore.addUser(newUser.value);
       confirmPassword.value = '';
       groups.value = '';
+      certificate.value = '';
       emit('update:modelValue', false);
       showDialog.value = false;
     } catch (err) {

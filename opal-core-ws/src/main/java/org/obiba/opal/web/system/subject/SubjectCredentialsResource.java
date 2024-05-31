@@ -48,7 +48,7 @@ public class SubjectCredentialsResource {
   @POST
   public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
-    if (subjectCredentials.getName().trim().length() == 0) {
+    if (subjectCredentials.getName().trim().isEmpty()) {
       throw new BadRequestException("Subject name cannot be empty");
     }
 
