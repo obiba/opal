@@ -16,23 +16,21 @@ export const useUsersStore = defineStore('users', () => {
   }
 
   async function loadUsers() {
-    const response = await api.get('/system/subject-credentials');
-    users.value = response.data;
+    return api.get('/system/subject-credentials').then((response) => {
+      users.value = response.data
+    })
   }
 
   async function addUser(user: SubjectCredentialsDto) {
-    await api.post(`/system/subject-credentials`, user);
-    await loadUsers();
+    return api.post(`/system/subject-credentials`, user).then(() => loadUsers());
   }
 
   async function updateUser(user: SubjectCredentialsDto) {
-    await api.put(`/system/subject-credential/${user.name}`, user);
-    await loadUsers();
+    return api.put(`/system/subject-credential/${user.name}`, user).then(() => loadUsers());
   }
 
   async function deleteUser(user: SubjectCredentialsDto) {
-    await api.delete(`/system/subject-credential/${user.name}`);
-    await loadUsers();
+    return api.delete(`/system/subject-credential/${user.name}`).then(() => loadUsers());
   }
 
   return {

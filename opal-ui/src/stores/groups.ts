@@ -15,13 +15,13 @@ export const useGroupsStore = defineStore('groups', () => {
   }
 
   async function loadGroups() {
-    const response = await  Promise.all([api.get('/system/subject-credentials'), api.get('/system/groups')]);
-    groups.value = response[1].data;
+    return api.get('/system/groups').then((response) => {
+      groups.value = response.data;
+    })
   }
 
   async function deleteGroup(group: GroupDto) {
-    await api.delete(`/system/group/${group.name}`);
-    await loadGroups();
+    return api.delete(`/system/group/${group.name}`).then(() => loadGroups());
   }
 
   return {

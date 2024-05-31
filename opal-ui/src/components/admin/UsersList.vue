@@ -122,6 +122,7 @@ import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddUserDialog from 'src/components/admin/AddUserDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { aw } from 'app/dist/spa/assets/index.223434f7';
 
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
@@ -220,6 +221,7 @@ async function doDeleteUser() {
 
   try {
     await usersStore.deleteUser(toDelete);
+    await groupsStore.initGroups();
   } catch (err) {
     notifyError(err);
   }
@@ -244,8 +246,8 @@ function onAddWithCertificate() {
   authenticationType.value = SubjectCredentialsDto_AuthenticationType.CERTIFICATE;
 }
 
-function onUserAdded() {
-  groupsStore.initGroups();
+async function onUserAdded() {
+  await groupsStore.initGroups();
   selectedUser.value = null;
   showAddUser.value = false;
 }
