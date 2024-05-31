@@ -256,4 +256,11 @@ export default {
   table: 'Table',
   delete_categories_confirm: '- | Are you sure you want to delete this category? | Are you sure you want to delete these {count} categories?',
   labels: 'Labels',
+  unique_name_hint: 'The name must be unique.',
+  is_missing_hint: 'Indicates that an observational value is missing.',
+  edit_category: 'Edit category',
+  add_category: 'Add a category',
+  add_categories_range: 'Add category range',
+  range: 'Range',
+  categories_range_hint: 'Use hyphen \'-\' to specify a range of numerical values and comma \',\' to separate names or ranges of names, for example: \'1-4, 9\', or \'A, B, C\'. Existing categories will not be overridden.',
 };

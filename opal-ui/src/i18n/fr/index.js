@@ -249,4 +249,12 @@ export default {
   table: 'Table',
   delete_categories_confirm: '- | Êtes-vous sûr de vouloir supprimer cette catégorie ? | Êtes-vous sûr de vouloir supprimer ces {count} catégories ?',
   labels: 'Libellés',
+  unique_name_hint: 'Le nom doit être unique.',
+  is_missing_hint: 'Indique qu\'une valeur d\'observation est manquante.',
+  edit_category: 'Éditer la catégorie',
+  add_category: 'Ajouter une catégorie',
+  add_categories_range: 'Ajouter une plage de catégories',
+  range: 'Plage',
+  categories_range_hint: 'Utilisez le trait d\'union \'-\' pour spécifier une plage de valeurs numériques et la virgule \',\' pour séparer les noms ou les plages de noms, par exemple : \'1-4, 9\' ou \'A, B, C \'. Les catégories existantes ne seront pas modifiées.',
 };
+

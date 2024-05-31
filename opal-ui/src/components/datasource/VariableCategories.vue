@@ -13,7 +13,18 @@
     >
       <template v-slot:top>
         <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :label="$t('add')" size="sm">
-          <q-list> </q-list>
+          <q-list>
+            <q-item clickable @click="onShowAddSingle">
+              <q-item-section>
+                <q-item-label>{{ $t('add_category') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable @click="onShowAddRange">
+              <q-item-section>
+                <q-item-label>{{ $t('add_categories_range') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
         </q-btn-dropdown>
         <q-btn
           v-if="canUpdate"
@@ -78,10 +89,14 @@
       :text="$t('delete_categories_confirm', { count: selected.length })"
       @confirm="onDelete" />
 
-    <category-dialog
+      <category-dialog
       v-model="showEdit"
       :variable="datasourceStore.variable"
-      :category="selected[0]" />
+      :category="selectedSingle" />
+
+    <categories-range-dialog
+      v-model="showAddRange"
+      :variable="datasourceStore.variable" />
   </div>
 </template>
 
@@ -95,6 +110,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
+import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
@@ -107,9 +123,11 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const selected = ref<CategoryDto[]>([]);
+const selectedSingle = ref<CategoryDto>();
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showDelete = ref(false);
 const showEdit = ref(false);
+const showAddRange = ref(false);
 
 const columns = [
   {
@@ -151,8 +169,17 @@ function onLeaveRow(row: CategoryDto) {
 }
 
 function onShowEdit(row: CategoryDto) {
-  selected.value = [row];
+  selectedSingle.value = row;
   showEdit.value = true;
+}
+
+function onShowAddSingle() {
+  selectedSingle.value = { name: '', attributes: [], isMissing: false } as CategoryDto;
+  showEdit.value = true;
+}
+
+function onShowAddRange() {
+  showAddRange.value = true;
 }
 
 function onShowDeleteSingle(row: CategoryDto) {
