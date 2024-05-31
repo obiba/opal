@@ -193,16 +193,13 @@ function onHide() {
 async function onAddUser() {
   const valid = await formRef.value.validate();
   if (valid) {
-    try {
-      editMode.value ? await usersStore.updateUser(newUser.value) : await usersStore.addUser(newUser.value);
-      confirmPassword.value = '';
-      groups.value = '';
-      certificate.value = '';
-      emit('update:modelValue', false);
-      showDialog.value = false;
-    } catch (err) {
-      notifyError(err);
+      (editMode.value ? usersStore.updateUser(newUser.value) : usersStore.addUser(newUser.value)).then(() => {
+        confirmPassword.value = '';
+        groups.value = '';
+        certificate.value = '';
+        emit('update:modelValue', false);
+        showDialog.value = false;
+      }).catch(notifyError);
     }
-  }
 }
 </script>

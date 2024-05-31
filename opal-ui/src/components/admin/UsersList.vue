@@ -180,7 +180,7 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 const filteredUsers = computed(() => filterUsers(users.value, filter.value));
 
 const filterUsers = (rows: any[], terms: string) => {
-  const query = filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
 
   const result = rows.filter((row) => {
     return Object.values(row).some((val) => {
@@ -219,21 +219,12 @@ async function doDeleteUser() {
   const toDelete: SubjectCredentialsDto | null = selectedUser.value;
   selectedUser.value = null;
 
-  try {
-    await usersStore.deleteUser(toDelete);
-    await groupsStore.initGroups();
-  } catch (err) {
-    notifyError(err);
-  }
+  Promise.all([usersStore.deleteUser(toDelete), groupsStore.initGroups()]).catch(notifyError);
 }
 
 async function onEnableUser(user: SubjectCredentialsDto) {
   user.enabled = !user.enabled;
-  try {
-    await usersStore.updateUser(user);
-  } catch (err) {
-    notifyError(err);
-  }
+  usersStore.updateUser(user).catch(notifyError);
 }
 
 function onAddWithPassword() {
