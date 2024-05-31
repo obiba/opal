@@ -63,8 +63,7 @@ export default {
   databases: 'Databases',
   datashield_caption: 'Configure DataSHIELD, grant access to DataSHIELD service',
   datashield: 'DataSHIELD',
-  delete_file_confirm: 'Are you sure you want to delete this file?',
-  delete_files_confirm: 'Are you sure you want to delete these files?',
+  delete_files_confirm: '- | Are you sure you want to delete this file? | Are you sure you want to delete these {count} files?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
   delete_variables_confirm: 'No variables to delete | Are you sure you want to delete this variable? | Are you sure you want to delete these {count} variables?',
   delete: 'Delete',
@@ -255,4 +254,6 @@ export default {
   bookmark_remove: 'Remove from favorites',
   no_bookmarks: 'No favorites',
   table: 'Table',
+  delete_categories_confirm: '- | Are you sure you want to delete this category? | Are you sure you want to delete these {count} categories?',
+  labels: 'Labels',
 };
