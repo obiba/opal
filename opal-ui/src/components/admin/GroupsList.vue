@@ -123,7 +123,8 @@ const loading = ref(false);
 
 onMounted(async () => {
   loading.value = true;
-  await groupsStore.initGroups();
-  loading.value = false;
+  groupsStore.initGroups().then(() => {
+    loading.value = false;
+  });
 });
 </script>

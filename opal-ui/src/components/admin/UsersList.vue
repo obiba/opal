@@ -254,7 +254,8 @@ async function onUserAdded() {
 
 onMounted(async () => {
   loading.value = true;
-  await usersStore.initUsers();
-  loading.value = false;
+  usersStore.initUsers().then(() => {
+    loading.value = false;
+  });
 });
 </script>
