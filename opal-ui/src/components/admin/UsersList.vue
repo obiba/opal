@@ -179,7 +179,6 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 const filteredUsers = computed(() => filterUsers(users.value, filter.value));
 
 const filterUsers = (rows: any[], terms: string) => {
-  console.log('Filter users', terms);
   const query = filter.value.length > 0 ? filter.value.toLowerCase() : '';
 
   const result = rows.filter((row) => {

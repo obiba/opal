@@ -11,7 +11,7 @@ export const useGroupsStore = defineStore('groups', () => {
 
   async function initGroups() {
     reset();
-    await loadGroups();
+    return loadGroups();
   }
 
   async function loadGroups() {
@@ -26,6 +26,7 @@ export const useGroupsStore = defineStore('groups', () => {
 
   return {
     groups,
+    reset,
     initGroups,
     deleteGroup,
   };

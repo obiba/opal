@@ -15,7 +15,7 @@ export default {
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
     PasswordTooWeak: 'Password is too weak',
     IllegalArgument: 'Invalid data',
-    Conflict: 'Duplicate entry detected',
+    Conflict: 'Conflicting entry detected',
   },
   importer: {
     file: {

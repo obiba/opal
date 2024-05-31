@@ -11,7 +11,8 @@ export const useUsersStore = defineStore('users', () => {
 
   async function initUsers() {
     reset();
-    await loadUsers();
+    console.log('initUsers');
+    return loadUsers();
   }
 
   async function loadUsers() {
@@ -36,6 +37,7 @@ export const useUsersStore = defineStore('users', () => {
 
   return {
     users,
+    reset,
     initUsers,
     addUser,
     updateUser,
