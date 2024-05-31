@@ -201,7 +201,6 @@ async function onAddUser() {
         confirmPassword.value = '';
         groups.value = '';
         certificate.value = '';
-        emit('update:modelValue', false);
         showDialog.value = false;
       })
       .catch(notifyError);
