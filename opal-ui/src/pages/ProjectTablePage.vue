@@ -19,7 +19,7 @@
       />
       <bookmark-icon :resource="`/datasource/${dsName}/table/${tName}`" />
     </q-toolbar>
-    <q-page class="q-pa-md">
+    <q-page class="q-pa-md" v-show="datasourceStore.table.name">
       <div class="text-h5">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ datasourceStore.table.name }}</span>

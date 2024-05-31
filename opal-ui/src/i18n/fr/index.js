@@ -6,7 +6,8 @@ export default {
     username: "Nom d'utilisateur",
   },
   error: {
-    Forbidden: 'L\'operation est interdite'
+    Forbidden: 'L\'operation est interdite',
+    NoSuchValueTableInDatasource: 'La table n\'existe pas ou vous n\'y avez pas accès',
   },
   importer : {
     file: {

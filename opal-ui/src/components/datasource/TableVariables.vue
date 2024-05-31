@@ -70,6 +70,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { notifyError } from 'src/utils/notify';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
@@ -141,6 +142,10 @@ function init() {
     .initDatasourceTableVariables(dsName.value, tName.value)
     .then(() => {
       loading.value = false;
+    })
+    .catch((err) => {
+      loading.value = false;
+      notifyError(err);
     });
 }
 
