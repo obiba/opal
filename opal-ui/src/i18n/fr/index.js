@@ -256,5 +256,7 @@ export default {
   add_categories_range: 'Ajouter une plage de catégories',
   range: 'Plage',
   categories_range_hint: 'Utilisez le trait d\'union \'-\' pour spécifier une plage de valeurs numériques et la virgule \',\' pour séparer les noms ou les plages de noms, par exemple : \'1-4, 9\' ou \'A, B, C \'. Les catégories existantes ne seront pas modifiées.',
+  move_up: 'Monter',
+  move_down: 'Descendre',
 };
 

@@ -263,4 +263,6 @@ export default {
   add_categories_range: 'Add category range',
   range: 'Range',
   categories_range_hint: 'Use hyphen \'-\' to specify a range of numerical values and comma \',\' to separate names or ranges of names, for example: \'1-4, 9\', or \'A, B, C\'. Existing categories will not be overridden.',
+  move_up: 'Move up',
+  move_down: 'Move down',
 };

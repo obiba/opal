@@ -28,6 +28,24 @@
         </q-btn-dropdown>
         <q-btn
           v-if="canUpdate"
+          color="secondary"
+          icon="arrow_upward"
+          size="sm"
+          :title="$t('move_up')"
+          @click="onUp"
+          :disable="selected.length === 0 || !moveEnabled"
+          class="on-right" />
+        <q-btn
+          v-if="canUpdate"
+          color="secondary"
+          icon="arrow_downward"
+          size="sm"
+          :title="$t('move_down')"
+          @click="onDown"
+          :disable="selected.length === 0 || !moveEnabled"
+          class="on-right" />
+        <q-btn
+          v-if="canUpdate"
           outline
           color="red"
           icon="delete"
@@ -128,6 +146,7 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showDelete = ref(false);
 const showEdit = ref(false);
 const showAddRange = ref(false);
+const moveEnabled = ref(true);
 
 const columns = [
   {
@@ -197,5 +216,41 @@ function onDelete() {
     categories: datasourceStore.variable.categories.filter((c) => !selected.value.includes(c)),
   };
   datasourceStore.saveVariable(newVariable);
+}
+
+function onUp() {
+  const categories = [...datasourceStore.variable.categories];
+  const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort();
+  for (let i = 0; i < indices.length; i++) {
+    const idx = indices[i];
+    if (idx === 0) {
+      continue;
+    }
+    const c = categories[idx];
+    categories.splice(idx, 1);
+    categories.splice(idx - 1, 0, c);
+  }
+  moveEnabled.value = false;
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
+    moveEnabled.value = true;
+  });
+}
+
+function onDown() {
+  const categories = [...datasourceStore.variable.categories];
+  const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort((a, b) => b - a);
+  for (let i = 0; i < indices.length; i++) {
+    const idx = indices[i];
+    if (idx === categories.length - 1) {
+      continue;
+    }
+    const c = categories[idx];
+    categories.splice(idx, 1);
+    categories.splice(idx + 1, 0, c);
+  }
+  moveEnabled.value = false;
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
+    moveEnabled.value = true;
+  });
 }
 </script>

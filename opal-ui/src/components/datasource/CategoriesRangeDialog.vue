@@ -46,8 +46,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { parse } from 'path';
-import { CategoryDto, VariableDto } from 'src/models/Magma';
+import { VariableDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;

@@ -30,13 +30,13 @@
                   type="text"
                   :label="$t('locale')"
                   :debounce="500"
-                  style="width: 50px" />
+                  style="width: 80px" />
                 <q-input
                   v-model="label.value"
                   dense
                   type="text"
                   :label="$t('value')"
-                  style="min-width: 300px" />
+                  style="min-width: 290px" />
                 <span class="q-mt-md">
                   <q-btn
                     flat
