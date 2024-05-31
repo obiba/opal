@@ -243,7 +243,7 @@ function onAddWithCertificate() {
 }
 
 async function onUserAdded() {
-  await groupsStore.initGroups();
+  groupsStore.initGroups();
   selectedUser.value = null;
   showAddUser.value = false;
 }
