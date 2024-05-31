@@ -219,7 +219,12 @@ async function doDeleteUser() {
   const toDelete: SubjectCredentialsDto | null = selectedUser.value;
   selectedUser.value = null;
 
-  Promise.all([usersStore.deleteUser(toDelete), groupsStore.initGroups()]).catch(notifyError);
+  try {
+    await usersStore.deleteUser(toDelete);
+    await groupsStore.initGroups();
+  } catch (err) {
+    notifyError(err);
+  }
 }
 
 async function onEnableUser(user: SubjectCredentialsDto) {

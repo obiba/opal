@@ -120,8 +120,10 @@ const userGroups = computed({
     return groups.value;
   },
   set(value) {
-    groups.value = value;
-    newUser.value.groups = value.split(',').map((g) => g.trim());
+    if (!!value && value.trim().length > 0) {
+      groups.value = value;
+      newUser.value.groups = value.split(',').map((g) => g.trim());
+    }
   },
 });
 
@@ -172,7 +174,8 @@ watch(
           groups: [],
         } as SubjectCredentialsDto;
       }
-      userGroups.value = newUser.value.groups.join(', ');
+
+      userGroups.value = newUser.value.groups ? newUser.value.groups.join(', ') : '';
       showDialog.value = value;
     }
   }
@@ -193,13 +196,15 @@ function onHide() {
 async function onAddUser() {
   const valid = await formRef.value.validate();
   if (valid) {
-      (editMode.value ? usersStore.updateUser(newUser.value) : usersStore.addUser(newUser.value)).then(() => {
+    (editMode.value ? usersStore.updateUser(newUser.value) : usersStore.addUser(newUser.value))
+      .then(() => {
         confirmPassword.value = '';
         groups.value = '';
         certificate.value = '';
         emit('update:modelValue', false);
         showDialog.value = false;
-      }).catch(notifyError);
-    }
+      })
+      .catch(notifyError);
+  }
 }
 </script>
