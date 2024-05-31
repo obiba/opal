@@ -13,7 +13,7 @@
             <q-item-label header class="text-uppercase">{{ $t('data_access') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/users">{{ $t('users_and_groups') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/users">{{ $t('users_and_groups') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('users_and_groups_caption') }}</q-item-label>
               </q-item-section>
             </q-item>

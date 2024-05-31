@@ -1,4 +1,13 @@
 {
   "singleQuote": true,
-  "semi": true
+  "semi": true,
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": "src/i18n/**/index.js",
+      "options": {
+        "printWidth": 10000
+      }
+    }
+  ]
 }

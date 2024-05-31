@@ -84,6 +84,9 @@
     "useFilesStore": true,
     "usePluginsStore": true,
     "useTransientDatasourceStore": true,
-    "useCommandsStore": true
+    "useCommandsStore": true,
+    "useUsersStore": true,
+    "useUsersGroupsStore": true,
+    "useGroupsStore": true
   }
 }

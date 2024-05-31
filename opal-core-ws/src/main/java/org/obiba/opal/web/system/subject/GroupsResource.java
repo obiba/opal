@@ -19,6 +19,7 @@ import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
+import org.obiba.opal.web.support.ConflictingRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,8 +55,12 @@ public class GroupsResource {
   @POST
   public Response createGroup(Opal.GroupDto dto) {
     Group group = new Group(dto.getName());
+    if (group.getName().trim().isEmpty()) {
+      throw new BadRequestException("Group name cannot be empty");
+    }
+
     if(subjectCredentialsService.getGroup(dto.getName()) != null) {
-      throw new BadRequestException("Group name must be unique");
+      throw new ConflictingRequestException("Group name must be unique");
     }
     subjectCredentialsService.createGroup(dto.getName());
     return Response.ok().build();

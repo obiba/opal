@@ -16,6 +16,7 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
+import org.obiba.opal.web.support.ConflictingRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,8 +48,12 @@ public class SubjectCredentialsResource {
   @POST
   public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
+    if (subjectCredentials.getName().trim().isEmpty()) {
+      throw new BadRequestException("Subject name cannot be empty");
+    }
+
     if (subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
-      throw new BadRequestException("Subject name must be unique");
+      throw new ConflictingRequestException("Subject name must be unique");
     }
 
     switch (subjectCredentials.getAuthenticationType()) {

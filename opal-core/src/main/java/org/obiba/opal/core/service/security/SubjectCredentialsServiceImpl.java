@@ -285,6 +285,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       @Nullable
       @Override
       public Group apply(String groupName) {
+        if (groupName.isEmpty()) return null;
+
         Group group = getGroup(groupName);
         if (group == null) {
           group = new Group(groupName);

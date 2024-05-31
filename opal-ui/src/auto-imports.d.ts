@@ -67,6 +67,7 @@ declare global {
   const useCssVars: typeof import('vue')['useCssVars']
   const useDatasourceStore: typeof import('./stores/datasource')['useDatasourceStore']
   const useFilesStore: typeof import('./stores/files')['useFilesStore']
+  const useGroupsStore: typeof import('./stores/groups')['useGroupsStore']
   const useI18n: typeof import('vue-i18n')['useI18n']
   const useLink: typeof import('vue-router')['useLink']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
@@ -75,6 +76,8 @@ declare global {
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
   const useTransientDatasourceStore: typeof import('./stores/transient-datasource')['useTransientDatasourceStore']
+  const useUsersGroupsStore: typeof import('./stores/users-groups')['useUsersGroupsStore']
+  const useUsersStore: typeof import('./stores/users')['useUsersStore']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -152,6 +155,7 @@ declare module 'vue' {
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useDatasourceStore: UnwrapRef<typeof import('./stores/datasource')['useDatasourceStore']>
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
+    readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
@@ -160,6 +164,7 @@ declare module 'vue' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
+    readonly useUsersStore: UnwrapRef<typeof import('./stores/users')['useUsersStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>
@@ -230,6 +235,7 @@ declare module '@vue/runtime-core' {
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useDatasourceStore: UnwrapRef<typeof import('./stores/datasource')['useDatasourceStore']>
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
+    readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
@@ -238,6 +244,7 @@ declare module '@vue/runtime-core' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
+    readonly useUsersStore: UnwrapRef<typeof import('./stores/users')['useUsersStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>

@@ -163,6 +163,8 @@ const projectsStore = useProjectsStore();
 const commandsStore = useCommandsStore();
 const pluginsStore = usePluginsStore();
 const transientDatasourceStore = useTransientDatasourceStore();
+const usersStore = useUsersStore();
+const groupsStore = useGroupsStore();
 
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -190,6 +192,8 @@ onMounted(() => {
   pluginsStore.reset();
   projectsStore.reset();
   transientDatasourceStore.reset();
+  usersStore.reset();
+  groupsStore.reset();
 });
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
