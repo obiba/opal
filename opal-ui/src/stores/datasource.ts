@@ -275,6 +275,17 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  function saveVariable(localVar: VariableDto) {
+    const tableType = table.value.viewType ? 'view' : 'table';
+    const link = `/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
+    return api.put(`${link}/variable/${variable.value.name}`, localVar).then(() => {
+      return Promise.all([
+        loadTableVariable(localVar.name),
+        loadTableVariables(),
+      ]);
+    });
+  }
+
   function saveDerivedVariable(localVar: VariableDto, comment: string | undefined) {
     const link = `/datasource/${datasource.value.name}/view/${table.value.name}`;
     return api.put(`${link}/variable/${variable.value.name}`, localVar, { params: { comment } }).then(() => {
@@ -309,6 +320,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadView,
     loadValueSets,
     loadVariableSummary,
+    saveVariable,
     saveDerivedVariable,
     reset,
   };

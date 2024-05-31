@@ -8,24 +8,86 @@
       row-key="name"
       :pagination="initialPagination"
       :loading="loading"
+      :selection="canUpdate ? 'multiple' : 'none'"
+      v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :label="$t('add')" size="sm">
-          <q-list> </q-list>
+        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :label="$t('add')" size="sm">
+          <q-list>
+            <q-item clickable @click="onShowAddSingle">
+              <q-item-section>
+                <q-item-label>{{ $t('add_category') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable @click="onShowAddRange">
+              <q-item-section>
+                <q-item-label>{{ $t('add_categories_range') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
         </q-btn-dropdown>
+        <q-btn
+          v-if="canUpdate"
+          color="secondary"
+          icon="arrow_upward"
+          size="sm"
+          :title="$t('move_up')"
+          @click="onUp"
+          :disable="selected.length === 0 || !moveEnabled"
+          class="on-right" />
+        <q-btn
+          v-if="canUpdate"
+          color="secondary"
+          icon="arrow_downward"
+          size="sm"
+          :title="$t('move_down')"
+          @click="onDown"
+          :disable="selected.length === 0 || !moveEnabled"
+          class="on-right" />
+        <q-btn
+          v-if="canUpdate"
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          @click="onShowDelete"
+          :disable="selected.length === 0"
+          class="on-right" />
       </template>
       <template v-slot:body-cell-name="props">
-        <q-td :props="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <span class="text-primary">{{ props.value }}</span>
+          <div v-if="canUpdate" class="float-right">
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('edit')"
+              :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
+              class="q-ml-xs"
+              @click="onShowEdit(props.row)" />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('delete')"
+              :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+              class="q-ml-xs"
+              @click="onShowDeleteSingle(props.row)" />
+          </div>
         </q-td>
       </template>
       <template v-slot:body-cell-missing="props">
-        <q-td :props="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-icon v-if="props.value" name="done"></q-icon>
         </q-td>
       </template>
       <template v-slot:body-cell-label="props">
-        <q-td :props="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <div v-for="attr in getLabels(props.value)" :key="attr.locale">
             <q-badge
               v-if="attr.locale"
@@ -38,17 +100,36 @@
         </q-td>
       </template>
     </q-table>
+
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('delete_categories_confirm', { count: selected.length })"
+      @confirm="onDelete" />
+
+      <category-dialog
+      v-model="showEdit"
+      :variable="datasourceStore.variable"
+      :category="selectedSingle" />
+
+    <categories-range-dialog
+      v-model="showAddRange"
+      :variable="datasourceStore.variable" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { getLabels } from 'src/utils/attributes';
+import { CategoryDto } from 'src/models/Magma';
 export default defineComponent({
   name: 'VariableCategories',
 });
 </script>
 <script setup lang="ts">
+import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
+import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
@@ -59,6 +140,13 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
+const selected = ref<CategoryDto[]>([]);
+const selectedSingle = ref<CategoryDto>();
+const toolsVisible = ref<{ [key: string]: boolean }>({});
+const showDelete = ref(false);
+const showEdit = ref(false);
+const showAddRange = ref(false);
+const moveEnabled = ref(true);
 
 const columns = [
   {
@@ -88,4 +176,81 @@ const columns = [
 ];
 
 const rows = computed(() => datasourceStore.variable?.categories ? datasourceStore.variable.categories : []);
+
+const canUpdate = computed(() => datasourceStore.perms.variable?.canUpdate());
+
+function onOverRow(row: CategoryDto) {
+  toolsVisible.value[row.name] = true;
+}
+
+function onLeaveRow(row: CategoryDto) {
+  toolsVisible.value[row.name] = false;
+}
+
+function onShowEdit(row: CategoryDto) {
+  selectedSingle.value = row;
+  showEdit.value = true;
+}
+
+function onShowAddSingle() {
+  selectedSingle.value = { name: '', attributes: [], isMissing: false } as CategoryDto;
+  showEdit.value = true;
+}
+
+function onShowAddRange() {
+  showAddRange.value = true;
+}
+
+function onShowDeleteSingle(row: CategoryDto) {
+  selected.value = [row];
+  onShowDelete();
+}
+
+function onShowDelete() {
+  showDelete.value = true;
+}
+
+function onDelete() {
+  const newVariable = {
+    ...datasourceStore.variable,
+    categories: datasourceStore.variable.categories.filter((c) => !selected.value.includes(c)),
+  };
+  datasourceStore.saveVariable(newVariable);
+}
+
+function onUp() {
+  const categories = [...datasourceStore.variable.categories];
+  const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort();
+  for (let i = 0; i < indices.length; i++) {
+    const idx = indices[i];
+    if (idx === 0) {
+      continue;
+    }
+    const c = categories[idx];
+    categories.splice(idx, 1);
+    categories.splice(idx - 1, 0, c);
+  }
+  moveEnabled.value = false;
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
+    moveEnabled.value = true;
+  });
+}
+
+function onDown() {
+  const categories = [...datasourceStore.variable.categories];
+  const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort((a, b) => b - a);
+  for (let i = 0; i < indices.length; i++) {
+    const idx = indices[i];
+    if (idx === categories.length - 1) {
+      continue;
+    }
+    const c = categories[idx];
+    categories.splice(idx, 1);
+    categories.splice(idx + 1, 0, c);
+  }
+  moveEnabled.value = false;
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
+    moveEnabled.value = true;
+  });
+}
 </script>

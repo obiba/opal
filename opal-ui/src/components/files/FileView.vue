@@ -198,7 +198,7 @@
     <confirm-dialog
       v-model="showDelete"
       :title="$t('delete')"
-      :text="props.file.type === FileDto_FileType.FILE || writables.length === 1 ? $t('delete_file_confirm') : $t('delete_files_confirm')"
+      :text="$t('delete_files_confirm', { count: props.file.type === FileDto_FileType.FILE ? 1 : writables.length })"
       @confirm="onDelete" />
 
     <upload-file-dialog v-model="showUpload" :file="props.file" :extensions="[]" />
