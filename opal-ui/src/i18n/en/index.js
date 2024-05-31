@@ -249,7 +249,9 @@ export default {
   id_column_name: 'ID column name',
   id_column_name_hint: 'Name of the column that identifies the entity. If not provided, the default name applies.',
   export_tables_task_created: 'Export tables task created with identifier [ {id} ].',
-  bookmarks: 'Stars',
-  bookmark_item: 'Star this item',
-  bookmarked_item: 'Item starred',
+  bookmarks: 'Favorites',
+  bookmark_add: 'Add to favorites',
+  bookmark_remove: 'Remove from favorites',
+  no_bookmarks: 'No favorites',
+  table: 'Table',
 };

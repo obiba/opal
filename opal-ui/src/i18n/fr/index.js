@@ -243,6 +243,8 @@ export default {
   password: 'Mot de passe',
   auth_method: 'Méthode d\'authentification',
   bookmarks: 'Favoris',
-  bookmark_item: 'Ajouter aux favoris',
-  bookmarked_item: 'Favori enregistré',
+  bookmark_add: 'Ajouter aux favoris',
+  bookmark_remove: 'Retirer des favoris',
+  no_bookmarks: 'Aucun favori',
+  table: 'Table',
 };

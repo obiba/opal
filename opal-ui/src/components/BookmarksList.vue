@@ -1,16 +1,29 @@
 <template>
-  <q-list separator v-if="bookmarks.length">
-    <q-item-label header class="text-uppercase">{{ $t('bookmarks') }}</q-item-label>
-    <q-item
-      v-for="bookmark in bookmarks"
-      :key="bookmark.link"
-    >
-      <q-item-section>
-        <q-item-label><router-link :to="bookmark.link">{{ bookmark.title }}</router-link></q-item-label>
-        <q-item-label caption lines="2">{{ bookmark.caption }}</q-item-label>
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div>
+    <q-list separator>
+      <q-item-label header class="text-uppercase">{{ $t('bookmarks') }}</q-item-label>
+      <q-item
+        v-for="item in items"
+        :key="item.link"
+      >
+        <q-item-section>
+          <q-item-label><router-link :to="item.link">{{ item.title }}</router-link></q-item-label>
+          <q-item-label caption lines="2">{{ $t(item.caption) }}</q-item-label>
+        </q-item-section>
+        <q-item-section avatar>
+          <bookmark-icon :resource="item.resource" />
+        </q-item-section>
+      </q-item>
+      <q-item v-if="items.length === 0">
+        <q-item-section>
+          <q-item-label class="text-hint">{{ $t('no_bookmarks') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+    </q-list>
+    <div  class="text-help">
+
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -21,12 +34,14 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
+import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 const authStore = useAuthStore();
 
-const bookmarks = computed(() => authStore.bookmarks.map((bookmark) => ({
+const items = computed(() => authStore.bookmarks.map((bookmark) => ({
   title: getTitle(bookmark),
-  caption: bookmark.type,
-  link: getLink(bookmark)
+  caption: bookmark.type.toLowerCase(),
+  link: getLink(bookmark),
+  resource: bookmark.resource,
 })));
 
 function getTitle(bookmark: BookmarkDto) {

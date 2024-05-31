@@ -43,13 +43,4 @@
 
 <script setup lang="ts">
 import BookmarksList from 'src/components/BookmarksList.vue';
-const authStore = useAuthStore();
-
-const username = computed(() =>
-  authStore.profile?.principal ? authStore.profile.principal : ''
-);
-
-onMounted(() => {
-  authStore.loadBookmarks();
-});
 </script>

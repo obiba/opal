@@ -29,5 +29,5 @@ const name = computed(() => authStore.isBookmarked(props.resource) ? 'star' : 's
 
 const color = computed(() => authStore.isBookmarked(props.resource) ? 'warning' : 'grey-5');
 
-const title = computed(() => authStore.isBookmarked(props.resource) ? 'bookmarked_item' : 'bookmark_item');
+const title = computed(() => authStore.isBookmarked(props.resource) ? 'bookmark_remove' : 'bookmark_add');
 </script>
