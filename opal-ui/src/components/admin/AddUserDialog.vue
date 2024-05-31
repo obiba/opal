@@ -90,7 +90,6 @@
 <script setup lang="ts">
 import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
-import { onMounted, onUnmounted } from 'vue';
 
 interface DialogProps {
   modelValue: boolean;
@@ -178,13 +177,6 @@ watch(
     }
   }
 );
-
-onMounted(() => {
-  console.log('mounted');
-});
-onUnmounted(() => {
-  console.log('unmounted');
-});
 
 function onHide() {
   confirmPassword.value = '';
