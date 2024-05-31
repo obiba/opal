@@ -224,7 +224,7 @@ export default {
   users_filter_placeholder: 'Filter users by name, group or authentication type...',
   groups: 'Groups',
   groups_info: 'Groups can only be defined through users. Removing a group removes users from this group.',
-  groups_hint: "Press comma (',') to add a group that is not in the suggestion list.",
+  groups_hint: 'Select a group or type a new name and press \'Enter\'.',
   delete_group_confirm: "Are you sure you want to delete group '{group}'?",
   enable: 'Enable',
   enabled: 'Enabled',

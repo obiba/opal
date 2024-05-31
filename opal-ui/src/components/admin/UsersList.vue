@@ -54,7 +54,9 @@
       </template>
       <template v-slot:body-cell-groups="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span>{{ props.col.format(props.row.groups) }}</span>
+          <q-chip class="q-ml-none" v-for="group in props.col.format(props.row.groups)" :key="group.name">
+            {{ group }}
+          </q-chip>
           <div class="float-right">
             <q-btn
               rounded
@@ -144,13 +146,14 @@ const columns = [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
+    style: 'width: 15%',
   },
   {
     name: 'groups',
     label: t('groups'),
     align: 'left',
     field: 'groups',
-    format: (val: string[]) => (val || []).join(', '),
+    format: (val: string[]) => (val || []).filter((val) => !!val && val.length > 0),
     style: 'width: 50%',
   },
   {

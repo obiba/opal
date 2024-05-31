@@ -62,18 +62,17 @@
             >
             </q-input>
           </template>
-
-          <!-- TODO: create a comp with q-input and q-chip -->
-          <q-input
-            v-model="userGroups"
-            dense
-            type="text"
-            :label="$t('groups')"
+          <q-select
+            v-model="newUser.groups"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
             :hint="$t('groups_hint')"
-            class="q-mb-md"
-            lazy-rules
-          >
-          </q-input>
+            @new-value="addGroup"
+            :options="groupFilters"
+            @filter="filterGroups"
+          ></q-select>
         </q-form>
       </q-card-section>
 
@@ -99,6 +98,7 @@ interface DialogProps {
 
 const { t } = useI18n();
 const usersStore = useUsersStore();
+const groupsStore = useGroupsStore();
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
@@ -112,20 +112,9 @@ const newUser = ref<SubjectCredentialsDto>({
 } as SubjectCredentialsDto);
 
 const confirmPassword = ref('');
-const groups = ref('');
 const certificate = ref('');
-
-const userGroups = computed({
-  get() {
-    return groups.value;
-  },
-  set(value) {
-    if (!!value && value.trim().length > 0) {
-      groups.value = value;
-      newUser.value.groups = value.split(',').map((g) => g.trim());
-    }
-  },
-});
+let groupFilterOptions = Array<string>();
+const groupFilters = ref(Array<string>());
 
 const userCertificate = computed({
   get() {
@@ -142,6 +131,33 @@ const authPassword = computed(() => props.authenticationType === SubjectCredenti
 const editMode = computed(() => !!props.user && !!props.user.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('user_edit') : t('user_add')));
+
+function filterGroups(val: string, update: any) {
+  update(() => {
+    if (val.trim().length === 0) {
+      groupFilters.value = [...groupFilterOptions];
+    } else {
+      const needle = val.toLowerCase();
+      groupFilters.value = groupFilters.value.filter((v) => v.toLowerCase().indexOf(needle) > -1);
+    }
+  });
+}
+
+function addGroup(val: string, done: any) {
+  if (val.trim().length > 0) {
+    const modelValue = newUser.value.groups.slice();
+    if (groupFilterOptions.includes(val) === false) {
+      groupFilterOptions.push(val);
+      groupFilters.value = [...groupFilterOptions];
+    }
+    if (modelValue.includes(val) === false) {
+      modelValue.push(val);
+    }
+
+    done(null);
+    newUser.value.groups = modelValue;
+  }
+}
 
 // Validation rules
 const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.user.name_required');
@@ -175,7 +191,8 @@ watch(
         } as SubjectCredentialsDto;
       }
 
-      userGroups.value = newUser.value.groups ? newUser.value.groups.join(', ') : '';
+      groupFilterOptions = groupsStore.groups.map((g) => g.name) || [];
+      groupFilters.value = [...groupFilterOptions];
       showDialog.value = value;
     }
   }
@@ -199,7 +216,8 @@ async function onAddUser() {
     (editMode.value ? usersStore.updateUser(newUser.value) : usersStore.addUser(newUser.value))
       .then(() => {
         confirmPassword.value = '';
-        groups.value = '';
+        groupFilterOptions = [];
+        groupFilters.value = [];
         certificate.value = '';
         showDialog.value = false;
       })
