@@ -21,7 +21,7 @@ export const useUsersStore = defineStore('users', () => {
   }
 
   async function addUser(user: SubjectCredentialsDto) {
-    return api.post(`/system/subject-credentials`, user).then(() => loadUsers());
+    return api.post('/system/subject-credentials', user).then(() => loadUsers());
   }
 
   async function updateUser(user: SubjectCredentialsDto) {

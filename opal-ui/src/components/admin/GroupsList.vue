@@ -1,13 +1,11 @@
 <template>
   <div>
-    <div class="text-h5 q-pt-lg">
-      <q-icon name="groups" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ $t('groups') }}</span>
+    <div class="text-h5 q-mb-md">
+      {{ $t('groups') }}
     </div>
-    <p>{{ $t('groups_info') }}</p>
-
+    <div class="text-help q-mb-md">{{ $t('groups_info') }}</div>
     <q-table
       flat
-      bordered
       :rows="groups"
       :columns="columns"
       row-key="name"
@@ -15,11 +13,9 @@
       :hide-pagination="groups.length <= initialPagination.rowsPerPage"
       :loading="loading"
     >
-      <template v-slot:body-cell-users="props">
+      <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <q-chip class="q-ml-none" v-for="user in props.col.format(props.row.subjectCredentials)" :key="user.name">
-            {{ user }}
-          </q-chip>
+          <span class="text-primary">{{ props.value }}</span>
           <div class="float-right">
             <q-btn
               rounded
@@ -33,6 +29,14 @@
               @click="onDeleteGroup(props.row)"
             />
           </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-users="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <q-chip class="q-ml-none" v-for="user in props.col.format(props.row.subjectCredentials)" :key="user.name">
+            {{ user }}
+          </q-chip>
+
         </q-td>
       </template>
     </q-table>
@@ -72,7 +76,7 @@ const columns = [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
-    style: 'width: 15%',
+    style: 'width: 25%',
   },
   {
     name: 'users',

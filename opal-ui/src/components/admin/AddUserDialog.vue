@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
-    <q-card style="width: 60vw">
+    <q-card class="dialog-sm">
       <q-card-section>
         <div class="text-h6">{{ dialogTitle }}</div>
       </q-card-section>
@@ -132,6 +132,7 @@ const editMode = computed(() => !!props.user && !!props.user.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('user_edit') : t('user_add')));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function filterGroups(val: string, update: any) {
   update(() => {
     if (val.trim().length === 0) {
@@ -143,6 +144,7 @@ function filterGroups(val: string, update: any) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addGroup(val: string, done: any) {
   if (val.trim().length > 0) {
     const modelValue = newUser.value.groups.slice();
