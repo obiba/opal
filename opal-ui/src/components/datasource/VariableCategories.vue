@@ -83,7 +83,7 @@
       </template>
       <template v-slot:body-cell-missing="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <q-icon v-if="props.value" name="done"></q-icon>
+          <q-icon v-if="props.value" name="check" size="sm"></q-icon>
         </q-td>
       </template>
       <template v-slot:body-cell-label="props">

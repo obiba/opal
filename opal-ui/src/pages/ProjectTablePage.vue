@@ -38,6 +38,7 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right"></q-btn>
+        <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="secondary" icon="edit" size="sm" @click="onShowEdit" class="on-right"></q-btn>
         <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
@@ -85,6 +86,8 @@
       </q-tab-panels>
 
       <copy-tables-dialog v-model="showCopy" :tables="[datasourceStore.table]"/>
+      <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
+        @update:table="onTableUpdate" @update:view="onViewUpdate"/>
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
     </q-page>
   </div>
@@ -97,7 +100,8 @@ import TableValues from 'src/components/datasource/TableValues.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
-import { TableDto } from 'src/models/Magma';
+import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
+import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 
@@ -109,6 +113,7 @@ const datasourceStore = useDatasourceStore();
 const tab = ref('dictionary');
 const showDelete = ref(false);
 const showCopy = ref(false);
+const showEdit = ref(false);
 
 const items1: FieldItem<TableDto>[] = [
   {
@@ -174,11 +179,27 @@ function onShowCopy() {
   showCopy.value = true;
 }
 
+function onShowEdit() {
+  datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+}
+
 function onShowDelete() {
   showDelete.value = true;
 }
 
 function onDeleteTable() {
   datasourceStore.deleteTable(tName.value).then(() => router.push(`/project/${dsName.value}/tables`));
+}
+
+function onTableUpdate(updated: TableDto) {
+  router.push(`/project/${dsName.value}/table/${updated.name}`);
+}
+
+function onViewUpdate(updated: ViewDto) {
+  if (updated.name === tName.value) {
+    datasourceStore.view = updated;
+  } else {
+    router.push(`/project/${dsName.value}/table/${updated.name}`);
+  }
 }
 </script>

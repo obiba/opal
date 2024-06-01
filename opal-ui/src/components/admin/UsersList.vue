@@ -99,7 +99,7 @@
       </template>
       <template v-slot:body-cell-enabled="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <q-icon :name="props.value ? 'check' : 'close'" size="1.5rem" />
+          <q-icon :name="props.value ? 'check' : 'close'" size="sm" />
         </q-td>
       </template>
     </q-table>

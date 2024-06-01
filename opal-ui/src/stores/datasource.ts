@@ -194,6 +194,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
     )
   }
 
+  async function updateTable(original: TableDto, updated: TableDto) {
+    return api.put(
+      `/datasource/${datasource.value.name}/table/${original.name}`,
+      updated)
+  }
+
+  async function updateView(original: ViewDto, updated: ViewDto, comment: string) {
+    return api.put(
+      `/datasource/${datasource.value.name}/view/${original.name}`,
+      updated, { params: { comment } })
+  }
+
   async function deleteTable(name: string) {
     return api.delete(
       `/datasource/${datasource.value.name}/table/${name}`)
@@ -275,6 +287,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  async function getAllTables(entityType: string): Promise<TableDto[]> {
+    return api.get('/datasources/tables', { params: { entityType } }).then((response) => response.data as TableDto[]);
+  }
+
   function saveVariable(localVar: VariableDto) {
     const tableType = table.value.viewType ? 'view' : 'table';
     const link = `/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
@@ -311,6 +327,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadTable,
     isNewTableNameValid,
     addTable,
+    updateTable,
+    updateView,
     deleteTable,
     deleteTables,
     deleteVariables,
@@ -322,6 +340,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadVariableSummary,
     saveVariable,
     saveDerivedVariable,
+    getAllTables,
     reset,
   };
 });
