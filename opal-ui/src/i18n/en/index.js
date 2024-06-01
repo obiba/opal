@@ -299,7 +299,7 @@ export default {
   users_and_groups_caption: 'Add, update, remove users and groups',
   users_and_groups: 'Users and groups',
   users_filter_placeholder: 'Filter users by name, group or authentication type...',
-  users_info: 'Users can login using a password or programmatically by providing a certificate in a secured connection (HTTP).',
+  users_info: 'Users can login using a password or programmatically by providing a certificate in a secured connection (HTTPS).',
   users: 'Users',
   value_type: 'Value type',
   value: 'Value',

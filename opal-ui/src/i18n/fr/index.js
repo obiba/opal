@@ -296,7 +296,7 @@ export default {
   users_and_groups_caption: 'Ajouter, mettre à jour, supprimer des utilisateurs et des groupes',
   users_and_groups: 'Utilisateurs et groupes',
   users_filter_placeholder: 'Filtrer les utilisateurs par nom, groupe ou type d\'authentification...',
-  users_info: 'Les utilisateurs peuvent se connecter à l\'aide d\'un mot de passe ou de manière programmatique en fournissant un certificat dans une connexion sécurisée (HTTP).',
+  users_info: 'Les utilisateurs peuvent se connecter à l\'aide d\'un mot de passe ou de manière programmatique en fournissant un certificat dans une connexion sécurisée (HTTPS).',
   users: 'Utilisateurs',
   value_type: 'Type de valeur',
   value: 'Valeur',
