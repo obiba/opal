@@ -17,13 +17,13 @@
       <template v-slot:top-left>
         <q-btn-dropdown color="primary" :label="$t('user_add')" icon="add" size="sm">
         <q-list>
-          <q-item dense clickable v-close-popup @click.prevent="onAddWithPassword">
+          <q-item clickable v-close-popup @click.prevent="onAddWithPassword">
             <q-item-section>
               <q-item-label>{{ $t('user_add_with_pwd') }}</q-item-label>
             </q-item-section>
           </q-item>
 
-          <q-item dense clickable v-close-popup @click.prevent="onAddWithCertificate">
+          <q-item clickable v-close-popup @click.prevent="onAddWithCertificate">
             <q-item-section>
               <q-item-label>{{ $t('user_add_with_crt') }}</q-item-label>
             </q-item-section>
