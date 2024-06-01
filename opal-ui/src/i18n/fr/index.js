@@ -222,7 +222,7 @@ export default {
   users_filter_placeholder: "Filtrer les utilisateurs par nom, groupe ou type d'authentification...",
   groups: 'Groupes',
   groups_info: "Les groupes ne peuvent être définis que par l'intermédiaire des utilisateurs. La suppression d'un groupe supprime les utilisateurs de ce groupe.",
-  groups_hint: "Appuyez sur la virgule (',') pour ajouter un groupe qui ne figure pas dans la liste des suggestions.",
+  groups_hint: 'Sélectionnez un groupe ou saisissez un nouveau nom et appuyez sur \'Entrée\'.',
   enable: 'Activer',
   enabled: 'Activé',
   disable: 'Désactiver',

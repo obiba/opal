@@ -17,7 +17,9 @@
     >
       <template v-slot:body-cell-users="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span>{{ props.col.format(props.row.subjectCredentials) }}</span>
+          <q-chip class="q-ml-none" v-for="user in props.col.format(props.row.subjectCredentials)" :key="user.name">
+            {{ user }}
+          </q-chip>
           <div class="float-right">
             <q-btn
               rounded
@@ -70,14 +72,14 @@ const columns = [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
-    style: 'width: 25%',
+    style: 'width: 15%',
   },
   {
     name: 'users',
     label: t('users'),
     align: 'left',
     field: 'subjectCredentials',
-    format: (val: string[]) => (val || []).join(', '),
+    format: (val: string[]) => (val || []).filter((val) => !!val && val.length > 0),
   },
 ];
 
