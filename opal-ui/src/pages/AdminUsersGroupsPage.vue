@@ -9,7 +9,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <users-list></users-list>
-      <groups-list></groups-list>
+      <groups-list class="q-mt-lg"></groups-list>
     </q-page>
   </div>
 </template>
