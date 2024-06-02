@@ -33,7 +33,7 @@ api.interceptors.response.use(
     if (
       error.response &&
       [401, 403, 404].includes(error.response.status) &&
-      SAFE_PATHS.includes(error.config.url)
+      !SAFE_PATHS.includes(error.config.url)
     ) {
       // verify that user is still logged in
       console.debug('error', error);
