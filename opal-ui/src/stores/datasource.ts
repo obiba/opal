@@ -312,6 +312,12 @@ export const useDatasourceStore = defineStore('datasource', () => {
     });
   }
 
+  async function createView(destination: string, view: ViewDto) {
+    delete view.datasourceName;
+    delete view.status;
+    return api.post(`/datasource/${destination}/views`, view);
+  }
+
   return {
     datasource,
     tables,
@@ -341,6 +347,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     saveVariable,
     saveDerivedVariable,
     getAllTables,
+    createView,
     reset,
   };
 });

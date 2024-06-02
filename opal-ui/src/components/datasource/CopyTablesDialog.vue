@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
       <q-card class="dialog-sm">
         <q-card-section>
-          <div class="text-h6">{{ $t('copy_tables') }}</div>
+          <div class="text-h6">{{ copyTablesTitle }}</div>
         </q-card-section>
 
         <q-separator />
@@ -92,7 +92,8 @@ const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
 
 const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
-const copyTablesText = computed(() => t('copy_tables_text', { count: props.tables.length }));
+const copyTablesTitle = computed(() => t('copy_tables_data', { count: props.tables.length }));
+const copyTablesText = computed(() => t('copy_tables_data_text', { count: props.tables.length }));
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
@@ -139,7 +140,7 @@ function onCopyTables() {
     noVariables: false,
   };
   projectsStore.copyCommand(projectsStore.project.name, options).then((response) => {
-    notifySuccess(t('copy_tables_task_created', { id: response.data.id }));
+    notifySuccess(t('copy_tables_data_task_created', { id: response.data.id }));
   }).catch((err) => {
     console.error(err);
     notifyError(err);

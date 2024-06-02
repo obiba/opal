@@ -22,6 +22,7 @@ export default {
     Conflict: 'Conflit détecté',
     BannedUser: 'Trop d\'erreurs d\'identification, l\'utilisateur {0} est banni pour une durée de {1} secondes',
     InvalidCredentials: 'Nom d\'utilisateur ou mot de passe incorrect, veuillez réessayer',
+    TableAlreadyExists: 'La table existe déjà'
   },
   importer: {
     file: {
@@ -82,13 +83,15 @@ export default {
   confirm: 'Confirmer',
   content: 'Contenu',
   continue: 'Continuer',
+  copy_data: 'Copier les données',
+  copy_view: 'Copier la vue',
   copy_incremental_hint: 'Seuls les enregistrements nouveaux ou mises à jour seront copiés.',
   copy_incremental: 'Incrémental',
   copy_nulls_hint: 'Permettre de remplacer une donnée par une valeur nulle.',
   copy_nulls: 'Copier les valeurs nulles',
-  copy_tables_task_created: 'La tâche de copie des tables a été créée avec l\'identifiant [ {id} ].',
-  copy_tables_text: 'Aucune table à copier | Une table sera copiée | {count} tables seront copiées.',
-  copy_tables: 'Copier les tables',
+  copy_tables_data_task_created: 'La tâche de copie des tables a été créée avec l\'identifiant [ {id} ].',
+  copy_tables_data_text: 'Aucune table à copier | Une table sera copiée | {count} tables seront copiées.',
+  copy_tables_data: 'Copier la table | Copier la table | Copier les tables',
   copy: 'Copier',
   created: 'Date de création',
   credentials: 'Informations d\'identification',

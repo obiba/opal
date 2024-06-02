@@ -37,7 +37,22 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy" class="on-right"></q-btn>
+        <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
+        <q-btn-dropdown v-if="isView" color="secondary" icon="content_copy" size="sm" :label="$t('copy')" class="on-right">
+          <q-list>
+            <q-item clickable v-close-popup @click="onShowCopyData">
+              <q-item-section>
+                <q-item-label>{{ $t('copy_data') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item v-if="isView" clickable v-close-popup @click="onShowCopyView">
+              <q-item-section>
+                <q-item-label>{{ $t('copy_view') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+
         <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="secondary" icon="edit" size="sm" @click="onShowEdit" class="on-right"></q-btn>
         <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
       </div>
@@ -85,7 +100,8 @@
         </q-tab-panel>
       </q-tab-panels>
 
-      <copy-tables-dialog v-model="showCopy" :tables="[datasourceStore.table]"/>
+      <copy-tables-dialog v-model="showCopyData" :tables="[datasourceStore.table]"/>
+      <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view"/>
       <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
         @update:table="onTableUpdate" @update:view="onViewUpdate"/>
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
@@ -100,6 +116,7 @@ import TableValues from 'src/components/datasource/TableValues.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
+import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
@@ -112,7 +129,8 @@ const datasourceStore = useDatasourceStore();
 
 const tab = ref('dictionary');
 const showDelete = ref(false);
-const showCopy = ref(false);
+const showCopyData = ref(false);
+const showCopyView = ref(false);
 const showEdit = ref(false);
 
 const items1: FieldItem<TableDto>[] = [
@@ -175,8 +193,12 @@ function onDownloadView() {
   datasourceStore.downloadView();
 }
 
-function onShowCopy() {
-  showCopy.value = true;
+function onShowCopyData() {
+  showCopyData.value = true;
+}
+
+function onShowCopyView() {
+  showCopyView.value = true;
 }
 
 function onShowEdit() {

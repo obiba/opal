@@ -22,6 +22,7 @@ export default {
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
     InvalidCredentials: 'Invalid credentials, please try again',
+    TableAlreadyExists: 'The table already exists'
   },
   importer: {
     file: {
@@ -85,13 +86,15 @@ export default {
   confirm: 'Confirm',
   content: 'Content',
   continue: 'Continue',
+  copy_data: 'Copy data',
+  copy_view: 'Copy view',
   copy_incremental_hint: 'Whether only new or updated data will be copied.',
   copy_incremental: 'Incremental',
   copy_nulls_hint: 'Whether a data can be overridden by a null value.',
   copy_nulls: 'Copy null values',
-  copy_tables_task_created: 'Copy tables task created with identifier [ {id} ].',
-  copy_tables_text: 'No tables to be copied | One table will be copied | {count} tables will be copied.',
-  copy_tables: 'Copy tables',
+  copy_tables_data_task_created: 'Copy tables data task created with identifier [ {id} ].',
+  copy_tables_data_text: 'No tables to be copied | One table will be copied | {count} tables will be copied.',
+  copy_tables_data: 'Copy table data | Copy table data | Copy tables data',
   copy: 'Copy',
   created: 'Created on',
   credentials: 'Credentials',
