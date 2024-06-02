@@ -245,9 +245,9 @@ public class OpalJettyServer {
     if (!Strings.isNullOrEmpty(corsAllowed)) {
       FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(REQUEST));
       cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, corsAllowed);
-      cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "Content-Type,Access-Control-Allow-Origin,X-File-Key");
+      cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "Content-Type,Access-Control-Allow-Origin,X-File-Key,X-Opal-TOTP,X-Obiba-TOTP");
       cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,PUT,DELETE,OPTIONS");
-      cors.setInitParameter(CrossOriginFilter.EXPOSED_HEADERS_PARAM, "X-Opal-Version,Location,X-TOTP,Content-Disposition,Allow");
+      cors.setInitParameter(CrossOriginFilter.EXPOSED_HEADERS_PARAM, "X-Opal-Version,Location,X-TOTP,Content-Disposition,Allow,WWW-Authenticate");
       cors.setInitParameter(CrossOriginFilter.ALLOW_CREDENTIALS_PARAM, "true");
     }
 

@@ -4,6 +4,10 @@ export default {
     signin: 'Sign in',
     signout: 'Sign out',
     username: 'User name',
+    totp_help: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator.',
+    code: 'Code',
+    code_hint: 'Enter the 6-digits PIN code.',
+    validate: 'Validate',
   },
   auth_types: {
     PASSWORD: 'Password',
@@ -16,6 +20,8 @@ export default {
     PasswordTooWeak: 'Password is too weak',
     IllegalArgument: 'Invalid data',
     Conflict: 'Conflicting entry detected',
+    BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
+    InvalidCredentials: 'Invalid credentials, please try again',
   },
   importer: {
     file: {

@@ -18,13 +18,17 @@ export const useAuthStore = defineStore('auth', () => {
     return profile.value.principal !== undefined;
   });
 
-  async function signin(username: string, password: string) {
+  async function signin(username: string, password: string, authMethod: string, token: string) {
     const params = new URLSearchParams();
     params.append('username', username);
     params.append('password', password);
     sid.value = '';
     version.value = '';
-    return api.post('/auth/sessions', params).then((response) => {
+    const headers = {};
+    if (authMethod && token) {
+      headers[authMethod] = token;
+    }
+    return api.post('/auth/sessions', params, { headers }).then((response) => {
       if (response.status === 201) {
         const sessionUrl = response.headers['location'];
         sid.value = sessionUrl.split('/').pop();

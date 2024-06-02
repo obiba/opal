@@ -70,38 +70,12 @@
                     </div>
                   </q-form>
                 </q-card-section>
-                <q-card-section v-show="secret">
+                <q-card-section v-show="qr" class="q-pb-none">
                   <div class="col text-subtitle">
-                    {{ $t('login.totp') }}
+                    {{ $t('auth.totp_help') }}
                   </div>
                   <div class="text-center q-mt-md">
                     <img :src="qr" />
-                  </div>
-                  <div class="col text-subtitle q-mt-md">
-                    {{ $t('login.totp_secret') }}
-                  </div>
-                  <q-input dense color="grey-10" v-model="secret" readonly>
-                    <template v-slot:after>
-                      <q-btn
-                        round
-                        dense
-                        flat
-                        icon="content_copy"
-                        @click="onCopySecret"
-                      />
-                    </template>
-                  </q-input>
-                  <div class="col text-subtitle q-mt-md">
-                    {{ $t('login.email_otp') }}
-                  </div>
-                  <div class="q-mt-md">
-                    <q-btn
-                      :label="$t('login.send_email_token')"
-                      @click="onEmailToken"
-                      color="info"
-                      stretch
-                      class="text-bold"
-                    />
                   </div>
                 </q-card-section>
                 <q-card-section v-if="withToken">
@@ -111,9 +85,8 @@
                       type="number"
                       color="grey-10"
                       v-model="token"
-                      :label="$t('login.token')"
-                      lazy-rules
-                      class="no-spinner"
+                      :label="$t('auth.code')"
+                      :hint="$t('auth.code_hint')"
                     >
                       <template v-slot:prepend>
                         <q-icon name="fas fa-mobile" size="xs" />
@@ -121,10 +94,10 @@
                     </q-input>
                     <div>
                       <q-btn
-                        :label="$t('login.validate')"
+                        :label="$t('auth.validate')"
                         type="submit"
-                        color="secondary"
-                        :disable="disableValidate"
+                        color="primary"
+                        :disable="token.length !== 6"
                       />
                       <q-btn
                         :label="$t('cancel')"
@@ -170,6 +143,7 @@ import { useCookies } from 'vue3-cookies';
 import { locales } from 'src/boot/i18n';
 import { AuthProviderDto } from 'src/models/Opal';
 import { baseUrl } from 'src/boot/api';
+import { notifyError } from 'src/utils/notify';
 
 const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();
@@ -193,6 +167,10 @@ const localeOptions = computed(() => {
 
 const username = ref('');
 const password = ref('');
+const token = ref('');
+const qr = ref('');
+const authMethod = ref('');
+const withToken = ref(false);
 const showForm = ref(true);
 const authProviders = ref<AuthProviderDto[]>([]);
 
@@ -220,15 +198,35 @@ function onLocaleSelection(localeOpt: { label: string; value: string }) {
   cookies.set('locale', localeOpt.value);
 }
 
-function onSubmit() {
-  authStore.signin(username.value, password.value).then(() => {
+async function onSubmit() {
+  try {
+    await authStore.signin(username.value, password.value, authMethod.value, token.value);
     if (authStore.sid) {
       router.push('/');
     }
-  });
+  } catch(err) {
+    authMethod.value = err.response.headers['www-authenticate'];
+    if (authMethod.value) {
+      withToken.value = true;
+      if (err.response?.data?.image) {
+        qr.value = err.response.data.image;
+      }
+    } else if (err.response?.status === 403 && err.response.data?.status === undefined) {
+      notifyError('error.InvalidCredentials');
+    } else {
+      notifyError(err);
+    }
+  }
 }
 
 function onSigninProvider(provider: AuthProviderDto) {
   window.open(`${baseUrl}/../auth/login/${provider.name}`, '_self');
+}
+
+function onCancelToken() {
+  withToken.value = false;
+  qr.value = '';
+  token.value = '';
+  authMethod.value = '';
 }
 </script>

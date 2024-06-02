@@ -4,6 +4,10 @@ export default {
     signin: 'Se connecter',
     signout: 'Se déconnecter',
     username: 'Nom d\'utilisateur',
+    totp_help: 'Ouvrir l\'application mobile d\'authentification et scanner ce code QR pour initialiser votre générateur de code NIP.',
+    code: 'Code',
+    code_hint: 'Entrer le code à 6 chiffres.',
+    validate: 'Valider',
   },
   auth_types: {
     PASSWORD: 'Mot de passe',
@@ -13,9 +17,11 @@ export default {
   error: {
     Forbidden: 'L\'operation est interdite',
     NoSuchValueTableInDatasource: 'La table n\'existe pas ou vous n\'y avez pas accès',
-    PasswordTooWeak: 'Password is too weak',
+    PasswordTooWeak: 'Mot de passe trop faible',
     IllegalArgument: 'Données non valides',
     Conflict: 'Conflit détecté',
+    BannedUser: 'Trop d\'erreurs d\'identification, l\'utilisateur {0} est banni pour une durée de {1} secondes',
+    InvalidCredentials: 'Nom d\'utilisateur ou mot de passe incorrect, veuillez réessayer',
   },
   importer: {
     file: {
