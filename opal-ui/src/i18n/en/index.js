@@ -259,6 +259,7 @@ export default {
   select_import_options: 'Select import options',
   select_import_source: 'Select the source of data',
   select: 'Select',
+  signin_with: 'Sign in with {provider}',
   size: 'Size',
   skewness: 'Skewness',
   source_code: 'Source code',

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { BookmarkDto, SubjectProfileDto } from 'src/models/Opal';
+import { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
   const sid = ref('');
@@ -76,6 +76,12 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
+  async function getProviders(): Promise<AuthProviderDto[]> {
+    return api.get('/auth/providers').then((response) => {
+      return response.data;
+    });
+  }
+
   return {
     sid,
     version,
@@ -88,6 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     isBookmarked,
     loadBookmarks,
     toggleBookmark,
+    getProviders,
     reset,
   };
 });

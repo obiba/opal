@@ -255,6 +255,7 @@ export default {
   select_import_options: 'Sélectionner les options d\'import',
   select_import_source: 'Sélectionner la source de données',
   select: 'Sélectionner',
+  signin_with: 'S\'identifier avec {provider}',
   size: 'Taille',
   skewness: 'Skewness',
   source_code: 'Code source',

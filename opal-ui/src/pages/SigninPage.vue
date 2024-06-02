@@ -20,7 +20,7 @@
           </div>
           <div class="col">
             <q-card class="bg-white text-dark">
-              <q-card-section>
+              <q-card-section class="q-pb-none">
                 <q-card-section v-show="!withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
                     <q-input
@@ -54,6 +54,19 @@
                         color="primary"
                         :disable="disableSubmit"
                       />
+                    </div>
+                    <div v-if="authProviders.length > 0">
+                      <q-separator class="q-mb-md"/>
+                      <div v-for="provider in authProviders" :key="provider.name">
+                        <q-btn
+                          no-caps
+                          :label="$t('signin_with', {provider: provider.name})"
+                          @click="onSigninProvider(provider)"
+                          color="primary"
+                          class="full-width"
+                          stretch
+                        />
+                      </div>
                     </div>
                   </q-form>
                 </q-card-section>
@@ -124,7 +137,7 @@
                   </q-form>
                 </q-card-section>
               </q-card-section>
-              <q-card-section>
+              <q-card-section class="q-pt-none">
                 <q-btn-dropdown flat :label="$t(locale)">
                   <q-list>
                     <q-item
@@ -155,6 +168,8 @@
 <script setup lang="ts">
 import { useCookies } from 'vue3-cookies';
 import { locales } from 'src/boot/i18n';
+import { AuthProviderDto } from 'src/models/Opal';
+import { baseUrl } from 'src/boot/api';
 
 const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();
@@ -179,6 +194,7 @@ const localeOptions = computed(() => {
 const username = ref('');
 const password = ref('');
 const showForm = ref(true);
+const authProviders = ref<AuthProviderDto[]>([]);
 
 const disableSubmit = computed(() => {
   return !username.value || !password.value;
@@ -194,6 +210,9 @@ onMounted(() => {
   transientDatasourceStore.reset();
   usersStore.reset();
   groupsStore.reset();
+  authStore.getProviders().then((providers) => {
+    authProviders.value = providers;
+  });
 });
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
@@ -207,5 +226,9 @@ function onSubmit() {
       router.push('/');
     }
   });
+}
+
+function onSigninProvider(provider: AuthProviderDto) {
+  window.open(`${baseUrl}/../auth/login/${provider.name}`, '_self');
 }
 </script>
