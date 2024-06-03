@@ -1,19 +1,17 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="flex flex-center bg-grey-4">
+      <q-page class="flex flex-center bg-blue-grey-1">
         <div
           class="column"
           :style="
             $q.screen.lt.sm
               ? { width: '80%' }
-              : $q.screen.lt.md
-              ? { width: '50%' }
-              : { width: '30%' }
+              : { width: '360px' }
           "
         >
           <div class="col text-center">
-            <h4>{{ $t('main.brand') }}</h4>
+            <div class="text-h4 q-mb-lg">{{ $t('main.brand') }}</div>
           </div>
           <div v-if="!showForm" class="col text-center q-mt-md">
             <q-spinner color="primary" size="4em" :thickness="10" />
@@ -21,6 +19,7 @@
           <div class="col">
             <q-card class="bg-white text-dark">
               <q-card-section class="q-pb-none">
+                <div class="text-help text-center q-pt-xs q-pb-xs">{{ $t('auth.title') }}</div>
                 <q-card-section v-show="!withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
                     <q-input

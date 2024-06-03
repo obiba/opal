@@ -1,5 +1,6 @@
 export default {
   auth: {
+    title: 'Sign in to start your session',
     password: 'Password',
     signin: 'Sign in',
     signout: 'Sign out',
