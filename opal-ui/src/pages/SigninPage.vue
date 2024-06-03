@@ -204,7 +204,7 @@ async function onSubmit() {
       router.push('/');
     }
   } catch(err) {
-    authMethod.value = err.response.headers['www-authenticate'];
+    authMethod.value = err.response?.headers['www-authenticate'];
     if (authMethod.value) {
       withToken.value = true;
       if (err.response?.data?.image) {
