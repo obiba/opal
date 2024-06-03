@@ -17,6 +17,7 @@
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredName]"
+            :disable="editMode"
           >
           </q-input>
 
