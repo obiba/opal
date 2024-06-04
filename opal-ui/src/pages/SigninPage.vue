@@ -157,6 +157,7 @@ const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
+const profilesStore = useProfilesStore();
 
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -197,6 +198,7 @@ onMounted(() => {
   groupsStore.reset();
   rStore.reset();
   datashieldStore.reset();
+  profilesStore.reset();
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });

@@ -1,0 +1,39 @@
+import { defineStore } from 'pinia';
+import { api } from 'src/boot/api';
+import { SubjectProfileDto } from 'src/models/Opal';
+
+export const useProfilesStore = defineStore('profiles', () => {
+  const profiles = ref([] as SubjectProfileDto[]);
+
+  function reset() {
+    profiles.value = [];
+  }
+
+  async function initProfiles() {
+    reset();
+    return loadProfiles();
+  }
+
+  async function loadProfiles() {
+    return api.get('/system/subject-profiles').then((response) => {
+      profiles.value = response.data
+    })
+  }
+
+  async function getProfile(profile: SubjectProfileDto) {
+    return api.delete(`/system/subject-profile/${profile.principal}`).then(() => loadProfiles());
+  }
+
+  async function deleteProfile(profile: SubjectProfileDto) {
+    return api.delete(`/system/subject-profile/${profile.principal}`).then(() => loadProfiles());
+  }
+
+  return {
+    profiles: profiles,
+    reset,
+    initProfiles: initProfiles,
+    getProfile,
+    deleteProfile,
+  };
+
+});
