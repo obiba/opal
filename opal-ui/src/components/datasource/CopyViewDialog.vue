@@ -51,7 +51,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { TableDto, ViewDto } from 'src/models/Magma';
-import { notifyError, notifySuccess } from 'src/utils/notify';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
