@@ -13,28 +13,28 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.ee10.servlet.FilterHolder;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintAware;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee10.servlets.CrossOriginFilter;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.security.ConstraintAware;
-import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.http.pathmap.PathSpec;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlets.CrossOriginFilter;
-import org.eclipse.jetty.util.URIUtil;
-import org.eclipse.jetty.util.resource.PathResource;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.PathResourceFactory;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.eclipse.jetty.util.resource.Resources;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -47,9 +47,10 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Properties;
 
 import static jakarta.servlet.DispatcherType.*;
@@ -125,15 +126,13 @@ public class OpalJettyServer {
         .valueOf(properties.getProperty("org.obiba.opal.maxFormContentSize", MAX_FORM_CONTENT_SIZE));
     jettyServer.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", maxFormContentSize);
 
-    HandlerList handlers = new HandlerList();
+    PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
+    pathMappingsHandler.addMapping(PathSpec.from("/ws/*"), createServletHandler(properties));
+    pathMappingsHandler.addMapping(PathSpec.from("/"), createDistFileHandler("webapp"));
 
-    // Add a file handler that points to the Opal GWT client directory
-    handlers.addHandler(createDistFileHandler("/webapp"));
-    // Add webapp extensions
-    handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    handlers.addHandler(createServletHandler(properties));
+    //pathMappingsHandler.dumpStdErr();
 
-    jettyServer.setHandler(handlers);
+    jettyServer.setHandler(pathMappingsHandler);
   }
 
   private Properties loadProperties() throws IOException {
@@ -226,7 +225,6 @@ public class OpalJettyServer {
     GzipHandler gzipHandler = new GzipHandler();
     gzipHandler.setHandler(servletContextHandler);
     gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
-
     return gzipHandler;
   }
 
@@ -268,17 +266,28 @@ public class OpalJettyServer {
     ConstraintAware securityHandler = (ConstraintAware) servletContextHandler.getSecurityHandler();
     securityHandler.addConstraintMapping(newMethodConstraintMapping("TRACE"));
     securityHandler.addConstraintMapping(newMethodConstraintMapping("TRACK"));
+    securityHandler.addConstraintMapping(newPathConstraintMapping("/WEB-INF"));
+    securityHandler.addConstraintMapping(newPathConstraintMapping("/META-INF"));
   }
 
   private ConstraintMapping newMethodConstraintMapping(String method) {
-    Constraint constraint = new Constraint();
-    constraint.setName("Disable " + method);
-    constraint.setAuthenticate(true);
+    Constraint constraint = Constraint.from("Disable " + method, Constraint.Authorization.ANY_USER);
 
     ConstraintMapping mapping = new ConstraintMapping();
     mapping.setConstraint(constraint);
     mapping.setMethod(method);
     mapping.setPathSpec("/");
+
+    return mapping;
+  }
+
+  private ConstraintMapping newPathConstraintMapping(String path) {
+    Constraint constraint = Constraint.from("Disable GET " + path, Constraint.Authorization.FORBIDDEN);
+
+    ConstraintMapping mapping = new ConstraintMapping();
+    mapping.setConstraint(constraint);
+    mapping.setMethod("GET");
+    mapping.setPathSpec(path);
 
     return mapping;
   }
@@ -290,17 +299,20 @@ public class OpalJettyServer {
   private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
     log.info("Creating a file handler for the following URL : {}", fileUrl);
     ResourceHandler resourceHandler = new ResourceHandler();
-    resourceHandler.setBaseResource(new PathResource(new URL(fileUrl)));
-    resourceHandler.setRedirectWelcome(true);
-    resourceHandler.setDirectoriesListed(false);
+    Resource base = ResourceFactory.of(resourceHandler).newResource(new URI(fileUrl));
+    if (!Resources.isReadableDirectory(base))
+      throw new IOException("Resource is not a readable directory: " + fileUrl);
+    resourceHandler.setBaseResource(base);
+    resourceHandler.setDirAllowed(true);
+    resourceHandler.setWelcomeFiles(List.of("index.html"));
 
-    GzipHandler gzipHandler = new SecureGzipHandler();
+    GzipHandler gzipHandler = new GzipHandler();
     gzipHandler.setHandler(resourceHandler);
     gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
 
     ContextHandler ctxHandler = new ContextHandler();
     ctxHandler.setContextPath(contextPath);
-    ctxHandler.setHandler(gzipHandler);
+    ctxHandler.setHandler(resourceHandler);
 
     return ctxHandler;
   }
@@ -321,7 +333,9 @@ public class OpalJettyServer {
    */
   private String resolveOpalDistURI() throws IOException {
     String uri = new File(System.getProperty("OPAL_DIST")).toPath().toRealPath().toUri().toString();
-    return normalizeFileURI(uri);
+    uri = normalizeFileURI(uri);
+    if (!uri.endsWith("/")) uri = uri + "/";
+    return uri;
   }
 
   private String normalizeFileURI(String uri) {
@@ -341,23 +355,6 @@ public class OpalJettyServer {
                                     ConfigurableWebApplicationContext configurableWebApplicationContext) {
       super.customizeContext(servletContext, configurableWebApplicationContext);
       springContextLoaderSupport.customizeContext(servletContext, configurableWebApplicationContext);
-    }
-  }
-
-  static class SecureGzipHandler extends GzipHandler {
-    public SecureGzipHandler() {
-      super();
-    }
-
-    @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-      ServletContext context = baseRequest.getServletContext();
-      String path = context == null ? baseRequest.getRequestURI() : URIUtil.addPaths(baseRequest.getServletPath(), baseRequest.getPathInfo());
-      if (path.startsWith("/WEB-INF") || path.startsWith("/META-INF")) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        return;
-      }
-      super.handle(target, baseRequest, request, response);
     }
   }
 
