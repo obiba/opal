@@ -9,25 +9,26 @@
  */
 package org.obiba.opal.server.httpd;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
+import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintAware;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
-import org.eclipse.jetty.ee10.servlets.CrossOriginFilter;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.http.pathmap.PathSpec;
 import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.CrossOriginHandler;
 import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.util.resource.PathResourceFactory;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.resource.Resources;
@@ -52,13 +53,11 @@ import java.net.URISyntaxException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static jakarta.servlet.DispatcherType.*;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
-
-/**
- *
- */
 
 public class OpalJettyServer {
 
@@ -70,7 +69,7 @@ public class OpalJettyServer {
 
   private static final String MAX_FORM_CONTENT_SIZE = "200000";
 
-  private static String[] GZIP_MIME_TYPES = {"text/css", "text/html", "text/plain", "text/csv",
+  private static String[] GZIP_MIME_TYPES = {"text/css", "text/html", "text/plain", "text/csv", "text/javascript",
       "application/xml", "application/json", "application/x-protobuf+json", "application/javascript"};
 
   private Server jettyServer;
@@ -127,8 +126,11 @@ public class OpalJettyServer {
     jettyServer.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", maxFormContentSize);
 
     PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-    pathMappingsHandler.addMapping(PathSpec.from("/ws/*"), createServletHandler(properties));
-    pathMappingsHandler.addMapping(PathSpec.from("/"), createDistFileHandler("webapp"));
+    Handler servletHandler = createServletHandler(properties);
+    String prefix = contextPath.equals("/") ? "" : contextPath;
+    pathMappingsHandler.addMapping(PathSpec.from(prefix + "/ws/*"), servletHandler);
+    pathMappingsHandler.addMapping(PathSpec.from(prefix + "/auth/*"), servletHandler);
+    pathMappingsHandler.addMapping(PathSpec.from(prefix + "/*"), createDistFileHandler("webapp"));
 
     //pathMappingsHandler.dumpStdErr();
 
@@ -203,7 +205,7 @@ public class OpalJettyServer {
     return jettySsl;
   }
 
-  private Handler createServletHandler(Properties properties) {
+  private Handler createServletHandler(Properties properties) throws IOException, URISyntaxException {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath(contextPath);
     servletContextHandler.getSessionHandler().setSessionCookie("JSESSIONID_" + ("-1".equals(httpPort) ? httpsPort : httpPort));
@@ -222,8 +224,32 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
 
-    GzipHandler gzipHandler = new GzipHandler();
+    GzipHandler gzipHandler = makeGzipHandler();
     gzipHandler.setHandler(servletContextHandler);
+    Handler rootHandler = gzipHandler;
+
+    String corsAllowed = properties.getProperty("cors.allowed");
+    if (!Strings.isNullOrEmpty(corsAllowed)) {
+      CrossOriginHandler corsHandler = makeCrossOriginHandler(Splitter.on(",").splitToStream(corsAllowed).collect(Collectors.toSet()));
+      corsHandler.setHandler(rootHandler);
+      rootHandler = corsHandler;
+    }
+
+    return rootHandler;
+  }
+
+  private CrossOriginHandler makeCrossOriginHandler(Set<String> origins) {
+    CrossOriginHandler corsHandler = new CrossOriginHandler();
+    corsHandler.setAllowedOriginPatterns(origins);
+    corsHandler.setAllowedHeaders(Set.of("Content-Type", "Access-Control-Allow-Origin", "X-File-Key", "X-Opal-TOTP", "X-Obiba-TOTP"));
+    corsHandler.setAllowedMethods(Set.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    corsHandler.setExposedHeaders(Set.of("X-Opal-Version", "Location", "X-TOTP", "Content-Disposition", "Allow", "WWW-Authenticate"));
+    corsHandler.setAllowCredentials(true);
+    return corsHandler;
+  }
+
+  private GzipHandler makeGzipHandler() {
+    GzipHandler gzipHandler = new GzipHandler();
     gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
     return gzipHandler;
   }
@@ -237,17 +263,6 @@ public class OpalJettyServer {
 
   private void initFilters(Properties properties) {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
-
-    // Add the CrossOriginFilter
-    String corsAllowed = properties.getProperty("cors.allowed");
-    if (!Strings.isNullOrEmpty(corsAllowed)) {
-      FilterHolder cors = servletContextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(REQUEST));
-      cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, corsAllowed);
-      cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "Content-Type,Access-Control-Allow-Origin,X-File-Key,X-Opal-TOTP,X-Obiba-TOTP");
-      cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,PUT,DELETE,OPTIONS");
-      cors.setInitParameter(CrossOriginFilter.EXPOSED_HEADERS_PARAM, "X-Opal-Version,Location,X-TOTP,Content-Disposition,Allow,WWW-Authenticate");
-      cors.setInitParameter(CrossOriginFilter.ALLOW_CREDENTIALS_PARAM, "true");
-    }
 
     initOIDCFilter(properties);
 
@@ -292,11 +307,12 @@ public class OpalJettyServer {
     return mapping;
   }
 
-  private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
+  private Handler.Singleton createDistFileHandler(String directory) throws IOException, URISyntaxException {
     return createFileHandler(resolveOpalDistURI() + directory);
   }
 
-  private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
+  private Handler.Singleton createFileHandler(String fileUrl) throws IOException, URISyntaxException {
+
     log.info("Creating a file handler for the following URL : {}", fileUrl);
     ResourceHandler resourceHandler = new ResourceHandler();
     Resource base = ResourceFactory.of(resourceHandler).newResource(new URI(fileUrl));
@@ -306,23 +322,13 @@ public class OpalJettyServer {
     resourceHandler.setDirAllowed(true);
     resourceHandler.setWelcomeFiles(List.of("index.html"));
 
-    GzipHandler gzipHandler = new GzipHandler();
+    GzipHandler gzipHandler = makeGzipHandler();
     gzipHandler.setHandler(resourceHandler);
-    gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
 
-    ContextHandler ctxHandler = new ContextHandler();
-    ctxHandler.setContextPath(contextPath);
-    ctxHandler.setHandler(resourceHandler);
+    ContextHandler ctxHandler = new ContextHandler(contextPath);
+    ctxHandler.setHandler(gzipHandler);
 
     return ctxHandler;
-  }
-
-  private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
-    File file = new File(filePath);
-    if (!file.exists() && !file.mkdirs()) {
-      throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
-    }
-    return createFileHandler(normalizeFileURI(file.toPath().toRealPath().toUri().toString()));
   }
 
   /**
