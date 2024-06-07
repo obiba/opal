@@ -108,6 +108,7 @@
           :rows="filteredPackages"
           :columns="packagesColumns"
           row-key="name"
+          wrap-cells
           :pagination="initialPagination"
           :filter="filter"
         >
@@ -118,8 +119,7 @@
               icon="refresh"
               :label="$t('refresh')"
               size="sm"
-              @click="updateRPackages"
-              class="q-mb-sm" />
+              @click="updateRPackages" />
           </template>
           <template v-slot:top-right>
             <q-input dense debounce="500" v-model="filter">
@@ -168,7 +168,7 @@ const rStore = useRStore();
 
 const tab = ref<string>('servers');
 const packages = ref<RPackageDto[]>([]);
-  const initialPagination = ref({
+const initialPagination = ref({
   descending: false,
   page: 1,
   rowsPerPage: 20,

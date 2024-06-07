@@ -13,6 +13,7 @@
       <r-servers />
       <div class="text-h5 q-mb-md">{{ $t('r_sessions') }}</div>
       <div class="text-help q-mb-md">{{ $t('r_sessions_info') }}</div>
+      <r-sessions class="q-mb-md" />
       <div class="text-h5 q-mb-md">{{ $t('r_workspaces') }}</div>
       <div class="text-help q-mb-md">{{ $t('r_workspaces_info') }}</div>
     </q-page>
@@ -20,7 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import RServers from 'src/components/admin/RServers.vue';
+import RServers from 'src/components/admin/r/RServers.vue';
+import RSessions from 'src/components/admin/r/RSessions.vue';
 
 const rStore = useRStore();
 

@@ -53,6 +53,16 @@ export const useRStore = defineStore('r', () => {
     });
   }
 
+  async function terminateSession(id: string) {
+    return api.delete(`/service/r/session/${id}`);
+  }
+
+  async function terminateSessions(ids: string[]) {
+    Promise.all(ids.map((id) => terminateSession(id))).then(() => {
+      initSessions();
+    });
+  }
+
   return {
     clusters,
     sessions,
@@ -61,5 +71,8 @@ export const useRStore = defineStore('r', () => {
     getRPackages,
     startRServer,
     stopRServer,
+    initSessions,
+    initWorkspaces,
+    terminateSessions,
   };
 });

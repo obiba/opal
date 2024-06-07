@@ -18,7 +18,6 @@
   </div>
 </template>
 
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 export default defineComponent({
@@ -27,7 +26,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
-import RServerCluster from 'src/components/admin/RServerCluster.vue';
+import RServerCluster from 'src/components/admin/r/RServerCluster.vue';
 
 const rStore = useRStore();
 

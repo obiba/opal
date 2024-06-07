@@ -341,4 +341,13 @@ export default {
   download_logs: 'Download logs',
   start: 'Start',
   stop: 'Stop',
+  profile: 'Profile',
+  context: 'Context',
+  started: 'Started',
+  last_access: 'Last access',
+  waiting: 'Waiting',
+  busy: 'Busy',
+  unrecognized: 'Unrecognized',
+  terminate: 'Terminate',
+  terminate_r_sessions_confirm: 'No R sessions to terminate | Are you sure you want to terminate this R session? | Are you sure you want to terminate these {count} R sessions?',
 };
