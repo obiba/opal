@@ -14,7 +14,7 @@ const locationContextPath = window.location.pathname.substring(0, window.locatio
 const baseUrl = process.env.API.startsWith('/') ? locationContextPath + process.env.API : process.env.API;
 const contextPath = locationContextPath || '/';
 const PROFILE_PATH = '/system/subject-profile/_current';
-const SAFE_PATHS = [PROFILE_PATH, '/auth/session'];
+const SAFE_PATHS = [PROFILE_PATH, '/auth/session', '/system/conf/general'];
 
 const api = axios.create({
   baseURL: baseUrl,

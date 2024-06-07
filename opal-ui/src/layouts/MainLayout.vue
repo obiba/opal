@@ -13,7 +13,7 @@
 
         <q-toolbar-title>
           <q-btn flat to="/" no-caps size="lg">
-            {{ $t('main.brand') }}
+            {{ $t(appName) }}
           </q-btn>
         </q-toolbar-title>
 
@@ -93,6 +93,7 @@ import FilesDrawer from 'src/components/FilesDrawer.vue';
 import { computed } from 'vue';
 
 const router = useRouter();
+const systemStore = useSystemStore();
 const authStore = useAuthStore();
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -107,10 +108,15 @@ const localeOptions = computed(() => {
 const leftDrawerOpen = ref(false);
 
 onMounted(() => {
-  authStore.userProfile().then(() => authStore.loadBookmarks()).catch(() => {
+  authStore.userProfile().then(() => {
+    systemStore.initGeneralConf();
+    authStore.loadBookmarks();
+  }).catch(() => {
     router.push('/signin');
   });
 });
+
+const appName = computed(() => systemStore.generalConf.name || 'main.brand');
 
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : '?'
@@ -134,12 +140,21 @@ function onLocaleSelection(localeOpt: { label: string; value: string }) {
 }
 
 function onSignout() {
+  const logoutURL = systemStore.getLogoutURL();
   authStore
     .signout()
     .then(() => {
+      if (logoutURL) {
+        window.location.href = logoutURL;
+        return;
+      }
       router.push('/signin');
     })
     .catch(() => {
+      if (logoutURL) {
+        window.location.href = logoutURL;
+        return;
+      }
       router.push('/signin');
     });
 }

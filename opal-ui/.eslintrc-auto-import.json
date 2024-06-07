@@ -87,6 +87,7 @@
     "useCommandsStore": true,
     "useUsersStore": true,
     "useUsersGroupsStore": true,
-    "useGroupsStore": true
+    "useGroupsStore": true,
+    "useSystemStore": true
   }
 }

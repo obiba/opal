@@ -11,7 +11,7 @@
           "
         >
           <div class="col text-center">
-            <div class="text-h4 q-mb-lg">{{ $t('main.brand') }}</div>
+            <div class="text-h4 q-mb-lg">{{ $t(appName) }}</div>
           </div>
           <div v-if="!showForm" class="col text-center q-mt-md">
             <q-spinner color="primary" size="4em" :thickness="10" />
@@ -144,6 +144,7 @@ import { AuthProviderDto } from 'src/models/Opal';
 import { baseUrl } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
+const systemStore = useSystemStore();
 const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();
 const filesStore = useFilesStore();
@@ -173,11 +174,14 @@ const withToken = ref(false);
 const showForm = ref(true);
 const authProviders = ref<AuthProviderDto[]>([]);
 
+const appName = computed(() => systemStore.generalConf.name || 'main.brand');
+
 const disableSubmit = computed(() => {
   return !username.value || !password.value;
 });
 
 onMounted(() => {
+  systemStore.initGeneralConf();
   authStore.reset();
   commandsStore.reset();
   datasourceStore.reset();
