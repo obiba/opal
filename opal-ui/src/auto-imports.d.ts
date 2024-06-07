@@ -72,6 +72,7 @@ declare global {
   const useLink: typeof import('vue-router')['useLink']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
   const useProjectsStore: typeof import('./stores/projects')['useProjectsStore']
+  const useRStore: typeof import('./stores/r')['useRStore']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
@@ -161,6 +162,7 @@ declare module 'vue' {
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
+    readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
@@ -242,6 +244,7 @@ declare module '@vue/runtime-core' {
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
+    readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>

@@ -88,6 +88,7 @@
     "useUsersStore": true,
     "useUsersGroupsStore": true,
     "useGroupsStore": true,
-    "useSystemStore": true
+    "useSystemStore": true,
+    "useRStore": true
   }
 }

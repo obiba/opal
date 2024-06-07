@@ -1,9 +1,5 @@
 <template>
   <div>
-    <div class="text-h5 q-mb-md">
-      {{ $t('groups') }}
-    </div>
-    <div class="text-help q-mb-md">{{ $t('groups_info') }}</div>
     <q-table
       flat
       :rows="groups"

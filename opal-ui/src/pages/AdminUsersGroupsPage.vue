@@ -8,8 +8,16 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <users-list></users-list>
-      <groups-list class="q-mt-lg"></groups-list>
+      <div class="text-h5 q-mb-md">
+        {{ $t('users') }}
+      </div>
+      <div class="text-help">{{ $t('users_info') }}</div>
+      <users-list />
+      <div class="text-h5 q-mt-lg q-mb-md">
+        {{ $t('groups') }}
+      </div>
+      <div class="text-help q-mb-md">{{ $t('groups_info') }}</div>
+      <groups-list />
     </q-page>
   </div>
 </template>

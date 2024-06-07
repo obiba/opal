@@ -1,9 +1,5 @@
 <template>
   <div>
-    <div class="text-h5 q-mb-md">
-      {{ $t('users') }}
-    </div>
-    <div class="text-help">{{ $t('users_info') }}</div>
     <q-table
       flat
       :filter="filter"
@@ -38,7 +34,6 @@
           debounce="400"
           color="primary"
           v-model="filter"
-          :placeholder="$t('users_filter_placeholder')"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -182,7 +177,7 @@ const initialPagination = ref({
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const filteredUsers = computed(() => filterUsers(users.value));
 
-const filterUsers = (rows: SubjectCredentialsDto[]) => {
+function filterUsers(rows: SubjectCredentialsDto[]) {
   const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
 
   const result = rows.filter((row) => {

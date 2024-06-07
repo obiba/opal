@@ -36,19 +36,19 @@
             <q-item-label header class="text-uppercase">{{ $t('data_analysis') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/rservers">{{ $t('rservers') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/rservers">{{ $t('rservers') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('rservers_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/datashield">{{ $t('datashield') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/datashield">{{ $t('datashield') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('datashield_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/search">{{ $t('search') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/search">{{ $t('search') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('search_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
