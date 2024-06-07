@@ -49,17 +49,31 @@ export const useRStore = defineStore('r', () => {
 
   async function stopRServer(clusterId: string, serverId: string) {
     return api.delete(`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
-      initClusters();
+      Promise.all([ initClusters(), initSessions()]);
     });
   }
 
-  async function terminateSession(id: string) {
-    return api.delete(`/service/r/session/${id}`);
+  async function terminateSession(session: RSessionDto) {
+    return api.delete(`/service/r/session/${session.id}`);
   }
 
-  async function terminateSessions(ids: string[]) {
-    Promise.all(ids.map((id) => terminateSession(id))).then(() => {
+  async function terminateSessions(sessions: RSessionDto[]) {
+    Promise.all(sessions.map((s) => terminateSession(s))).then(() => {
       initSessions();
+    });
+  }
+
+  async function deleteWorkspace(ws: RWorkspaceDto) {
+    return api.delete(`/service/r/workspaces`, { params: {
+      name: ws.name,
+      user: ws.user,
+      context: ws.context,
+    } });
+  }
+
+  async function deleteWorkspaces(workspaces: RWorkspaceDto[]) {
+    Promise.all(workspaces.map((ws) => deleteWorkspace(ws))).then(() => {
+      initWorkspaces();
     });
   }
 
@@ -74,5 +88,6 @@ export const useRStore = defineStore('r', () => {
     initSessions,
     initWorkspaces,
     terminateSessions,
+    deleteWorkspaces,
   };
 });

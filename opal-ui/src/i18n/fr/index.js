@@ -347,4 +347,5 @@ export default {
   unrecognized: 'Non reconnu',
   terminate: 'Terminer',
   terminate_r_sessions_confirm: '- | Êtes-vous sûr de vouloir terminer cette session R ? | Êtes-vous sûr de vouloir terminer ces {count} sessions R ?',
+  delete_r_workspaces_confirm: '- | Êtes-vous sûr de vouloir terminer cet espace de travail R ? | Êtes-vous sûr de vouloir terminer ces {count} espaces de travail R ?',
 };

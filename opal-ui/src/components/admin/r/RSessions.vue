@@ -110,7 +110,7 @@ function onShowTerminateSessions() {
 }
 
 function onTerminateSessions() {
-  rStore.terminateSessions(selected.value.map((s) => s.id)).finally(() => {
+  rStore.terminateSessions(selected.value).finally(() => {
     selected.value = [];
   });
 }

@@ -349,5 +349,6 @@ export default {
   busy: 'Busy',
   unrecognized: 'Unrecognized',
   terminate: 'Terminate',
-  terminate_r_sessions_confirm: 'No R sessions to terminate | Are you sure you want to terminate this R session? | Are you sure you want to terminate these {count} R sessions?',
+  terminate_r_sessions_confirm: '- | Are you sure you want to terminate this R session? | Are you sure you want to terminate these {count} R sessions?',
+  delete_r_workspaces_confirm: '- | Are you sure you want to delete this R workspace? | Are you sure you want to delete these {count} R workspaces?',
 };
