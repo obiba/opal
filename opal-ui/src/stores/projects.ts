@@ -81,21 +81,15 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function copyCommand(name: string, options: CopyCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_copy`, options).then((response) => {
-      return response;
-    });
+    return api.post(`/project/${name}/commands/_copy`, options);
   }
 
   async function exportCommand(name: string, options: ExportCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_export`, options).then((response) => {
-      return response;
-    });
+    return api.post(`/project/${name}/commands/_export`, options);
   }
 
   async function importCommand(name: string, options: ImportCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_import`, options).then((response) => {
-      return response;
-    });
+    return api.post(`/project/${name}/commands/_import`, options);
   }
 
   async function loadCommandStates() {

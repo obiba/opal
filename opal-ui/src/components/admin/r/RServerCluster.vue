@@ -107,12 +107,26 @@
           flat
           :rows="filteredPackages"
           :columns="packagesColumns"
-          row-key="name"
+          :row-key="getPackageKey"
           wrap-cells
           :pagination="initialPagination"
           :filter="filter"
         >
           <template v-slot:top-left>
+            <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left">
+            <q-list>
+              <q-item clickable v-close-popup @click="onShowInstallPackages">
+                <q-item-section>
+                  <q-item-label>{{ $t('install_r_package') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="onShowUpdatePackages">
+                <q-item-section>
+                  <q-item-label>{{ $t('update_all_r_packages') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
             <q-btn
               color="secondary"
               text-color="white"
@@ -128,20 +142,59 @@
               </template>
             </q-input>
           </template>
-          <template v-slot:body-cell-name="props">
-            <q-td :props="props">
-              <span class="text-primary">{{  props.value }}</span>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-rserver="props">
-            <q-td :props="props">
-              <span>{{  props.value.split('~')[0] }}</span>
-              <code class="on-right">{{  props.value.split('~')[1].split('-')[0] }}</code>
-            </q-td>
+          <template v-slot:body="props">
+            <q-tr :props="props" @mouseover="onOverPackage(props.row)" @mouseleave="onLeavePackage(props.row)">
+              <q-td key="name" :props="props">
+                <span class="text-primary">{{  props.row.name }}</span>
+                <div class="float-right" >
+                  <q-btn
+                    rounded
+                    dense
+                    flat
+                    size="sm"
+                    color="secondary"
+                    :icon="packageToolsVisible[getPackageKey(props.row)] ? 'visibility' : 'none'"
+                    class="q-ml-xs"
+                    @click="onShowViewPackage(props.row)"
+                  />
+                  <q-btn
+                    rounded
+                    dense
+                    flat
+                    size="sm"
+                    color="secondary"
+                    :title="$t('delete')"
+                    :icon="packageToolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'"
+                    class="q-ml-xs"
+                    @click="onShowDeletePackage(props.row)"
+                  />
+                </div>
+              </q-td>
+              <q-td key="title" :props="props">
+                {{  getDescriptionValue(props.row, 'Title') }}
+              </q-td>
+              <q-td key="version" :props="props">
+                {{  getDescriptionValue(props.row, 'Version') }}
+              </q-td>
+              <q-td key="built" :props="props">
+                {{  `R ${getDescriptionValue(props.row, 'Built')}` }}
+              </q-td>
+              <q-td key="libpath" :props="props">
+                {{  getDescriptionValue(props.row, 'LibPath') }}
+              </q-td>
+              <q-td key="rserver" :props="props">
+                <span>{{  props.row.rserver.split('~')[0] }}</span>
+                <code class="on-right">{{  props.row.rserver.split('~')[1].split('-')[0] }}</code>
+              </q-td>
+            </q-tr>
           </template>
         </q-table>
       </q-tab-panel>
    </q-tab-panels>
+   <confirm-dialog v-model="showDeletePackage" :title="$t('delete')" :text="$t('delete_r_package_confirm', { name: pkg?.name })" @confirm="onDeletePackage" />
+   <install-r-dialog v-model="showInstallPackage" :cluster="cluster" />
+   <update-r-dialog v-model="showUpdatePackages" :cluster="cluster" />
+   <view-r-dialog v-model="showViewPackage" :pkg="pkg" />
   </div>
 </template>
 
@@ -156,6 +209,10 @@ export default defineComponent({
 import { baseUrl } from 'src/boot/api';
 import { RServerClusterDto, RServerDto, RPackageDto } from 'src/models/OpalR';
 import { getSizeLabel } from 'src/utils/files';
+import UpdateRDialog from 'src/components/admin/r/UpdateRDialog.vue';
+import InstallRDialog from 'src/components/admin/r/InstallRDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import ViewRDialog from 'src/components/admin/r/ViewRDialog.vue';
 
 interface Props {
   cluster: RServerClusterDto
@@ -174,6 +231,12 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const filter = ref('');
+const showInstallPackage = ref(false);
+const showUpdatePackages = ref(false);
+const showDeletePackage = ref(false);
+const showViewPackage = ref(false);
+const pkg = ref<RPackageDto>();
+const packageToolsVisible = ref<{ [key: string]: boolean }>({});
 
 onMounted(() => {
   updateRPackages();
@@ -266,7 +329,6 @@ const packagesColumns = [
     required: true,
     label: t('title'),
     align: 'left',
-    field: (row: RPackageDto) => getDescriptionValue(row, 'Title'),
     sortable: true,
   },
   {
@@ -274,7 +336,6 @@ const packagesColumns = [
     required: true,
     label: t('version'),
     align: 'left',
-    field: (row: RPackageDto) => getDescriptionValue(row, 'Version'),
     classes: 'text-caption',
     sortable: true,
   },
@@ -283,7 +344,6 @@ const packagesColumns = [
     required: true,
     label: t('built'),
     align: 'left',
-    field: (row: RPackageDto) => `R ${getDescriptionValue(row, 'Built')}`,
     classes: 'text-caption',
     sortable: true,
   },
@@ -292,7 +352,6 @@ const packagesColumns = [
     required: true,
     label: t('libpath'),
     align: 'left',
-    field: (row: RPackageDto) => getDescriptionValue(row, 'LibPath'),
     classes: 'text-caption',
     sortable: true,
   },
@@ -305,6 +364,10 @@ const packagesColumns = [
     sortable: true,
   },
 ];
+
+function getPackageKey(row: RPackageDto) {
+  return `${row.name}-${getDescriptionValue(row, 'LibPath')}`;
+}
 
 function getDescriptionValue(pkg: RPackageDto, key: string) {
   return pkg.description.find((entry) => entry.key === key)?.value;
@@ -326,5 +389,37 @@ function onRServerStop(server: RServerDto) {
   rStore.stopRServer(props.cluster.name, server.name);
 }
 
+function onShowInstallPackages() {
+  showInstallPackage.value = true;
+}
+
+function onShowUpdatePackages() {
+  showUpdatePackages.value = true;
+}
+
+function onShowDeletePackage(rPackage: RPackageDto) {
+  pkg.value = rPackage;
+  showDeletePackage.value = true;
+}
+
+function onShowViewPackage(rPackage: RPackageDto) {
+  pkg.value = rPackage;
+  showViewPackage.value = true;
+}
+
+function onDeletePackage() {
+  if (!pkg.value) return;
+  rStore.deleteRPackage(props.cluster.name, pkg.value.name).finally(() => {
+    updateRPackages();
+  });
+}
+
+function onOverPackage(row: RPackageDto) {
+  packageToolsVisible.value[getPackageKey(row)] = true;
+}
+
+function onLeavePackage(row: RPackageDto) {
+  packageToolsVisible.value[getPackageKey(row)] = false;
+}
 
 </script>

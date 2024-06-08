@@ -1,3 +1,4 @@
+import cluster from 'cluster';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { RServerClusterDto, RSessionDto, RWorkspaceDto, RPackageDto } from 'src/models/OpalR';
@@ -64,7 +65,7 @@ export const useRStore = defineStore('r', () => {
   }
 
   async function deleteWorkspace(ws: RWorkspaceDto) {
-    return api.delete(`/service/r/workspaces`, { params: {
+    return api.delete('/service/r/workspaces', { params: {
       name: ws.name,
       user: ws.user,
       context: ws.context,
@@ -75,6 +76,23 @@ export const useRStore = defineStore('r', () => {
     Promise.all(workspaces.map((ws) => deleteWorkspace(ws))).then(() => {
       initWorkspaces();
     });
+  }
+
+  async function installRPackage(clusterId: string, manager: 'cran' | 'gh' | 'bioc', packageName: string, ref?: string) {
+    return api.post(`/service/r/cluster/${clusterId}/commands/_install`, {
+      cluster: clusterId,
+      manager: manager,
+      name: packageName,
+      ref: ref,
+    }, { params: { name: packageName } });
+  }
+
+  async function updateRPackages(clusterId: string) {
+    return api.post(`/service/r/cluster/${clusterId}/commands/_update`);
+  }
+
+  async function deleteRPackage(clusterId: string, packageName: string) {
+    return api.delete(`/service/r/cluster/${clusterId}/package/${packageName}`);
   }
 
   return {
@@ -89,5 +107,8 @@ export const useRStore = defineStore('r', () => {
     initWorkspaces,
     terminateSessions,
     deleteWorkspaces,
+    installRPackage,
+    updateRPackages,
+    deleteRPackage,
   };
 });

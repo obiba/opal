@@ -1,7 +1,7 @@
 <template>
   <q-list v-if="dbobject" separator dense>
     <q-item v-for="item in visibleItems" :key="item.field">
-      <q-item-section>
+      <q-item-section style="max-width: 200px;">
         <q-item-label overline class="text-grey-6">
           {{ $t(item.label ? item.label : item.field) }}
         </q-item-label>
@@ -45,6 +45,7 @@ export default defineComponent({
 import { withDefaults } from 'vue';
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { DescriptiveStatsDto } from 'src/models/Math';
+import { StringMap } from 'src/components/models';
 
 export interface FieldLink {
   label: string;
@@ -62,8 +63,8 @@ export interface FieldItem<T> {
 }
 
 export interface FieldsListProps {
-  dbobject: TableDto | VariableDto | DescriptiveStatsDto;
-  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto>[];
+  dbobject: TableDto | VariableDto | DescriptiveStatsDto | StringMap;
+  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | StringMap>[];
 }
 
 const props = withDefaults(defineProps<FieldsListProps>(), {
