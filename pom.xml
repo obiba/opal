@@ -39,7 +39,7 @@
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
     <commons-fileupload.version>1.5</commons-fileupload.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
-    <commons-io.version>2.7</commons-io.version>
+    <commons-io.version>2.15.1</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
