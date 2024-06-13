@@ -10,6 +10,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin', component: () => import('pages/AdminPage.vue') },
       { path: '/admin/users', component: () => import('pages/AdminUsersGroupsPage.vue') },
       { path: '/admin/rservers', component: () => import('pages/AdminRPage.vue') },
+      { path: '/admin/datashield', component: () => import('pages/AdminDatashieldPage.vue') },
       { path: '/projects', component: () => import('pages/ProjectsPage.vue') },
       {
         path: '/project/:id',

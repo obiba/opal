@@ -368,4 +368,6 @@ export default {
   gh_ref_hint: 'Branch, tag or commit, default is "master"',
   install_r_package_task_created: 'Install R package task created with identifier [ {id} ].',
   delete_r_package_confirm: 'The deletion of an R package may not succeed if it is installed in a folder that is not writable. Are you sure you want to delete the R package "{name}"?',
+  datashield_packages_info: 'DataSHIELD packages are a set of R packages that provide the DataSHIELD functionalities. They are installed in the R servers and are used by the DataSHIELD clients to perform the analysis.',
+  datashield_profiles_info: 'A DataSHIELD profile is associated to a R server cluster: the methods and options are extracted from the installed DataSHIELD packages settings and can be amended. ',
 };

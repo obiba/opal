@@ -21,12 +21,6 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  name: 'ViewRDialog',
-});
-</script>
 <script setup lang="ts">
 import { RPackageDto } from 'src/models/OpalR';
 import { StringMap } from 'src/components/models';

@@ -1,4 +1,3 @@
-import cluster from 'cluster';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { RServerClusterDto, RSessionDto, RWorkspaceDto, RPackageDto } from 'src/models/OpalR';
@@ -22,6 +21,7 @@ export const useRStore = defineStore('r', () => {
       return response;
     });
   }
+
   async function initSessions() {
     return api.get('/service/r/sessions').then((response) => {
       if (response.status === 200) {
@@ -30,6 +30,7 @@ export const useRStore = defineStore('r', () => {
       return response;
     });
   }
+
   async function initWorkspaces() {
     return api.get('/service/r/workspaces').then((response) => {
       if (response.status === 200) {
@@ -38,8 +39,13 @@ export const useRStore = defineStore('r', () => {
       return response;
     });
   }
+
   async function getRPackages(clusterId: string): Promise<RPackageDto[]> {
     return api.get(`/service/r/cluster/${clusterId}/packages`).then((response) => response.data);
+  }
+
+  async function getDatashieldPackages(clusterId: string): Promise<RPackageDto[]> {
+    return api.get('/datashield/packages', { params: { profile: clusterId } }).then((response) => response.data);
   }
 
   async function startRServer(clusterId: string, serverId: string) {
@@ -110,5 +116,6 @@ export const useRStore = defineStore('r', () => {
     installRPackage,
     updateRPackages,
     deleteRPackage,
+    getDatashieldPackages,
   };
 });

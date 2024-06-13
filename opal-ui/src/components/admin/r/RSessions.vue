@@ -63,12 +63,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  name: 'RSessions',
-});
-</script>
 <script setup lang="ts">
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { RSessionDto } from 'src/models/OpalR';

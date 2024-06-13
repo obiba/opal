@@ -12,7 +12,7 @@
     </div>
     <q-tab-panels v-model="tab" animated>
       <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
-        <r-server-cluster :cluster="cluster" />
+        <datashield-packages :cluster="cluster" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
-import RServerCluster from 'src/components/admin/r/RServerCluster.vue';
+import DatashieldPackages from 'src/components/admin/datashield/DatashieldPackages.vue';
 
 const rStore = useRStore();
 

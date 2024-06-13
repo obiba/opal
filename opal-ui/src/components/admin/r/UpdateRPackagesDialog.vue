@@ -27,12 +27,6 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  name: 'UpdateRDialog',
-});
-</script>
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
 import { notifyError, notifySuccess } from 'src/utils/notify';
