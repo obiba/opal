@@ -12,7 +12,7 @@
       <q-card-section>
         <q-select
           v-model="manager"
-          :options="managers"
+          :options="managersOptions"
           dense
           :label="$t('package_manager')"
           class="q-mb-md"/>
@@ -60,9 +60,12 @@ import { notifyError, notifySuccess } from 'src/utils/notify';
 interface DialogProps {
   modelValue: boolean
   cluster: RServerClusterDto
+  managers: string[] | undefined
 }
 
-const props = defineProps<DialogProps>();
+const props = withDefaults(defineProps<DialogProps>(), {
+  managers: undefined,
+});
 const showDialog = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue'])
 
@@ -70,19 +73,21 @@ const { t } = useI18n();
 const rStore = useRStore();
 
 watch(() => props.modelValue, (value) => {
-  manager.value = managers[0];
+  manager.value = managersOptions.value[0];
   name.value = '';
   organization.value = '';
   reference.value = '';
   showDialog.value = value;
 });
 
-const managers = [
-  { label: 'CRAN', value: 'cran' },
-  { label: 'Github', value: 'gh' },
-  { label: 'Bioconductor', value: 'bioc' },
-];
-const manager = ref(managers[0]);
+const managersOptions = computed(() => {
+  return [
+    { label: 'CRAN', value: 'cran' },
+    { label: 'Github', value: 'gh' },
+    { label: 'Bioconductor', value: 'bioc' },
+  ].filter((m) => props.managers === undefined || props.managers.includes(m.value));
+});
+const manager = ref(managersOptions.value[0]);
 const name = ref('');
 const organization = ref('');
 const reference = ref('');

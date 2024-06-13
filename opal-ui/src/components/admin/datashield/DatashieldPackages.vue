@@ -17,11 +17,6 @@
               <q-item-label>{{ $t('install_r_package') }}</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-close-popup @click="onShowUpdatePackages">
-            <q-item-section>
-              <q-item-label>{{ $t('update_all_r_packages') }}</q-item-label>
-            </q-item-section>
-          </q-item>
         </q-list>
       </q-btn-dropdown>
         <q-btn
@@ -107,7 +102,7 @@
       </template>
     </q-table>
     <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_r_package_confirm', { name: pkg?.name })" @confirm="onDeletePackage" />
-    <install-r-package-dialog v-model="showInstall" :cluster="cluster" />
+    <install-r-package-dialog v-model="showInstall" :cluster="cluster" :managers="['cran', 'gh']" />
     <view-r-package-dialog v-model="showView" :pkg="pkg" />
   </div>
 </template>
@@ -138,7 +133,6 @@ const filter = ref('');
 const pkg = ref<RPackageDto>();
 const packageToolsVisible = ref<{ [key: string]: boolean }>({});
 const showInstall = ref(false);
-const showUpdate = ref(false);
 const showDelete = ref(false);
 const showView = ref(false);
 
@@ -225,10 +219,6 @@ function updateRPackages() {
 
 function onShowInstallPackages() {
   showInstall.value = true;
-}
-
-function onShowUpdatePackages() {
-  showUpdate.value = true;
 }
 
 function onShowDeletePackage(rPackage: RPackageDto) {
