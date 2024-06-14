@@ -10,7 +10,7 @@
         class="text-grey"/>
       <div class="q-mt-sm text-help">{{ $t('r_clusters_count', { count: clusterNames.length }) }}</div>
     </div>
-    <q-tab-panels v-model="tab" animated>
+    <q-tab-panels v-model="tab">
       <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
         <datashield-packages :cluster="cluster" />
       </q-tab-panel>

@@ -10,18 +10,12 @@
 </template>
 
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  name: 'BookmarkIcon',
-});
-</script>
 <script setup lang="ts">
-interface BookmarkIconProps {
+interface Props {
   resource: string;
 }
 
-const props = defineProps<BookmarkIconProps>();
+const props = defineProps<Props>();
 
 const authStore = useAuthStore();
 

@@ -10,9 +10,9 @@
         class="text-grey"/>
       <div class="q-mt-sm text-help">{{ $t('r_clusters_count', { count: clusterNames.length }) }}</div>
     </div>
-    <q-tab-panels v-model="tab" animated>
+    <q-tab-panels v-model="tab">
       <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
-        <r-server-cluster :cluster="cluster" />
+        <r-cluster :cluster="cluster" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
-import RServerCluster from 'src/components/admin/r/RServerCluster.vue';
+import RCluster from 'src/components/admin/r/RCluster.vue';
 
 const rStore = useRStore();
 

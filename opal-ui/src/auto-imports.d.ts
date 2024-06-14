@@ -65,6 +65,7 @@ declare global {
   const useCounterStore: typeof import('./stores/auth')['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useDatashieldStore: typeof import('./stores/datashield')['useDatashieldStore']
   const useDatasourceStore: typeof import('./stores/datasource')['useDatasourceStore']
   const useFilesStore: typeof import('./stores/files')['useFilesStore']
   const useGroupsStore: typeof import('./stores/groups')['useGroupsStore']
@@ -155,6 +156,7 @@ declare module 'vue' {
     readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
+    readonly useDatashieldStore: UnwrapRef<typeof import('./stores/datashield')['useDatashieldStore']>
     readonly useDatasourceStore: UnwrapRef<typeof import('./stores/datasource')['useDatasourceStore']>
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
@@ -237,6 +239,7 @@ declare module '@vue/runtime-core' {
     readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
+    readonly useDatashieldStore: UnwrapRef<typeof import('./stores/datashield')['useDatashieldStore']>
     readonly useDatasourceStore: UnwrapRef<typeof import('./stores/datasource')['useDatasourceStore']>
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>

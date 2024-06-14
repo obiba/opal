@@ -22,7 +22,7 @@
 
     <resources>
       <heap unit="entries">10000</heap>
-      <disk unit="GB">1</disk>
+      <disk persistent="true" unit="GB">1</disk>
     </resources>
   </cache>
 

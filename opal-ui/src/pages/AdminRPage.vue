@@ -10,7 +10,7 @@
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">{{ $t('r_servers') }}</div>
       <div class="text-help q-mb-md">{{ $t('r_servers_info') }}</div>
-      <r-servers />
+      <r-clusters />
       <div class="text-h5 q-mb-md">{{ $t('r_sessions') }}</div>
       <div class="text-help q-mb-md">{{ $t('r_sessions_info') }}</div>
       <r-sessions class="q-mb-md" />
@@ -22,13 +22,13 @@
 </template>
 
 <script setup lang="ts">
-import RServers from 'src/components/admin/r/RServers.vue';
+import RClusters from 'src/components/admin/r/RClusters.vue';
 import RSessions from 'src/components/admin/r/RSessions.vue';
 import RWorkspaces from 'src/components/admin/r/RWorkspaces.vue';
 
 const rStore = useRStore();
 
 onMounted(() => {
-  rStore.init();
+  rStore.initR();
 });
 </script>

@@ -18,6 +18,9 @@
         </q-toolbar-title>
 
         <div class="q-gutter-sm row items-center no-wrap">
+          <q-btn to="/admin" no-caps>
+            {{ $t('administration') }}
+          </q-btn>
           <q-btn-dropdown flat :label="locale">
             <q-list>
               <q-item

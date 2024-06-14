@@ -45,6 +45,7 @@ export default defineComponent({
 import { withDefaults } from 'vue';
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { DescriptiveStatsDto } from 'src/models/Math';
+import { DataShieldProfileDto } from 'src/models/DataShield';
 import { StringMap } from 'src/components/models';
 
 export interface FieldLink {
@@ -63,8 +64,8 @@ export interface FieldItem<T> {
 }
 
 export interface FieldsListProps {
-  dbobject: TableDto | VariableDto | DescriptiveStatsDto | StringMap;
-  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | StringMap>[];
+  dbobject: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap;
+  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap>[];
 }
 
 const props = withDefaults(defineProps<FieldsListProps>(), {

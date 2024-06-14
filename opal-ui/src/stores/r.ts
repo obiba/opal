@@ -2,14 +2,19 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { RServerClusterDto, RSessionDto, RWorkspaceDto, RPackageDto } from 'src/models/OpalR';
 
-
 export const useRStore = defineStore('r', () => {
 
   const clusters = ref<RServerClusterDto[]>([]);
   const sessions = ref<RSessionDto[]>([]);
   const workspaces = ref<RWorkspaceDto[]>([]);
 
-  async function init() {
+  function reset() {
+    clusters.value = [];
+    sessions.value = [];
+    workspaces.value = [];
+  }
+
+  async function initR() {
     return Promise.all([initClusters(), initSessions(), initWorkspaces()]);
   }
 
@@ -42,10 +47,6 @@ export const useRStore = defineStore('r', () => {
 
   async function getRPackages(clusterId: string): Promise<RPackageDto[]> {
     return api.get(`/service/r/cluster/${clusterId}/packages`).then((response) => response.data);
-  }
-
-  async function getDatashieldPackages(clusterId: string): Promise<RPackageDto[]> {
-    return api.get('/datashield/packages', { params: { profile: clusterId } }).then((response) => response.data);
   }
 
   async function startRServer(clusterId: string, serverId: string) {
@@ -105,7 +106,8 @@ export const useRStore = defineStore('r', () => {
     clusters,
     sessions,
     workspaces,
-    init,
+    reset,
+    initR,
     getRPackages,
     startRServer,
     stopRServer,
@@ -116,6 +118,5 @@ export const useRStore = defineStore('r', () => {
     installRPackage,
     updateRPackages,
     deleteRPackage,
-    getDatashieldPackages,
   };
 });

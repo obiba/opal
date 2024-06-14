@@ -11,14 +11,14 @@
     >
       <template v-slot:top-left>
         <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left">
-        <q-list>
-          <q-item clickable v-close-popup @click="onShowInstallPackages">
-            <q-item-section>
-              <q-item-label>{{ $t('install_r_package') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+          <q-list>
+            <q-item clickable v-close-popup @click="onShowInstallPackages">
+              <q-item-section>
+                <q-item-label>{{ $t('install_r_package') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
         <q-btn
           color="secondary"
           text-color="white"
@@ -45,27 +45,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :icon="packageToolsVisible[getPackageKey(props.row)] ? 'visibility' : 'none'"
-                class="q-ml-xs"
-                @click="onShowViewPackage(props.row)"
-              />
-              <q-btn
-                rounded
-                dense
-                flat
-                size="sm"
-                color="secondary"
-                :icon="packageToolsVisible[getPackageKey(props.row)] ? 'publish' : 'none'"
-                class="q-ml-xs"
-                @click="onShowViewPackage(props.row)"
-              />
-              <q-btn
-                rounded
-                dense
-                flat
-                size="sm"
-                color="secondary"
-                :icon="packageToolsVisible[getPackageKey(props.row)] ? 'get_app' : 'none'"
+                :icon="toolsVisible[getPackageKey(props.row)] ? 'visibility' : 'none'"
                 class="q-ml-xs"
                 @click="onShowViewPackage(props.row)"
               />
@@ -76,7 +56,7 @@
                 size="sm"
                 color="secondary"
                 :title="$t('delete')"
-                :icon="packageToolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'"
+                :icon="toolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onShowDeletePackage(props.row)"
               />
@@ -121,6 +101,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const rStore = useRStore();
+const datashieldStore = useDatashieldStore();
 const { t } = useI18n();
 
 const packages = ref<RPackageDto[]>([]);
@@ -131,7 +112,7 @@ const initialPagination = ref({
 });
 const filter = ref('');
 const pkg = ref<RPackageDto>();
-const packageToolsVisible = ref<{ [key: string]: boolean }>({});
+const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showInstall = ref(false);
 const showDelete = ref(false);
 const showView = ref(false);
@@ -208,7 +189,7 @@ watch(() => props.cluster, () => {
 function updateRPackages() {
   if (props.cluster.servers.length) {
     if (props.cluster.servers.some((server: RServerDto) => server.running)) {
-      rStore.getDatashieldPackages(props.cluster.name).then((res: RPackageDto[]) => {
+      datashieldStore.getPackages(props.cluster.name).then((res: RPackageDto[]) => {
         packages.value = res;
       });
     } else {
@@ -239,11 +220,11 @@ function onDeletePackage() {
 }
 
 function onOverPackage(row: RPackageDto) {
-  packageToolsVisible.value[getPackageKey(row)] = true;
+  toolsVisible.value[getPackageKey(row)] = true;
 }
 
 function onLeavePackage(row: RPackageDto) {
-  packageToolsVisible.value[getPackageKey(row)] = false;
+  toolsVisible.value[getPackageKey(row)] = false;
 }
 
 </script>

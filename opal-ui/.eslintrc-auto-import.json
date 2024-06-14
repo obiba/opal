@@ -89,6 +89,7 @@
     "useUsersGroupsStore": true,
     "useGroupsStore": true,
     "useSystemStore": true,
-    "useRStore": true
+    "useRStore": true,
+    "useDatashieldStore": true
   }
 }

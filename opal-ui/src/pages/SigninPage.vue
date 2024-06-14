@@ -154,6 +154,7 @@ const pluginsStore = usePluginsStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
+const rStore = useRStore();
 
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -191,6 +192,7 @@ onMounted(() => {
   transientDatasourceStore.reset();
   usersStore.reset();
   groupsStore.reset();
+  rStore.reset();
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });

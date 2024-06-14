@@ -10,19 +10,23 @@
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">{{ $t('packages') }}</div>
       <div class="text-help q-mb-md">{{ $t('datashield_packages_info') }}</div>
-      <datashield-servers />
+      <datashield-clusters />
       <div class="text-h5 q-mb-md">{{ $t('profiles') }}</div>
       <div class="text-help q-mb-md">{{ $t('datashield_profiles_info') }}</div>
+      <datashield-profiles />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import DatashieldServers from 'src/components/admin/datashield/DatashieldServers.vue';
+import DatashieldClusters from 'src/components/admin/datashield/DatashieldClusters.vue';
+import DatashieldProfiles from 'src/components/admin/datashield/DatashieldProfiles.vue';
 
 const rStore = useRStore();
+const datashieldStore = useDatashieldStore();
 
 onMounted(() => {
-  rStore.init();
+  rStore.initR();
+  datashieldStore.initProfiles();
 });
 </script>
