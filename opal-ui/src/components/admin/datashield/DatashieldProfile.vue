@@ -14,18 +14,19 @@
         icon="delete"
         size="sm"
         class="on-right"
-        @click="onDeleteProfile" />
+        @click="onShowDeleteProfile" />
     </div>
+    <q-separator class="q-mb-md"/>
     <div v-if="missingCluster" class="bg-warning q-pa-md q-mb-md">
       <q-icon name="warning" />
-      {{ $t('datashield_profile_missing_cluster') }}
+      {{ $t('datashield.profile_missing_cluster') }}
     </div>
     <div class="row q-col-gutter-md q-mb-md">
       <div class="col-md-6 col-xs-12">
         <div class="text-h6 q-mb-md">{{ $t('status') }}</div>
         <div class="q-mb-md">
           <q-toggle v-model="enabled"
-            :label="$t('datashield_profile_status_toggle')"
+            :label="$t('datashield.profile_status_toggle')"
             left-label
             @update:model-value="datashieldStore.updateProfileStatus(enabled)"
           />
@@ -39,24 +40,27 @@
         <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
         <div v-if="profile?.restrictedAccess">
           <div class="text-help">
-            {{ $t('datashield_access_restricted') }}
+            {{ $t('datashield.access_restricted') }}
           </div>
         </div>
         <div v-else>
           <div class="text-help">
-            {{ $t('datashield_access_not_restricted') }}
+            {{ $t('datashield.access_not_restricted') }}
           </div>
         </div>
       </div>
     </div>
     <div class="text-h6 q-mb-md">{{ $t('settings') }}</div>
+    <div class="text-help q-mb-md">
+      {{ $t('datashield.profile_settings_help') }}
+    </div>
     <div v-if="!missingCluster" class="q-mb-md">
       <q-btn
         color="primary"
         text-color="white"
         icon="restart_alt"
         :label="$t('initialize')"
-        :title="$t('datashield_settings_init')"
+        :title="$t('datashield.settings_init')"
         size="sm"
         @click="onShowInitSettings" />
     </div>
@@ -83,6 +87,11 @@
       </q-tab-panel>
     </q-tab-panels>
     <datashield-profile-init-dialog v-model="showInitSettings" />
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('datashield.profile_delete_confirm')"
+      @confirm="onDeleteProfile" />
   </div>
 </template>
 
@@ -91,6 +100,7 @@ import { DataShieldProfileDto } from 'src/models/DataShield';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import DatashieldMethods from 'src/components/admin/datashield/DatashieldMethods.vue';
 import DatashieldOptions from 'src/components/admin/datashield/DatashieldOptions.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import DatashieldProfileInitDialog from 'src/components/admin/datashield/DatashieldProfileInitDialog.vue';
 
 interface Props {
@@ -131,8 +141,12 @@ function getCluster(profile: DataShieldProfileDto) {
   return rStore.clusters.find((c) => c.name === profile.cluster)
 }
 
-function onDeleteProfile() {
+function onShowDeleteProfile() {
   showDelete.value = true;
+}
+
+function onDeleteProfile() {
+  datashieldStore.deleteProfile(props.profile.name);
 }
 
 function onShowInitSettings() {

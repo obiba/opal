@@ -36,15 +36,15 @@
         </q-tab-panels>
       </div>
     </div>
-
+    <add-datashield-profile-dialog v-model="showAdd" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { DataShieldProfileDto } from 'src/models/DataShield';
 import DatashieldProfile from 'src/components/admin/datashield/DatashieldProfile.vue';
+import AddDatashieldProfileDialog from 'src/components/admin/datashield/AddDatashieldProfileDialog.vue';
 
-const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 
 const tab = ref<string>(datashieldStore.profiles.length ? datashieldStore.profiles[0].name : '');

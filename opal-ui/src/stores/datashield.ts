@@ -32,6 +32,15 @@ export const useDatashieldStore = defineStore('datashield', () => {
     });
   }
 
+  async function addProfile(name: string, cluster: string) {
+    const newProfile = { name, cluster, enabled: false, restrictedAccess: false };
+    return api.post('/datashield/profiles', newProfile).then(() => initProfiles());
+  }
+
+  async function deleteProfile(name: string) {
+    return api.delete(`/datashield/profile/${name}`).then(() => initProfiles());
+  }
+
   async function getPackages(): Promise<RPackageDto[]> {
     return api.get('/datashield/packages', { params: { profile: profile.value.cluster } }).then((response) => response.data);
   }
@@ -111,6 +120,8 @@ export const useDatashieldStore = defineStore('datashield', () => {
     options,
     reset,
     initProfiles,
+    addProfile,
+    deleteProfile,
     getPackages,
     deleteMethods,
     deleteOptions,

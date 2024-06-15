@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-help">
-      {{ $t('datashield_options_info') }}
+      {{ $t('datashield.options_info') }}
     </div>
     <q-table
       flat
@@ -81,7 +81,7 @@
         </q-td>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_datashield_options_confirm', { count: selected.length })" @confirm="onDeleteOptions" />
+    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('datashield.delete_options_confirm', { count: selected.length })" @confirm="onDeleteOptions" />
     <edit-datashield-option-dialog v-model="showEdit" :option="opt"/>
   </div>
 </template>

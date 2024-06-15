@@ -2,18 +2,17 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ props.profile?.name }}</div>
+        <div class="text-h6">{{ datashieldStore.profile.name }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
         <div class="text-help q-mb-md">
-          {{ $t('datashield_settings_init_help') }}
+          {{ $t('datashield.settings_init_help') }}
         </div>
         <q-spinner-dots v-if="loading" />
         <q-option-group
           v-model="selected"
           :options="options"
-
           type="checkbox"
         />
       </q-card-section>

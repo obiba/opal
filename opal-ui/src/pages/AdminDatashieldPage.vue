@@ -4,15 +4,15 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('datashield')" />
+        <q-breadcrumbs-el label="DataSHIELD" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">{{ $t('packages') }}</div>
-      <div class="text-help q-mb-md">{{ $t('datashield_packages_info') }}</div>
+      <div class="text-help q-mb-md">{{ $t('datashield.packages_info') }}</div>
       <datashield-clusters />
       <div class="text-h5 q-mb-md">{{ $t('profiles') }}</div>
-      <div class="text-help q-mb-md">{{ $t('datashield_profiles_info') }}</div>
+      <div class="text-help q-mb-md">{{ $t('datashield.profiles_info') }}</div>
       <datashield-profiles />
     </q-page>
   </div>

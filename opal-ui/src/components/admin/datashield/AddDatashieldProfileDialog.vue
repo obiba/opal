@@ -2,31 +2,33 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t(isCreation ? 'add_option' : 'update_option') }}</div>
+        <div class="text-h6">{{ $t('add_profile') }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
         <q-input
-          v-model="optName"
+          v-model="name"
           :label="$t('name')"
-          :hint="$t('datashield.option_name_hint')"
-          :disable="!isCreation"
+          :hint="$t('datashield.profile_name_hint')"
           dense
           class="q-mb-md" />
-        <q-input
-          v-model="optValue"
-          :label="$t('value')"
-          :hint="$t('datashield.option_value_hint')"
+        <q-spinner-dots v-if="loading" />
+        <q-select
+          v-model="cluster"
+          :options="clusterNames"
+          :label="$t('r_cluster')"
           dense
-          class="q-mb-md" />
+          class="text-grey"/>
+        <div class="text-hint q-mt-xs">
+          {{ $t('datashield.profile_cluster_hint') }}
+        </div>
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t(isCreation ? 'add' : 'update_action')"
-          :disable="optName.length === 0 || optValue.length === 0"
+          :label="$t('add')"
           color="primary"
           @click="onSubmit"
           v-close-popup
@@ -37,11 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { DataShieldROptionDto } from 'src/models/DataShield';
+import { RServerClusterDto } from 'src/models/OpalR';
 
 interface DialogProps {
   modelValue: boolean
-  option: DataShieldROptionDto | null
 }
 
 const props = defineProps<DialogProps>();
@@ -49,17 +50,19 @@ const showDialog = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue'])
 
 const datashieldStore = useDatashieldStore();
+const rStore = useRStore();
 
-const optName = ref('');
-const optValue = ref('');
+const name = ref<string>('');
+const cluster = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
+const loading = ref(false);
 
-const isCreation = computed(() => props.option === null);
+const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
 
 watch(() => props.modelValue, (value) => {
   showDialog.value = value;
   if (value) {
-    optName.value = props.option ? props.option.name : '';
-    optValue.value = props.option ? props.option.value : '';
+    name.value = '';
+    cluster.value = rStore.clusters.length ? rStore.clusters[0].name : '';
   }
 });
 
@@ -68,6 +71,6 @@ function onHide() {
 }
 
 function onSubmit() {
-  datashieldStore.setOption({ name: optName.value, value: optValue.value });
+  datashieldStore.addProfile(name.value, cluster.value);
 }
 </script>

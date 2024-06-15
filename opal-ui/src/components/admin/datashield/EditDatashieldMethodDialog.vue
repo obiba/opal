@@ -9,7 +9,7 @@
         <q-input
           v-model="name"
           :label="$t('name')"
-          :hint="$t('datashield_method_name_hint')"
+          :hint="$t('datashield.method_name_hint')"
           :disable="!isCreation"
           dense
           class="q-mb-md" />
@@ -23,7 +23,7 @@
           v-if="type.value === 'r_func'"
           v-model="func"
           :label="$t('function')"
-          :hint="$t('datashield_method_func_hint')"
+          :hint="$t('datashield.method_func_hint')"
           placeholder="package::function"
           dense
           class="q-mb-md" />
@@ -31,7 +31,7 @@
           v-if="type.value === 'r_script'"
           v-model="script"
           :label="$t('script')"
-          :hint="$t('datashield_method_script_hint')"
+          :hint="$t('datashield.method_script_hint')"
           placeholder="function(x) { return(x) }"
           dense
           type="textarea"

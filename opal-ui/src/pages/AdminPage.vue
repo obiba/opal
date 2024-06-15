@@ -42,8 +42,8 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/datashield">{{ $t('datashield') }}</router-link></q-item-label>
-                <q-item-label caption lines="2">{{ $t('datashield_caption') }}</q-item-label>
+                <q-item-label><router-link to="/admin/datashield">DataSHIELD</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('datashield.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
