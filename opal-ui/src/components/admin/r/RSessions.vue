@@ -82,7 +82,7 @@ const initialPagination = ref({
 const columns = [
   { name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
   { name: 'profile', label: t('profile'), align: 'left', field: 'profile', sortable: true, classes: 'text-caption' },
-  { name: 'cluster', label: t('r_cluster'), align: 'left', field: 'cluster', sortable: true, classes: 'text-caption' },
+  { name: 'cluster', label: t('r.cluster'), align: 'left', field: 'cluster', sortable: true, classes: 'text-caption' },
   { name: 'server', label: t('server'), align: 'left', field: 'server', sortable: true },
   { name: 'context', label: t('context'), align: 'left', field: 'context', sortable: true, classes: 'text-caption' },
   { name: 'user', label: t('user'), align: 'left', field: 'user', sortable: true },

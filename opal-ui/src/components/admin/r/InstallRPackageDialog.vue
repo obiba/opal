@@ -7,7 +7,7 @@
       <q-separator />
       <q-card-section class="bg-warning">
         <q-icon name="warning" />
-        {{ $t('r_packages_warn') }}
+        {{ $t('r.packages_warn') }}
       </q-card-section>
       <q-card-section>
         <q-select

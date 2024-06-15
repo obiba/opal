@@ -16,7 +16,7 @@
         <q-select
           v-model="cluster"
           :options="clusterNames"
-          :label="$t('r_cluster')"
+          :label="$t('r.cluster')"
           dense
           class="text-grey"/>
         <div class="text-hint q-mt-xs">

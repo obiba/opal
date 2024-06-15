@@ -137,7 +137,7 @@ const columns = [
   {
     name: 'version',
     required: true,
-    label: t('r_version'),
+    label: t('r.version'),
     align: 'left',
     field: 'version',
     classes: 'text-caption',
@@ -145,16 +145,16 @@ const columns = [
   {
     name: 'sessionCount',
     required: true,
-    label: t('r_sessions'),
+    label: t('r.sessions'),
     align: 'left',
-    field: (row: RServerDto) => t('r_sessions_counts', { count: row.sessionCount, active: row.busySessionCount }),
+    field: (row: RServerDto) => t('r.sessions_counts', { count: row.sessionCount, active: row.busySessionCount }),
   },
   {
     name: 'system',
     required: true,
     label: t('system'),
     align: 'left',
-    field: (row: RServerDto) => t('r_system', { cores: row.cores, memory: getSizeLabel(row.freeMemory * 1000) }),
+    field: (row: RServerDto) => t('r.system', { cores: row.cores, memory: getSizeLabel(row.freeMemory * 1000) }),
   },
   {
     name: 'url',

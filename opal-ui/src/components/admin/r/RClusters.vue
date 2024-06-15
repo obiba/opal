@@ -4,11 +4,11 @@
       <q-select
         v-model="tab"
         :options="clusterNames"
-        :label="$t('r_cluster')"
+        :label="$t('r.cluster')"
         dense
         outlined
         class="text-grey"/>
-      <div class="q-mt-sm text-help">{{ $t('r_clusters_count', { count: clusterNames.length }) }}</div>
+      <div class="q-mt-sm text-help">{{ $t('r.clusters_count', { count: clusterNames.length }) }}</div>
     </div>
     <q-tab-panels v-model="tab">
       <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">

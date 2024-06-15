@@ -4,18 +4,18 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('r')" />
+        <q-breadcrumbs-el label="R" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h5 q-mb-md">{{ $t('r_servers') }}</div>
-      <div class="text-help q-mb-md">{{ $t('r_servers_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ $t('r.servers') }}</div>
+      <div class="text-help q-mb-md">{{ $t('r.servers_info') }}</div>
       <r-clusters />
-      <div class="text-h5 q-mb-md">{{ $t('r_sessions') }}</div>
-      <div class="text-help q-mb-md">{{ $t('r_sessions_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ $t('r.sessions') }}</div>
+      <div class="text-help q-mb-md">{{ $t('r.sessions_info') }}</div>
       <r-sessions class="q-mb-md" />
-      <div class="text-h5 q-mb-md">{{ $t('r_workspaces') }}</div>
-      <div class="text-help q-mb-md">{{ $t('r_workspaces_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ $t('r.workspaces') }}</div>
+      <div class="text-help q-mb-md">{{ $t('r.workspaces_info') }}</div>
       <r-workspaces />
     </q-page>
   </div>
