@@ -12,7 +12,6 @@
           :hint="$t('datashield.profile_name_hint')"
           dense
           class="q-mb-md" />
-        <q-spinner-dots v-if="loading" />
         <q-select
           v-model="cluster"
           :options="clusterNames"
@@ -30,6 +29,7 @@
           flat
           :label="$t('add')"
           color="primary"
+          :disable="!name"
           @click="onSubmit"
           v-close-popup
         />
@@ -54,7 +54,6 @@ const rStore = useRStore();
 
 const name = ref<string>('');
 const cluster = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
-const loading = ref(false);
 
 const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
 

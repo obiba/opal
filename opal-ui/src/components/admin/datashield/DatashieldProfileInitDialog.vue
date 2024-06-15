@@ -56,8 +56,9 @@ watch(() => props.modelValue, (value) => {
     options.value = [];
     loading.value = true;
     datashieldStore.getPackages().then((packages: RPackageDto[]) => {
-      options.value = packages.map((p) => ({ label: p.name, value: p.name }));
-      selected.value = packages.map((p) => p.name);
+      const uniquePackages = Array.from(new Set(packages.map((p) => p.name)));
+      options.value = uniquePackages.map((name) => ({ label: name, value: name }));
+      selected.value = uniquePackages;
       loading.value = false;
     });
   }
