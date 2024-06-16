@@ -90,6 +90,7 @@
     "useGroupsStore": true,
     "useSystemStore": true,
     "useRStore": true,
-    "useDatashieldStore": true
+    "useDatashieldStore": true,
+    "useAuthzStore": true
   }
 }

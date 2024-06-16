@@ -97,6 +97,7 @@
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
+          <access-control-list :resource="`/project/${dsName}/permissions/table/${tName}`" />
         </q-tab-panel>
       </q-tab-panels>
 
@@ -113,6 +114,7 @@
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';

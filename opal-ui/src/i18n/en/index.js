@@ -64,6 +64,13 @@ export default {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
     },
   },
+  acls: {
+    TABLE_READ: 'View dictionary and summaries',
+    TABLE_VALUES: 'View dictionary and values',
+    TABLE_EDIT: 'Edit dictionary and view summaries',
+    TABLE_VALUES_EDIT: 'Edit dictionary and view values',
+    TABLE_ALL: 'Administrate',
+  },
   validation: {
     user: {
       name_required: 'Name is required',
@@ -219,6 +226,7 @@ export default {
   gh_ref: 'Reference',
   gh_repo_hint: 'Example: dsBase',
   gh_repo: 'Repository',
+  group: 'Group',
   groups_hint: 'Select a group or type a new name and press \'Enter\'.',
   groups_info: 'Groups can only be defined through users. Removing a group removes users from this group.',
   groups: 'Groups',

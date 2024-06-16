@@ -61,6 +61,7 @@ declare global {
   const unref: typeof import('vue')['unref']
   const useAttrs: typeof import('vue')['useAttrs']
   const useAuthStore: typeof import('./stores/auth')['useAuthStore']
+  const useAuthzStore: typeof import('./stores/authz')['useAuthzStore']
   const useCommandsStore: typeof import('./stores/commands')['useCommandsStore']
   const useCounterStore: typeof import('./stores/auth')['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
@@ -153,6 +154,7 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
     readonly useAuthStore: UnwrapRef<typeof import('./stores/auth')['useAuthStore']>
+    readonly useAuthzStore: UnwrapRef<typeof import('./stores/authz')['useAuthzStore']>
     readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
@@ -236,6 +238,7 @@ declare module '@vue/runtime-core' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
     readonly useAuthStore: UnwrapRef<typeof import('./stores/auth')['useAuthStore']>
+    readonly useAuthzStore: UnwrapRef<typeof import('./stores/authz')['useAuthzStore']>
     readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
