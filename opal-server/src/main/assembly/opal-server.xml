@@ -94,7 +94,7 @@
 
     <!-- Tools -->
     <dependencySet>
-      <outputDirectory>tools/lib</outputDirectory>
+      <outputDirectory>tools/hasher/lib</outputDirectory>
       <includes>
         <include>org.apache.shiro.tools:shiro-tools-hasher:*</include>
         <include>org.obiba.commons:obiba-password-hasher:jar:cli</include>
