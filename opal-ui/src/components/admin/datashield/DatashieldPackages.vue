@@ -87,6 +87,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'DatashieldPackages',
+});
+</script>
 <script setup lang="ts">
 import { RServerDto, RServerClusterDto, RPackageDto } from 'src/models/OpalR';
 import InstallRPackageDialog from 'src/components/admin/r/InstallRPackageDialog.vue';

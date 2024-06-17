@@ -18,6 +18,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'RClusters',
+});
+</script>
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
 import RCluster from 'src/components/admin/r/RCluster.vue';

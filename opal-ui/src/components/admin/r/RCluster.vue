@@ -109,6 +109,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'RCluster',
+});
+</script>
 <script setup lang="ts">
 import { baseUrl } from 'src/boot/api';
 import { RServerClusterDto, RServerDto } from 'src/models/OpalR';

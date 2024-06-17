@@ -35,14 +35,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { toMaxDecimals } from 'src/utils/numbers';
 export default defineComponent({
   name: 'FieldsList',
 });
 </script>
 <script setup lang="ts">
-import { withDefaults } from 'vue';
+import { toMaxDecimals } from 'src/utils/numbers';
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { DescriptiveStatsDto } from 'src/models/Math';
 import { DataShieldProfileDto } from 'src/models/DataShield';

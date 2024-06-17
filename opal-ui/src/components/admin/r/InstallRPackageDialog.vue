@@ -53,6 +53,11 @@
   </q-dialog>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'InstallRPackageDialog',
+});
+</script>
 <script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
 import { notifyError, notifySuccess } from 'src/utils/notify';

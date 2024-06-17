@@ -93,6 +93,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'RPackages',
+});
+</script>
 <script setup lang="ts">
 import { RServerDto, RServerClusterDto, RPackageDto } from 'src/models/OpalR';
 import UpdateRPackagesDialog from 'src/components/admin/r/UpdateRPackagesDialog.vue';

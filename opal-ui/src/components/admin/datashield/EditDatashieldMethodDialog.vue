@@ -53,6 +53,11 @@
   </q-dialog>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'EditDatashieldethodDialog',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldMethodDto, RScriptDataShieldMethodDto, RFunctionDataShieldMethodDto } from 'src/models/DataShield';
 

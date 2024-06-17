@@ -81,13 +81,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { QTableColumn } from 'quasar';
 export default defineComponent({
   name: 'ValuesList',
 });
 </script>
 <script setup lang="ts">
+import { QTableColumn } from 'quasar';
 import { TableDto, ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { t } from 'src/boot/i18n';

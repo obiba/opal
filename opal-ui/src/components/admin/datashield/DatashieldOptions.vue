@@ -86,6 +86,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'DatashieldOptions',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldROptionDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

@@ -87,6 +87,11 @@
   </q-dialog>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'AddUserDialog',
+});
+</script>
 <script setup lang="ts">
 import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';

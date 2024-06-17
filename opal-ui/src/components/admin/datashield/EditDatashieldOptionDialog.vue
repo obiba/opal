@@ -36,6 +36,11 @@
   </q-dialog>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'EditDatashieldOptionDialog',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldROptionDto } from 'src/models/DataShield';
 

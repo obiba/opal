@@ -47,6 +47,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'RWorkspaces',
+});
+</script>
 <script setup lang="ts">
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { RWorkspaceDto } from 'src/models/OpalR';

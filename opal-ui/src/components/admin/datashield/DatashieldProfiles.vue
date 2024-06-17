@@ -40,6 +40,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'DatashieldProfiles',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldProfileDto } from 'src/models/DataShield';
 import DatashieldProfile from 'src/components/admin/datashield/DatashieldProfile.vue';

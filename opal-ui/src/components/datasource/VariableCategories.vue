@@ -119,14 +119,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { getLabels } from 'src/utils/attributes';
-import { CategoryDto } from 'src/models/Magma';
 export default defineComponent({
   name: 'VariableCategories',
 });
 </script>
 <script setup lang="ts">
+import { getLabels } from 'src/utils/attributes';
+import { CategoryDto } from 'src/models/Magma';
 import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
 import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

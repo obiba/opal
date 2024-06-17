@@ -116,6 +116,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'UsersList',
+});
+</script>
 <script setup lang="ts">
 import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

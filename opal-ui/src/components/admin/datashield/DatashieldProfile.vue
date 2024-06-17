@@ -95,6 +95,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'DatashieldProfile',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldProfileDto } from 'src/models/DataShield';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
@@ -131,7 +136,7 @@ const items: FieldItem<DataShieldProfileDto>[] = [
   },
   {
     field: 'cluster',
-    label: 'r_cluster',
+    label: 'r.cluster',
     html: (val: DataShieldProfileDto) =>
       val ? `<code>${val.cluster}</code>` : '',
   },

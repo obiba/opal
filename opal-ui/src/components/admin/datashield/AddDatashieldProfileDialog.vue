@@ -38,7 +38,12 @@
   </q-dialog>
 </template>
 
-<script setup lang="ts">
+
+<script lang="ts">
+export default defineComponent({
+  name: 'AddDatashieldProfileDialog',
+});
+</script><script setup lang="ts">
 import { RServerClusterDto } from 'src/models/OpalR';
 
 interface DialogProps {

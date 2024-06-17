@@ -27,13 +27,12 @@
 </template>
 
 <script lang="ts">
-import { BookmarkDto, BookmarkDto_ResourceType } from 'src/models/Opal';
-import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'BookmarksList',
 });
 </script>
 <script setup lang="ts">
+import { BookmarkDto, BookmarkDto_ResourceType } from 'src/models/Opal';
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 const authStore = useAuthStore();
 

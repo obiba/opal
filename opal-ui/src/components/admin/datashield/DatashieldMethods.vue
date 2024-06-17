@@ -102,6 +102,11 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'DatashieldMethods',
+});
+</script>
 <script setup lang="ts">
 import { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
