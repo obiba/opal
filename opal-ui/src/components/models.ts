@@ -2,7 +2,7 @@ import { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins
 import { ViewDto, VariableListViewDto, DatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto } from 'src/models/Magma';
 
 export interface StringMap {
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 }
 
 export interface Message {

@@ -472,4 +472,9 @@ export default {
   variance: 'Variance',
   version: 'Version',
   waiting: 'En attente',
+  public_url: 'URL publique',
+  logout_url: 'URL après déconnexion',
+  laguages: 'Langues',
+  default_charset: 'Jeu de caractères par défaut',
+  enforced_2fa: 'Authentification à deux facteurs obligatoire',
 };

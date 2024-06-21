@@ -9,10 +9,8 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">{{ $t('configuration') }}</div>
-      <div>
-        <pre>{{ systemStore.generalConf }}</pre>
-      </div>
-      <div class="text-h5 q-mb-md">{{ $t('permissions') }}</div>
+      <general-configuration />
+      <div class="text-h5 q-mb-md q-mt-lg">{{ $t('permissions') }}</div>
       <access-control-list
         resource="/system/permissions/administration"
         :options="['PROJECT_ADD', 'SYSTEM_ALL']"
@@ -22,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
+import GeneralConfiguration from 'src/components/admin/GeneralConfiguration.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
-
-const systemStore = useSystemStore();
 </script>
