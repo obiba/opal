@@ -20,6 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import GeneralConfiguration from 'src/components/admin/GeneralConfiguration.vue';
+import GeneralConfiguration from 'src/components/admin/configuration/GeneralConfiguration.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 </script>
