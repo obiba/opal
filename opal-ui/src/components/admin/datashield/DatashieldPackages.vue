@@ -2,12 +2,13 @@
   <div>
     <q-table
       flat
-      :rows="filteredPackages"
+      :rows="packages"
       :columns="columns"
       :row-key="getPackageKey"
       wrap-cells
       :pagination="initialPagination"
       :filter="filter"
+      :filter-method="onFilter"
     >
       <template v-slot:top-left>
         <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left">
@@ -172,7 +173,7 @@ const columns = [
   },
 ];
 
-const filteredPackages = computed(() => {
+function onFilter() {
   if (filter.value.length === 0) {
     return packages.value;
   }
@@ -181,7 +182,7 @@ const filteredPackages = computed(() => {
     const description = ['Title', 'Version', 'Built', 'LibPath'].map((key) => getDescriptionValue(pkg, key)).join(' ');
     return `${pkg.name} ${pkg.rserver} ${description}`.toLowerCase().includes(query);
   });
-});
+}
 
 onMounted(() => {
   updateRPackages();

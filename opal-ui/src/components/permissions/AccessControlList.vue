@@ -1,12 +1,13 @@
 <template>
   <div>
     <q-table
-      :rows="filteredRows"
+      :rows="authzStore.acls"
       flat
       :row-key="getRowKey"
       :columns="columns"
       :pagination="initialPagination"
       :filter="filter"
+      :filter-method="onFilter"
     >
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
@@ -83,15 +84,6 @@ const columns = [
   { name: 'permissions', label: t('permissions'), align: 'left', field: 'actions' },
 ];
 
-const filteredRows = computed(() => {
-  if (!filter.value) {
-    return authzStore.acls;
-  }
-  return authzStore.acls.filter((row) => {
-    return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
-  });
-});
-
 onMounted(async () => {
   authzStore.initAcls(props.resource);
 });
@@ -120,5 +112,14 @@ function onShowEdit(row: Acl) {
 function onShowDelete(row: Acl) {
   selected.value = row;
   showDelete.value = true;
+}
+
+function onFilter() {
+  if (!filter.value) {
+    return authzStore.acls;
+  }
+  return authzStore.acls.filter((row) => {
+    return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
+  });
 }
 </script>

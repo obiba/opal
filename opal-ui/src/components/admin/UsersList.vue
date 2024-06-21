@@ -3,11 +3,11 @@
     <q-table
       flat
       :filter="filter"
-      :rows="filteredUsers"
+      :filter-method="onFilter"
+      :rows="users"
       :columns="columns"
       row-key="name"
       :pagination="initialPagination"
-      :hide-pagination="filteredUsers.length <= initialPagination.rowsPerPage"
       :loading="loading"
     >
       <template v-slot:top-left>
@@ -180,12 +180,13 @@ const initialPagination = ref({
 });
 
 const toolsVisible = ref<{ [key: string]: boolean }>({});
-const filteredUsers = computed(() => filterUsers(users.value));
 
-function filterUsers(rows: SubjectCredentialsDto[]) {
+function onFilter() {
+  if (filter.value.length === 0) {
+    return users.value;
+  }
   const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
-
-  const result = rows.filter((row) => {
+  const result = users.value.filter((row) => {
     return Object.values(row).some((val) => {
       return String(val).toLowerCase().includes(query);
     });

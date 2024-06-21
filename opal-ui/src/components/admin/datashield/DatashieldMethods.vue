@@ -5,12 +5,13 @@
     </div>
     <q-table
       flat
-      :rows="filteredMethods"
+      :rows="methods"
       :columns="columns"
       row-key="name"
       wrap-cells
       :pagination="initialPagination"
       :filter="filter"
+      :filter-method="onFilter"
       selection="multiple"
       v-model:selected="selected"
     >
@@ -137,7 +138,7 @@ const methods = computed(() => {
   return datashieldStore.methods[props.env];
 });
 
-const filteredMethods = computed(() => {
+function onFilter () {
   if (filter.value.length === 0) {
     return methods.value;
   }
@@ -146,7 +147,7 @@ const filteredMethods = computed(() => {
     const desc = `${m.name} ${getCode(m)} ${getPackageName(m)}`.toLowerCase();
     return desc.includes(query);
   });
-});
+}
 
 const columns = [
   {

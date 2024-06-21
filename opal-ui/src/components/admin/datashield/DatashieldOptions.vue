@@ -5,12 +5,13 @@
     </div>
     <q-table
       flat
-      :rows="filteredOptions"
+      :rows="datashieldStore.options"
       :columns="columns"
       row-key="name"
       wrap-cells
       :pagination="initialPagination"
       :filter="filter"
+      :filter-method="onFilter"
       selection="multiple"
       v-model:selected="selected"
     >
@@ -111,7 +112,7 @@ const showDelete = ref(false);
 const showEdit = ref(false);
 const opt = ref<DataShieldROptionDto | null>(null);
 
-const filteredOptions = computed(() => {
+function onFilter() {
   if (filter.value.length === 0) {
     return datashieldStore.options;
   }
@@ -119,7 +120,7 @@ const filteredOptions = computed(() => {
   return datashieldStore.options.filter((o) => {
     return o.name.includes(query);
   });
-});
+}
 
 const columns = [
   {
