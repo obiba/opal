@@ -9,6 +9,23 @@
       :filter="filter"
       :filter-method="onFilter"
     >
+      <template v-slot:top-left>
+        <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm">
+          <q-list>
+            <q-item clickable v-close-popup @click.prevent="onShowAddUser">
+              <q-item-section>
+                <q-item-label>{{ $t('add_user_permission') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup @click.prevent="onShowAddGroup">
+              <q-item-section>
+                <q-item-label>{{ $t('add_group_permission') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </template>
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
           <template v-slot:append>
@@ -44,22 +61,78 @@
               />
             </div>
           </q-td>
-          <q-td key="type" :props="props">
+          <q-td key="type" :props="props" class="text-caption">
             {{ $t(props.row.subject.type.toLowerCase()) }}
           </q-td>
           <q-td key="permissions" :props="props" class="text-help">
-            {{ props.row.actions.map((action: string) => $t(`acls.${action}`)).join(', ') }}
+            <div v-for="action in props.row.actions" :key="action">
+              <span :title="$t(`acls.${action}.description`)">{{ $t(`acls.${action}.label`) }}</span>
+            </div>
           </q-td>
         </q-tr>
       </template>
     </q-table>
+
+    <confirm-dialog
+      v-if="selected && selected.subject"
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('delete_permission_confirm', { principal: selected.subject.principal })"
+      @confirm="deletePermission"
+    />
+
+    <q-dialog v-model="showEdit">
+      <q-card class="dialog-sm">
+        <q-card-section>
+          <div class="text-h6">{{ $t(editMode ? 'edit_permission' : 'add_permission') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+            <q-input
+              v-model="selected.subject.principal"
+              dense
+              :label="$t(selected.subject.type.toLowerCase())"
+              :disable="editMode"
+              class="q-mb-md"
+              debounce="300"
+              @update:model-value="onSearchSubject"
+            >
+              <q-menu
+                v-model="showSuggestions"
+                no-parent-event
+                auto-close>
+                <q-list style="min-width: 100px">
+                  <q-item clickable v-close-popup v-for="sugg in suggestions" :key="sugg" @click="selected.subject.principal = sugg">
+                    <q-item-section>{{ sugg }}</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-input>
+            <div>
+              {{ $t('permission') }}
+            </div>
+            <div v-for="option in props.options" :key="option">
+              <q-radio v-model="action" :label="$t(`acls.${option}.label`)" :val="option" />
+              <div class="text-hint q-ml-sm">{{ $t(`acls.${option}.description`) }}</div>
+            </div>
+        </q-card-section>
+        <q-separator />
+        <q-card-actions align="right" class="bg-grey-3"
+          ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          <q-btn flat :label="$t('submit')" color="primary" :disable="selected.subject.principal" @click="onSubmitPermission" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Acl } from 'src/models/Opal';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+
 interface Props {
   resource: string;
+  options: string[];
 }
 
 const props = defineProps<Props>();
@@ -77,6 +150,11 @@ const initialPagination = ref({
 const showEdit = ref(false);
 const showDelete = ref(false);
 const selected = ref();
+const editMode = ref(false);
+const action = ref('');
+const suggestions = ref<string[]>([]);
+
+const showSuggestions = ref(false);
 
 const columns = [
   { name: 'name', label: t('name'), align: 'left', field: 'subject' },
@@ -106,6 +184,8 @@ function onLeaveRow(row: Acl) {
 
 function onShowEdit(row: Acl) {
   selected.value = row;
+  editMode.value = true;
+  action.value = row.actions[0];
   showEdit.value = true;
 }
 
@@ -120,6 +200,48 @@ function onFilter() {
   }
   return authzStore.acls.filter((row) => {
     return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
+  });
+}
+
+function onShowAddUser() {
+  selected.value = { subject: { principal: '', type: 'USER' }, actions: [], resource: props.resource, domain: 'opal' };
+  editMode.value = false;
+  action.value = props.options[0];
+  suggestions.value = [];
+  showEdit.value = true;
+}
+
+function onShowAddGroup() {
+  selected.value = { subject: { principal: '', type: 'GROUP' }, actions: [], resource: props.resource, domain: 'opal' };
+  editMode.value = false;
+  action.value = props.options[0];
+  suggestions.value = [];
+  showEdit.value = true;
+}
+
+function onSubmitPermission() {
+  selected.value.actions = [action.value];
+  authzStore.setAcl(selected.value);
+}
+
+function deletePermission() {
+  authzStore.deleteAcl(selected.value);
+}
+
+function onSearchSubject(value: string) {
+  if (value.length < 3) {
+    suggestions.value = [];
+    showSuggestions.value = false;
+    return;
+  }
+  authzStore.searchSubjects(selected.value.subject.type, value).then((response) => {
+    if (response.suggestions) {
+      suggestions.value = response.suggestions;
+      showSuggestions.value = true;
+    } else {
+      suggestions.value = [];
+      showSuggestions.value = false;
+    }
   });
 }
 </script>

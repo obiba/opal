@@ -97,7 +97,10 @@
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
-          <access-control-list :resource="`/project/${dsName}/permissions/table/${tName}`" />
+          <access-control-list
+            :resource="`/project/${dsName}/permissions/table/${tName}`"
+            :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
+          />
         </q-tab-panel>
       </q-tab-panels>
 

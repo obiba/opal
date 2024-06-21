@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { Acl } from 'src/models/Opal';
+import { Acl, SuggestionsDto } from 'src/models/Opal';
 
 export const useAuthzStore = defineStore('authz', () => {
 
@@ -18,8 +18,39 @@ export const useAuthzStore = defineStore('authz', () => {
     });
   }
 
+  async function setAcl(acl: Acl) {
+    return api.post(resource.value, {}, { params: {
+      type: acl.subject?.type,
+      principal: acl.subject?.principal,
+      permission: acl.actions.join(','),
+    }}).then(() => {
+      return initAcls(resource.value);
+    });
+  }
+
+  async function deleteAcl(acl: Acl) {
+    return api.delete(resource.value, { params: {
+      type: acl.subject?.type,
+      principal: acl.subject?.principal,
+    }}).then(() => {
+      return initAcls(resource.value);
+    });
+  }
+
+  async function searchSubjects(type: string, query: string): Promise<SuggestionsDto> {
+    return api.get('/system/subject-profiles/_search', { params: {
+      type,
+      query,
+    }}).then((response) => {
+      return response.data;
+    });
+  }
+
   return {
     acls,
     initAcls,
+    setAcl,
+    deleteAcl,
+    searchSubjects,
   }
 });

@@ -65,11 +65,26 @@ export default {
     },
   },
   acls: {
-    TABLE_READ: 'View dictionary and summaries',
-    TABLE_VALUES: 'View dictionary and values',
-    TABLE_EDIT: 'Edit dictionary and view summaries',
-    TABLE_VALUES_EDIT: 'Edit dictionary and view values',
-    TABLE_ALL: 'Administrate',
+    TABLE_READ: {
+      label: 'View dictionary and summaries',
+      description: 'View dictionary and summaries (no access to individual values).',
+    },
+    TABLE_VALUES: {
+      label: 'View dictionary and values',
+      description: 'View dictionary with access to individual values.',
+    },
+    TABLE_EDIT: {
+      label: 'Edit dictionary and view summaries',
+      description: 'Edit dictionary and view values summary (no access to individual values).',
+    },
+    TABLE_VALUES_EDIT: {
+      label: 'Edit dictionary and view values',
+      description: 'Edit dictionary and view individual values.',
+    },
+    TABLE_ALL: {
+      label: 'Administrate',
+      description: 'Full access to the table, including edition of the dictionary and individual values.',
+    },
   },
   validation: {
     user: {
@@ -105,6 +120,9 @@ export default {
   add_folder: 'Add folder',
   add_method: 'Add method',
   add_option: 'Add option',
+  add_permission: 'Add permission',
+  add_group_permission: 'Add group permission',
+  add_user_permission: 'Add user permission',
   add_profile: 'Add profile',
   add_table: 'Add table',
   add_tables: 'Add/update some tables',
@@ -169,7 +187,8 @@ export default {
   delete_r_package_confirm: 'The deletion of an R package may not succeed if it is installed in a folder that is not writable. Are you sure you want to delete the R package "{name}"?',
   delete_r_workspaces_confirm: '- | Are you sure you want to delete this R workspace? | Are you sure you want to delete these {count} R workspaces?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
-  delete_user_confirm: "Are you sure you want to delete user '{user}'?",
+  delete_permission_confirm: 'Are you sure you want to delete permission of {principal}?',
+  delete_user_confirm: 'Are you sure you want to delete user {user}?',
   delete_variables_confirm: 'No variables to delete | Are you sure you want to delete this variable? | Are you sure you want to delete these {count} variables?',
   delete: 'Delete',
   density: 'Density',
@@ -187,6 +206,7 @@ export default {
   download_views_backup: 'Backup views',
   download: 'Download',
   edit_category: 'Edit category',
+  edit_permission: 'Edit permission',
   edit_script: 'Edit script',
   edit_table: 'Edit table',
   edit_view: 'Edit view',
@@ -304,6 +324,7 @@ export default {
   password_hint: "{'The password must be at least 8 characters long, including one digit, one uppercase letter, one lowercase letter, one special character (e.g., @#$%^&+=!), and no white space.'}",
   password: 'Password',
   percentage: 'Percentage',
+  permission: 'Permission',
   permissions: 'Permissions',
   personal_access_token: 'Personal access token',
   plugins_caption: 'Manage system plugins',
