@@ -65,6 +65,11 @@ export default {
     },
   },
   acls: {
+    // r service
+    R_USE: {
+      label: 'Use R service',
+      description: 'Can push accessible data to R and can execute ANY R commands on them (trusted users only!).',
+    },
     // datasource permissions
     DATASOURCE_VIEW: {
       label: 'View dictionary and values of all tables',
@@ -399,6 +404,7 @@ export default {
   std_dev: 'Standard deviation',
   stop: 'Stop',
   sub_total: 'Sub total',
+  submit: 'Submit',
   sum: 'Sum',
   summary: 'Summary',
   sumsq: 'Sum of squares',

@@ -65,6 +65,11 @@ export default {
     },
   },
   acls: {
+    // r service
+    R_USE: {
+      label: 'Utiliser le service R',
+      description: 'Pouvoir assigner les données accessibles dans une session R et executer n\'importe quel commande R (utilisateurs de confiance uniquement !).',
+    },
     // datasource permissions
     DATASOURCE_VIEW: {
       label: 'Voir le dictonnaire et les données de toutes les tables',
@@ -395,6 +400,7 @@ export default {
   std_dev: 'Écart type',
   stop: 'Arrêter',
   sub_total: 'Sous-total',
+  submit: 'Soumettre',
   sum: 'Somme',
   summary: 'Sommaire',
   sumsq: 'Somme des carrés',

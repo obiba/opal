@@ -17,6 +17,11 @@
       <div class="text-h5 q-mb-md">{{ $t('r.workspaces') }}</div>
       <div class="text-help q-mb-md">{{ $t('r.workspaces_info') }}</div>
       <r-workspaces />
+      <div class="text-h5 q-mb-md">{{ $t('permissions') }}</div>
+      <access-control-list
+        resource="/system/permissions/r"
+        :options="['R_USE']"
+      />
     </q-page>
   </div>
 </template>
@@ -25,6 +30,7 @@
 import RClusters from 'src/components/admin/r/RClusters.vue';
 import RSessions from 'src/components/admin/r/RSessions.vue';
 import RWorkspaces from 'src/components/admin/r/RWorkspaces.vue';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const rStore = useRStore();
 
