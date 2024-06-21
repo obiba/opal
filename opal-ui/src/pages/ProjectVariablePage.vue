@@ -100,6 +100,10 @@
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
+          <access-control-list
+            :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
+            :options="['VARIABLE_READ']"
+          />
         </q-tab-panel>
       </q-tab-panels>
     </q-page>
@@ -112,6 +116,7 @@ import VariableCategories from 'src/components/datasource/VariableCategories.vue
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
 import VariableScript from 'src/components/datasource/VariableScript.vue';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { VariableDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';

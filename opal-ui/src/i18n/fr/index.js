@@ -99,6 +99,11 @@ export default {
       label: 'Administrer',
       description: 'Accès complet à la table, incluant l\'édition du dictionnaire et des données individuelles.',
     },
+    // variable permissions
+    VARIABLE_READ: {
+      label: 'Voir avec le sommaire',
+      description: 'Voir la description de la variable et le sommaire des données (pas d\'accès aux données individuelles).',
+    },
   },
   validation: {
     user: {
