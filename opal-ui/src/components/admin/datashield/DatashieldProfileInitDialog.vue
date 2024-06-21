@@ -46,7 +46,7 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'beforeInit', 'afterInit'])
 
 const selected = ref<string[]>([]);
 const options = ref<{ label: string; value: string}[]>();
@@ -75,7 +75,10 @@ function onHide() {
 
 function onInitSettings() {
   if (selected.value.length > 0) {
-    datashieldStore.applyProfileSettings(selected.value);
+    emit('beforeInit');
+    datashieldStore.applyProfileSettings(selected.value).finally(() => {
+      emit('afterInit');
+    });
   }
 }
 </script>

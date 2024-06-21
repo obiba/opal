@@ -73,29 +73,35 @@
         size="sm"
         @click="onShowInitSettings" />
     </div>
-    <q-tabs
-      v-model="tab"
-      dense
-      class="text-grey"
-      active-color="primary"
-      indicator-color="primary"
-      align="justify"
-      narrow-indicator
-    >
-      <q-tab name="aggregate" :label="$t('aggregate')" />
-      <q-tab name="assign" :label="$t('assign')" />
-      <q-tab name="options" :label="$t('options')" />
-    </q-tabs>
-    <q-separator />
-    <q-tab-panels v-model="tab">
-      <q-tab-panel v-for="env in ['aggregate', 'assign']" :key="env" :name="env">
-        <datashield-methods :env="env"/>
-      </q-tab-panel>
-      <q-tab-panel name="options">
-        <datashield-options />
-      </q-tab-panel>
-    </q-tab-panels>
-    <datashield-profile-init-dialog v-model="showInitSettings" />
+    <div v-if="loading">
+      <q-spinner-dots size="lg" />
+    </div>
+    <div v-else>
+      <q-tabs
+        v-model="tab"
+        dense
+        class="text-grey"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        narrow-indicator
+      >
+        <q-tab name="aggregate" :label="$t('aggregate')" />
+        <q-tab name="assign" :label="$t('assign')" />
+        <q-tab name="options" :label="$t('options')" />
+      </q-tabs>
+      <q-separator />
+      <q-tab-panels v-model="tab">
+        <q-tab-panel v-for="env in ['aggregate', 'assign']" :key="env" :name="env">
+          <datashield-methods :env="env"/>
+        </q-tab-panel>
+        <q-tab-panel name="options">
+          <datashield-options />
+        </q-tab-panel>
+      </q-tab-panels>
+    </div>
+
+    <datashield-profile-init-dialog v-model="showInitSettings" @before-init="onBeforeInit" @after-init="onAfterInit" />
     <confirm-dialog
       v-model="showDelete"
       :title="$t('delete')"
@@ -138,8 +144,9 @@ const enabled = ref(props.profile.enabled);
 const restricted = ref(props.profile.restrictedAccess);
 const showDelete = ref(false);
 const showInitSettings = ref(false);
+const loading = ref(false);
 
-const missingCluster = computed(() => props.profile === undefined || getCluster(props.profile) === undefined)
+const missingCluster = computed(() => props.profile === undefined || (rStore.clusters.length > 0 && getCluster(props.profile) === undefined))
 const builtinProfile = computed(() => props.profile?.name === props.profile?.cluster);
 
 const items: FieldItem<DataShieldProfileDto>[] = [
@@ -170,4 +177,11 @@ function onShowInitSettings() {
   showInitSettings.value = true;
 }
 
+function onBeforeInit() {
+  loading.value = true;
+}
+
+function onAfterInit() {
+  loading.value = false;
+}
 </script>
