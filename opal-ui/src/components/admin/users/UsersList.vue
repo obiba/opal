@@ -124,7 +124,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import AddUserDialog from 'src/components/admin/AddUserDialog.vue';
+import AddUserDialog from 'src/components/admin/users/AddUserDialog.vue';
 import { notifyError } from 'src/utils/notify';
 
 const usersStore = useUsersStore();

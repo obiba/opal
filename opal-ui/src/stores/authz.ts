@@ -7,6 +7,11 @@ export const useAuthzStore = defineStore('authz', () => {
   const resource = ref<string>(''); // the path of the current resource
   const acls = ref<Acl[]>([]); // the list of ACLs for the current resource
 
+  function reset() {
+    resource.value = '';
+    acls.value = [];
+  }
+
   async function initAcls(path: string) {
     resource.value = path;
     acls.value = [];
@@ -48,6 +53,7 @@ export const useAuthzStore = defineStore('authz', () => {
 
   return {
     acls,
+    reset,
     initAcls,
     setAcl,
     deleteAcl,

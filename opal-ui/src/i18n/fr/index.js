@@ -66,6 +66,15 @@ export default {
     },
   },
   acls: {
+    // global permissions
+    PROJECT_ADD: {
+      label: 'Ajouter des projets',
+      description: 'Ajouter de nouveaux projets et ainsi pouvoir importer/exporter des données dans ces projets.',
+    },
+    SYSTEM_ALL: {
+      label: 'Administrer',
+      description: 'Accès complet à toutes les ressources du système (utilisateurs de confiance uniquement !).',
+    },
     // r service
     R_USE: {
       label: 'Utiliser le service R',
@@ -179,6 +188,7 @@ export default {
   clear_tasks_confirm: 'Aucune tâche à nettoyer | Êtes-vous sûr de vouloir nettoyer cette tâche ? | Êtes-vous sûr de vouloir nettoyer ces {count} tâches ?',
   clear: 'Nettoyer',
   code: 'Code',
+  configuration: 'Configuration',
   comment: 'Commentaire',
   configure_import_source: 'Configurer la source de données',
   confirm: 'Confirmer',

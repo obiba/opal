@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import UsersList from 'src/components/admin/UsersList.vue';
-import GroupsList from 'src/components/admin/GroupsList.vue';
+import UsersList from 'src/components/admin/users/UsersList.vue';
+import GroupsList from 'src/components/admin/users/GroupsList.vue';
 
 
 </script>

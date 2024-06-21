@@ -66,6 +66,15 @@ export default {
     },
   },
   acls: {
+    // global permissions
+    PROJECT_ADD: {
+      label: 'Add projects',
+      description: 'Add new projects and therefore can import/export data in the context of the project.',
+    },
+    SYSTEM_ALL: {
+      label: 'Administrate',
+      description: 'Access to all resources and actions in the system (trusted users only!).',
+    },
     // r service
     R_USE: {
       label: 'Use R service',
@@ -183,6 +192,7 @@ export default {
   clear: 'Clear',
   code: 'Code',
   comment: 'Comment',
+  configuration: 'Configuration',
   configure_import_source: 'Configure import source',
   confirm: 'Confirm',
   content: 'Content',

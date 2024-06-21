@@ -146,6 +146,7 @@ import { notifyError } from 'src/utils/notify';
 
 const systemStore = useSystemStore();
 const authStore = useAuthStore();
+const authzStore = useAuthzStore();
 const datasourceStore = useDatasourceStore();
 const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
@@ -155,6 +156,7 @@ const transientDatasourceStore = useTransientDatasourceStore();
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
 const rStore = useRStore();
+const datashieldStore = useDatashieldStore();
 
 const { cookies } = useCookies();
 const { locale } = useI18n({ useScope: 'global' });
@@ -184,6 +186,7 @@ const disableSubmit = computed(() => {
 onMounted(() => {
   systemStore.initGeneralConf();
   authStore.reset();
+  authzStore.reset();
   commandsStore.reset();
   datasourceStore.reset();
   filesStore.reset();
@@ -193,6 +196,7 @@ onMounted(() => {
   usersStore.reset();
   groupsStore.reset();
   rStore.reset();
+  datashieldStore.reset();
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });

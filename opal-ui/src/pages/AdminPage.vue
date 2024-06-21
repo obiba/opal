@@ -90,7 +90,7 @@
             <q-item-label header class="text-uppercase">{{ $t('system') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/settings">{{ $t('general_settings') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/settings">{{ $t('general_settings') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('general_settings_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
