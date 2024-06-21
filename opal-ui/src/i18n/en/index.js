@@ -35,6 +35,7 @@ export default {
     profile_missing_cluster: 'The R servers cluster for this DataSHIELD profile does not exist.',
     profile_name_hint: 'The DataSHIELD profile name must be unique. This is the name that will be used by the DataSHIELD client to start a DataSHIELD session.',
     profile_settings_help: 'The DataSHIELD profile settings are used to define the aggregate/assign methods that are allowed to be called by a DataSHIELD and the R options that will be applied to the server-side DataSHIELD R session.',
+    profile_access_toggle: 'Restrict access to this profile',
     profile_status_toggle: 'Activate or deactivate profile',
     profiles_info: 'A DataSHIELD profile is associated to a R servers cluster: the methods and options are extracted from the installed DataSHIELD packages settings and can be amended. ',
     settings_init_help: 'Select which DataSHIELD packages will get their methods and options applied to this profile.',
@@ -69,6 +70,11 @@ export default {
     R_USE: {
       label: 'Use R service',
       description: 'Can push accessible data to R and can execute ANY R commands on them (trusted users only!).',
+    },
+    // datashield service
+    DATASHIELD_PROFILE_USE: {
+      label: 'Use DataSHIELD profile',
+      description: 'Can push accessible data to R and can execute limited R commands on them, in the context of this DataSHIELD profile.',
     },
     // datasource permissions
     DATASOURCE_VIEW: {

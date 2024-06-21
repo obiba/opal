@@ -113,6 +113,12 @@ export const useDatashieldStore = defineStore('datashield', () => {
     }).then(() => loadProfileSettings());
   }
 
+  async function applyProfileAccess(access: boolean) {
+    return access ?
+      api.put(`/datashield/profile/${profile.value.name}/_access`).then(() => profile.value.restrictedAccess = true)
+      : api.delete(`/datashield/profile/${profile.value.name}/_access`).then(() => profile.value.restrictedAccess = false);
+  }
+
   return {
     profiles,
     profile,
@@ -132,5 +138,6 @@ export const useDatashieldStore = defineStore('datashield', () => {
     setOption,
     addMethod,
     updateMethod,
+    applyProfileAccess,
   };
 });

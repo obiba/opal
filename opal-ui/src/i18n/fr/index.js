@@ -35,6 +35,7 @@ export default {
     profile_missing_cluster: 'Le cluster de serveurs R pour ce profil DataSHIELD n\'existe pas.',
     profile_name_hint: 'Le nom du profil DataSHIELD doit être unique. C\'est le nom qui sera utilisé par le client DataSHIELD pour démarrer une session DataSHIELD.',
     profile_settings_help: 'Les paramètres du profil DataSHIELD sont utilisés pour définir les méthodes d\'agrégation/affectation qui peuvent être appelées par un client DataSHIELD et les options R qui seront appliquées à la session DataSHIELD du serveur R.',
+    profile_access_toggle: 'Restreindre l\'utilisation de ce profil',
     profile_status_toggle: 'Activer or désactivater le profil',
     profiles_info: 'Un profil DataSHIELD est associé à un cluster de serveurs R: les méthodes et options extraits des packages DataSHIELD installés définissent la configuration du profil. Celle-ci peut être modifiée par la suite. ',
     settings_init_help: 'Selectionner quels packages DataSHIELD auront leurs méthodes et options appliqués à ce profil.',
@@ -69,6 +70,11 @@ export default {
     R_USE: {
       label: 'Utiliser le service R',
       description: 'Pouvoir assigner les données accessibles dans une session R et executer n\'importe quel commande R (utilisateurs de confiance uniquement !).',
+    },
+    // datashield service
+    DATASHIELD_PROFILE_USE: {
+      label: 'Utiliser le profil DataSHIELD',
+      description: 'Pouvoir assigner les données accessibles dans une session R et executer des commandes dans le contexte de ce profil DataSHIELD.',
     },
     // datasource permissions
     DATASOURCE_VIEW: {

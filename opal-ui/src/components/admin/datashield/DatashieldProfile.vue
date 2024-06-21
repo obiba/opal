@@ -38,10 +38,19 @@
       </div>
       <div class="col-md-6 col-xs-12">
         <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
+        <q-toggle v-model="restricted"
+          :label="$t('datashield.profile_access_toggle')"
+          left-label
+          @update:model-value="datashieldStore.applyProfileAccess(!profile.restrictedAccess)"
+        />
         <div v-if="profile?.restrictedAccess">
           <div class="text-help">
             {{ $t('datashield.access_restricted') }}
           </div>
+          <access-control-list
+            :resource="`/datashield/profile/${profile.name}/permissions`"
+            :options="['DATASHIELD_PROFILE_USE']"
+          />
         </div>
         <div v-else>
           <div class="text-help">
@@ -105,6 +114,7 @@ import { DataShieldProfileDto } from 'src/models/DataShield';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import DatashieldMethods from 'src/components/admin/datashield/DatashieldMethods.vue';
 import DatashieldOptions from 'src/components/admin/datashield/DatashieldOptions.vue';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import DatashieldProfileInitDialog from 'src/components/admin/datashield/DatashieldProfileInitDialog.vue';
 
@@ -116,6 +126,7 @@ const props = defineProps<Props>();
 
 onMounted(() => {
   enabled.value = props.profile.enabled;
+  restricted.value = props.profile.restrictedAccess;
   datashieldStore.initProfileSettings(props.profile);
 });
 
@@ -124,6 +135,7 @@ const datashieldStore = useDatashieldStore();
 
 const tab = ref<string>('aggregate');
 const enabled = ref(props.profile.enabled);
+const restricted = ref(props.profile.restrictedAccess);
 const showDelete = ref(false);
 const showInitSettings = ref(false);
 
