@@ -65,6 +65,20 @@ export default {
     },
   },
   acls: {
+    // datasource permissions
+    DATASOURCE_VIEW: {
+      label: 'Voir le dictonnaire et les données de toutes les tables',
+      description: 'Accès en lecture des tables du projet, incluant les données individuelles.',
+    },
+    TABLE_ADD: {
+      label: 'Ajouter des tables',
+      description: 'Ajouter de tables ou des vues.',
+    },
+    DATASOURCE_ALL: {
+      label: 'Administrer',
+      description: 'Accès complet aux tables du projet, incluant l\'édition des dictionnaire et des données individuelles.',
+    },
+    // table permissions
     TABLE_READ: {
       label: 'Voir le dictionnaire et les sommaires',
       description: 'Voir le dictionnaire et les sommaires (pas d\'accès aux données individuelles).',

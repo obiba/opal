@@ -235,9 +235,14 @@ function onSearchSubject(value: string) {
     return;
   }
   authzStore.searchSubjects(selected.value.subject.type, value).then((response) => {
-    if (response.suggestions) {
-      suggestions.value = response.suggestions;
-      showSuggestions.value = true;
+    if (response.suggestions && response.suggestions.length > 0) {
+      if (response.suggestions.length === 1 && response.suggestions[0] === value) {
+        suggestions.value = [];
+        showSuggestions.value = false;
+      } else {
+        suggestions.value = response.suggestions;
+        showSuggestions.value = true;
+      }
     } else {
       suggestions.value = [];
       showSuggestions.value = false;

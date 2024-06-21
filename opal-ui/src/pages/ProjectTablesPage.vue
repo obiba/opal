@@ -40,6 +40,10 @@
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.datasourcePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
+          <access-control-list
+            :resource="`/project/${name}/permissions/datasource`"
+            :options="['DATASOURCE_VIEW', 'TABLE_ADD', 'DATASOURCE_ALL']"
+          />
         </q-tab-panel>
       </q-tab-panels>
     </q-page>
@@ -48,6 +52,7 @@
 
 <script setup lang="ts">
 import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const route = useRoute();
 const projectsStore = useProjectsStore();
