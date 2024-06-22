@@ -72,7 +72,7 @@ export default {
       description: 'Ajouter de nouveaux projets et ainsi pouvoir importer/exporter des données dans ces projets.',
     },
     SYSTEM_ALL: {
-      label: 'Administrer',
+      label: 'Administrer le système',
       description: 'Accès complet à toutes les ressources du système (utilisateurs de confiance uniquement !).',
     },
     // r service
@@ -81,6 +81,15 @@ export default {
       description: 'Pouvoir assigner les données accessibles dans une session R et executer n\'importe quel commande R (utilisateurs de confiance uniquement !).',
     },
     // datashield service
+    DATASHIELD_USE: {
+      label: 'Utiliser le service DataSHIELD',
+      description: 'Pouvoir assigner les données accessibles dans une session R et executer les commandes prédifinies.',
+    },
+    DATASHIELD_ALL: {
+      label: 'Administrer le service DataSHIELD',
+      description: 'Administrer la configuration de DataSHIELD.',
+    },
+    // datashield profile
     DATASHIELD_PROFILE_USE: {
       label: 'Utiliser le profil DataSHIELD',
       description: 'Pouvoir assigner les données accessibles dans une session R et executer des commandes dans le contexte de ce profil DataSHIELD.',
@@ -95,33 +104,33 @@ export default {
       description: 'Ajouter de tables ou des vues.',
     },
     DATASOURCE_ALL: {
-      label: 'Administrer',
+      label: 'Administrer les tables',
       description: 'Accès complet aux tables du projet, incluant l\'édition des dictionnaire et des données individuelles.',
     },
     // table permissions
     TABLE_READ: {
-      label: 'Voir le dictionnaire et les sommaires',
+      label: 'Voir le dictionnaire et les sommaires de la table',
       description: 'Voir le dictionnaire et les sommaires (pas d\'accès aux données individuelles).',
     },
     TABLE_VALUES: {
-      label: 'Voir le dictionnaire et les valeurs',
+      label: 'Voir le dictionnaire et les valeurs de la table',
       description: 'Voir le dictionnaire et les données individuelles.',
     },
     TABLE_EDIT: {
-      label: 'Éditer le dictionnaire et voir les sommaires',
+      label: 'Éditer le dictionnaire et voir les sommaires de la table',
       description: 'Éditer le dictionnaire et voir les sommaires (pas d\'accès aux données individuelles).',
     },
     TABLE_VALUES_EDIT: {
-      label: 'Éditer le dictionnaire et voir les valeurs',
+      label: 'Éditer le dictionnaire et voir les valeurs de la table',
       description: 'Éditer le dictionnaire et voir les données individuelles.',
     },
     TABLE_ALL: {
-      label: 'Administrer',
+      label: 'Administrer la table',
       description: 'Accès complet à la table, incluant l\'édition du dictionnaire et des données individuelles.',
     },
     // variable permissions
     VARIABLE_READ: {
-      label: 'Voir avec le sommaire',
+      label: 'Voir avec le sommaire de la variable',
       description: 'Voir la description de la variable et le sommaire des données (pas d\'accès aux données individuelles).',
     },
   },

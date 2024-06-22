@@ -72,15 +72,24 @@ export default {
       description: 'Add new projects and therefore can import/export data in the context of the project.',
     },
     SYSTEM_ALL: {
-      label: 'Administrate',
+      label: 'Administrate system',
       description: 'Access to all resources and actions in the system (trusted users only!).',
     },
     // r service
     R_USE: {
       label: 'Use R service',
-      description: 'Can push accessible data to R and can execute ANY R commands on them (trusted users only!).',
+      description: 'Can push accessible data to an R server session and can execute ANY R commands on them (trusted users only!).',
     },
     // datashield service
+    DATASHIELD_USE: {
+      label: 'Use DataSHIELD service',
+      description: 'Can push accessible data to an R server session and can execute limited R commands on them.',
+    },
+    DATASHIELD_ALL: {
+      label: 'Administrate DataSHIELD service',
+      description: 'Administrate DataSHIELD settings.',
+    },
+    // datashield profile
     DATASHIELD_PROFILE_USE: {
       label: 'Use DataSHIELD profile',
       description: 'Can push accessible data to R and can execute limited R commands on them, in the context of this DataSHIELD profile.',
@@ -95,33 +104,33 @@ export default {
       description: 'Add tables or views.',
     },
     DATASOURCE_ALL: {
-      label: 'Administrate',
+      label: 'Administrate tables',
       description: 'Full access to project tables, including individual values.',
     },
     // table permissions
     TABLE_READ: {
-      label: 'View dictionary and summaries',
+      label: 'View table dictionary and summaries',
       description: 'View dictionary and summaries (no access to individual values).',
     },
     TABLE_VALUES: {
-      label: 'View dictionary and values',
+      label: 'View table dictionary and values',
       description: 'View dictionary with access to individual values.',
     },
     TABLE_EDIT: {
-      label: 'Edit dictionary and view summaries',
+      label: 'Edit table dictionary and view summaries',
       description: 'Edit dictionary and view values summary (no access to individual values).',
     },
     TABLE_VALUES_EDIT: {
-      label: 'Edit dictionary and view values',
+      label: 'Edit table dictionary and view values',
       description: 'Edit dictionary and view individual values.',
     },
     TABLE_ALL: {
-      label: 'Administrate',
+      label: 'Administrate table',
       description: 'Full access to the table, including edition of the dictionary and individual values.',
     },
     // variable permissions
     VARIABLE_READ: {
-      label: 'View with summary',
+      label: 'View variable with summary',
       description: 'View variable description and values summary (no access to individual values).',
     },
   },
