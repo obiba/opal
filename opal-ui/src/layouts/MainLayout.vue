@@ -143,7 +143,7 @@ function onLocaleSelection(localeOpt: { label: string; value: string }) {
 }
 
 function onSignout() {
-  const logoutURL = systemStore.getLogoutURL();
+  const logoutURL = systemStore.generalConf.logoutURL;
   authStore
     .signout()
     .then(() => {

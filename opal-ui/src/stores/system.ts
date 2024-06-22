@@ -16,13 +16,13 @@ export const useSystemStore = defineStore('system', () => {
     });
   }
 
-  function getLogoutURL() {
-    return generalConf.value.logoutURL;
+  async function saveGeneralConf(data: GeneralConf) {
+    return api.put('/system/conf/general', data).then(initGeneralConf);
   }
 
   return {
     generalConf,
     initGeneralConf,
-    getLogoutURL,
+    saveGeneralConf,
   };
 });

@@ -17,6 +17,9 @@
               </router-link>
             </div>
           </span>
+          <span v-else-if="item.icon">
+            <q-icon :name="item.icon(dbobject)" />
+          </span>
           <span v-else>
             {{
               dbobject[item.field] !== undefined
@@ -59,6 +62,7 @@ export interface FieldItem<T> {
   html?: (val: T) => string;
   visible?: (val: T) => boolean;
   links?: (val: T) => FieldLink[];
+  icon?: (val: T) => string;
 }
 
 export interface FieldsListProps {

@@ -1,4 +1,12 @@
 export default {
+  app_configuration: {
+    name_hint: 'Un nom pour l\'application qui représente votre organisation.',
+    public_url_hint: 'L\'URL publique de l\'application. Cette URL est utilisée pour générer des liens dans les e-mails et les notifications.',
+    logout_url_hint: 'Rediriger les utilisateurs vers cette URL après la déconnexion.',
+    languages_hint: 'Les langues disponibles pour les dictionnaires.',
+    default_charset_hint: 'Le jeu de caractères par défaut pour les dictionnaires.',
+    enforced_2fa_hint: 'Activer l\'authentification à deux facteurs pour tous les utilisateurs. Ne s\'applique pas aux utilisateurs de registres extérieurs.',
+  },
   auth: {
     title: 'Identifiez-vous pour commencer une session',
     password: 'Mot de passe',

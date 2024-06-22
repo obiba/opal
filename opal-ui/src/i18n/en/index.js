@@ -1,4 +1,12 @@
 export default {
+  app_configuration: {
+    name_hint: 'A name for the application that represents your organization.',
+    public_url_hint: 'Public base URL of the server that will be used when sending notification emails on report generation.',
+    logout_url_hint: 'Optional redirection URL after user has logged out.',
+    languages_hint: 'The languages used to describe the dictionaries.',
+    default_charset_hint: 'The default char set used when prompting dictionnaries data.',
+    enforced_2fa_hint: 'Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.'
+  },
   auth: {
     title: 'Sign in to start your session',
     password: 'Password',
