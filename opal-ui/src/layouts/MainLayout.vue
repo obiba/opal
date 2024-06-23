@@ -21,6 +21,9 @@
           <q-btn to="/admin" no-caps>
             {{ $t('administration') }}
           </q-btn>
+          <q-btn no-caps @click="onHelp">
+            {{ $t('help') }}
+          </q-btn>
           <q-btn-dropdown flat :label="locale">
             <q-list>
               <q-item
@@ -160,5 +163,9 @@ function onSignout() {
       }
       router.push('/signin');
     });
+}
+
+function onHelp() {
+  window.open('https://opaldoc.obiba.org', '_blank');
 }
 </script>

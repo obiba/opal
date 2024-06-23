@@ -20,9 +20,24 @@ export const useSystemStore = defineStore('system', () => {
     return api.put('/system/conf/general', data).then(initGeneralConf);
   }
 
+  async function getDatabases(usage: string) {
+    return api.get('/system/databases', { params: { usage } });
+  }
+
+  async function getDatabasesWithSettings() {
+    return api.get('/system/databases', { params: { settings: true } }).then((response) => response.data);
+  }
+
+  async function getIdentifiersDatabase() {
+    return api.get('/system/databases/identifiers').then((response) => response.data);
+  }
+
   return {
     generalConf,
     initGeneralConf,
     saveGeneralConf,
+    getDatabases,
+    getDatabasesWithSettings,
+    getIdentifiersDatabase,
   };
 });

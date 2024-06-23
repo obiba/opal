@@ -96,34 +96,34 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/taxonomies">{{ $t('taxonomies') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/taxonomies">{{ $t('taxonomies') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('taxonomies_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/databases">{{ $t('databases') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/databases">{{ $t('databases') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('databases_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/plugins">{{ $t('plugins') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/plugins">{{ $t('plugins') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('plugins_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/apps">{{ $t('apps') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/apps">{{ $t('apps') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('apps_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <!-- <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/jvm">{{ $t('jvm') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/jvm">{{ $t('jvm') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('jvm_caption') }}</q-item-label>
               </q-item-section>
-            </q-item>
+            </q-item> -->
           </q-list>
         </div>
       </div>
