@@ -16,8 +16,8 @@
       v-model:selected="selectedProfiles"
     >
       <template v-slot:top>
-        <div v-if="selectedProfiles.length > 0" class="row q-gutter-sm">
-          <span>Remove selected profiles</span>
+        <div v-if="selectedProfiles.length > 0" class="row items-center q-gutter-sm">
+          <span>{{ $t("delete_profiles_selected") }}</span>
           <q-btn outline color="red" icon="delete" size="sm" @click="onDeleteProfiles"></q-btn>
         </div>
       </template>
@@ -94,7 +94,7 @@ const columns = [
   {
     name: 'principal',
     required: true,
-    label: t('Name'),
+    label: t('name'),
     align: 'left',
     field: 'principal',
     format: (val: string) => val,

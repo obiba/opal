@@ -31,7 +31,7 @@ export const useProfilesStore = defineStore('profiles', () => {
 
   async function deleteProfiles(profiles: SubjectProfileDto[]) {
     const principals = profiles.map((profile) => profile.principal);
-    return api.delete(`/system/subject-profiles`,{
+    return api.delete('/system/subject-profiles',{
       params: {
           p: principals
       },
