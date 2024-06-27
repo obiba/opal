@@ -9,13 +9,12 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <profiles-list></profiles-list>
-      <groups-list class="q-mt-lg"></groups-list>
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import ProfilesList from 'src/components/admin/ProfilesList.vue';
+import ProfilesList from 'src/components/admin/profiles/ProfilesList.vue';
 
 
 </script>

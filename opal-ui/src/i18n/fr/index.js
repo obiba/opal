@@ -1,4 +1,5 @@
 export default {
+  '2fa': '2FA',
   app_configuration: {
     name_hint: 'Un nom pour l\'application qui représente votre organisation.',
     public_url_hint: 'L\'URL publique de l\'application. Cette URL est utilisée pour générer des liens dans les e-mails et les notifications.',
@@ -409,10 +410,12 @@ export default {
   project_destination: 'Projet de destination',
   project: 'Projet',
   projects_caption: 'Parcourir les tables et les variables, créer des vues, importer/exporter des données et des dictionnaires',
+  profiles_info: 'Chaque utilisateur qui se connecte a un profil. Un domaine est le répertoire d\'utilisateurs dans lequel un utilisateur est défini. Pour des raisons de sécurité, il est interdit de se connecter à partir de différents domaines avec le même nom d\'utilisateur. S\'il est supprimé, le profil de l\'utilisateur sera automatiquement recréé lorsque l\'utilisateur se connectera.',
   projects: 'Projets',
   properties: 'Propriétés',
   quotation_mark: 'Marque de citation',
   range: 'Plage',
+  realm: 'Domaine',
   referenced_entity_type: 'Type d\'entité référencée',
   refresh: 'Rafraîchir',
   repeatable: 'Répétable',
