@@ -35,9 +35,9 @@ export const useProfilesStore = defineStore('profiles', () => {
       params: {
           p: principals
       },
-      paramsSerializer: params => {
-        return qs.stringify(params, { arrayFormat: 'repeat' });
-      }
+      paramsSerializer: {
+        indexes: null,
+    }
   });
   }
 
