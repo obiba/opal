@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
+import { DatabaseDto } from 'src/models/Database';
 import { GeneralConf } from 'src/models/Opal';
 
 
@@ -32,10 +33,21 @@ export const useSystemStore = defineStore('system', () => {
     return api.get('/system/databases/identifiers').then((response) => response.data);
   }
 
-  async function testDataDatabase(name: string) {
+  async function testDatabase(name: string) {
     return api.post(`/system/database/${name}/connections`);
   }
 
+  async function deleteDatabase(name: string) {
+    return api.delete(`/system/database/${name}`);
+  }
+
+  async function saveDatabase(database: DatabaseDto, update: boolean) {
+    if (update) {
+      return api.put(`/system/database/${database.name}`, database);
+    } else {
+      return api.post('/system/databases', database);
+    }
+  }
 
   return {
     generalConf,
@@ -44,6 +56,8 @@ export const useSystemStore = defineStore('system', () => {
     getDatabases,
     getDatabasesWithSettings,
     getIdentifiersDatabase,
-    testDataDatabase,
+    testDatabase,
+    deleteDatabase,
+    saveDatabase,
   };
 });

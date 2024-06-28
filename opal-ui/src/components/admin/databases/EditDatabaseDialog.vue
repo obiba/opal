@@ -7,6 +7,7 @@
       <q-separator />
       <q-card-section>
         <q-input
+          v-if="!database.usedForIdentifiers"
           v-model="database.name"
           :label="$t('name')"
           :hint="$t('db.name_hint')"
@@ -14,7 +15,7 @@
           dense
           class="q-mb-md" />
         <q-select
-          v-if="database.sqlSettings"
+          v-if="!database.usedForIdentifiers && database.sqlSettings"
           v-model="database.usage"
           :options="usageOptions"
           :label="$t('usage')"
@@ -25,7 +26,7 @@
           map-options
           class="q-mb-md" />
         <q-toggle
-          v-if="database.usage === DatabaseDto_Usage.STORAGE"
+          v-if="!database.usedForIdentifiers && database.usage === DatabaseDto_Usage.STORAGE"
           v-model="database.defaultStorage"
           :label="$t('default_storage')"
           dense
@@ -184,6 +185,7 @@ export default defineComponent({
 </script><script setup lang="ts">
 import { DatabaseDto, DatabaseDto_Usage, SqlSettingsDto_SqlSchema } from 'src/models/Database';
 import { JdbcDatasourceSettingsDto } from 'src/models/Magma';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean
@@ -191,11 +193,12 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'save'])
 
+const systemStore = useSystemStore();
 const { t } = useI18n();
 
+const showDialog = ref(props.modelValue);
 const database = ref<DatabaseDto>(props.database);
 const jdbcDatasourceSettings = ref<JdbcDatasourceSettingsDto>({} as JdbcDatasourceSettingsDto);
 const editMode = ref<boolean>(false);
@@ -236,6 +239,9 @@ watch(() => props.modelValue, (value) => {
     hasDatasource.value = !!database.value.hasDatasource;
     delete database.value.hasDatasource;
     editMode.value = !!props.database.name;
+    if (database.value.usedForIdentifiers) {
+      database.value.name = '_identifiers';
+    }
     if (props.database.sqlSettings) {
       database.value.sqlSettings = { ...props.database.sqlSettings };
       if (!database.value.sqlSettings.driverClass) {
@@ -275,6 +281,10 @@ function onSubmit() {
     database.value.sqlSettings.jdbcDatasourceSettings = jdbcDatasourceSettings.value;
     database.value.sqlSettings.sqlSchema = SqlSettingsDto_SqlSchema.JDBC;
   }
-  console.log(database.value);
+  systemStore.saveDatabase(database.value, editMode.value).then(() => {
+    emit('save', true);
+  }).catch((error) => {
+    notifyError(t('db.save_error', { error: error.response.data.message }));
+  });
 }
 </script>

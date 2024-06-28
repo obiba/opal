@@ -86,7 +86,8 @@
         </q-tr>
       </template>
     </q-table>
-    <edit-database-dialog v-model="showEdit" :database="selected" />
+    <confirm-dialog v-model="showDelete" :title="$t('db.unregister')" :text="$t('db.unregister_confirm', { name: selected?.name })" @confirm="onDelete" />
+    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave"/>
   </div>
 </template>
 
@@ -98,6 +99,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const systemStore = useSystemStore();
@@ -140,7 +142,7 @@ function onLeaveRow(row: DatabaseDto) {
 }
 
 function onTest(row: DatabaseDto) {
-  systemStore.testDataDatabase(row.name)
+  systemStore.testDatabase(row.name)
     .then(() => {
       notifySuccess(t('db.test_success'));
     })
@@ -159,6 +161,12 @@ function onShowDelete(row: DatabaseDto) {
   showDelete.value = true;
 }
 
+function onDelete() {
+  systemStore.deleteDatabase(selected.value.name).then(() => {
+    refresh();
+  });
+}
+
 function onShowAddSQLDB() {
   selected.value = {
     name: '',
@@ -168,6 +176,7 @@ function onShowAddSQLDB() {
       url: 'jdbc:postgresql://localhost:5432/opal',
     },
     defaultStorage: false,
+    usedForIdentifiers: false,
   } as DatabaseDto;
   showEdit.value = true;
 }
@@ -180,7 +189,12 @@ function onShowAddMondoDB() {
       url: 'mongodb://localhost:27017/opal',
     },
     defaultStorage: false,
+    usedForIdentifiers: false,
   } as DatabaseDto;
   showEdit.value = true;
+}
+
+function onSave() {
+  refresh();
 }
 </script>

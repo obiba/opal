@@ -37,6 +37,8 @@ export default {
     batch_size_hint: 'The number of rows to be processed in a batch.',
     register_sqldb: 'Register SQL DB',
     register_mongodb: 'Register MongoDB',
+    unregister: 'Unregister',
+    unregister_confirm: 'Are you sure you want to unregister this database \'{name}\'? Note that the data WILL NOT be deleted.',
     test_error: 'Connection test failed',
     test_success: 'Connection test succeeded',
     in_use: 'In use',
@@ -48,6 +50,7 @@ export default {
     default_updated_column_hint: 'The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.',
     use_metadata_tables: 'With variables description tables',
     use_metadata_tables_hint: 'Export data dictionnaries to metadata tables.',
+    save_error: 'Error saving database',
   },
   datashield: {
     access_not_restricted: 'Any DataSHIELD user can access this profile.',
