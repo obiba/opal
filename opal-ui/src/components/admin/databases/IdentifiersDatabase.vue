@@ -29,7 +29,7 @@
         <div class="col-6">
           <q-list separator dense>
             <q-item>
-              <q-item-section style="max-width: 200px;">
+              <q-item-section style="max-width: 50px;">
                 <q-item-label overline class="text-grey-6">
                   URL
                 </q-item-label>
