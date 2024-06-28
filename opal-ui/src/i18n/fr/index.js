@@ -109,6 +109,10 @@ export default {
       label: 'Ajouter des projets',
       description: 'Ajouter de nouveaux projets et ainsi pouvoir importer/exporter des données dans ces projets.',
     },
+    PROJECT_All: {
+      label: 'Administrer le project',
+      description: 'Accès complet au projet',
+    },
     SYSTEM_ALL: {
       label: 'Administrer le système',
       description: 'Accès complet à toutes les ressources du système (utilisateurs de confiance uniquement !).',
@@ -170,6 +174,63 @@ export default {
     VARIABLE_READ: {
       label: 'Voir avec le sommaire de la variable',
       description: 'Voir la description de la variable et le sommaire des données (pas d\'accès aux données individuelles).',
+    },
+    // file permissions
+    FILES_READ: {
+      label: 'Accéder aux fichiers',
+      description: 'Accéder à des fichiers sans avoir la permission d\'en ajouter ou d\'en supprimer.',
+    },
+    FILES_SHARE: {
+      label: 'Ajouter et accéder à des fichiers',
+      description: 'Ajouter et accéder à des fichiers sans avoir l\'autorisation de les supprimer.',
+    },
+    FILES_ALL: {
+      label: 'Administrer les dossiers',
+      description: 'Accès complet aux dossiers.',
+    },
+    // report permissions
+    REPORT_TEMPLATE_ALL: {
+      label: 'REPORT_TEMPLATE_ALL',
+      description: 'REPORT_TEMPLATE_ALL',
+    },
+    REPORT_TEMPLATE_READ: {
+      label: 'REPORT_TEMPLATE_ALL',
+      description: 'REPORT_TEMPLATE_ALL',
+    },
+    // resource permissions
+    RESOURCE_ALL: {
+      label: 'RESOURCE_ALL',
+      description: 'RESOURCE_ALL',
+    },
+    RESOURCES_ALL: {
+      label: 'RESOURCES_ALL',
+      description: 'RESOURCES_ALL',
+    },
+    RESOURCE_VIEW: {
+      label: 'RESOURCE_VIEW',
+      description: 'RESOURCE_VIEW',
+    },
+    RESOURCES_VIEW: {
+      label: 'RESOURCES_VIEW',
+      description: 'RESOURCES_VIEW',
+    },
+    // database permissions
+    DATABASES_ALL: {
+      label: 'DATABASES_ALL',
+      description: 'DATABASES_ALL',
+    },
+    // vcf permissions
+    DATABASES_ALLVCF_STORE_ALL: {
+      label: 'VCF_STORE_ALL',
+      description: 'VCF_STORE_ALL',
+    },
+    VCF_STORE_VALUES: {
+      label: 'VCF_STORE_VALUES',
+      description: 'VCF_STORE_VALUES',
+    },
+    VCF_STORE_VIEW: {
+      label: 'VCF_STORE_VIEW',
+      description: 'VCF_STORE_VIEW',
     },
   },
   validation: {
@@ -276,6 +337,7 @@ export default {
   delete_tables_confirm: 'Aucune table à supprimer | Êtes-vous sûr de vouloir supprimer cette table ? | Êtes-vous sûr de vouloir supprimer ces {count} tables ?',
   delete_permission_confirm: 'Êtes-vous sûr de vouloir supprimer la permission de {principal} ?',
   delete_profile_confirm : 'Êtes-vous sûr de vouloir supprimer le profil \'{profile}\'?',
+  delete_profile_acl_confirm: 'Êtes-vous sûr de vouloir révoquer \'{permission}\' de la ressource \'{ressource}\'?',
   delete_profiles_confirm : 'Êtes-vous sûr de vouloir supprimer le profil \'{profile}\'? | Êtes-vous sûr de vouloir supprimer ces {count} profils?',
   delete_profiles_selected : 'Supprimer les profils sélectionnés',
   delete_user_confirm: 'Êtes-vous sûr de vouloir supprimer l\'utilisateur {user} ?',
@@ -422,6 +484,8 @@ export default {
   plugins: 'Greffons',
   preview_import_source: 'Prévisualiser les données',
   profile: 'Profile',
+  profile_acls_info : 'Liste des permissions de {principal} par ressource',
+  profile_acls : 'Permissions de l\'utilisateur',
   profiles_caption: 'Gérer les profils',
   profiles: 'Profils',
   progress: 'Progression',
@@ -516,6 +580,7 @@ export default {
   user_enable: 'Activer l\'utilisateur',
   user: 'Utilisateur',
   username: 'Nom d\'utilisateur',
+  user_profiles: 'Profils des utilisateurs',
   users_and_groups_caption: 'Ajouter, mettre à jour, supprimer des utilisateurs et des groupes',
   users_and_groups: 'Utilisateurs et groupes',
   users_filter_placeholder: 'Filtrer les utilisateurs par nom, groupe ou type d\'authentification...',
