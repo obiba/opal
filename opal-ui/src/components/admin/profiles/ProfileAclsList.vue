@@ -49,6 +49,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'ProfileAclsList',
+});
+</script>
+
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { notifyError } from 'src/utils/notify';

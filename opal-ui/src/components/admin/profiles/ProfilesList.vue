@@ -77,6 +77,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default defineComponent({
+  name: 'ProfilesList',
+});
+</script>
+
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { SubjectProfileDto } from 'src/models/Opal';
