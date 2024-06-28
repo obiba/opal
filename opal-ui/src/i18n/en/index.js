@@ -112,6 +112,10 @@ export default {
       label: 'Add projects',
       description: 'Add new projects and therefore can import/export data in the context of the project.',
     },
+    PROJECT_All: {
+      label: 'Administrate projects',
+      description: 'Full access to project.',
+    },
     SYSTEM_ALL: {
       label: 'Administrate system',
       description: 'Access to all resources and actions in the system (trusted users only!).',
@@ -173,6 +177,63 @@ export default {
     VARIABLE_READ: {
       label: 'View variable with summary',
       description: 'View variable description and values summary (no access to individual values).',
+    },
+    // file permissions
+    FILES_READ: {
+      label: 'Access files',
+      description: 'Access files without the permission to add or delete.',
+    },
+    FILES_SHARE: {
+      label: 'Add and access files',
+      description: 'Add and access files without the permission to delete.',
+    },
+    FILES_ALL: {
+      label: 'Administrate files',
+      description: 'Full access to files.',
+    },
+    // report permissions
+    REPORT_TEMPLATE_ALL: {
+      label: 'REPORT_TEMPLATE_ALL',
+      description: 'REPORT_TEMPLATE_ALL',
+    },
+    REPORT_TEMPLATE_READ: {
+      label: 'REPORT_TEMPLATE_ALL',
+      description: 'REPORT_TEMPLATE_ALL',
+    },
+    // resource permissions
+    RESOURCE_ALL: {
+      label: 'RESOURCE_ALL',
+      description: 'RESOURCE_ALL',
+    },
+    RESOURCES_ALL: {
+      label: 'RESOURCES_ALL',
+      description: 'RESOURCES_ALL',
+    },
+    RESOURCE_VIEW: {
+      label: 'RESOURCE_VIEW',
+      description: 'RESOURCE_VIEW',
+    },
+    RESOURCES_VIEW: {
+      label: 'RESOURCES_VIEW',
+      description: 'RESOURCES_VIEW',
+    },
+    // database permissions
+    DATABASES_ALL: {
+      label: 'DATABASES_ALL',
+      description: 'DATABASES_ALL',
+    },
+    // vcf permissions
+    DATABASES_ALLVCF_STORE_ALL: {
+      label: 'VCF_STORE_ALL',
+      description: 'VCF_STORE_ALL',
+    },
+    VCF_STORE_VALUES: {
+      label: 'VCF_STORE_VALUES',
+      description: 'VCF_STORE_VALUES',
+    },
+    VCF_STORE_VIEW: {
+      label: 'VCF_STORE_VIEW',
+      description: 'VCF_STORE_VIEW',
     },
   },
   validation: {
@@ -278,6 +339,7 @@ export default {
   delete_r_workspaces_confirm: '- | Are you sure you want to delete this R workspace? | Are you sure you want to delete these {count} R workspaces?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
   delete_permission_confirm: 'Are you sure you want to delete permission of {principal}?',
+  delete_profile_acl_confirm: 'Are you sure you want to revoke \'{permission}\' from \'{resource}\' resource?',
   delete_profile_confirm: 'Are you sure you want to delete profile \'{profile}\'?',
   delete_profiles_confirm: 'Are you sure you want to delete  profile \'{profile}\'?| Are you sure you want to delete these {count} profiles?',
   delete_profiles_selected: 'Delete selected profiles',
@@ -425,6 +487,8 @@ export default {
   plugins: 'Plugins',
   preview_import_source: 'Preview the data',
   profile: 'Profile',
+  profile_acls_info: 'List of {principal}\'s permissions per resource.',
+  profile_acls: 'User Permissions',
   profiles_caption: 'Manage user and application profiles',
   profiles_info: 'Each user who logged in has a profile. A realm is the user directory in which a user is defined. Logging in from different realm with the same user name is forbidden for security reasons. If removed, the user profile will be automatically recreated when the user logs in.',
   profiles: 'Profiles',
@@ -519,6 +583,7 @@ export default {
   user_enable: 'Enable user',
   user: 'User',
   username: 'User name',
+  user_profiles: 'User Profiles',
   users_and_groups_caption: 'Add, update, remove users and groups',
   users_and_groups: 'Users and groups',
   users_filter_placeholder: 'Filter users by name, group or authentication type...',

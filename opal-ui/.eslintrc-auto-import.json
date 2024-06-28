@@ -92,6 +92,7 @@
     "useRStore": true,
     "useDatashieldStore": true,
     "useAuthzStore": true,
-    "useProfilesStore": true
+    "useProfilesStore": true,
+    "useProfileAclsStore": true
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-h5 q-mb-md">
-      {{ $t('profile') }}
+      {{ $t('user_profiles') }}
     </div>
     <div class="text-help q-mb-md">{{ $t('profiles_info') }}</div>
     <q-table
@@ -16,14 +16,18 @@
       v-model:selected="selectedProfiles"
     >
       <template v-slot:top>
-        <div v-if="selectedProfiles.length > 0" class="row items-center q-gutter-sm">
-          <span>{{ $t("delete_profiles_selected") }}</span>
-          <q-btn outline color="red" icon="delete" size="sm" @click="onDeleteProfiles"></q-btn>
+        <div class="row items-center q-gutter-sm">
+          <span :class="{'text-secondary': selectedProfiles.length === 0}">{{ $t("delete_profiles_selected") }}</span>
+          <q-btn outline color="red" icon="delete" size="sm" :disable="selectedProfiles.length === 0" @click="onDeleteProfiles"></q-btn>
         </div>
       </template>
       <template v-slot:body-cell-principal="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-primary">{{ props.value }} </span>
+          <router-link
+            :to="`/admin/profile/${props.value}/permissions`"
+            class="text-primary"
+            >{{ props.value }}</router-link
+          >
           <div class="float-right">
             <q-btn
               rounded
@@ -72,6 +76,12 @@
     />
   </div>
 </template>
+
+<script lang="ts">
+export default defineComponent({
+  name: 'ProfilesList',
+});
+</script>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
