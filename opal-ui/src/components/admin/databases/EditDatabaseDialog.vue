@@ -14,16 +14,18 @@
           dense
           class="q-mb-md" />
         <q-select
+          v-if="database.sqlSettings"
           v-model="database.usage"
           :options="usageOptions"
           :label="$t('usage')"
           :hint="$t('db.usage_hint')"
+          :disable="hasDatasource"
           dense
           emit-value
           map-options
           class="q-mb-md" />
         <q-toggle
-          v-if="database.usage === 'STORAGE'"
+          v-if="database.usage === DatabaseDto_Usage.STORAGE"
           v-model="database.defaultStorage"
           :label="$t('default_storage')"
           dense
@@ -44,22 +46,51 @@
             :hint="$t('example', { text: dbUrlPlaceholder })"
             dense
             class="q-mb-md" />
-          <div class="row q-col-gutter-md">
+          <div class="row q-col-gutter-md q-mb-md">
             <div class="col">
               <q-input
                 v-model="database.sqlSettings.username"
                 :label="$t('username')"
-                dense
-                class="q-mb-md" />
+                dense />
             </div>
             <div class="col">
               <q-input
                 v-model="database.sqlSettings.password"
                 :label="$t('password')"
-                dense
-                class="q-mb-md" />
+                dense />
             </div>
           </div>
+          <div v-if="database.usage !== DatabaseDto_Usage.STORAGE">
+            <q-input
+              v-model="jdbcDatasourceSettings.defaultEntityType"
+              :label="$t('db.default_entity_type')"
+              :hint="$t('db.default_entity_type_hint')"
+              dense
+              class="q-mb-md" />
+            <q-input
+              v-model="jdbcDatasourceSettings.defaultEntityIdColumnName"
+              :label="$t('db.default_id_column')"
+              :hint="$t('db.default_id_column_hint')"
+              dense
+              class="q-mb-md" />
+            <q-input
+              v-model="jdbcDatasourceSettings.defaultUpdatedTimestampColumnName"
+              :label="$t('db.default_updated_column')"
+              :hint="$t('db.default_updated_column_hint')"
+              dense
+              class="q-mb-md" />
+            <div v-if="database.usage === DatabaseDto_Usage.EXPORT" class="q-mt-lg">
+              <q-toggle
+                v-model="jdbcDatasourceSettings.useMetadataTables"
+                :label="$t('db.use_metadata_tables')"
+                dense
+                class="q-mb-sm" />
+              <div class="text-hint">
+                {{ $t('db.use_metadata_tables_hint') }}
+              </div>
+            </div>
+          </div>
+
           <q-list>
             <q-expansion-item
               switch-toggle-side
@@ -151,7 +182,7 @@ export default defineComponent({
   name: 'EditDatabaseDialog',
 });
 </script><script setup lang="ts">
-import { DatabaseDto, DatabaseDto_Usage, SqlSettingsDto_SqlSchema, MongoDbSettingsDto } from 'src/models/Database';
+import { DatabaseDto, DatabaseDto_Usage, SqlSettingsDto_SqlSchema } from 'src/models/Database';
 import { JdbcDatasourceSettingsDto } from 'src/models/Magma';
 
 interface DialogProps {
@@ -168,6 +199,7 @@ const { t } = useI18n();
 const database = ref<DatabaseDto>(props.database);
 const jdbcDatasourceSettings = ref<JdbcDatasourceSettingsDto>({} as JdbcDatasourceSettingsDto);
 const editMode = ref<boolean>(false);
+const hasDatasource = ref<boolean>(false);
 
 const hasUrl = computed(() => database.value.sqlSettings?.url || database.value.mongoDbSettings?.url);
 const dbUrlPlaceholder = computed(() => {
@@ -201,6 +233,7 @@ watch(() => props.modelValue, (value) => {
   showDialog.value = value;
   if (value) {
     database.value = { ...props.database };
+    hasDatasource.value = !!database.value.hasDatasource;
     delete database.value.hasDatasource;
     editMode.value = !!props.database.name;
     if (props.database.sqlSettings) {
@@ -225,6 +258,7 @@ watch(() => props.modelValue, (value) => {
         };
     } else if (props.database.mongoDbSettings) {
       database.value.mongoDbSettings = { ...props.database.mongoDbSettings };
+      database.value.usage = DatabaseDto_Usage.STORAGE;
       if (!database.value.mongoDbSettings.url) {
         database.value.mongoDbSettings.url = 'mongodb://localhost:27017/opal';
       }

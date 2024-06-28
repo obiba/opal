@@ -41,7 +41,19 @@
                 flat
                 size="sm"
                 color="secondary"
+                :icon="toolsVisible[props.row.name] ? 'settings_ethernet' : 'none'"
+                :title="$t('test')"
+                class="q-ml-xs"
+                @click="onTest(props.row)"
+              />
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
                 :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
+                :title="$t('edit')"
                 class="q-ml-xs"
                 @click="onShowEdit(props.row)"
               />
@@ -58,6 +70,11 @@
                 @click="onShowDelete(props.row)"
               />
             </div>
+          </q-td>
+          <q-td key="hasDatasource" :props="props">
+            <q-icon
+              :name="props.row.hasDatasource ? 'check' : 'close'"
+              :class="props.row.hasDatasource ? 'text-positive' : ''" />
           </q-td>
           <q-td key="url" :props="props" class="text-help">
             <span v-if="props.row.sqlSettings">{{ props.row.sqlSettings.url }}</span>
@@ -81,6 +98,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
+import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const systemStore = useSystemStore();
 const { t } = useI18n();
@@ -98,6 +116,7 @@ const selected = ref();
 
 const columns = [
   { name: 'name', label: t('name'), align: 'left', field: 'name' },
+  { name: 'hasDatasource', label: t('db.in_use'), align: 'left' },
   { name: 'url', label: 'URL', align: 'left' },
   { name: 'usage', label: t('usage'), align: 'left', field: 'usage' },
 ];
@@ -118,6 +137,16 @@ function onOverRow(row: DatabaseDto) {
 
 function onLeaveRow(row: DatabaseDto) {
   toolsVisible.value[row.name] = false;
+}
+
+function onTest(row: DatabaseDto) {
+  systemStore.testDataDatabase(row.name)
+    .then(() => {
+      notifySuccess(t('db.test_success'));
+    })
+    .catch((error) => {
+      notifyError(t('db.test_error', { error: error.response.data.message }));
+    });
 }
 
 function onShowEdit(row: DatabaseDto) {

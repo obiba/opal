@@ -37,6 +37,17 @@ export default {
     batch_size_hint: 'The number of rows to be processed in a batch.',
     register_sqldb: 'Register SQL DB',
     register_mongodb: 'Register MongoDB',
+    test_error: 'Connection test failed',
+    test_success: 'Connection test succeeded',
+    in_use: 'In use',
+    default_entity_type: 'Default entity type',
+    default_entity_type_hint: 'Entity type to be used if no variables description tables is available.',
+    default_id_column: 'Entity Identifier Column',
+    default_id_column_hint: 'The column name for identifying the entity. Make sure it will not conflict with a variable column name.',
+    default_updated_column: 'Update Timestamp Column',
+    default_updated_column_hint: 'The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.',
+    use_metadata_tables: 'With variables description tables',
+    use_metadata_tables_hint: 'Export data dictionnaries to metadata tables.',
   },
   datashield: {
     access_not_restricted: 'Any DataSHIELD user can access this profile.',
@@ -528,4 +539,5 @@ export default {
   default_storage: 'Default storage',
   options: 'Options',
   example: 'Example: {text}',
+  test: 'Test',
 };

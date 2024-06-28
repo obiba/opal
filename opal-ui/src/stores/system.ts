@@ -32,6 +32,11 @@ export const useSystemStore = defineStore('system', () => {
     return api.get('/system/databases/identifiers').then((response) => response.data);
   }
 
+  async function testDataDatabase(name: string) {
+    return api.post(`/system/database/${name}/connections`);
+  }
+
+
   return {
     generalConf,
     initGeneralConf,
@@ -39,5 +44,6 @@ export const useSystemStore = defineStore('system', () => {
     getDatabases,
     getDatabasesWithSettings,
     getIdentifiersDatabase,
+    testDataDatabase,
   };
 });

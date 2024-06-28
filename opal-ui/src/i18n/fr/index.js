@@ -37,6 +37,17 @@ export default {
     batch_size_hint: 'Le nombre maximum de lignes à traiter en une seule fois.',
     register_sqldb: 'Enregistrer une base de données SQL',
     register_mongodb: 'Enregistrer une base de données MongoDB',
+    test_error: 'Test de connexion échoué',
+    test_success: 'Test de connexion réussi',
+    in_use: 'Utilisée',
+    default_entity_type: 'Type d\'entité par défaut',
+    default_entity_type_hint: 'Type d\'entité par défaut pour les tables nouvellement créées.',
+    default_id_column: 'Colonne d\'identifiant',
+    default_id_column_hint: 'Le nom de la colonne d\'identifiant des entités. Assurez-vous qu\'il ne sera pas en conflit avec un nom de variable.',
+    default_updated_column: 'Colonne de mise à jour',
+    default_updated_column_hint: 'Le nom de la colonne contenant la date de mise à jour des entités. Assurez-vous qu\'il ne sera pas en conflit avec un nom de variable.',
+    use_metadata_tables: 'Avec les tables de variables',
+    use_metadata_tables_hint: 'Exporter les dictionnaires de données dans les tables de méta-données.',
   },
   datashield: {
     access_not_restricted: 'Tous les utilisateurs DataSHIELD peuvent accèder à ce profil.',
@@ -528,4 +539,5 @@ export default {
   default_storage: 'Stockage par défaut',
   options: 'Options',
   example: 'Exemple : {text}',
+  test: 'Test',
 };
