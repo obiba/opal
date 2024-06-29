@@ -46,7 +46,7 @@
   <div v-else-if="summary['Math.ContinuousSummaryDto.continuous']">
     <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md"/>
   </div>
-  <div v-else>
+  <div v-else-if="total > 0">
     <pre>{{ summary }}</pre>
   </div>
 </template>

@@ -122,9 +122,10 @@ watch(() => props.modelValue, (value) => {
   showDialog.value = value;
 });
 
-const isValid = computed(() => newCategory.value.name !== '' && props.variable.categories
-  .filter((c) => c.name !== props.category.name)
-  .find((c) => c.name === newCategory.value.name) === undefined);
+const isValid = computed(() => newCategory.value.name !== '' && (props.variable.categories === undefined ||
+  props.variable.categories
+    .filter((c) => c.name !== props.category.name)
+    .find((c) => c.name === newCategory.value.name) === undefined));
 
 function onHide() {
   emit('update:modelValue', false);
@@ -132,7 +133,7 @@ function onHide() {
 
 function onSave() {
   const newVariable = { ...props.variable } as VariableDto;
-  newVariable.categories = [...props.variable.categories];
+  newVariable.categories = props.variable.categories ? [...props.variable.categories] : [];
   const idx = newVariable.categories.findIndex((c) => props.category.name === c.name);
   newCategory.value.attributes = labels.value
     .filter((l) => l.value !== '') // remove empty labels

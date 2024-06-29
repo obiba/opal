@@ -294,6 +294,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
   function saveVariable(localVar: VariableDto) {
     const tableType = table.value.viewType ? 'view' : 'table';
     const link = `/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
+    const isNew = variables.value === undefined || variables.value.find((v) => v.name === localVar.name) === undefined;
+    localVar.entityType = table.value.entityType;
+    if (isNew) {
+      return api.post(`${link}/variables`, [localVar]).then(() => {
+        return Promise.all([
+          loadTableVariable(localVar.name),
+          loadTableVariables(),
+        ]);
+      });
+    }
     return api.put(`${link}/variable/${variable.value.name}`, localVar).then(() => {
       return Promise.all([
         loadTableVariable(localVar.name),

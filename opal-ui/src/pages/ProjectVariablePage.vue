@@ -57,8 +57,18 @@
 
       <q-tab-panels v-model="tab">
         <q-tab-panel name="dictionary">
-          <div class="text-h6">{{ $t('properties') }}</div>
-          <div class="row q-col-gutter-md q-mt-md q-mb-md">
+          <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
+          <div class="q-mb-sm">
+            <q-btn
+              v-if="datasourceStore.perms.variable?.canUpdate()"
+              color="primary"
+              size="sm"
+              icon="edit"
+              :label="$t('edit')"
+              @click="onShowEditVariable"
+            />
+          </div>
+          <div class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
               <fields-list
                 :items="items1"
@@ -106,6 +116,10 @@
           />
         </q-tab-panel>
       </q-tab-panels>
+      <edit-variable-dialog
+        v-model="showEditVariable"
+        :variable="datasourceStore.variable"
+        @save="init" />
     </q-page>
   </div>
 </template>
@@ -117,12 +131,14 @@ import VariableAttribues from 'src/components/datasource/VariableAttributes.vue'
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
 import VariableScript from 'src/components/datasource/VariableScript.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
+import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { VariableDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
 const datasourceStore = useDatasourceStore();
+const showEditVariable = ref(false);
 
 const tab = ref('dictionary');
 
@@ -185,5 +201,9 @@ function init() {
     tName.value,
     vName.value
   );
+}
+
+function onShowEditVariable() {
+  showEditVariable.value = true;
 }
 </script>

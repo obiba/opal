@@ -14,9 +14,14 @@
     >
       <template v-slot:top>
         <div class="row q-gutter-sm">
-          <q-btn-dropdown v-if="datasourceStore.perms.variables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm">
-            <q-list> </q-list>
-          </q-btn-dropdown>
+          <q-btn
+            v-if="datasourceStore.perms.variables?.canCreate()"
+            color="primary"
+            icon="add"
+            :label="$t('add_variable')"
+            size="sm"
+            @click="onShowAddVariable"
+          />
           <q-btn
             color="secondary"
             icon="refresh"
@@ -24,7 +29,14 @@
             size="sm"
             @click="init"
           />
-          <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="red" icon="delete" size="sm" @click="onShowDeleteVariables"></q-btn>
+          <q-btn
+            v-if="datasourceStore.perms.table?.canUpdate()"
+            outline
+            color="red"
+            icon="delete"
+            size="sm"
+            @click="onShowDeleteVariables"
+          />
         </div>
       </template>
       <template v-slot:body-cell-name="props">
@@ -57,6 +69,7 @@
       </template>
     </q-table>
 
+    <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" @save="onVariableSaved" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
 </template>
@@ -69,6 +82,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import { notifyError } from 'src/utils/notify';
 import { getLabels } from 'src/utils/attributes';
 
@@ -85,7 +99,9 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const selected = ref([] as VariableDto[]);
+const selectedSingle = ref<VariableDto>({} as VariableDto);
 const showDeleteVariables = ref(false);
+const showEditVariable = ref(false);
 
 const columns = [
   {
@@ -170,5 +186,20 @@ function onDeleteVariables() {
       selected.value = [];
       init();
     });
+}
+
+function onShowAddVariable() {
+  selectedSingle.value = {
+    name: '',
+    valueType: 'text',
+    isRepeatable: false,
+    occurrenceGroup: '',
+    index: datasourceStore.variables?.length,
+  } as VariableDto;
+  showEditVariable.value = true;
+}
+
+function onVariableSaved(variable: VariableDto) {
+  console.log('variable', variable);
 }
 </script>
