@@ -6,45 +6,46 @@
     <div class="text-help q-mb-md">{{ $t('profile_acls_info', {principal: $route.params.principal}) }}</div>
     <q-table
       flat
-      :rows="acls"
+      :rows="rows"
       :columns="columns"
       row-key="resource"
       :pagination="initialPagination"
-      :hide-pagination="acls.length <= initialPagination.rowsPerPage"
+      :hide-pagination="rows.length <= initialPagination.rowsPerPage"
       :loading="loading"
+      selection="multiple"
+      v-model:selected="selectedAcls"
     >
+      <template v-slot:top>
+        <div class="row rows-center q-gutter-sm">
+          <span :class="{'text-secondary': selectedAcls.length === 0}">{{ $t("delete_profiles_selected") }}</span>
+          <q-btn outline color="red" icon="delete" size="sm" :disable="selectedAcls.length === 0" @click="onDeleteAcls"></q-btn>
+        </div>
+      </template>
       <template v-slot:body-cell-resource="props">
         <q-td :props="props">
-          <span>{{ props.value }} </span>
-          <div class="float-right">
-            <q-btn
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('delete')"
-              :icon="toolsVisible[props.row.principal] ? 'delete' : 'none'"
-              class="q-ml-xs"
-            />
-          </div>
+          <q-item-section>
+            <q-item-label><router-link :to="props.row.url">{{ props.row.title }}</router-link></q-item-label>
+            <q-item-label caption lines="2">{{ props.row.caption }}</q-item-label>
+          </q-item-section>
+
+
         </q-td>
       </template>
       <template v-slot:body-cell-permissions="props">
         <q-td :props="props">
-          <q-chip removable class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index" @remove="onRemovePermission(props.row, permission)">
+          <span class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index">
             {{ props.col.format(permission) }}
             <q-tooltip>{{ props.col.tooltip(permission) }}</q-tooltip>
-          </q-chip>
+          </span>
         </q-td>
       </template>
     </q-table>
 
     <confirm-dialog
-      v-model="showDelete"
+      v-model="showDeletes"
       :title="$t('delete')"
-      :text="$t('delete_profile_acl_confirm', { permission: $t(`acls.${selectedAcl.permission}.label`), resource: selectedAcl.acl?.resource || ''})"
-      @confirm="doRemovePermission"
+      :text="$t('delete_profile_acl_confirm', {count: selectedAcls.length})"
+      @confirm="doRemoveAcls"
     />
   </div>
 </template>
@@ -65,10 +66,8 @@ const { t } = useI18n();
 
 const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
-const acls = computed(() => profileAclsStore.acls || []);
-const toolsVisible = ref<{ [key: string]: boolean }>({});
-const selectedAcl = ref({permission: null as string | null, acl: null as Acl | null});
-const showDelete = ref(false);
+const selectedAcls = ref<Acl[]>([]);
+const showDeletes = ref(false);
 
 const columns = [
   {
@@ -77,7 +76,6 @@ const columns = [
     label: t('name'),
     align: 'left',
     field: 'resource',
-    format: (val: string) => val,
     sortable: true,
     style: 'width: 25%',
   },
@@ -85,7 +83,7 @@ const columns = [
     name: 'permissions',
     label: t('permissions'),
     align: 'left',
-    field: 'actions',
+    field: 'action',
     format: (val: string) => t(`acls.${val}.label`),
     tooltip: (val: string) => t(`acls.${val}.description`),
   }
@@ -99,27 +97,75 @@ const initialPagination = ref({
   minRowsForPagination: 10,
 });
 
-function onRemovePermission(acl: Acl, permission: string) {
-  console.log('onRemovePermission', acl, permission);
-  selectedAcl.value = {permission, acl};
-  showDelete.value = true;
+function onDeleteAcls() {
+  showDeletes.value = true;
 }
 
-async function doRemovePermission() {
-  console.log('doRemovePermission');
-  showDelete.value = false;
-  const toDelete = selectedAcl.value;
-  selectedAcl.value = {acl: null, permission: null};
+async function doRemoveAcls() {
+  showDeletes.value = false;
+  const toDelete: Acl[] = selectedAcls.value;
+  selectedAcls.value = [];
 
-  if (toDelete.acl && toDelete.permission) {
-    try {
-      await profileAclsStore.deleteAcl(`${route.params.principal}`, toDelete.permission, toDelete.acl.resource);
-      await profileAclsStore.initAcls(`${route.params.principal}`);
-    } catch (err) {
-      notifyError(err);
-    }
+  try {
+    await profileAclsStore.deleteAcls(toDelete);
+    await profileAclsStore.initAcls(`${route.params.principal}`);
+  } catch (err) {
+    notifyError(err);
   }
 }
+
+
+const cases = [
+  { regex: /\/files\/home\/(.*)$/, type: 'home_folder' },
+  { regex: /\/files\/(.*)$/, type: 'folder' },
+  { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
+  { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
+  { regex: /\/datasource\/(.*)$/, type: 'project' },
+];
+
+const rows = computed(() => {
+  return (profileAclsStore.acls || []).map((acl) => {
+    const result = {
+      ...acl,
+      ...{
+        url: acl.resource.replace(/\/datasource\//g, '/project/'),
+        title: acl.resource,
+        caption: '',
+      }
+    };
+
+    const input = acl.resource;
+
+    cases.some((item) => {
+      const match = item.regex.exec(input);
+        if (match) {
+          result.caption = t(item.type);
+          switch (item.type) {
+            case 'home_folder':
+              result.title = `${match[1]}`;
+              break;
+            case 'folder':
+              result.title = `${match[1]}`;
+              break;
+            case 'project':
+              result.title = `${match[1]}`;
+              break;
+            case 'table':
+              result.title = `${match[1]}.${match[2]}`;
+              break;
+            case 'variable':
+              result.title = `${match[1]}.${match[2]}.${match[3]}`;
+              break;
+          }
+          return true;
+        }
+        return false;
+      });
+
+      return result;
+    });
+  }
+);
 
 const loading = ref(false);
 

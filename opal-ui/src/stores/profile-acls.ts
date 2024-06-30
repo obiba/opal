@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { Acl, Subject_SubjectType } from 'src/models/Opal';
@@ -21,14 +22,15 @@ export const useProfileAclsStore = defineStore('profileAcls', () => {
     });
   }
 
-  async function deleteAcl(principal: string, permission: string, resource: string, type: Subject_SubjectType = Subject_SubjectType.USER) {
-    return api.delete(`/authz/${resource.replace(/^\//, '')}`, { params: { subject: principal, perm: permission, type }}).then(() => initAcls(principal, type));
+  async function deleteAcls(acls:Acl[], type: Subject_SubjectType = Subject_SubjectType.USER) {
+    const requests = acls.map((acl) => api.delete(`/authz/${acl.resource.replace(/^\//, '')}`, { params: { subject: acl.subject?.principal, perm: acl.actions.pop() || '', type }}));
+    return Promise.all(requests);
   }
 
   return {
     acls,
     reset,
     initAcls,
-    deleteAcl
+    deleteAcls
   }
 });
