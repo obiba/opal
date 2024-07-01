@@ -44,7 +44,8 @@
       </template>
       <template v-slot:body-cell-otpEnabled="props">
         <q-td :props="props">
-          {{ props.value }}
+          <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)"/>
+          <q-tooltip>{{ $t((props.value ? 'profile_otp_disable' : 'profile_otp_disabled'), {user: props.row.principal})  }}</q-tooltip>
         </q-td>
       </template>
     </q-table>
@@ -106,7 +107,7 @@ const columns = [
   {
     name: 'otpEnabled',
     label: t('2fa'),
-    align: 'left',
+    align: 'center',
     field: 'otpEnabled',
     format: (val: string) => val,
   },
@@ -138,9 +139,19 @@ const initialPagination = ref({
 
 const principalsToDelete = computed(() => selectedProfiles.value.map((p) => p.principal).join(', '));
 
-async function onDeleteProfiles() {
+async function disableOtp(profile: SubjectProfileDto) {
+  try {
+    await profilesStore.disableOtp(profile);
+    await profilesStore.initProfiles();
+  } catch (err) {
+    notifyError(err);
+  }
+}
+
+function onDeleteProfiles() {
   showDeletes.value = true;
 }
+
 
 async function doDeleteProfiles() {
   showDeletes.value = false;

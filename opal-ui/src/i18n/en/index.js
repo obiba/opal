@@ -492,6 +492,8 @@ export default {
   profile: 'Profile',
   profile_acls_info: 'List of {principal}\'s permissions per resource.',
   profile_acls: 'User Permissions',
+  profile_otp_disabled: 'Two-factor authentication can be enabled by user \'{user}\'',
+  profile_otp_disable: 'Disable Two-factor authentication for user \'{user}\'',
   profiles_caption: 'Manage user and application profiles',
   profiles_info: 'Each user who logged in has a profile. A realm is the user directory in which a user is defined. Logging in from different realm with the same user name is forbidden for security reasons. If removed, the user profile will be automatically recreated when the user logs in.',
   profiles: 'Profiles',
