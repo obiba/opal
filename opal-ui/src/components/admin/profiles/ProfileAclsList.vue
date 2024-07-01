@@ -64,8 +64,24 @@ const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
 const selectedAcls = ref<Acl[]>([]);
 const showDeletes = ref(false);
+const loading = ref(false);
+
+const initialPagination = ref({
+  sortBy: 'resource',
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+  minRowsForPagination: 10,
+});
 
 const principal = computed(() => route.params.principal);
+
+interface Row {
+  resource: string;
+  url: string;
+  title: string;
+  caption: string;
+}
 
 const columns = [
   {
@@ -86,31 +102,6 @@ const columns = [
     tooltip: (val: string) => t(`acls.${val}.description`),
   }
 ];
-
-const initialPagination = ref({
-  sortBy: 'resource',
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  minRowsForPagination: 10,
-});
-
-function onDeleteAcls() {
-  showDeletes.value = true;
-}
-
-async function doRemoveAcls() {
-  showDeletes.value = false;
-  const toDelete: Acl[] = selectedAcls.value;
-  selectedAcls.value = [];
-
-  try {
-    await profileAclsStore.deleteAcls(toDelete);
-    await profileAclsStore.initAcls(`${route.params.principal}`);
-  } catch (err) {
-    notifyError(err);
-  }
-}
 
 const cases = [
   { regex: new RegExp(`/files/home/${principal.value}$`), type: 'home_folder' },
@@ -194,10 +185,17 @@ const rows = computed(() => {
   }
 );
 
-function sortRows(rows: readonly any[], sortBy: string, descending: boolean) {
+onMounted(async () => {
+  loading.value = true;
+  profileAclsStore.initAcls(`${route.params.principal}`).then(() => {
+    loading.value = false;
+  });
+});
+
+function sortRows(rows: readonly Row[], sortBy: string, descending: boolean) {
   const data = [...rows];
 
-  data.sort((a: any, b: any): any => {
+  data.sort((a: Row, b: Row): number => {
     if (sortBy) {
       const sortA = a['caption'];
       const sortB = b['caption'];
@@ -209,17 +207,26 @@ function sortRows(rows: readonly any[], sortBy: string, descending: boolean) {
       }
       return 0;
     }
+    return 0; // default when no sorting
   });
 
   return data;
 }
 
-const loading = ref(false);
+function onDeleteAcls() {
+  showDeletes.value = true;
+}
 
-onMounted(async () => {
-  loading.value = true;
-  profileAclsStore.initAcls(`${route.params.principal}`).then(() => {
-    loading.value = false;
-  });
-});
+async function doRemoveAcls() {
+  showDeletes.value = false;
+  const toDelete: Acl[] = selectedAcls.value;
+  selectedAcls.value = [];
+
+  try {
+    await profileAclsStore.deleteAcls(toDelete);
+    await profileAclsStore.initAcls(`${route.params.principal}`);
+  } catch (err) {
+    notifyError(err);
+  }
+}
 </script>
