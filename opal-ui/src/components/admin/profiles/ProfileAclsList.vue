@@ -9,6 +9,8 @@
       :rows="rows"
       :columns="columns"
       row-key="resource"
+      :sort-method="sortRows"
+      binary-state-sort
       :pagination="initialPagination"
       :hide-pagination="rows.length <= initialPagination.rowsPerPage"
       :loading="loading"
@@ -27,8 +29,6 @@
             <q-item-label><router-link :to="props.row.url">{{ props.row.title }}</router-link></q-item-label>
             <q-item-label caption lines="2">{{ props.row.caption }}</q-item-label>
           </q-item-section>
-
-
         </q-td>
       </template>
       <template v-slot:body-cell-permissions="props">
@@ -63,7 +63,6 @@ import { Acl } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 const { t } = useI18n();
-
 const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
 const selectedAcls = ref<Acl[]>([]);
@@ -90,7 +89,7 @@ const columns = [
 ];
 
 const initialPagination = ref({
-  sortBy: 'name',
+  sortBy: 'resource',
   descending: false,
   page: 1,
   rowsPerPage: 10,
@@ -114,13 +113,15 @@ async function doRemoveAcls() {
   }
 }
 
-
 const cases = [
   { regex: /\/files\/home\/(.*)$/, type: 'home_folder' },
   { regex: /\/files\/(.*)$/, type: 'folder' },
   { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
   { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
   { regex: /\/datasource\/(.*)$/, type: 'project' },
+  { regex: /\/r/, type: 'r_service', url: '/admin/rservers' },
+  { regex: /\/datashield/, type: 'datashield_service', url: '/admin/datashield' },
+  { regex: /^\/$/, type: 'project|system', url: '/admin/settings' },
 ];
 
 const rows = computed(() => {
@@ -134,10 +135,8 @@ const rows = computed(() => {
       }
     };
 
-    const input = acl.resource;
-
     cases.some((item) => {
-      const match = item.regex.exec(input);
+      const match = item.regex.exec(acl.resource);
         if (match) {
           result.caption = t(item.type);
           switch (item.type) {
@@ -156,6 +155,22 @@ const rows = computed(() => {
             case 'variable':
               result.title = `${match[1]}.${match[2]}.${match[3]}`;
               break;
+            case 'r_service':
+              result.title = 'R';
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'datashield_service':
+              result.title = 'DataSHIELD';
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'project|system':
+              result.url = item.url || '';
+              const isSystem = acl.actions.includes('SYSTEM_ALL');
+              result.title = isSystem ? t('system_settings') : t('project_settings');
+              result.caption = isSystem ? t('system') : t('project');
+              break;
           }
           return true;
         }
@@ -164,8 +179,29 @@ const rows = computed(() => {
 
       return result;
     });
+
   }
 );
+
+function sortRows(rows: readonly any[], sortBy: string, descending: boolean) {
+  const data = [...rows];
+
+  data.sort((a: any, b: any): any => {
+    if (sortBy) {
+      const sortA = a['caption'];
+      const sortB = b['caption'];
+      if (sortA < sortB) {
+        return descending ? 1 : -1;
+      }
+      if (sortA > sortB) {
+        return descending ? -1 : 1;
+      }
+      return 0;
+    }
+  });
+
+  return data;
+}
 
 const loading = ref(false);
 
