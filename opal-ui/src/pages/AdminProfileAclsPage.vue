@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
         <q-breadcrumbs-el :label="$t('profiles')" to="/admin/profiles" />
-        <q-breadcrumbs-el :label="$t('permissions', {principal: $route.params.principal})" />
+        <q-breadcrumbs-el :label="`${$route.params.principal}`" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">

@@ -21,11 +21,11 @@ export const useProfilesStore = defineStore('profiles', () => {
   }
 
   async function getProfile(profile: SubjectProfileDto) {
-    return api.delete(`/system/subject-profile/${profile.principal}`).then(() => loadProfiles());
+    return api.delete(`/system/subject-profile/${profile.principal}`);
   }
 
   async function deleteProfile(profile: SubjectProfileDto) {
-    return api.delete(`/system/subject-profile/${profile.principal}`).then(() => loadProfiles());
+    return api.delete(`/system/subject-profile/${profile.principal}`);
   }
 
   async function deleteProfiles(profiles: SubjectProfileDto[]) {
@@ -36,8 +36,12 @@ export const useProfilesStore = defineStore('profiles', () => {
       },
       paramsSerializer: {
         indexes: null,
-    }
-  });
+      }
+    });
+  }
+
+  async function disableOtp(profile: SubjectProfileDto) {
+    return api.delete(`/system/subject-profile/${profile.principal}/otp`);
   }
 
   return {
@@ -47,6 +51,7 @@ export const useProfilesStore = defineStore('profiles', () => {
     getProfile,
     deleteProfile,
     deleteProfiles,
+    disableOtp
   };
 
 });

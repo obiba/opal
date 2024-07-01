@@ -3,48 +3,46 @@
     <div class="text-h5 q-mb-md">
       {{ $t('profile_acls') }}
     </div>
-    <div class="text-help q-mb-md">{{ $t('profile_acls_info', {principal: $route.params.principal}) }}</div>
+    <div class="text-help q-mb-md">{{ $t('profile_acls_info') }}</div>
     <q-table
       flat
-      :rows="acls"
+      :rows="rows"
       :columns="columns"
       row-key="resource"
+      :sort-method="sortRows"
+      binary-state-sort
       :pagination="initialPagination"
-      :hide-pagination="acls.length <= initialPagination.rowsPerPage"
+      :hide-pagination="rows.length <= initialPagination.rowsPerPage"
       :loading="loading"
+      selection="multiple"
+      v-model:selected="selectedAcls"
     >
+      <template v-slot:top>
+        <q-btn outline color="red" icon="delete" size="sm" :disable="selectedAcls.length === 0" @click="onDeleteAcls"></q-btn>
+      </template>
       <template v-slot:body-cell-resource="props">
         <q-td :props="props">
-          <span>{{ props.value }} </span>
-          <div class="float-right">
-            <q-btn
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('delete')"
-              :icon="toolsVisible[props.row.principal] ? 'delete' : 'none'"
-              class="q-ml-xs"
-            />
-          </div>
+          <q-item-section>
+            <q-item-label><router-link :to="props.row.url">{{ props.row.title }}</router-link></q-item-label>
+            <q-item-label caption lines="2">{{ props.row.caption }}</q-item-label>
+          </q-item-section>
         </q-td>
       </template>
       <template v-slot:body-cell-permissions="props">
         <q-td :props="props">
-          <q-chip removable class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index" @remove="onRemovePermission(props.row, permission)">
+          <span class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index">
             {{ props.col.format(permission) }}
             <q-tooltip>{{ props.col.tooltip(permission) }}</q-tooltip>
-          </q-chip>
+          </span>
         </q-td>
       </template>
     </q-table>
 
     <confirm-dialog
-      v-model="showDelete"
+      v-model="showDeletes"
       :title="$t('delete')"
-      :text="$t('delete_profile_acl_confirm', { permission: $t(`acls.${selectedAcl.permission}.label`), resource: selectedAcl.acl?.resource || ''})"
-      @confirm="doRemovePermission"
+      :text="$t('delete_profile_acl_confirm', {count: selectedAcls.length})"
+      @confirm="doRemoveAcls"
     />
   </div>
 </template>
@@ -62,13 +60,28 @@ import { Acl } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 const { t } = useI18n();
-
 const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
-const acls = computed(() => profileAclsStore.acls || []);
-const toolsVisible = ref<{ [key: string]: boolean }>({});
-const selectedAcl = ref({permission: null as string | null, acl: null as Acl | null});
-const showDelete = ref(false);
+const selectedAcls = ref<Acl[]>([]);
+const showDeletes = ref(false);
+const loading = ref(false);
+
+const initialPagination = ref({
+  sortBy: 'resource',
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+  minRowsForPagination: 10,
+});
+
+const principal = computed(() => route.params.principal);
+
+interface Row {
+  resource: string;
+  url: string;
+  title: string;
+  caption: string;
+}
 
 const columns = [
   {
@@ -77,7 +90,6 @@ const columns = [
     label: t('name'),
     align: 'left',
     field: 'resource',
-    format: (val: string) => val,
     sortable: true,
     style: 'width: 25%',
   },
@@ -85,43 +97,93 @@ const columns = [
     name: 'permissions',
     label: t('permissions'),
     align: 'left',
-    field: 'actions',
+    field: 'action',
     format: (val: string) => t(`acls.${val}.label`),
     tooltip: (val: string) => t(`acls.${val}.description`),
   }
 ];
 
-const initialPagination = ref({
-  sortBy: 'name',
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  minRowsForPagination: 10,
-});
+const cases = [
+  { regex: new RegExp(`/files/home/${principal.value}$`), type: 'home_folder' },
+  { regex: /\/files\/(.*)$/, type: 'folder' },
+  { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
+  { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
+  { regex: /\/datasource\/(.*)$/, type: 'project' },
+  { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
+  { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
+  { regex: /\/r$/, type: 'r_service', url: '/admin/rservers' },
+  { regex: /\/datashield$/, type: 'datashield_service', url: '/admin/datashield' },
+  { regex: /\/datashield\/profile\/(.*)$/, type: 'datashield_profile', url: '/admin/datashield' },
+  { regex: /^\/$/, type: 'project|system', url: '/admin/settings' },
+];
 
-function onRemovePermission(acl: Acl, permission: string) {
-  console.log('onRemovePermission', acl, permission);
-  selectedAcl.value = {permission, acl};
-  showDelete.value = true;
-}
+const rows = computed(() => {
+  return (profileAclsStore.acls || []).map((acl) => {
+    const result = {
+      ...acl,
+      ...{
+        url: acl.resource.replace(/^\/datasource\//g, '/project/'),
+        title: acl.resource,
+        caption: '',
+      }
+    };
 
-async function doRemovePermission() {
-  console.log('doRemovePermission');
-  showDelete.value = false;
-  const toDelete = selectedAcl.value;
-  selectedAcl.value = {acl: null, permission: null};
+    cases.some((item) => {
+      const match = item.regex.exec(acl.resource);
+        if (match) {
+          result.caption = t(item.type);
+          switch (item.type) {
+            case 'home_folder':
+            case 'folder':
+              result.title = result.url.replace(/^\/files\//, '/');
+              break;
+            case 'project':
+              result.title = `${match[1]}`;
+              break;
+            case 'table':
+              result.title = `${match[1]}.${match[2]}`;
+              break;
+            case 'variable':
+              result.title = `${match[1]}.${match[2]}.${match[3]}`;
+              break;
+            case 'resources':
+              result.title = `${match[1]}`;
+              break;
+            case 'resource':
+              result.title = `${match[1]}.${match[2]}`;
+              break;
+            case 'r_service':
+              result.title = 'R';
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'datashield_service':
+              result.title = 'DataSHIELD';
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'datashield_profile':
+              result.title = `${match[1]}`;
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'project|system':
+              result.url = item.url || '';
+              const isSystem = acl.actions.includes('SYSTEM_ALL');
+              result.title = isSystem ? t('system_settings') : t('project_settings');
+              result.caption = isSystem ? t('system') : t('project');
+              break;
+          }
+          return true;
+        }
+        return false;
+      });
 
-  if (toDelete.acl && toDelete.permission) {
-    try {
-      await profileAclsStore.deleteAcl(`${route.params.principal}`, toDelete.permission, toDelete.acl.resource);
-      await profileAclsStore.initAcls(`${route.params.principal}`);
-    } catch (err) {
-      notifyError(err);
-    }
+      return result;
+    });
+
   }
-}
-
-const loading = ref(false);
+);
 
 onMounted(async () => {
   loading.value = true;
@@ -129,4 +191,42 @@ onMounted(async () => {
     loading.value = false;
   });
 });
+
+function sortRows(rows: readonly Row[], sortBy: string, descending: boolean) {
+  const data = [...rows];
+
+  data.sort((a: Row, b: Row): number => {
+    if (sortBy) {
+      const sortA = a['caption'];
+      const sortB = b['caption'];
+      if (sortA < sortB) {
+        return descending ? 1 : -1;
+      }
+      if (sortA > sortB) {
+        return descending ? -1 : 1;
+      }
+      return 0;
+    }
+    return 0; // default when no sorting
+  });
+
+  return data;
+}
+
+function onDeleteAcls() {
+  showDeletes.value = true;
+}
+
+async function doRemoveAcls() {
+  showDeletes.value = false;
+  const toDelete: Acl[] = selectedAcls.value;
+  selectedAcls.value = [];
+
+  try {
+    await profileAclsStore.deleteAcls(toDelete);
+    await profileAclsStore.initAcls(`${route.params.principal}`);
+  } catch (err) {
+    notifyError(err);
+  }
+}
 </script>

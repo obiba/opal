@@ -22,52 +22,34 @@
         </div>
       </template>
       <template v-slot:body-cell-principal="props">
-        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-td :props="props">
           <router-link
             :to="`/admin/profile/${props.value}/permissions`"
             class="text-primary"
             >{{ props.value }}</router-link
           >
-          <div class="float-right">
-            <q-btn
-              rounded
-              dense
-              flat
-              size="sm"
-              color="secondary"
-              :title="$t('delete')"
-              :icon="toolsVisible[props.row.principal] ? 'delete' : 'none'"
-              class="q-ml-xs"
-              @click="onDeleteProfile(props.row)"
-            />
-          </div>
         </q-td>
       </template>
       <template v-slot:body-cell-realm="props">
-        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-td :props="props">
           {{ props.value }}
         </q-td>
       </template>
       <template v-slot:body-cell-groups="props">
-        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-td :props="props">
           <q-chip class="q-ml-none" v-for="group in props.col.format(props.row.groups)" :key="group.name">
             {{ group }}
           </q-chip>
         </q-td>
       </template>
       <template v-slot:body-cell-otpEnabled="props">
-        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          {{ props.value }}
+        <q-td :props="props">
+          <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)"/>
+          <q-tooltip>{{ $t((props.value ? 'profile_otp_disable' : 'profile_otp_disabled'), {user: props.row.principal})  }}</q-tooltip>
         </q-td>
       </template>
     </q-table>
 
-    <confirm-dialog
-      v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_profile_confirm', { profile: (selectedProfile || {}).principal })"
-      @confirm="doDeleteProfile"
-    />
     <confirm-dialog
       v-model="showDeletes"
       :title="$t('delete')"
@@ -94,10 +76,7 @@ const { t } = useI18n();
 
 const profilesStore = useProfilesStore();
 const profiles = computed(() => profilesStore.profiles || []);
-const toolsVisible = ref<{ [key: string]: boolean }>({});
-const showDelete = ref(false);
 const showDeletes = ref(false);
-const selectedProfile = ref<SubjectProfileDto | null>(null);
 const selectedProfiles = ref<SubjectProfileDto[]>([]);
 
 const columns = [
@@ -128,7 +107,7 @@ const columns = [
   {
     name: 'otpEnabled',
     label: t('2fa'),
-    align: 'left',
+    align: 'center',
     field: 'otpEnabled',
     format: (val: string) => val,
   },
@@ -160,39 +139,19 @@ const initialPagination = ref({
 
 const principalsToDelete = computed(() => selectedProfiles.value.map((p) => p.principal).join(', '));
 
-function onOverRow(row: SubjectProfileDto) {
-  toolsVisible.value[row.principal] = selectedProfiles.value.length === 0 && true;
-}
-
-function onLeaveRow(row: SubjectProfileDto) {
-  toolsVisible.value[row.principal] = false;
-}
-
-async function onDeleteProfile(profile: SubjectProfileDto) {
-  selectedProfile.value = profile;
-  showDelete.value = true;
-}
-
-async function onDeleteProfiles() {
-  showDeletes.value = true;
-}
-
-async function doDeleteProfile() {
-  showDelete.value = false;
-  if (selectedProfile.value == null) {
-    return;
-  }
-
-  const toDelete: SubjectProfileDto | null = selectedProfile.value;
-  selectedProfile.value = null;
-
+async function disableOtp(profile: SubjectProfileDto) {
   try {
-    await profilesStore.deleteProfile(toDelete);
+    await profilesStore.disableOtp(profile);
     await profilesStore.initProfiles();
   } catch (err) {
     notifyError(err);
   }
 }
+
+function onDeleteProfiles() {
+  showDeletes.value = true;
+}
+
 
 async function doDeleteProfiles() {
   showDeletes.value = false;
