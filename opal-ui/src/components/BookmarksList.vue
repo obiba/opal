@@ -7,7 +7,7 @@
         :key="item.link"
       >
         <q-item-section>
-          <q-item-label><router-link :to="item.link">{{ item.title }} </router-link></q-item-label>
+          <q-item-label><router-link :to="item.link">{{ item.title }}</router-link></q-item-label>
           <q-item-label caption lines="2">{{ $t(item.caption) }}</q-item-label>
         </q-item-section>
         <q-item-section avatar>

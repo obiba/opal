@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { Acl, Subject_SubjectType } from 'src/models/Opal';

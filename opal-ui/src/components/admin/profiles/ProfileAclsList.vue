@@ -3,7 +3,7 @@
     <div class="text-h5 q-mb-md">
       {{ $t('profile_acls') }}
     </div>
-    <div class="text-help q-mb-md">{{ $t('profile_acls_info', {principal: $route.params.principal}) }}</div>
+    <div class="text-help q-mb-md">{{ $t('profile_acls_info') }}</div>
     <q-table
       flat
       :rows="rows"
@@ -18,10 +18,7 @@
       v-model:selected="selectedAcls"
     >
       <template v-slot:top>
-        <div class="row rows-center q-gutter-sm">
-          <span :class="{'text-secondary': selectedAcls.length === 0}">{{ $t("delete_profiles_selected") }}</span>
-          <q-btn outline color="red" icon="delete" size="sm" :disable="selectedAcls.length === 0" @click="onDeleteAcls"></q-btn>
-        </div>
+        <q-btn outline color="red" icon="delete" size="sm" :disable="selectedAcls.length === 0" @click="onDeleteAcls"></q-btn>
       </template>
       <template v-slot:body-cell-resource="props">
         <q-td :props="props">
@@ -67,6 +64,8 @@ const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
 const selectedAcls = ref<Acl[]>([]);
 const showDeletes = ref(false);
+
+const principal = computed(() => route.params.principal);
 
 const columns = [
   {
@@ -114,13 +113,16 @@ async function doRemoveAcls() {
 }
 
 const cases = [
-  { regex: /\/files\/home\/(.*)$/, type: 'home_folder' },
+  { regex: new RegExp(`/files/home/${principal.value}$`), type: 'home_folder' },
   { regex: /\/files\/(.*)$/, type: 'folder' },
   { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
   { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
   { regex: /\/datasource\/(.*)$/, type: 'project' },
-  { regex: /\/r/, type: 'r_service', url: '/admin/rservers' },
-  { regex: /\/datashield/, type: 'datashield_service', url: '/admin/datashield' },
+  { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
+  { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
+  { regex: /\/r$/, type: 'r_service', url: '/admin/rservers' },
+  { regex: /\/datashield$/, type: 'datashield_service', url: '/admin/datashield' },
+  { regex: /\/datashield\/profile\/(.*)$/, type: 'datashield_profile', url: '/admin/datashield' },
   { regex: /^\/$/, type: 'project|system', url: '/admin/settings' },
 ];
 
@@ -129,7 +131,7 @@ const rows = computed(() => {
     const result = {
       ...acl,
       ...{
-        url: acl.resource.replace(/\/datasource\//g, '/project/'),
+        url: acl.resource.replace(/^\/datasource\//g, '/project/'),
         title: acl.resource,
         caption: '',
       }
@@ -141,10 +143,8 @@ const rows = computed(() => {
           result.caption = t(item.type);
           switch (item.type) {
             case 'home_folder':
-              result.title = `${match[1]}`;
-              break;
             case 'folder':
-              result.title = `${match[1]}`;
+              result.title = result.url.replace(/^\/files\//, '/');
               break;
             case 'project':
               result.title = `${match[1]}`;
@@ -155,6 +155,12 @@ const rows = computed(() => {
             case 'variable':
               result.title = `${match[1]}.${match[2]}.${match[3]}`;
               break;
+            case 'resources':
+              result.title = `${match[1]}`;
+              break;
+            case 'resource':
+              result.title = `${match[1]}.${match[2]}`;
+              break;
             case 'r_service':
               result.title = 'R';
               result.caption = t(item.type);
@@ -162,6 +168,11 @@ const rows = computed(() => {
               break;
             case 'datashield_service':
               result.title = 'DataSHIELD';
+              result.caption = t(item.type);
+              result.url = item.url || '';
+              break;
+            case 'datashield_profile':
+              result.title = `${match[1]}`;
               result.caption = t(item.type);
               result.url = item.url || '';
               break;

@@ -202,20 +202,20 @@ export default {
     },
     // resource permissions
     RESOURCE_ALL: {
-      label: 'RESOURCE_ALL',
-      description: 'RESOURCE_ALL',
+      label: 'Administrate',
+      description: 'Full access to the resource.',
     },
     RESOURCES_ALL: {
-      label: 'RESOURCES_ALL',
-      description: 'RESOURCES_ALL',
+      label: 'Administrate',
+      description: 'Full access to project resources.',
     },
     RESOURCE_VIEW: {
-      label: 'RESOURCE_VIEW',
-      description: 'RESOURCE_VIEW',
+      label: 'View resource (no credentials)',
+      description: 'View resource without having access to the associated credentials (DataSHIELD compliant permission).',
     },
     RESOURCES_VIEW: {
-      label: 'RESOURCES_VIEW',
-      description: 'RESOURCES_VIEW',
+      label: 'View any resource (no credentials)',
+      description: 'View any resource without having access to the associated credentials (DataSHIELD compliant permission).',
     },
     // database permissions
     DATABASES_ALL: {
@@ -331,6 +331,7 @@ export default {
   databases_caption: 'Manage identifiers database and data databases for storage, import and export',
   databases: 'Databases',
   datashield_service: 'DataSHIELD Service',
+  datashield_profile: 'DataSHIELD Profile',
   date: 'Date',
   default_value_type: 'Default value type',
   delete_categories_confirm: '- | Are you sure you want to delete this category? | Are you sure you want to delete these {count} categories?',
@@ -490,7 +491,7 @@ export default {
   plugins: 'Plugins',
   preview_import_source: 'Preview the data',
   profile: 'Profile',
-  profile_acls_info: 'List of {principal}\'s permissions per resource.',
+  profile_acls_info: 'List of the permissions directly applied to the user. Permissions that would be inherited from groups membership are not included.',
   profile_acls: 'User Permissions',
   profile_otp_disabled: 'Two-factor authentication can be enabled by user \'{user}\'',
   profile_otp_disable: 'Disable Two-factor authentication for user \'{user}\'',
@@ -513,6 +514,7 @@ export default {
   reports_caption: 'Configure and schedule reports',
   reports: 'Reports',
   resources: 'Resources',
+  resource: 'Resource',
   restore_views: 'Restore views',
   rservers_caption: 'Configure R server, grant access to R service',
   rservers: 'R',

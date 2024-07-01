@@ -202,20 +202,20 @@ export default {
     },
     // resource permissions
     RESOURCE_ALL: {
-      label: 'RESOURCE_ALL',
-      description: 'RESOURCE_ALL',
+      label: 'Administrer',
+      description: 'Accès complet à la ressource.',
     },
     RESOURCES_ALL: {
-      label: 'RESOURCES_ALL',
-      description: 'RESOURCES_ALL',
+      label: 'Administrer',
+      description: 'Accès complet aux ressources du projet.',
     },
     RESOURCE_VIEW: {
-      label: 'RESOURCE_VIEW',
-      description: 'RESOURCE_VIEW',
+      label: 'Voire la ressource (sans les identifiants associés)',
+      description: 'Voir la ressource sans avoir accès aux identifiants associés (permission conforme à DataSHIELD).',
     },
     RESOURCES_VIEW: {
-      label: 'RESOURCES_VIEW',
-      description: 'RESOURCES_VIEW',
+      label: 'Voire les ressources (sans les identifiants associés)',
+      description: 'Voir les ressources sans avoir accès aux identifiants associés (permission conforme à DataSHIELD).',
     },
     // database permissions
     DATABASES_ALL: {
@@ -331,6 +331,7 @@ export default {
   databases_caption: 'Gérer les bases de données pour le stockage, l\'import et l\'export des données',
   databases: 'Base de données',
   datashield_service: 'Service DataSHIELD',
+  datashield_profile: 'Profil DataSHIELD',
   date: 'Date',
   default_value_type: 'Type de valeur par défaut',
   delete_categories_confirm: '- | Êtes-vous sûr de vouloir supprimer cette catégorie ? | Êtes-vous sûr de vouloir supprimer ces {count} catégories ?',
@@ -490,7 +491,7 @@ export default {
   plugins: 'Greffons',
   preview_import_source: 'Prévisualiser les données',
   profile: 'Profile',
-  profile_acls_info : 'Liste des permissions de {principal} par ressource',
+  profile_acls_info : 'Liste des permissions directement accordées à l\'utilisateur. Les permissions accordées à l\'utilisateur par l\'intermédiaire de groupes ne sont pas incluses.',
   profile_acls : 'Permissions de l\'utilisateur',
   profiles_caption: 'Gérer les profils',
   profiles: 'Profils',
@@ -511,6 +512,7 @@ export default {
   reports_caption: 'Configurer et planifier des rapports',
   reports: 'Rapports',
   resources: 'Ressources',
+  resource: 'Ressource',
   restore_views: 'Restaurer des vues',
   rservers_caption: 'Configurer les serveurs R, accorder l\'accès au service R',
   rservers: 'R',
