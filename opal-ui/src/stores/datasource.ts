@@ -194,6 +194,17 @@ export const useDatasourceStore = defineStore('datasource', () => {
     )
   }
 
+  async function addVariablesView(name: string, from: string[], variables: VariableDto[]) {
+    return api.post(
+      `/datasource/${datasource.value.name}/views`,
+      {
+        name: name.trim(),
+        from: from,
+        'Magma.VariableListViewDto.view':{variables}
+      }
+    )
+  }
+
   async function updateTable(original: TableDto, updated: TableDto) {
     return api.put(
       `/datasource/${datasource.value.name}/table/${original.name}`,
@@ -287,7 +298,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
-  async function getAllTables(entityType: string): Promise<TableDto[]> {
+  async function getAllTables(entityType: string | undefined): Promise<TableDto[]> {
     return api.get('/datasources/tables', { params: { entityType } }).then((response) => response.data as TableDto[]);
   }
 
@@ -298,17 +309,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
     localVar.entityType = table.value.entityType;
     if (isNew) {
       return api.post(`${link}/variables`, [localVar]).then(() => {
-        return Promise.all([
-          loadTableVariable(localVar.name),
-          loadTableVariables(),
-        ]);
+        return loadTableVariables();
       });
     }
     return api.put(`${link}/variable/${variable.value.name}`, localVar).then(() => {
-      return Promise.all([
-        loadTableVariable(localVar.name),
-        loadTableVariables(),
-      ]);
+      return loadTableVariables();
     });
   }
 
@@ -343,6 +348,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadTable,
     isNewTableNameValid,
     addTable,
+    addVariablesView,
     updateTable,
     updateView,
     deleteTable,

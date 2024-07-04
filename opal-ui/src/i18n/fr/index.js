@@ -627,4 +627,5 @@ export default {
   referenced_entity_type_hint: 'Quand les valeurs sont des identifiants, la variable est une référence à une autre entité.',
   mime_type_hint: 'Le type MIME de la variable.',
   index_hint: 'Position ou poids de la variable dans la table, pour établir un ordre.',
+  add_view: 'Ajouter une vue',
 };
