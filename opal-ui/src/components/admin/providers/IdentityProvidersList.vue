@@ -1,0 +1,229 @@
+<template>
+  <div>
+    <div class="text-h5 q-mb-md">
+      {{ $t('identity_providers') }}
+    </div>
+		<div class="text-help q-mb-md" v-html="$t('identity_providers_info')"></div>
+		<q-table
+      flat
+      :rows="providers"
+      :columns="columns"
+      row-key="resource"
+      binary-state-sort
+      :pagination="initialPagination"
+      :hide-pagination="providers.length <= initialPagination.rowsPerPage"
+      :loading="loading"
+    >
+    <template v-slot:body-cell-name="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <span class="text-primary">{{ props.value }}</span>
+          <div class="float-right">
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('edit')"
+              :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
+              class="q-ml-xs"
+              @click="onEditProvider(props.row)"
+            />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="props.row.enabled ? $t('disable') : $t('enable')"
+              :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
+              class="q-ml-xs"
+              @click="onCloneProvider(props.row)"
+            />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="props.row.enabled ? $t('disable') : $t('enable')"
+              :icon="toolsVisible[props.row.name] ? (props.row.enabled ? 'close' : 'check') : 'none'"
+              class="q-ml-xs"
+              @click="onEnableProvider(props.row)"
+            />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('delete')"
+              :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+              class="q-ml-xs"
+              @click="onDeleteProvider(props.row)"
+            />
+          </div>
+        </q-td>
+      </template>
+		<template v-slot:body-cell-groups="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-chip class="q-ml-none" v-for="(group, index) in props.col.format(props.row.groups)" :key="index">{{ group }}</q-chip>
+      </q-td>
+    </template>
+		<template v-slot:body-cell-providerUrl="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <a :href="props.value" target="_blank" ><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_url') }}</q-chip></a>
+      </q-td>
+    </template>
+		<template v-slot:body-cell-parameters="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <a :href="props.value" target="_blank" class="ml-0"><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_discovery_uri') }}</q-chip></a>
+      </q-td>
+    </template>
+		<template v-slot:body-cell-enabled="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <q-icon :name="props.value ? 'check' : 'close'" size="sm" />
+        </q-td>
+      </q-td>
+    </template>
+	</q-table>
+
+  <confirm-dialog
+      v-if="selectedProvider"
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('delete_identity_provider_confirm', { provider: selectedProvider.name })"
+      @confirm="doDeleteProvider"
+    />
+  </div>
+</template>
+
+<script lang="ts">
+export default defineComponent({
+  name: 'IdentityProvidersList',
+});
+</script>
+
+
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { notifyError } from 'src/utils/notify';
+import { IDProviderDto } from 'src/models/Opal';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+
+const identityProvidersStore = useIdentityProvidersStore();
+const { t } = useI18n();
+const loading = ref(false);
+const providers = computed(() => identityProvidersStore.providers || []);
+const toolsVisible = ref<{ [key: string]: boolean }>({});
+const selectedProvider = ref<IDProviderDto | null>(null);
+const showDelete = ref(false);
+
+const columns = [
+  {
+    name: 'name',
+    required: true,
+    label: t('name'),
+    align: 'left',
+    field: 'name',
+    format: (val: string) => val,
+    sortable: true,
+    style: 'width: 25%',
+  },
+  {
+    name: 'label',
+    label: t('label'),
+    align: 'left',
+    field: 'label',
+    format: (val: string) => val,
+  },
+  {
+    name: 'groups',
+    label: t('groups'),
+    align: 'left',
+    field: 'groups',
+    format: (val: string) => (val => (val || '').split(/\s+/))(val).filter(group => group),
+  },
+  {
+    name: 'providerUrl',
+    label: t('identity_provider_account_login'),
+    align: 'left',
+    field: 'providerUrl',
+    format: (val: string) => val,
+  },
+  {
+    name: 'parameters',
+    label: t('parameters'),
+    align: 'left',
+    field: 'discoveryURI',
+    format: (val: string) => val,
+  },
+  {
+    name: 'enabled',
+    label: t('enabled'),
+    align: 'left',
+    field: 'enabled',
+    format: (val: string) => val,
+  },
+];
+
+const initialPagination = ref({
+  sortBy: 'name',
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+  minRowsForPagination: 10,
+});
+
+function onOverRow(row: IDProviderDto) {
+  toolsVisible.value[row.name] = true;
+}
+
+function onLeaveRow(row: IDProviderDto) {
+  toolsVisible.value[row.name] = false;
+}
+
+function onEditProvider(provider: IDProviderDto) {
+  // identityProvidersStore.editProvider(provider);
+}
+
+function onCloneProvider(provider: IDProviderDto) {
+  // identityProvidersStore.editProvider(provider);
+}
+
+function onEnableProvider(provider: IDProviderDto) {
+  // identityProvidersStore.editProvider(provider);
+}
+
+async function onDeleteProvider(provider: IDProviderDto) {
+  showDelete.value = true;
+  selectedProvider.value = provider;
+}
+
+async function doDeleteProvider() {
+  showDelete.value = false;
+
+  if (selectedProvider.value === null) {
+    return;
+  }
+
+  const toDelete: IDProviderDto | null = selectedProvider.value;
+  selectedProvider.value = null;
+
+  try {
+    await identityProvidersStore.deleteProvider(toDelete);
+    await identityProvidersStore.initProviders();
+  } catch (err) {
+    notifyError(err);
+  }
+}
+
+onMounted(async () => {
+  loading.value = true;
+  identityProvidersStore.initProviders().then(() => {
+    loading.value = false;
+  });
+});
+
+</script>
