@@ -21,13 +21,15 @@
             :options="valueTypes"
             :label="$t('value_type')"
             :hint="$t('value_type_hint')"
-            dense
+            :disable="editMode && hasValues"
+            dens
             class="q-mb-sm"/>
           <div class="row q-mb-md">
             <div class="col">
               <q-checkbox
                 v-model="selected.isRepeatable"
                 :label="$t('repeatable')"
+                :disable="editMode && hasValues"
                 dense
                 class="q-mt-md q-mb-sm" />
               <div class="text-hint">
@@ -128,6 +130,8 @@ watch(() => props.modelValue, (value) => {
 function onHide() {
   emit('update:modelValue', false);
 }
+
+const hasValues = computed(() => datasourceStore.table.valueSetCount && datasourceStore.table.valueSetCount > 0);
 
 const isValid = computed(() => selected.value.name && (editMode.value || datasourceStore.table.variableCount === 0 || !datasourceStore.variables.some((v) => v.name === selected.value.name)));
 

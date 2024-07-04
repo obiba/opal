@@ -28,7 +28,7 @@
                   <q-item-label>{{ $t('add_tables') }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item clickable v-close-popup @click="onAddView">
+              <q-item clickable v-close-popup @click="onShowAddView">
                 <q-item-section>
                   <q-item-label>{{ $t('add_a_view') }}</q-item-label>
                 </q-item-section>
@@ -113,6 +113,8 @@
 
     <add-table-dialog v-model="showAddTable" />
 
+    <add-view-dialog v-model="showAddView" />
+
     <add-tables-dialog v-model="showAddTables" />
 
     <import-data-dialog v-model="showImport" :type="importType"/>
@@ -133,6 +135,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { TableDto, TimestampsDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
+import AddViewDialog from 'src/components/datasource/AddViewDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import ImportDataDialog from 'src/components/datasource/import/ImportDataDialog.vue';
 import ExportDataDialog from 'src/components/datasource/export/ExportDataDialog.vue';
@@ -148,6 +151,7 @@ const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
 const showAddTable = ref(false);
+const showAddView = ref(false);
 const showAddTables = ref(false);
 const showCopy = ref(false);
 const showImport = ref(false);
@@ -234,6 +238,10 @@ function onRowClick(evt: unknown, row: { name: string }) {
 
 function onShowAddTable() {
   showAddTable.value = true;
+}
+
+function onShowAddView() {
+  showAddView.value = true;
 }
 
 function onShowAddTables() {

@@ -629,4 +629,5 @@ export default {
   referenced_entity_type_hint: 'When the value is an identifier, its entity type can be specified.',
   mime_type_hint: 'The MIME type of the variable values.',
   index_hint: 'Position or weight of the variable in the list of variables of the table, for ordering.',
+  add_view: 'Add view',
 };
