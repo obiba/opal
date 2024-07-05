@@ -131,7 +131,7 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-const hasValues = computed(() => datasourceStore.table.valueSetCount && datasourceStore.table.valueSetCount > 0);
+const hasValues = computed(() => !datasourceStore.table.viewLink && datasourceStore.table.valueSetCount && datasourceStore.table.valueSetCount > 0);
 
 const isValid = computed(() => selected.value.name && (editMode.value || datasourceStore.table.variableCount === 0 || !datasourceStore.variables.some((v) => v.name === selected.value.name)));
 

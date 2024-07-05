@@ -32,6 +32,37 @@
             class="q-mb-md"
           >
           </q-input>
+
+          <div class="q-mt-lg">
+            {{ $t('derived_variables') }}
+          </div>
+          <div class="text-hint">
+            {{ $t('derived_variables_hint') }}
+          </div>
+          <q-table
+            :rows="derivedVariables"
+            :columns="columns"
+            row-key="index"
+            flat
+            class="q-mb-md">
+            <template v-slot:body-cell="props">
+              <q-td :props="props">
+                <q-input
+                  v-if="props.col.name === 'name'"
+                  v-model="props.row[ props.col.name ]"
+                  dense
+                  borderless
+                />
+                <q-select
+                  v-else
+                  v-model="props.row[ props.col.name ]"
+                  :options="valueTypes"
+                  dense
+                  borderless
+                ></q-select>
+              </q-td>
+              </template>
+          </q-table>
         </q-card-section>
 
         <q-separator />
@@ -56,8 +87,8 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { AttributeDto, TableDto, VariableDto, ViewDto } from 'src/models/Magma';
-import { EmitHint } from 'typescript';
+import { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
+import { valueTypes } from 'src/utils/magma';
 
 interface DialogProps {
   modelValue: boolean;
@@ -71,12 +102,21 @@ const emit = defineEmits(['update:modelValue'])
 const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
+const { t } = useI18n();
 
 const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
 const newTableName = ref('');
+const derivedVariables = ref<VariableDto[]>([]);
+
+const validDerivedVariables = computed(() => derivedVariables.value.filter((v) => v.name));
+
+const columns = [
+  { name: 'name', align: 'left', label: t('name'), field: 'name' },
+  { name: 'valueType', align: 'left', label: t('value_type'), field: 'valueType' },
+];
 
 watch(() => props.modelValue, (value) => {
   if (value) {
@@ -91,6 +131,7 @@ watch(() => props.modelValue, (value) => {
       }
       idx += 1;
     }
+    derivedVariables.value = makeDerivedVariables();
   }
   showDialog.value = value;
 });
@@ -116,17 +157,18 @@ function onSaveView() {
       if (!view.from.includes(from)) {
         view.from.push(from);
       }
-      view['Magma.VariableListViewDto.view'].variables = mergeVariables(view['Magma.VariableListViewDto.view'].variables, makeDerivedVariables());
+      view['Magma.VariableListViewDto.view'].variables = mergeVariables(view['Magma.VariableListViewDto.view'].variables, validDerivedVariables.value);
       datasourceStore.updateView(projectDestination.value, newTableName.value, view, `Added variables from ${from} to view`)
         .then(() => router.push(newViewPage));
     })
     .catch((err) => {
-      datasourceStore.addVariablesView(projectDestination.value, newTableName.value, [from], makeDerivedVariables())
+      datasourceStore.addVariablesView(projectDestination.value, newTableName.value, [from], validDerivedVariables.value)
         .then(() => router.push(newViewPage));
     });
 }
 
 function makeDerivedVariables() {
+  let idx = 0;
   return props.variables.map((variable) => {
     const scriptAttr: AttributeDto = {
       name: 'script',
@@ -135,6 +177,7 @@ function makeDerivedVariables() {
     const newVariable = { ...variable };
     delete newVariable.link;
     delete newVariable.parentLink;
+    newVariable.index = idx++;
     if (variable.categories) {
       newVariable.categories = [...variable.categories];
     }
@@ -142,7 +185,7 @@ function makeDerivedVariables() {
       newVariable.attributes = [...variable.attributes].filter((attr) => attr.name !== 'script');
       newVariable.attributes.push(scriptAttr);
     } else {
-      newVariable.attributes = [ scriptAttr ];
+      newVariable.attributes = [scriptAttr];
     }
     return newVariable;
   });
@@ -154,8 +197,10 @@ function mergeVariables(originalVariables: VariableDto[], variables: VariableDto
     const original = originalVariables.find((v) => v.name === variable.name);
     if (original) {
       const index = newVariables.indexOf(original);
+      variable.index = original.index;
       newVariables[index] = variable;
     } else {
+      variable.index = newVariables.length;
       newVariables.push(variable);
     }
   });

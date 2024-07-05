@@ -90,7 +90,8 @@ export default {
     Conflict: 'Conflit détecté',
     BannedUser: 'Trop d\'erreurs d\'identification, l\'utilisateur {0} est banni pour une durée de {1} secondes',
     InvalidCredentials: 'Nom d\'utilisateur ou mot de passe incorrect, veuillez réessayer',
-    TableAlreadyExists: 'La table existe déjà'
+    TableAlreadyExists: 'La table existe déjà',
+    MagmaRuntimeException: 'Erreur de traitement des données: {0}',
   },
   importer: {
     file: {
@@ -634,4 +635,6 @@ export default {
   annotate: 'Annotater',
   view_name: 'Nom de la vue',
   view_destination_hint: 'La vue de destination sera créée si elle n\'existe pas, sinon elle sera mise à jour en fusionnant les variables dérivées.',
+  derived_variables: 'Variables dérivées',
+  derived_variables_hint: 'Le nom et le type de la variable dérivée peuvent être différents de celui de la variable d\'origine.',
 };

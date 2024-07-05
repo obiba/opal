@@ -90,6 +90,7 @@ import { QTableColumn } from 'quasar';
 import { ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { t } from 'src/boot/i18n';
+import { notifyError } from 'src/utils/notify';
 
 interface TableValuesProps {
   variable: VariableDto | undefined;
@@ -190,6 +191,9 @@ function onRequest(props) {
     pagination.value.rowsPerPage = rowsPerPage
     pagination.value.sortBy = sortBy
     pagination.value.descending = descending
+    loading.value = false;
+  }).catch((err) => {
+    notifyError(err);
     loading.value = false;
   });
 }
