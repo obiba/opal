@@ -14,7 +14,7 @@
     >
       <template v-slot:top>
         <div class="row q-gutter-sm">
-          <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :label="$t('add')" size="sm"
+          <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :title="$t('add')" size="sm"
            >
             <q-list>
               <q-item clickable v-close-popup @click="onShowAddTable">
@@ -43,12 +43,13 @@
           <q-btn
             color="secondary"
             icon="refresh"
-            :label="$t('refresh')"
+            :title="$t('refresh')"
+            outline
             size="sm"
             @click="init"
 
           />
-          <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')">
+          <q-btn-dropdown outline color="primary" icon="download" size="sm" :title="$t('download')">
             <q-list>
               <q-item clickable v-close-popup @click="onDownloadDictionary">
                 <q-item-section>
@@ -90,8 +91,8 @@
               </q-item> -->
             </q-list>
           </q-btn-dropdown>
-          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
-          <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" size="sm" @click="onShowDeleteTables"></q-btn>
+          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
+          <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDeleteTables"></q-btn>
         </div>
       </template>
       <template v-slot:body-cell-name="props">

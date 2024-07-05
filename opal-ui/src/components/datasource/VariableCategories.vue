@@ -12,7 +12,7 @@
       v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :label="$t('add')" size="sm">
+        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :title="$t('add')" size="sm">
           <q-list>
             <q-item clickable @click="onShowAddSingle">
               <q-item-section>
@@ -216,7 +216,7 @@ function onDelete() {
     ...datasourceStore.variable,
     categories: datasourceStore.variable.categories.filter((c) => !selected.value.map((cs) => cs.name).includes(c.name)),
   };
-  datasourceStore.saveVariable(newVariable)
+  datasourceStore.updateVariable(newVariable)
     .then(onUpdate)
     .then(() => {
       selected.value = [];
@@ -236,7 +236,7 @@ function onUp() {
     categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.saveVariable({ ...datasourceStore.variable, categories })
+  datasourceStore.updateVariable({ ...datasourceStore.variable, categories })
     .then(onUpdate)
     .finally(() => {
       moveEnabled.value = true;
@@ -256,7 +256,7 @@ function onDown() {
     categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.saveVariable({ ...datasourceStore.variable, categories })
+  datasourceStore.updateVariable({ ...datasourceStore.variable, categories })
     .then(onUpdate)
     .finally(() => {
       moveEnabled.value = true;

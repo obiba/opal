@@ -14,7 +14,7 @@
             :label="$t('name')"
             :hint="$t('variable_name_hint')"
             class="q-mb-md"
-            :disable="editMode"
+            :disable="editMode && !isView"
           />
           <q-select
             v-model="selected.valueType"
@@ -131,15 +131,26 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
+const isView = computed(() => datasourceStore.table.viewType);
+
 const hasValues = computed(() => !datasourceStore.table.viewLink && datasourceStore.table.valueSetCount && datasourceStore.table.valueSetCount > 0);
 
 const isValid = computed(() => selected.value.name && (editMode.value || datasourceStore.table.variableCount === 0 || !datasourceStore.variables.some((v) => v.name === selected.value.name)));
 
 function onSave() {
-  datasourceStore.saveVariable(selected.value)
-    .then(() => emit('save', selected))
-    .catch((err) => {
-      notifyError(err);
-    });
+  if (editMode.value) {
+    datasourceStore.updateVariable(selected.value)
+      .then(() => emit('save', selected.value))
+      .catch((err) => {
+        notifyError(err);
+      });
+    return;
+  } else {
+    datasourceStore.addVariable(selected.value)
+      .then(() => emit('save', selected.value))
+      .catch((err) => {
+        notifyError(err);
+      });
+  }
 }
 </script>

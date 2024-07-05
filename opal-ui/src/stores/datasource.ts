@@ -302,7 +302,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.get('/datasources/tables', { params: { entityType } }).then((response) => response.data as TableDto[]);
   }
 
-  function saveVariable(localVar: VariableDto) {
+  function addVariable(localVar: VariableDto) {
     const tableType = table.value.viewType ? 'view' : 'table';
     const link = `/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
     const isNew = variables.value === undefined || variables.value.find((v) => v.name === localVar.name) === undefined;
@@ -312,7 +312,15 @@ export const useDatasourceStore = defineStore('datasource', () => {
         return loadTableVariables();
       });
     }
-    return api.put(`${link}/variable/${variable.value.name}`, localVar).then(() => {
+    return api.put(`${link}/variable/${localVar.name}`, localVar).then(() => {
+      return loadTableVariables();
+    });
+  }
+
+  function updateVariable(localVar: VariableDto) {
+    const tableType = table.value.viewType ? 'view' : 'table';
+    localVar.entityType = table.value.entityType;
+    return api.put(`/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`, localVar).then(() => {
       return loadTableVariables();
     });
   }
@@ -369,7 +377,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadValueSets,
     loadTableVariable,
     loadVariableSummary,
-    saveVariable,
+    addVariable,
+    updateVariable,
     saveDerivedVariable,
     getAllTables,
     createView,

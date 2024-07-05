@@ -144,7 +144,7 @@ function onSave() {
   } else {
     newVariable.categories.push(newCategory.value);
   }
-  datasourceStore.saveVariable(newVariable)
+  datasourceStore.updateVariable(newVariable)
     .then(() => {
       emit('saved', newVariable);
     });

@@ -10,7 +10,7 @@
       :loading="loading"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :label="$t('add')" size="sm">
+        <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :title="$t('add')" size="sm">
           <q-list> </q-list>
         </q-btn-dropdown>
       </template>

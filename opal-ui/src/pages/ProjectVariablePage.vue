@@ -129,7 +129,7 @@
       <edit-variable-dialog
         v-model="showEdit"
         :variable="datasourceStore.variable"
-        @save="init" />
+        @save="onSaved" />
       <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="[datasourceStore.variable]" />
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: 1 })" @confirm="onDeleteVariable" />
     </q-page>
@@ -236,5 +236,13 @@ function onDeleteVariable() {
   datasourceStore
     .deleteVariables([vName.value])
     .then(() => router.push(`/project/${dsName.value}/table/${tName.value}`));
+}
+
+function onSaved(variable: VariableDto) {
+  if (variable.name !== vName.value) {
+    router.push(`/project/${dsName.value}/table/${tName.value}/variable/${variable.name}`);
+  } else {
+    datasourceStore.loadTableVariable(variable.name);
+  }
 }
 </script>

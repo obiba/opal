@@ -20,7 +20,8 @@
     <q-btn
       color="secondary"
       icon="refresh"
-      :label="$t('refresh')"
+      :title="$t('refresh')"
+      outline
       size="sm"
       @click="init"
       class="q-mt-lg"

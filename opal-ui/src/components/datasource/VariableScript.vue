@@ -5,7 +5,7 @@
         size="sm"
         color="primary"
         icon="edit"
-        :label="$t('edit')"
+        :title="$t('edit')"
         @click="onShowEdit" />
     </div>
     <v-ace-editor

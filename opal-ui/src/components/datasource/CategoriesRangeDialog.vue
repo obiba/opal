@@ -99,7 +99,7 @@ function onSave() {
       }
     }
   });
-  datasourceStore.saveVariable(newVariable)
+  datasourceStore.updateVariable(newVariable)
     .then(() => {
       emit('saved', newVariable);
     });

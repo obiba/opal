@@ -19,14 +19,15 @@
               v-if="datasourceStore.perms.variables?.canCreate()"
               color="primary"
               icon="add"
-              :label="$t('add_variable')"
+              :title="$t('add_variable')"
               size="sm"
               @click="onShowAddVariable"
             />
             <q-btn
               color="secondary"
               icon="refresh"
-              :label="$t('refresh')"
+              :title="$t('refresh')"
+              outline
               size="sm"
               @click="init"
             />
@@ -96,7 +97,7 @@
     </q-table>
 
     <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
-    <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" @save="onVariableSaved" />
+    <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
 </template>
@@ -227,10 +228,6 @@ function onShowAddVariable() {
     index: datasourceStore.variables?.length,
   } as VariableDto;
   showEditVariable.value = true;
-}
-
-function onVariableSaved(variable: VariableDto) {
-  console.log('variable', variable);
 }
 
 function onAddToView() {
