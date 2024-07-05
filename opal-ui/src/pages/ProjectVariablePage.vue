@@ -29,6 +29,7 @@
           @click="onShowEditVariable"
           class="on-right"
         />
+        <q-btn v-if="datasourceStore.perms.variable?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
         <q-btn
           :label="$t('add_to_view')"
           icon="add_circle"
@@ -126,10 +127,11 @@
         </q-tab-panel>
       </q-tab-panels>
       <edit-variable-dialog
-        v-model="showEditVariable"
+        v-model="showEdit"
         :variable="datasourceStore.variable"
         @save="init" />
       <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="[datasourceStore.variable]" />
+      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: 1 })" @confirm="onDeleteVariable" />
     </q-page>
   </div>
 </template>
@@ -143,14 +145,17 @@ import VariableScript from 'src/components/datasource/VariableScript.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { VariableDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
 
 const route = useRoute();
+const router = useRouter();
 const datasourceStore = useDatasourceStore();
-const showEditVariable = ref(false);
+const showEdit = ref(false);
 const showAddToView = ref(false);
+const showDelete = ref(false);
 
 const tab = ref('dictionary');
 
@@ -216,10 +221,20 @@ function init() {
 }
 
 function onShowEditVariable() {
-  showEditVariable.value = true;
+  showEdit.value = true;
+}
+
+function onShowDelete() {
+  showDelete.value = true;
 }
 
 function onAddToView() {
   showAddToView.value = true;
+}
+
+function onDeleteVariable() {
+  datasourceStore
+    .deleteVariables([vName.value])
+    .then(() => router.push(`/project/${dsName.value}/table/${tName.value}`));
 }
 </script>

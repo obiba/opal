@@ -75,6 +75,7 @@
             :label="$t('save')"
             color="primary"
             @click="onSaveView"
+            :disabled="!projectDestination || !newTableName || !validDerivedVariables.length"
             v-close-popup
           />
         </q-card-actions>
@@ -193,9 +194,9 @@ function makeDerivedVariables() {
 }
 
 function mergeVariables(originalVariables: VariableDto[], variables: VariableDto[]) {
-  const newVariables = [...originalVariables];
+  const newVariables = originalVariables ? [...originalVariables] : [];
   variables.forEach((variable) => {
-    const original = originalVariables.find((v) => v.name === variable.name);
+    const original = newVariables.find((v) => v.name === variable.name);
     if (original) {
       const index = newVariables.indexOf(original);
       variable.index = original.index;
