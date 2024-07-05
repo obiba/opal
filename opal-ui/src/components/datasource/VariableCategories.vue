@@ -110,11 +110,13 @@
       <category-dialog
       v-model="showEdit"
       :variable="datasourceStore.variable"
-      :category="selectedSingle" />
+      :category="selectedSingle"
+      @saved="onUpdate" />
 
     <categories-range-dialog
       v-model="showAddRange"
-      :variable="datasourceStore.variable" />
+      :variable="datasourceStore.variable"
+      @saved="onUpdate" />
   </div>
 </template>
 
@@ -212,9 +214,13 @@ function onShowDelete() {
 function onDelete() {
   const newVariable = {
     ...datasourceStore.variable,
-    categories: datasourceStore.variable.categories.filter((c) => !selected.value.includes(c)),
+    categories: datasourceStore.variable.categories.filter((c) => !selected.value.map((cs) => cs.name).includes(c.name)),
   };
-  datasourceStore.saveVariable(newVariable);
+  datasourceStore.saveVariable(newVariable)
+    .then(onUpdate)
+    .then(() => {
+      selected.value = [];
+    });
 }
 
 function onUp() {
@@ -230,9 +236,11 @@ function onUp() {
     categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
-    moveEnabled.value = true;
-  });
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories })
+    .then(onUpdate)
+    .finally(() => {
+      moveEnabled.value = true;
+    });
 }
 
 function onDown() {
@@ -248,8 +256,14 @@ function onDown() {
     categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.saveVariable({ ...datasourceStore.variable, categories }).finally(() => {
-    moveEnabled.value = true;
-  });
+  datasourceStore.saveVariable({ ...datasourceStore.variable, categories })
+    .then(onUpdate)
+    .finally(() => {
+      moveEnabled.value = true;
+    });
+}
+
+function onUpdate() {
+  datasourceStore.loadTableVariable(datasourceStore.variable.name);
 }
 </script>

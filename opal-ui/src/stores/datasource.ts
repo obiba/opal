@@ -367,6 +367,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadViews,
     downloadView,
     loadValueSets,
+    loadTableVariable,
     loadVariableSummary,
     saveVariable,
     saveDerivedVariable,
