@@ -18,6 +18,7 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.shiro.realm.OIDCRealm;
+import org.obiba.opal.core.service.security.DuplicateIDProviderException;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,13 @@ public class OpalIDProvidersService implements IDProvidersService, InitializingB
   @Override
   public Collection<OIDCConfiguration> getConfigurations() {
     return configurations.keySet().stream().sorted().map(configurations::get).collect(Collectors.toList());
+  }
+
+  @Override
+  public void ensureUniqueConfiguration(String name) throws DuplicateIDProviderException {
+    if (configurations.containsKey(Strings.nullToEmpty(name))) {
+      throw new DuplicateIDProviderException(configurations.get(name));
+    }
   }
 
   @Override

@@ -14,6 +14,7 @@
             dense
             type="text"
             :label="$t('name') + '*'"
+            :hint="$t('identity_provider.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('validation.identity_provider.name_required')]"
@@ -160,7 +161,7 @@
                     ></span>
                   </template>
                 </q-checkbox>
-                <q-checkbox dense v-model="newProvider.useNonce" class="q-mb-md">
+                <q-checkbox dense v-model="newProvider.useLogout" class="q-mb-md">
                   <template v-slot:default>
                     <span
                       class="text-secondary"
@@ -169,7 +170,7 @@
                   </template>
                 </q-checkbox>
                 <q-input
-                  v-model="newProvider.connectTimeout"
+                  v-model.number="newProvider.connectTimeout"
                   dense
                   type="number"
                   :label="$t('identity_provider.connect_timeout')"
@@ -179,7 +180,7 @@
                 >
                 </q-input>
                 <q-input
-                  v-model="newProvider.readTimeout"
+                  v-model.number="newProvider.readTimeout"
                   dense
                   type="number"
                   :label="$t('identity_provider.read_timeout')"
@@ -242,22 +243,27 @@ const emptyProvider = {
   discoveryURI: '',
   scope: 'openid',
   useNonce: true,
+  useLogout: true,
   parameters: [],
   enabled: false,
   connectTimeout: 0,
   readTimeout: 0,
 } as IDProviderDto;
 
+const groupsMappingOptionsIndices = {
+  groupsClaim: 0,
+  groupsScript: 1,
+};
 const groupsMappingOptions = ref([
-  { label: t('identity_provider.groups_claim'), value: 'claim_value' },
-  { label: t('identity_provider.groups_javascript'), value: 'javascript' },
+  { label: t('identity_provider.groups_claim'), value: 'groupsClaim' },
+  { label: t('identity_provider.groups_javascript'), value: 'groupsScript' },
 ]);
-const groupsMapping = ref(groupsMappingOptions.value[0]);
+const groupsMapping = ref(groupsMappingOptions.value[groupsMappingOptionsIndices.groupsClaim]);
 const newProvider = ref<IDProviderDto>(emptyProvider);
 const editMode = computed(() => !!props.provider && !!props.provider.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('identity_provider_edit') : t('identity_provider_add')));
-const isGroupsMappingByClaim = computed(() => groupsMapping.value.value === 'claim_value');
+const isGroupsMappingByClaim = computed(() => groupsMapping.value.value === 'groupsClaim');
 const groupsJavascriptPlaceholder = computed(() => {
   return `// input: userInfo
 // output: an array of strings
@@ -301,6 +307,9 @@ watch(
     if (value) {
       if (props.provider) {
         newProvider.value = { ...props.provider };
+        groupsMapping.value = newProvider.value.groupsClaim
+          ? groupsMappingOptions.value[groupsMappingOptionsIndices.groupsClaim]
+          : groupsMappingOptions.value[groupsMappingOptionsIndices.groupsScript];
       } else {
         newProvider.value = { ...emptyProvider };
       }
@@ -319,6 +328,12 @@ function onHide() {
 async function onAddProvider() {
   const valid = await formRef.value.validate();
   if (valid) {
+    if (isGroupsMappingByClaim) {
+      delete newProvider.value.groupsScript;
+    } else {
+      delete newProvider.value.groupsClaim;
+    }
+
     (editMode.value
       ? identityProvidersStore.updateProvider(newProvider.value)
       : identityProvidersStore.addProvider(newProvider.value)

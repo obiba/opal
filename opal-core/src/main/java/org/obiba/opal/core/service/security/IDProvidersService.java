@@ -27,6 +27,13 @@ public interface IDProvidersService {
   Collection<OIDCConfiguration> getConfigurations();
 
   /**
+   * Returns true if the OIDC configuration with name exists.
+   *
+   * @return
+   */
+  void ensureUniqueConfiguration(String name) throws DuplicateIDProviderException;
+
+  /**
    * Get the OIDC configuration from name.
    *
    * @return

@@ -92,9 +92,11 @@ export default {
     InvalidCredentials: 'Invalid credentials, please try again',
     TableAlreadyExists: 'The table already exists',
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
+    DuplicateIDProvider:'The identity provider already exists',
   },
   identity_provider: {
     title: 'Identity Provider',
+    name_hint: 'A unique name for the identity provider.',
     account_login: 'Account Login',
     client_id: 'Client ID',
     client_id_hint: 'Identification of the Opal server in the ID provider.',
