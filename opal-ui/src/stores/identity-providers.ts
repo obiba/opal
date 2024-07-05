@@ -20,8 +20,20 @@ export const useIdentityProvidersStore = defineStore('identityProviders', () => 
     })
   }
 
+  async function addProvider(provider: IDProviderDto) {
+    return api.post('/system/idproviders', provider);
+  }
+
+  async function updateProvider(provider: IDProviderDto) {
+    return api.put(`/system/idprovider/${provider.name}`, provider);
+  }
+
   async function getProvider(provider: IDProviderDto) {
     return api.delete(`/system/idprovider/${provider.name}`);
+  }
+
+  async function toggleEnableProvider(provider: IDProviderDto) {
+    return provider.enabled ? api.delete(`/system/idprovider/${provider.name}/_enable`) : api.put(`/system/idprovider/${provider.name}/_enable`);
   }
 
   async function deleteProvider(provider: IDProviderDto) {
@@ -33,7 +45,10 @@ export const useIdentityProvidersStore = defineStore('identityProviders', () => 
     reset,
     initProviders,
     getProvider,
+    addProvider,
+    updateProvider,
     deleteProvider,
+    toggleEnableProvider,
   };
 
 });

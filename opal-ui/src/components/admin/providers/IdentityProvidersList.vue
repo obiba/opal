@@ -3,8 +3,11 @@
     <div class="text-h5 q-mb-md">
       {{ $t('identity_providers') }}
     </div>
-		<div class="text-help q-mb-md" v-html="$t('identity_providers_info')"></div>
-		<q-table
+    <div
+      class="text-help q-mb-md"
+      v-html="$t('identity_providers_info', { idProvider: idProviderDefinition, openId: openIdDefinition })"
+    ></div>
+    <q-table
       flat
       :rows="providers"
       :columns="columns"
@@ -14,9 +17,12 @@
       :hide-pagination="providers.length <= initialPagination.rowsPerPage"
       :loading="loading"
     >
-    <template v-slot:body-cell-name="props">
+      <template v-slot:top-left>
+        <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddProfile" />
+      </template>
+      <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-primary">{{ props.value }}</span>
+          <span>{{ props.value }}</span>
           <div class="float-right">
             <q-btn
               rounded
@@ -35,7 +41,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="props.row.enabled ? $t('disable') : $t('enable')"
+              :title="$t('duplicate')"
               :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
               class="q-ml-xs"
               @click="onCloneProvider(props.row)"
@@ -65,37 +71,51 @@
           </div>
         </q-td>
       </template>
-		<template v-slot:body-cell-groups="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <q-chip class="q-ml-none" v-for="(group, index) in props.col.format(props.row.groups)" :key="index">{{ group }}</q-chip>
-      </q-td>
-    </template>
-		<template v-slot:body-cell-providerUrl="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <a :href="props.value" target="_blank" ><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_url') }}</q-chip></a>
-      </q-td>
-    </template>
-		<template v-slot:body-cell-parameters="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <a :href="props.value" target="_blank" class="ml-0"><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_discovery_uri') }}</q-chip></a>
-      </q-td>
-    </template>
-		<template v-slot:body-cell-enabled="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+      <template v-slot:body-cell-groups="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <q-icon :name="props.value ? 'check' : 'close'" size="sm" />
+          <q-chip class="q-ml-none" v-for="(group, index) in props.col.format(props.row.groups)" :key="index">{{
+            group
+          }}</q-chip>
         </q-td>
-      </q-td>
-    </template>
-	</q-table>
+      </template>
+      <template v-slot:body-cell-providerUrl="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <a :href="props.value" target="_blank"
+            ><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_url') }}</q-chip></a
+          >
+        </q-td>
+      </template>
+      <template v-slot:body-cell-parameters="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <a :href="props.value" target="_blank" class="ml-0"
+            ><q-chip square color="secondary" class="q-ml-none text-white">{{
+              $t('identity_provider_discovery_uri')
+            }}</q-chip></a
+          >
+        </q-td>
+      </template>
+      <template v-slot:body-cell-enabled="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+            <q-icon :name="props.value ? 'check' : 'close'" size="sm" />
+          </q-td>
+        </q-td>
+      </template>
+    </q-table>
 
-  <confirm-dialog
+    <confirm-dialog
       v-if="selectedProvider"
       v-model="showDelete"
       :title="$t('delete')"
       :text="$t('delete_identity_provider_confirm', { provider: selectedProvider.name })"
       @confirm="doDeleteProvider"
     />
+
+    <add-identity-provider-dialog
+      v-model="showAddProfile"
+      :provider="selectedProvider"
+      @update:modelValue="onProfileAdded"
+    ></add-identity-provider-dialog>
   </div>
 </template>
 
@@ -105,12 +125,12 @@ export default defineComponent({
 });
 </script>
 
-
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { notifyError } from 'src/utils/notify';
 import { IDProviderDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import AddIdentityProviderDialog from './AddIdentityProviderDialog.vue';
 
 const identityProvidersStore = useIdentityProvidersStore();
 const { t } = useI18n();
@@ -119,6 +139,14 @@ const providers = computed(() => identityProvidersStore.providers || []);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const selectedProvider = ref<IDProviderDto | null>(null);
 const showDelete = ref(false);
+const showAddProfile = ref(false);
+// NOTE: Using interpolation mute i18n warnings for using html fragments in messages
+const idProviderDefinition = computed(
+  () => `<a href="https://en.wikipedia.org/wiki/Identity_provider" target="_blank">${t('identity_provider.title')}</a>`
+);
+const openIdDefinition = computed(
+  () => `<a href="https://en.wikipedia.org/wiki/OpenID_Connect" target="_blank">${t('openid_connect')}</a>`
+);
 
 const columns = [
   {
@@ -143,7 +171,7 @@ const columns = [
     label: t('groups'),
     align: 'left',
     field: 'groups',
-    format: (val: string) => (val => (val || '').split(/\s+/))(val).filter(group => group),
+    format: (val: string) => ((val) => (val || '').split(/\s+/))(val).filter((group) => group),
   },
   {
     name: 'providerUrl',
@@ -185,20 +213,32 @@ function onLeaveRow(row: IDProviderDto) {
 }
 
 function onEditProvider(provider: IDProviderDto) {
-  // identityProvidersStore.editProvider(provider);
+  showAddProfile.value = true;
+  selectedProvider.value = provider;
 }
 
 function onCloneProvider(provider: IDProviderDto) {
   // identityProvidersStore.editProvider(provider);
 }
 
-function onEnableProvider(provider: IDProviderDto) {
-  // identityProvidersStore.editProvider(provider);
+async function onEnableProvider(provider: IDProviderDto) {
+  await identityProvidersStore.toggleEnableProvider(provider);
+  await identityProvidersStore.initProviders();
 }
 
 async function onDeleteProvider(provider: IDProviderDto) {
   showDelete.value = true;
   selectedProvider.value = provider;
+}
+
+function onAddProfile() {
+  showAddProfile.value = true;
+}
+
+async function onProfileAdded() {
+  identityProvidersStore.initProviders();
+  showAddProfile.value = false;
+  selectedProvider.value = null;
 }
 
 async function doDeleteProvider() {
@@ -225,5 +265,4 @@ onMounted(async () => {
     loading.value = false;
   });
 });
-
 </script>
