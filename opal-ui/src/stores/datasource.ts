@@ -194,9 +194,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
     )
   }
 
-  async function addVariablesView(name: string, from: string[], variables: VariableDto[]) {
+  async function addVariablesView(project: string, name: string, from: string[], variables: VariableDto[]) {
     return api.post(
-      `/datasource/${datasource.value.name}/views`,
+      `/datasource/${project}/views`,
       {
         name: name.trim(),
         from: from,
@@ -211,9 +211,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
       updated)
   }
 
-  async function updateView(original: ViewDto, updated: ViewDto, comment: string) {
+  async function updateView(project: string, name: string, updated: ViewDto, comment: string) {
     return api.put(
-      `/datasource/${datasource.value.name}/view/${original.name}`,
+      `/datasource/${project}/view/${name}`,
       updated, { params: { comment } })
   }
 
@@ -333,6 +333,14 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.post(`/datasource/${destination}/views`, view);
   }
 
+  async function getView(project: string, name: string) {
+    return api
+      .get(`/datasource/${project}/view/${name}`)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
   return {
     datasource,
     tables,
@@ -364,6 +372,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     saveDerivedVariable,
     getAllTables,
     createView,
+    getView,
     reset,
   };
 });

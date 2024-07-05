@@ -117,7 +117,7 @@ function filterFn (val: string, update: any) {
 function onSaveTable() {
   if (props.view && isView.value) {
     const updatedView = { ...props.view, name: name.value, from: from.value as string[] };
-    datasourceStore.updateView(props.view, updatedView, `Editing ${props.view.name}`)
+    datasourceStore.updateView(datasourceStore.datasource.name, props.view.name || name.value, updatedView, `Editing ${props.view.name}`)
       .then(() => emit('update:view', updatedView))
       .catch((err) => {
         notifyError(err);

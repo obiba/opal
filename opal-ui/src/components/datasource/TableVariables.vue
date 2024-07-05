@@ -13,30 +13,56 @@
       v-model:selected="selected"
     >
       <template v-slot:top>
-        <div class="row q-gutter-sm">
-          <q-btn
-            v-if="datasourceStore.perms.variables?.canCreate()"
-            color="primary"
-            icon="add"
-            :label="$t('add_variable')"
-            size="sm"
-            @click="onShowAddVariable"
-          />
-          <q-btn
-            color="secondary"
-            icon="refresh"
-            :label="$t('refresh')"
-            size="sm"
-            @click="init"
-          />
-          <q-btn
-            v-if="datasourceStore.perms.table?.canUpdate()"
-            outline
-            color="red"
-            icon="delete"
-            size="sm"
-            @click="onShowDeleteVariables"
-          />
+        <div class="column">
+          <div class="row q-gutter-sm">
+            <q-btn
+              v-if="datasourceStore.perms.variables?.canCreate()"
+              color="primary"
+              icon="add"
+              :label="$t('add_variable')"
+              size="sm"
+              @click="onShowAddVariable"
+            />
+            <q-btn
+              color="secondary"
+              icon="refresh"
+              :label="$t('refresh')"
+              size="sm"
+              @click="init"
+            />
+            <q-btn
+              v-if="datasourceStore.perms.table?.canUpdate()"
+              outline
+              color="red"
+              icon="delete"
+              size="sm"
+              @click="onShowDeleteVariables"
+            />
+            <div v-if="selected.length === 0" class="text-hint q-pt-xs">
+              <q-icon name="info" />
+              <span class="q-ml-xs">{{ $t('variables_hint') }}</span>
+            </div>
+            <q-btn
+              v-if="selected.length > 0"
+              :label="$t('add_to_view')"
+              icon="add_circle"
+              no-caps
+              dense
+              flat
+              size="sm"
+              @click="onAddToView"
+            />
+            <!-- <q-btn
+              v-if="selected.length > 0"
+              :label="$t('annotate')"
+              icon="label"
+              no-caps
+              dense
+              flat
+              size="sm"
+              @click="onAnnotate"
+            /> -->
+          </div>
         </div>
       </template>
       <template v-slot:body-cell-name="props">
@@ -69,6 +95,7 @@
       </template>
     </q-table>
 
+    <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" @save="onVariableSaved" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
@@ -83,6 +110,7 @@ export default defineComponent({
 import { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
+import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import { notifyError } from 'src/utils/notify';
 import { getLabels } from 'src/utils/attributes';
 
@@ -102,6 +130,7 @@ const selected = ref([] as VariableDto[]);
 const selectedSingle = ref<VariableDto>({} as VariableDto);
 const showDeleteVariables = ref(false);
 const showEditVariable = ref(false);
+const showAddToView = ref(false);
 
 const columns = [
   {
@@ -153,6 +182,7 @@ watch([dsName, tName], () => {
 
 function init() {
   loading.value = true;
+  selected.value = [];
   datasourceStore
     .initDatasourceTableVariables(dsName.value, tName.value)
     .then(() => {
@@ -201,5 +231,9 @@ function onShowAddVariable() {
 
 function onVariableSaved(variable: VariableDto) {
   console.log('variable', variable);
+}
+
+function onAddToView() {
+  showAddToView.value = true;
 }
 </script>

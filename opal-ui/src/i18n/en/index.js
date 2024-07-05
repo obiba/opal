@@ -630,4 +630,10 @@ export default {
   mime_type_hint: 'The MIME type of the variable values.',
   index_hint: 'Position or weight of the variable in the list of variables of the table, for ordering.',
   add_view: 'Add view',
+  variables_hint: 'Select some variables to see more actions.',
+  add_to_view: 'Add to view',
+  add_to_view_info: '- | One derived variable will be added/updated. | {count} derived variables will be added/updated.',
+  annotate: 'Annotate',
+  view_name: 'View name',
+  view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated by merging derived variables with the existing ones.',
 };
