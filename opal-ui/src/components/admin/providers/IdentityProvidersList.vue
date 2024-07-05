@@ -44,7 +44,7 @@
               :title="$t('duplicate')"
               :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
               class="q-ml-xs"
-              @click="onCloneProvider(props.row)"
+              @click="onDuplicateProvider(props.row)"
             />
             <q-btn
               rounded
@@ -217,8 +217,10 @@ function onEditProvider(provider: IDProviderDto) {
   selectedProvider.value = provider;
 }
 
-function onCloneProvider(provider: IDProviderDto) {
-  // identityProvidersStore.editProvider(provider);
+function onDuplicateProvider(provider: IDProviderDto) {
+  const clone = {...provider};
+  clone.name = '';
+  onEditProvider(clone);
 }
 
 async function onEnableProvider(provider: IDProviderDto) {

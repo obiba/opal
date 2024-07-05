@@ -143,6 +143,65 @@
             lazy-rules
           >
           </q-input>
+
+          <div class="q-py-md">
+            <q-list>
+              <q-expansion-item
+                dense
+                switch-toggle-side
+                header-class="text-primary text-caption q-pl-none"
+                :label="$t('advanced_options')"
+              >
+                <q-checkbox dense v-model="newProvider.useNonce" class="q-my-md">
+                  <template v-slot:default>
+                    <span
+                      class="text-secondary"
+                      v-html="$t('identity_provider.use_nonce', { url: useNonceDefinition })"
+                    ></span>
+                  </template>
+                </q-checkbox>
+                <q-checkbox dense v-model="newProvider.useNonce" class="q-mb-md">
+                  <template v-slot:default>
+                    <span
+                      class="text-secondary"
+                      v-html="$t('identity_provider.use_logout', { url: useLogoutDefinition })"
+                    ></span>
+                  </template>
+                </q-checkbox>
+                <q-input
+                  v-model="newProvider.connectTimeout"
+                  dense
+                  type="number"
+                  :label="$t('identity_provider.connect_timeout')"
+                  :hint="$t('identity_provider.connect_timeout_hint')"
+                  class="q-mb-md"
+                  lazy-rules
+                >
+                </q-input>
+                <q-input
+                  v-model="newProvider.readTimeout"
+                  dense
+                  type="number"
+                  :label="$t('identity_provider.read_timeout')"
+                  :hint="$t('identity_provider.read_timeout_hint')"
+                  class="q-mb-md"
+                  lazy-rules
+                >
+                </q-input>
+                <q-input
+                  v-model="newProvider.callbackURL"
+                  dense
+                  type="text"
+                  :label="$t('identity_provider.callback_url')"
+                  :hint="$t('identity_provider.callback_url_hint')"
+                  class="q-mb-md"
+                  lazy-rules
+                  :rules="[validateUri('validation.identity_provider.callback_url_format', false)]"
+                >
+                </q-input>
+              </q-expansion-item>
+            </q-list>
+          </div>
         </q-form>
       </q-card-section>
 
@@ -185,6 +244,8 @@ const emptyProvider = {
   useNonce: true,
   parameters: [],
   enabled: false,
+  connectTimeout: 0,
+  readTimeout: 0,
 } as IDProviderDto;
 
 const groupsMappingOptions = ref([
@@ -209,6 +270,18 @@ const discoveryURIDefinition = computed(
   () =>
     `<a href="https://openid.net/specs/openid-connect-discovery-1_0.html" target="_blank" tabindex="-1">${t(
       'identity_provider.discovery_uri_definition'
+    )}</a>`
+);
+const useNonceDefinition = computed(
+  () =>
+    `<a href="https://openid.net/specs/openid-connect-core-1_0.html#IDToken" target="_blank" tabindex="-1">${t(
+      'identity_provider.use_nonce_definition'
+    )}</a>`
+);
+const useLogoutDefinition = computed(
+  () =>
+    `<a href="https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout" target="_blank" tabindex="-1">${t(
+      'identity_provider.use_logout_definition'
     )}</a>`
 );
 

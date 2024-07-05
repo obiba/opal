@@ -116,6 +116,16 @@ export default {
     groups_claim_hint: 'Optional name of the (non-standard) claim in the UserInfo response that represents the groups to which the user belongs. These groups will be applied to the authenticated user. The value of this claim can be an array of strings or a string of comma or space-separated group names. The default values is "groups".',
     groups_javascript: 'By javascript',
     groups_javascript_hint: 'An optional custom javascript to extract the array of group names from the UserInfo object. Allows to adapt to non-standard claims and to transform values into Opal group names. These groups will be applied to the authenticated user.',
+    use_nonce: '{url} to validate ID token.',
+    use_nonce_definition: 'Use Nonce',
+    use_logout: '{url} to logout from both Opal and the ID provider.',
+    use_logout_definition: 'Use Logout Endpoint',
+    connect_timeout: 'Connection Timeout',
+    connect_timeout_hint: 'Maximum time to wait before a connection is established, in milliseconds. Zero implies no timeout.',
+    read_timeout: 'Read Timeout',
+    read_timeout_hint: 'Maximum time to wait before a response is received, in milliseconds. Zero implies no timeout.',
+    callback_url: 'Public URL',
+    callback_url_hint: 'In case Opal is accessible from different public URLs, it is possible to specify which one is to be used for this ID provider. When not specified, the system\'s public URL applies. Note that this ID provider will be only visible when Opal base URL matches this public URL.',
   },
   importer: {
     file: {
@@ -276,6 +286,7 @@ export default {
       discovery_uri_required: 'Discovery URI is required',
       discovery_uri_format: 'Discovery URI must begin with "https://" or "http://"',
       provider_url_format: 'Account login must begin with "https://" or "http://"',
+      callback_url_format: 'Public URL must begin with "https://" or "http://"',
     },
   },
   main: {
