@@ -90,7 +90,8 @@ export default {
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
     InvalidCredentials: 'Invalid credentials, please try again',
-    TableAlreadyExists: 'The table already exists'
+    TableAlreadyExists: 'The table already exists',
+    MagmaRuntimeException: 'An error occurred while processing the data: {0}',
   },
   importer: {
     file: {
@@ -630,4 +631,12 @@ export default {
   mime_type_hint: 'The MIME type of the variable values.',
   index_hint: 'Position or weight of the variable in the list of variables of the table, for ordering.',
   add_view: 'Add view',
+  variables_hint: 'Select some variables to see more actions.',
+  add_to_view: 'Add to view',
+  add_to_view_info: '- | One derived variable will be added/updated. | {count} derived variables will be added/updated.',
+  annotate: 'Annotate',
+  view_name: 'View name',
+  view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated by merging derived variables with the existing ones.',
+  derived_variables: 'Derived variables',
+  derived_variables_hint: 'The derived variable name and value type can be different from the one of original variable.',
 };

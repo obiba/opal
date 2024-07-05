@@ -12,9 +12,9 @@
       <template v-slot:top>
         <q-btn
           color="secondary"
-          text-color="white"
           icon="refresh"
-          :label="$t('refresh')"
+          :title="$t('refresh')"
+          outline
           size="sm"
           @click="onRefresh"
           class="q-mb-sm"
@@ -23,7 +23,7 @@
           outline
           color="secondary"
           icon="cleaning_services"
-          :label="$t('clear')"
+          :title="$t('clear')"
           size="sm"
           @click="onClear(undefined)"
           class="on-right q-mb-sm"

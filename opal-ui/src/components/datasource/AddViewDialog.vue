@@ -107,7 +107,7 @@ function onAddTable() {
   if (!isTableNameValid.value) {
     return;
   }
-  datasourceStore.addVariablesView(name.value, from.value, [])
+  datasourceStore.addVariablesView(datasourceStore.datasource.name, name.value, from.value, [])
     .then(() => datasourceStore.initDatasourceTables(datasourceStore.datasource.name))
     .catch((err) => {
       notifyError(err);

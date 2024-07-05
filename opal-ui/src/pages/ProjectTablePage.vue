@@ -23,7 +23,7 @@
       <div class="text-h5">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ datasourceStore.table.name }}</span>
-        <q-btn-dropdown outline color="primary" icon="download" size="sm" :label="$t('download')" class="on-right">
+        <q-btn-dropdown outline color="primary" icon="download" size="sm" :title="$t('download')" class="on-right">
           <q-list>
             <q-item clickable v-close-popup @click="onDownloadDictionary">
               <q-item-section>
@@ -37,8 +37,8 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :label="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
-        <q-btn-dropdown v-if="isView" color="secondary" icon="content_copy" size="sm" :label="$t('copy')" class="on-right">
+        <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
+        <q-btn-dropdown v-if="isView" color="secondary" icon="content_copy" size="sm" :title="$t('copy')" class="on-right">
           <q-list>
             <q-item clickable v-close-popup @click="onShowCopyData">
               <q-item-section>

@@ -99,7 +99,7 @@ interface Label {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const datasourceStore = useDatasourceStore();
 
@@ -144,6 +144,9 @@ function onSave() {
   } else {
     newVariable.categories.push(newCategory.value);
   }
-  datasourceStore.saveVariable(newVariable);
+  datasourceStore.updateVariable(newVariable)
+    .then(() => {
+      emit('saved', newVariable);
+    });
 }
 </script>

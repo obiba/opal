@@ -10,7 +10,7 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm">
+        <q-btn-dropdown color="primary" :title="$t('add')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onShowAddUser">
               <q-item-section>

@@ -90,7 +90,8 @@ export default {
     Conflict: 'Conflit détecté',
     BannedUser: 'Trop d\'erreurs d\'identification, l\'utilisateur {0} est banni pour une durée de {1} secondes',
     InvalidCredentials: 'Nom d\'utilisateur ou mot de passe incorrect, veuillez réessayer',
-    TableAlreadyExists: 'La table existe déjà'
+    TableAlreadyExists: 'La table existe déjà',
+    MagmaRuntimeException: 'Erreur de traitement des données: {0}',
   },
   importer: {
     file: {
@@ -628,4 +629,12 @@ export default {
   mime_type_hint: 'Le type MIME de la variable.',
   index_hint: 'Position ou poids de la variable dans la table, pour établir un ordre.',
   add_view: 'Ajouter une vue',
+  variables_hint: 'Sélectionnez des variables pour accèder à plus d\'actions.',
+  add_to_view: 'Ajouter à une vue',
+  add_to_view_info: '- | Une variable dérivée sera ajoutée/mise à jour. | {count} variables dérivées seront ajoutées/mises à jour.',
+  annotate: 'Annotater',
+  view_name: 'Nom de la vue',
+  view_destination_hint: 'La vue de destination sera créée si elle n\'existe pas, sinon elle sera mise à jour en fusionnant les variables dérivées.',
+  derived_variables: 'Variables dérivées',
+  derived_variables_hint: 'Le nom et le type de la variable dérivée peuvent être différents de celui de la variable d\'origine.',
 };
