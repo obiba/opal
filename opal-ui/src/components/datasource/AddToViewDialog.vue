@@ -43,6 +43,7 @@
             :rows="derivedVariables"
             :columns="columns"
             row-key="index"
+            :hide-pagination="derivedVariables.length <= 5"
             flat
             class="q-mb-md">
             <template v-slot:body-cell="props">
