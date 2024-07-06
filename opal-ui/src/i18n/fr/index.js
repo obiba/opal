@@ -289,6 +289,7 @@ export default {
       discovery_uri_format: 'L\'URI de découverte doit commencer par "https://" ou "http://"',
       provider_url_format: 'La connexion au compte doit commencer par "https://" ou "http://"',
       callback_url_format: 'L\'URL publique doit commencer par "https://" ou "http://"',
+      scope_required: 'La portée est requise',
     },
   },
   main: {

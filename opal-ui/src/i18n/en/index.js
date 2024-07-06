@@ -289,6 +289,7 @@ export default {
       discovery_uri_format: 'Discovery URI must begin with "https://" or "http://"',
       provider_url_format: 'Account login must begin with "https://" or "http://"',
       callback_url_format: 'Public URL must begin with "https://" or "http://"',
+      scope_required: 'Scope is required',
     },
   },
   main: {

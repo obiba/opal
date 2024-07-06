@@ -97,7 +97,7 @@
             :label="$t('identity_provider.scope')"
             class="q-mb-md"
             lazy-rules
-            :rules="[(val) => true]"
+            :rules="[validateRequiredField('validation.identity_provider.scope_required')]"
           >
             <!-- NOTE: to render hint in a with HTML the fields needs rules -->
             <template v-slot:hint>
@@ -118,7 +118,7 @@
             v-model="groupsMapping"
             :options="groupsMappingOptions"
             dense
-            :label="$t('laguages')"
+            :label="$t('identity_provider.groups_mapping')"
             class="q-mb-md q-pt-md"
           />
           <q-input
@@ -158,6 +158,7 @@
                     <span
                       class="text-secondary"
                       v-html="$t('identity_provider.use_nonce', { url: useNonceDefinition })"
+                      @click.stop="openWindow('https://openid.net/specs/openid-connect-core-1_0.html#IDToken')"
                     ></span>
                   </template>
                 </q-checkbox>
@@ -166,6 +167,7 @@
                     <span
                       class="text-secondary"
                       v-html="$t('identity_provider.use_logout', { url: useLogoutDefinition })"
+                      @click.stop="openWindow('https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout')"
                     ></span>
                   </template>
                 </q-checkbox>
@@ -254,11 +256,11 @@ const groupsMappingOptionsIndices = {
   groupsClaim: 0,
   groupsScript: 1,
 };
-const groupsMappingOptions = ref([
+const groupsMappingOptions = [
   { label: t('identity_provider.groups_claim'), value: 'groupsClaim' },
   { label: t('identity_provider.groups_javascript'), value: 'groupsScript' },
-]);
-const groupsMapping = ref(groupsMappingOptions.value[groupsMappingOptionsIndices.groupsClaim]);
+];
+const groupsMapping = ref(groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim]);
 const newProvider = ref<IDProviderDto>(emptyProvider);
 const editMode = computed(() => !!props.provider && !!props.provider.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
@@ -307,9 +309,11 @@ watch(
     if (value) {
       if (props.provider) {
         newProvider.value = { ...props.provider };
-        groupsMapping.value = newProvider.value.groupsClaim
-          ? groupsMappingOptions.value[groupsMappingOptionsIndices.groupsClaim]
-          : groupsMappingOptions.value[groupsMappingOptionsIndices.groupsScript];
+        if (!!newProvider.value.groupsClaim || !!newProvider.value.groupsScript) {
+          groupsMapping.value = newProvider.value.groupsClaim
+            ? groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim]
+            : groupsMappingOptions[groupsMappingOptionsIndices.groupsScript];
+        }
       } else {
         newProvider.value = { ...emptyProvider };
       }
@@ -319,21 +323,36 @@ watch(
   }
 );
 
+function openWindow(url: string) {
+  window.open(url, '_blank');
+}
+
 function onHide() {
   console.log('onHide');
   newProvider.value = { ...emptyProvider };
+  groupsMapping.value = groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim];
   emit('update:modelValue', false);
 }
 
+function trimStringFields() {
+  if (!newProvider.value.label || newProvider.value.label.trim().length === 0) delete newProvider.value.label;
+  if (!newProvider.value.providerUrl || newProvider.value.providerUrl.trim().length === 0)
+    delete newProvider.value.providerUrl;
+  if (!newProvider.value.groups || newProvider.value.groups.trim().length === 0) delete newProvider.value.groups;
+  if (!newProvider.value.groupsClaim || newProvider.value.groupsClaim.trim().length === 0)
+    delete newProvider.value.groupsScript;
+  if (!newProvider.value.usernameClaim || newProvider.value.usernameClaim.trim().length === 0)
+    delete newProvider.value.usernameClaim;
+  if (!newProvider.value.groupsScript || newProvider.value.groupsScript.trim().length === 0)
+    delete newProvider.value.groupsScript;
+  if (!newProvider.value.callbackURL || newProvider.value.callbackURL.trim().length === 0)
+    delete newProvider.value.callbackURL;
+}
+
 async function onAddProvider() {
+  trimStringFields();
   const valid = await formRef.value.validate();
   if (valid) {
-    if (isGroupsMappingByClaim) {
-      delete newProvider.value.groupsScript;
-    } else {
-      delete newProvider.value.groupsClaim;
-    }
-
     (editMode.value
       ? identityProvidersStore.updateProvider(newProvider.value)
       : identityProvidersStore.addProvider(newProvider.value)
