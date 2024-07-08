@@ -120,9 +120,11 @@
             dense
             :label="$t('identity_provider.groups_mapping')"
             class="q-mb-md q-pt-md"
+            emit-value
+            map-options
           />
           <q-input
-            v-if="isGroupsMappingByClaim"
+            v-if="groupsMapping !== 'groupsScript'"
             v-model="newProvider.groupsClaim"
             dense
             type="text"
@@ -252,20 +254,15 @@ const emptyProvider = {
   readTimeout: 0,
 } as IDProviderDto;
 
-const groupsMappingOptionsIndices = {
-  groupsClaim: 0,
-  groupsScript: 1,
-};
 const groupsMappingOptions = [
   { label: t('identity_provider.groups_claim'), value: 'groupsClaim' },
   { label: t('identity_provider.groups_javascript'), value: 'groupsScript' },
 ];
-const groupsMapping = ref(groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim]);
-const newProvider = ref<IDProviderDto>(emptyProvider);
+const groupsMapping: Ref<string | null> = ref(null);
+const newProvider = ref<IDProviderDto>({ ...emptyProvider });
 const editMode = computed(() => !!props.provider && !!props.provider.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('identity_provider_edit') : t('identity_provider_add')));
-const isGroupsMappingByClaim = computed(() => groupsMapping.value.value === 'groupsClaim');
 const groupsJavascriptPlaceholder = computed(() => {
   return `// input: userInfo
 // output: an array of strings
@@ -310,9 +307,7 @@ watch(
       if (props.provider) {
         newProvider.value = { ...props.provider };
         if (!!newProvider.value.groupsClaim || !!newProvider.value.groupsScript) {
-          groupsMapping.value = newProvider.value.groupsClaim
-            ? groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim]
-            : groupsMappingOptions[groupsMappingOptionsIndices.groupsScript];
+          groupsMapping.value = newProvider.value.groupsClaim ? 'groupsClaim' : 'groupsScript';
         }
       } else {
         newProvider.value = { ...emptyProvider };
@@ -330,27 +325,34 @@ function openWindow(url: string) {
 function onHide() {
   console.log('onHide');
   newProvider.value = { ...emptyProvider };
-  groupsMapping.value = groupsMappingOptions[groupsMappingOptionsIndices.groupsClaim];
+  groupsMapping.value = 'groupsClaim';
   emit('update:modelValue', false);
 }
 
-function trimStringFields() {
+function cleanupFields() {
   if (!newProvider.value.label || newProvider.value.label.trim().length === 0) delete newProvider.value.label;
   if (!newProvider.value.providerUrl || newProvider.value.providerUrl.trim().length === 0)
     delete newProvider.value.providerUrl;
   if (!newProvider.value.groups || newProvider.value.groups.trim().length === 0) delete newProvider.value.groups;
   if (!newProvider.value.groupsClaim || newProvider.value.groupsClaim.trim().length === 0)
-    delete newProvider.value.groupsScript;
-  if (!newProvider.value.usernameClaim || newProvider.value.usernameClaim.trim().length === 0)
-    delete newProvider.value.usernameClaim;
+    delete newProvider.value.groupsClaim;
   if (!newProvider.value.groupsScript || newProvider.value.groupsScript.trim().length === 0)
     delete newProvider.value.groupsScript;
+
+  if (groupsMapping.value === 'groupsClaim') {
+    delete newProvider.value.groupsScript;
+  } else {
+    delete newProvider.value.groupsClaim;
+  }
+
+  if (!newProvider.value.usernameClaim || newProvider.value.usernameClaim.trim().length === 0)
+    delete newProvider.value.usernameClaim;
   if (!newProvider.value.callbackURL || newProvider.value.callbackURL.trim().length === 0)
     delete newProvider.value.callbackURL;
 }
 
 async function onAddProvider() {
-  trimStringFields();
+  cleanupFields();
   const valid = await formRef.value.validate();
   if (valid) {
     (editMode.value
