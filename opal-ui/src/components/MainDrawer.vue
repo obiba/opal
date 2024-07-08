@@ -5,7 +5,7 @@
       <span v-else>&nbsp;</span>
     </div>
     <q-list>
-      <q-item to="/profile" v-if="authStore.isAuthenticated">
+      <q-item to="/admin/profile" v-if="authStore.isAuthenticated">
         <q-item-section avatar>
           <q-icon name="person" />
         </q-item-section>
