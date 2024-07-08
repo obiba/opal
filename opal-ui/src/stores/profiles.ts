@@ -20,6 +20,10 @@ export const useProfilesStore = defineStore('profiles', () => {
     })
   }
 
+  async function getCurrentProfile() : Promise<SubjectProfileDto> {
+    return api.get('/system/subject-profile/_current').then((response) => response.data);
+  }
+
   async function getProfile(profile: SubjectProfileDto) {
     return api.delete(`/system/subject-profile/${profile.principal}`);
   }
@@ -44,14 +48,25 @@ export const useProfilesStore = defineStore('profiles', () => {
     return api.delete(`/system/subject-profile/${profile.principal}/otp`);
   }
 
+  async function enableCurrentOtp(): Promise<string> {
+    return api.put('/system/subject-profile/_current/otp').then(response => response.data);
+  }
+
+  async function disableCurrentOtp() {
+    return api.delete('/system/subject-profile/_current/otp');
+  }
+
   return {
     profiles: profiles,
     reset,
     initProfiles: initProfiles,
     getProfile,
     deleteProfile,
+    getCurrentProfile,
     deleteProfiles,
-    disableOtp
+    disableOtp,
+    enableCurrentOtp,
+    disableCurrentOtp
   };
 
 });

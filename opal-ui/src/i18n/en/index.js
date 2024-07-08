@@ -1,5 +1,8 @@
 export default {
-  '2fa': '2FA',
+  '2fa': {
+    name: '2FA',
+    title: 'Two-Factor Authentication',
+  },
   app_configuration: {
     name_hint: 'A name for the application that represents your organization.',
     public_url_hint: 'Public base URL of the server that will be used when sending notification emails on report generation.',
@@ -273,6 +276,19 @@ export default {
       description: 'VCF_STORE_VIEW',
     },
   },
+  user_profile: {
+    title: 'My profile',
+    groups: 'Your account belongs to the group | Your account belongs to the {count} groups',
+    password_update_not_allowed: 'Your account was defined in the user directory \'{realm}\'. Please contact your system administrator to change the password in this directory.',
+    '2fa_info': 'In addition to your username/password authentication, a dynamic password (also called one-time password) can be requested for an enhanced security of your account access. This one-time password is time-based (TOTP): to generate the temporary PIN code, install the Microsoft Authenticator app ({androidOtp} or {iosOtp}) or the FreeOTP+ app ({androidOnlyOtp}) on your mobile device, enable 2FA in your profile and follow instructions to initialise the authenticator app.',
+    android_otp: 'Android',
+    android_only_otp: 'Android only',
+    ios_otp: 'iOS',
+    update_password: 'Update Password',
+    enable_2fa: 'Enable 2FA',
+    disable_2fa: 'Disable 2FA',
+    otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
+  },
   validation: {
     user: {
       name_required: 'Name is required',
@@ -310,6 +326,7 @@ export default {
     workspaces_info: 'R workspaces storage: each saved R/DataSHIELD workspace contains the session\'s image and files (if any). These can be restored any number of times on user demand.',
     workspaces: 'R workspaces',
   },
+  account: 'Account',
   actions: 'Actions',
   add_a_view: 'Add view',
   add_categories_range: 'Add category range',

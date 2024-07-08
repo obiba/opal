@@ -106,7 +106,7 @@ const columns = [
   },
   {
     name: 'otpEnabled',
-    label: t('2fa'),
+    label: t('2fa.name'),
     align: 'center',
     field: 'otpEnabled',
     format: (val: string) => val,

@@ -1,5 +1,8 @@
 export default {
-  '2fa': '2FA',
+  '2fa': {
+    name: '2FA',
+    title: 'Authentification à deux facteurs',
+  },
   app_configuration: {
     name_hint: 'Un nom pour l\'application qui représente votre organisation.',
     public_url_hint: 'L\'URL publique de l\'application. Cette URL est utilisée pour générer des liens dans les e-mails et les notifications.',

@@ -47,7 +47,7 @@
               <q-item
                 clickable
                 v-close-popup
-                to="/profile"
+                to="/admin/profile"
                 v-if="authStore.isAuthenticated"
               >
                 <q-item-section>
