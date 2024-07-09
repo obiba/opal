@@ -24,7 +24,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +50,7 @@ public class IDProvidersResource {
   @POST
   public Response createOrUpdate(@Context UriInfo uriInfo, Opal.IDProviderDto dto) {
     try {
+      idProvidersService.ensureUniqueConfiguration(dto.getName());
       idProvidersService.saveConfiguration(Dtos.fromDto(dto));
       return Response.created(uriInfo.getBaseUriBuilder().path("/system/idprovider/" + dto.getName()).build()).build();
     } catch (IOException e) {

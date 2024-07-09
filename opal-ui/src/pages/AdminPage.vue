@@ -25,7 +25,7 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/idproviders">{{ $t('identity_providers') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/idproviders">{{ $t('identity_providers') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('identity_providers_caption') }}</q-item-label>
               </q-item-section>
             </q-item>

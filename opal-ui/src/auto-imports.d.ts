@@ -71,6 +71,8 @@ declare global {
   const useFilesStore: typeof import('./stores/files')['useFilesStore']
   const useGroupsStore: typeof import('./stores/groups')['useGroupsStore']
   const useI18n: typeof import('vue-i18n')['useI18n']
+  const useIdentProfilesStore: typeof import('./stores/identity-providers')['useIdentProfilesStore']
+  const useIdentityProvidersStore: typeof import('./stores/identity-providers')['useIdentityProvidersStore']
   const useLink: typeof import('vue-router')['useLink']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
   const useProfileAclsStore: typeof import('./stores/profile-acls')['useProfileAclsStore']
@@ -165,6 +167,7 @@ declare module 'vue' {
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
+    readonly useIdentityProvidersStore: UnwrapRef<typeof import('./stores/identity-providers')['useIdentityProvidersStore']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProfileAclsStore: UnwrapRef<typeof import('./stores/profile-acls')['useProfileAclsStore']>
@@ -251,6 +254,7 @@ declare module '@vue/runtime-core' {
     readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
     readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
     readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
+    readonly useIdentityProvidersStore: UnwrapRef<typeof import('./stores/identity-providers')['useIdentityProvidersStore']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProfileAclsStore: UnwrapRef<typeof import('./stores/profile-acls')['useProfileAclsStore']>

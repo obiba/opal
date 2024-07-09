@@ -93,6 +93,7 @@
     "useDatashieldStore": true,
     "useAuthzStore": true,
     "useProfilesStore": true,
-    "useProfileAclsStore": true
+    "useProfileAclsStore": true,
+    "useIdentityProvidersStore": true
   }
 }
