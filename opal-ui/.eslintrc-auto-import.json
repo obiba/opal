@@ -94,6 +94,7 @@
     "useAuthzStore": true,
     "useProfilesStore": true,
     "useProfileAclsStore": true,
+    "useTokensStore": true,
     "useIdentityProvidersStore": true
   }
 }

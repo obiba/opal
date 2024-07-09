@@ -146,6 +146,10 @@ export default {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
     },
   },
+  access: {
+    READ: 'Read only',
+    READ_NO_VALUES: "Read only, without individual-level data"
+  },
   acls: {
     // global permissions
     PROJECT_ADD: {
@@ -288,6 +292,14 @@ export default {
     enable_2fa: 'Enable 2FA',
     disable_2fa: 'Disable 2FA',
     otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
+    all_projects: '[all]',
+    personal_access_tokens: 'Personal Access Tokens',
+  },
+  token_services: {
+    userR: 'R',
+    useDatashield: 'DataSHIELD',
+    useSQL: 'SQL',
+    sysAdmin: 'Administration',
   },
   validation: {
     user: {
@@ -498,6 +510,7 @@ export default {
   import_limit_hint: 'The maximum number of rows to import. If there is no limit or the limit is 0, all the records will be imported.',
   import_server: 'Import from server',
   import: 'Import',
+  inactive: 'Inactive',  
   incremental_import_hint: 'Import only new or updated data.',
   incremental_import: 'Incremental import',
   index: 'Index',
@@ -610,6 +623,7 @@ export default {
   select: 'Select',
   server: 'Server',
   servers: 'Servers',
+  services: 'Services',
   settings: 'Settings',
   signin_with: 'Sign in with {provider}',
   size: 'Size',
