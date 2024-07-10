@@ -199,7 +199,7 @@ onMounted(() => {
   usersStore.reset();
   groupsStore.reset();
   rStore.reset();
-  datashieldStore.reset();  
+  datashieldStore.reset();
   profilesStore.reset();
   identityProvidersStore.reset();
   tokensStore.reset();

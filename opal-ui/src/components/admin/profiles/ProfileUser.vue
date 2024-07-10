@@ -14,7 +14,13 @@
           </q-chip>
         </div>
         <div>
-          <q-btn no-caps v-if="isOpalUserRealm" color="primary" :label="$t('user_profile.update_password')" @click="onUpdatePassword"/>
+          <q-btn
+            no-caps
+            v-if="isOpalUserRealm"
+            color="primary"
+            :label="$t('user_profile.update_password')"
+            @click="onUpdatePassword"
+          />
           <q-chip v-else square class="q-py-lg q-ml-none" color="info" text-color="white" icon="warning">{{
             $t('user_profile.password_update_not_allowed', { realm: profile?.realm })
           }}</q-chip>
@@ -53,6 +59,7 @@
       <div class="q-gutter-sm">
         <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
       </div>
+      <p>{{ $t('user_profile.tokens_info') }}</p>
       <q-table
         flat
         :rows="tokens"
@@ -62,6 +69,37 @@
         :hide-pagination="tokens.length <= initialPagination.rowsPerPage"
         :loading="loading"
       >
+        <template v-slot:top-left>
+          <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
+            <q-list>
+              <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
+                <q-item-section>
+                  <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click.prevent="onAddRToken">
+                <q-item-section>
+                  <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
+                <q-item-section>
+                  <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
+                <q-item-section>
+                  <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </template>
+        <template v-slot:body-cell-projects="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+            {{ props.col.format(props.row.projects) }}
+          </q-td>
+        </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <span class="text-primary">{{ props.value }}</span>
@@ -81,16 +119,14 @@
           </q-td>
         </template>
         <template v-slot:body-cell-commands="props">
-          <!-- <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)"> -->
-          <q-td :props="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <q-chip dense class="q-ml-none" v-for="command in props.col.format(props.row.commands)" :key="command">
               {{ command }}
             </q-chip>
           </q-td>
         </template>
         <template v-slot:body-cell-services="props">
-          <!-- <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)"> -->
-          <q-td :props="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <q-chip
               dense
               class="q-ml-none"
@@ -99,6 +135,11 @@
             >
               {{ service }}
             </q-chip>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-inactive="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+            {{ props.col.format(props.row.inactiveAt) }}
           </q-td>
         </template>
       </q-table>
@@ -112,9 +153,8 @@
         @confirm="doDeleteToken"
       />
 
-      <pre>{{ showUpdatePassword }}</pre>
       <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
-
+      <add-token-dialog v-model="showAddToken" :type="tokenType" @update:modelValue="onTokenAdded"></add-token-dialog>
     </div>
   </div>
 </template>
@@ -132,19 +172,22 @@ import { notifyError } from 'src/utils/notify';
 import { getDateLabel } from 'src/utils/dates';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/admin/profiles/user/UpdatePasswordDialog.vue';
+import AddTokenDialog from 'src/components/admin/profiles/user/AddTokenDialog.vue';
 
 const loading = ref(false);
 const authStore = useAuthStore();
 const profilesStore = useProfilesStore();
 const tokensStore = useTokensStore();
-const profile = ref<SubjectProfileDto | null>(null);
-const tokens = ref<SubjectTokenDto[]>([]);
+const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
+const tokens = computed(() => tokensStore.tokens || ([] as SubjectTokenDto[]));
 const otpQrCode = ref<string | null>(null);
 const { t } = useI18n();
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const selectedToken = ref<SubjectTokenDto | null>(null);
 const showDelete = ref(false);
 const showUpdatePassword = ref(false);
+const showAddToken = ref(false);
+const tokenType = ref(TOKEN_TYPES.DATASHIELD);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -167,6 +210,9 @@ const columns = [
     label: t('projects'),
     align: 'left',
     field: 'projects',
+    format: (values: string[]) => (values || []).join(', '),
+    headerStyle: 'width: 40%; white-space: normal;',
+    style: 'width: 40%; white-space: normal;',
   },
   {
     name: 'access',
@@ -264,6 +310,32 @@ function onDeleteToken(token: SubjectTokenDto) {
   showDelete.value = true;
 }
 
+function onAddDataShieldToken() {
+  tokenType.value = TOKEN_TYPES.DATASHIELD;
+  showAddToken.value = true;
+}
+
+function onAddRToken() {
+  tokenType.value = TOKEN_TYPES.R;
+  showAddToken.value = true;
+}
+
+function onAddSqlToken() {
+  tokenType.value = TOKEN_TYPES.SQL;
+  showAddToken.value = true;
+}
+
+function onAddCustomToken() {
+  tokenType.value = TOKEN_TYPES.CUSTOM;
+  showAddToken.value = true;
+}
+
+function onTokenAdded() {
+  tokenType.value = TOKEN_TYPES.DATASHIELD;
+  showAddToken.value = false;
+  fetchData();
+}
+
 async function doDeleteToken() {
   showDelete.value = false;
   if (selectedToken.value === null) {
@@ -274,20 +346,15 @@ async function doDeleteToken() {
   selectedToken.value = null;
 
   try {
-    await tokensStore.deleteCurrentToken(toDelete.name);
+    await tokensStore.deleteToken(toDelete.name);
     await fetchData();
   } catch (err) {
     notifyError(err);
   }
 }
 
-function fetchData() {
-  return Promise.all([profilesStore.getCurrentProfile(), tokensStore.getCurrentTokens()])
-    .then(([profileDto, tokenDtos]) => {
-      profile.value = profileDto;
-      tokens.value = tokenDtos;
-    })
-    .catch(notifyError);
+async function fetchData() {
+  return Promise.all([profilesStore.initProfile(), tokensStore.initTokens()]).catch(notifyError);
 }
 
 onMounted(() => {
