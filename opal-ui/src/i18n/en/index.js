@@ -1,3 +1,5 @@
+import { add } from "date-fns";
+
 export default {
   '2fa': {
     name: '2FA',
@@ -307,11 +309,24 @@ export default {
     otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
     all_projects: '[all]',
     personal_access_tokens: 'Personal Access Tokens',
+    tokens_info: 'Personal access tokens can be created for use in scripts and on the command line (using R or Python client API). Be careful, these tokens are like passwords so you should guard them carefully. The advantage to using a token over putting your password into a script is that a token can be revoked, and you can generate lots of them. The scope of the access granted to the token can be restricted by projects, operations that can performed on these projects and system services. Note that this scope does not grant new permissions but rather alter the ones you have.',
+    add_token: 'Add Access Token',
+    add_datashield_token: 'Add DataSHIELD Token',
+    add_r_token: 'Add R Token',
+    add_sql_token: 'Add SQL Token',
+    add_custom_token: 'Add Custom Token',
     password_dialog: {
       old_password: 'Old Password',
       new_password: 'New Password',
       info: "{'The password must contain at least 8 characters, with at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=!) and no white space.'}",
-    }    
+    },
+    token_dialog: {
+      add_datashield_token: 'Add DataSHIELD Token',
+      add_r_token: 'Add R Token',
+      add_sql_token: 'Add SQL Token',
+      add_custom_token: 'Add Custom Token',
+      name_hint: 'The name or short description of this API access token so that you can remember its usage.',
+    }
   },
   token_services: {
     useR: 'R',
@@ -339,8 +354,11 @@ export default {
     },
     update_password: {
       old_password: 'Old password is required',
-      new_password: 'New password is required and must be at least 8 characters long',  
-    }
+      new_password: 'New password is required and must be at least 8 characters long',
+    },
+    token: {
+      name_required: 'Name is required',
+    },
   },
   main: {
     brand: 'Opal',
@@ -533,7 +551,7 @@ export default {
   import_limit_hint: 'The maximum number of rows to import. If there is no limit or the limit is 0, all the records will be imported.',
   import_server: 'Import from server',
   import: 'Import',
-  inactive: 'Inactive',  
+  inactive: 'Inactive',
   incremental_import_hint: 'Import only new or updated data.',
   incremental_import: 'Incremental import',
   index: 'Index',

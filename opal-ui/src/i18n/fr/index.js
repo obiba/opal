@@ -307,11 +307,12 @@ export default {
     otp_qr_core_info: 'Ouvrez l\'application mobile authenticator et scannez ce code QR pour initialiser votre générateur de code PIN :',
     all_projects: '[tous]',
     personal_access_tokens: 'Jetons d\'accès personnels',
+    tokens_info: 'Des jetons d\'accès personnels peuvent être créés pour être utilisés dans des scripts et sur la ligne de commande (à l\'aide de l\'API client R ou Python). Attention, ces jetons sont comme des mots de passe, il faut donc les garder précieusement. L\'avantage d\'utiliser un jeton plutôt que de mettre votre mot de passe dans un script est qu\'un jeton peut être révoqué et que vous pouvez en générer un grand nombre. L\'étendue de l\'accès accordé au jeton peut être limitée par les projets, les opérations qui peuvent être effectuées sur ces projets et les services du système. Notez que cette portée n\'accorde pas de nouvelles autorisations, mais modifie plutôt celles que vous avez.',
     password_dialog: {
       old_password: 'Ancien mot de passe',
       new_password: 'Nouveau mot de passe',
       info: "{'Le mot de passe doit comporter au moins 8 caractères, dont un chiffre, une lettre majuscule, une lettre minuscule, un caractère spécial (par exemple, @#$%^&+= !) et aucun espace blanc.'}",
-    }      
+    }
   },
   token_services: {
     useR: 'R',
@@ -339,7 +340,7 @@ export default {
     },
     update_password: {
       old_password: 'L\'ancien mot de passe est requis',
-      new_password: 'Un nouveau mot de passe est requis et doit comporter au moins 8 caractères.',  
+      new_password: 'Un nouveau mot de passe est requis et doit comporter au moins 8 caractères.',
     }
   },
   main: {
@@ -533,7 +534,7 @@ export default {
   import_limit_hint: "Le nombre maximum de lignes à importer. Si aucune limite n'est définie ou si la limite est 0, tous les enregistrements seront importés.",
   import_server: 'Importer depuis un serveur',
   import: 'Importer',
-  inactive: 'Inactif',  
+  inactive: 'Inactif',
   incremental_import_hint: 'Importer uniquement les données nouvelles ou mises à jour',
   incremental_import: 'Importation incrémentale',
   index: 'Index',

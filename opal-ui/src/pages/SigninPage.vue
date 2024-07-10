@@ -159,6 +159,7 @@ const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 const profilesStore = useProfilesStore();
 const identityProvidersStore = useIdentityProvidersStore();
+const tokensStore = useTokensStore();
 
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -198,9 +199,10 @@ onMounted(() => {
   usersStore.reset();
   groupsStore.reset();
   rStore.reset();
-  datashieldStore.reset();  
+  datashieldStore.reset();
   profilesStore.reset();
   identityProvidersStore.reset();
+  tokensStore.reset();
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });

@@ -27,7 +27,7 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function initProjects() {
     projects.value = [];
-    loadProjects();
+    return loadProjects();
   }
 
   async function initProject(name: string) {

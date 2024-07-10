@@ -8,6 +8,7 @@
       :columns="columns"
       row-key="name"
       :pagination="initialPagination"
+      :hide-pagination="users.length <= initialPagination.rowsPerPage"
       :loading="loading"
     >
       <template v-slot:top-left>
