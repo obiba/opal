@@ -27,6 +27,17 @@ export default {
     CERTIFICATE: 'Certificate',
     UNRECOGNIZED: 'Unrecognized',
   },
+  command_types: {
+    import: 'Import',
+    export: 'Export',
+    copy: 'Copy',
+    analyse: 'Analyse',
+    report: 'Report',
+    import_vcf: 'Import VCF',
+    export_vcf: 'Export VCF',
+    backup: 'Backup',
+    restore: 'Restore',
+  },
   db: {
     data_databases: 'Data databases',
     data_databases_info: 'Data databases are used to store data tables and variables.',
@@ -89,6 +100,7 @@ export default {
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
     PasswordTooWeak: 'Password is too weak',
+    OldPasswordMismatch: 'Old password is invalid',
     IllegalArgument: 'Invalid data',
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
@@ -147,6 +159,7 @@ export default {
     },
   },
   access: {
+    undefined: '[all]',
     READ: 'Read only',
     READ_NO_VALUES: "Read only, without individual-level data"
   },
@@ -294,9 +307,14 @@ export default {
     otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
     all_projects: '[all]',
     personal_access_tokens: 'Personal Access Tokens',
+    password_dialog: {
+      old_password: 'Old Password',
+      new_password: 'New Password',
+      info: "{'The password must contain at least 8 characters, with at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=!) and no white space.'}",
+    }    
   },
   token_services: {
-    userR: 'R',
+    useR: 'R',
     useDatashield: 'DataSHIELD',
     useSQL: 'SQL',
     sysAdmin: 'Administration',
@@ -319,6 +337,10 @@ export default {
       callback_url_format: 'Public URL must begin with "https://" or "http://"',
       scope_required: 'Scope is required',
     },
+    update_password: {
+      old_password: 'Old password is required',
+      new_password: 'New password is required and must be at least 8 characters long',  
+    }
   },
   main: {
     brand: 'Opal',
@@ -417,7 +439,8 @@ export default {
   delete_r_package_confirm: 'The deletion of an R package may not succeed if it is installed in a folder that is not writable. Are you sure you want to delete the R package "{name}"?',
   delete_r_workspaces_confirm: '- | Are you sure you want to delete this R workspace? | Are you sure you want to delete these {count} R workspaces?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
-  delete_permission_confirm: 'Are you sure you want to delete permission of {principal}?',
+  delete_token_confirm: 'Are you sure you want to delete token \'{token}\'?',
+  delete_permission_confirm: 'Are you sure you want to delete permission of \'{principal}\'?',
   delete_profile_acl_confirm: 'Are you sure you want to revoke the selected permission? | Are you sure you want to revoke these {count} permissions?',
   delete_profile_confirm: 'Are you sure you want to delete profile \'{profile}\'?',
   delete_profiles_confirm: 'Are you sure you want to delete  profile \'{profile}\'? | Are you sure you want to delete these {count} profiles?',

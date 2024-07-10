@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SubjectCredentialsDto } from 'src/models/Opal';
+import { PasswordDto, SubjectCredentialsDto } from 'src/models/Opal';
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref([] as SubjectCredentialsDto[]);
@@ -32,6 +32,10 @@ export const useUsersStore = defineStore('users', () => {
     return api.delete(`/system/subject-credential/${user.name}`).then(() => loadUsers());
   }
 
+  async function updateCurrentPassword(password: PasswordDto) {
+    return api.put('/system/subject-credential/_current/password', password);
+  }
+
   return {
     users,
     reset,
@@ -39,6 +43,7 @@ export const useUsersStore = defineStore('users', () => {
     addUser,
     updateUser,
     deleteUser,
+    updateCurrentPassword,
   };
 
 });
