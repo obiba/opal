@@ -14,7 +14,7 @@
           </q-chip>
         </div>
         <div>
-          <q-btn v-if="isOpalUserRealm" color="primary" :label="$t('update_password')" />
+          <q-btn no-caps v-if="isOpalUserRealm" color="primary" :label="$t('user_profile.update_password')" @click="onUpdatePassword"/>
           <q-chip v-else square class="q-py-lg q-ml-none" color="info" text-color="white" icon="warning">{{
             $t('user_profile.password_update_not_allowed', { realm: profile?.realm })
           }}</q-chip>
@@ -62,9 +62,59 @@
         :hide-pagination="tokens.length <= initialPagination.rowsPerPage"
         :loading="loading"
       >
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+            <span class="text-primary">{{ props.value }}</span>
+            <div class="float-right">
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('delete')"
+                :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+                class="q-ml-xs"
+                @click="onDeleteToken(props.row)"
+              />
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-commands="props">
+          <!-- <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)"> -->
+          <q-td :props="props">
+            <q-chip dense class="q-ml-none" v-for="command in props.col.format(props.row.commands)" :key="command">
+              {{ command }}
+            </q-chip>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-services="props">
+          <!-- <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)"> -->
+          <q-td :props="props">
+            <q-chip
+              dense
+              class="q-ml-none"
+              v-for="service in props.col.format(props.col.field(props.row))"
+              :key="service"
+            >
+              {{ service }}
+            </q-chip>
+          </q-td>
+        </template>
       </q-table>
       <!-- !PERSONAL ACCESS TOKENS-->
-      <pre>{{ tokens }}</pre>
+
+      <confirm-dialog
+        v-if="selectedToken"
+        v-model="showDelete"
+        :title="$t('delete')"
+        :text="$t('delete_token_confirm', { token: selectedToken.name })"
+        @confirm="doDeleteToken"
+      />
+
+      <pre>{{ showUpdatePassword }}</pre>
+      <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
+
     </div>
   </div>
 </template>
@@ -76,19 +126,25 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { onMounted, nextTick } from 'vue';
+import { onMounted } from 'vue';
 import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { getDateLabel } from 'src/utils/dates';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import UpdatePasswordDialog from 'src/components/admin/profiles/user/UpdatePasswordDialog.vue';
 
 const loading = ref(false);
+const authStore = useAuthStore();
 const profilesStore = useProfilesStore();
 const tokensStore = useTokensStore();
 const profile = ref<SubjectProfileDto | null>(null);
 const tokens = ref<SubjectTokenDto[]>([]);
 const otpQrCode = ref<string | null>(null);
 const { t } = useI18n();
+const toolsVisible = ref<{ [key: string]: boolean }>({});
+const selectedToken = ref<SubjectTokenDto | null>(null);
+const showDelete = ref(false);
+const showUpdatePassword = ref(false);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -104,13 +160,13 @@ const columns = [
     align: 'left',
     field: 'name',
     sortable: true,
-    style: 'width: 25%',
+    headerStyle: 'width: 25%;',
   },
   {
     name: 'projects',
     label: t('projects'),
     align: 'left',
-    field: 'groups',
+    field: 'projects',
   },
   {
     name: 'access',
@@ -122,21 +178,23 @@ const columns = [
   {
     name: 'commands',
     label: t('tasks'),
-    align: 'center  ',
+    align: 'left  ',
     field: 'commands',
-    format: (values: string[]) => (values || []).map((val) => t(`command_types.${val}`)),
+    format: (values: string[]) => (values || []).map((val) => t(`command_types.${val}`)).sort(),
+    headerStyle: 'width: 40%; white-space: normal;',
+    style: 'width: 40%; white-space: normal;',
   },
   {
     name: 'services',
     label: t('services'),
-    align: 'center  ',
+    align: 'left  ',
     field: (row: SubjectTokenDto) => getServicesField(row),
-    format: (values: string[]) => values.map((val) => t(`token_services.${val}`)),
+    format: (values: string[]) => values.map((val) => t(`token_services.${val}`)).sort(),
   },
   {
     name: 'inactive',
     label: t('inactive'),
-    align: 'center  ',
+    align: 'left  ',
     field: 'inactiveAt',
     format: (val: string) => getDateLabel(val),
   },
@@ -173,7 +231,7 @@ async function onToggleOtp() {
         otpQrCode.value = await profilesStore.enableCurrentOtp();
       }
 
-      await fetchProfile();
+      await fetchData();
     } catch (e) {
       notifyError(e);
     }
@@ -189,7 +247,41 @@ function getServicesField(row: SubjectTokenDto): string[] {
   return services;
 }
 
-function fetchProfile() {
+function onOverRow(row: SubjectTokenDto) {
+  toolsVisible.value[row.name] = true;
+}
+
+function onLeaveRow(row: SubjectTokenDto) {
+  toolsVisible.value[row.name] = false;
+}
+
+function onUpdatePassword() {
+  showUpdatePassword.value = true;
+}
+
+function onDeleteToken(token: SubjectTokenDto) {
+  selectedToken.value = token;
+  showDelete.value = true;
+}
+
+async function doDeleteToken() {
+  showDelete.value = false;
+  if (selectedToken.value === null) {
+    return;
+  }
+
+  const toDelete: SubjectTokenDto | null = selectedToken.value;
+  selectedToken.value = null;
+
+  try {
+    await tokensStore.deleteCurrentToken(toDelete.name);
+    await fetchData();
+  } catch (err) {
+    notifyError(err);
+  }
+}
+
+function fetchData() {
   return Promise.all([profilesStore.getCurrentProfile(), tokensStore.getCurrentTokens()])
     .then(([profileDto, tokenDtos]) => {
       profile.value = profileDto;
@@ -199,6 +291,6 @@ function fetchProfile() {
 }
 
 onMounted(() => {
-  fetchProfile();
+  fetchData();
 });
 </script>

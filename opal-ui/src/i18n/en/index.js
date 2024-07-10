@@ -338,7 +338,7 @@ export default {
     }
   },
   token_services: {
-    useR: 'R',
+    userR: 'R',
     useDatashield: 'DataSHIELD',
     useSQL: 'SQL',
     sysAdmin: 'Administration',
