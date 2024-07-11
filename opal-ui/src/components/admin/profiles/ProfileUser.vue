@@ -154,7 +154,7 @@
       />
 
       <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
-      <add-token-dialog v-model="showAddToken" :type="tokenType" @update:modelValue="onTokenAdded"></add-token-dialog>
+      <add-token-dialog v-model="showAddToken" :type="tokenType" :names="tokenNames" @update:modelValue="onTokenAdded"></add-token-dialog>
     </div>
   </div>
 </template>
@@ -246,6 +246,7 @@ const columns = [
   },
 ];
 
+const tokenNames = computed(() => tokens.value.map((t) => t.name));
 const otpIcon = computed(() => (profile.value?.otpEnabled ? 'lock_open' : 'lock'));
 const isOpalUserRealm = computed(() => profile.value && 'opal-user-realm' === profile.value.realm);
 const isAnOpalRealm = computed(
