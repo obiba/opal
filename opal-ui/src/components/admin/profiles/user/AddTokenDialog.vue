@@ -65,10 +65,12 @@ import { copyToClipboard, Notify } from 'quasar';
 import { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { generateToken } from 'src/utils/tokens';
+import { generateName } from 'src/utils/strings';
 
 interface DialogProps {
   modelValue: boolean;
   type: string;
+  names: string[];
 }
 
 const props = defineProps<DialogProps>();
@@ -101,6 +103,7 @@ watch(
       });
 
       token.value.token = generateToken();
+      token.value.name = generateName(props.type, props.names);
       updateTokenType();
       showDialog.value = value;
     }
