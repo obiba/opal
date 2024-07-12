@@ -16,6 +16,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin/profiles', component: () => import('pages/AdminProfilesPage.vue') },
       { path: '/admin/profile/:principal/permissions', component: () => import('pages/AdminProfileAclsPage.vue') },
       { path: '/admin/idproviders', component: () => import('pages/AdminIdentityProvidersPage.vue') },
+      { path: '/admin/taxonomies', component: () => import('pages/AdminTaxonomiesPage.vue') },
       { path: '/profile', component: () => import('pages/ProfilePage.vue') },
       { path: '/projects', component: () => import('pages/ProjectsPage.vue') },
       {
