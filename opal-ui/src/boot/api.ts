@@ -1,5 +1,5 @@
 import { boot } from 'quasar/wrappers';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -21,6 +21,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
+function requiresCode(response: AxiosResponse): boolean {
+  if (response && response.status === 401)
+    return response.headers['www-authenticate'] === 'X-Opal-TOTP';
+  return false;
+}
+
 api.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
@@ -32,6 +38,7 @@ api.interceptors.response.use(
     // Do something with response error
     if (
       error.response &&
+      !requiresCode(error.response) &&
       [401, 403, 404].includes(error.response.status) &&
       !SAFE_PATHS.includes(error.config.url)
     ) {

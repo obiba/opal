@@ -11,7 +11,7 @@
           "
         >
           <div class="col text-center">
-            <div class="text-h4 q-mb-lg">{{ $t(appName) }}</div>
+            <div class="text-h4 q-mb-lg">{{ appName }}</div>
           </div>
           <div v-if="!showForm" class="col text-center q-mt-md">
             <q-spinner color="primary" size="4em" :thickness="10" />
@@ -159,9 +159,10 @@ const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 const profilesStore = useProfilesStore();
 const identityProvidersStore = useIdentityProvidersStore();
+const tokensStore = useTokensStore();
 
 const { cookies } = useCookies();
-const { locale } = useI18n({ useScope: 'global' });
+const { locale, t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 const localeOptions = computed(() => {
   return locales.map((key) => ({
@@ -179,7 +180,7 @@ const withToken = ref(false);
 const showForm = ref(true);
 const authProviders = ref<AuthProviderDto[]>([]);
 
-const appName = computed(() => systemStore.generalConf.name || 'main.brand');
+const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
 
 const disableSubmit = computed(() => {
   return !username.value || !password.value;
@@ -201,6 +202,7 @@ onMounted(() => {
   datashieldStore.reset();
   profilesStore.reset();
   identityProvidersStore.reset();
+  tokensStore.reset();
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });

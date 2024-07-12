@@ -4,14 +4,21 @@ import { SubjectProfileDto } from 'src/models/Opal';
 
 export const useProfilesStore = defineStore('profiles', () => {
   const profiles = ref([] as SubjectProfileDto[]);
+  const profile = ref({} as SubjectProfileDto);
 
   function reset() {
     profiles.value = [];
+    profile.value = {} as SubjectProfileDto;
   }
 
   async function initProfiles() {
-    reset();
+    profiles.value = [];
     return loadProfiles();
+  }
+
+  async function initProfile(principal = '_current') {
+    profile.value = {} as SubjectProfileDto;
+    return loadProfile(principal);
   }
 
   async function loadProfiles() {
@@ -20,8 +27,10 @@ export const useProfilesStore = defineStore('profiles', () => {
     })
   }
 
-  async function getProfile(profile: SubjectProfileDto) {
-    return api.delete(`/system/subject-profile/${profile.principal}`);
+  async function loadProfile(principal: string) {
+    return api.get(`/system/subject-profile/${principal}`).then((response) => {
+      profile.value = response.data;
+    });
   }
 
   async function deleteProfile(profile: SubjectProfileDto) {
@@ -44,14 +53,25 @@ export const useProfilesStore = defineStore('profiles', () => {
     return api.delete(`/system/subject-profile/${profile.principal}/otp`);
   }
 
+  async function enableCurrentOtp(): Promise<string> {
+    return api.put('/system/subject-profile/_current/otp').then(response => response.data);
+  }
+
+  async function disableCurrentOtp() {
+    return api.delete('/system/subject-profile/_current/otp');
+  }
+
   return {
-    profiles: profiles,
+    profiles,
+    profile,
     reset,
-    initProfiles: initProfiles,
-    getProfile,
+    initProfiles,
+    initProfile,
     deleteProfile,
     deleteProfiles,
-    disableOtp
+    disableOtp,
+    enableCurrentOtp,
+    disableCurrentOtp
   };
 
 });

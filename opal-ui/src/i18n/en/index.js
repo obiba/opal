@@ -1,5 +1,8 @@
 export default {
-  '2fa': '2FA',
+  '2fa': {
+    name: '2FA',
+    title: 'Two-Factor Authentication',
+  },
   app_configuration: {
     name_hint: 'A name for the application that represents your organization.',
     public_url_hint: 'Public base URL of the server that will be used when sending notification emails on report generation.',
@@ -23,6 +26,17 @@ export default {
     PASSWORD: 'Password',
     CERTIFICATE: 'Certificate',
     UNRECOGNIZED: 'Unrecognized',
+  },
+  command_types: {
+    import: 'Import',
+    export: 'Export',
+    copy: 'Copy',
+    analyse: 'Analyse',
+    report: 'Report',
+    import_vcf: 'Import VCF',
+    export_vcf: 'Export VCF',
+    backup: 'Backup',
+    restore: 'Restore',
   },
   db: {
     data_databases: 'Data databases',
@@ -86,6 +100,7 @@ export default {
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
     PasswordTooWeak: 'Password is too weak',
+    OldPasswordMismatch: 'Old password is invalid',
     IllegalArgument: 'Invalid data',
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
@@ -93,6 +108,7 @@ export default {
     TableAlreadyExists: 'The table already exists',
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
     DuplicateIDProvider:'The identity provider already exists',
+    DuplicateSubjectToken:'The token already exists',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -142,6 +158,12 @@ export default {
     server: {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
     },
+  },
+  access: {
+    undefined: '',
+    DEFAULT: 'Default',
+    READ: 'Read only',
+    READ_NO_VALUES: "Read only, without individual-level data"
   },
   acls: {
     // global permissions
@@ -273,6 +295,59 @@ export default {
       description: 'VCF_STORE_VIEW',
     },
   },
+  user_profile: {
+    title: 'My profile',
+    groups: 'Your account belongs to the group | Your account belongs to the {count} groups',
+    password_update_not_allowed: 'Your account was defined in the user directory \'{realm}\'. Please contact your system administrator to change the password in this directory.',
+    '2fa_info': 'In addition to your username/password authentication, a dynamic password (also called one-time password) can be requested for an enhanced security of your account access. This one-time password is time-based (TOTP): to generate the temporary PIN code, install the Microsoft Authenticator app ({androidOtp} or {iosOtp}) or the FreeOTP+ app ({androidOnlyOtp}) on your mobile device, enable 2FA in your profile and follow instructions to initialise the authenticator app.',
+    android_otp: 'Android',
+    android_only_otp: 'Android only',
+    ios_otp: 'iOS',
+    update_password: 'Update Password',
+    enable_2fa: 'Enable 2FA',
+    disable_2fa: 'Disable 2FA',
+    otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
+    all_projects: 'All Projects',
+    personal_access_tokens: 'Personal Access Tokens',
+    tokens_info: 'Personal access tokens can be created for use in scripts and on the command line (using R or Python client API). Be careful, these tokens are like passwords so you should guard them carefully. The advantage to using a token over putting your password into a script is that a token can be revoked, and you can generate lots of them. The scope of the access granted to the token can be restricted by projects, operations that can performed on these projects and system services. Note that this scope does not grant new permissions but rather alter the ones you have.',
+    add_token: 'Add Access Token',
+    add_datashield_token: 'Add DataSHIELD Token',
+    add_r_token: 'Add R Token',
+    add_sql_token: 'Add SQL Token',
+    add_custom_token: 'Add Custom Token',
+    bookmarks_hint: 'Quickly access your favorite items by clicking on them.',
+    password_dialog: {
+      old_password: 'Old Password',
+      new_password: 'New Password',
+      info: "{'The password must contain at least 8 characters, with at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=!) and no white space.'}",
+    },
+    token_dialog: {
+      add_datashield_token: 'Add DataSHIELD Token',
+      add_r_token: 'Add R Token',
+      add_sql_token: 'Add SQL Token',
+      add_custom_token: 'Add Custom Token',
+      name_hint: 'The name or short description of this API access token so that you can remember its usage.',
+      project_access: 'Project Data Access',
+      project_access_hint: 'Data access can be limited to read operations. Limiting data access affects which project tasks can be performed and which services can be used.',
+      project_tasks: 'Project Tasks',
+      project_tasks_hint: 'Select the project tasks that can be performed using the token. By default none is available.',
+      project_administration: 'Project Administration',
+      project_administration_hint: 'Select the project administration operations that can be performed using the token. By default none is available.',
+      services: 'Services',
+      services_hint: 'Select the system services that can be performed using the token. By default none is available.',
+    }
+  },
+  token_services: {
+    useR: 'R',
+    useDatashield: 'DataSHIELD',
+    useSQL: 'SQL',
+    sysAdmin: 'Administration',
+  },
+  token_administration: {
+    createProject: 'Create',
+    updateProject: 'Update',
+    deleteProject: 'Delete',
+  },
   validation: {
     user: {
       name_required: 'Name is required',
@@ -290,6 +365,13 @@ export default {
       provider_url_format: 'Account login must begin with "https://" or "http://"',
       callback_url_format: 'Public URL must begin with "https://" or "http://"',
       scope_required: 'Scope is required',
+    },
+    update_password: {
+      old_password: 'Old password is required',
+      new_password: 'New password is required and must be at least 8 characters long',
+    },
+    token: {
+      name_required: 'Token name is required',
     },
   },
   main: {
@@ -310,6 +392,7 @@ export default {
     workspaces_info: 'R workspaces storage: each saved R/DataSHIELD workspace contains the session\'s image and files (if any). These can be restored any number of times on user demand.',
     workspaces: 'R workspaces',
   },
+  account: 'Account',
   actions: 'Actions',
   add_a_view: 'Add view',
   add_categories_range: 'Add category range',
@@ -388,7 +471,8 @@ export default {
   delete_r_package_confirm: 'The deletion of an R package may not succeed if it is installed in a folder that is not writable. Are you sure you want to delete the R package "{name}"?',
   delete_r_workspaces_confirm: '- | Are you sure you want to delete this R workspace? | Are you sure you want to delete these {count} R workspaces?',
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
-  delete_permission_confirm: 'Are you sure you want to delete permission of {principal}?',
+  delete_token_confirm: 'Are you sure you want to delete token \'{token}\'?',
+  delete_permission_confirm: 'Are you sure you want to delete permission of \'{principal}\'?',
   delete_profile_acl_confirm: 'Are you sure you want to revoke the selected permission? | Are you sure you want to revoke these {count} permissions?',
   delete_profile_confirm: 'Are you sure you want to delete profile \'{profile}\'?',
   delete_profiles_confirm: 'Are you sure you want to delete  profile \'{profile}\'? | Are you sure you want to delete these {count} profiles?',
@@ -481,6 +565,7 @@ export default {
   import_limit_hint: 'The maximum number of rows to import. If there is no limit or the limit is 0, all the records will be imported.',
   import_server: 'Import from server',
   import: 'Import',
+  inactive: 'Inactive',
   incremental_import_hint: 'Import only new or updated data.',
   incremental_import: 'Incremental import',
   index: 'Index',
@@ -593,6 +678,7 @@ export default {
   select: 'Select',
   server: 'Server',
   servers: 'Servers',
+  services: 'Services',
   settings: 'Settings',
   signin_with: 'Sign in with {provider}',
   size: 'Size',

@@ -13,7 +13,7 @@
 
         <q-toolbar-title>
           <q-btn flat to="/" no-caps size="lg">
-            {{ $t(appName) }}
+            {{ appName }}
           </q-btn>
         </q-toolbar-title>
 
@@ -102,7 +102,7 @@ const router = useRouter();
 const systemStore = useSystemStore();
 const authStore = useAuthStore();
 const { cookies } = useCookies();
-const { locale } = useI18n({ useScope: 'global' });
+const { locale, t } = useI18n({ useScope: 'global' });
 const localeOptions = computed(() => {
   return locales.map((key) => ({
     label: key.toUpperCase(),
@@ -122,7 +122,7 @@ onMounted(() => {
   });
 });
 
-const appName = computed(() => systemStore.generalConf.name || 'main.brand');
+const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
 
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : '?'

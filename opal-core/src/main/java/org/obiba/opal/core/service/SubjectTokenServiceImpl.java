@@ -86,7 +86,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Override
   public SubjectToken saveToken(SubjectToken token) {
     if (hasToken(token.getPrincipal(), token.getName())) {
-      throw new IllegalArgumentException("Subject token with name " + token.getName() + " already exists for principal " + token.getPrincipal());
+      throw new DuplicateSubjectTokenException(token);
     }
     if (!token.hasToken()) {
       throw new IllegalArgumentException("Access token is missing");
