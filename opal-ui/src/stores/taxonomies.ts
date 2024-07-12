@@ -6,9 +6,11 @@ import { Annotation } from 'src/components/models';
 
 export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomies = ref<TaxonomyDto[]>([]);
+  const summaries = ref<TaxonomyDto[]>([]);
 
   function reset() {
     taxonomies.value = [];
+    summaries.value = [];
   }
 
   function refresh() {
@@ -22,8 +24,20 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return Promise.resolve();
   }
 
+  async function initSummaries() {
+    summaries.value = [];
+    return loadSummaries();
+  }
+
   async function loadTaxonomies() {
     return api.get('/system/conf/taxonomies').then((response) => {
+      taxonomies.value = response.data;
+      return response;
+    });
+  }
+
+  async function loadSummaries() {
+    return api.get('/system/conf/taxonomies/summaries').then((response) => {
       taxonomies.value = response.data;
       return response;
     });
@@ -77,9 +91,11 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   return {
     taxonomies,
+    summaries,
     reset,
     refresh,
     init,
+    initSummaries,
     getLabel,
     getAnnotations,
   };
