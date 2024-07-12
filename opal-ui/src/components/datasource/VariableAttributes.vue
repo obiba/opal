@@ -21,7 +21,7 @@
             icon="edit"
             :title="$t('add')"
             size="sm"
-            @click="onShowAnnotate" />
+            @click="onShowAnnotate(undefined)" />
         </div>
         <q-list separator>
           <q-item v-for="annotation in taxonomiesStore.getAnnotations(rows, false)" :key="annotation.id" class="q-pl-none q-pr-none">
@@ -29,16 +29,33 @@
               <annotation-panel :annotation="annotation" header/>
             </q-item-section>
             <q-item-section v-if="datasourceStore.perms.variable?.canUpdate()" side>
-              <q-btn
-                rounded
-                dense
-                flat
-                size="sm"
-                color="secondary"
-                :title="$t('delete')"
-                icon="delete"
-                class="q-ml-xs"
-                @click="onShowDelete(annotation)" />
+              <table>
+                <tr>
+                  <td>
+                    <q-btn
+                      rounded
+                      dense
+                      flat
+                      size="sm"
+                      color="secondary"
+                      :title="$t('edit')"
+                      icon="edit"
+                      @click="onShowAnnotate(annotation)" />
+                  </td>
+                  <td>
+                    <q-btn
+                      rounded
+                      dense
+                      flat
+                      size="sm"
+                      color="secondary"
+                      :title="$t('delete')"
+                      icon="delete"
+                      class="q-ml-xs"
+                      @click="onShowDelete(annotation)" />
+                  </td>
+                </tr>
+              </table>
             </q-item-section>
           </q-item>
         </q-list>
@@ -85,7 +102,7 @@
     </q-tab-panels>
 
     <confirm-dialog v-model="showDeleteAnnotation" :title="$t('delete')" :text="$t('delete_annotation_confirm')" @confirm="onConfirmDeleteAnnotation" />
-    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="[datasourceStore.variable]"/>
+    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="[datasourceStore.variable]" :annotation="annotationSelected"/>
   </div>
 </template>
 
@@ -153,7 +170,8 @@ const columns = [
 
 const rows = computed(() => datasourceStore.variable?.attributes ? datasourceStore.variable.attributes : []);
 
-function onShowAnnotate() {
+function onShowAnnotate(annotation: Annotation | undefined) {
+  annotationSelected.value = annotation;
   showAnnotate.value = true;
 }
 

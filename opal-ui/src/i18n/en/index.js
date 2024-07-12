@@ -791,4 +791,7 @@ export default {
   more: 'More',
   less: 'Less',
   delete_annotation_confirm: 'Are you sure you want to delete this annotation?',
+  annotation_texts_hint: 'Annotate with free text. For human readibility, you can provide a different text for each language. For machine processing or not localized text, choose "default" language. Empty text will be ignored. Markdown text format is supported.',
+  preview: 'Preview',
+  markdown_guide: 'Markdown guide',
 };

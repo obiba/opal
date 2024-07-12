@@ -22,9 +22,10 @@
             dense
             emit-value
             map-options
-            class="q-mb-md"
+            class="q-mb-sm"
             @update:model-value="onTaxonomyChange"
           />
+          <div class="text-hint q-mb-md">{{  taxonomyHint }}</div>
           <q-select
             v-model="vocabularyName"
             :options="vocabulariesOptions"
@@ -32,27 +33,91 @@
             dense
             emit-value
             map-options
-            class="q-mb-md"
+            class="q-mb-sm"
             @update:model-value="onVocabularyChange"
           />
-          <q-select
-            v-if="termsOptions.length > 0"
-            v-model="termName"
-            :options="termsOptions"
-            :label="$t('term')"
-            dense
-            emit-value
-            map-options
-            class="q-mb-md"
-          />
-          <q-input
-            v-else
-            v-model="text"
-            :label="$t('text')"
-            type="textarea"
-            auto-grow
-            dense
-            class="q-mb-md"/>
+          <div class="text-hint q-mb-md">{{  vocabularyHint }}</div>
+          <div v-if="termsOptions.length > 0">
+            <q-select
+              v-model="termName"
+              :options="termsOptions"
+              :label="$t('term')"
+              dense
+              emit-value
+              map-options
+              class="q-mb-sm"
+            />
+            <div class="text-hint q-mb-md">{{  termHint }}</div>
+          </div>
+          <div v-else>
+            <q-tabs
+              v-model="tab"
+              dense
+              class="text-grey"
+              active-color="primary"
+              indicator-color="primary"
+              align="left"
+              narrow-indicator
+              no-caps
+            >
+              <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>
+            </q-tabs>
+            <q-separator />
+            <q-tab-panels v-model="tab">
+              <template v-for="loc in locales" :key="loc">
+                <q-tab-panel v-if="tab === loc" :name="loc">
+                  <q-input
+                    v-if="!previews[loc]"
+                    v-model="texts[loc]"
+                    :label="$t('text')"
+                    type="textarea"
+                    auto-grow
+                    dense/>
+                  <q-card v-if="previews[loc]" bordered flat>
+                    <q-card-section>
+                      <q-markdown :src="texts[loc]" no-heading-anchor-links />
+                    </q-card-section>
+                  </q-card>
+                  <div class=" q-mt-sm">
+                    <q-btn
+                      v-if="!previews[loc]"
+                      flat
+                      no-caps
+                      size="sm"
+                      :label="$t('preview')"
+                      color="secondary"
+                      class="q-pl-none q-pr-none"
+                      @click="previews[loc] = true"
+                    />
+                    <q-btn
+                      v-else
+                      flat
+                      no-caps
+                      size="sm"
+                      :label="$t('edit')"
+                      color="secondary"
+                      class="q-pl-none q-pr-none"
+                      @click="previews[loc] = false"
+                    />
+                    <q-btn
+                      flat
+                      no-caps
+                      size="sm"
+                      icon="help_outline"
+                      :label="$t('markdown_guide')"
+                      color="secondary"
+                      class="float-right q-pl-none q-pr-none"
+                      @click="onMarkdownGuide"
+                    />
+
+                  </div>
+                </q-tab-panel>
+              </template>
+            </q-tab-panels>
+            <div class="text-hint">
+              {{ $t('annotation_texts_hint') }}
+            </div>
+          </div>
         </q-card-section>
 
         <q-separator />
@@ -78,27 +143,48 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { TableDto, VariableDto } from 'src/models/Magma';
+import { Annotation } from 'src/components/models';
+import { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
+import { on } from 'events';
 
 interface DialogProps {
   modelValue: boolean;
   table: TableDto;
   variables: VariableDto[];
+  annotation?: Annotation;
 }
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
+const NO_LOCALE = 'default';
+
 const taxonomiesStore = useTaxonomiesStore();
 const datasourceStore = useDatasourceStore();
+const systemStore = useSystemStore();
 const { locale } = useI18n({ useScope: 'global' });
 
 const taxonomyName = ref<string>('');
 const vocabularyName = ref<string>('');
 const termName = ref<string>('');
-const text = ref<string>('');
+const texts = ref<{[key: string]: string | undefined}>({});
+const previews = ref<{[key: string]: boolean | undefined}>({});
+const tab = ref(NO_LOCALE);
+
+const locales = computed(() => {
+  const availableLocales = [...systemStore.generalConf.languages];
+  if (props.annotation) {
+    props.annotation.attributes.forEach((attr) => {
+      if (attr.locale && !availableLocales.includes(attr.locale)) {
+        availableLocales.push(attr.locale);
+      }
+    });
+  }
+  return [NO_LOCALE, ...availableLocales];
+});
 
 const taxonomiesOptions = computed(() => {
-  return taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies.map((item) => {
+  return taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies.map((item: TaxonomyDto) => {
     return {
       label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
       value: item.name,
@@ -107,14 +193,18 @@ const taxonomiesOptions = computed(() => {
 });
 
 const taxonomy = computed(() => {
-  return taxonomiesStore.taxonomies.find((taxo) => taxo.name === taxonomyName.value);
+  return taxonomiesStore.taxonomies.find((taxo: TaxonomyDto) => taxo.name === taxonomyName.value);
+});
+
+const taxonomyHint = computed(() => {
+  return taxonomy.value?.description? taxonomiesStore.getLabel(taxonomy.value.description, locale.value) : '';
 });
 
 const vocabulariesOptions = computed(() => {
   if (!taxonomy.value) {
     return [];
   }
-  return taxonomy.value.vocabularies ? taxonomy.value.vocabularies.map((item) => {
+  return taxonomy.value.vocabularies ? taxonomy.value.vocabularies.map((item: VocabularyDto) => {
     return {
       label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
       value: item.name,
@@ -123,14 +213,20 @@ const vocabulariesOptions = computed(() => {
 });
 
 const vocabulary = computed(() => {
-  return taxonomiesStore.taxonomies.find((taxo) => taxo.name === taxonomyName.value)?.vocabularies.find((voc) => voc.name === vocabularyName.value);
+  return taxonomiesStore.taxonomies
+    .find((taxo: TaxonomyDto) => taxo.name === taxonomyName.value)?.vocabularies
+    .find((voc: VocabularyDto) => voc.name === vocabularyName.value);
+});
+
+const vocabularyHint = computed(() => {
+  return vocabulary.value?.description? taxonomiesStore.getLabel(vocabulary.value.description, locale.value) : '';
 });
 
 const termsOptions = computed(() => {
   if (!vocabulary.value) {
     return [];
   }
-  return vocabulary.value.terms ? vocabulary.value.terms.map((item) => {
+  return vocabulary.value.terms ? vocabulary.value.terms.map((item: VocabularyDto) => {
     return {
       label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
       value: item.name,
@@ -138,13 +234,41 @@ const termsOptions = computed(() => {
   }) : [];
 });
 
+const term = computed(() => {
+  return taxonomiesStore.taxonomies
+    .find((taxo: TaxonomyDto) => taxo.name === taxonomyName.value)?.vocabularies
+    .find((voc: VocabularyDto) => voc.name === vocabularyName.value)?.terms?.
+    find((trm: TermDto) => trm.name === termName.value);
+});
+
+const termHint = computed(() => {
+  return term.value?.description? taxonomiesStore.getLabel(term.value.description, locale.value) : '';
+});
+
 const showDialog = ref(props.modelValue);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
     taxonomiesStore.init().then(() => {
-      taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0].name : '';
-      onTaxonomyChange();
+      if (props.annotation) {
+        taxonomyName.value = props.annotation.taxonomy.name;
+        onTaxonomyChange();
+        vocabularyName.value = props.annotation.vocabulary.name;
+        onVocabularyChange();
+        if (props.annotation.term) {
+          termName.value = props.annotation.term.name;
+        } else {
+          texts.value = {};
+          previews.value = {};
+          props.annotation.attributes.forEach((attr) => {
+            texts.value[attr.locale || NO_LOCALE] = attr.value;
+          });
+        }
+      } else {
+        taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0].name : '';
+        onTaxonomyChange();
+      }
+      tab.value = NO_LOCALE;
     });
   }
   showDialog.value = value;
@@ -165,14 +289,21 @@ function onVocabularyChange() {
   } else {
     termName.value = '';
   }
+  texts.value = {};
 }
 
 function onHide() {
   emit('update:modelValue', false);
 }
 
-function onApply() {
-  datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : text.value);
+async function onApply() {
+  if (props.annotation) {
+    await datasourceStore.deleteAnnotation(props.variables, props.annotation.taxonomy.name, props.annotation.vocabulary.name);
+  }
+  datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
 }
 
+function onMarkdownGuide() {
+  window.open('https://www.markdownguide.org/basic-syntax/', '_blank');
+}
 </script>

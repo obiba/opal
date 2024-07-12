@@ -36,35 +36,33 @@
     </q-card-section>
     <q-card-section v-if="annotation.term" class="q-pa-none q-mb-sm">
       <div class="text-bold">{{ taxonomiesStore.getLabel(annotation.term.title, locale) }}</div>
-      <div :style="maxWidth ? `max-width: ${maxWidth}` : ''">
+      <div v-if="!header || showDetails" :style="maxWidth ? `max-width: ${maxWidth}` : ''">
         <q-markdown :src="taxonomiesStore.getLabel(annotation.term.description, locale)" no-heading-anchor-links />
       </div>
     </q-card-section>
     <q-card-section v-else-if="annotation.attributes" class="q-pa-none q-mb-sm">
-      <div v-if="annotation.attributes.length > 1">
+      <div v-if="hasLocale">
         <q-tabs
-            v-model="tab"
-            dense
-            class="text-grey"
-            active-color="primary"
-            indicator-color="primary"
-            align="left"
-            narrow-indicator
-            no-caps
-          >
-            <q-tab v-for="attr in annotation.attributes" :key="attr.locale || NO_LOCALE" :name="attr.locale || NO_LOCALE" :label="attr.locale || NO_LOCALE"/>
+          v-model="tab"
+          dense
+          class="text-grey"
+          active-color="primary"
+          indicator-color="primary"
+          align="left"
+          narrow-indicator
+          no-caps
+        >
+          <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>
         </q-tabs>
-        <q-separator />
         <q-tab-panels v-model="tab">
-        <template v-for="attr in annotation.attributes" :key="attr.locale || NO_LOCALE">
-          <q-tab-panel v-if="tab === (attr.locale || NO_LOCALE)" :name="attr.locale || NO_LOCALE">
-            <q-card bordered flat>
-              <q-card-section>
-                <q-markdown :src="attr.value" no-heading-anchor-links />
-              </q-card-section>
-            </q-card>
-
-          </q-tab-panel>
+          <template v-for="loc in locales" :key="loc">
+            <q-tab-panel :name="loc" style="padding-top: 0;">
+              <q-card bordered flat>
+                <q-card-section>
+                  <q-markdown :src="getValue(loc)" no-heading-anchor-links />
+                </q-card-section>
+              </q-card>
+            </q-tab-panel>
           </template>
         </q-tab-panels>
       </div>
@@ -100,13 +98,14 @@ const NO_LOCALE = 'default';
 
 const props = defineProps<Props>();
 
-const tab = ref(NO_LOCALE);
-const showDetails = ref()
+const locales = computed(() => props.annotation.attributes?.map(attr => attr.locale || NO_LOCALE) || []);
 
-watch(() => props.annotation, () => {
-  if (props.annotation.attributes) {
-    tab.value = props.annotation.attributes[0].locale || NO_LOCALE;
-    showDetails.value = !!props.header;
-  }
-});
+const hasLocale = computed(() => locales.value.length > 1 || locales.value[0] !== NO_LOCALE);
+
+const tab = ref(locales.value[0] || NO_LOCALE);
+const showDetails = ref(false);
+
+function getValue(locale: string) {
+  return props.annotation.attributes?.find(attr => attr.locale === (locale === NO_LOCALE ? undefined : locale))?.value || '';
+}
 </script>
