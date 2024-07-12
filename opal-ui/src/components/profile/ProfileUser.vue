@@ -7,23 +7,23 @@
       <!-- Account -->
       <div class="text-h6">{{ $t('account') }}</div>
       <div>
-        <div>
-          <span>{{ $t('user_profile.groups', { count: (profile?.groups || []).length }) }}</span>
-          <q-chip v-for="group in profile?.groups" :key="group">
-            {{ group }}
-          </q-chip>
-        </div>
-        <div>
-          <q-btn
-            no-caps
-            v-if="isOpalUserRealm"
-            color="primary"
-            :label="$t('user_profile.update_password')"
-            @click="onUpdatePassword"
-          />
-          <q-chip v-else square class="q-py-lg q-ml-none" color="info" text-color="white" icon="warning">{{
-            $t('user_profile.password_update_not_allowed', { realm: profile?.realm })
-          }}</q-chip>
+        <span>{{ $t('user_profile.groups', { count: (profile?.groups || []).length }) }}</span>
+        <q-chip v-for="group in profile?.groups" :key="group">
+          {{ group }}
+        </q-chip>
+      </div>
+      <div class="q-mb-md">
+        <q-btn
+          no-caps
+          v-if="isOpalUserRealm"
+          color="primary"
+          size="sm"
+          :label="$t('user_profile.update_password')"
+          @click="onUpdatePassword"
+        />
+        <div v-else square class="box-info q-mt-md" text-color="white" icon="warning">
+          <q-icon name="info" size="1.2rem"/>
+          <span class="on-right">{{ $t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
         </div>
       </div>
       <!-- !Account -->
@@ -32,6 +32,7 @@
       <div v-if="isAnOpalRealm" class="q-gutter-sm">
         <div class="text-h6 q-mt-lg">{{ $t('2fa.title') }}</div>
         <div
+          class="text-help q-mb-md"
           v-html="
             $t('user_profile.2fa_info', {
               androidOtp: androidOtpUrl,
@@ -44,22 +45,27 @@
           no-caps
           :icon="otpIcon"
           color="primary"
+          size="sm"
           :label="profile?.otpEnabled ? $t('user_profile.disable_2fa') : $t('user_profile.enable_2fa')"
           @click="onToggleOtp"
         />
 
-        <div v-if="profile?.otpEnabled && otpQrCode" class="q-p-xl bg-blue-grey-1">
-          <p class="q-py-md q-ml-sm">{{ $t('user_profile.otp_qr_core_info') }}</p>
-          <div class="text-center q-pb-lg"><img :src="otpQrCode" alt="QR Code" /></div>
-        </div>
+        <q-card v-if="profile?.otpEnabled && otpQrCode" bordered flat class="bg-grey-3">
+          <q-card-section>
+            <div class="text-help">{{ $t('user_profile.otp_qr_core_info') }}</div>
+          </q-card-section>
+          <q-card-section>
+            <div class="text-center"><img :src="otpQrCode" alt="QR Code" /></div>
+          </q-card-section>
+        </q-card>
       </div>
       <!--!2FA -->
 
       <!-- PERSONAL ACCESS TOKENS-->
       <div class="q-gutter-sm">
         <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
-        <p>{{ $t('user_profile.tokens_info') }}</p>
-        <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
+        <div class="text-help q-mb-md">{{ $t('user_profile.tokens_info') }}</div>
+        <q-btn-dropdown no-caps color="primary" :title="$t('user_profile.add_token')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
               <q-item-section>
@@ -178,7 +184,7 @@
       <bookmarks-list>
         <template #title>
           <div class="text-h6 q-mt-lg">{{ $t('bookmarks') }}</div>
-          <p>{{ $t('user_profile.bookmarks_hint') }}</p>
+          <div class="text-help q-mb-md">{{ $t('user_profile.bookmarks_hint') }}</div>
         </template>
       </bookmarks-list>
 
