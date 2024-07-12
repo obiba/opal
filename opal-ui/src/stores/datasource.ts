@@ -349,6 +349,38 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  async function annotate(variables: VariableDto[], taxonomy: string, vocabulary: string, termOrText: string) {
+    const parentLink = variables[0].parentLink?.link;
+    if (!parentLink) return Promise.reject('No parent link found');
+
+    variables.forEach((v) => {
+      if (v.attributes === undefined) {
+        v.attributes = [];
+      }
+      const attr = v.attributes.find((a) => a.namespace === taxonomy && a.name === vocabulary);
+      if (attr) {
+        attr.value = termOrText;
+      } else {
+        v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrText });
+      }
+    });
+
+    return api.post(`${parentLink}/variables`, variables);
+  }
+
+  async function deleteAnnotation(variables: VariableDto[], taxonomy: string, vocabulary: string) {
+    const parentLink = variables[0].parentLink?.link;
+    if (!parentLink) return Promise.reject('No parent link found');
+
+    variables.forEach((v) => {
+      if (v.attributes !== undefined) {
+        v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+      }
+    });
+
+    return api.post(`${parentLink}/variables`, variables);
+  }
+
   return {
     datasource,
     tables,
@@ -383,6 +415,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     getAllTables,
     createView,
     getView,
+    annotate,
+    deleteAnnotation,
     reset,
   };
 });

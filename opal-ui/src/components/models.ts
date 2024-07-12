@@ -1,5 +1,6 @@
 import { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
-import { ViewDto, VariableListViewDto, DatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto } from 'src/models/Magma';
+import { ViewDto, VariableListViewDto, DatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto, AttributeDto } from 'src/models/Magma';
+import { TaxonomyDto, VocabularyDto, TermDto } from 'src/models/Opal';
 
 export interface StringMap {
   [key: string]: string | string[] | undefined;
@@ -62,4 +63,12 @@ export interface SchemaFormObject {
 
 export interface FormObject {
   [key: string]: boolean | number | string | FileObject | FormObject | undefined;
+}
+
+export interface Annotation {
+  id: string;
+  taxonomy: TaxonomyDto;
+  vocabulary: VocabularyDto;
+  term: TermDto;
+  attributes: AttributeDto[];
 }

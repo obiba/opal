@@ -72,7 +72,6 @@ declare global {
   const useFilesStore: typeof import('./stores/files')['useFilesStore']
   const useGroupsStore: typeof import('./stores/groups')['useGroupsStore']
   const useI18n: typeof import('vue-i18n')['useI18n']
-  const useIdentProfilesStore: typeof import('./stores/identity-providers')['useIdentProfilesStore']
   const useIdentityProvidersStore: typeof import('./stores/identity-providers')['useIdentityProvidersStore']
   const useLink: typeof import('vue-router')['useLink']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
@@ -182,6 +181,7 @@ declare module 'vue' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
+    readonly useTaxonomiesStore: UnwrapRef<typeof import('./stores/taxonomies')['useTaxonomiesStore']>
     readonly useTokensStore: UnwrapRef<typeof import('./stores/tokens')['useTokensStore']>
     readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
     readonly useUsersStore: UnwrapRef<typeof import('./stores/users')['useUsersStore']>
@@ -271,6 +271,7 @@ declare module '@vue/runtime-core' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
+    readonly useTaxonomiesStore: UnwrapRef<typeof import('./stores/taxonomies')['useTaxonomiesStore']>
     readonly useTokensStore: UnwrapRef<typeof import('./stores/tokens')['useTokensStore']>
     readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
     readonly useUsersStore: UnwrapRef<typeof import('./stores/users')['useUsersStore']>
