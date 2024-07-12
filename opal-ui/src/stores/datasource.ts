@@ -349,7 +349,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
-  async function annotate(variables: VariableDto[], taxonomy: string, vocabulary: string, termOrText: string) {
+  async function annotate(variables: VariableDto[], taxonomy: string, vocabulary: string, termOrTexts: string | { [key: string]: string | undefined}) {
     const parentLink = variables[0].parentLink?.link;
     if (!parentLink) return Promise.reject('No parent link found');
 
@@ -357,11 +357,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
       if (v.attributes === undefined) {
         v.attributes = [];
       }
-      const attr = v.attributes.find((a) => a.namespace === taxonomy && a.name === vocabulary);
-      if (attr) {
-        attr.value = termOrText;
+      // filter out existing annotations
+      v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+      // add new annotations
+      if (typeof termOrTexts === 'string') {
+        v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrTexts });
       } else {
-        v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrText });
+        for (const [key, value] of Object.entries(termOrTexts)) {
+          if (value !== undefined && value.trim() !== '') {
+            const locale = key === 'default' ? undefined : key;
+            v.attributes.push({ namespace: taxonomy, name: vocabulary, locale,  value });
+          }
+        }
       }
     });
 

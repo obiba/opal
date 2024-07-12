@@ -791,4 +791,7 @@ export default {
   more: 'Plus',
   less: 'Moins',
   delete_annotation_confirm: 'Êtes-vous sûr de vouloir supprimer cette annotation ?',
+  annotation_texts_hint: 'Annotez avec du texte libre. Pour une lisibilité humaine, vous pouvez fournir un texte différent dans chaque langue. Pour un traitement automatique ou un texte sans localisation, choisissez la langue "default". Le texte vide sera ignoré. Le format de texte Markdown est pris en charge.',
+  preview: 'Prévisualiser',
+  markdown_guide: 'Guide Markdown',
 };
