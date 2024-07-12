@@ -2,7 +2,7 @@
   <div>
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
+        <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('profile')" />
       </q-breadcrumbs>
     </q-toolbar>
