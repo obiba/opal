@@ -163,7 +163,7 @@ export default {
     undefined: '',
     DEFAULT: 'Default',
     READ: 'Read only',
-    READ_NO_VALUES: "Read only, without individual-level data"
+    READ_NO_VALUES: 'Read only, without individual-level data'
   },
   acls: {
     // global permissions
@@ -777,8 +777,18 @@ export default {
   add_to_view: 'Add to view',
   add_to_view_info: '- | One derived variable will be added/updated. | {count} derived variables will be added/updated.',
   annotate: 'Annotate',
+  annotate_info: '- | One variable will be annotated. | {count} variables will be annotated.',
+  annotations: 'Annotations',
   view_name: 'View name',
   view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated by merging derived variables with the existing ones.',
   derived_variables: 'Derived variables',
   derived_variables_hint: 'The derived variable name and value type can be different from the one of original variable.',
+  taxonomy: 'Taxonomy',
+  vocabulary: 'Vocabulary',
+  term: 'Term',
+  apply: 'Apply',
+  text: 'Text',
+  more: 'More',
+  less: 'Less',
+  delete_annotation_confirm: 'Are you sure you want to delete this annotation?',
 };

@@ -1,35 +1,91 @@
 <template>
   <div>
-    <q-table
-      ref="tableRef"
-      flat
-      :rows="rows"
-      :columns="columns"
-      row-key="name"
-      :pagination="initialPagination"
-      :loading="loading"
-    >
-      <template v-slot:top>
-        <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :title="$t('add')" size="sm">
-          <q-list> </q-list>
-        </q-btn-dropdown>
-      </template>
-      <template v-slot:body-cell-name="props">
-        <q-td :props="props">
-          <span class="text-primary">{{ props.value }}</span>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-locale="props">
-        <q-td :props="props">
-          <q-badge
-            v-if="props.value"
-            color="grey-6"
-            :label="props.value"
-            class="on-left"
-          />
-        </q-td>
-      </template>
-    </q-table>
+    <q-tabs
+        v-model="tab"
+        dense
+        class="text-grey"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        narrow-indicator
+      >
+        <q-tab name="annotations" :label="$t('annotations')" />
+        <q-tab name="raw" :label="$t('raw')" />
+    </q-tabs>
+    <q-separator />
+    <q-tab-panels v-model="tab">
+      <q-tab-panel name="annotations">
+        <div v-if="datasourceStore.perms.variable?.canUpdate()" class="q-mb-sm">
+          <q-btn
+            color="primary"
+            icon="edit"
+            :title="$t('add')"
+            size="sm"
+            @click="onShowAnnotate" />
+        </div>
+        <q-list separator>
+          <q-item v-for="annotation in taxonomiesStore.getAnnotations(rows, false)" :key="annotation.id" class="q-pl-none q-pr-none">
+            <q-item-section>
+              <annotation-panel :annotation="annotation" header/>
+            </q-item-section>
+            <q-item-section v-if="datasourceStore.perms.variable?.canUpdate()" side>
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('delete')"
+                icon="delete"
+                class="q-ml-xs"
+                @click="onShowDelete(annotation)" />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-tab-panel>
+      <q-tab-panel name="raw">
+        <q-table
+          ref="tableRef"
+          flat
+          :rows="rows"
+          :columns="columns"
+          row-key="name"
+          :pagination="initialPagination"
+          :loading="loading"
+        >
+          <template v-slot:top>
+            <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :title="$t('add')" size="sm">
+              <q-list>
+                <q-item clickable @click="onShowAnnotate">
+                  <q-item-section>
+                    <q-item-label>{{ $t('annotate') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </template>
+          <template v-slot:body-cell-name="props">
+            <q-td :props="props">
+              <span class="text-primary">{{ props.value }}</span>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-locale="props">
+            <q-td :props="props">
+              <q-badge
+                v-if="props.value"
+                color="grey-6"
+                :label="props.value"
+                class="on-left"
+              />
+            </q-td>
+          </template>
+        </q-table>
+
+      </q-tab-panel>
+    </q-tab-panels>
+
+    <confirm-dialog v-model="showDeleteAnnotation" :title="$t('delete')" :text="$t('delete_annotation_confirm')" @confirm="onConfirmDeleteAnnotation" />
+    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="[datasourceStore.variable]"/>
   </div>
 </template>
 
@@ -39,9 +95,16 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
+import { Annotation } from 'src/components/models';
+import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
+import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
+const taxonomiesStore = useTaxonomiesStore();
 
+const tab = ref('annotations');
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
@@ -49,6 +112,9 @@ const initialPagination = ref({
   page: 1,
   rowsPerPage: 20,
 });
+const showAnnotate = ref(false);
+const showDeleteAnnotation = ref(false);
+const annotationSelected = ref<Annotation>();
 
 const columns = [
   {
@@ -86,4 +152,19 @@ const columns = [
 ];
 
 const rows = computed(() => datasourceStore.variable?.attributes ? datasourceStore.variable.attributes : []);
+
+function onShowAnnotate() {
+  showAnnotate.value = true;
+}
+
+function onShowDelete(annotation: Annotation) {
+  annotationSelected.value = annotation;
+  showDeleteAnnotation.value = true;
+}
+
+function onConfirmDeleteAnnotation() {
+  if (annotationSelected.value) {
+    datasourceStore.deleteAnnotation([datasourceStore.variable], annotationSelected.value.taxonomy.name, annotationSelected.value.vocabulary.name);
+  }
+}
 </script>

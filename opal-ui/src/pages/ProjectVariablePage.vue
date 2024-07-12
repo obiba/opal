@@ -55,6 +55,18 @@
             />
             <span>{{ attr.value }}</span>
           </div>
+          <div
+            v-for="attr in getDescriptions(datasourceStore.variable?.attributes)"
+            :key="attr.locale"
+          >
+            <q-badge
+              v-if="attr.locale"
+              color="grey-6"
+              :label="attr.locale"
+              class="on-left"
+            />
+            <span class="text-italic">{{ attr.value }}</span>
+          </div>
         </q-card-section>
       </q-card>
       <q-tabs
@@ -148,11 +160,13 @@ import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import { VariableDto } from 'src/models/Magma';
-import { getLabels } from 'src/utils/attributes';
+import { getLabels, getDescriptions } from 'src/utils/attributes';
 
 const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
+const taxonomiesStore = useTaxonomiesStore();
+
 const showEdit = ref(false);
 const showAddToView = ref(false);
 const showDelete = ref(false);
@@ -218,6 +232,7 @@ function init() {
     tName.value,
     vName.value
   );
+  taxonomiesStore.init();
 }
 
 function onShowEditVariable() {

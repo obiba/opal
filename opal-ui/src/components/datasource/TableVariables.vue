@@ -51,9 +51,9 @@
               dense
               flat
               size="sm"
-              @click="onAddToView"
+              @click="onShowAddToView"
             />
-            <!-- <q-btn
+            <q-btn
               v-if="selected.length > 0"
               :label="$t('annotate')"
               icon="label"
@@ -61,8 +61,8 @@
               dense
               flat
               size="sm"
-              @click="onAnnotate"
-            /> -->
+              @click="onShowAnnotate"
+            />
           </div>
         </div>
       </template>
@@ -94,9 +94,24 @@
           <span>{{ getCategoryNames(props.value) }}</span>
         </q-td>
       </template>
+      <template v-slot:body-cell-annotations="props">
+        <q-td :props="props">
+
+          <template v-for="annotation in taxonomiesStore.getAnnotations(props.value, true)" :key="annotation.id">
+            <q-chip
+              class="on-left">
+              {{ taxonomiesStore.getLabel(annotation.term.title, locale) }}
+              <q-tooltip>
+                <annotation-panel :annotation="annotation" max-width="400px" class="bg-grey-7" />
+              </q-tooltip>
+            </q-chip>
+          </template>
+        </q-td>
+      </template>
     </q-table>
 
     <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
+    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" />
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
@@ -112,6 +127,8 @@ import { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
+import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
+import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
 import { notifyError } from 'src/utils/notify';
 import { getLabels } from 'src/utils/attributes';
 
@@ -119,6 +136,8 @@ const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
+const taxonomiesStore = useTaxonomiesStore();
+const { locale } = useI18n({ useScope: 'global' });
 
 const tableRef = ref();
 const loading = ref(false);
@@ -132,6 +151,7 @@ const selectedSingle = ref<VariableDto>({} as VariableDto);
 const showDeleteVariables = ref(false);
 const showEditVariable = ref(false);
 const showAddToView = ref(false);
+const showAnnotate = ref(false);
 
 const columns = [
   {
@@ -166,6 +186,13 @@ const columns = [
     align: 'left',
     field: 'categories',
   },
+  {
+    name: 'annotations',
+    required: true,
+    label: t('annotations'),
+    align: 'left',
+    field: 'attributes',
+  },
 ];
 
 const rows = computed(() => datasourceStore.variables);
@@ -193,6 +220,7 @@ function init() {
       loading.value = false;
       notifyError(err);
     });
+  taxonomiesStore.init();
 }
 
 function getCategoryNames(categories: CategoryDto[]) {
@@ -230,7 +258,11 @@ function onShowAddVariable() {
   showEditVariable.value = true;
 }
 
-function onAddToView() {
+function onShowAddToView() {
   showAddToView.value = true;
+}
+
+function onShowAnnotate() {
+  showAnnotate.value = true;
 }
 </script>

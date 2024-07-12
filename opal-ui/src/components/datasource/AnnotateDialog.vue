@@ -20,9 +20,39 @@
             :options="taxonomiesOptions"
             :label="$t('taxonomy')"
             dense
+            emit-value
+            map-options
+            class="q-mb-md"
+            @update:model-value="onTaxonomyChange"
           />
-
-          <pre>{{ taxonomiesStore.taxonomies }}</pre>
+          <q-select
+            v-model="vocabularyName"
+            :options="vocabulariesOptions"
+            :label="$t('vocabulary')"
+            dense
+            emit-value
+            map-options
+            class="q-mb-md"
+            @update:model-value="onVocabularyChange"
+          />
+          <q-select
+            v-if="termsOptions.length > 0"
+            v-model="termName"
+            :options="termsOptions"
+            :label="$t('term')"
+            dense
+            emit-value
+            map-options
+            class="q-mb-md"
+          />
+          <q-input
+            v-else
+            v-model="text"
+            :label="$t('text')"
+            type="textarea"
+            auto-grow
+            dense
+            class="q-mb-md"/>
         </q-card-section>
 
         <q-separator />
@@ -48,7 +78,6 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { TableDto, VariableDto } from 'src/models/Magma';
-import { LocaleTextDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
@@ -60,37 +89,90 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
 const taxonomiesStore = useTaxonomiesStore();
+const datasourceStore = useDatasourceStore();
+const { locale } = useI18n({ useScope: 'global' });
 
 const taxonomyName = ref<string>('');
+const vocabularyName = ref<string>('');
+const termName = ref<string>('');
+const text = ref<string>('');
 
 const taxonomiesOptions = computed(() => {
-  return taxonomiesStore.taxonomies.map((taxonomy) => {
+  return taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies.map((item) => {
     return {
-      label: taxonomy.title ? getLabel(taxonomy.title) : taxonomy.name,
-      value: taxonomy.name,
+      label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
+      value: item.name,
     };
-  });
+  }) : [];
+});
+
+const taxonomy = computed(() => {
+  return taxonomiesStore.taxonomies.find((taxo) => taxo.name === taxonomyName.value);
+});
+
+const vocabulariesOptions = computed(() => {
+  if (!taxonomy.value) {
+    return [];
+  }
+  return taxonomy.value.vocabularies ? taxonomy.value.vocabularies.map((item) => {
+    return {
+      label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
+      value: item.name,
+    };
+  }) : [];
+});
+
+const vocabulary = computed(() => {
+  return taxonomiesStore.taxonomies.find((taxo) => taxo.name === taxonomyName.value)?.vocabularies.find((voc) => voc.name === vocabularyName.value);
+});
+
+const termsOptions = computed(() => {
+  if (!vocabulary.value) {
+    return [];
+  }
+  return vocabulary.value.terms ? vocabulary.value.terms.map((item) => {
+    return {
+      label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
+      value: item.name,
+    };
+  }) : [];
 });
 
 const showDialog = ref(props.modelValue);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    taxonomiesStore.init();
+    taxonomiesStore.init().then(() => {
+      taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0].name : '';
+      onTaxonomyChange();
+    });
   }
   showDialog.value = value;
 });
+
+function onTaxonomyChange() {
+  if (taxonomy.value) {
+    vocabularyName.value = taxonomy.value.vocabularies ? taxonomy.value.vocabularies[0].name : '';
+  } else {
+    vocabularyName.value = '';
+  }
+  onVocabularyChange();
+}
+
+function onVocabularyChange() {
+  if (vocabulary.value) {
+    termName.value = vocabulary.value.terms ? vocabulary.value.terms[0].name : '';
+  } else {
+    termName.value = '';
+  }
+}
 
 function onHide() {
   emit('update:modelValue', false);
 }
 
 function onApply() {
-  console.log('apply');
+  datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : text.value);
 }
 
-function getLabel(messages: LocaleTextDto[]): string {
-  const msg = messages.find((t) => t.locale === 'en');
-  return msg ? msg.text : '';
-}
 </script>
