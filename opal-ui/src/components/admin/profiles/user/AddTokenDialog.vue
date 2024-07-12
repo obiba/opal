@@ -34,6 +34,7 @@
 
           <q-select
             v-model="token.projects"
+            v-if="projectsFilterOptions.length > 0"
             use-input
             use-chips
             multiple
@@ -210,6 +211,7 @@ function updateTokenType() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function filterProjects(val: string, update: any) {
   update(() => {
     if (val.trim().length === 0) {

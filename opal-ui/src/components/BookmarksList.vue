@@ -1,7 +1,8 @@
 <template>
   <div>
+    <slot name="title"></slot>
     <q-list separator>
-      <q-item-label header class="text-uppercase">{{ $t('bookmarks') }}</q-item-label>
+      <q-item-label header v-if="!$slots.title" class="text-uppercase">{{ $t('bookmarks') }}</q-item-label>
       <q-item
         v-for="item in items"
         :key="item.link"

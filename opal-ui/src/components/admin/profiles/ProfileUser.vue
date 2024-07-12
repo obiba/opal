@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="!loading">
     <div class="text-h5 q-mb-md">
       {{ $t('user_profile.title') }}
     </div>
@@ -58,107 +58,113 @@
       <!-- PERSONAL ACCESS TOKENS-->
       <div class="q-gutter-sm">
         <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
-      </div>
-      <p>{{ $t('user_profile.tokens_info') }}</p>
-      <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
-        <q-list>
-          <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
-            <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup @click.prevent="onAddRToken">
-            <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
-            <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
-            <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+        <p>{{ $t('user_profile.tokens_info') }}</p>
+        <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
+          <q-list>
+            <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
+              <q-item-section>
+                <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click.prevent="onAddRToken">
+              <q-item-section>
+                <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
+              <q-item-section>
+                <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
+              <q-item-section>
+                <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
 
-      <q-table
-        flat
-        :rows="tokens"
-        :columns="columns"
-        row-key="name"
-        :pagination="initialPagination"
-        :hide-pagination="tokens.length <= initialPagination.rowsPerPage"
-        :loading="loading"
-      >
-        <template v-slot:body-cell-projects="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            <q-chip
-              dense
-              square
-              class="q-ml-none"
-              v-for="project in props.col.format(props.row.projects)"
-              :key="project"
-            >
-              {{ project }}
-            </q-chip>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-name="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            <span class="text-primary">{{ props.value }}</span>
-            <div class="float-right">
-              <q-btn
-                rounded
+        <q-table
+          flat
+          :rows="tokens"
+          :columns="columns"
+          row-key="name"
+          :pagination="initialPagination"
+          :hide-pagination="tokens.length <= initialPagination.rowsPerPage"
+          :loading="loading"
+        >
+          <template v-slot:body-cell-projects="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <q-chip
                 dense
-                flat
-                size="sm"
-                color="secondary"
-                :title="$t('delete')"
-                :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
-                class="q-ml-xs"
-                @click="onDeleteToken(props.row)"
-              />
-            </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-commands="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            <q-chip dense class="q-ml-none" v-for="command in props.col.format(props.row.commands)" :key="command">
-              {{ command }}
-            </q-chip>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-services="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            <q-chip
-              dense
-              class="q-ml-none"
-              v-for="service in props.col.format(props.col.field(props.row))"
-              :key="service"
-            >
-              {{ service }}
-            </q-chip>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-administration="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            <q-chip dense class="q-ml-none" v-for="admin in props.col.format(props.col.field(props.row))" :key="admin">
-              {{ admin }}
-            </q-chip>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-inactive="props">
-          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            {{ props.col.format(props.row.inactiveAt) }}
-          </q-td>
-        </template>
-      </q-table>
+                square
+                class="q-ml-none"
+                v-for="project in props.col.format(props.row.projects)"
+                :key="project"
+              >
+                {{ project }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-name="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <span class="text-primary">{{ props.value }}</span>
+              <div class="float-right">
+                <q-btn
+                  rounded
+                  dense
+                  flat
+                  size="sm"
+                  color="secondary"
+                  :title="$t('delete')"
+                  :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+                  class="q-ml-xs"
+                  @click="onDeleteToken(props.row)"
+                />
+              </div>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-commands="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <q-chip dense class="q-ml-none" v-for="command in props.col.format(props.row.commands)" :key="command">
+                {{ command }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-services="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <q-chip
+                dense
+                class="q-ml-none"
+                v-for="service in props.col.format(props.col.field(props.row))"
+                :key="service"
+              >
+                {{ service }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-administration="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <q-chip
+                dense
+                class="q-ml-none"
+                v-for="admin in props.col.format(props.col.field(props.row))"
+                :key="admin"
+              >
+                {{ admin }}
+              </q-chip>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-inactive="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              {{ props.col.format(props.row.inactiveAt) }}
+            </q-td>
+          </template>
+        </q-table>
+      </div>
       <!-- !PERSONAL ACCESS TOKENS-->
 
+      <!-- Dialogs -->
       <confirm-dialog
         v-if="selectedToken"
         v-model="showDelete"
@@ -168,13 +174,22 @@
       />
 
       <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
-      
+
+      <bookmarks-list>
+        <template #title>
+          <div class="text-h6 q-mt-lg">{{ $t('bookmarks') }}</div>
+          <p>{{ $t('user_profile.bookmarks_hint') }}</p>
+        </template>
+      </bookmarks-list>
+
       <add-token-dialog
         v-model="showAddToken"
         :type="tokenType"
         :names="tokenNames"
         @update:modelValue="onTokenAdded"
       ></add-token-dialog>
+      <!-- !Dialogs -->
+
     </div>
   </div>
 </template>
@@ -193,6 +208,7 @@ import { getDateLabel } from 'src/utils/dates';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/admin/profiles/user/UpdatePasswordDialog.vue';
 import AddTokenDialog from 'src/components/admin/profiles/user/AddTokenDialog.vue';
+import BookmarksList from 'src/components/BookmarksList.vue';
 
 const loading = ref(false);
 const authStore = useAuthStore();
@@ -215,7 +231,7 @@ const initialPagination = ref({
   rowsPerPage: 10,
   minRowsForPagination: 10,
 });
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -271,7 +287,7 @@ const columns = [
     field: 'inactiveAt',
     format: (val: string) => getDateLabel(val),
   },
-];
+]);
 
 const tokenNames = computed(() => tokens.value.map((t) => t.name));
 const otpIcon = computed(() => (profile.value?.otpEnabled ? 'lock_open' : 'lock'));
@@ -295,22 +311,6 @@ const iosOtpUrl = computed(() => {
   )}</a>`;
 });
 
-async function onToggleOtp() {
-  if (profile.value) {
-    try {
-      if (profile.value.otpEnabled) {
-        otpQrCode.value = null;
-        await profilesStore.disableCurrentOtp();
-      } else {
-        otpQrCode.value = await profilesStore.enableCurrentOtp();
-      }
-
-      await fetchData();
-    } catch (e) {
-      notifyError(e);
-    }
-  }
-}
 
 function getServicesField(row: SubjectTokenDto): string[] {
   const services: string[] = [];
@@ -329,6 +329,46 @@ function getAdministrationField(row: SubjectTokenDto): string[] {
   return admin;
 }
 
+
+async function onToggleOtp() {
+  if (profile.value) {
+    try {
+      if (profile.value.otpEnabled) {
+        otpQrCode.value = null;
+        await profilesStore.disableCurrentOtp();
+      } else {
+        otpQrCode.value = await profilesStore.enableCurrentOtp();
+      }
+
+      await fetchData();
+    } catch (e) {
+      notifyError(e);
+    }
+  }
+}
+
+async function doDeleteToken() {
+  showDelete.value = false;
+  if (selectedToken.value === null) {
+    return;
+  }
+
+  const toDelete: SubjectTokenDto | null = selectedToken.value;
+  selectedToken.value = null;
+
+  try {
+    await tokensStore.deleteToken(toDelete.name);
+    await fetchData();
+  } catch (err) {
+    notifyError(err);
+  }
+}
+
+async function fetchData() {
+  return Promise.all([profilesStore.initProfile(), tokensStore.initTokens()]).catch(notifyError);
+}
+
+// Hook and event handlers
 function onOverRow(row: SubjectTokenDto) {
   toolsVisible.value[row.name] = true;
 }
@@ -372,28 +412,10 @@ function onTokenAdded() {
   fetchData();
 }
 
-async function doDeleteToken() {
-  showDelete.value = false;
-  if (selectedToken.value === null) {
-    return;
-  }
-
-  const toDelete: SubjectTokenDto | null = selectedToken.value;
-  selectedToken.value = null;
-
-  try {
-    await tokensStore.deleteToken(toDelete.name);
-    await fetchData();
-  } catch (err) {
-    notifyError(err);
-  }
-}
-
-async function fetchData() {
-  return Promise.all([profilesStore.initProfile(), tokensStore.initTokens()]).catch(notifyError);
-}
-
 onMounted(() => {
-  fetchData();
+  loading.value = true;
+  fetchData().then(() => {
+    loading.value = false;
+  });
 });
 </script>

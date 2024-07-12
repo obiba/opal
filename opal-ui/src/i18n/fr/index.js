@@ -29,7 +29,7 @@ export default {
   },
   command_types: {
     import: 'Importer',
-    export: 'Exportation',
+    export: 'exporter',
     copy: 'Copier',
     analyse: 'Analyser',
     report: 'Rapport',
@@ -108,6 +108,7 @@ export default {
     TableAlreadyExists: 'La table existe déjà',
     MagmaRuntimeException: 'Erreur de traitement des données: {0}',
     DuplicateIDProvider: "Le fournisseur d'identité existe déjà",
+    DuplicateSubjectToken:'Le jeton existe déjà',
   },
   identity_provider: {
     title: "Fournisseur d'identité",
@@ -160,6 +161,7 @@ export default {
   },
   access: {
     undefined: '[tous]',
+    DEFAULT: 'Défaut',
     READ: 'Lecture seulement',
     READ_NO_VALUES: 'Lecture seulement, sans données individuelles',
   },
@@ -308,10 +310,31 @@ export default {
     all_projects: '[tous]',
     personal_access_tokens: 'Jetons d\'accès personnels',
     tokens_info: 'Des jetons d\'accès personnels peuvent être créés pour être utilisés dans des scripts et sur la ligne de commande (à l\'aide de l\'API client R ou Python). Attention, ces jetons sont comme des mots de passe, il faut donc les garder précieusement. L\'avantage d\'utiliser un jeton plutôt que de mettre votre mot de passe dans un script est qu\'un jeton peut être révoqué et que vous pouvez en générer un grand nombre. L\'étendue de l\'accès accordé au jeton peut être limitée par les projets, les opérations qui peuvent être effectuées sur ces projets et les services du système. Notez que cette portée n\'accorde pas de nouvelles autorisations, mais modifie plutôt celles que vous avez.',
+    add_token: 'Ajouter un jeton d\'accès',
+    add_datashield_token: 'Ajouter un jeton DataSHIELD',
+    add_r_token: 'Ajouter un jeton R',
+    add_sql_token: 'Ajouter un jeton SQL',
+    add_custom_token: 'Ajouter un jeton personnalisé',
+    bookmarks_hint: 'Accédez rapidement à vos articles préférés en cliquant dessus.',
     password_dialog: {
       old_password: 'Ancien mot de passe',
       new_password: 'Nouveau mot de passe',
       info: "{'Le mot de passe doit comporter au moins 8 caractères, dont un chiffre, une lettre majuscule, une lettre minuscule, un caractère spécial (par exemple, @#$%^&+= !) et aucun espace blanc.'}",
+    },
+    token_dialog: {
+      add_datashield_token: 'Ajouter un token DataSHIELD',
+      add_r_token: 'Ajouter un jeton R',
+      add_sql_token: 'Ajouter un jeton SQL',
+      add_custom_token: 'Ajouter un jeton personnalisé',
+      name_hint: 'Le nom ou une courte description de ce jeton d\'accès à l\'API afin que vous puissiez vous souvenir de son utilisation.',
+      project_access: 'Accès aux données du projet',
+      project_access_hint: 'L\'accès aux données peut être limité aux opérations de lecture. La limitation de l\'accès aux données affecte les tâches du projet qui peuvent être exécutées et les services qui peuvent être utilisés.',
+      project_tasks: 'Tâches du projet',
+      project_tasks_hint: 'Sélectionnez les tâches du projet qui peuvent être effectuées à l\'aide du jeton. Par défaut, aucune n\'est disponible.',
+      project_administration: 'Administration du projet',
+      project_administration_hint: 'Sélectionnez les opérations d\'administration du projet qui peuvent être effectuées à l\'aide du jeton. Par défaut, aucune n\'est disponible.',
+      services: 'Services',
+      services_hint: 'Sélectionnez les services du système qui peuvent être exécutés à l\'aide du jeton. Par défaut, aucun service n\'est disponible.',
     }
   },
   token_services: {
@@ -319,6 +342,11 @@ export default {
     useDatashield: 'DataSHIELD',
     useSQL: 'SQL',
     sysAdmin: 'Administration',
+  },
+  token_administration : {
+    createProject : 'Créer',
+    updateProject : 'Mise à jour',
+    deleteProject : 'Supprimer',
   },
   validation: {
     user: {
@@ -341,7 +369,10 @@ export default {
     update_password: {
       old_password: 'L\'ancien mot de passe est requis',
       new_password: 'Un nouveau mot de passe est requis et doit comporter au moins 8 caractères.',
-    }
+    },
+    token : {
+      name_required : 'Le nom du jeton est obligatoire',
+    },
   },
   main: {
     brand: 'Opal',
@@ -480,7 +511,7 @@ export default {
   entity_type: "Type d'entité",
   export_data: 'Exporter les données',
   export_file: 'Exporter vers un fichier',
-  export_tables_task_created: "Tâche d'exportation de tables créée avec l'identifiant [ {id} ]",
+  export_tables_task_created: "Tâche d'exporter de tables créée avec l'identifiant [ {id} ]",
   export_tables_text: 'Aucune table à exporter | Une table sera exportée | {count} tables seront exportées',
   export: 'Exporter',
   extract: 'Extraire',

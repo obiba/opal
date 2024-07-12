@@ -1,5 +1,3 @@
-import { add } from "date-fns";
-
 export default {
   '2fa': {
     name: '2FA',
@@ -317,6 +315,7 @@ export default {
     add_r_token: 'Add R Token',
     add_sql_token: 'Add SQL Token',
     add_custom_token: 'Add Custom Token',
+    bookmarks_hint: 'Quickly access your favorite items by clicking on them.',
     password_dialog: {
       old_password: 'Old Password',
       new_password: 'New Password',
@@ -372,7 +371,7 @@ export default {
       new_password: 'New password is required and must be at least 8 characters long',
     },
     token: {
-      name_required: 'Name is required',
+      name_required: 'Token name is required',
     },
   },
   main: {
