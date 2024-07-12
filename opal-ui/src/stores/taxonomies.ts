@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { TaxonomyDto, LocaleTextDto } from 'src/models/Opal';
+import { TaxonomyDto, TaxonomiesDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto } from 'src/models/Opal';
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 
 export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomies = ref<TaxonomyDto[]>([]);
-  const summaries = ref<TaxonomyDto[]>([]);
+  const summaries = ref<TaxonomiesDto_TaxonomySummaryDto[]>([]);
 
   function reset() {
     taxonomies.value = [];
@@ -18,6 +18,11 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     loadTaxonomies();
   }
 
+  function refreshSummaries() {
+    summaries.value = [];
+    loadSummaries();
+  }
+
   async function init() {
     if (taxonomies.value.length === 0)
       return loadTaxonomies();
@@ -25,8 +30,9 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   async function initSummaries() {
-    summaries.value = [];
-    return loadSummaries();
+    if (taxonomies.value.length === 0)
+      return loadSummaries();
+    return Promise.resolve();
   }
 
   async function loadTaxonomies() {
@@ -38,7 +44,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function loadSummaries() {
     return api.get('/system/conf/taxonomies/summaries').then((response) => {
-      taxonomies.value = response.data;
+      summaries.value = response.data.summaries || [];
       return response;
     });
   }
@@ -94,6 +100,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     summaries,
     reset,
     refresh,
+    refreshSummaries,
     init,
     initSummaries,
     getLabel,

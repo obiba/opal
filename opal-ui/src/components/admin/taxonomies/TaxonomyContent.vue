@@ -1,10 +1,10 @@
 <template>
-    <span>Hello there!</span>
+  <pre>Taxonomy content</pre>
 </template>
 
 <script lang="ts">
 export default defineComponent({
-  name: 'TaxonomiesList',
+  name: 'TaxonomyContent',
 });
 </script>
 
@@ -18,4 +18,7 @@ const { t } = useI18n();
 const loading = ref(false);
 
 
+onMounted(() => {
+  loading.value = true;
+});
 </script>

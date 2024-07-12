@@ -71,11 +71,15 @@
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+
       <div v-if="projectPage">
         <project-drawer />
       </div>
       <div v-else-if="filesPage">
         <files-drawer />
+      </div>
+      <div v-else-if="taxonomiesPage">
+        <taxonomies-drawer />
       </div>
       <div v-else>
         <main-drawer />
@@ -96,6 +100,7 @@ import { ref } from 'vue';
 import MainDrawer from 'src/components/MainDrawer.vue';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
+import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
 import { computed } from 'vue';
 
 const router = useRouter();
@@ -127,6 +132,10 @@ const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : '?'
 );
+
+const taxonomiesPage = computed(() => {
+  return router.currentRoute.value.path.startsWith('/admin/taxonomies');
+});
 
 const projectPage = computed(() => {
   return router.currentRoute.value.path.startsWith('/project/');
