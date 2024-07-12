@@ -110,6 +110,7 @@ export default {
     TableAlreadyExists: 'The table already exists',
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
     DuplicateIDProvider:'The identity provider already exists',
+    DuplicateSubjectToken:'The token already exists',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -161,7 +162,8 @@ export default {
     },
   },
   access: {
-    undefined: '[all]',
+    undefined: '',
+    DEFAULT: 'Default',
     READ: 'Read only',
     READ_NO_VALUES: "Read only, without individual-level data"
   },
@@ -307,7 +309,7 @@ export default {
     enable_2fa: 'Enable 2FA',
     disable_2fa: 'Disable 2FA',
     otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
-    all_projects: '[all]',
+    all_projects: 'All Projects',
     personal_access_tokens: 'Personal Access Tokens',
     tokens_info: 'Personal access tokens can be created for use in scripts and on the command line (using R or Python client API). Be careful, these tokens are like passwords so you should guard them carefully. The advantage to using a token over putting your password into a script is that a token can be revoked, and you can generate lots of them. The scope of the access granted to the token can be restricted by projects, operations that can performed on these projects and system services. Note that this scope does not grant new permissions but rather alter the ones you have.',
     add_token: 'Add Access Token',
@@ -326,6 +328,14 @@ export default {
       add_sql_token: 'Add SQL Token',
       add_custom_token: 'Add Custom Token',
       name_hint: 'The name or short description of this API access token so that you can remember its usage.',
+      project_access: 'Project Data Access',
+      project_access_hint: 'Data access can be limited to read operations. Limiting data access affects which project tasks can be performed and which services can be used.',
+      project_tasks: 'Project Tasks',
+      project_tasks_hint: 'Select the project tasks that can be performed using the token. By default none is available.',
+      project_administration: 'Project Administration',
+      project_administration_hint: 'Select the project administration operations that can be performed using the token. By default none is available.',
+      services: 'Services',
+      services_hint: 'Select the system services that can be performed using the token. By default none is available.',
     }
   },
   token_services: {
@@ -333,6 +343,11 @@ export default {
     useDatashield: 'DataSHIELD',
     useSQL: 'SQL',
     sysAdmin: 'Administration',
+  },
+  token_administration: {
+    createProject: 'Create',
+    updateProject: 'Update',
+    deleteProject: 'Delete',
   },
   validation: {
     user: {

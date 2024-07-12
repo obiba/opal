@@ -60,6 +60,31 @@
         <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
       </div>
       <p>{{ $t('user_profile.tokens_info') }}</p>
+      <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
+        <q-list>
+          <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddRToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+
       <q-table
         flat
         :rows="tokens"
@@ -69,35 +94,17 @@
         :hide-pagination="tokens.length <= initialPagination.rowsPerPage"
         :loading="loading"
       >
-        <template v-slot:top-left>
-          <q-btn-dropdown no-caps color="primary" :label="$t('user_profile.add_token')" icon="add">
-            <q-list>
-              <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
-                <q-item-section>
-                  <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click.prevent="onAddRToken">
-                <q-item-section>
-                  <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
-                <q-item-section>
-                  <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
-                <q-item-section>
-                  <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        </template>
         <template v-slot:body-cell-projects="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-            {{ props.col.format(props.row.projects) }}
+            <q-chip
+              dense
+              square
+              class="q-ml-none"
+              v-for="project in props.col.format(props.row.projects)"
+              :key="project"
+            >
+              {{ project }}
+            </q-chip>
           </q-td>
         </template>
         <template v-slot:body-cell-name="props">
@@ -137,6 +144,13 @@
             </q-chip>
           </q-td>
         </template>
+        <template v-slot:body-cell-administration="props">
+          <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+            <q-chip dense class="q-ml-none" v-for="admin in props.col.format(props.col.field(props.row))" :key="admin">
+              {{ admin }}
+            </q-chip>
+          </q-td>
+        </template>
         <template v-slot:body-cell-inactive="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             {{ props.col.format(props.row.inactiveAt) }}
@@ -154,7 +168,13 @@
       />
 
       <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
-      <add-token-dialog v-model="showAddToken" :type="tokenType" :names="tokenNames" @update:modelValue="onTokenAdded"></add-token-dialog>
+      
+      <add-token-dialog
+        v-model="showAddToken"
+        :type="tokenType"
+        :names="tokenNames"
+        @update:modelValue="onTokenAdded"
+      ></add-token-dialog>
     </div>
   </div>
 </template>
@@ -210,7 +230,7 @@ const columns = [
     label: t('projects'),
     align: 'left',
     field: 'projects',
-    format: (values: string[]) => (values || []).join(', '),
+    format: (values: string[]) => ((values || []).length > 0 ? values : [t('user_profile.all_projects')]),
     headerStyle: 'width: 40%; white-space: normal;',
     style: 'width: 40%; white-space: normal;',
   },
@@ -236,6 +256,13 @@ const columns = [
     align: 'left  ',
     field: (row: SubjectTokenDto) => getServicesField(row),
     format: (values: string[]) => values.map((val) => t(`token_services.${val}`)).sort(),
+  },
+  {
+    name: 'administration',
+    label: t('administration'),
+    align: 'left  ',
+    field: (row: SubjectTokenDto) => getAdministrationField(row),
+    format: (values: string[]) => values.map((val) => t(`token_administration.${val}`)).sort(),
   },
   {
     name: 'inactive',
@@ -292,6 +319,14 @@ function getServicesField(row: SubjectTokenDto): string[] {
   if (row.useSQL) services.push('useSQL');
   if (row.sysAdmin) services.push('sysAdmin');
   return services;
+}
+
+function getAdministrationField(row: SubjectTokenDto): string[] {
+  const admin: string[] = [];
+  if (row.createProject) admin.push('createProject');
+  if (row.updateProject) admin.push('updateProject');
+  if (row.deleteProject) admin.push('deleteProject');
+  return admin;
 }
 
 function onOverRow(row: SubjectTokenDto) {
