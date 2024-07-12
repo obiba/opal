@@ -96,6 +96,7 @@
     "useProfileAclsStore": true,
     "useTokensStore": true,
     "useIdentityProvidersStore": true,
-    "TOKEN_TYPES": true
+    "TOKEN_TYPES": true,
+    "useTaxonomiesStore": true
   }
 }

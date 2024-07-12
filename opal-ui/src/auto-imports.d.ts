@@ -84,6 +84,7 @@ declare global {
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
   const useSystemStore: typeof import('./stores/system')['useSystemStore']
+  const useTaxonomiesStore: typeof import('./stores/taxonomies')['useTaxonomiesStore']
   const useTokensStore: typeof import('./stores/tokens')['useTokensStore']
   const useTransientDatasourceStore: typeof import('./stores/transient-datasource')['useTransientDatasourceStore']
   const useUsersGroupsStore: typeof import('./stores/users-groups')['useUsersGroupsStore']

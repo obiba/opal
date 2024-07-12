@@ -206,8 +206,8 @@ import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { getDateLabel } from 'src/utils/dates';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import UpdatePasswordDialog from 'src/components/admin/profiles/user/UpdatePasswordDialog.vue';
-import AddTokenDialog from 'src/components/admin/profiles/user/AddTokenDialog.vue';
+import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';
+import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
 import BookmarksList from 'src/components/BookmarksList.vue';
 
 const loading = ref(false);
