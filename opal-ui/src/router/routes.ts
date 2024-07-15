@@ -17,8 +17,16 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin/profile/:principal/permissions', component: () => import('pages/AdminProfileAclsPage.vue') },
       { path: '/admin/idproviders', component: () => import('pages/AdminIdentityProvidersPage.vue') },
       {
-        path: '/admin/taxonomies', component: () => import('pages/AdminTaxonomiesPage.vue'),
-        alias: '/admin/taxonomies/:name',
+        path: '/admin/taxonomies',
+        component: () => import('pages/AdminTaxonomiesPage.vue'),
+      },
+      {
+        path: '/admin/taxonomies/:name',
+        component: () => import('pages/AdminTaxonomyPage.vue'),
+      },
+      {
+        path: '/admin/taxonomies/:name/:vocabulary',
+        component: () => import('pages/AdminTaxonomyPage.vue'),
       },
       { path: '/profile', component: () => import('pages/ProfilePage.vue') },
       { path: '/projects', component: () => import('pages/ProjectsPage.vue') },

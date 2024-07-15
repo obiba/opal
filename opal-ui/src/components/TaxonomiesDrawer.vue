@@ -8,7 +8,7 @@
         v-for="summary in summaries"
         :active="name === summary.name"
         :key="summary.name"
-        :to="`/admin/taxonomy/${summary.name}`"
+        :to="`/admin/taxonomies/${summary.name}`"
       >
         <q-item-section avatar>
           <q-icon name="sell" />
@@ -32,8 +32,6 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
-import { notifyError } from 'src/utils/notify';
 import { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto } from 'src/models/Opal';
 
 const route = useRoute();
@@ -41,7 +39,4 @@ const taxonomiesStore = useTaxonomiesStore();
 const summaries = computed<TaxonomySummariesDto[]>(() => taxonomiesStore.summaries);
 const name = computed(() => route.params.name as string);
 
-onMounted(() => {
-  taxonomiesStore.initSummaries().catch(notifyError);
-});
 </script>

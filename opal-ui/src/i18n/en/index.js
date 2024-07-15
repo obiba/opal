@@ -482,6 +482,7 @@ export default {
   delete: 'Delete',
   density: 'Density',
   derivation_script: 'Derivation script',
+  description: 'Description',
   descriptive_statistics: 'Descriptive statistics',
   destination_folder: 'Destination folder',
   dictionary: 'Dictionary',

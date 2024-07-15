@@ -1,16 +1,20 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { TaxonomyDto, TaxonomiesDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto } from 'src/models/Opal';
+import { TaxonomyDto, TaxonomiesDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto } from 'src/models/Opal';
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 
 export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomies = ref<TaxonomyDto[]>([]);
+  const taxonomy = ref<TaxonomyDto>({} as TaxonomyDto);
+  const vocabulary = ref<VocabularyDto | null>(null);
   const summaries = ref<TaxonomiesDto_TaxonomySummaryDto[]>([]);
 
   function reset() {
     taxonomies.value = [];
     summaries.value = [];
+    taxonomy.value = {} as TaxonomyDto;
+    vocabulary.value = null;
   }
 
   function refresh() {
@@ -30,8 +34,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   async function initSummaries() {
-    if (taxonomies.value.length === 0)
+    if (summaries.value.length === 0) {
+      console.log('##### initSummaries');
       return loadSummaries();
+    }
     return Promise.resolve();
   }
 
@@ -45,6 +51,23 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   async function loadSummaries() {
     return api.get('/system/conf/taxonomies/summaries').then((response) => {
       summaries.value = response.data.summaries || [];
+      return response;
+    });
+  }
+
+  async function getTaxonomy(name: string) {
+    taxonomy.value = {} as TaxonomyDto;
+    vocabulary.value = null;
+    return api.get(`/system/conf/taxonomy/${name}`).then((response) => {
+      taxonomy.value = response.data;
+      return response;
+    });
+  }
+
+  async function getVocabulary(name: string, vocName: string) {
+    vocabulary.value = null;
+    return api.get(`/system/conf/taxonomy/${name}/vocabulary/${vocName}`).then((response) => {
+      vocabulary.value = response.data;
       return response;
     });
   }
@@ -98,11 +121,15 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   return {
     taxonomies,
     summaries,
+    taxonomy,
+    vocabulary,
     reset,
     refresh,
     refreshSummaries,
     init,
     initSummaries,
+    getTaxonomy,
+    getVocabulary,
     getLabel,
     getAnnotations,
   };
