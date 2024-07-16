@@ -22,11 +22,7 @@ const taxonomiesStore = useTaxonomiesStore();
 const taxonomy = computed(() => taxonomiesStore.taxonomy || null);
 const name = computed(() => route.params.name as string);
 
-onUnmounted(() => console.log('##### TaxonomyPage Unmounted'));
-
-
 onMounted(() => {
-  console.log('##### TaxonomiesPage mounted', taxonomiesStore.summaries);
   taxonomiesStore
     .initSummaries()
     .then(() => {

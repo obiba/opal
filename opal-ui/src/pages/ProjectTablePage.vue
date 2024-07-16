@@ -190,7 +190,7 @@ function init() {
   datasourceStore.initDatasourceTable(dsName.value, tName.value);
 }
 
-function onDownloadDictionary() {
+function onDownloadDictionary() {``
   datasourceStore.downloadTableDictionary();
 }
 

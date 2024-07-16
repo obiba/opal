@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, baseUrl } from 'src/boot/api';
 import { TaxonomyDto, TaxonomiesDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto } from 'src/models/Opal';
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
@@ -35,7 +35,6 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function initSummaries() {
     if (summaries.value.length === 0) {
-      console.log('##### initSummaries');
       return loadSummaries();
     }
     return Promise.resolve();
@@ -62,6 +61,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
       taxonomy.value = response.data;
       return response;
     });
+  }
+
+  async function updateTaxonomy(taxonomy: TaxonomyDto) {
+    return api.put(`/system/conf/taxonomy/${taxonomy.name}`, taxonomy).then((response) => response.data);
   }
 
   async function getVocabulary(name: string, vocName: string) {
@@ -118,6 +121,16 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return annotations;
   }
 
+
+  async function deleteTaxonomy(taxonomy: TaxonomyDto) {
+    return api.delete(`/system/conf/taxonomy/${taxonomy.name}`);
+  }
+
+  function downloadTaxonomy(taxonomy: TaxonomyDto) {
+    window.open(`${baseUrl}/system/conf/taxonomy/${taxonomy.name}/_download`, '_self');
+  }
+
+
   return {
     taxonomies,
     summaries,
@@ -129,8 +142,11 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     init,
     initSummaries,
     getTaxonomy,
+    updateTaxonomy,
     getVocabulary,
     getLabel,
     getAnnotations,
+    deleteTaxonomy,
+    downloadTaxonomy,
   };
 });
