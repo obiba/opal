@@ -21,11 +21,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/AdminTaxonomiesPage.vue'),
       },
       {
-        path: '/admin/taxonomies/:name',
-        component: () => import('pages/AdminTaxonomyPage.vue'),
+        path: '/admin/taxonomies/:name/:vocabulary',
+        component: () => import('pages/AdminTaxonomyVocabularyPage.vue'),
       },
       {
-        path: '/admin/taxonomies/:name/:vocabulary',
+        path: '/admin/taxonomies/:name',
         component: () => import('pages/AdminTaxonomyPage.vue'),
       },
       { path: '/profile', component: () => import('pages/ProfilePage.vue') },

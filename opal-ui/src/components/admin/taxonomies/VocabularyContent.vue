@@ -1,12 +1,13 @@
 <template>
   <div class="text-h5">
-    <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ taxonomy.name }}</span>
+    <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ vocabulary.name }}</span>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
-    <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
+    <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
   </div>
 
-  <div class="text-h6 q-mb-md q-mt-lg">{{ $t('vocabularies') }}</div>
+
+  <div class="text-h6 q-mb-md q-mt-lg">{{ $t('terms') }}</div>
   <q-table
     flat
     :rows="rows"
@@ -15,13 +16,6 @@
     :pagination="initialPagination"
     :hide-pagination="rows.length <= initialPagination.rowsPerPage"
   >
-    <template v-slot:body-cell-name="props">
-      <q-td :props="props">
-        <router-link :to="`/admin/taxonomies/${taxonomy.name}/${props.value}`">
-          {{ props.value }}
-        </router-link>
-      </q-td>
-    </template>
     <template v-slot:body-cell-license="props">
       <q-td :props="props">
         {{ props.col.format(props.value) }}
@@ -53,19 +47,19 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'TaxonomyContent',
+  name: 'VocabularyContent',
 });
 </script>
 
 <script setup lang="ts">
-import { TaxonomyDto, VocabularyDto, LocaleTextDto } from 'src/models/Opal';
+import { VocabularyDto, LocaleTextDto } from 'src/models/Opal';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { locales } from 'boot/i18n';
 
 // import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 interface Props {
-  taxonomy: TaxonomyDto;
+  vocabulary: VocabularyDto;
 }
 
 const taxonomiesStore = useTaxonomiesStore();
@@ -78,18 +72,9 @@ const initialPagination = ref({
   rowsPerPage: 10,
   minRowsForPagination: 10,
 });
-const properties: FieldItem<TaxonomyDto>[] = [
+const properties: FieldItem<VocabularyDto>[] = [
   {
     field: 'name',
-  },
-  {
-    field: 'author',
-    label: 'author',
-  },
-  {
-    field: 'license',
-    label: 'license',
-    html: (val) => getCreativeCommonsLicense(val),
   },
   {
     field: 'title',
@@ -100,6 +85,11 @@ const properties: FieldItem<TaxonomyDto>[] = [
     field: 'description',
     label: 'description',
     html: (val) => generateLocaleRows(val.description),
+  },
+  {
+    field: 'repeatable',
+    label: 'repeatable',
+    html: (val) => val.repeatable ? t('yes') : t('no'),
   },
 ];
 
@@ -122,7 +112,7 @@ function generateLocaleRows(val: LocaleTextDto[]) {
   return '';
 }
 
-const rows = computed(() => props.taxonomy.vocabularies || []);
+const rows = computed(() => props.vocabulary.terms || []);
 const columns = computed(() => [
   {
     name: 'name',
@@ -132,7 +122,7 @@ const columns = computed(() => [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
-    style: 'width: 20%',
+    style: 'width: 15%',
   },
   {
     name: 'title',
@@ -148,22 +138,6 @@ const columns = computed(() => [
     headerStyle: 'width: 60%; white-space: normal;',
     style: 'width: 60%; white-space: normal;',
   },
-  {
-    name: 'terms',
-    label: t('terms'),
-    align: 'left',
-    field: (row: VocabularyDto) => (row.terms || []).length,
-  },
 ]);
 
-function getCreativeCommonsLicense(taxonomy: TaxonomyDto) {
-  const theLicense = taxonomy.license || '';
-  const licenseParts = theLicense.split(/\s+/);
-  if (licenseParts.length === 3) {
-    return `
-        <a href="https://creativecommons.org/licenses/${licenseParts[1]}/${licenseParts[2]}" target="_blank">${theLicense}</a>`;
-  } else {
-    return theLicense;
-  }
-}
 </script>
