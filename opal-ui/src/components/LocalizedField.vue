@@ -55,7 +55,6 @@ interface Props {
 // TODO: Add validation for correct locales
 
 const emit = defineEmits(['update:modelValue']);
-const { t } = useI18n();
 const props = defineProps<Props>();
 const dirty = ref(false);
 const labels = computed({

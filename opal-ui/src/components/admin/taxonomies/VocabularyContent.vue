@@ -86,7 +86,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
+import { VocabularyDto, TermDto } from 'src/models/Opal';
 import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { locales } from 'boot/i18n';

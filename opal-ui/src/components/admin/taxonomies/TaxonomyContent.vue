@@ -22,10 +22,13 @@
     :pagination="initialPagination"
     :hide-pagination="rows.length <= initialPagination.rowsPerPage"
   >
-    <template v-slot:top-left v-if="dirty">
+    <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
-        <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+        <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
+        <template v-if="dirty">
+          <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
+          <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+        </template>
       </div>
     </template>
     <template v-slot:body-cell-name="props">
@@ -99,6 +102,13 @@
   />
 
   <add-taxonomy-dialog v-model="showEditTaxonomy" :taxonomy="taxonomy" @update:modelValue="onTaxonomyEdited" />
+
+  <add-vocabulary-dialog
+    v-model="showAddVocabulary"
+    :taxonomy="taxonomyName"
+    :vocabulary="null"
+    @update:modelValue="onVocabularyAdded"
+  />
 </template>
 
 <script lang="ts">
@@ -108,9 +118,10 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { TaxonomyDto, VocabularyDto, LocaleTextDto } from 'src/models/Opal';
+import { TaxonomyDto, VocabularyDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog.vue';
+import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
 import { locales } from 'boot/i18n';
@@ -126,6 +137,7 @@ const router = useRouter();
 const { t } = useI18n({ useScope: 'global' });
 const showDelete = ref(false);
 const showEditTaxonomy = ref(false);
+const showAddVocabulary = ref(false);
 const tableKey = ref(0);
 
 const {
@@ -170,6 +182,7 @@ const properties: FieldItem<TaxonomyDto>[] = [
   },
 ];
 
+const taxonomyName = computed(() => props.taxonomy.name || '');
 const columns = computed(() => [
   {
     name: 'name',
@@ -236,6 +249,15 @@ function onEditTaxonomy() {
 
 function onTaxonomyEdited() {
   showEditTaxonomy.value = false;
+  emit('refresh');
+}
+
+function onAddVocabulary() {
+  showAddVocabulary.value = true;
+}
+
+function onVocabularyAdded() {
+  showAddVocabulary.value = false;
   emit('refresh');
 }
 

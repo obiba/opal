@@ -71,6 +71,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.put(`/system/conf/taxonomy/${taxonomy.name}`, taxonomy).then((response) => response.data);
   }
 
+  async function addVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
+    return api.post(`/system/conf/taxonomy/${taxonomyName}/vocabularies`, vocabulary).then((response) => response.data);
+  }
+
   async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
     return api.put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`, vocabulary).then((response) => response.data);
   }
@@ -152,6 +156,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     addTaxonomy,
     getTaxonomy,
     updateTaxonomy,
+    addVocabulary,
     updateVocabulary,
     getVocabulary,
     getLabel,
