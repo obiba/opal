@@ -2,6 +2,7 @@
   <div class="text-h5">
     <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ taxonomy.name }}</span>
     <q-btn outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
+    <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
     <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
   </div>
 
@@ -9,8 +10,6 @@
     <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
   </div>
 
-  <pre>{{ dirty }}</pre>
-  <pre>{{ sortedName }}</pre>
   <div class="text-h6 q-mb-md q-mt-lg">{{ $t('vocabularies') }}</div>
   <q-table
     flat
@@ -98,6 +97,8 @@
     :text="$t('delete_taxonomy_confirm', { taxonomy: taxonomy.name })"
     @confirm="doDelete"
   />
+
+  <add-taxonomy-dialog v-model="showEditTaxonomy" :taxonomy="taxonomy" @update:modelValue="onTaxonomyEdited" />
 </template>
 
 <script lang="ts">
@@ -109,9 +110,11 @@ export default defineComponent({
 <script setup lang="ts">
 import { TaxonomyDto, VocabularyDto, LocaleTextDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
 import { locales } from 'boot/i18n';
+import { getCreativeCommonsLicense } from 'src/utils/taxonomies';
 
 interface Props {
   taxonomy: TaxonomyDto;
@@ -122,6 +125,7 @@ const props = defineProps<Props>();
 const router = useRouter();
 const { t } = useI18n({ useScope: 'global' });
 const showDelete = ref(false);
+const showEditTaxonomy = ref(false);
 const tableKey = ref(0);
 
 const {
@@ -201,20 +205,12 @@ const columns = computed(() => [
   },
 ]);
 
-function getCreativeCommonsLicense(taxonomy: TaxonomyDto) {
-  const theLicense = taxonomy.license || '';
-  const licenseParts = theLicense.split(/\s+/);
-  if (licenseParts.length === 3) {
-    return `
-        <a href="https://creativecommons.org/licenses/${licenseParts[1]}/${licenseParts[2]}" target="_blank">${theLicense}</a>`;
-  } else {
-    return theLicense;
-  }
-}
+// Handlers
 
 async function doDelete() {
   showDelete.value = false;
   await taxonomiesStore.deleteTaxonomy(props.taxonomy);
+  await taxonomiesStore.refreshSummaries();
   router.replace('/admin/taxonomies');
 }
 
@@ -232,6 +228,15 @@ function onDownload() {
 
 function onDelete() {
   showDelete.value = true;
+}
+
+function onEditTaxonomy() {
+  showEditTaxonomy.value = true;
+}
+
+function onTaxonomyEdited() {
+  showEditTaxonomy.value = false;
+  emit('refresh');
 }
 
 watch(

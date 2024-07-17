@@ -37,7 +37,9 @@ export default function useEntityContent<TYPE extends VocabularyDto | TermDto>(g
 
   function generateLocaleRows(val: LocaleTextDto[]) {
     if (val) {
-      const rows = locales
+      const validLocales = locales.filter((locale) => val.find((v) => v.locale === locale));
+
+      const rows = validLocales
         .map(
           (locale) =>
             `

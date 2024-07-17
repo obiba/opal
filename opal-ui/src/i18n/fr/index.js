@@ -783,7 +783,6 @@ export default {
   view_destination_hint: "La vue de destination sera créée si elle n'existe pas, sinon elle sera mise à jour en fusionnant les variables dérivées.",
   derived_variables: 'Variables dérivées',
   derived_variables_hint: 'Le nom et le type de la variable dérivée peuvent être différents de celui de la variable d\'origine.',
-  taxonomy: 'Taxonomie',
   vocabulary: 'Vocabulaire',
   term: 'Terme',
   apply: 'Appliquer',

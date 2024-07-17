@@ -21,6 +21,14 @@ const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
 const taxonomyName = computed(() => route.params.name as string);
 
+watch(taxonomyName, (name) => {
+  if (name) {
+    console.log('DDDDD');
+    const path = `${route.path.replace(/\/$/, '')}/${taxonomiesStore.summaries[0].name}`;
+    router.replace(path);
+  }
+});
+
 onMounted(() => {
   taxonomiesStore
     .initSummaries()

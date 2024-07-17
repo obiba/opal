@@ -5,8 +5,7 @@
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
   </div>
-  <pre>{{ dirty }}</pre>
-  <pre>{{ sortedName }}</pre>
+
   <div class="text-h6 q-mb-md q-mt-lg">{{ $t('terms') }}</div>
   <q-table
     flat

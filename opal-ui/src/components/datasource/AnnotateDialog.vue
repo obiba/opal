@@ -18,7 +18,7 @@
           <q-select
             v-model="taxonomyName"
             :options="taxonomiesOptions"
-            :label="$t('taxonomy')"
+            :label="$t('taxonomy.title')"
             dense
             emit-value
             map-options

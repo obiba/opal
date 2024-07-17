@@ -26,6 +26,7 @@ const taxonomyName = computed(() => route.params.name as string);
 
 watch(taxonomyName, (newName) => {
   if (newName) {
+    taxonomiesStore.initSummaries().catch(notifyError);
     taxonomiesStore.getTaxonomy(taxonomyName.value).catch(notifyError);
   }
 });

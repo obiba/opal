@@ -22,9 +22,9 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     loadTaxonomies();
   }
 
-  function refreshSummaries() {
+  async function refreshSummaries() {
     summaries.value = [];
-    loadSummaries();
+    return loadSummaries();
   }
 
   async function init() {
@@ -61,6 +61,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
       taxonomy.value = response.data;
       return response;
     });
+  }
+
+  async function addTaxonomy(taxonomy: TaxonomyDto) {
+    return api.post('/system/conf/taxonomies', taxonomy).then((response) => response.data);
   }
 
   async function updateTaxonomy(taxonomy: TaxonomyDto) {
@@ -145,6 +149,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     refreshSummaries,
     init,
     initSummaries,
+    addTaxonomy,
     getTaxonomy,
     updateTaxonomy,
     updateVocabulary,
