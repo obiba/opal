@@ -9,6 +9,8 @@
     <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
   </div>
 
+  <pre>{{ dirty }}</pre>
+  <pre>{{ sortedName }}</pre>
   <div class="text-h6 q-mb-md q-mt-lg">{{ $t('vocabularies') }}</div>
   <q-table
     flat
@@ -60,13 +62,8 @@
         </div>
       </q-td>
     </template>
-    <template v-slot:body-cell-license="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        {{ props.col.format(props.value) }}
-      </q-td>
-    </template>
     <template v-slot:body-cell-title="props">
-      <q-td :props="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         <template v-for="locale in locales" :key="locale">
           <div class="q-py-xs">
             <code class="text-secondary q-my-xs">{{ locale }}</code>
@@ -113,6 +110,7 @@ export default defineComponent({
 import { TaxonomyDto, VocabularyDto, LocaleTextDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
 import { locales } from 'boot/i18n';
 
 interface Props {
@@ -120,23 +118,29 @@ interface Props {
 }
 
 const emit = defineEmits(['update', 'refresh']);
-const taxonomiesStore = useTaxonomiesStore();
 const props = defineProps<Props>();
 const router = useRouter();
 const { t } = useI18n({ useScope: 'global' });
-const toolsVisible = ref<{ [key: string]: boolean }>({});
-const rows = ref<VocabularyDto[]>([]);
 const showDelete = ref(false);
 const tableKey = ref(0);
-const dirty = ref(false);
-let canSort = true;
-const sortedName = ref<string[]>([]);
-const initialPagination = ref({
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  minRowsForPagination: 10,
-});
+
+const {
+  initialPagination,
+  toolsVisible,
+  canSort,
+  sortedName,
+  dirty,
+  taxonomiesStore,
+  rows,
+  applySort,
+  onOverRow,
+  onLeaveRow,
+  onMoveUp,
+  onMoveDown,
+  generateLocaleRows,
+  customSort,
+} = useEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
+
 const properties: FieldItem<TaxonomyDto>[] = [
   {
     field: 'name',
@@ -197,42 +201,6 @@ const columns = computed(() => [
   },
 ]);
 
-// Functions
-
-function customSort(rows: VocabularyDto[], sortBy: string, descending: string) {
-  if (!canSort || !sortBy) return rows;
-
-  const data = rows;
-  dirty.value = true;
-
-  data.sort((a: VocabularyDto, b: VocabularyDto): number =>
-    descending ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
-  );
-
-  sortedName.value = data.map((row) => row.name);
-
-  return data;
-}
-
-function generateLocaleRows(val: LocaleTextDto[]) {
-  if (val) {
-    const rows = locales
-      .map(
-        (locale) =>
-          `
-          <div class="row no-wrap q-py-xs">
-            <div class="col-auto"><code class="text-secondary q-my-xs">${locale}</code></div>
-            <div class="col q-ml-sm">${taxonomiesStore.getLabel(val, locale)}</div>
-          </div>
-          `
-      )
-      .join('');
-    return rows;
-  }
-
-  return '';
-}
-
 function getCreativeCommonsLicense(taxonomy: TaxonomyDto) {
   const theLicense = taxonomy.license || '';
   const licenseParts = theLicense.split(/\s+/);
@@ -248,71 +216,6 @@ async function doDelete() {
   showDelete.value = false;
   await taxonomiesStore.deleteTaxonomy(props.taxonomy);
   router.replace('/admin/taxonomies');
-}
-
-
-function applySort() {
-  const clone = JSON.parse(JSON.stringify(props.taxonomy));
-  clone.vocabularies = [...rows.value]; // to be sure all changes are applied
-
-  const sortFunction = (a: VocabularyDto, b: VocabularyDto) => {
-    const aIndex = sortedName.value.findIndex((name) => name === a.name);
-    const bIndex = sortedName.value.findIndex((name) => name === b.name);
-    return aIndex - bIndex;
-  };
-
-  clone.vocabularies.sort(sortFunction);
-  sortedName.value = [];
-
-  return clone;
-}
-
-// Handlers
-
-function onMoveUp(name: string) {
-  dirty.value = true;
-  const clone = sortedName.value.length > 0 ? applySort().vocabularies : JSON.parse(JSON.stringify(rows.value));
-  const index = clone.findIndex((row: VocabularyDto) => row.name === name);
-
-  if (index > 0) {
-    const temp = clone[index - 1];
-    clone[index - 1] = clone[index];
-    clone[index] = temp;
-    canSort = false;
-    rows.value = clone;
-  }
-
-  nextTick(() => {
-    // Wait so the default sort is not applied right after the move
-    canSort = true;
-  });
-}
-
-function onMoveDown(name: string) {
-  dirty.value = true;
-  const clone = sortedName.value.length > 0 ? applySort().vocabularies : JSON.parse(JSON.stringify(rows.value));
-  const index = clone.findIndex((row: VocabularyDto) => row.name === name);
-
-  if (index < rows.value.length - 1) {
-    const temp = clone[index + 1];
-    clone[index + 1] = clone[index];
-    clone[index] = temp;
-    canSort = false;
-    rows.value = clone;
-  }
-
-  nextTick(() => {
-    // Wait so the default sort is not applied right after the move
-    canSort = true;
-  });
-}
-
-function onOverRow(row: VocabularyDto) {
-  toolsVisible.value[row.name] = true;
-}
-
-function onLeaveRow(row: VocabularyDto) {
-  toolsVisible.value[row.name] = false;
 }
 
 function onApply() {
@@ -335,9 +238,10 @@ watch(
   () => props.taxonomy,
   (newValue) => {
     if (!!newValue.name) {
+      console.log('WATCH Taxonomy name changed');
       tableKey.value += 1;
       sortedName.value = [];
-      canSort = true;
+      canSort.value = true;
       dirty.value = false;
       rows.value = props.taxonomy.vocabularies || [];
     }

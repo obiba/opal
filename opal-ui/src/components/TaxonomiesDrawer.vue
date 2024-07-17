@@ -6,7 +6,7 @@
     <q-list>
       <q-item
         v-for="summary in summaries"
-        :active="name === summary.name"
+        :active="taxonomyName === summary.name"
         :key="summary.name"
         :to="`/admin/taxonomies/${summary.name}`"
       >
@@ -37,6 +37,6 @@ import { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto } from 'src/mo
 const route = useRoute();
 const taxonomiesStore = useTaxonomiesStore();
 const summaries = computed<TaxonomySummariesDto[]>(() => taxonomiesStore.summaries);
-const name = computed(() => route.params.name as string);
+const taxonomyName = computed(() => route.params.name as string);
 
 </script>

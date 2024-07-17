@@ -1,20 +1,20 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { TaxonomyDto, TaxonomiesDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto } from 'src/models/Opal';
+import { TaxonomyDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto } from 'src/models/Opal';
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 
 export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomies = ref<TaxonomyDto[]>([]);
   const taxonomy = ref<TaxonomyDto>({} as TaxonomyDto);
-  const vocabulary = ref<VocabularyDto | null>(null);
+  const vocabulary = ref<VocabularyDto>({} as VocabularyDto);
   const summaries = ref<TaxonomiesDto_TaxonomySummaryDto[]>([]);
 
   function reset() {
     taxonomies.value = [];
     summaries.value = [];
     taxonomy.value = {} as TaxonomyDto;
-    vocabulary.value = null;
+    vocabulary.value = {} as VocabularyDto;
   }
 
   function refresh() {
@@ -56,7 +56,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function getTaxonomy(name: string) {
     taxonomy.value = {} as TaxonomyDto;
-    vocabulary.value = null;
+    vocabulary.value = {} as VocabularyDto;
     return api.get(`/system/conf/taxonomy/${name}`).then((response) => {
       taxonomy.value = response.data;
       return response;
@@ -67,9 +67,13 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.put(`/system/conf/taxonomy/${taxonomy.name}`, taxonomy).then((response) => response.data);
   }
 
-  async function getVocabulary(name: string, vocName: string) {
-    vocabulary.value = null;
-    return api.get(`/system/conf/taxonomy/${name}/vocabulary/${vocName}`).then((response) => {
+  async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
+    return api.put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`, vocabulary).then((response) => response.data);
+  }
+
+  async function getVocabulary(taxonomyName: string, vocabularyName: string) {
+    vocabulary.value = {} as VocabularyDto;
+    return api.get(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}`).then((response) => {
       vocabulary.value = response.data;
       return response;
     });
@@ -143,6 +147,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     initSummaries,
     getTaxonomy,
     updateTaxonomy,
+    updateVocabulary,
     getVocabulary,
     getLabel,
     getAnnotations,

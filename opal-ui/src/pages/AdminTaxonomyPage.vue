@@ -5,7 +5,7 @@
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
         <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies"/>
-        <q-breadcrumbs-el :label="name" />
+        <q-breadcrumbs-el :label="taxonomyName" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page v-if="taxonomy" class="q-pa-md">
@@ -22,18 +22,18 @@ import { TaxonomyDto } from 'src/models/Opal';
 const route = useRoute();
 const taxonomiesStore = useTaxonomiesStore();
 const taxonomy = computed(() => taxonomiesStore.taxonomy || null);
-const name = computed(() => route.params.name as string);
+const taxonomyName = computed(() => route.params.name as string);
 
-watch(name, (newName) => {
+watch(taxonomyName, (newName) => {
   if (newName) {
-    taxonomiesStore.getTaxonomy(name.value).catch(notifyError);
+    taxonomiesStore.getTaxonomy(taxonomyName.value).catch(notifyError);
   }
 });
 
 async function onUpdate(updated: TaxonomyDto) {
   try {
     await taxonomiesStore.updateTaxonomy(updated);
-    await taxonomiesStore.getTaxonomy(name.value);
+    await taxonomiesStore.getTaxonomy(taxonomyName.value);
   } catch (error) {
     notifyError(error);
   }
@@ -41,15 +41,15 @@ async function onUpdate(updated: TaxonomyDto) {
 
 async function onRefresh() {
   try {
-    await taxonomiesStore.getTaxonomy(name.value);
+    await taxonomiesStore.getTaxonomy(taxonomyName.value);
   } catch (error) {
     notifyError(error);
   }
 }
 
 onMounted(() => {
-  console.log('TaxonomiesPage mounted', taxonomiesStore.summaries);
+  console.log('TaxonomyPage mounted', taxonomiesStore.summaries);
   taxonomiesStore.initSummaries().catch(notifyError);
-  taxonomiesStore.getTaxonomy(name.value).catch(notifyError);
+  taxonomiesStore.getTaxonomy(taxonomyName.value).catch(notifyError);
 });
 </script>
