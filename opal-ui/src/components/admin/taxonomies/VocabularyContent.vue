@@ -43,6 +43,17 @@
         {{ props.value }}
         <div class="float-right">
           <q-btn
+            rounded
+            dense
+            flat
+            size="sm"
+            color="secondary"
+            :title="$t('edit')"
+            :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
+            class="q-ml-xs"
+            @click="onAddTerm(props.row)"
+          />
+          <q-btn
             v-show="props.rowIndex > 0"
             rounded
             dense
@@ -93,6 +104,18 @@
         </template>
       </q-td>
     </template>
+    <template v-slot:body-cell-keywords="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <template v-for="locale in locales" :key="locale">
+          <div v-if="props.value" class="row no-wrap q-py-xs">
+            <div class="col-auto">
+              <code class="text-secondary q-my-xs">{{ locale }}</code>
+            </div>
+            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+          </div>
+        </template>
+      </q-td>
+    </template>
   </q-table>
 
   <!-- Dialogs -->
@@ -108,7 +131,16 @@
     v-model="showEditVocabulary"
     :taxonomy="taxonomy"
     :vocabulary="vocabulary"
-    @update:modelValue="onVocabularyEdited"
+    @update:modelValue="onClose"
+    @updated="onVocabularyUpdated"
+  />
+
+  <add-term-dialog
+    v-model="showAddTerm"
+    :taxonomy="taxonomy"
+    :vocabulary="vocabulary.name || ''"
+    :term="newTerm"
+    @update:modelValue="onTermUpdated"
   />
 </template>
 
@@ -123,6 +155,7 @@ import { VocabularyDto, TermDto } from 'src/models/Opal';
 import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVocabularyDialog from 'src//components/admin/taxonomies/AddVocabularyDialog.vue';
+import AddTermDialog from 'src//components/admin/taxonomies/AddTermDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { locales } from 'boot/i18n';
 import { notifyError } from 'src/utils/notify';
@@ -140,6 +173,7 @@ const tableKey = ref(0);
 const showDelete = ref(false);
 const showEditVocabulary = ref(false);
 const showAddTerm = ref(false);
+const newTerm = ref<TermDto | null>(null);
 const {
   initialPagination,
   toolsVisible,
@@ -197,6 +231,8 @@ const columns = computed(() => [
     label: t('title'),
     align: 'left',
     field: 'title',
+    headerStyle: 'width: 20%; white-space: normal;',
+    style: 'width: 20%; white-space: normal;',
   },
   {
     name: 'description',
@@ -205,6 +241,12 @@ const columns = computed(() => [
     field: 'description',
     headerStyle: 'width: 50%; white-space: normal;',
     style: 'width: 50%; white-space: normal;',
+  },
+  {
+    name: 'keywords',
+    label: t('keywords'),
+    align: 'left',
+    field: 'keywords',
   },
 ]);
 
@@ -234,13 +276,22 @@ function onEditVocabulary() {
   showEditVocabulary.value = true;
 }
 
-
-function onAddVocabulary() {
-  showAddTerm.value = true;
+function onClose() {
+  showEditVocabulary.value = false;
 }
 
-function onVocabularyEdited() {
-  showEditVocabulary.value = false;
+function onVocabularyUpdated(updated: VocabularyDto, oldName?: string) {
+  emit('refresh', updated.name !== oldName ? updated.name : null);
+}
+
+function onAddTerm(term: TermDto) {
+  showAddTerm.value = true;
+  newTerm.value = term;
+}
+
+function onTermUpdated() {
+  showAddTerm.value = false;
+  newTerm.value = null;
   emit('refresh');
 }
 

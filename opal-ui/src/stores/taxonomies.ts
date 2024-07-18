@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { TaxonomyDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto } from 'src/models/Opal';
+import { TaxonomyDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto, TermDto } from 'src/models/Opal';
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 
@@ -28,8 +28,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   async function init() {
-    if (taxonomies.value.length === 0)
-      return loadTaxonomies();
+    if (taxonomies.value.length === 0) return loadTaxonomies();
     return Promise.resolve();
   }
 
@@ -67,8 +66,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.post('/system/conf/taxonomies', taxonomy).then((response) => response.data);
   }
 
-  async function updateTaxonomy(taxonomy: TaxonomyDto) {
-    return api.put(`/system/conf/taxonomy/${taxonomy.name}`, taxonomy).then((response) => response.data);
+  async function updateTaxonomy(taxonomy: TaxonomyDto, oldName?: string) {
+    return api
+      .put(`/system/conf/taxonomy/${oldName ? oldName : taxonomy.name}`, taxonomy)
+      .then((response) => response.data);
   }
 
   async function deleteTaxonomy(taxonomy: TaxonomyDto) {
@@ -79,8 +80,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.post(`/system/conf/taxonomy/${taxonomyName}/vocabularies`, vocabulary).then((response) => response.data);
   }
 
-  async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
-    return api.put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`, vocabulary).then((response) => response.data);
+  async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto, oldName?: string) {
+    return api
+      .put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${oldName ? oldName : vocabulary.name}`, vocabulary)
+      .then((response) => response.data);
   }
 
   async function deleteVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
@@ -93,6 +96,25 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
       vocabulary.value = response.data;
       return response;
     });
+  }
+
+  async function addTerm(taxonomyName: string, vocabularyName: string, term: TermDto) {
+    return api
+      .post(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/terms`, term)
+      .then((response) => response.data);
+  }
+
+  async function updateTerm(taxonomyName: string, vocabularyName: string, term: TermDto, oldName?: string) {
+    return api
+      .put(
+        `/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
+        term
+      )
+      .then((response) => response.data);
+  }
+
+  async function deleteTerm(taxonomyName: string, vocabularyName: string, term: TermDto) {
+    return api.delete(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${term.name}`);
   }
 
   function getLabel(messages: LocaleTextDto[], locale: string): string {
@@ -123,7 +145,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     // merge annotations with same taxonomy and vocabulary
     for (let i = 0; i < annotations.length; i++) {
       for (let j = i + 1; j < annotations.length; j++) {
-        if (annotations[i].taxonomy === annotations[j].taxonomy && annotations[i].vocabulary === annotations[j].vocabulary) {
+        if (
+          annotations[i].taxonomy === annotations[j].taxonomy &&
+          annotations[i].vocabulary === annotations[j].vocabulary
+        ) {
           annotations[i].attributes.push(...annotations[j].attributes);
           annotations.splice(j, 1);
           j--;
@@ -145,7 +170,6 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     window.open(`${baseUrl}/system/conf/taxonomy/${taxonomy.name}/_download`, '_self');
   }
 
-
   return {
     taxonomies,
     summaries,
@@ -164,6 +188,9 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     updateVocabulary,
     deleteVocabulary,
     getVocabulary,
+    addTerm,
+    updateTerm,
+    deleteTerm,
     getLabel,
     getAnnotations,
     downloadTaxonomy,

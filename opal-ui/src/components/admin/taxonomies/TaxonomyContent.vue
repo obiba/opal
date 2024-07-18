@@ -112,7 +112,7 @@
     @confirm="doDelete"
   />
 
-  <add-taxonomy-dialog v-model="showEditTaxonomy" :taxonomy="taxonomy" @update:modelValue="onTaxonomyEdited" />
+  <add-taxonomy-dialog v-model="showEditTaxonomy" :taxonomy="taxonomy" @update:modelValue="onClose" @updated="onTaxonomyUpdated"/>
 
   <add-vocabulary-dialog
     v-model="showAddVocabulary"
@@ -136,7 +136,7 @@ import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDi
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
 import { locales } from 'boot/i18n';
-import { getCreativeCommonsLicense } from 'src/utils/taxonomies';
+import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
 
 interface Props {
@@ -182,7 +182,7 @@ const properties: FieldItem<TaxonomyDto>[] = [
   {
     field: 'license',
     label: 'license',
-    html: (val) => getCreativeCommonsLicense(val),
+    html: (val) => getCreativeCommonsLicenseAnchor(val),
   },
   {
     field: 'title',
@@ -265,9 +265,12 @@ function onEditTaxonomy() {
   showEditTaxonomy.value = true;
 }
 
-function onTaxonomyEdited() {
+function onClose() {
   showEditTaxonomy.value = false;
-  emit('refresh');
+}
+
+function onTaxonomyUpdated(updated: TaxonomyDto, oldName?: string) {
+  emit('refresh', updated.name !== oldName ? updated.name : null);
 }
 
 function onAddVocabulary() {

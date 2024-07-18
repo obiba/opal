@@ -10,57 +10,35 @@
       <q-card-section style="max-height: 75vh" class="scroll">
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
-            v-model="newTaxonomy.name"
+            v-model="newTerm.name"
             dense
             type="text"
             :label="$t('name') + '*'"
-            :hint="$t('taxonomy.name_hint')"
+            :hint="$t('taxonomy.vocabulary.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('required_field')]"
           >
           </q-input>
 
-          <q-input
-            v-model="newTaxonomy.author"
-            dense
-            type="text"
-            :label="$t('author')"
-            :hint="$t('taxonomy.author_hint')"
-            class="q-mb-md"
-            lazy-rules
-          >
-          </q-input>
-
-          <q-input
-            v-model="newTaxonomy.license"
-            dense
-            type="text"
-            :label="$t('license')"
-            class="q-mb-md"
-            lazy-rules
-            :rules="[() => true]"
-          >
-            <template v-slot:hint>
-              <html-anchor-hint
-                :tr-key="'taxonomy.license_hint'"
-                :text="$t('taxonomy.creative_commons_licenses')"
-                :url="getCreativeCommonsLicenseUrl()"
-              />
-            </template>
-          </q-input>
-
           <localized-field-large
-            v-model="newTaxonomy.title"
+            v-model="newTerm.title"
             :title="$t('title')"
-            :hint="$t('taxonomy.title_hint')"
+            :hint="$t('taxonomy.vocabulary.title_hint')"
           ></localized-field-large>
 
           <localized-field-large
-            v-model="newTaxonomy.description"
+            v-model="newTerm.description"
             :title="$t('description')"
-            :hint="$t('taxonomy.description_hint')"
+            :hint="$t('taxonomy.term.description_hint')"
           />
+
+          <localized-field-large
+            v-model="newTerm.keywords"
+            :title="$t('keywords')"
+            :hint="$t('taxonomy.term.keywords_hint')"
+          />
+
         </q-form>
       </q-card-section>
 
@@ -68,7 +46,7 @@
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddTaxonomy" />
+        <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddTerm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -76,41 +54,42 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'AddTaxonomyDialog',
+  name: 'AddTermDialog',
 });
 </script>
 <script setup lang="ts">
-import { TaxonomyDto } from 'src/models/Opal';
+import { TermDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
-import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
-import { getCreativeCommonsLicenseUrl } from 'src/utils/taxonomies';
 
 interface DialogProps {
   modelValue: boolean;
-  taxonomy: TaxonomyDto | null;
+  taxonomy: string;
+  vocabulary: string;
+  term: TermDto | null;
 }
 
 const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
+const oldName = computed(() => props.term?.name);
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'updated']);
 const showDialog = ref(props.modelValue);
-const emptyTaxonomy = {
+const emptyTerm = {
   name: '',
   title: [],
   description: [],
-  vocabularies: [],
+  terms: [],
   keywords: [],
   attributes: [],
-} as TaxonomyDto;
+} as TermDto;
 
-const newTaxonomy = ref<TaxonomyDto>({ ...emptyTaxonomy });
-const oldName = computed(() => props.taxonomy?.name);
-const editMode = computed(() => !!props.taxonomy);
+
+const newTerm = ref<TermDto>({ ...emptyTerm });
+const editMode = computed(() => !!props.term && !!props.term.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
-const dialogTitle = computed(() => (editMode.value ? t('taxonomy.edit') : t('taxonomy.add')));
+const dialogTitle = computed(() => (editMode.value ? t('taxonomy.term.edit') : t('taxonomy.term.add')));
 
 // Validation rules
 const validateRequiredField = (msgKey: string) => (val: string) => (val && val.trim().length > 0) || t(msgKey);
@@ -119,10 +98,10 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      if (props.taxonomy) {
-        newTaxonomy.value = JSON.parse(JSON.stringify(props.taxonomy));
+      if (props.term) {
+        newTerm.value = JSON.parse(JSON.stringify(props.term));
       } else {
-        newTaxonomy.value = { ...emptyTaxonomy };
+        newTerm.value = { ...emptyTerm };
       }
 
       showDialog.value = value;
@@ -133,19 +112,19 @@ watch(
 // Handlers
 
 function onHide() {
-  newTaxonomy.value = { ...emptyTaxonomy };
+  newTerm.value = { ...emptyTerm };
   emit('update:modelValue', false);
 }
 
-async function onAddTaxonomy() {
+async function onAddTerm() {
   const valid = await formRef.value.validate();
   if (valid) {
     (editMode.value
-      ? taxonomiesStore.updateTaxonomy(newTaxonomy.value, oldName.value)
-      : taxonomiesStore.addTaxonomy(newTaxonomy.value)
+      ? taxonomiesStore.updateTerm(props.taxonomy, props.vocabulary, newTerm.value, oldName.value)
+      : taxonomiesStore.addTerm(props.taxonomy, props.vocabulary, newTerm.value)
     )
       .then(() => {
-        emit('updated', newTaxonomy.value, oldName.value);
+        emit('updated', newTerm.value, oldName.value);
         showDialog.value = false;
       })
       .catch(notifyError);

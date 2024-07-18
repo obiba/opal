@@ -7,7 +7,7 @@
 
       <q-separator />
 
-      <q-card-section>
+      <q-card-section style="max-height: 75vh" class="scroll">
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
             v-model="newVocabulary.name"
@@ -21,16 +21,16 @@
           >
           </q-input>
 
-          <localized-field
+          <localized-field-large
             v-model="newVocabulary.title"
             :title="$t('title')"
             :hint="$t('taxonomy.vocabulary.title_hint')"
-          ></localized-field>
+          />
 
-          <localized-field
+          <localized-field-large
             v-model="newVocabulary.description"
             :title="$t('description')"
-            :hint="$t('taxonomy.vocabulary.title_hint')"
+            :hint="$t('taxonomy.vocabulary.description_hint')"
           />
 
           <q-checkbox v-model="newVocabulary.repeatable" :label="$t('taxonomy.vocabulary.repeatable')" />
@@ -44,7 +44,7 @@
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddTaxonomy" />
+        <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddVocabulary" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -58,7 +58,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { VocabularyDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
-import LocalizedField from 'src/components/LocalizedField.vue';
+import LocalizedFieldLarge  from 'src/components/LocalizedFieldLarge.vue';
 
 interface DialogProps {
   modelValue: boolean;
@@ -68,6 +68,7 @@ interface DialogProps {
 
 const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
+const oldName = computed(() => props.vocabulary?.name);
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'updated']);
@@ -112,15 +113,15 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-async function onAddTaxonomy() {
+async function onAddVocabulary() {
   const valid = await formRef.value.validate();
   if (valid) {
     (editMode.value
-      ? taxonomiesStore.updateVocabulary(props.taxonomy, newVocabulary.value)
+      ? taxonomiesStore.updateVocabulary(props.taxonomy, newVocabulary.value, oldName.value)
       : taxonomiesStore.addVocabulary(props.taxonomy, newVocabulary.value)
     )
       .then(() => {
-        emit('updated', newVocabulary.value);
+        emit('updated', newVocabulary.value, oldName.value);
         showDialog.value = false;
       })
       .catch(notifyError);

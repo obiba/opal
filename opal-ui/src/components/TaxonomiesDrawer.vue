@@ -55,7 +55,7 @@
     </q-list>
   </div>
 
-  <add-taxonomy-dialog v-model="showAddTaxonomy" :taxonomy="null" @update:modelValue="onClose" @updated="onUpdated" />
+  <add-taxonomy-dialog v-model="showAddTaxonomy" :taxonomy="null" @update:modelValue="onClose" @updated="onAdded" />
 </template>
 
 <script lang="ts">
@@ -84,7 +84,7 @@ async function onClose() {
   showAddTaxonomy.value = false;
 }
 
-async function onUpdated(updated: TaxonomyDto) {
+async function onAdded(updated: TaxonomyDto) {
   if (updated) {
     taxonomiesStore
       .refreshSummaries()

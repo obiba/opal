@@ -20,6 +20,7 @@ import { notifyError } from 'src/utils/notify';
 import { TaxonomyDto } from 'src/models/Opal';
 
 const route = useRoute();
+const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
 const taxonomy = computed(() => taxonomiesStore.taxonomy || null);
 const taxonomyName = computed(() => route.params.name as string);
@@ -40,9 +41,14 @@ async function onUpdate(updated: TaxonomyDto) {
   }
 }
 
-async function onRefresh() {
+async function onRefresh(newName?: string) {
   try {
-    await taxonomiesStore.getTaxonomy(taxonomyName.value);
+    if (!!newName) {
+      await taxonomiesStore.refreshSummaries();
+      router.replace(`/admin/taxonomies/${newName}`);
+    } else {
+      await taxonomiesStore.getTaxonomy(taxonomyName.value);
+    }
   } catch (error) {
     notifyError(error);
   }

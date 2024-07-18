@@ -56,7 +56,13 @@
             ]"
           >
             <template v-slot:hint>
-              <div v-html="$t('identity_provider.discovery_uri_hint', { url: discoveryURIDefinition })"></div>
+              <html-anchor-hint
+                :tr-key="'identity_provider.discovery_uri_hint'"
+                :text="$t('identity_provider.discovery_uri_definition')"
+                :url="`https://openid.net/specs/openid-connect-discovery-1_0.html`"
+              />
+
+              <!-- <div v-html="$t('identity_provider.discovery_uri_hint', { url: discoveryURIDefinition })"></div> -->
             </template>
           </q-input>
           <q-input
@@ -228,6 +234,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { IDProviderDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
+import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
 
 interface DialogProps {
   modelValue: boolean;
@@ -271,12 +278,7 @@ const groupsJavascriptPlaceholder = computed(() => {
 userInfo.some.property.map(x => x.split(':')[0])
 `;
 });
-const discoveryURIDefinition = computed(
-  () =>
-    `<a href="https://openid.net/specs/openid-connect-discovery-1_0.html" target="_blank" tabindex="-1">${t(
-      'identity_provider.discovery_uri_definition'
-    )}</a>`
-);
+
 const useNonceDefinition = computed(
   () =>
     `<a href="https://openid.net/specs/openid-connect-core-1_0.html#IDToken" target="_blank" tabindex="-1">${t(
