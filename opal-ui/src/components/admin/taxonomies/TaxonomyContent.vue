@@ -67,9 +67,11 @@
     <template v-slot:body-cell-title="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         <template v-for="locale in locales" :key="locale">
-          <div class="q-py-xs">
-            <code class="text-secondary q-my-xs">{{ locale }}</code>
-            {{ taxonomiesStore.getLabel(props.value, locale) }}
+          <div v-if="props.value" class="row no-wrap q-py-xs">
+            <div class="col-auto">
+              <code class="text-secondary q-my-xs">{{ locale }}</code>
+            </div>
+            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
           </div>
         </template>
       </q-td>
@@ -77,7 +79,7 @@
     <template v-slot:body-cell-description="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         <template v-for="locale in locales" :key="locale">
-          <div class="row no-wrap q-py-xs">
+          <div v-if="props.value" class="row no-wrap q-py-xs">
             <div class="col-auto">
               <code class="text-secondary q-my-xs">{{ locale }}</code>
             </div>
@@ -123,9 +125,10 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog.vue';
 import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
+import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
 import { locales } from 'boot/i18n';
 import { getCreativeCommonsLicense } from 'src/utils/taxonomies';
+import { notifyError } from 'src/utils/notify';
 
 interface Props {
   taxonomy: TaxonomyDto;
@@ -155,7 +158,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
-} = useEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
+} = useTaxonomyEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
 
 const properties: FieldItem<TaxonomyDto>[] = [
   {
@@ -222,9 +225,13 @@ const columns = computed(() => [
 
 async function doDelete() {
   showDelete.value = false;
-  await taxonomiesStore.deleteTaxonomy(props.taxonomy);
-  await taxonomiesStore.refreshSummaries();
-  router.replace('/admin/taxonomies');
+  try {
+    await taxonomiesStore.deleteTaxonomy(props.taxonomy);
+    await taxonomiesStore.refreshSummaries();
+    router.replace('/admin/taxonomies');
+  } catch (error) {
+    notifyError(error);
+  }
 }
 
 function onApply() {

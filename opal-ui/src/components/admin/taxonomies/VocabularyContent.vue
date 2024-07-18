@@ -1,6 +1,8 @@
 <template>
   <div class="text-h5">
     <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ vocabulary.name }}</span>
+    <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
+    <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
@@ -58,8 +60,11 @@
     <template v-slot:body-cell-title="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         <template v-for="locale in locales" :key="locale">
-          <div class="q-py-xs">
-            <code class="text-secondary q-my-xs">{{ locale }}</code> {{ taxonomiesStore.getLabel(props.value, locale) }}
+          <div v-if="props.value" class="row no-wrap q-py-xs">
+            <div class="col-auto">
+              <code class="text-secondary q-my-xs">{{ locale }}</code>
+            </div>
+            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
           </div>
         </template>
       </q-td>
@@ -67,7 +72,7 @@
     <template v-slot:body-cell-description="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         <template v-for="locale in locales" :key="locale">
-          <div class="row no-wrap q-py-xs">
+          <div v-if="props.value" class="row no-wrap q-py-xs">
             <div class="col-auto">
               <code class="text-secondary q-my-xs">{{ locale }}</code>
             </div>
@@ -77,6 +82,22 @@
       </q-td>
     </template>
   </q-table>
+
+  <!-- Dialogs -->
+
+  <confirm-dialog
+    v-model="showDelete"
+    :title="$t('delete')"
+    :text="$t('delete_vocabulary_confirm', { taxonomy: taxonomy, vocabulary: vocabulary.name })"
+    @confirm="doDelete"
+  />
+
+  <add-vocabulary-dialog
+    v-model="showEditVocabulary"
+    :taxonomy="taxonomy"
+    :vocabulary="vocabulary"
+    @update:modelValue="onVocabularyEdited"
+  />
 </template>
 
 <script lang="ts">
@@ -87,20 +108,27 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { VocabularyDto, TermDto } from 'src/models/Opal';
-import useEntityContent from 'src/components/admin/taxonomies/EntityContent';
+import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import AddVocabularyDialog from 'src//components/admin/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { locales } from 'boot/i18n';
+import { notifyError } from 'src/utils/notify';
 
 // import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 interface Props {
+  taxonomy: string;
   vocabulary: VocabularyDto;
 }
 
 const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const { t } = useI18n({ useScope: 'global' });
+const router = useRouter();
 const tableKey = ref(0);
+const showDelete = ref(false);
+const showEditVocabulary = ref(false);
 const {
   initialPagination,
   toolsVisible,
@@ -116,7 +144,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
-} = useEntityContent<TermDto>(() => props.vocabulary, 'terms');
+} = useTaxonomyEntityContent<TermDto>(() => props.vocabulary, 'terms');
 
 const properties: FieldItem<VocabularyDto>[] = [
   {
@@ -148,7 +176,8 @@ const columns = computed(() => [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
-    style: 'width: 15%',
+    headerStyle: 'width: 20%; white-space: normal;',
+    style: 'width: 20%; white-space: normal;',
   },
   {
     name: 'title',
@@ -161,8 +190,8 @@ const columns = computed(() => [
     label: t('description'),
     align: 'left',
     field: 'description',
-    headerStyle: 'width: 60%; white-space: normal;',
-    style: 'width: 60%; white-space: normal;',
+    headerStyle: 'width: 50%; white-space: normal;',
+    style: 'width: 50%; white-space: normal;',
   },
 ]);
 
@@ -174,6 +203,32 @@ function onApply() {
 
 function onResetSort() {
   emit('refresh');
+}
+
+async function doDelete() {
+  showDelete.value = false;
+  try {
+    await taxonomiesStore.deleteVocabulary(props.taxonomy, props.vocabulary);
+    router.replace(`/admin/taxonomies/${props.taxonomy}`);
+  } catch (error) {
+    notifyError(error);
+  }
+
+}
+
+// Handlers
+
+function onEditVocabulary() {
+  showEditVocabulary.value = true;
+}
+
+function onVocabularyEdited() {
+  showEditVocabulary.value = false;
+  emit('refresh');
+}
+
+async function onDelete() {
+  showDelete.value = true;
 }
 
 watch(

@@ -70,7 +70,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { TaxonomyDto, LocaleTextDto } from 'src/models/Opal';
+import { TaxonomyDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import LocalizedField from 'src/components/LocalizedField.vue';
 import { getCreativeCommonsLicense } from 'src/utils/taxonomies';

@@ -10,7 +10,7 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page v-if="vocabulary" class="q-pa-md">
-      <vocabulary-content :vocabulary="vocabulary" @update="onUpdate" @refresh="onRefresh"></vocabulary-content>
+      <vocabulary-content :taxonomy="taxonomyName" :vocabulary="vocabulary" @update="onUpdate" @refresh="onRefresh"></vocabulary-content>
     </q-page>
   </div>
 </template>

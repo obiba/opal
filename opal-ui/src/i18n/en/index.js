@@ -373,6 +373,7 @@ export default {
     token: {
       name_required: 'Token name is required',
     },
+    text_required: 'A text is required',
   },
   main: {
     brand: 'Opal',
@@ -502,6 +503,7 @@ export default {
   delete_tables_confirm: 'No tables to delete | Are you sure you want to delete this table? | Are you sure you want to delete these {count} tables?',
   delete_token_confirm: 'Are you sure you want to delete token \'{token}\'?',
   delete_taxonomy_confirm: 'Are you sure you want to delete taxonomy \'{taxonomy}\'?',
+  delete_vocabulary_confirm: 'Are you sure you want to delete vocabulary \'{vocabulary}\' from \'{taxonomy}\' taxonomy?',
   delete_permission_confirm: 'Are you sure you want to delete permission of \'{principal}\'?',
   delete_profile_acl_confirm: 'Are you sure you want to revoke the selected permission? | Are you sure you want to revoke these {count} permissions?',
   delete_profile_confirm: 'Are you sure you want to delete profile \'{profile}\'?',

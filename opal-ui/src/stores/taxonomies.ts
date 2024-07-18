@@ -71,12 +71,20 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.put(`/system/conf/taxonomy/${taxonomy.name}`, taxonomy).then((response) => response.data);
   }
 
+  async function deleteTaxonomy(taxonomy: TaxonomyDto) {
+    return api.delete(`/system/conf/taxonomy/${taxonomy.name}`);
+  }
+
   async function addVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
     return api.post(`/system/conf/taxonomy/${taxonomyName}/vocabularies`, vocabulary).then((response) => response.data);
   }
 
   async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
     return api.put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`, vocabulary).then((response) => response.data);
+  }
+
+  async function deleteVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
+    return api.delete(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`);
   }
 
   async function getVocabulary(taxonomyName: string, vocabularyName: string) {
@@ -133,11 +141,6 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return annotations;
   }
 
-
-  async function deleteTaxonomy(taxonomy: TaxonomyDto) {
-    return api.delete(`/system/conf/taxonomy/${taxonomy.name}`);
-  }
-
   function downloadTaxonomy(taxonomy: TaxonomyDto) {
     window.open(`${baseUrl}/system/conf/taxonomy/${taxonomy.name}/_download`, '_self');
   }
@@ -156,12 +159,13 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     addTaxonomy,
     getTaxonomy,
     updateTaxonomy,
+    deleteTaxonomy,
     addVocabulary,
     updateVocabulary,
+    deleteVocabulary,
     getVocabulary,
     getLabel,
     getAnnotations,
-    deleteTaxonomy,
     downloadTaxonomy,
   };
 });

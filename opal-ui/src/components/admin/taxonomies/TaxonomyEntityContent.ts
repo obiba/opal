@@ -6,7 +6,7 @@ import { locales } from 'boot/i18n';
  * @param getProps returns the proper component props field
  * @returns common variables and functions for taxonomy contents
  */
-export default function useEntityContent<TYPE extends VocabularyDto | TermDto>(getProps: any, collectionName: string) {
+export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | TermDto>(getProps: any, collectionName: string) {
   const canSort = ref(true);
   const dirty = ref(false);
   const sortedName = ref<string[]>([]);

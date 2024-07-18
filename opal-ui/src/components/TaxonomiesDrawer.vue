@@ -46,7 +46,7 @@
             -->
             <q-item clickable v-close-popup @click.prevent="onAddTaxonomy">
               <q-item-section>
-                <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+                <q-item-label>{{ $t('taxonomy.add') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
