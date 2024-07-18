@@ -19,6 +19,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     rowsPerPage: 10,
     minRowsForPagination: 10,
   });
+  const filter = ref('');
 
   // Functions
 
@@ -74,8 +75,22 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
 
   // Handlers
 
+  function onFilter(tableRows: VocabularyDto[], filter: string) {
+    if (filter.length === 0) {
+      return tableRows;
+    }
+    const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
+    const result = tableRows.filter((row) => {
+      return Object.values(row).some((val) => {
+        return String(val).toLowerCase().includes(query);
+      });
+    });
+
+    return result;
+  };
+
   function onOverRow(row: TYPE) {
-    toolsVisible.value[row.name] = true;
+    toolsVisible.value[row.name] = true && filter.value.length === 0;
   }
 
   function onLeaveRow(row: TYPE) {
@@ -128,6 +143,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     dirty,
     taxonomiesStore,
     rows,
+    filter,
     applySort,
     onOverRow,
     onLeaveRow,
@@ -135,5 +151,6 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     onMoveDown,
     generateLocaleRows,
     customSort,
+    onFilter,
   };
 }

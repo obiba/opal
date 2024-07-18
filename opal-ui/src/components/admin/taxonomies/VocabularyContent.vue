@@ -8,23 +8,35 @@
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
   </div>
 
-  <div class="text-h6 q-mb-md q-mt-lg">{{ $t('terms') }}</div>
+  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('terms') }}</div>
   <q-table
     flat
     :key="tableKey"
     :rows="rows"
     :columns="columns"
     :sort-method="customSort"
+    :filter="filter"
+    :filter-method="onFilter"
     binary-state-sort
     row-key="name"
     :pagination="initialPagination"
     :hide-pagination="rows.length <= initialPagination.rowsPerPage"
   >
-    <template v-slot:top-left v-if="dirty">
+    <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
-        <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+        <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddTerm" />
+        <template v-if="dirty">
+          <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
+          <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+        </template>
       </div>
+    </template>
+    <template v-slot:top-right>
+      <q-input dense clearable debounce="400" color="primary" v-model="filter">
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -115,8 +127,6 @@ import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { locales } from 'boot/i18n';
 import { notifyError } from 'src/utils/notify';
 
-// import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-
 interface Props {
   taxonomy: string;
   vocabulary: VocabularyDto;
@@ -129,6 +139,7 @@ const router = useRouter();
 const tableKey = ref(0);
 const showDelete = ref(false);
 const showEditVocabulary = ref(false);
+const showAddTerm = ref(false);
 const {
   initialPagination,
   toolsVisible,
@@ -137,6 +148,7 @@ const {
   dirty,
   taxonomiesStore,
   rows,
+  filter,
   applySort,
   onOverRow,
   onLeaveRow,
@@ -144,6 +156,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
+  onFilter,
 } = useTaxonomyEntityContent<TermDto>(() => props.vocabulary, 'terms');
 
 const properties: FieldItem<VocabularyDto>[] = [
@@ -213,13 +226,17 @@ async function doDelete() {
   } catch (error) {
     notifyError(error);
   }
-
 }
 
 // Handlers
 
 function onEditVocabulary() {
   showEditVocabulary.value = true;
+}
+
+
+function onAddVocabulary() {
+  showAddTerm.value = true;
 }
 
 function onVocabularyEdited() {

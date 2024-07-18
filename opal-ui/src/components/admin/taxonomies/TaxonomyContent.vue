@@ -10,13 +10,15 @@
     <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
   </div>
 
-  <div class="text-h6 q-mb-md q-mt-lg">{{ $t('vocabularies') }}</div>
+  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('vocabularies') }}</div>
   <q-table
     flat
     :key="tableKey"
     :rows="rows"
     :columns="columns"
     :sort-method="customSort"
+    :filter="filter"
+    :filter-method="onFilter"
     binary-state-sort
     row-key="name"
     :pagination="initialPagination"
@@ -30,6 +32,13 @@
           <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
         </template>
       </div>
+    </template>
+    <template v-slot:top-right>
+      <q-input dense clearable debounce="400" color="primary" v-model="filter">
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -151,6 +160,7 @@ const {
   dirty,
   taxonomiesStore,
   rows,
+  filter,
   applySort,
   onOverRow,
   onLeaveRow,
@@ -158,6 +168,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
+  onFilter,
 } = useTaxonomyEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
 
 const properties: FieldItem<TaxonomyDto>[] = [
