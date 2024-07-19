@@ -145,7 +145,6 @@ export default defineComponent({
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 import { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
-import { on } from 'events';
 
 interface DialogProps {
   modelValue: boolean;
@@ -300,7 +299,8 @@ async function onApply() {
   if (props.annotation) {
     await datasourceStore.deleteAnnotation(props.variables, props.annotation.taxonomy.name, props.annotation.vocabulary.name);
   }
-  datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  await datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  datasourceStore.loadTableVariables();
 }
 
 function onMarkdownGuide() {
