@@ -19,7 +19,7 @@
       </template>
       <template v-slot:body-cell-type="props">
         <q-td :props="props">
-          <q-badge color="grey-6" class="on-left">{{ props.value }}</q-badge>
+          <q-badge :color="getResourceFactory(props.row) ? 'positive' : 'negative'" class="on-left">{{ props.value }}</q-badge>
           <span class="text-caption">{{ getResourceFactory(props.row)?.title }}</span>
         </q-td>
       </template>

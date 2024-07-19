@@ -9,8 +9,11 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h5">
+      <div class="text-h5 q-mb-md">
         {{ $t('resources') }}
+      </div>
+      <div class="text-help">
+        {{ $t('resources_info') }}
       </div>
       <q-tabs
         v-model="tab"

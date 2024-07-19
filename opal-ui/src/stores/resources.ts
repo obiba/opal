@@ -33,8 +33,16 @@ export const useResourcesStore = defineStore('resources', () => {
     return api.get(`/project/${project.value}/resources`).then((response) => resourceReferences.value = response.data);
   }
 
+  function getResourceReference(name: string) {
+    return resourceReferences.value?.find((reference) => reference.name === name);
+  }
+
   function getResourceFactory(reference: ResourceReferenceDto) {
     return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider)?.resourceFactories.find((factory) => factory.name === reference.factory);
+  }
+
+  function getResourceProvider(reference: ResourceReferenceDto) {
+    return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider);
   }
 
   return {
@@ -45,6 +53,8 @@ export const useResourcesStore = defineStore('resources', () => {
     initResourceReferences,
     loadResourceReferences,
     getResourceFactory,
+    getResourceReference,
+    getResourceProvider,
   }
 
 });

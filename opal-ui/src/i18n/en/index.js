@@ -898,4 +898,8 @@ export default {
   attribute_name_hint: 'A name for the attribute is required.',
   label_description: 'Label & description',
   description: 'Description',
+  resources_info: 'Resources are datasets or computation units which location is described by a URL and access is protected by credentials. When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance computers are made accessible to data analysts.',
+  format: 'Format',
+  provider: 'Provider',
+  provider_not_found: 'Provider not found: no R server can provide a way to make this resource available. Is the R package {provider} installed?',
 };
