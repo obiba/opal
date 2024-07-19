@@ -193,6 +193,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   function getAnnotations(attributes: AttributeDto[], withTerms: boolean): Annotation[] {
+    if (!attributes) return [];
     const annotations = attributes
       .filter((a) => a.namespace && a.name && a.value)
       .map((a) => {

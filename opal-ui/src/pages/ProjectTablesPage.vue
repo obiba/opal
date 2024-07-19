@@ -10,8 +10,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5">
-        <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
-        ><span class="on-right">{{ $t('tables') }}</span>
+        {{ $t('tables') }}
       </div>
       <q-tabs
         v-model="tab"

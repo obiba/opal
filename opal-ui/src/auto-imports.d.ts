@@ -79,6 +79,7 @@ declare global {
   const useProfilesStore: typeof import('./stores/profiles')['useProfilesStore']
   const useProjectsStore: typeof import('./stores/projects')['useProjectsStore']
   const useRStore: typeof import('./stores/r')['useRStore']
+  const useResourcesStore: typeof import('./stores/resources')['useResourcesStore']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
@@ -177,6 +178,7 @@ declare module 'vue' {
     readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
     readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
+    readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
@@ -267,6 +269,7 @@ declare module '@vue/runtime-core' {
     readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
     readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
+    readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>

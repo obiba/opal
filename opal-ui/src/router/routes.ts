@@ -51,6 +51,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/ProjectResourcesPage.vue'),
       },
       {
+        path: '/project/:id/resource/:rid',
+        component: () => import('pages/ProjectResourcePage.vue'),
+      },
+      {
         path: '/project/:id/files',
         component: () => import('pages/ProjectFilesPage.vue'),
       },

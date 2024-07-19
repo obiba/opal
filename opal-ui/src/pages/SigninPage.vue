@@ -148,6 +148,7 @@ const systemStore = useSystemStore();
 const authStore = useAuthStore();
 const authzStore = useAuthzStore();
 const datasourceStore = useDatasourceStore();
+const resourcesStore = useResourcesStore();
 const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
 const commandsStore = useCommandsStore();
@@ -192,6 +193,7 @@ onMounted(() => {
   authzStore.reset();
   commandsStore.reset();
   datasourceStore.reset();
+  resourcesStore.reset();
   filesStore.reset();
   pluginsStore.reset();
   projectsStore.reset();

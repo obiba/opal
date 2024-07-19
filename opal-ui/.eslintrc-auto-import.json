@@ -97,6 +97,7 @@
     "useTokensStore": true,
     "useIdentityProvidersStore": true,
     "TOKEN_TYPES": true,
-    "useTaxonomiesStore": true
+    "useTaxonomiesStore": true,
+    "useResourcesStore": true
   }
 }
