@@ -13,7 +13,6 @@
         />
         <div v-if="factory">
           <q-markdown :src="factory.description" no-heading-anchor-links class="q-pa-md"/>
-          <q-separator />
         </div>
       </div>
       <div class="col-12 col-md-6">
@@ -79,7 +78,7 @@ function init() {
 const itemsReference: FieldItem<ResourceReferenceDto>[] = [
   { field: 'name', },
   { field: 'description', },
-  { field: 'resource', label: 'URL', html: (val) => val.resource ? `<a href="${val.resource?.url}" target="_blank">${val.resource?.url}</a>` : '' },
+  { field: 'resource', label: 'URL', html: (val) => val.resource && val.resource?.url.startsWith('http') ? `<a href="${val.resource?.url}" target="_blank">${val.resource?.url}</a>` : val.resource?.url },
   { field: 'resource', label: 'format', html: (val) => val.resource?.format ? `<code>${val.resource?.format}</code>` : undefined },
 ];
 

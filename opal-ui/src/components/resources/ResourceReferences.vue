@@ -29,8 +29,7 @@
           <span v-else>{{ props.value }}</span>
         </q-td>
       </template>
-  </q-table>
-    <pre>{{ resourcesStore.resourceReferences }}</pre>
+    </q-table>
   </div>
 </template>
 
