@@ -41,38 +41,7 @@
       </div>
     </q-card-section>
     <q-card-section v-else-if="annotation.attributes" class="q-pa-none q-mb-sm">
-      <div v-if="hasLocale">
-        <q-tabs
-          v-model="tab"
-          dense
-          class="text-grey"
-          active-color="primary"
-          indicator-color="primary"
-          align="left"
-          narrow-indicator
-          no-caps
-        >
-          <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>
-        </q-tabs>
-        <q-tab-panels v-model="tab">
-          <template v-for="loc in locales" :key="loc">
-            <q-tab-panel :name="loc" style="padding-top: 0;">
-              <q-card bordered flat>
-                <q-card-section>
-                  <q-markdown :src="getValue(loc)" no-heading-anchor-links />
-                </q-card-section>
-              </q-card>
-            </q-tab-panel>
-          </template>
-        </q-tab-panels>
-      </div>
-      <div v-else>
-        <q-card bordered flat>
-          <q-card-section>
-            <q-markdown :src="annotation.attributes[0].value" no-heading-anchor-links />
-          </q-card-section>
-        </q-card>
-      </div>
+      <attributes-bundle-panel :bundle="annotation" />
     </q-card-section>
   </q-card>
 </template>
@@ -85,6 +54,8 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { Annotation } from 'src/components/models';
+import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
+
 const taxonomiesStore = useTaxonomiesStore();
 const { locale } = useI18n({ useScope: 'global' });
 
@@ -94,18 +65,7 @@ interface Props {
   header?: boolean;
 }
 
-const NO_LOCALE = 'default';
+defineProps<Props>();
 
-const props = defineProps<Props>();
-
-const locales = computed(() => props.annotation.attributes?.map(attr => attr.locale || NO_LOCALE) || []);
-
-const hasLocale = computed(() => locales.value.length > 1 || locales.value[0] !== NO_LOCALE);
-
-const tab = ref(locales.value[0] || NO_LOCALE);
 const showDetails = ref(false);
-
-function getValue(locale: string) {
-  return props.annotation.attributes?.find(attr => attr.locale === (locale === NO_LOCALE ? undefined : locale))?.value || '';
-}
 </script>

@@ -299,7 +299,8 @@ async function onApply() {
   if (props.annotation) {
     await datasourceStore.deleteAnnotation(props.variables, props.annotation.taxonomy.name, props.annotation.vocabulary.name);
   }
-  datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  await datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  datasourceStore.loadTableVariables();
 }
 
 function onMarkdownGuide() {

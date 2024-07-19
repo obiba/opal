@@ -791,6 +791,7 @@ export default {
   more: 'More',
   less: 'Less',
   delete_annotation_confirm: 'Are you sure you want to delete this annotation?',
+  delete_attributes_confirm: 'Are you sure you want to delete this attribute (all languages)?',
   annotation_texts_hint: 'Annotate with free text. For human readibility, you can provide a different text for each language. For machine processing or not localized text, choose "default" language. Empty text will be ignored. Markdown text format is supported.',
   preview: 'Preview',
   markdown_guide: 'Markdown guide',
@@ -798,7 +799,9 @@ export default {
   records: 'Records',
   attributes_info: 'Attributes can be used to store metadata in a structured way.',
   attributes_annotations_info: 'Annotations are attributes that are described by taxonomies. They are used to provide additional information or to classify the variable.',
-  attributes_records_info: 'These are the attributes as they are stored in the variable dictionary. The triplet (namespace, name, locale) defines uniquely an attribute. For annotations, the "namespace" is the taxonomy name, the "name" is the vocabulary name in the taxonomy and the "value" is the term in the vocabulary. Other reserved attribute names are "label" and "description" (without namespace).',
+  attributes_records_info: 'These are the attributes as they are stored in the variable dictionary. The triplet (namespace, name, locale) defines uniquely an attribute. For annotations, the "namespace" is the taxonomy name, the "name" is the vocabulary name in the taxonomy and the "value" is the term in the vocabulary. Other reserved attribute names are "label", "description" and "script" (without namespace).',
   attribute_namespace_hint: 'A namespace is optional.',
   attribute_name_hint: 'A name for the attribute is required.',
+  label_description: 'Label & description',
+  description: 'Description',
 };

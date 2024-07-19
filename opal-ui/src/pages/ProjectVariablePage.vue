@@ -17,7 +17,7 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h6">
+      <div class="text-h6 q-mb-md">
         <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ vName }}</span>
         <q-btn
@@ -41,34 +41,10 @@
           class="on-right"
         />
       </div>
-      <q-card flat bordered class="bg-grey-3 q-mt-md q-mb-md">
-        <q-card-section>
-          <div
-            v-for="attr in getLabels(datasourceStore.variable?.attributes)"
-            :key="attr.locale"
-          >
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
-            <span>{{ attr.value }}</span>
-          </div>
-          <div
-            v-for="attr in getDescriptions(datasourceStore.variable?.attributes)"
-            :key="attr.locale"
-          >
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
-            <span class="text-italic">{{ attr.value }}</span>
-          </div>
-        </q-card-section>
-      </q-card>
+
+      <attributes-bundle-panel :bundle="labelBundle" />
+      <attributes-bundle-panel :bundle="descriptionBundle" />
+
       <q-tabs
         v-model="tab"
         dense
@@ -159,8 +135,8 @@ import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
+import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
 import { VariableDto } from 'src/models/Magma';
-import { getLabels, getDescriptions } from 'src/utils/attributes';
 
 const route = useRoute();
 const router = useRouter();
@@ -170,8 +146,13 @@ const taxonomiesStore = useTaxonomiesStore();
 const showEdit = ref(false);
 const showAddToView = ref(false);
 const showDelete = ref(false);
-
 const tab = ref('dictionary');
+
+const bundles = computed(() => datasourceStore.variableAttributesBundles || []);
+
+const labelBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'label'));
+const descriptionBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'description'));
+
 
 const items1: FieldItem<VariableDto>[] = [
   {

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
+import { AttributesBundle } from 'src/components/models';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -23,6 +24,25 @@ export const useDatasourceStore = defineStore('datasource', () => {
   const variables = ref([] as VariableDto[]); // current table variables
   const variable = ref({} as VariableDto); // current variable
   const perms = ref({} as DatasourcePerms);
+
+  const variableAttributesBundles = computed(() => {
+    if (!variable.value?.attributes) return [];
+    // bundle attributes by namespace and name into a AttributesBundle array
+    const bundles = variable.value.attributes.reduce((acc: AttributesBundle[], attr) => {
+      const id = attr.namespace ? `${attr.namespace}::${attr.name}` : attr.name;
+      const index = acc.findIndex(bundle => bundle.id === id);
+      if (index === -1) {
+        acc.push({
+          id,
+          attributes: [attr]
+        } as AttributesBundle);
+      } else {
+        acc[index].attributes.push(attr);
+      }
+      return acc;
+    }, []);
+    return bundles;
+  });
 
   function reset() {
     datasource.value = {} as DatasourceDto;
@@ -397,7 +417,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     }
     variable.attributes.push(...attributes);
 
-    return api.post(`${parentLink}/variables`, variables);
+    return api.post(`${parentLink}/variables`, [variable]);
   }
 
   async function deleteAttributes(variable: VariableDto, namespace: string | undefined, name: string) {
@@ -419,12 +439,14 @@ export const useDatasourceStore = defineStore('datasource', () => {
     view,
     variables,
     variable,
+    variableAttributesBundles,
     perms,
     initDatasourceTables,
     initDatasourceTable,
     initDatasourceTableVariables,
     initDatasourceTableVariable,
     loadTable,
+    loadTableVariables,
     isNewTableNameValid,
     addTable,
     addVariablesView,

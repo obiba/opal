@@ -65,10 +65,13 @@ export interface FormObject {
   [key: string]: boolean | number | string | FileObject | FormObject | undefined;
 }
 
-export interface Annotation {
+export interface AttributesBundle {
   id: string;
+  attributes: AttributeDto[];
+}
+
+export interface Annotation extends AttributesBundle {
   taxonomy: TaxonomyDto;
   vocabulary: VocabularyDto;
   term: TermDto;
-  attributes: AttributeDto[];
 }

@@ -117,12 +117,13 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { TableDto, VariableDto, AttributeDto } from 'src/models/Magma';
+import { AttributesBundle } from 'src/components/models';
 
 interface DialogProps {
   modelValue: boolean;
   table: TableDto;
   variable: VariableDto;
-  attributes?: AttributeDto[];
+  bundle?: AttributesBundle;
 }
 
 const props = defineProps<DialogProps>();
@@ -141,8 +142,8 @@ const tab = ref(NO_LOCALE);
 
 const locales = computed(() => {
   const availableLocales = [...systemStore.generalConf.languages];
-  if (props.attributes) {
-    props.attributes.forEach((attr) => {
+  if (props.bundle && props.bundle.attributes) {
+    props.bundle.attributes.forEach((attr) => {
       if (attr.locale && !availableLocales.includes(attr.locale)) {
         availableLocales.push(attr.locale);
       }
@@ -155,12 +156,12 @@ const showDialog = ref(props.modelValue);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    if (props.attributes && props.attributes.length > 0) {
-      namespace.value = props.attributes[0].namespace || '';
-      name.value = props.attributes[0].name;
+    if (props.bundle && props.bundle.attributes.length > 0) {
+      namespace.value = props.bundle.attributes[0].namespace || '';
+      name.value = props.bundle.attributes[0].name;
       texts.value = {};
       previews.value = {};
-      props.attributes.forEach((attr) => {
+      props.bundle.attributes.forEach((attr) => {
         texts.value[attr.locale || NO_LOCALE] = attr.value;
       });
     } else {
@@ -179,9 +180,9 @@ function onHide() {
 }
 
 async function onApply() {
-  if (props.attributes && props.attributes.length > 0) {
+  if (props.bundle && props.bundle.attributes.length > 0) {
     // provided are to be modified
-    await datasourceStore.deleteAttributes(props.variable, props.attributes[0].namespace, props.attributes[0].name);
+    await datasourceStore.deleteAttributes(props.variable, props.bundle.attributes[0].namespace, props.bundle.attributes[0].name);
   }
   // any existing is to be updated
   await datasourceStore.deleteAttributes(props.variable, namespace.value === '' ? undefined : namespace.value, name.value);
@@ -198,6 +199,7 @@ async function onApply() {
   }
   if (attributes.length > 0) {
     await datasourceStore.applyAttributes(props.variable, attributes);
+    datasourceStore.loadTableVariables();
   }
   onHide();
 }
