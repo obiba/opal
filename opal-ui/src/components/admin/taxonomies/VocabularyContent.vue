@@ -85,9 +85,9 @@
         <template v-for="locale in locales" :key="locale">
           <div v-if="props.value" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <code class="text-secondary q-my-xs">{{ locale }}</code>
+              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
           </div>
         </template>
       </q-td>
@@ -97,9 +97,9 @@
         <template v-for="locale in locales" :key="locale">
           <div v-if="props.value" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <code class="text-secondary q-my-xs">{{ locale }}</code>
+              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
           </div>
         </template>
       </q-td>

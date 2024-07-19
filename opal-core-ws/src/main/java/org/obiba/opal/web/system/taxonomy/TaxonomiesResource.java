@@ -107,8 +107,7 @@ public class TaxonomiesResource {
 
   @POST
   public Response addTaxonomy(@Context UriInfo uriInfo, TaxonomyDto dto) {
-    if (taxonomyService.hasTaxonomy(dto.getName()))
-      return Response.status(Response.Status.BAD_REQUEST).build();
+    taxonomyService.ensureUniqueTaxonomy(dto.getName());
     taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(dto.getName()).build();
     return Response.created(uri).build();

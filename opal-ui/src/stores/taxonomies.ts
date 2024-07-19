@@ -117,6 +117,22 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.delete(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${term.name}`);
   }
 
+  async function gitCommits(name: string) {
+    return api.get(`/system/conf/taxonomy/${name}/commits`).then((response) => response.data);
+  }
+
+  async function gitCompare(name: string, id: string) {
+    return api.get(`/system/conf/taxonomy/${name}/commit/${id}`).then((response) => response.data);
+  }
+
+  async function gitCompareWith(name: string, id: string, withId = 'head') {
+    return api.get(`/system/conf/taxonomy/${name}/commit/${withId}/${id}`).then((response) => response.data);
+  }
+
+  async function gitRestore(name: string, id: string) {
+    return api.put(`/system/conf/taxonomy/${name}/restore/${id}`).then((response) => response.data);
+  }
+
   function getLabel(messages: LocaleTextDto[], locale: string): string {
     if (!messages || messages.length === 0) return '';
     let msg = messages.find((msg) => msg.locale === locale);
@@ -191,6 +207,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     addTerm,
     updateTerm,
     deleteTerm,
+    gitCommits,
+    gitCompare,
+    gitCompareWith,
+    gitRestore,
     getLabel,
     getAnnotations,
     downloadTaxonomy,

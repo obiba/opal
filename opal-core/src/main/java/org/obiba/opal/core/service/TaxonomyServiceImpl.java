@@ -14,9 +14,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.git.CommitInfo;
+import org.obiba.opal.core.cfg.DuplicateTaxonomyException;
 import org.obiba.opal.core.cfg.GitService;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
@@ -29,7 +31,6 @@ import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,8 +95,8 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
     try {
       ObjectMapper mapper = new ObjectMapper();
       List<Map<String, Object>> tagsInfo = mapper.readValue(new URL(String.format(GITHUB_API_REF_URL, user, repo)),
-          new TypeReference<List<Map<String, Object>>>() {
-          });
+        new TypeReference<List<Map<String, Object>>>() {
+        });
       for (Map<String, Object> tag : tagsInfo) {
         tags.add(tag.get("name").toString());
       }
@@ -155,6 +156,14 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   }
 
   @Override
+  public void ensureUniqueTaxonomy(String name) throws DuplicateTaxonomyException {
+    taxonomies.stream().filter(t -> t.getName().equals(name)).findFirst()
+      .ifPresent(t -> {
+        throw new DuplicateTaxonomyException(t);
+      });
+  }
+
+  @Override
   public boolean hasTaxonomy(@NotNull String name) {
     for (Taxonomy taxonomy : taxonomies) {
       if (taxonomy.getName().equals(name)) return true;
@@ -188,7 +197,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
 
   @Override
   public void saveTaxonomy(@NotNull String taxonomy, @NotNull Taxonomy taxonomyObj)
-      throws NoSuchTaxonomyException {
+    throws NoSuchTaxonomyException {
     synchronized (this) {
       if (!hasTaxonomy(taxonomy)) throw new NoSuchTaxonomyException(taxonomy);
       taxonomies.remove(getTaxonomy(taxonomy));
@@ -239,7 +248,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
 
   @Override
   public boolean hasVocabulary(@NotNull String taxonomyName, @NotNull String vocabularyName)
-      throws NoSuchTaxonomyException {
+    throws NoSuchTaxonomyException {
     Taxonomy taxonomy = getTaxonomy(taxonomyName);
     if (taxonomy == null) throw new NoSuchTaxonomyException(taxonomyName);
     return taxonomy.hasVocabulary(vocabularyName);

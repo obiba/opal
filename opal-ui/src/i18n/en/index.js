@@ -109,6 +109,7 @@ export default {
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
     DuplicateIDProvider:'The identity provider already exists',
     DuplicateSubjectToken:'The token already exists',
+    DuplicateTaxonomy:'The taxonomy already exists',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -295,6 +296,11 @@ export default {
       description: 'VCF_STORE_VIEW',
     },
   },
+  git: {
+    diff_viewer: {
+      title: 'Commit Details',
+    }
+  },
   user_profile: {
     title: 'My profile',
     groups: 'Your account belongs to the group | Your account belongs to the {count} groups',
@@ -403,6 +409,9 @@ export default {
     description_hint: 'Optional description of the taxonomy.',
     add: 'Add Taxonomy',
     edit: 'Edit Taxonomy',
+    change_history: 'History of Changes',
+    compare_current: 'Compare with current',
+    restore_confirm: 'Are you sure you want to restore the version from \'{date}\'? This will replace the current information.',
     vocabulary: {
       title: 'Vocabulary',
       name_hint: 'A vocabulary must have a unique name.',
@@ -463,8 +472,10 @@ export default {
   char_set: 'Character set',
   clear_tasks_confirm: 'No tasks to clear | Are you sure you want to clear this task? (does not apply if task is running) | Are you sure you want to clear these {count} tasks? (running tasks will not be affected)',
   clear: 'Clear',
+  close: 'Close',
   code: 'Code',
   comment: 'Comment',
+  compare: 'Compare',
   configuration: 'Configuration',
   configure_import_source: 'Configure import source',
   confirm: 'Confirm',
@@ -695,6 +706,7 @@ export default {
   reset: 'Reset',
   resources: 'Resources',
   resource: 'Resource',
+  restore: 'Restore',
   restore_views: 'Restore views',
   rservers_caption: 'Configure R server, grant access to R service',
   rservers: 'R',

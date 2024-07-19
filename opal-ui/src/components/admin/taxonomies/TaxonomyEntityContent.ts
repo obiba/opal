@@ -6,7 +6,10 @@ import { locales } from 'boot/i18n';
  * @param getProps returns the proper component props field
  * @returns common variables and functions for taxonomy contents
  */
-export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | TermDto>(getProps: any, collectionName: string) {
+export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | TermDto>(
+  getProps: any,
+  collectionName: string
+) {
   const canSort = ref(true);
   const dirty = ref(false);
   const sortedName = ref<string[]>([]);
@@ -45,7 +48,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
           (locale) =>
             `
             <div class="row no-wrap q-py-xs">
-              <div class="col-auto"><code class="text-secondary q-my-xs">${locale}</code></div>
+              <div class="col-auto"><span class="q-badge bg-grey-6 flex inline items-center no-wrap" >${locale}</span></div>
               <div class="col q-ml-sm">${taxonomiesStore.getLabel(val, locale)}</div>
             </div>
             `
@@ -87,7 +90,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     });
 
     return result;
-  };
+  }
 
   function onOverRow(row: TYPE) {
     toolsVisible.value[row.name] = true && filter.value.length === 0;

@@ -78,9 +78,9 @@
         <template v-for="locale in locales" :key="locale">
           <div v-if="props.value" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <code class="text-secondary q-my-xs">{{ locale }}</code>
+              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
           </div>
         </template>
       </q-td>
@@ -104,6 +104,9 @@
     </template>
   </q-table>
 
+  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
+  <taxonomy-git-history :taxonomy="taxonomy" @restore="onGitRestored"/>
+
   <!-- Dialogs -->
   <confirm-dialog
     v-model="showDelete"
@@ -112,7 +115,12 @@
     @confirm="doDelete"
   />
 
-  <add-taxonomy-dialog v-model="showEditTaxonomy" :taxonomy="taxonomy" @update:modelValue="onClose" @updated="onTaxonomyUpdated"/>
+  <add-taxonomy-dialog
+    v-model="showEditTaxonomy"
+    :taxonomy="taxonomy"
+    @update:modelValue="onClose"
+    @updated="onTaxonomyUpdated"
+  />
 
   <add-vocabulary-dialog
     v-model="showAddVocabulary"
@@ -135,6 +143,7 @@ import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog
 import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
+import TaxonomyGitHistory from 'src/components/admin/taxonomies/TaxonomyGitHistory.vue';
 import { locales } from 'boot/i18n';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
@@ -267,6 +276,10 @@ function onEditTaxonomy() {
 
 function onClose() {
   showEditTaxonomy.value = false;
+}
+
+function onGitRestored() {
+  emit('refresh');
 }
 
 function onTaxonomyUpdated(updated: TaxonomyDto, oldName?: string) {

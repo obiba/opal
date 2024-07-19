@@ -85,6 +85,13 @@ public interface TaxonomyService extends SystemService, GitService {
   Iterable<Taxonomy> getTaxonomies();
 
   /**
+   * Throws {@link org.obiba.opal.core.cfg.DuplicateTaxonomyException} if {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} with name exists.
+   *
+   * @return
+   */
+  void ensureUniqueTaxonomy(String name) throws DuplicateTaxonomyException;
+
+  /**
    * Check {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} exists from name.
    *
    * @return

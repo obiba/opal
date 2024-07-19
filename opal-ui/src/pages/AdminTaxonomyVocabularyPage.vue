@@ -21,7 +21,6 @@ import { notifyError } from 'src/utils/notify';
 import { VocabularyDto } from 'src/models/Opal';
 
 const route = useRoute();
-const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
 const vocabulary = computed(() => taxonomiesStore.vocabulary || null);
 const taxonomyName = computed(() => route.params.name as string);
