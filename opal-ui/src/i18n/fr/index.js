@@ -794,4 +794,9 @@ export default {
   annotation_texts_hint: 'Annotez avec du texte libre. Pour une lisibilité humaine, vous pouvez fournir un texte différent dans chaque langue. Pour un traitement automatique ou un texte sans localisation, choisissez la langue "default". Le texte vide sera ignoré. Le format de texte Markdown est pris en charge.',
   preview: 'Prévisualiser',
   markdown_guide: 'Guide Markdown',
+  annotations: 'Annotations',
+  records: 'Enregistrements',
+  attributes_info: 'Les attributs peuvent être utilisés pour stocker de l\'information supplémentaire d\'une manière structurée.',
+  attributes_annotations_info: 'Les annotations sont des attributs en lien avec une taxonomie. Ils sont utilisés pour apporter un supplément d\'information ou pour aider à la classification.',
+  attributes_records_info: 'Ce sont les attributs tels qu\'ils sont stockés dans le dictionnaire de la variable. Le triplet (espace de noms, nom, locale) identifie de manière unique un attribut. Les annotations sont des attributs dont l\'"espace de noms" est le nom de la taxonomie associée, le "nom" est le vocabulaire dans la taxonomie et la "valeur" est le terme dans le vocabulaire. Les autres noms d\'attribut réservés sont "label" et "description" (sans espace de noms).',
 };

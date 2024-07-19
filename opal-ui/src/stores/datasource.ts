@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
+import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
 
 interface DatasourcePerms {
@@ -388,6 +388,30 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.post(`${parentLink}/variables`, variables);
   }
 
+  async function applyAttributes(variable: VariableDto, attributes: AttributeDto[]) {
+    const parentLink = variable.parentLink?.link;
+    if (!parentLink) return Promise.reject('No parent link found');
+
+    if (variable.attributes === undefined) {
+      variable.attributes = [];
+    }
+    variable.attributes.push(...attributes);
+
+    return api.post(`${parentLink}/variables`, variables);
+  }
+
+  async function deleteAttributes(variable: VariableDto, namespace: string | undefined, name: string) {
+    const parentLink = variable.parentLink?.link;
+    if (!parentLink) return Promise.reject('No parent link found');
+
+    if (variable.attributes !== undefined) {
+      variable.attributes = variable.attributes.filter((a) => a.namespace !== namespace || a.name !== name);
+    }
+
+    return api.post(`${parentLink}/variables`, [variable]);
+  }
+
+
   return {
     datasource,
     tables,
@@ -424,6 +448,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     getView,
     annotate,
     deleteAnnotation,
+    applyAttributes,
+    deleteAttributes,
     reset,
   };
 });

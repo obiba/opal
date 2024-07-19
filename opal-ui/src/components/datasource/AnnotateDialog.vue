@@ -145,7 +145,6 @@ export default defineComponent({
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 import { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
-import { on } from 'events';
 
 interface DialogProps {
   modelValue: boolean;

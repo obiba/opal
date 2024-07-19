@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="text-help q-mb-md">
+      {{ $t('attributes_info') }}
+    </div>
     <q-tabs
         v-model="tab"
         dense
@@ -10,11 +13,14 @@
         narrow-indicator
       >
         <q-tab name="annotations" :label="$t('annotations')" />
-        <q-tab name="raw" :label="$t('raw')" />
+        <q-tab name="records" :label="$t('records')" />
     </q-tabs>
     <q-separator />
     <q-tab-panels v-model="tab">
       <q-tab-panel name="annotations">
+        <div class="text-help q-mb-md">
+          {{ $t('attributes_annotations_info') }}
+        </div>
         <div v-if="datasourceStore.perms.variable?.canUpdate()" class="q-mb-sm">
           <q-btn
             color="primary"
@@ -60,7 +66,10 @@
           </q-item>
         </q-list>
       </q-tab-panel>
-      <q-tab-panel name="raw">
+      <q-tab-panel name="records">
+        <div class="text-help q-mb-md">
+          {{ $t('attributes_records_info') }}
+        </div>
         <q-table
           ref="tableRef"
           flat
@@ -71,15 +80,13 @@
           :loading="loading"
         >
           <template v-slot:top>
-            <q-btn-dropdown v-if="datasourceStore.perms.variable?.canUpdate()" color="primary" icon="add" :title="$t('add')" size="sm">
-              <q-list>
-                <q-item clickable @click="onShowAnnotate">
-                  <q-item-section>
-                    <q-item-label>{{ $t('annotate') }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
+            <q-btn
+               v-if="datasourceStore.perms.variable?.canUpdate()"
+              color="primary"
+              icon="edit"
+              :title="$t('add')"
+              size="sm"
+              @click="onShowAttribute(undefined)" />
           </template>
           <template v-slot:body-cell-name="props">
             <q-td :props="props">
@@ -103,6 +110,7 @@
 
     <confirm-dialog v-model="showDeleteAnnotation" :title="$t('delete')" :text="$t('delete_annotation_confirm')" @confirm="onConfirmDeleteAnnotation" />
     <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="[datasourceStore.variable]" :annotation="annotationSelected"/>
+    <attribute-dialog v-model="showAttribute" :table="datasourceStore.table" :variable="datasourceStore.variable" :attributes="attributesSelected" />
   </div>
 </template>
 
@@ -115,7 +123,9 @@ export default defineComponent({
 import { Annotation } from 'src/components/models';
 import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
 import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
+import AttributeDialog from 'src/components/datasource/AttributeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { AttributeDto } from 'src/models/Magma';
 
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
@@ -132,6 +142,8 @@ const initialPagination = ref({
 const showAnnotate = ref(false);
 const showDeleteAnnotation = ref(false);
 const annotationSelected = ref<Annotation>();
+const showAttribute = ref(false);
+const attributesSelected = ref<AttributeDto[]>([]);
 
 const columns = [
   {
@@ -184,5 +196,15 @@ function onConfirmDeleteAnnotation() {
   if (annotationSelected.value) {
     datasourceStore.deleteAnnotation([datasourceStore.variable], annotationSelected.value.taxonomy.name, annotationSelected.value.vocabulary.name);
   }
+}
+
+function onShowAttribute(attribute: AttributeDto | undefined) {
+  // find the attributes with same namespace and name
+  if (attribute) {
+    attributesSelected.value = datasourceStore.variable.attributes.filter(attr => attr.namespace === attribute.namespace && attr.name === attribute.name);
+  } else {
+    attributesSelected.value = [];
+  }
+  showAttribute.value = true;
 }
 </script>
