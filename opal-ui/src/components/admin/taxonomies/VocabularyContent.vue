@@ -303,7 +303,6 @@ watch(
   () => props.vocabulary,
   (newValue) => {
     if (!!newValue.name) {
-      console.log('WATCH Vocabulary name changed');
       tableKey.value += 1;
       sortedName.value = [];
       canSort.value = true;

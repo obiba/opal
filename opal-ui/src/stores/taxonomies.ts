@@ -133,6 +133,33 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api.put(`/system/conf/taxonomy/${name}/restore/${id}`).then((response) => response.data);
   }
 
+  async function getMlstrTaxonomies() {
+    return api
+      .get('/system/conf/taxonomies/tags/_github', {
+        params: {
+          user: 'maelstrom-research',
+          repo: 'maelstrom-taxonomies',
+        },
+      })
+      .then((response) => response.data);
+  }
+
+  async function importMlstrTaxonomies(ref: string, override = true) {
+    // https://opal-demo.obiba.org/ws/system/conf/taxonomies/import/_github?user=maelstrom-research&repo=maelstrom-taxonomies&override=true&ref=1.4
+
+
+    return api
+      .post('/system/conf/taxonomies/import/_github', null, {
+        params: {
+          user: 'maelstrom-research',
+          repo: 'maelstrom-taxonomies',
+          override: override,
+          ref: ref,
+        },
+      })
+      .then((response) => response.data);
+  }
+
   function getLabel(messages: LocaleTextDto[], locale: string): string {
     if (!messages || messages.length === 0) return '';
     let msg = messages.find((msg) => msg.locale === locale);
@@ -211,6 +238,8 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     gitCompare,
     gitCompareWith,
     gitRestore,
+    getMlstrTaxonomies,
+    importMlstrTaxonomies,
     getLabel,
     getAnnotations,
     downloadTaxonomy,

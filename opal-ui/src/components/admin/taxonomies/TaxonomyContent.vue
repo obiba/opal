@@ -299,7 +299,6 @@ watch(
   () => props.taxonomy,
   (newValue) => {
     if (!!newValue.name) {
-      console.log('WATCH Taxonomy name changed');
       tableKey.value += 1;
       sortedName.value = [];
       canSort.value = true;

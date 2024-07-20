@@ -188,7 +188,6 @@ watch(
   () => props.taxonomy,
   async (newValue) => {
     if (!!newValue.name) {
-      console.log('Git history', props.taxonomy.name);
       taxonomiesStore
         .gitCommits(props.taxonomy.name)
         .then((response) => {

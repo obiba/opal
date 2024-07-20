@@ -8,6 +8,7 @@
         <template v-if="taxonomyName">
           <q-breadcrumbs-el :label="taxonomyName" />
         </template>
+        <span v-else>Nada</span>
       </q-breadcrumbs>
     </q-toolbar>
   </div>
@@ -20,11 +21,12 @@ const route = useRoute();
 const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
 const taxonomyName = computed(() => route.params.name as string);
+const summaries = computed(() => taxonomiesStore.summaries || []);
+
 
 watch(taxonomyName, (name) => {
   if (name) {
-    console.log('DDDDD');
-    const path = `${route.path.replace(/\/$/, '')}/${taxonomiesStore.summaries[0].name}`;
+    const path = `${route.path.replace(/\/$/, '')}/${summaries.value[0].name}`;
     router.replace(path);
   }
 });
@@ -33,8 +35,9 @@ onMounted(() => {
   taxonomiesStore
     .initSummaries()
     .then(() => {
-      if (!taxonomyName.value) {
-        const path = `${route.path.replace(/\/$/, '')}/${taxonomiesStore.summaries[0].name}`;
+      console.log('TAXs', taxonomyName.value, summaries.value);
+      if (!taxonomyName.value && summaries.value.length > 0) {
+        const path = `${route.path.replace(/\/$/, '')}/${summaries.value[0].name}`;
         router.replace(path);
       }
     })
