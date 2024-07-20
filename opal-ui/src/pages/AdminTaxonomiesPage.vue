@@ -35,7 +35,6 @@ onMounted(() => {
   taxonomiesStore
     .initSummaries()
     .then(() => {
-      console.log('TAXs', taxonomyName.value, summaries.value);
       if (!taxonomyName.value && summaries.value.length > 0) {
         const path = `${route.path.replace(/\/$/, '')}/${summaries.value[0].name}`;
         router.replace(path);

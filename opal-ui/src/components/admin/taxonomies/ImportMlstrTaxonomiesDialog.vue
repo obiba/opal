@@ -72,9 +72,6 @@ export default defineComponent({
 import { notifyError } from 'src/utils/notify';
 import { VcsTagsInfoDto } from 'src/models/Opal';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
-// import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
-// import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
-// import { getCreativeCommonsLicenseUrl } from 'src/utils/taxonomies';
 
 interface DialogProps {
   modelValue: boolean;

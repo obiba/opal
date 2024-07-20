@@ -28,7 +28,6 @@ const vocabularyName = computed(() => route.params.vocabulary as string);
 
 watch(vocabularyName, (newVocabulary) => {
   if (newVocabulary) {
-    console.log('$$$$$ Vocabulary name changed');
     taxonomiesStore.getVocabulary(taxonomyName.value, newVocabulary).catch(notifyError);
   }
 });
@@ -52,7 +51,6 @@ async function onRefresh() {
 }
 
 onMounted(() => {
-  console.log('TaxonomiesPage mounted', taxonomiesStore.summaries);
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch(notifyError);
 });

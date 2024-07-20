@@ -325,7 +325,6 @@ function openWindow(url: string) {
 }
 
 function onHide() {
-  console.log('onHide');
   newProvider.value = { ...emptyProvider };
   groupsMapping.value = 'groupsClaim';
   emit('update:modelValue', false);

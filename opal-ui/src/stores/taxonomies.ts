@@ -4,6 +4,14 @@ import { TaxonomyDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, Vocabular
 import { AttributeDto } from 'src/models/Magma';
 import { Annotation } from 'src/components/models';
 
+export interface TaxonomiesImportOptions {
+  user: string;
+  repo: string;
+  override: boolean | false;
+  ref?: string;
+  file?: string;
+}
+
 export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomies = ref<TaxonomyDto[]>([]);
   const taxonomy = ref<TaxonomyDto>({} as TaxonomyDto);
@@ -144,18 +152,32 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
       .then((response) => response.data);
   }
 
-  async function importMlstrTaxonomies(ref: string, override = true) {
-    // https://opal-demo.obiba.org/ws/system/conf/taxonomies/import/_github?user=maelstrom-research&repo=maelstrom-taxonomies&override=true&ref=1.4
-
-
+  async function importGithubTaxonomies(options: TaxonomiesImportOptions) {
     return api
       .post('/system/conf/taxonomies/import/_github', null, {
+        params: options,
+      })
+      .then((response) => response.data);
+  }
+
+  async function importMlstrTaxonomies(ref: string, override = true) {
+    const params: TaxonomiesImportOptions = {
+      user: 'maelstrom-research',
+      repo: 'maelstrom-taxonomies',
+      override,
+      ref,
+    };
+
+    return importGithubTaxonomies(params);
+  }
+
+  async function importFileTaxonomy(file: string, override = false) {
+    return api
+      .post('/system/conf/taxonomies/import/_file', null, {
         params: {
-          user: 'maelstrom-research',
-          repo: 'maelstrom-taxonomies',
-          override: override,
-          ref: ref,
-        },
+          file,
+          override,
+        }
       })
       .then((response) => response.data);
   }
@@ -240,6 +262,8 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     gitRestore,
     getMlstrTaxonomies,
     importMlstrTaxonomies,
+    importGithubTaxonomies,
+    importFileTaxonomy,
     getLabel,
     getAnnotations,
     downloadTaxonomy,

@@ -110,6 +110,7 @@ export default {
     DuplicateIDProvider:'The identity provider already exists',
     DuplicateSubjectToken:'The token already exists',
     DuplicateTaxonomy:'The taxonomy already exists',
+    TaxonomyImportFailed:'The taxonomy import failed, make sure to provide valid information',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -380,6 +381,10 @@ export default {
       name_required: 'Token name is required',
     },
     text_required: 'A text is required',
+    github: {
+      org_required: 'Github organization or username is required',
+      repo_required: 'Github repository name is required',
+    },
   },
   main: {
     brand: 'Opal',
@@ -409,7 +414,7 @@ export default {
     description_hint: 'Optional description of the taxonomy.',
     add: 'Add Taxonomy',
     edit: 'Edit Taxonomy',
-    brand_new: 'Brand New',
+    new_taxonomy: 'New Taxonomy',
     import_mlstr: 'Maelstrom Research Taxonomies',
     import_github: 'GitHub Repository',
     import_file: 'YAML File',
@@ -443,7 +448,22 @@ export default {
       versions_hint: 'These taxonomies are available under the {url}',
       versions_hint_url: 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License.',
       license_agreement: 'I have read and accepted the license terms.',
+    },
+    import_github: {
+      label: 'From GitHub Repository',
+      title: 'Import GitHub Repository',
+      org_hint: 'Example: maelstrom-research',
+      repo_hint: 'Example: maelstrom-taxonomies',
+      ref_hint: 'Example: Repository branch name (e.g. master), release version (1.0) or a commit id.',
+      file: 'File',
+      file_hint: 'Taxonomy YAML file name (e.g. taxonomy.yml or scales/taxonomy.yml). Leave this field empty to import all taxonomy files.',
+      override: 'Override existing taxonomies',
+    },
+    import_file: {
+      label: 'From YAML File',
+      title: 'Import YAML File',
     }
+
   },
   account: 'Account',
   actions: 'Actions',

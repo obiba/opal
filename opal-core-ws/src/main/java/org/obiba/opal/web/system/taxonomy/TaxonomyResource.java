@@ -74,7 +74,9 @@ public class TaxonomyResource {
 
   @PUT
   public Response updateTaxonomy(Opal.TaxonomyDto dto) {
-    taxonomyService.ensureUniqueTaxonomy(dto.getName());
+    if (!name.equals(dto.getName())) {
+      taxonomyService.ensureUniqueTaxonomy(dto.getName());
+    }
     taxonomyService.saveTaxonomy(name, Dtos.fromDto(dto));
     return Response.ok().build();
   }

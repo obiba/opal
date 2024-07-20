@@ -55,7 +55,6 @@ async function onRefresh(newName?: string) {
 }
 
 onMounted(() => {
-  console.log('TaxonomyPage mounted', taxonomiesStore.summaries);
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getTaxonomy(taxonomyName.value).catch(notifyError);
 });
