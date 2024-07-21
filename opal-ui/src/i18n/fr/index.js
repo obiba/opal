@@ -558,6 +558,7 @@ export default {
   delete_profile_acl_confirm: 'Êtes-vous sûr de vouloir révoquer la permission sélectionnée? | Êtes-vous sûr de vouloir révoquer ces {count} permissions?',
   delete_profiles_confirm: "Êtes-vous sûr de vouloir supprimer le profil '{profile}'? | Êtes-vous sûr de vouloir supprimer ces {count} profils?",
   delete_profiles_selected: 'Supprimer les profils sélectionnés',
+  delete_term_confirm: 'Êtes-vous sûr de vouloir supprimer le terme \'{term}\' du vocabulaire \'{vocabulary}\'?',
   delete_user_confirm: "Êtes-vous sûr de vouloir supprimer l'utilisateur {user} ?",
   delete_variables_confirm: 'Aucune variable à supprimer | Êtes-vous sûr de vouloir supprimer cette variable ? | Êtes-vous sûr de vouloir supprimer ces {count} variables ?',
   delete: 'Supprimer',

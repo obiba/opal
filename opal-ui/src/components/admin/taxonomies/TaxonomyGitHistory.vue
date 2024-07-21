@@ -186,7 +186,6 @@ function onCloseDiffViewer() {
 }
 
 async function getCommits() {
-  console.log('\t getting commits', props.taxonomyName);
   taxonomiesStore
     .gitCommits(props.taxonomyName)
     .then((response) => {
@@ -205,7 +204,6 @@ watch(
 );
 
 onMounted(() => {
-  console.log('TaxonomyGitPage mounted');
   if (!!props.taxonomyName) {
     getCommits();
   }

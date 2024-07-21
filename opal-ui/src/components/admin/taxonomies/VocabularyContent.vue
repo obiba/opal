@@ -89,6 +89,17 @@
             class="q-ml-xs"
             @click="onMoveDown(props.value)"
           />
+          <q-btn
+            rounded
+            dense
+            flat
+            size="sm"
+            color="secondary"
+            :title="$t('delete')"
+            :icon="toolsVisible[props.value] ? 'delete' : 'none'"
+            class="q-ml-xs"
+            @click="onDeleteTerm(props.row)"
+          />
         </div>
       </q-td>
     </template>
@@ -128,7 +139,7 @@
         </template>
       </q-td>
     </template>
-    
+
   </q-table>
 
   <!-- Dialogs -->
@@ -138,6 +149,13 @@
     :title="$t('delete')"
     :text="$t('delete_vocabulary_confirm', { taxonomy: taxonomy, vocabulary: vocabulary.name })"
     @confirm="doDelete"
+  />
+
+  <confirm-dialog
+    v-model="showDeleteTerm"
+    :title="$t('delete')"
+    :text="$t('delete_term_confirm', { vocabulary: vocabulary.name, term: newTerm?.name })"
+    @confirm="doDeleteTerm"
   />
 
   <add-vocabulary-dialog
@@ -184,6 +202,7 @@ const router = useRouter();
 const systemStore = useSystemStore();
 const tableKey = ref(0);
 const showDelete = ref(false);
+const showDeleteTerm = ref(false);
 const showEditVocabulary = ref(false);
 const showAddTerm = ref(false);
 const newTerm = ref<TermDto | null>(null);
@@ -237,8 +256,8 @@ const columns = computed(() => [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
-    headerStyle: 'width: 20%; white-space: normal;',
-    style: 'width: 20%; white-space: normal;',
+    headerStyle: 'width: 25%; white-space: normal;',
+    style: 'width: 25%; white-space: normal;',
   },
   {
     name: 'title',
@@ -285,6 +304,21 @@ async function doDelete() {
   }
 }
 
+async function doDeleteTerm() {
+  showDelete.value = false;
+  if (!!newTerm.value) {
+    const toDelete: TermDto = newTerm.value;
+    newTerm.value = null;
+
+    try {
+      await taxonomiesStore.deleteTerm(props.taxonomy, props.vocabulary.name, toDelete);
+      emit('refresh');
+    } catch (error) {
+      notifyError(error);
+    }
+  }
+}
+
 // Handlers
 
 function onEditVocabulary() {
@@ -308,6 +342,11 @@ function onTermUpdated() {
   showAddTerm.value = false;
   newTerm.value = null;
   emit('refresh');
+}
+
+function onDeleteTerm(term: TermDto) {
+  showDeleteTerm.value = true;
+  newTerm.value = term;
 }
 
 async function onDelete() {

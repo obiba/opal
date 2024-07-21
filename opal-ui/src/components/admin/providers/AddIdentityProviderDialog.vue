@@ -61,8 +61,6 @@
                 :text="$t('identity_provider.discovery_uri_definition')"
                 :url="`https://openid.net/specs/openid-connect-discovery-1_0.html`"
               />
-
-              <!-- <div v-html="$t('identity_provider.discovery_uri_hint', { url: discoveryURIDefinition })"></div> -->
             </template>
           </q-input>
           <q-input

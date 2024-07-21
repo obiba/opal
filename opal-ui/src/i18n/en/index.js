@@ -558,6 +558,7 @@ export default {
   delete_profile_confirm: 'Are you sure you want to delete profile \'{profile}\'?',
   delete_profiles_confirm: 'Are you sure you want to delete  profile \'{profile}\'? | Are you sure you want to delete these {count} profiles?',
   delete_profiles_selected: 'Delete selected profiles',
+  delete_term_confirm: 'Are you sure you want to delete term \'{term}\' from \'{vocabulary}\' vocabulary?',
   delete_user_confirm: 'Are you sure you want to delete user \'{user}\'?',
   delete_variables_confirm: 'No variables to delete | Are you sure you want to delete this variable? | Are you sure you want to delete these {count} variables?',
   delete: 'Delete',

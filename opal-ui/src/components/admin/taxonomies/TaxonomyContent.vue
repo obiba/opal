@@ -261,12 +261,10 @@ const columns = computed(() => [
 // Handlers
 
 async function doDelete() {
-  console.log('Delete taxonomy');
   showDelete.value = false;
   try {
     await taxonomiesStore.deleteTaxonomy(props.taxonomy);
     await taxonomiesStore.refreshSummaries();
-    console.log('\t route to taxonomies');
     router.replace('/admin/taxonomies');
   } catch (error) {
     notifyError(error);

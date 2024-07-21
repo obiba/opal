@@ -24,6 +24,7 @@
             ref="input"
             :hint="hint"
             dense
+            :disable="canAddLocale"
             type="textarea"
             lazy-rules
             :rules="[validateRequiredField]"
