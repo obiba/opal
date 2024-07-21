@@ -30,7 +30,24 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="link" /> {{ rName }}
+        <q-icon name="link" /><span>{{ rName }}</span>
+        <q-btn
+          color="secondary"
+          size="sm"
+          outline
+          icon="edit"
+          @click="onShowEditResource"
+          class="on-right"
+        />
+        <q-btn
+          color="positive"
+          size="sm"
+          outline
+          icon="terminal"
+          :label="$t('test')"
+          @click="onTest"
+          class="on-right"
+        />
       </div>
       <q-tabs
         v-model="tab"
@@ -68,15 +85,16 @@
 <script setup lang="ts">
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
+import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const route = useRoute();
 const projectsStore = useProjectsStore();
 const resourcesStore = useResourcesStore();
+const { t } = useI18n();
 
 const pName = computed(() => route.params.id as string);
 const rName = computed(() => route.params.rid as string);
 const tab = ref('reference');
-
 
 const previousReference = computed(() => {
   const idx = resourcesStore.resourceReferences.findIndex((rsrc) => rsrc.name === rName.value);
@@ -91,4 +109,14 @@ const nextReference = computed(() => {
 onMounted(() => {
   projectsStore.initProject(pName.value);
 });
+
+function onTest() {
+  resourcesStore.testResource(pName.value, rName.value)
+    .then(() => {
+      notifySuccess(t('resource_test_success'));
+    })
+    .catch((error) => {
+      notifyError(t('resource_test_error', { error: error.response.data.message }));
+    });
+}
 </script>

@@ -902,4 +902,6 @@ export default {
   format: 'Format',
   provider: 'Provider',
   provider_not_found: 'Provider not found: no R server can provide a way to make this resource available. Is the R package {provider} installed?',
+  resource_test_success: 'Resource assignment successful.',
+  resource_test_error: 'Resource assignment failed.'
 };

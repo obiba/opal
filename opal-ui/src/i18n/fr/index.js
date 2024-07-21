@@ -902,4 +902,6 @@ export default {
   format: 'Format',
   provider: 'Fournisseur',
   provider_not_found: 'Fournisseur non trouvé : aucun serveur R ne peut fournir une façon de rendre la ressource disponible. Le package R {provider} est-il installé ?',
+  resource_test_success: 'L\'assignation de la resource a réussie.',
+  resource_test_error: 'L\'assignation de la resource a échoué.',
 };
