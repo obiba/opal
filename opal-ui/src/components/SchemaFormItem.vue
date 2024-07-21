@@ -78,7 +78,7 @@
       <div class="text-help">{{ field.title }}</div>
       <div class="text-hint q-mb-sm">{{ field.description }}</div>
       <q-list separator bordered>
-        <q-item v-for="(datum, index) in data" :key="index">
+        <q-item v-for="(datum, index) in dataArray" :key="index">
           <q-item-section>
             <div v-for="item in field.items" :key="item.key">
               <schema-form-item
@@ -143,9 +143,13 @@ const data = ref(props.modelValue);
 const dataFile = ref<FileObject>();
 const dataArray = ref<Array<FormObject>>([]);
 
-watch([() => props.modelValue, () => props.field], () => {
+onMounted(init);
+
+watch([() => props.modelValue, () => props.field], init);
+
+function init() {
   data.value = props.modelValue;
-  if (props.field.type === 'array') {
+  if (isArray()) {
     dataArray.value = data.value ? data.value as Array<FormObject> : [];
   }
   else if (isFileItem()) {
@@ -155,7 +159,7 @@ watch([() => props.modelValue, () => props.field], () => {
       });
     }
   }
-});
+}
 function isFileItem() {
   return props.field.type === 'string' && (props.field.format === 'file' || props.field.format === 'folder');
 }
@@ -164,12 +168,19 @@ function isPasswordItem() {
   return props.field.type === 'string' && props.field.format === 'password';
 }
 
+function isArray() {
+  return props.field.type === 'array';
+}
+
 function onFileSelect() {
   data.value = dataFile.value?.path;
   onUpdate();
 }
 
 function onUpdate() {
+  if (isArray()) {
+    data.value = dataArray.value;
+  }
   emit('update:modelValue', data.value);
 }
 
