@@ -23,6 +23,7 @@ import { VocabularyDto } from 'src/models/Opal';
 const route = useRoute();
 const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
+const systemStore = useSystemStore();
 const vocabulary = computed(() => taxonomiesStore.vocabulary || null);
 const taxonomyName = computed(() => route.params.name as string);
 const vocabularyName = computed(() => route.params.vocabulary as string);
@@ -57,6 +58,8 @@ async function onRefresh(newName?: string) {
 }
 
 onMounted(() => {
+  console.log('AdminTaxonomyVocabularyPage mounted');
+  systemStore.initGeneralConf();
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
     notifyError(error);

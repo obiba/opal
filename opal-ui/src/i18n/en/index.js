@@ -346,7 +346,7 @@ export default {
     }
   },
   token_services: {
-    userR: 'R',
+    useR: 'R',
     useDatashield: 'DataSHIELD',
     useSQL: 'SQL',
     sysAdmin: 'Administration',
@@ -422,6 +422,7 @@ export default {
     change_history: 'History of Changes',
     compare_current: 'Compare with current',
     restore_confirm: 'Are you sure you want to restore the version from \'{date}\'? This will replace the current information.',
+    filter_vocabulary: 'Filter vocabularies...',
     vocabulary: {
       title: 'Vocabulary',
       name_hint: 'A vocabulary must have a unique name.',
@@ -431,6 +432,7 @@ export default {
       edit: 'Edit Vocabulary',
       repeatable: 'Repeatable',
       repeatable_hint: 'When several terms of this vocabulary can be applied to a variable.',
+      filter_terms: 'Filter terms...',
     },
     term: {
       title: 'Term',
@@ -464,7 +466,6 @@ export default {
       label: 'From YAML File',
       title: 'Import YAML File',
     }
-
   },
   account: 'Account',
   actions: 'Actions',
@@ -528,6 +529,7 @@ export default {
   copy: 'Copy',
   created: 'Created on',
   credentials: 'Credentials',
+  current: 'Current',
   dashboard: 'Dashboard',
   data_access: 'Data access',
   data_analysis: 'Data analysis',

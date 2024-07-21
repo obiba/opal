@@ -31,6 +31,7 @@ watch(taxonomyName, (name) => {
 });
 
 onMounted(() => {
+  console.log('AdminTaxonomiesPage mounted');
   taxonomiesStore
     .initSummaries()
     .then(() => {

@@ -80,8 +80,9 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
       .then((response) => response.data);
   }
 
-  async function deleteTaxonomy(taxonomy: TaxonomyDto) {
-    return api.delete(`/system/conf/taxonomy/${taxonomy.name}`);
+  async function deleteTaxonomy(toDelete: TaxonomyDto) {
+    taxonomy.value = {} as TaxonomyDto;
+    return api.delete(`/system/conf/taxonomy/${toDelete.name}`);
   }
 
   async function addVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {

@@ -22,6 +22,11 @@
     :pagination="initialPagination"
     :hide-pagination="rows.length <= initialPagination.rowsPerPage"
   >
+    <template v-slot:header-cell-name="props">
+      <q-th :props="props" @click="onSortUpdate">
+        {{ props.col.label }}
+      </q-th>
+    </template>
     <template v-slot:top-left>
       <div class="q-gutter-sm">
         <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddTerm" />
@@ -32,7 +37,14 @@
       </div>
     </template>
     <template v-slot:top-right>
-      <q-input dense clearable debounce="400" color="primary" v-model="filter">
+      <q-input
+        dense
+        clearable
+        debounce="400"
+        color="primary"
+        v-model="filter"
+        :placeholder="$t('taxonomy.vocabulary.filter_terms')"
+      >
         <template v-slot:append>
           <q-icon name="search" />
         </template>
@@ -82,40 +94,41 @@
     </template>
     <template v-slot:body-cell-title="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <template v-for="locale in locales" :key="locale">
-          <div v-if="props.value" class="row no-wrap q-py-xs">
+        <template v-for="prop in props.value" :key="prop.locale">
+          <div v-if="prop.text" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+              <q-badge color="grey-6" :label="prop.locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ prop.text }}</div>
           </div>
         </template>
       </q-td>
     </template>
     <template v-slot:body-cell-description="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <template v-for="locale in locales" :key="locale">
-          <div v-if="props.value" class="row no-wrap q-py-xs">
+        <template v-for="prop in props.value" :key="prop.locale">
+          <div v-if="prop.text" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+              <q-badge color="grey-6" :label="prop.locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ prop.text }}</div>
           </div>
         </template>
       </q-td>
     </template>
     <template v-slot:body-cell-keywords="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <template v-for="locale in locales" :key="locale">
-          <div v-if="props.value" class="row no-wrap q-py-xs">
+        <template v-for="prop in props.value" :key="prop.locale">
+          <div v-if="prop.text" class="row no-wrap q-py-xs">
             <div class="col-auto">
-              <code class="text-secondary q-my-xs">{{ locale }}</code>
+              <q-badge color="grey-6" :label="prop.locale" class="on-left q-mr-sm" />
             </div>
-            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            <div class="col q-ml-none">{{ prop.text }}</div>
           </div>
         </template>
       </q-td>
     </template>
+    
   </q-table>
 
   <!-- Dialogs -->
@@ -157,7 +170,6 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVocabularyDialog from 'src//components/admin/taxonomies/AddVocabularyDialog.vue';
 import AddTermDialog from 'src//components/admin/taxonomies/AddTermDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import { locales } from 'boot/i18n';
 import { notifyError } from 'src/utils/notify';
 
 interface Props {
@@ -169,6 +181,7 @@ const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
+const systemStore = useSystemStore();
 const tableKey = ref(0);
 const showDelete = ref(false);
 const showEditVocabulary = ref(false);
@@ -190,6 +203,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
+  onSortUpdate,
   onFilter,
 } = useTaxonomyEntityContent<TermDto>(() => props.vocabulary, 'terms');
 
@@ -249,6 +263,7 @@ const columns = computed(() => [
     field: 'keywords',
   },
 ]);
+const locales = computed(() => (systemStore.generalConf || {}).languages || []);
 
 // Functions
 

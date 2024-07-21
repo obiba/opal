@@ -151,7 +151,6 @@ async function onAdded(updated: TaxonomyDto) {
   }
 }
 
-
 async function onImportedTaxonomies() {
   taxonomiesStore
     .refreshSummaries()

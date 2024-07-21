@@ -86,11 +86,12 @@ defineComponent({
 import GitDiffViewerDialog from 'src/components/git/GitDiffViewerDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
-import { TaxonomyDto, VcsCommitInfoDto } from 'src/models/Opal';
+import { VcsCommitInfoDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
+import { get } from 'http';
 
 interface Props {
-  taxonomy: TaxonomyDto;
+  taxonomyName: string;
 }
 const emit = defineEmits(['restore']);
 const props = defineProps<Props>();
@@ -145,7 +146,7 @@ function onLeaveRow(row: VcsCommitInfoDto) {
 
 async function onCompare(row: VcsCommitInfoDto) {
   try {
-    commitInfo.value = await taxonomiesStore.gitCompare(props.taxonomy.name, row.commitId);
+    commitInfo.value = await taxonomiesStore.gitCompare(props.taxonomyName, row.commitId);
     showDiff.value = true;
   } catch (error) {
     notifyError(error);
@@ -154,7 +155,7 @@ async function onCompare(row: VcsCommitInfoDto) {
 
 async function onCompareWith(row: VcsCommitInfoDto) {
   try {
-    commitInfo.value = await taxonomiesStore.gitCompareWith(props.taxonomy.name, row.commitId, 'head');
+    commitInfo.value = await taxonomiesStore.gitCompareWith(props.taxonomyName, row.commitId, 'head');
     showDiff.value = true;
   } catch (error) {
     notifyError(error);
@@ -172,7 +173,7 @@ async function doRestore() {
   commitInfo.value = {} as VcsCommitInfoDto;
 
   try {
-    await taxonomiesStore.gitRestore(props.taxonomy.name, toRestore.commitId);
+    await taxonomiesStore.gitRestore(props.taxonomyName, toRestore.commitId);
     emit('restore');
   } catch (error) {
     notifyError(error);
@@ -184,17 +185,29 @@ function onCloseDiffViewer() {
   showDiff.value = false;
 }
 
+async function getCommits() {
+  console.log('\t getting commits', props.taxonomyName);
+  taxonomiesStore
+    .gitCommits(props.taxonomyName)
+    .then((response) => {
+      commits.value = response.commitInfos;
+    })
+    .catch((error) => notifyError(error));
+}
+
 watch(
-  () => props.taxonomy,
+  () => props.taxonomyName,
   async (newValue) => {
-    if (!!newValue.name) {
-      taxonomiesStore
-        .gitCommits(props.taxonomy.name)
-        .then((response) => {
-          commits.value = response.commitInfos;
-        })
-        .catch((error) => notifyError(error));
+    if (!!newValue) {
+      getCommits();
     }
   }
 );
+
+onMounted(() => {
+  console.log('TaxonomyGitPage mounted');
+  if (!!props.taxonomyName) {
+    getCommits();
+  }
+});
 </script>

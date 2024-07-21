@@ -18,6 +18,7 @@
       :rows="rows"
       :columns="columns"
       :sort-method="customSort"
+      @update:sort="onSortUpdate"
       :filter="filter"
       :filter-method="onFilter"
       binary-state-sort
@@ -25,6 +26,11 @@
       :pagination="initialPagination"
       :hide-pagination="rows.length <= initialPagination.rowsPerPage"
     >
+      <template v-slot:header-cell-name="props">
+        <q-th :props="props" @click="onSortUpdate">
+          {{ props.col.label }}
+        </q-th>
+      </template>
       <template v-slot:top-left>
         <div class="q-gutter-sm">
           <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
@@ -35,7 +41,14 @@
         </div>
       </template>
       <template v-slot:top-right>
-        <q-input dense clearable debounce="400" color="primary" v-model="filter">
+        <q-input
+          dense
+          clearable
+          debounce="400"
+          color="primary"
+          v-model="filter"
+          :placeholder="$t('taxonomy.filter_vocabulary')"
+        >
           <template v-slot:append>
             <q-icon name="search" />
           </template>
@@ -76,24 +89,24 @@
       </template>
       <template v-slot:body-cell-title="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <template v-for="locale in locales" :key="locale">
-            <div v-if="props.value" class="row no-wrap q-py-xs">
+          <template v-for="prop in props.value" :key="prop.locale">
+            <div v-if="prop.text" class="row no-wrap q-py-xs">
               <div class="col-auto">
-                <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+                <q-badge color="grey-6" :label="prop.locale" class="on-left q-mr-sm" />
               </div>
-              <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+              <div class="col q-ml-none">{{ prop.text }}</div>
             </div>
           </template>
         </q-td>
       </template>
       <template v-slot:body-cell-description="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <template v-for="locale in locales" :key="locale">
-            <div v-if="props.value" class="row no-wrap q-py-xs">
+          <template v-for="prop in props.value" :key="prop.locale">
+            <div v-if="prop.text" class="row no-wrap q-py-xs">
               <div class="col-auto">
-                <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+                <q-badge color="grey-6" :label="prop.locale" class="on-left q-mr-sm" />
               </div>
-              <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+              <div class="col q-ml-none">{{ prop.text }}</div>
             </div>
           </template>
         </q-td>
@@ -106,7 +119,7 @@
     </q-table>
 
     <div class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
-    <taxonomy-git-history :taxonomy="taxonomy" @restore="onGitRestored"/>
+    <taxonomy-git-history :taxonomy-name="taxonomyName" @restore="onGitRestored" />
 
     <!-- Dialogs -->
     <confirm-dialog
@@ -146,7 +159,6 @@ import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDi
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
 import TaxonomyGitHistory from 'src/components/admin/taxonomies/TaxonomyGitHistory.vue';
-import { locales } from 'boot/i18n';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
 
@@ -157,7 +169,8 @@ interface Props {
 const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const router = useRouter();
-const { t } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
+const systemStore = useSystemStore();
 const showDelete = ref(false);
 const showEditTaxonomy = ref(false);
 const showAddVocabulary = ref(false);
@@ -179,6 +192,7 @@ const {
   onMoveDown,
   generateLocaleRows,
   customSort,
+  onSortUpdate,
   onFilter,
 } = useTaxonomyEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
 
@@ -193,7 +207,7 @@ const properties: FieldItem<TaxonomyDto>[] = [
   {
     field: 'license',
     label: 'license',
-    html: (val) => getCreativeCommonsLicenseAnchor(val),
+    html: (val) => getCreativeCommonsLicenseAnchor(val, locale.value),
   },
   {
     field: 'title',
@@ -207,6 +221,7 @@ const properties: FieldItem<TaxonomyDto>[] = [
   },
 ];
 
+const locales = computed(() => (systemStore.generalConf || {}).languages || []);
 const taxonomyName = computed(() => props.taxonomy.name || '');
 const columns = computed(() => [
   {
@@ -246,10 +261,12 @@ const columns = computed(() => [
 // Handlers
 
 async function doDelete() {
+  console.log('Delete taxonomy');
   showDelete.value = false;
   try {
     await taxonomiesStore.deleteTaxonomy(props.taxonomy);
     await taxonomiesStore.refreshSummaries();
+    console.log('\t route to taxonomies');
     router.replace('/admin/taxonomies');
   } catch (error) {
     notifyError(error);

@@ -1,5 +1,6 @@
 import { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
 import { locales } from 'boot/i18n';
+import { flattenObjectToString } from 'src/utils/strings';
 /**
  * Composable to handle common variables and functions for taxonomy contents
  *
@@ -27,7 +28,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
   // Functions
 
   function customSort(rows: TYPE[], sortBy: string, descending: string) {
-    if (!canSort || !sortBy) return rows;
+    if (!canSort.value || !sortBy) return rows;
 
     const data = rows;
     dirty.value = true;
@@ -78,22 +79,27 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
 
   // Handlers
 
-  function onFilter(tableRows: VocabularyDto[], filter: string) {
+  function onSortUpdate() {
+    canSort.value = true;
+  }
+
+  function onFilter(tableRows: TYPE[], filter: string) {
     if (filter.length === 0) {
       return tableRows;
     }
     const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
     const result = tableRows.filter((row) => {
-      return Object.values(row).some((val) => {
-        return String(val).toLowerCase().includes(query);
-      });
+      const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
+        row.description || {}
+      )}`;
+      return rowString.includes(query);
     });
 
     return result;
   }
 
   function onOverRow(row: TYPE) {
-    toolsVisible.value[row.name] = true && filter.value.length === 0;
+    toolsVisible.value[row.name] = true && (filter.value || '').length === 0;
   }
 
   function onLeaveRow(row: TYPE) {
@@ -112,11 +118,6 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
       canSort.value = false;
       rows.value = clone;
     }
-
-    nextTick(() => {
-      // Wait so the default sort is not applied right after the move
-      canSort.value = true;
-    });
   }
 
   function onMoveDown(name: string) {
@@ -132,10 +133,6 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
       rows.value = clone;
     }
 
-    nextTick(() => {
-      // Wait so the default sort is not applied right after the move
-      canSort.value = true;
-    });
   }
 
   return {
@@ -154,6 +151,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     onMoveDown,
     generateLocaleRows,
     customSort,
+    onSortUpdate,
     onFilter,
   };
 }

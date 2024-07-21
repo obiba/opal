@@ -8,7 +8,6 @@
       :class="{ 'text-primary': dirty, 'text-secondary': !dirty }"
       >{{ title }}</span
     >
-
     <q-card flat >
       <q-tabs inline-label v-model="tab" dense class="text-grey" active-color="primary" active-bg-color="grey-1" >
         <q-tab v-for="label in labels" :key="label.locale" :name="label.locale" :label="label.locale">
@@ -22,6 +21,8 @@
         <q-tab-panel v-for="label in labels" :key="label.locale" :name="label.locale">
           <q-input
             v-model="label.text"
+            ref="input"
+            :hint="hint"
             dense
             type="textarea"
             lazy-rules
@@ -40,7 +41,6 @@
       />
 
     </q-card>
-    <span v-if="!!hint" class="text-caption text-secondary q-pa-none">{{ hint }}</span>
   </div>
 </template>
 
@@ -52,7 +52,7 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { LocaleTextDto } from 'src/models/Opal';
-import { t, locales } from 'boot/i18n';
+import { t } from 'boot/i18n';
 
 interface Props {
   modelValue: LocaleTextDto[] | undefined;
@@ -62,6 +62,8 @@ interface Props {
 
 const emit = defineEmits(['update:modelValue']);
 const props = defineProps<Props>();
+const systemStore = useSystemStore();
+const locales = [...systemStore.generalConf.languages];
 const tab = ref(props.modelValue?.[0]?.locale || locales[0]);
 const dirty = ref(false);
 const canAddLocale = computed(() => getMissingLocales().length > 0);

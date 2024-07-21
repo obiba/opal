@@ -22,6 +22,7 @@ import { TaxonomyDto } from 'src/models/Opal';
 const route = useRoute();
 const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
+const systemStore = useSystemStore();
 const taxonomy = computed(() => taxonomiesStore.taxonomy || null);
 const taxonomyName = computed(() => route.params.name as string);
 
@@ -55,6 +56,9 @@ async function onRefresh(newName?: string) {
 }
 
 onMounted(() => {
+  console.log('AdminTaxonomyPage mounted');
+  systemStore.initGeneralConf();
+
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getTaxonomy(taxonomyName.value).catch((error) => {
     notifyError(error);
