@@ -21,6 +21,7 @@ import { notifyError } from 'src/utils/notify';
 import { VocabularyDto } from 'src/models/Opal';
 
 const route = useRoute();
+const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
 const vocabulary = computed(() => taxonomiesStore.vocabulary || null);
 const taxonomyName = computed(() => route.params.name as string);
@@ -42,9 +43,14 @@ async function onUpdate(updated: VocabularyDto) {
   }
 }
 
-async function onRefresh() {
+async function onRefresh(newName?: string) {
   try {
-    await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
+    if (!!newName) {
+      await taxonomiesStore.getVocabulary(taxonomyName.value, newName);
+      router.replace(`/admin/taxonomies/${taxonomyName.value}/${newName}`);
+    } else {
+      await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
+    }
   } catch (error) {
     notifyError(error);
   }
@@ -52,6 +58,9 @@ async function onRefresh() {
 
 onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
-  taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch(notifyError);
+  taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
+    notifyError(error);
+    router.replace(`/admin/taxonomies/${taxonomyName}`);
+  });
 });
 </script>

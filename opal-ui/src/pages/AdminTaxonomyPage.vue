@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies"/>
+        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
         <q-breadcrumbs-el :label="taxonomyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -56,6 +56,9 @@ async function onRefresh(newName?: string) {
 
 onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
-  taxonomiesStore.getTaxonomy(taxonomyName.value).catch(notifyError);
+  taxonomiesStore.getTaxonomy(taxonomyName.value).catch((error) => {
+    notifyError(error);
+    router.replace('/admin/taxonomies');
+  });
 });
 </script>

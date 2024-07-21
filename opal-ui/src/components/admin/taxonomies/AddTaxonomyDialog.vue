@@ -147,6 +147,7 @@ async function onAddTaxonomy() {
       .then(() => {
         emit('updated', newTaxonomy.value, oldName.value);
         showDialog.value = false;
+        if (!!oldName.value) onHide(); // due to reroute in the page
       })
       .catch(notifyError);
   }

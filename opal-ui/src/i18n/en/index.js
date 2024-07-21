@@ -111,6 +111,7 @@ export default {
     DuplicateSubjectToken:'The token already exists',
     DuplicateTaxonomy:'The taxonomy already exists',
     TaxonomyImportFailed:'The taxonomy import failed, make sure to provide valid information',
+    NoSuchTaxonomy:'The taxonomy does not exist',
   },
   identity_provider: {
     title: 'Identity Provider',

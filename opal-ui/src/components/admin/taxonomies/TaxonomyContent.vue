@@ -1,133 +1,135 @@
 <template>
-  <div class="text-h5">
-    <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ taxonomy.name }}</span>
-    <q-btn outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
-    <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
-    <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
-  </div>
+  <div v-if="taxonomyName">
+    <div class="text-h5">
+      <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ taxonomy.name }}</span>
+      <q-btn outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
+      <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
+      <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
+    </div>
 
-  <div class="q-gutter-md q-mt-md q-mb-md">
-    <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
-  </div>
+    <div class="q-gutter-md q-mt-md q-mb-md">
+      <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
+    </div>
 
-  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('vocabularies') }}</div>
-  <q-table
-    flat
-    :key="tableKey"
-    :rows="rows"
-    :columns="columns"
-    :sort-method="customSort"
-    :filter="filter"
-    :filter-method="onFilter"
-    binary-state-sort
-    row-key="name"
-    :pagination="initialPagination"
-    :hide-pagination="rows.length <= initialPagination.rowsPerPage"
-  >
-    <template v-slot:top-left>
-      <div class="q-gutter-sm">
-        <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
-        <template v-if="dirty">
-          <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
-          <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
-        </template>
-      </div>
-    </template>
-    <template v-slot:top-right>
-      <q-input dense clearable debounce="400" color="primary" v-model="filter">
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-    </template>
-    <template v-slot:body-cell-name="props">
-      <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <router-link :to="`/admin/taxonomies/${taxonomy.name}/${props.value}`">
-          {{ props.value }}
-        </router-link>
-        <div class="float-right">
-          <q-btn
-            v-show="props.rowIndex > 0"
-            rounded
-            dense
-            flat
-            size="sm"
-            color="secondary"
-            :title="$t('move_up')"
-            :icon="toolsVisible[props.row.name] ? 'arrow_upward' : 'none'"
-            class="q-ml-xs"
-            @click="onMoveUp(props.value)"
-          />
-          <q-btn
-            v-show="props.rowIndex < rows.length - 1"
-            rounded
-            dense
-            flat
-            size="sm"
-            color="secondary"
-            :title="$t('move_down')"
-            :icon="toolsVisible[props.value] ? 'arrow_downward' : 'none'"
-            class="q-ml-xs"
-            @click="onMoveDown(props.value)"
-          />
+    <div class="text-h6 q-mb-none q-mt-lg">{{ $t('vocabularies') }}</div>
+    <q-table
+      flat
+      :key="tableKey"
+      :rows="rows"
+      :columns="columns"
+      :sort-method="customSort"
+      :filter="filter"
+      :filter-method="onFilter"
+      binary-state-sort
+      row-key="name"
+      :pagination="initialPagination"
+      :hide-pagination="rows.length <= initialPagination.rowsPerPage"
+    >
+      <template v-slot:top-left>
+        <div class="q-gutter-sm">
+          <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
+          <template v-if="dirty">
+            <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
+            <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+          </template>
         </div>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-title="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <template v-for="locale in locales" :key="locale">
-          <div v-if="props.value" class="row no-wrap q-py-xs">
-            <div class="col-auto">
-              <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
-            </div>
-            <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+      </template>
+      <template v-slot:top-right>
+        <q-input dense clearable debounce="400" color="primary" v-model="filter">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
+      <template v-slot:body-cell-name="props">
+        <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <router-link :to="`/admin/taxonomies/${taxonomy.name}/${props.value}`">
+            {{ props.value }}
+          </router-link>
+          <div class="float-right">
+            <q-btn
+              v-show="props.rowIndex > 0"
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('move_up')"
+              :icon="toolsVisible[props.row.name] ? 'arrow_upward' : 'none'"
+              class="q-ml-xs"
+              @click="onMoveUp(props.value)"
+            />
+            <q-btn
+              v-show="props.rowIndex < rows.length - 1"
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('move_down')"
+              :icon="toolsVisible[props.value] ? 'arrow_downward' : 'none'"
+              class="q-ml-xs"
+              @click="onMoveDown(props.value)"
+            />
           </div>
-        </template>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-description="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <template v-for="locale in locales" :key="locale">
-          <div v-if="props.value" class="row no-wrap q-py-xs">
-            <div class="col-auto">
-              <code class="text-secondary q-my-xs">{{ locale }}</code>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-title="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <template v-for="locale in locales" :key="locale">
+            <div v-if="props.value" class="row no-wrap q-py-xs">
+              <div class="col-auto">
+                <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+              </div>
+              <div class="col q-ml-none">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
             </div>
-            <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
-          </div>
-        </template>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-terms="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        {{ props.value }}
-      </q-td>
-    </template>
-  </q-table>
+          </template>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-description="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <template v-for="locale in locales" :key="locale">
+            <div v-if="props.value" class="row no-wrap q-py-xs">
+              <div class="col-auto">
+                <q-badge v-if="locale" color="grey-6" :label="locale" class="on-left q-mr-sm" />
+              </div>
+              <div class="col q-ml-sm">{{ taxonomiesStore.getLabel(props.value, locale) }}</div>
+            </div>
+          </template>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-terms="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          {{ props.value }}
+        </q-td>
+      </template>
+    </q-table>
 
-  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
-  <taxonomy-git-history :taxonomy="taxonomy" @restore="onGitRestored"/>
+    <div class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
+    <taxonomy-git-history :taxonomy="taxonomy" @restore="onGitRestored"/>
 
-  <!-- Dialogs -->
-  <confirm-dialog
-    v-model="showDelete"
-    :title="$t('delete')"
-    :text="$t('delete_taxonomy_confirm', { taxonomy: taxonomy.name })"
-    @confirm="doDelete"
-  />
+    <!-- Dialogs -->
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('delete_taxonomy_confirm', { taxonomy: taxonomy.name })"
+      @confirm="doDelete"
+    />
 
-  <add-taxonomy-dialog
-    v-model="showEditTaxonomy"
-    :taxonomy="taxonomy"
-    @update:modelValue="onClose"
-    @updated="onTaxonomyUpdated"
-  />
+    <add-taxonomy-dialog
+      v-model="showEditTaxonomy"
+      :taxonomy="taxonomy"
+      @update:modelValue="onClose"
+      @updated="onTaxonomyUpdated"
+    />
 
-  <add-vocabulary-dialog
-    v-model="showAddVocabulary"
-    :taxonomy="taxonomyName"
-    :vocabulary="null"
-    @update:modelValue="onVocabularyAdded"
-  />
+    <add-vocabulary-dialog
+      v-model="showAddVocabulary"
+      :taxonomy="taxonomyName"
+      :vocabulary="null"
+      @update:modelValue="onVocabularyAdded"
+    />
+  </div>
 </template>
 
 <script lang="ts">

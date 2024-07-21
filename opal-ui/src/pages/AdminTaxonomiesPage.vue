@@ -8,7 +8,6 @@
         <template v-if="taxonomyName">
           <q-breadcrumbs-el :label="taxonomyName" />
         </template>
-        <span v-else>Nada</span>
       </q-breadcrumbs>
     </q-toolbar>
   </div>

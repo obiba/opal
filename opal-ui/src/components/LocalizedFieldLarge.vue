@@ -64,7 +64,7 @@ const emit = defineEmits(['update:modelValue']);
 const props = defineProps<Props>();
 const tab = ref(props.modelValue?.[0]?.locale || locales[0]);
 const dirty = ref(false);
-const canAddLocale = computed(() => getMissingLocales().length <= locales.length);
+const canAddLocale = computed(() => getMissingLocales().length > 0);
 const labels = computed({
   get: () => props.modelValue || [],
   set: (value: LocaleTextDto[]) => {
