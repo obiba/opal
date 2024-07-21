@@ -42,6 +42,11 @@ export interface DatasourceFactory extends DatasourceFactoryDto {
   'Magma.RestDatasourceFactoryDto.params': RestDatasourceFactoryDto | undefined;
 }
 
+export interface EnumOption {
+  key: string;
+  title: string;
+}
+
 export interface SchemaFormField {
   key: string;
   type: string;
@@ -52,6 +57,8 @@ export interface SchemaFormField {
   minimum?: number;
   maximum?: number;
   fileFormats?: string[];
+  enum?: EnumOption[];
+  items: SchemaFormField[];
 }
 
 export interface SchemaFormObject {
@@ -62,7 +69,7 @@ export interface SchemaFormObject {
 }
 
 export interface FormObject {
-  [key: string]: boolean | number | string | FileObject | FormObject | undefined;
+  [key: string]: boolean | number | string | FileObject | FormObject | Array<FormObject> | undefined;
 }
 
 export interface AttributesBundle {

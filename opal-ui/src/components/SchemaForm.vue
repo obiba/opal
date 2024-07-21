@@ -1,65 +1,11 @@
 <template>
   <div v-if="schema">
     <div v-for="item in schema.items" :key="item.key">
-      <div v-if="isFileItem(item)">
-        <file-select
-          v-model="dataFiles[item.key]"
-          :label="item.title"
-          :hint="item.description"
-          :folder="filesStore.current"
-          selection="single"
-          :type="item.format"
-          :extensions="item.fileFormats"
-          @select="onFileSelect(item.key)"
-          class="q-mb-md"/>
-      </div>
-      <div v-else-if="isPasswordItem(item)">
-        <q-input
-          v-model="data[item.key]"
-          :label="item.title"
-          :hint="item.description"
-          type="password"
-          dense
-          class="q-mb-md"
-          :debounce="500"
-          @update:model-value="onUpdate(item.key)"/>
-      </div>
-      <div v-else-if="item.type === 'string'">
-        <q-input
-          v-model="data[item.key]"
-          :label="item.title"
-          :hint="item.description"
-          dense
-          class="q-mb-md"
-          :debounce="500"
-          @update:model-value="onUpdate(item.key)"/>
-      </div>
-      <div v-else-if="item.type === 'integer'">
-        <q-input
-          v-model.number="data[item.key]"
-          :label="item.title"
-          :hint="item.description"
-          type="number"
-          dense
-          class="q-mb-md"
-          :debounce="500"
-          @update:model-value="onUpdate(item.key)"/>
-      </div>
-      <div v-else-if="item.type === 'boolean'">
-        <q-toggle
-          v-model="data[item.key]"
-          :label="item.title"
-          :hint="item.description"
-          dense
-          :class="item.description ? 'q-mb-xs': 'q-mb-md'"
-          @update:model-value="onUpdate(item.key)"/>
-        <div v-if="item.description" class="text-hint q-mb-md">
-          {{ item.description }}
-        </div>
-      </div>
-      <div v-else>
-        {{ item }}
-      </div>
+      <schema-form-item
+        v-model="data[item.key]"
+        :field="item"
+        :disable="disable"
+        @update:model-value="onUpdate(item.key)" />
     </div>
   </div>
 </template>
@@ -71,56 +17,36 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { FileObject, FormObject, SchemaFormField, SchemaFormObject } from 'src/components/models';
-import FileSelect from 'src/components/files/FileSelect.vue';
+import { FormObject, SchemaFormObject } from 'src/components/models';
+import SchemaFormItem from 'src/components/SchemaFormItem.vue';
 
-interface SchemaFormFormProps {
+interface Props {
   modelValue: FormObject | undefined;
   schema: SchemaFormObject;
+  disable?: boolean;
 }
 
-const props = defineProps<SchemaFormFormProps>();
+const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);
 
-const filesStore = useFilesStore();
-
-const dataFiles = ref<{ [key: string]: FileObject }>({});
 const data = ref(props.modelValue || {});
 
 watch([() => props.modelValue, () => props.schema], () => {
   data.value = props.modelValue || {};
   if (props.schema) {
     initDefaults();
-    props.schema.items.filter((item) => isFileItem(item)).forEach((item) => {
-      if (data.value[item.key]) {
-        filesStore.getFile(data.value[item.key] as string).then((file) => {
-          dataFiles.value[item.key] = file;
-        });
-      }
-    });
   }
 });
-
-function isFileItem(item: SchemaFormField) {
-  return item.type === 'string' && (item.format === 'file' || item.format === 'folder');
-}
-
-function isPasswordItem(item: SchemaFormField) {
-  return item.type === 'string' && item.format === 'password';
-}
 
 function initDefaults() {
   if (!props.schema?.items) return;
   props.schema.items.forEach((item) => {
     if (item.default !== undefined && data.value[item.key] === undefined) {
       data.value[item.key] = item.default;
+    } else if (item.type === 'array') {
+      data.value[item.key] = [];
     }
   });
-}
-
-function onFileSelect(key: string) {
-  data.value[key] = dataFiles.value[key].path;
-  onUpdate(key);
 }
 
 function isValid() {
@@ -137,4 +63,5 @@ function onUpdate(key: string) {
   if (!isValid()) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);
 }
+
 </script>

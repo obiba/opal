@@ -35,7 +35,16 @@
         </div>
       </div>
     </div>
-    <!-- <pre>{{ reference }}</pre> -->
+    <div v-if="reference && factory" class="row q-col-gutter-md">
+      <div class="col-12 col-md-6">
+        <div class="text-h6 q-mb-md">{{ $t('parameters') }}</div>
+        <schema-form v-model="refParameters" :schema="parametersSchemaForm" @update:model-value="onParametersUpdate" disable />
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="text-h6 q-mb-md">{{ $t('credentials') }}</div>
+        <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" @update:model-value="onParametersUpdate" disable />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,6 +58,7 @@ export default defineComponent({
 import { ResourceReferenceDto } from 'src/models/Projects';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { ResourceFactoryDto } from 'src/models/Resources';
+import SchemaForm from 'src/components/SchemaForm.vue';
 
 const route = useRoute();
 const resourcesStore = useResourcesStore();
@@ -58,8 +68,14 @@ const reference = ref<ResourceReferenceDto>();
 const factory = computed(() => reference.value ? resourcesStore.getResourceFactory(reference.value) : null);
 const provider = computed(() => reference.value ? resourcesStore.getResourceProvider(reference.value) : null);
 
+const refParameters = ref({});
+const refCredentials = ref({});
+
 const pName = computed(() => route.params.id as string);
 const rName = computed(() => route.params.rid as string);
+
+const parametersSchemaForm = computed(() => factory.value ? JSON.parse(factory.value.parametersSchemaForm) : {});
+const credentialsSchemaForm = computed(() => factory.value ? JSON.parse(factory.value.credentialsSchemaForm) : {});
 
 watch([pName, rName], () => {
   init();
@@ -72,6 +88,25 @@ function init() {
   resourcesStore.initResourceReferences(pName.value).finally(() => {
     reference.value = resourcesStore.getResourceReference(rName.value);
     loading.value = false;
+    if (factory.value && reference.value) {
+      try {
+        refParameters.value = JSON.parse(reference.value.parameters);
+      } catch (e) {
+        refParameters.value = {};
+      }
+      if (reference.value.credentials) {
+        try {
+          refCredentials.value = JSON.parse(reference.value.credentials);
+        } catch (e) {
+          refCredentials.value = {};
+        }
+      } else {
+        refCredentials.value = {};
+      }
+    } else {
+      refParameters.value = {};
+      refCredentials.value = {};
+    }
   });
 }
 
@@ -85,4 +120,8 @@ const itemsReference: FieldItem<ResourceReferenceDto>[] = [
 const itemsFactory: FieldItem<ResourceFactoryDto>[] = [
   { field: 'title', label: 'type' },
 ];
+
+function onParametersUpdate() {
+  console.log('onParametersUpdate');
+}
 </script>
