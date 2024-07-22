@@ -12,6 +12,20 @@
       selection="multiple"
       v-model:selected="selected"
     >
+      <template v-slot:top-left>
+        <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm" :disable="!hasProviders">
+          <q-list>
+            <template v-for="provider in resourcesStore.resourceProviders?.providers" :key="provider.name">
+              <q-item clickable v-close-popup @click.prevent="onShowAdd(provider)">
+                <q-item-section>
+                  <q-item-label>{{ provider.title }}</q-item-label>
+                  <q-item-label caption style="max-width: 300px;">{{ provider.description }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-list>
+        </q-btn-dropdown>
+      </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <span class="text-primary">{{ props.value }}</span>
@@ -30,6 +44,8 @@
         </q-td>
       </template>
     </q-table>
+
+    <resource-reference-dialog v-if="selectedProvider" v-model="showAdd" :provider="selectedProvider" />
   </div>
 </template>
 
@@ -41,6 +57,8 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { ResourceReferenceDto } from 'src/models/Projects';
+import { ResourceProviderDto } from 'src/models/Resources';
+import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -56,6 +74,8 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const selected = ref([] as ResourceReferenceDto[]);
+const selectedProvider = ref<ResourceProviderDto>();
+const showAdd = ref(false);
 
 const pName = computed(() => route.params.id as string);
 const columns = computed(() => [
@@ -64,6 +84,7 @@ const columns = computed(() => [
   { name: 'description', label: t('description'), align: 'left', field: 'description' },
   { name: 'url', label: 'URL', align: 'left', field: (row: ResourceReferenceDto) => row.resource?.url },
 ]);
+const hasProviders = computed(() => resourcesStore.resourceProviders?.providers.length)
 
 onMounted(() => {
   loading.value = true;
@@ -82,4 +103,8 @@ function onRowClick(evt: unknown, row: ResourceReferenceDto) {
   );
 }
 
+function onShowAdd(provider: ResourceProviderDto) {
+  selectedProvider.value = provider;
+  showAdd.value = true;
+}
 </script>

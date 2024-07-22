@@ -52,6 +52,7 @@ export const useResourcesStore = defineStore('resources', () => {
   return {
     project,
     resourceReferences,
+    resourceProviders,
     reset,
     initResourceProviders,
     initResourceReferences,

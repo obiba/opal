@@ -113,10 +113,10 @@ onMounted(() => {
 function onTest() {
   resourcesStore.testResource(pName.value, rName.value)
     .then(() => {
-      notifySuccess(t('resource_test_success'));
+      notifySuccess(t('resource_ref.test_success'));
     })
     .catch((error) => {
-      notifyError(t('resource_test_error', { error: error.response.data.message }));
+      notifyError(t('resource_ref.test_error', { error: error.response.data.message }));
     });
 }
 </script>

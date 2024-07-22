@@ -900,8 +900,13 @@ export default {
   description: 'Description',
   resources_info: 'Resources are datasets or computation units which location is described by a URL and access is protected by credentials. When assigned to a R/DataSHIELD server session, remote big/complex datasets or high performance computers are made accessible to data analysts.',
   format: 'Format',
-  provider: 'Provider',
-  provider_not_found: 'Provider not found: no R server can provide a way to make this resource available. Is the R package {provider} installed?',
-  resource_test_success: 'Resource assignment successful.',
-  resource_test_error: 'Resource assignment failed.'
+  resource_ref: {
+    provider: 'Provider',
+    provider_not_found: 'Provider not found: no R server can provide a way to make this resource available. Is the R package {provider} installed?',
+    test_success: 'Resource assignment successful.',
+    test_error: 'Resource assignment failed.',
+    add_from_provider: 'Add from {provider}',
+    category: 'Category',
+    factory: 'Factory'
+  }
 };

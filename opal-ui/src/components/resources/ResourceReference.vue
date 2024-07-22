@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="col-12 col-md-6">
-        <div class="text-h6 q-mb-md">{{ $t('provider') }}</div>
+        <div class="text-h6 q-mb-md">{{ $t('resource_ref.provider') }}</div>
         <div class="q-mb-md">
           <q-badge :label="reference?.provider" :color="provider ? 'positive' : 'negative'" />
         </div>
@@ -29,7 +29,7 @@
           <div class="q-mb-md box-warning">
             <q-icon name="error" size="1.2rem"/>
             <span class="on-right">
-              {{ $t('provider_not_found', { provider: reference?.provider }) }}
+              {{ $t('resource_ref.provider_not_found', { provider: reference?.provider }) }}
             </span>
           </div>
         </div>

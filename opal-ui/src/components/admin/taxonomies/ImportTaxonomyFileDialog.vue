@@ -55,7 +55,6 @@ interface DialogProps {
   modelValue: boolean;
 }
 
-const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();

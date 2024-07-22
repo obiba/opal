@@ -900,8 +900,12 @@ export default {
   description: 'Description',
   resources_info: 'Les ressources sont des ensembles de données ou des unités de calcul dont l\'emplacement est décrit par une URL et dont l\'accès est protégé par des informations d\'identification. Lorsqu\'ils sont affectés à une session de serveur R/DataSHIELD, des ensembles de données distants volumineux/complexes ou des ordinateurs hautes performances sont rendus accessibles aux analystes de données.',
   format: 'Format',
-  provider: 'Fournisseur',
-  provider_not_found: 'Fournisseur non trouvé : aucun serveur R ne peut fournir une façon de rendre la ressource disponible. Le package R {provider} est-il installé ?',
-  resource_test_success: 'L\'assignation de la resource a réussie.',
-  resource_test_error: 'L\'assignation de la resource a échoué.',
+  resource_ref: {
+    provider: 'Fournisseur',
+    provider_not_found: 'Fournisseur non trouvé : aucun serveur R ne peut fournir une façon de rendre la ressource disponible. Le package R {provider} est-il installé ?',
+    test_success: 'L\'assignation de la resource a réussie.',
+    test_error: 'L\'assignation de la resource a échoué.',
+    category: 'Categorie',
+    factory: 'Constructeur'
+  }
 };
