@@ -61,12 +61,27 @@
           </div>
 
           <div v-if="factory">
-            <div class="text-bold q-mb-sm">{{ $t('parameters') }}</div>
-            <schema-form v-model="refParameters" :schema="parametersSchemaForm" class="q-mb-lg" />
-            <div v-if="factory.credentialsSchemaForm">
-              <div class="text-bold q-mb-sm">{{ $t('credentials') }}</div>
-              <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" />
-            </div>
+            <q-tabs
+              v-model="tab"
+              dense
+              class="text-grey"
+              active-color="primary"
+              indicator-color="primary"
+              align="justify"
+              narrow-indicator
+            >
+              <q-tab name="parameters" :label="$t('parameters')" />
+              <q-tab name="credentials" :label="$t('credentials')" />
+            </q-tabs>
+            <q-separator />
+            <q-tab-panels v-model="tab">
+              <q-tab-panel name="parameters">
+                <schema-form v-model="refParameters" :schema="parametersSchemaForm"/>
+              </q-tab-panel>
+              <q-tab-panel name="credentials">
+                <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" />
+              </q-tab-panel>
+            </q-tab-panels>
           </div>
         </q-card-section>
 
@@ -111,6 +126,7 @@ const category = ref();
 const factory = ref();
 const refParameters = ref();
 const refCredentials = ref();
+const tab = ref('parameters');
 
 const categories = computed(() => props.provider.categories.map((p) => {
   return {
