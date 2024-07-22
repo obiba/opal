@@ -11,6 +11,7 @@
 package org.obiba.opal.core.service.security;
 
 import org.obiba.oidc.OIDCConfiguration;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -27,7 +28,7 @@ public interface IDProvidersService {
   Collection<OIDCConfiguration> getConfigurations();
 
   /**
-   * Returns true if the OIDC configuration with name exists.
+   * Throws {@link org.obiba.opal.core.service.security.DuplicateIDProviderException} if {@link org.obiba.oidc.OIDCConfiguration} with name exists.
    *
    * @return
    */

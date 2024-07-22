@@ -75,7 +75,7 @@
             :label="$t('save')"
             color="primary"
             @click="onSaveView"
-            :disabled="!projectDestination || !newTableName || !validDerivedVariables.length"
+            :disable="!projectDestination || !newTableName || !validDerivedVariables.length"
             v-close-popup
           />
         </q-card-actions>

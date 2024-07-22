@@ -136,7 +136,6 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      console.log('Watch token Dlg', value);
       projectsStore.initProjects().then(() => {
         projectsFilterOptions = projectsStore.projects.map((p) => p.name);
         projectFilters.value = [...projectsFilterOptions];
