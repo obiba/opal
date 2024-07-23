@@ -59,7 +59,7 @@
           <router-link :to="`/admin/taxonomies/${taxonomy.name}/${props.value}`">
             {{ props.value }}
           </router-link>
-          <div class="float-right">
+          <div class="float-right" v-if="!hasFilter">
             <q-btn
               v-show="props.rowIndex > 0"
               rounded
@@ -170,7 +170,6 @@ const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const router = useRouter();
 const { t, locale } = useI18n({ useScope: 'global' });
-const systemStore = useSystemStore();
 const showDelete = ref(false);
 const showEditTaxonomy = ref(false);
 const showAddVocabulary = ref(false);
@@ -185,6 +184,7 @@ const {
   taxonomiesStore,
   rows,
   filter,
+  hasFilter,
   applySort,
   onOverRow,
   onLeaveRow,
@@ -221,7 +221,6 @@ const properties: FieldItem<TaxonomyDto>[] = [
   },
 ];
 
-const locales = computed(() => (systemStore.generalConf || {}).languages || []);
 const taxonomyName = computed(() => props.taxonomy.name || '');
 const columns = computed(() => [
   {

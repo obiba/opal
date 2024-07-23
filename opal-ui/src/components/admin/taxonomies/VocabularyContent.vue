@@ -66,7 +66,7 @@
             @click="onAddTerm(props.row)"
           />
           <q-btn
-            v-show="props.rowIndex > 0"
+            v-show="!hasFilter && props.rowIndex > 0"
             rounded
             dense
             flat
@@ -78,7 +78,7 @@
             @click="onMoveUp(props.value)"
           />
           <q-btn
-            v-show="props.rowIndex < rows.length - 1"
+            v-show="!hasFilter && props.rowIndex < rows.length - 1"
             rounded
             dense
             flat
@@ -139,7 +139,6 @@
         </template>
       </q-td>
     </template>
-
   </q-table>
 
   <!-- Dialogs -->
@@ -215,6 +214,7 @@ const {
   taxonomiesStore,
   rows,
   filter,
+  hasFilter,
   applySort,
   onOverRow,
   onLeaveRow,
