@@ -64,6 +64,8 @@ export interface SchemaFormField {
 export interface SchemaFormObject {
   '$schema': string;
   type: string;
+  title?: string;
+  description?: string;
   items: SchemaFormField[];
   required: string[];
 }

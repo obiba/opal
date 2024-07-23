@@ -14,6 +14,20 @@
             <q-badge :label="provider.name" class="on-left"/><a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md">{{ $t('Website') }} <q-icon name="open_in_new" /></a>
           </div>
           
+          <q-input
+            v-model="name"
+            :label="$t('name')"
+            :hint="$t('resource_ref.name_hint')"
+            dense
+            class="q-mb-md" />
+          <q-input
+            v-model="description"
+            :label="$t('description')"
+            :hint="$t('resource_ref.description_hint')"
+            dense
+            type="textarea"
+            class="q-mb-md" />
+
           <q-select
             v-model="category"
             :options="categories"
@@ -33,8 +47,9 @@
               </q-item>
             </template>
           </q-select>
-          <div v-if="category?.description" class="text-hint q-mb-md">
-            <q-markdown :src="category.description" />
+          <div class="text-hint q-mb-md">
+            <q-markdown v-if="category?.description" :src="category.description" />
+            <span v-else>{{ $t('resource_ref.category_hint') }}</span>
           </div>
 
           <q-select
@@ -56,8 +71,9 @@
               </q-item>
             </template>
           </q-select>
-          <div v-if="factory?.description" class="text-hint q-mb-md">
-            <q-markdown :src="factory.description" />
+          <div class="text-hint q-mb-md">
+            <q-markdown v-if="factory?.description" :src="factory.description" />
+            <span v-else>{{ $t('resource_ref.factory_hint') }}</span>
           </div>
 
           <div v-if="factory">
@@ -110,6 +126,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { ResourceProviderDto } from 'src/models/Resources';
+import { ResourceReferenceDto } from 'src/models/Projects';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface DialogProps {
@@ -118,10 +135,15 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
+
+const resourcesStore = useResourcesStore();
+const projectStore = useProjectsStore();
 
 const editMode = ref<boolean>(false);
 const showDialog = ref(props.modelValue);
+const name = ref('');
+const description = ref('');
 const category = ref();
 const factory = ref();
 const refParameters = ref();
@@ -147,8 +169,12 @@ const credentialsSchemaForm = computed(() => factory.value ? JSON.parse(factory.
 
 watch(() => props.modelValue, (value) => {
   if (value) {
+    name.value = '';
+    description.value = '';
     category.value = undefined;
     factory.value = undefined;
+    refParameters.value = {};
+    refCredentials.value = {};
   }
   showDialog.value = value;
 });
@@ -167,5 +193,22 @@ function compareTitles(a: { title: string }, b: { title: string }) {
   if (a.title > b.title)
     return 1;
   return 0;
+}
+
+function onSave() {
+  const resourceRef: ResourceReferenceDto = {
+    project: projectStore.project.name,
+    name: name.value,
+    description: description.value,
+    provider: props.provider.name,
+    factory: factory.value.name,
+    parameters: JSON.stringify(refParameters.value),
+    credentials: JSON.stringify(refCredentials.value),
+  };
+  if (editMode.value) {
+    resourcesStore.saveResource(resourceRef);  
+  } else {
+    resourcesStore.addResource(resourceRef);
+  }
 }
 </script>

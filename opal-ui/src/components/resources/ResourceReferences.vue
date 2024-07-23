@@ -45,7 +45,7 @@
       </template>
     </q-table>
 
-    <resource-reference-dialog v-if="selectedProvider" v-model="showAdd" :provider="selectedProvider" />
+    <resource-reference-dialog v-if="selectedProvider" v-model="showAdd" :provider="selectedProvider" @update:model-value="onRefresh" />
   </div>
 </template>
 
@@ -86,12 +86,7 @@ const columns = computed(() => [
 ]);
 const hasProviders = computed(() => resourcesStore.resourceProviders?.providers.length)
 
-onMounted(() => {
-  loading.value = true;
-  resourcesStore.initResourceReferences(pName.value).finally(() => {
-    loading.value = false;
-  });
-});
+onMounted(onRefresh);
 
 function getResourceFactory(reference: ResourceReferenceDto) {
   return resourcesStore.getResourceFactory(reference);
@@ -106,5 +101,12 @@ function onRowClick(evt: unknown, row: ResourceReferenceDto) {
 function onShowAdd(provider: ResourceProviderDto) {
   selectedProvider.value = provider;
   showAdd.value = true;
+}
+
+function onRefresh() {
+  loading.value = true;
+  resourcesStore.initResourceReferences(pName.value).finally(() => {
+    loading.value = false;
+  });
 }
 </script>

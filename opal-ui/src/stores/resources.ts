@@ -49,6 +49,14 @@ export const useResourcesStore = defineStore('resources', () => {
     return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider);
   }
 
+  async function addResource(resourceRef: ResourceReferenceDto) {
+    return api.post(`/project/${resourceRef.project}/resources`, resourceRef);
+  }
+
+  async function saveResource(resourceRef: ResourceReferenceDto) {
+    return api.put(`/project/${resourceRef.project}/resource/${resourceRef.name}`, resourceRef);
+  }
+
   return {
     project,
     resourceReferences,
@@ -61,6 +69,8 @@ export const useResourcesStore = defineStore('resources', () => {
     getResourceReference,
     getResourceProvider,
     testResource,
+    addResource,
+    saveResource,
   }
 
 });

@@ -906,7 +906,11 @@ export default {
     test_success: 'Resource assignment successful.',
     test_error: 'Resource assignment failed.',
     add_from_provider: 'Add from {provider}',
+    name_hint: 'The name of the resource, unique in the project.',
+    description_hint: 'A short description of the resource, optional.',
     category: 'Category',
-    factory: 'Factory'
+    category_hint: 'The type of resource.',
+    factory: 'Factory',
+    factory_hint: 'How to make a resource.',
   }
 };

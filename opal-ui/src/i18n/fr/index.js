@@ -905,7 +905,11 @@ export default {
     provider_not_found: 'Fournisseur non trouvé : aucun serveur R ne peut fournir une façon de rendre la ressource disponible. Le package R {provider} est-il installé ?',
     test_success: 'L\'assignation de la resource a réussie.',
     test_error: 'L\'assignation de la resource a échoué.',
+    name_hint: 'Le nom de la ressource, unique dans le projet.',
+    description_hint: 'Une courte description de la ressource, optionelle.',
     category: 'Categorie',
-    factory: 'Constructeur'
+    category_hint: 'Le type de ressource.',
+    factory: 'Constructeur',
+    factory_hint: 'Comment la resource sera créée.',
   }
 };
