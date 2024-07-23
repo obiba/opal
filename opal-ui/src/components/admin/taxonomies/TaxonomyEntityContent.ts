@@ -24,6 +24,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     minRowsForPagination: 10,
   });
   const filter = ref('');
+  const hasFilter = computed(() => (filter.value || '').length > 0);
 
   // Functions
 
@@ -99,7 +100,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
   }
 
   function onOverRow(row: TYPE) {
-    toolsVisible.value[row.name] = true && (filter.value || '').length === 0;
+    toolsVisible.value[row.name] = true;
   }
 
   function onLeaveRow(row: TYPE) {
@@ -144,6 +145,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     taxonomiesStore,
     rows,
     filter,
+    hasFilter,
     applySort,
     onOverRow,
     onLeaveRow,
