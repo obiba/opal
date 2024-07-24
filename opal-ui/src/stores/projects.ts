@@ -1,13 +1,22 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
-import { CommandStateDto, CommandStateDto_Status, ImportCommandOptionsDto, ExportCommandOptionsDto, CopyCommandOptionsDto } from 'src/models/Commands';
+import { Acl } from 'src/models/Opal';
+import { Subject } from 'src/models/Opal';
+import {
+  CommandStateDto,
+  CommandStateDto_Status,
+  ImportCommandOptionsDto,
+  ExportCommandOptionsDto,
+  CopyCommandOptionsDto,
+} from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
 interface ProjectPerms {
   export: Perms | undefined;
   copy: Perms | undefined;
   import: Perms | undefined;
+  subjects: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -16,6 +25,7 @@ export const useProjectsStore = defineStore('projects', () => {
   const summary = ref({} as ProjectSummaryDto);
   const commandStates = ref([] as CommandStateDto[]);
   const perms = ref({} as ProjectPerms);
+  const subjects = ref([] as Subject[]);
 
   function reset() {
     projects.value = [];
@@ -23,6 +33,7 @@ export const useProjectsStore = defineStore('projects', () => {
     summary.value = {} as ProjectSummaryDto;
     commandStates.value = [];
     perms.value = {} as ProjectPerms;
+    subjects.value = [] as Subject[];
   }
 
   async function initProjects() {
@@ -38,14 +49,10 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function loadProjects() {
-    return api
-      .get('/projects', { params: { digest: true } })
-      .then((response) => {
-        projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) =>
-          a.name.localeCompare(b.name)
-        );
-        return response;
-      });
+    return api.get('/projects', { params: { digest: true } }).then((response) => {
+      projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) => a.name.localeCompare(b.name));
+      return response;
+    });
   }
 
   async function loadProject(name: string) {
@@ -66,18 +73,20 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.copy = new Perms(response);
           return response;
         }),
+        api.options(`/project/${project.value.name}/permissions/subjects`).then((response) => {
+          perms.value.subjects = new Perms(response);
+          return response;
+        }),
       ]);
     });
   }
 
   async function loadSummary() {
     summary.value = {} as ProjectSummaryDto;
-    return api
-      .get(`/project/${project.value.name}/summary`)
-      .then((response) => {
-        summary.value = response.data;
-        return response;
-      });
+    return api.get(`/project/${project.value.name}/summary`).then((response) => {
+      summary.value = response.data;
+      return response;
+    });
   }
 
   async function copyCommand(name: string, options: CopyCommandOptionsDto) {
@@ -112,7 +121,45 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   function cancelCommandState(command: CommandStateDto) {
-    return api.put(`/project/${project.value.name}/command/${command.id}/status`, { status: CommandStateDto_Status.CANCELED });
+    return api.put(`/project/${project.value.name}/command/${command.id}/status`, {
+      status: CommandStateDto_Status.CANCELED,
+    });
+  }
+
+  async function loadSubjects() {
+    subjects.value = [] as Subject[];
+    return api.get(`/project/${project.value.name}/permissions/subjects`).then((response) => {
+      subjects.value = response.data;
+      return response;
+    });
+  }
+
+  async function deleteSubject(subject: Subject) {
+    return api.delete(`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
+      params: { type: subject.type },
+    });
+  }
+
+  async function getSubjectPermissions(subject: Subject) {
+    return api
+      .get(`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
+        params: { type: subject.type },
+      })
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async function deleteSubjectPermission(subject: Subject, acl: Acl) {
+    const resource =
+      acl.resource.indexOf('table') > -1
+        ? acl.resource.replace(/.*table/, 'table')
+        : acl.resource.replace(/\/datasource.*$/, 'datasource');
+
+    const params = { principal: subject.principal, type: subject.type };
+    return api.delete(`/project/${project.value.name}/permissions/${resource}`, {
+      params,
+    });
   }
 
   return {
@@ -121,10 +168,15 @@ export const useProjectsStore = defineStore('projects', () => {
     summary,
     commandStates,
     perms,
+    subjects,
     initProjects,
     initProject,
     loadSummary,
     loadCommandStates,
+    loadSubjects,
+    deleteSubject,
+    getSubjectPermissions,
+    deleteSubjectPermissions: deleteSubjectPermission,
     clearCommandStates,
     cancelCommandState,
     copyCommand,

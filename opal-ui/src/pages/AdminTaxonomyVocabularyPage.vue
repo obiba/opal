@@ -58,7 +58,6 @@ async function onRefresh(newName?: string) {
 }
 
 onMounted(() => {
-  console.log('AdminTaxonomyVocabularyPage mounted');
   systemStore.initGeneralConf();
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {

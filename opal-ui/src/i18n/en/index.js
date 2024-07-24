@@ -729,6 +729,7 @@ export default {
   progress: 'Progress',
   project_destination: 'Destination project',
   project: 'Project',
+  project_acls_empty: 'No granted permissions.',
   project_settings: 'Project Settings',
   projects_caption: 'Browse tables and variables, create views, import/export data and dictionaries.',
   projects: 'Projects',

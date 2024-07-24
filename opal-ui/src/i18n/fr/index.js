@@ -728,6 +728,7 @@ export default {
   progress: 'Progression',
   project_destination: 'Projet de destination',
   project: 'Projet',
+  project_acls_empty: 'Aucune permission n\'a été accordée.',
   projects_caption: 'Parcourir les tables et les variables, créer des vues, importer/exporter des données et des dictionnaires',
   profiles_info: "Chaque utilisateur qui se connecte a un profil. Un domaine est le répertoire d'utilisateurs dans lequel un utilisateur est défini. Pour des raisons de sécurité, il est interdit de se connecter à partir de différents domaines avec le même nom d'utilisateur. S'il est supprimé, le profil de l'utilisateur sera automatiquement recréé lorsque l'utilisateur se connectera.",
   project_settings: 'Paramètres du projet',

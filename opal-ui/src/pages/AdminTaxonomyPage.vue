@@ -56,7 +56,6 @@ async function onRefresh(newName?: string) {
 }
 
 onMounted(() => {
-  console.log('AdminTaxonomyPage mounted');
   systemStore.initGeneralConf();
 
   taxonomiesStore.initSummaries().catch(notifyError);
