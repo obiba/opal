@@ -108,9 +108,12 @@ const cases = [
   { regex: /\/files\/(.*)$/, type: 'folder' },
   { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
   { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
+  { regex: /\/datasource\/([^\/]+)\/view\/(.*)$/, type: 'view' },
   { regex: /\/datasource\/(.*)$/, type: 'project' },
   { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
   { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
+  { regex: /\/project\/(.*)\/report-template/, type: 'report', url: '/admin/datashield' },
+  { regex: /\/project\/(.*)$/, type: 'project' },
   { regex: /\/r$/, type: 'r_service', url: '/admin/rservers' },
   { regex: /\/datashield$/, type: 'datashield_service', url: '/admin/datashield' },
   { regex: /\/datashield\/profile\/(.*)$/, type: 'datashield_profile', url: '/admin/datashield' },
@@ -147,6 +150,10 @@ const rows = computed(() => {
           case 'table':
             result.title = `${match[1]}.${match[2]}`;
             break;
+          case 'view':
+            result.title = `${match[1]}.${match[2]}`;
+            result.caption = t(item.type);
+            break;
           case 'variable':
             result.title = `${match[1]}.${match[2]}.${match[3]}`;
             break;
@@ -155,6 +162,10 @@ const rows = computed(() => {
             break;
           case 'resource':
             result.title = `${match[1]}.${match[2]}`;
+            break;
+          case 'report':
+            result.title = `${match[1]}`;
+            result.caption = t(item.type);
             break;
           case 'r_service':
             result.title = 'R';

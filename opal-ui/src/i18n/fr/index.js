@@ -174,7 +174,7 @@ export default {
       label: 'Ajouter des projets',
       description: 'Ajouter de nouveaux projets et ainsi pouvoir importer/exporter des données dans ces projets.',
     },
-    PROJECT_All: {
+    PROJECT_ALL: {
       label: 'Administrer le project',
       description: 'Accès complet au projet',
     },
@@ -255,12 +255,12 @@ export default {
     },
     // report permissions
     REPORT_TEMPLATE_ALL: {
-      label: 'REPORT_TEMPLATE_ALL',
-      description: 'REPORT_TEMPLATE_ALL',
+      label: 'Administrer les rapports',
+      description: 'Accès complet au modèle de rapport (paramètres et rapports).',
     },
     REPORT_TEMPLATE_READ: {
-      label: 'REPORT_TEMPLATE_ALL',
-      description: 'REPORT_TEMPLATE_ALL',
+      label: 'Voir les rapports',
+      description: 'Voir les rapports uniquement.',
     },
     // resource permissions
     RESOURCE_ALL: {
@@ -740,6 +740,7 @@ export default {
   referenced_entity_type: "Type d'entité référencée",
   refresh: 'Rafraîchir',
   repeatable: 'Répétable',
+  report: 'Rapport',
   reports_caption: 'Configurer et planifier des rapports',
   reports: 'Rapports',
   reset: 'Réinitialiser',
@@ -837,6 +838,7 @@ export default {
   variables: 'Variables',
   variance: 'Variance',
   version: 'Version',
+  view: 'Vue',
   waiting: 'En attente',
   public_url: 'URL publique',
   logout_url: 'URL après déconnexion',
