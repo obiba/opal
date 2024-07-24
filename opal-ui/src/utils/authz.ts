@@ -24,4 +24,8 @@ export class Perms {
     return this.methods.includes('DELETE');
   }
 
+  none() {
+    return this.methods.length === 1 && this.methods.includes('OPTIONS');
+  }
+
 }
