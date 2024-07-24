@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-      <q-card class="dialog-sm">
+      <q-card class="dialog-md">
         <q-card-section>
           <div class="text-h6">{{ $t(editMode ? 'edit' : 'add') }}</div>
         </q-card-section>
@@ -13,7 +13,7 @@
             <q-markdown :src="provider.description" no-heading-anchor-links/>
             <q-badge :label="provider.name" class="on-left"/><a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md">{{ $t('Website') }} <q-icon name="open_in_new" /></a>
           </div>
-          
+
           <q-input
             v-model="name"
             :label="$t('name')"
@@ -77,30 +77,18 @@
           </div>
 
           <div v-if="factory">
-            <q-tabs
-              v-model="tab"
-              dense
-              class="text-grey"
-              active-color="primary"
-              indicator-color="primary"
-              align="justify"
-              narrow-indicator
-            >
-              <q-tab name="parameters" :label="$t('parameters')" />
-              <q-tab name="credentials" :label="$t('credentials')" />
-            </q-tabs>
-            <q-separator />
-            <q-tab-panels v-model="tab">
-              <q-tab-panel name="parameters">
+            <div class="row q-col-gutter-md">
+              <div class="col-6">
+                <div class="text-bold q-mb-sm">{{ $t('parameters') }}</div>
                 <schema-form v-model="refParameters" :schema="parametersSchemaForm"/>
-              </q-tab-panel>
-              <q-tab-panel name="credentials">
+              </div>
+              <div class="col-6">
+                <div class="text-bold q-mb-sm">{{ $t('credentials') }}</div>
                 <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" />
-              </q-tab-panel>
-            </q-tab-panels>
+              </div>
+            </div>
           </div>
         </q-card-section>
-
 
         <q-separator />
 
@@ -112,7 +100,6 @@
             color="primary"
             :disable="!factory"
             @click="onSave"
-            v-close-popup
           />
         </q-card-actions>
       </q-card>
@@ -135,7 +122,7 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue','saved']);
 
 const resourcesStore = useResourcesStore();
 const projectStore = useProjectsStore();
@@ -148,7 +135,6 @@ const category = ref();
 const factory = ref();
 const refParameters = ref();
 const refCredentials = ref();
-const tab = ref('parameters');
 
 const categories = computed(() => props.provider.categories.map((p) => {
   return {
@@ -206,9 +192,17 @@ function onSave() {
     credentials: JSON.stringify(refCredentials.value),
   };
   if (editMode.value) {
-    resourcesStore.saveResource(resourceRef);  
+    resourcesStore.saveResource(resourceRef)
+      .then(() => emit('saved', resourceRef))
+      .finally(() => {
+        emit('update:modelValue', false);
+      });
   } else {
-    resourcesStore.addResource(resourceRef);
+    resourcesStore.addResource(resourceRef)
+      .then(() => emit('saved', resourceRef))
+      .finally(() => {
+        emit('update:modelValue', false);
+      });
   }
 }
 </script>

@@ -41,6 +41,19 @@ export const useResourcesStore = defineStore('resources', () => {
     return api.put(`/project/${pName}/resource/${name}/_test`);
   }
 
+  async function deleteResource(pName: string, name: string) {
+    return api.delete(`/project/${pName}/resource/${name}`);
+  }
+
+  async function deleteResources(pName: string, names: string[]) {
+    return api.delete(`/project/${pName}/resources`, {
+      params: { names },
+      paramsSerializer: {
+        indexes: null,
+      }
+    });
+  }
+
   function getResourceFactory(reference: ResourceReferenceDto) {
     return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider)?.resourceFactories.find((factory) => factory.name === reference.factory);
   }
@@ -69,6 +82,8 @@ export const useResourcesStore = defineStore('resources', () => {
     getResourceReference,
     getResourceProvider,
     testResource,
+    deleteResource,
+    deleteResources,
     addResource,
     saveResource,
   }

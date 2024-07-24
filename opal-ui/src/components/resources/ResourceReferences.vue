@@ -25,6 +25,7 @@
             </template>
           </q-list>
         </q-btn-dropdown>
+        <q-btn :disable="selected.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDelete"  class="on-right"></q-btn>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -45,7 +46,8 @@
       </template>
     </q-table>
 
-    <resource-reference-dialog v-if="selectedProvider" v-model="showAdd" :provider="selectedProvider" @update:model-value="onRefresh" />
+    <resource-reference-dialog v-if="selectedProvider" v-model="showAdd" :provider="selectedProvider" @saved="onSaved" />
+    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: selected.length })" @confirm="onDeleteResources" />
   </div>
 </template>
 
@@ -59,6 +61,7 @@ export default defineComponent({
 import { ResourceReferenceDto } from 'src/models/Projects';
 import { ResourceProviderDto } from 'src/models/Resources';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -76,6 +79,7 @@ const initialPagination = ref({
 const selected = ref([] as ResourceReferenceDto[]);
 const selectedProvider = ref<ResourceProviderDto>();
 const showAdd = ref(false);
+const showDelete = ref(false);
 
 const pName = computed(() => route.params.id as string);
 const columns = computed(() => [
@@ -107,6 +111,27 @@ function onRefresh() {
   loading.value = true;
   resourcesStore.initResourceReferences(pName.value).finally(() => {
     loading.value = false;
+  });
+}
+
+function onSaved() {
+  loading.value = true;
+  resourcesStore.loadResourceReferences(pName.value).finally(() => {
+    loading.value = false;
+  });
+}
+
+function onShowDelete() {
+  showDelete.value = true;
+}
+
+function onDeleteResources() {
+  loading.value = true;
+  resourcesStore.deleteResources(pName.value, selected.value.map((r) => r.name)).then(() => {
+    return resourcesStore.loadResourceReferences(pName.value);
+  }).finally(() => {
+    loading.value = false;
+    selected.value = [];
   });
 }
 </script>

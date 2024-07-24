@@ -30,7 +30,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="link" /><span>{{ rName }}</span>
+        <q-icon name="link" class="on-left"/><span>{{ rName }}</span>
         <q-btn
           color="secondary"
           size="sm"
@@ -46,6 +46,14 @@
           icon="terminal"
           :label="$t('test')"
           @click="onTest"
+          class="on-right"
+        />
+        <q-btn
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          @click="onShowDelete"
           class="on-right"
         />
       </div>
@@ -78,6 +86,7 @@
         </q-tab-panel>
       </q-tab-panels>
 
+      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
     </q-page>
   </div>
 </template>
@@ -85,9 +94,11 @@
 <script setup lang="ts">
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const route = useRoute();
+const router = useRouter();
 const projectsStore = useProjectsStore();
 const resourcesStore = useResourcesStore();
 const { t } = useI18n();
@@ -95,6 +106,7 @@ const { t } = useI18n();
 const pName = computed(() => route.params.id as string);
 const rName = computed(() => route.params.rid as string);
 const tab = ref('reference');
+const showDelete = ref(false);
 
 const previousReference = computed(() => {
   const idx = resourcesStore.resourceReferences.findIndex((rsrc) => rsrc.name === rName.value);
@@ -117,6 +129,20 @@ function onTest() {
     })
     .catch((error) => {
       notifyError(t('resource_ref.test_error', { error: error.response.data.message }));
+    });
+}
+
+function onShowDelete() {
+  showDelete.value = true;
+}
+
+function onDeleteResource() {
+  resourcesStore.deleteResource(pName.value, rName.value)
+    .then(() => {
+      return resourcesStore.loadResourceReferences(pName.value);
+    })
+    .then(() => {
+      router.push(`/project/${pName.value}/resources`);
     });
 }
 </script>

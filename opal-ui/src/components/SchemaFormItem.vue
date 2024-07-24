@@ -85,7 +85,7 @@
                 v-model="dataArray[index][item.key]"
                 :field="item"
                 :disable="disable"
-                @update:model-value="onUpdate()"
+                @update:model-value="onArrayUpdate(index)"
                 />
             </div>
           </q-item-section>
@@ -108,6 +108,7 @@
         color="primary"
         icon="add"
         :label="$t('add')"
+        @click="dataArray.push({})"
         size="sm"
         class="q-mt-sm"
       />
@@ -182,6 +183,13 @@ function onUpdate() {
     data.value = dataArray.value;
   }
   emit('update:modelValue', data.value);
+}
+
+function onArrayUpdate(index: number) {
+  return (value: any) => {
+    dataArray.value[index] = value;
+    onUpdate();
+  };
 }
 
 function logUnsupported() {
