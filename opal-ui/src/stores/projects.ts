@@ -81,6 +81,17 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function addProject(project: ProjectDto) {
+    return api.post('/projects', project).then((response) => response.data);
+  }
+
+  async function updateProject(updated: ProjectDto) {
+    return api.put(`/project/${updated.name}`, updated).then((response) => {
+      if (updated.name === project.value.name) project.value = updated;
+      return response;
+    });
+  }
+
   async function loadSummary() {
     summary.value = {} as ProjectSummaryDto;
     return api.get(`/project/${project.value.name}/summary`).then((response) => {
@@ -172,6 +183,8 @@ export const useProjectsStore = defineStore('projects', () => {
     subjects,
     initProjects,
     initProject,
+    addProject,
+    updateProject,
     loadSummary,
     loadCommandStates,
     loadSubjects,

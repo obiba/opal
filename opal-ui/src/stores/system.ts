@@ -22,7 +22,7 @@ export const useSystemStore = defineStore('system', () => {
   }
 
   async function getDatabases(usage: string) {
-    return api.get('/system/databases', { params: { usage } });
+    return api.get('/system/databases', { params: { usage } }).then((response) => response.data);
   }
 
   async function getDatabasesWithSettings() {

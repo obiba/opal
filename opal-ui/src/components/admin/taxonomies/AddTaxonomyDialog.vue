@@ -53,7 +53,7 @@
           <localized-field-large
             v-model="newTaxonomy.title"
             :title="$t('title')"
-            :hint="$t('taxonomy.title_hint')"
+            :hint="$t('title_hint')"
           ></localized-field-large>
 
           <localized-field-large
