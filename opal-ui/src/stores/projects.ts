@@ -151,10 +151,11 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function deleteSubjectPermission(subject: Subject, acl: Acl) {
-    const resource =
-      acl.resource.indexOf('table') > -1
-        ? acl.resource.replace(/.*table/, 'table')
-        : acl.resource.replace(/\/datasource.*$/, 'datasource');
+    const resource = acl.resource
+      .replace(/^\//, '')
+      .replace(/^datasource.*/, 'datasource')
+      .replace(/.*(table|view)/, 'table')
+      .replace(/.*report-template/, 'report-template');
 
     const params = { principal: subject.principal, type: subject.type };
     return api.delete(`/project/${project.value.name}/permissions/${resource}`, {

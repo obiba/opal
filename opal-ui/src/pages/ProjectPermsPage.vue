@@ -23,7 +23,7 @@
                   <q-item
                     clickable
                     active-class="bg-light-blue-1"
-                    :active="index === 0"
+                    :active="selectedSubject.principal === subject.principal"
                     v-for="subject in subjects"
                     :key="subject.principal"
                     @click="onSubject(subject)"
@@ -46,7 +46,6 @@
             :on-delete-acls="onDeleteAcls"
             :hide-delete="false"
             :loading="loading"
-            @selected="onSelectedAcl"
           />
         </div>
       </div>
@@ -112,6 +111,7 @@ function initializeSubjectTypes() {
   subjectTypes.value = projectsStore.subjects.reduce((acc: Record<string, Subject[]>, subject: Subject) => {
     acc[subject.type] = acc[subject.type] || [];
     acc[subject.type].push(subject);
+    acc[subject.type].sort((a, b) => a.principal.localeCompare(b.principal));
     return acc;
   }, {} as Record<string, Subject[]>);
 }
@@ -133,10 +133,6 @@ async function loadSubjects() {
 
 // Handlers
 
-function onSelectedAcl(acls: Acl[]) {
-  selectedAcls.value = acls;
-}
-
 function onDeleteAcls() {
   showDeletes.value = true;
 }
@@ -144,6 +140,7 @@ function onDeleteAcls() {
 async function onSubject(subject: Subject) {
   try {
     selectedSubject.value = subject;
+
     acls.value = await projectsStore.getSubjectPermissions(subject);
   } catch (error) {
     notifyError(error);

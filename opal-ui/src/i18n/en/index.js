@@ -174,7 +174,7 @@ export default {
       label: 'Add projects',
       description: 'Add new projects and therefore can import/export data in the context of the project.',
     },
-    PROJECT_All: {
+    PROJECT_ALL: {
       label: 'Administrate projects',
       description: 'Full access to project.',
     },
@@ -255,12 +255,12 @@ export default {
     },
     // report permissions
     REPORT_TEMPLATE_ALL: {
-      label: 'REPORT_TEMPLATE_ALL',
-      description: 'REPORT_TEMPLATE_ALL',
+      label: 'Administrate reports',
+      description: 'Full access to the report template (settings and reports).',
     },
     REPORT_TEMPLATE_READ: {
-      label: 'REPORT_TEMPLATE_ALL',
-      description: 'REPORT_TEMPLATE_ALL',
+      label: 'View reports',
+      description: 'View reports only.',
     },
     // resource permissions
     RESOURCE_ALL: {
@@ -740,6 +740,7 @@ export default {
   referenced_entity_type: 'Referenced entity type',
   refresh: 'Refresh',
   repeatable: 'Repeatable',
+  report: 'Report',
   reports_caption: 'Configure and schedule reports',
   reports: 'Reports',
   reset: 'Reset',
@@ -837,6 +838,7 @@ export default {
   variables: 'Variables',
   variance: 'Variance',
   version: 'Version',
+  view: 'View',
   waiting: 'Waiting',
   public_url: 'Public URL',
   logout_url: 'URL after logout',
