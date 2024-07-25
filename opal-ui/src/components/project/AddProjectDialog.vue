@@ -64,7 +64,8 @@
           use-chips
           multiple
           input-debounce="0"
-          :hint="$t('groups_hint')"
+          :label="$t('tags')"
+          :hint="$t('project_tag_hint')"
           @new-value="addTag"
           :options="tagsFilters"
           @filter="onFilterTags"

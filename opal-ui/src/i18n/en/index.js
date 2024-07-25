@@ -733,6 +733,7 @@ export default {
   project_description_hint: 'Optional description of the project.',
   project_filter_placeholder: 'Filter projects...',
   project_acls_empty: 'No granted permissions.',
+  project_tag_hint: 'Type a new tag and press \'ENTER\'.',
   project_settings: 'Project Settings',
   projects_caption: 'Browse tables and variables, create views, import/export data and dictionaries.',
   projects: 'Projects',
