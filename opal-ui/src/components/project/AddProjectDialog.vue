@@ -63,6 +63,7 @@
           use-input
           use-chips
           multiple
+          placeholder="(none)"
           input-debounce="0"
           :label="$t('tags')"
           :hint="$t('project_tag_hint')"

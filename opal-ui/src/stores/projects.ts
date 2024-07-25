@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
+import { ProjectDto, ProjectSummaryDto, ProjectDatasourceStatusDto } from 'src/models/Projects';
 import { Acl } from 'src/models/Opal';
 import { Subject } from 'src/models/Opal';
 import {
@@ -26,6 +26,7 @@ export const useProjectsStore = defineStore('projects', () => {
   const commandStates = ref([] as CommandStateDto[]);
   const perms = ref({} as ProjectPerms);
   const subjects = ref([] as Subject[]);
+  const acls = ref([] as Acl[]);
 
   function reset() {
     projects.value = [];
@@ -137,6 +138,22 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function reloadDbCommand(name: string) {
+    return api.post(`/project/${name}/commands/_reload`);
+  }
+
+  async function getState(name: string): Promise<ProjectDatasourceStatusDto> {
+    return api.get(`/project/${name}/state`).then((response) => response.data);
+  }
+
+  async function loadAcls(project: ProjectDto) {
+    acls.value = [];
+    return api.get(`/project/${project.name}/permissions/project`).then((response) => {
+      acls.value = response.data;
+      return response;
+    });
+  }
+
   async function loadSubjects() {
     subjects.value = [] as Subject[];
     return api.get(`/project/${project.value.name}/permissions/subjects`).then((response) => {
@@ -181,12 +198,14 @@ export const useProjectsStore = defineStore('projects', () => {
     commandStates,
     perms,
     subjects,
+    acls,
     initProjects,
     initProject,
     addProject,
     updateProject,
     loadSummary,
     loadCommandStates,
+    loadAcls,
     loadSubjects,
     deleteSubject,
     getSubjectPermissions,
@@ -196,6 +215,8 @@ export const useProjectsStore = defineStore('projects', () => {
     copyCommand,
     exportCommand,
     importCommand,
+    reloadDbCommand,
+    getState,
     reset,
   };
 });

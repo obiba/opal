@@ -1,4 +1,5 @@
 export default {
+  '_': '',
   '2fa': {
     name: '2FA',
     title: 'Two-Factor Authentication',
@@ -9,7 +10,7 @@ export default {
     logout_url_hint: 'Optional redirection URL after user has logged out.',
     languages_hint: 'The languages used to describe the dictionaries.',
     default_charset_hint: 'The default char set used when prompting dictionnaries data.',
-    enforced_2fa_hint: 'Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.'
+    enforced_2fa_hint: 'Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.',
   },
   auth: {
     title: 'Sign in to start your session',
@@ -107,11 +108,11 @@ export default {
     InvalidCredentials: 'Invalid credentials, please try again',
     TableAlreadyExists: 'The table already exists',
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
-    DuplicateIDProvider:'The identity provider already exists',
-    DuplicateSubjectToken:'The token already exists',
-    DuplicateTaxonomy:'The taxonomy already exists',
-    TaxonomyImportFailed:'The taxonomy import failed, make sure to provide valid information',
-    NoSuchTaxonomy:'The taxonomy does not exist',
+    DuplicateIDProvider: 'The identity provider already exists',
+    DuplicateSubjectToken: 'The token already exists',
+    DuplicateTaxonomy: 'The taxonomy already exists',
+    TaxonomyImportFailed: 'The taxonomy import failed, make sure to provide valid information',
+    NoSuchTaxonomy: 'The taxonomy does not exist',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -123,7 +124,7 @@ export default {
     secret_hint: 'Secret token of the Opal server in the ID provider.',
     discovery_uri: 'Discovery URI',
     discovery_uri_hint: '{url} to automatically get connection parameters.',
-    discovery_uri_definition : 'OpenID Connect configuration discovery URI',
+    discovery_uri_definition: 'OpenID Connect configuration discovery URI',
     label_hint: 'Label of the ID provider to be displayed in the sign-in button.',
     provider_url: 'Account Login',
     provider_url_hint: 'Link to the account login page so that user can manage its credentials.',
@@ -166,7 +167,7 @@ export default {
     undefined: '',
     DEFAULT: 'Default',
     READ: 'Read only',
-    READ_NO_VALUES: 'Read only, without individual-level data'
+    READ_NO_VALUES: 'Read only, without individual-level data',
   },
   acls: {
     // global permissions
@@ -301,7 +302,12 @@ export default {
   git: {
     diff_viewer: {
       title: 'Commit Details',
-    }
+    },
+  },
+  project_admin: {
+    db_hint: 'Project tables (dictionaries and data) are stored in the database:',
+    db_reload_hint: 'Reloading a project database makes its data temporarily inaccessible (no table listing, no import or export) while the connection to the database is being re-initialised. The time taken by this operation depends on the database type and schema.',
+    db_reload_confirm: 'Are you sure you want to reload the project database?',
   },
   user_profile: {
     title: 'My profile',
@@ -343,7 +349,7 @@ export default {
       project_administration_hint: 'Select the project administration operations that can be performed using the token. By default none is available.',
       services: 'Services',
       services_hint: 'Select the system services that can be performed using the token. By default none is available.',
-    }
+    },
   },
   token_services: {
     useR: 'R',
@@ -462,7 +468,7 @@ export default {
     import_file: {
       label: 'From YAML File',
       title: 'Import YAML File',
-    }
+    },
   },
   account: 'Account',
   actions: 'Actions',
@@ -686,6 +692,7 @@ export default {
   mime_type: 'Mime type',
   min: 'Min',
   missings: 'Missings',
+  mongodb: 'MongoDB',
   move_down: 'Move down',
   move_up: 'Move up',
   my_profile: 'My profile',
@@ -744,6 +751,7 @@ export default {
   referenced_entity_type: 'Referenced entity type',
   references: 'References',
   refresh: 'Refresh',
+  reload: 'Reload',
   repeatable: 'Repeatable',
   report: 'Report',
   reports_caption: 'Configure and schedule reports',
@@ -783,6 +791,7 @@ export default {
   start_time: 'Start time',
   start: 'Start',
   started: 'Started',
+  state: 'State',
   status: 'Status',
   std_dev: 'Standard deviation',
   stop: 'Stop',
