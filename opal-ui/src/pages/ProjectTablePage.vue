@@ -18,6 +18,25 @@
         class="on-right"
       />
       <bookmark-icon :resource="`/datasource/${dsName}/table/${tName}`" />
+      <q-space />
+      <q-btn
+        outline
+        icon="navigate_before"
+        size="sm"
+        :label="previousTable?.name"
+        :to="`/project/${dsName}/table/${previousTable?.name}`"
+        v-if="previousTable"
+        class="on-right"
+      />
+      <q-btn
+        outline
+        icon-right="navigate_next"
+        size="sm"
+        :label="nextTable?.name"
+        :to="`/project/${dsName}/table/${nextTable?.name}`"
+        v-if="nextTable"
+        class="on-right"
+      />
     </q-toolbar>
     <q-page class="q-pa-md" v-show="datasourceStore.table.name">
       <div class="text-h5">
@@ -137,6 +156,16 @@ const showDelete = ref(false);
 const showCopyData = ref(false);
 const showCopyView = ref(false);
 const showEdit = ref(false);
+
+const previousTable = computed(() => {
+  const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);
+  return idx > 0 ? datasourceStore.tables[idx - 1] : null;
+});
+
+const nextTable = computed(() => {
+  const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);
+  return idx === datasourceStore.tables.length - 1 ? null : datasourceStore.tables[idx + 1];
+});
 
 const items1: FieldItem<TableDto>[] = [
   {

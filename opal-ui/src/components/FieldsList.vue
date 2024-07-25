@@ -58,8 +58,8 @@ export interface FieldItem<T> {
   field: string;
   label?: string;
   unit?: string;
-  format?: (val: T) => string;
-  html?: (val: T) => string;
+  format?: (val: T) => string | undefined;
+  html?: (val: T) => string | undefined;
   visible?: (val: T) => boolean;
   links?: (val: T) => FieldLink[];
   icon?: (val: T) => string;

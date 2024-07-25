@@ -41,7 +41,7 @@
                   rounded
                   icon="arrow_forward"
                   size="sm"
-                  class="q-pa-sm bg-grey-2 text-grey-10 q-ml-sm"
+                  class="q-pa-sm bg-primary text-white q-ml-sm"
                   :to="`/project/${name}/tables`"
                 ></q-btn>
               </div>
@@ -64,7 +64,7 @@
                   rounded
                   icon="arrow_forward"
                   size="sm"
-                  class="q-pa-sm bg-grey-2 text-grey-10 q-ml-sm"
+                  class="q-pa-sm bg-primary text-white q-ml-sm"
                   :to="`/project/${name}/resources`"
                 ></q-btn>
               </div>

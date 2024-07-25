@@ -64,8 +64,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function initDatasourceTable(dsName: string, tName: string) {
-    if (datasource.value?.name !== dsName) {
-      return loadDatasource(dsName).then(() => {
+    if (datasource.value?.name !== dsName || !tables.value) {
+      return initDatasourceTables(dsName).then(() => {
         if (table.value?.name !== tName) {
           return loadTable(tName);
         } else {
@@ -98,9 +98,12 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tName: string,
     vName: string
   ) {
-    if (datasource.value?.name !== dsName) {
+    if (datasource.value?.name !== dsName || table.value?.name !== tName) {
       return initDatasourceTable(dsName, tName).then(() =>
-        loadTableVariable(vName)
+        Promise.all([
+          loadTableVariables(),
+          loadTableVariable(vName)
+        ])
       );
     } else {
       return loadTableVariable(vName);

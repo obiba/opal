@@ -15,6 +15,25 @@
         />
         <q-breadcrumbs-el :label="vName" />
       </q-breadcrumbs>
+      <q-space />
+      <q-btn
+        outline
+        icon="navigate_before"
+        size="sm"
+        :label="previousVariable?.name"
+        :to="`/project/${dsName}/table/${tName}/variable/${previousVariable?.name}`"
+        v-if="previousVariable"
+        class="on-right"
+      />
+      <q-btn
+        outline
+        icon-right="navigate_next"
+        size="sm"
+        :label="nextVariable?.name"
+        :to="`/project/${dsName}/table/${tName}/variable/${nextVariable?.name}`"
+        v-if="nextVariable"
+        class="on-right"
+      />
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h6 q-mb-md">
@@ -29,7 +48,15 @@
           @click="onShowEditVariable"
           class="on-right"
         />
-        <q-btn v-if="datasourceStore.perms.variable?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
+        <q-btn
+          v-if="datasourceStore.perms.variable?.canDelete()"
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          @click="onShowDelete"
+          class="on-right"
+        />
         <q-btn
           :label="$t('add_to_view')"
           icon="add_circle"
@@ -153,6 +180,15 @@ const bundles = computed(() => datasourceStore.variableAttributesBundles || []);
 const labelBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'label'));
 const descriptionBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'description'));
 
+const previousVariable = computed(() => {
+  const idx = datasourceStore.variables.findIndex((v) => v.name === vName.value);
+  return idx > 0 ? datasourceStore.variables[idx - 1] : null;
+});
+
+const nextVariable = computed(() => {
+  const idx = datasourceStore.variables.findIndex((v) => v.name === vName.value);
+  return idx === datasourceStore.variables.length - 1 ? null : datasourceStore.variables[idx + 1];
+});
 
 const items1: FieldItem<VariableDto>[] = [
   {
@@ -200,6 +236,10 @@ const items2: FieldItem<VariableDto>[] = [
 ];
 
 onMounted(() => {
+  init();
+});
+
+watch([() => route.params.vid], () => {
   init();
 });
 

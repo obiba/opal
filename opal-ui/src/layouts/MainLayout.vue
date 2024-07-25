@@ -105,6 +105,7 @@ import { computed } from 'vue';
 
 const router = useRouter();
 const systemStore = useSystemStore();
+const resourcesStore = useResourcesStore();
 const authStore = useAuthStore();
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -121,6 +122,7 @@ const leftDrawerOpen = ref(false);
 onMounted(() => {
   authStore.userProfile().then(() => {
     systemStore.initGeneralConf();
+    resourcesStore.initResourceProviders();
     authStore.loadBookmarks();
   }).catch(() => {
     router.push('/signin');
