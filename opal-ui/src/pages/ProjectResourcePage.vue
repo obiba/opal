@@ -177,7 +177,7 @@ function onShowDuplicate() {
   showEdit.value = true;
 }
 
-function onSaved() {
-  resourcesStore.loadResourceReferences(pName.value);
+function onSaved(resource: ResourceReferenceDto) {
+  resourcesStore.loadResourceReferences(pName.value).then(() => router.push(`/project/${pName.value}/resource/${resource.name}`));
 }
 </script>
