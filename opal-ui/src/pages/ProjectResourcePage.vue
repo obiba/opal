@@ -50,6 +50,16 @@
           class="on-right"
         />
         <q-btn
+          color="secondary"
+          size="sm"
+          outline
+          icon="content_copy"
+          :label="$t('duplicate')"
+          @click="onShowDuplicate"
+          :disable="!resourceProvider"
+          class="on-right"
+        />
+        <q-btn
           outline
           color="red"
           icon="delete"
@@ -87,13 +97,14 @@
         </q-tab-panel>
       </q-tab-panels>
 
-      <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="resourceReference" @saved="onSaved" />
+      <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="selected" @saved="onSaved" />
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ResourceReferenceDto } from 'src/models/Projects';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
@@ -112,6 +123,7 @@ const rName = computed(() => route.params.rid as string);
 const tab = ref('reference');
 const showEdit = ref(false);
 const showDelete = ref(false);
+const selected = ref({} as ResourceReferenceDto);
 
 const resourceReference = computed(() => resourcesStore.getResourceReference(rName.value));
 const resourceProvider = computed(() => resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined);
@@ -155,6 +167,13 @@ function onDeleteResource() {
 }
 
 function onShowEdit() {
+  selected.value = resourceReference.value ? { ...resourceReference.value } : {} as ResourceReferenceDto;
+  showEdit.value = true;
+}
+
+function onShowDuplicate() {
+  selected.value = resourceReference.value ? { ...resourceReference.value } : {} as ResourceReferenceDto;
+  selected.value.name = '';
   showEdit.value = true;
 }
 

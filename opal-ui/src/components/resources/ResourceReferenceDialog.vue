@@ -158,7 +158,7 @@ const credentialsSchemaForm = computed(() => factory.value ? JSON.parse(factory.
 watch(() => props.modelValue, (value) => {
   if (value) {
     if (props.resource) {
-      editMode.value = true;
+      editMode.value = props.resource.name !== undefined && props.resource.name !== '';
       name.value = props.resource.name;
       description.value = props.resource.description || '';
       const resourceFactory = props.provider?.resourceFactories.find((cat) => cat.name === props.resource?.factory);
