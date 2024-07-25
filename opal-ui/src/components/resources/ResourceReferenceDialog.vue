@@ -7,7 +7,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section v-if="provider">
           <div class="q-mb-md">
             <div class="text-bold q-mb-sm">{{ provider.title }}</div>
             <q-markdown :src="provider.description" no-heading-anchor-links/>
@@ -18,6 +18,7 @@
             v-model="name"
             :label="$t('name')"
             :hint="$t('resource_ref.name_hint')"
+            :disable="editMode"
             dense
             class="q-mb-md" />
           <q-input
@@ -118,7 +119,8 @@ import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface DialogProps {
   modelValue: boolean;
-  provider: ResourceProviderDto;
+  provider?: ResourceProviderDto;
+  resource?: ResourceReferenceDto;
 }
 
 const props = defineProps<DialogProps>();
@@ -136,14 +138,14 @@ const factory = ref();
 const refParameters = ref();
 const refCredentials = ref();
 
-const categories = computed(() => props.provider.categories.map((p) => {
+const categories = computed(() => props.provider?.categories.map((p) => {
   return {
     label: p.title,
     value: p.name,
     ...p
   }
 }).sort(compareTitles));
-const factories = computed(() => category.value ? props.provider.resourceFactories.filter((f) => f.tags.includes(category.value.name)).map((f) => {
+const factories = computed(() => category.value ? props.provider?.resourceFactories.filter((f) => f.tags.includes(category.value.name)).map((f) => {
   return {
     label: f.title,
     value: f.name,
@@ -155,12 +157,36 @@ const credentialsSchemaForm = computed(() => factory.value ? JSON.parse(factory.
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    name.value = '';
-    description.value = '';
-    category.value = undefined;
-    factory.value = undefined;
-    refParameters.value = {};
-    refCredentials.value = {};
+    if (props.resource) {
+      editMode.value = true;
+      name.value = props.resource.name;
+      description.value = props.resource.description || '';
+      const resourceFactory = props.provider?.resourceFactories.find((cat) => cat.name === props.resource?.factory);
+      factory.value = resourceFactory ? {
+          label: resourceFactory.title,
+          value: resourceFactory.name,
+          ...resourceFactory
+        } : undefined;
+      category.value = categories.value?.find((cat) => cat.value === factory.value?.tags[0]);
+      try {
+        refParameters.value = props.resource.parameters ? JSON.parse(props.resource.parameters) : {};
+      } catch (e) {
+        refParameters.value = {};
+      }
+      try {
+        refCredentials.value = props.resource.credentials ? JSON.parse(props.resource.credentials) : {};
+      } catch (e) {
+        refCredentials.value = {};
+      }
+    } else {
+      editMode.value = false;
+      name.value = '';
+      description.value = '';
+      category.value = undefined;
+      factory.value = undefined;
+      refParameters.value = {};
+      refCredentials.value = {};
+    }
   }
   showDialog.value = value;
 });
@@ -182,6 +208,9 @@ function compareTitles(a: { title: string }, b: { title: string }) {
 }
 
 function onSave() {
+  if (!props.provider) {
+    return;
+  }
   const resourceRef: ResourceReferenceDto = {
     project: projectStore.project.name,
     name: name.value,

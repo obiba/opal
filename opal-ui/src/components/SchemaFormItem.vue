@@ -37,7 +37,7 @@
         emit-value
         map-options
         :options="field.enum.map((opt) => ({ label: opt.title, value: opt.key }))"
-        />
+        @update:model-value="onUpdate"/>
       <q-input
         v-else
         v-model="data"
@@ -186,6 +186,7 @@ function onUpdate() {
 }
 
 function onArrayUpdate(index: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (value: any) => {
     dataArray.value[index] = value;
     onUpdate();

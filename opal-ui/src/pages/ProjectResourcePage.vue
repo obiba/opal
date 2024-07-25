@@ -36,7 +36,8 @@
           size="sm"
           outline
           icon="edit"
-          @click="onShowEditResource"
+          @click="onShowEdit"
+          :disable="!resourceProvider"
           class="on-right"
         />
         <q-btn
@@ -86,14 +87,17 @@
         </q-tab-panel>
       </q-tab-panels>
 
+      <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="resourceReference" @saved="onSaved" />
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
+import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
@@ -106,7 +110,11 @@ const { t } = useI18n();
 const pName = computed(() => route.params.id as string);
 const rName = computed(() => route.params.rid as string);
 const tab = ref('reference');
+const showEdit = ref(false);
 const showDelete = ref(false);
+
+const resourceReference = computed(() => resourcesStore.getResourceReference(rName.value));
+const resourceProvider = computed(() => resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined);
 
 const previousReference = computed(() => {
   const idx = resourcesStore.resourceReferences.findIndex((rsrc) => rsrc.name === rName.value);
@@ -144,5 +152,13 @@ function onDeleteResource() {
     .then(() => {
       router.push(`/project/${pName.value}/resources`);
     });
+}
+
+function onShowEdit() {
+  showEdit.value = true;
+}
+
+function onSaved() {
+  resourcesStore.loadResourceReferences(pName.value);
 }
 </script>
