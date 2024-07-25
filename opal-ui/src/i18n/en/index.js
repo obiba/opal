@@ -738,6 +738,7 @@ export default {
   range: 'Range',
   realm: 'Realm',
   referenced_entity_type: 'Referenced entity type',
+  references: 'References',
   refresh: 'Refresh',
   repeatable: 'Repeatable',
   report: 'Report',

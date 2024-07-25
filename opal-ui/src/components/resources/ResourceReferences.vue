@@ -88,7 +88,7 @@ const columns = computed(() => [
   { name: 'description', label: t('description'), align: 'left', field: 'description' },
   { name: 'url', label: 'URL', align: 'left', field: (row: ResourceReferenceDto) => row.resource?.url },
 ]);
-const hasProviders = computed(() => resourcesStore.resourceProviders?.providers.length)
+const hasProviders = computed(() => resourcesStore.resourceProviders?.providers?.length ?? 0)
 
 onMounted(onRefresh);
 

@@ -738,6 +738,7 @@ export default {
   range: 'Plage',
   realm: 'Domaine',
   referenced_entity_type: "Type d'entité référencée",
+  references: 'Références',
   refresh: 'Rafraîchir',
   repeatable: 'Répétable',
   report: 'Rapport',
