@@ -11,17 +11,32 @@ package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.*;
+import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.ProjectsState;
+import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.BaseResource;
@@ -35,18 +50,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Nullable;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Request;
-import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @Scope("request")
 @Path("/project/{name}")
-public class ProjectResource extends BaseResource {
+public class ProjectResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
@@ -84,7 +94,6 @@ public class ProjectResource extends BaseResource {
   }
 
   @GET
-  @Transactional(readOnly = true)
   public Projects.ProjectDto get(@Context Request request, @PathParam("name") String name) {
     Project project = getProject(name);
     return Dtos.asDto(project, projectService);
@@ -92,7 +101,6 @@ public class ProjectResource extends BaseResource {
 
   @GET
   @Path("/summary")
-  @Transactional(readOnly = true)
   public Projects.ProjectSummaryDto getSummary(@Context Request request, @PathParam("name") String name) {
     Project project = getProject(name);
     return Dtos.asSummaryDto(project, projectService);

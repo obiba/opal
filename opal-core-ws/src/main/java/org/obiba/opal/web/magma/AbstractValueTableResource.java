@@ -17,14 +17,13 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.opal.web.BaseResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import jakarta.annotation.Nullable;
 import java.util.*;
 
-abstract class AbstractValueTableResource extends BaseResource {
+abstract class AbstractValueTableResource {
 
   private ValueTable valueTable;
 

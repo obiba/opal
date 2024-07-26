@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/service/r/cluster/{cname}/commands")
-public class RClusterCommandsResource extends BaseResource {
+public class RClusterCommandsResource implements BaseResource {
 
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsResource.class);
 
