@@ -15,7 +15,7 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
-import org.obiba.opal.web.magma.view.BaseResource;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;

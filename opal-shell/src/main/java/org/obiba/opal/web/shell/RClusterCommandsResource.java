@@ -15,7 +15,7 @@ import jakarta.ws.rs.PathParam;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.service.CommandJobService;
-import org.obiba.opal.web.magma.view.BaseResource;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
