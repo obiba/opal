@@ -53,9 +53,8 @@
         <q-btn
           color="secondary"
           size="sm"
-          outline
           icon="content_copy"
-          :label="$t('duplicate')"
+          :title="$t('duplicate')"
           @click="onShowDuplicate"
           :disable="!resourceProvider"
           class="on-right"
@@ -67,6 +66,16 @@
           icon="delete"
           size="sm"
           @click="onShowDelete"
+          class="on-right"
+        />
+        <q-btn
+          :label="$t('add_view')"
+          icon="add_circle"
+          no-caps
+          dense
+          flat
+          size="sm"
+          @click="onAddView"
           class="on-right"
         />
       </div>
@@ -99,6 +108,7 @@
         </q-tab-panel>
       </q-tab-panels>
 
+      <add-resource-view-dialog v-if="resourceReference" v-model="showAddView" :resource="resourceReference" />
       <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="selected" @saved="onSaved" />
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
     </q-page>
@@ -112,6 +122,7 @@ import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import AddResourceViewDialog from 'src/components/resources/AddResourceViewDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const route = useRoute();
@@ -125,6 +136,7 @@ const rName = computed(() => route.params.rid as string);
 const tab = ref('reference');
 const showEdit = ref(false);
 const showDelete = ref(false);
+const showAddView = ref(false);
 const selected = ref({} as ResourceReferenceDto);
 
 const resourceReference = computed(() => resourcesStore.getResourceReference(rName.value));
@@ -187,5 +199,9 @@ function onShowDuplicate() {
 
 function onSaved(resource: ResourceReferenceDto) {
   resourcesStore.loadResourceReferences(pName.value).then(() => router.push(`/project/${pName.value}/resource/${resource.name}`));
+}
+
+function onAddView() {
+  showAddView.value = true;
 }
 </script>

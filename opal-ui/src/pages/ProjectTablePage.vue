@@ -89,6 +89,7 @@
           />
         </div>
       </div>
+
       <q-tabs
         v-model="tab"
         dense
@@ -167,32 +168,40 @@ const nextTable = computed(() => {
   return idx === datasourceStore.tables.length - 1 ? null : datasourceStore.tables[idx + 1];
 });
 
-const items1: FieldItem<TableDto>[] = [
-  {
-    field: 'name',
-  },
-  {
-    field: 'name',
-    label: 'full_name',
-    html: (val) =>
-      val ? `<code>${val.datasourceName}.${val.name}</code>` : '',
-  },
-  {
-    field: 'entityType',
-    label: 'entity_type',
-  },
-  {
-    field: 'from',
-    label: 'table_references',
-    links: (val) => (val ? datasourceStore.view.from?.map((f) => {
-      return {
-        label: f,
-        to: `/project/${f.split('.')[0]}/table/${f.split('.')[1]}`
-      };
-    }) : []),
-    visible: (val) => val.viewType !== undefined,
-  },
-];
+const items1: FieldItem<TableDto>[] = computed(() => {
+  return [
+    {
+      field: 'name',
+    },
+    {
+      field: 'name',
+      label: 'full_name',
+      html: (val) =>
+        val ? `<code>${val.datasourceName}.${val.name}</code>` : '',
+    },
+    {
+      field: 'entityType',
+      label: 'entity_type',
+    },
+    {
+      field: 'from',
+      label: datasourceStore.view.viewType === 'View' ? 'table_references' : 'resource_ref.label',
+      links: (val) => (val ? datasourceStore.view.from?.map((f) => {
+        return {
+          label: f,
+          to: `/project/${f.split('.')[0]}/${datasourceStore.view.viewType === 'View' ? 'table' : 'resource'}/${f.split('.')[1]}`
+        };
+      }) : []),
+      visible: (val) => val.viewType !== undefined,
+    },
+    {
+      field: 'idColumn',
+      label: 'resource_ref.id_column',
+      format: () => datasourceStore.view['Magma.ResourceViewDto.view']?.idColumn || '',
+      visible: (val) => val.viewType === 'ResourceView',
+    }
+  ];
+});
 
 const items2: FieldItem<TableDto>[] = [
   {

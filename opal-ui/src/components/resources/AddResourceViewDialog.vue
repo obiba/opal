@@ -1,0 +1,162 @@
+<template>
+  <q-dialog v-model="showDialog" @hide="onHide">
+      <q-card class="dialog-sm">
+        <q-card-section>
+          <div class="text-h6">{{ $t('add_view') }}</div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section>
+          <q-select
+            v-model="projectDestination"
+            :options="projectNames"
+            :label="$t('project_destination')"
+            dense
+            class="q-mb-md"/>
+          <q-input
+            v-model="name"
+            dense
+            type="text"
+            :label="$t('view_name')"
+            :hint="$t('resource_ref.view_destination_hint')"
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="id"
+            dense
+            type="text"
+            :label="$t('resource_ref.id_column')"
+            :hint="$t('resource_ref.id_column_hint')"
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="entityType"
+            dense
+            type="text"
+            :label="$t('entity_type')"
+            :hint="$t('resource_ref.entity_type_hint')"
+            class="q-mb-md"
+          />
+          <q-checkbox
+            dense
+            v-model="allColumns"
+            :label="$t('resource_ref.all_columns')"
+          />
+          <div class="text-hint q-mt-sm q-mb-md">{{ $t('resource_ref.all_columns_hint') }}</div>
+
+          <q-input
+            v-model="profile"
+            dense
+            type="text"
+            :label="$t('resource_ref.r_server_profile')"
+            :hint="$t('resource_ref.r_server_profile_hint')"
+            class="q-mb-md"
+          />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right" class="bg-grey-3">
+          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          <q-btn
+            flat
+            :label="$t('save')"
+            color="primary"
+            @click="onSaveView"
+            :disable="!projectDestination || !name"
+            v-close-popup
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+</template>
+
+<script lang="ts">
+export default defineComponent({
+  name: 'AddResourceViewDialog',
+});
+</script>
+<script setup lang="ts">
+import { ResourceReferenceDto } from 'src/models/Projects';
+import { ViewDto, ResourceViewDto } from 'src/models/Magma';
+import { notifyError } from 'src/utils/notify';
+
+interface DialogProps {
+  modelValue: boolean;
+  resource: ResourceReferenceDto;
+}
+
+const props = defineProps<DialogProps>();
+const emit = defineEmits(['update:modelValue'])
+
+const router = useRouter();
+const projectsStore = useProjectsStore();
+const datasourceStore = useDatasourceStore();
+
+const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+
+const showDialog = ref(props.modelValue);
+const projectDestination = ref('');
+const name = ref('');
+const id = ref('');
+const entityType = ref('Participant');
+const allColumns = ref(true);
+const profile = ref('');
+
+watch(() => props.modelValue, (value) => {
+  if (value) {
+    projectDestination.value = props.resource.project as string;
+    name.value = props.resource.name;
+    id.value = '';
+    entityType.value = 'Participant';
+    allColumns.value = true;
+    profile.value = '';
+  }
+  showDialog.value = value;
+});
+
+onMounted(() => {
+  projectsStore.initProjects();
+});
+
+function onHide() {
+  emit('update:modelValue', false);
+}
+
+function onSaveView() {
+  if (!projectDestination.value || !name.value) {
+    return;
+  }
+
+  const from = `${props.resource.project}.${props.resource.name}`;
+
+  const resView = {
+      entityType: entityType.value || 'Participant',
+      idColumn: id.value,
+      profile: profile.value || 'default',
+      allColumns: allColumns.value,
+    } as ResourceViewDto;
+
+  const newViewPage = `/project/${projectDestination.value}/table/${name.value}`;
+
+
+  datasourceStore.getView(projectDestination.value, name.value)
+    .then((view: ViewDto) => {
+      view.from = [from];
+      view['Magma.ResourceViewDto.view'] = resView;
+      datasourceStore.updateView(projectDestination.value, name.value, view, 'Updated from resource')
+        .then(() => {
+          router.push(newViewPage);
+        })
+        .catch((error) => {
+          notifyError(error);
+        });
+    })
+    .catch((err) => {
+      datasourceStore.addResourceView(projectDestination.value, name.value, from, resView)
+        .then(() => router.push(newViewPage));
+    });
+
+}
+</script>

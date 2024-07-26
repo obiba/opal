@@ -909,6 +909,7 @@ export default {
   format: 'Format',
   delete_resources_confirm: 'No resources to delete | Are you sure you want to delete this resource? | Are you sure you want to delete these {count} resources?',
   resource_ref: {
+    label: 'Resource reference',
     provider: 'Provider',
     provider_not_found: 'Provider not found: no R server can provide a way to make this resource available. Is the R package {provider} installed?',
     test_success: 'Resource assignment successful.',
@@ -920,5 +921,12 @@ export default {
     category_hint: 'The type of resource.',
     factory: 'Factory',
     factory_hint: 'How to make a resource.',
+    view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated.',
+    id_column: 'ID column',
+    id_column_hint: 'The column name in the resource\'s tabular representation that provides the entity identifiers. If not specified, the first column will be used.',
+    all_columns: 'All columns',
+    all_columns_hint: 'When checked, all the observed resource\'s columns (except the identifier\'s column) will be mapped to a variable when the connection with the resource is established. This means that when a new column appears in the resource, a corresponding variable will be automatically added.',
+    r_server_profile: 'R server profile',
+    r_server_profile_hint: 'Optional R server profile name to be used for establishing the connection with the resource. If not specified, the profile will be guessed based on the R package associated to the resource.',
   }
 };

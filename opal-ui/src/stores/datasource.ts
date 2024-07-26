@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto } from 'src/models/Magma';
+import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
 import { AttributesBundle } from 'src/components/models';
 
@@ -149,7 +149,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         perms.value.table = new Perms(response);
         table.value = response.data;
         return Promise.all([
-          table.value.viewType === 'View' ? loadView(name) : Promise.resolve(),
+          table.value.viewType !== undefined ? loadView(name) : Promise.resolve(),
           api.options(`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
             perms.value.tableValueSets = new Perms(response);
             return response;
@@ -224,6 +224,17 @@ export const useDatasourceStore = defineStore('datasource', () => {
         name: name.trim(),
         from: from,
         'Magma.VariableListViewDto.view':{variables}
+      }
+    )
+  }
+
+  async function addResourceView(project: string, name: string, from: string, view: ResourceViewDto) {
+    return api.post(
+      `/datasource/${project}/views`,
+      {
+        name: name.trim(),
+        from: [from],
+        'Magma.ResourceViewDto.view': view
       }
     )
   }
@@ -453,6 +464,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     isNewTableNameValid,
     addTable,
     addVariablesView,
+    addResourceView,
     updateTable,
     updateView,
     deleteTable,
