@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import com.google.common.eventbus.EventBus;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   private SubjectProfileService subjectProfileService;
 
   @Autowired
+  private ViewManager viewManager;
+
+  @Autowired
   private EventBus eventBus;
 
   @Override
@@ -42,7 +46,11 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   public Response drop() {
     try {
       ValueTable table = getValueTable();
-      getDatasource().dropTable(table.getName());
+      if (table.isView()) {
+        viewManager.removeView(table.getDatasource().getName(), table.getName());
+      } else {
+        getDatasource().dropTable(table.getName());
+      }
       eventBus.post(new ValueTableDeletedEvent(table));
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {

@@ -909,6 +909,7 @@ export default {
   format: 'Format',
   delete_resources_confirm: 'Aucune ressource à supprimer | Êtes-vous sûr de vouloir supprimer cette ressource ? | Êtes-vous sûr de vouloir supprimer ces {count} ressources ?',
   resource_ref: {
+    label: 'Ressource référencée',
     provider: 'Fournisseur',
     provider_not_found: 'Fournisseur non trouvé : aucun serveur R ne peut fournir une façon de rendre la ressource disponible. Le package R {provider} est-il installé ?',
     test_success: 'L\'assignation de la resource a réussie.',
@@ -920,5 +921,13 @@ export default {
     category_hint: 'Le type de ressource.',
     factory: 'Constructeur',
     factory_hint: 'Comment la resource sera créée.',
+    view_destination_hint: 'La vue de destination sera créée si elle n\'existe pas, sinon elle sera mise à jour.',
+    entity_type_hint: 'A propos de quoi sont les données de cette vue.',
+    id_column: 'Colonne ID',
+    id_column_hint: 'Le nom de la colonne dans la représentation tabulaire de la ressource fournissant les identifiants. Si non spécifié, la première colonne sera utilisée.',
+    all_columns: 'Toutes les colonnes',
+    all_columns_hint: 'Quand sélectionné, toutes les colonnes observées (sauf la colonne des identifiants) seront décrites comme des variables quand la connexion avec la ressource sera établie. Cela signifie que quand une nouvelle colonne apparait dans la resource, une variable correspondante sera automatiquement ajoutée.',
+    r_server_profile: 'Profile du serveur R',
+    r_server_profile_hint: 'Nom (optionnel) du serveur R à utiliser pour établir la connexion avec la ressource. Si non spécifié, le profile sera deviné à partir du package R associé à la ressource.',
   }
 };
