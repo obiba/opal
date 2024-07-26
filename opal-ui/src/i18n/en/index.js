@@ -922,6 +922,7 @@ export default {
     factory: 'Factory',
     factory_hint: 'How to make a resource.',
     view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated.',
+    entity_type_hint: 'What these view data are about.',
     id_column: 'ID column',
     id_column_hint: 'The column name in the resource\'s tabular representation that provides the entity identifiers. If not specified, the first column will be used.',
     all_columns: 'All columns',

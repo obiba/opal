@@ -922,6 +922,7 @@ export default {
     factory: 'Constructeur',
     factory_hint: 'Comment la resource sera créée.',
     view_destination_hint: 'La vue de destination sera créée si elle n\'existe pas, sinon elle sera mise à jour.',
+    entity_type_hint: 'A propos de quoi sont les données de cette vue.',
     id_column: 'Colonne ID',
     id_column_hint: 'Le nom de la colonne dans la représentation tabulaire de la ressource fournissant les identifiants. Si non spécifié, la première colonne sera utilisée.',
     all_columns: 'Toutes les colonnes',
