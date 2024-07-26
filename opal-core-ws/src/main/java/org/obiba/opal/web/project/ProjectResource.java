@@ -24,7 +24,6 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.*;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreService;
-import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.vcf.VCFStoreResource;
@@ -46,7 +45,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/project/{name}")
-public class ProjectResource extends BaseResource {
+public class ProjectResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 

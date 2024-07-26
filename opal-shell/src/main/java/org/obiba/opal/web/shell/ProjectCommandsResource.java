@@ -30,7 +30,7 @@ import java.util.List;
 @Scope("request")
 @Path("/project/{name}/commands")
 @SuppressWarnings("OverlyCoupledClass")
-public class ProjectCommandsResource extends BaseResource {
+public class ProjectCommandsResource implements BaseResource {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectCommandsResource.class);
 

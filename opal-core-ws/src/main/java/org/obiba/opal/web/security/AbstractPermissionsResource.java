@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
-public abstract class AbstractPermissionsResource extends BaseResource {
+public abstract class AbstractPermissionsResource implements BaseResource {
 
   public static final String DOMAIN = "opal";
 

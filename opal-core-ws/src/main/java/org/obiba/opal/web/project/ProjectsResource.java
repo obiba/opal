@@ -16,7 +16,6 @@ import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -35,7 +34,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Path("/projects")
-public class ProjectsResource extends BaseResource {
+public class ProjectsResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
