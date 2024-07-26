@@ -14,17 +14,18 @@
         ><span class="on-right">{{ $t('administration') }} </span>
       </div>
 
-      <div class="q-gutter-md q-mb-lg">
+      <div class="q-mb-lg">
         <fields-list class="col-6" :items="properties" :dbobject="project" />
         <div class="text-help">{{ $t('project_admin.db_hint') }}</div>
         <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
       </div>
 
-      <div class="q-gutter-md q-my-md">
+      <div class="q-my-lg">
         <span class="text-h5">{{ $t('permissions') }}</span>
         <access-control-list :resource="`/project/${name}/permissions/project`" :options="[AclAction.PROJECT_ALL]" />
       </div>
-      <div class="q-gutter-md q-mb-md">
+
+      <div class="q-gutter-md q-my-lg">
         <span class="text-h5"
           >{{ $t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
         /></span>
@@ -40,9 +41,19 @@
         <q-btn size="sm" icon="cached" color="primary" :label="$t('state')" @click="getState"></q-btn>
       </div>
 
-      <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+      <div class="q-gutter-md q-my-md">
+        <span class="text-h5"
+          >{{ $t('project_admin.backup_restore') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
+        /></span>
 
-      <pre>{{ projectsStore.project }}</pre>
+        <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
+        <q-btn size="sm" icon="download" color="primary" :label="$t('backup')" @click="onReloadDatabase"></q-btn>
+
+        <div class="text-help">{{ $t('project_admin.restore_hint') }}</div>
+        <q-btn size="sm" icon="upload" color="primary" :label="$t('restore')" @click="getState"></q-btn>
+      </div>
+
+      <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
     </q-page>
   </div>
 </template>

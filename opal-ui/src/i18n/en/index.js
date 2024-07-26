@@ -308,6 +308,9 @@ export default {
     db_hint: 'Project tables (dictionaries and data) are stored in the database:',
     db_reload_hint: 'Reloading a project database makes its data temporarily inaccessible (no table listing, no import or export) while the connection to the database is being re-initialised. The time taken by this operation depends on the database type and schema.',
     db_reload_confirm: 'Are you sure you want to reload the project database?',
+    backup_restore: 'Backup / Restore',
+    backup_hint: 'The project backup task has a limited scope: tables (dictionary and data export), views (either as a logical table or as an exported table), resources, files and report templates. Other project elements that are not part of the backup: user and group permissions, view change history, table analysis, report executions etc.',
+    restore_hint: 'Restore the data of a project from a backup archive file to be found on the file system.',
   },
   user_profile: {
     title: 'My profile',

@@ -238,7 +238,7 @@ async function onAddProject() {
 
 onMounted(() =>
   profilesStore.initProfile().then(() =>
-    filesStore.initFiles(`/home/${profile.value.principal}/export`).then(() => {
+    filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
       exportFolder.value = filesStore.current;
     })
   )
