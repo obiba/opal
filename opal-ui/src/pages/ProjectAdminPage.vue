@@ -16,8 +16,10 @@
 
       <div class="q-mb-lg">
         <fields-list class="col-6" :items="properties" :dbobject="project" />
-        <div class="text-help">{{ $t('project_admin.db_hint') }}</div>
-        <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
+        <div class="text-help q-mt-md">
+          {{ $t('project_admin.db_hint') }}
+          <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
+        </div>
       </div>
 
       <div class="q-my-lg">
@@ -47,13 +49,17 @@
         /></span>
 
         <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
-        <q-btn size="sm" icon="download" color="primary" :label="$t('backup')" @click="onReloadDatabase"></q-btn>
+        <q-btn size="sm" icon="download" color="primary" :label="$t('backup')" @click="onBackup"></q-btn>
 
         <div class="text-help">{{ $t('project_admin.restore_hint') }}</div>
-        <q-btn size="sm" icon="upload" color="primary" :label="$t('restore')" @click="getState"></q-btn>
+        <q-btn size="sm" icon="upload" color="primary" :label="$t('restore')" @click="onRestore"></q-btn>
       </div>
 
       <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+
+      <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp"/>
+
+      <restore-project-dialog v-model="showRestore" :project="project" @update:model-value="onRestored"/>
     </q-page>
   </div>
 </template>
@@ -67,11 +73,15 @@ import { AclAction } from 'src/models/Opal';
 import { ProjectDatasourceStatusDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
 import { tableStatusColor } from 'src/utils/colors';
+import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue';
+import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vue';
 
 const route = useRoute();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
 const showConfirm = ref(false);
+const showBackup = ref(false);
+const showRestore = ref(false);
 const confirmText = ref('');
 const onConfirmed = ref(() => ({}));
 const state = ref(ProjectDatasourceStatusDto.NONE);
@@ -140,6 +150,22 @@ function onReloadDatabase() {
   confirmText.value = t('project_admin.db_reload_confirm');
   onConfirmed.value = async () => await _onReloadDatabase();
   showConfirm.value = true;
+}
+
+function onBackup() {
+  showBackup.value = true;
+}
+
+function onBackedUp() {
+  showBackup.value = false;
+}
+
+function onRestore() {
+  showRestore.value = true;
+}
+
+function onRestored() {
+  showRestore.value = false;
 }
 
 onMounted(() => {

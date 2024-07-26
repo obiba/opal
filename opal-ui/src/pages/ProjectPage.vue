@@ -87,9 +87,8 @@ const name = computed(() => route.params.id as string);
 const tags = computed(() => projectsStore.project.tags ? projectsStore.project.tags : []);
 
 onMounted(() => {
-  console.log('ProjectPage mounted', projectsStore.router);
   projectsStore.initProject(name.value).then(() => {
-    projectsStore.loadSummary(name.value);
+    projectsStore.loadSummary();
   });
 });
 </script>

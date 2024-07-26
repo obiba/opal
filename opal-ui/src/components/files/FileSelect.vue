@@ -7,6 +7,7 @@
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
+    <slot name="error"></slot>
     <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
       {{ hint }}
     </div>

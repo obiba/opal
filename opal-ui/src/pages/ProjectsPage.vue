@@ -38,7 +38,7 @@
         :filter-method="onFilter"
         @row-click="onRowClick"
       >
-        <template v-slot:top-left>
+        <template v-slot:top-left v-if="projectsStore.perms.projects?.canCreate()">
           <div class="q-gutter-sm">
             <q-btn no-caps color="primary " icon="add" size="sm" @click="onAddProject" />
           </div>

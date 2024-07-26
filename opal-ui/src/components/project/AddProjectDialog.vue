@@ -229,7 +229,7 @@ async function onAddProject() {
         ? await projectsStore.updateProject(newProject.value as ProjectDto)
         : await projectsStore.addProject(newProject.value as ProjectDto),
         onHide();
-        emit('update');
+      emit('update');
     } catch (err) {
       notifyError(err);
     }

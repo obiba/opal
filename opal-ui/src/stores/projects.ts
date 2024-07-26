@@ -9,6 +9,8 @@ import {
   ImportCommandOptionsDto,
   ExportCommandOptionsDto,
   CopyCommandOptionsDto,
+  BackupCommandOptionsDto,
+  RestoreCommandOptionsDto,
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
@@ -16,7 +18,8 @@ interface ProjectPerms {
   export: Perms | undefined;
   copy: Perms | undefined;
   import: Perms | undefined;
-  subjects: Perms | undefined;
+  projects: Perms | undefined;
+  project: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -52,7 +55,10 @@ export const useProjectsStore = defineStore('projects', () => {
   async function loadProjects() {
     return api.get('/projects', { params: { digest: true } }).then((response) => {
       projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) => a.name.localeCompare(b.name));
-      return response;
+      return api.options('/projects').then((response) => {
+        perms.value.projects = new Perms(response);
+        return response;
+      });
     });
   }
 
@@ -62,6 +68,10 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(`/project/${name}`).then((response) => {
       project.value = response.data;
       return Promise.all([
+        api.options(`/project/${project.value.name}`).then((response) => {
+          perms.value.export = new Perms(response);
+          return response;
+        }),
         api.options(`/project/${project.value.name}/commands/_export`).then((response) => {
           perms.value.export = new Perms(response);
           return response;
@@ -74,8 +84,8 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.copy = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/permissions/subjects`).then((response) => {
-          perms.value.subjects = new Perms(response);
+        api.options(`/project/${project.value.name}`).then((response) => {
+          perms.value.project = new Perms(response);
           return response;
         }),
       ]);
@@ -93,6 +103,11 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  /**
+   * Must load the project first: @see {@link loadProject}.
+   *
+   * @returns A summary of the project counts (tables, views, variables, etc.)
+   */
   async function loadSummary() {
     summary.value = {} as ProjectSummaryDto;
     return api.get(`/project/${project.value.name}/summary`).then((response) => {
@@ -191,6 +206,14 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function backup(project: ProjectDto, options: BackupCommandOptionsDto) {
+    return api.post(`/project/${project.name}/commands/_backup`, options);
+  }
+
+  async function restore(project: ProjectDto, options: RestoreCommandOptionsDto) {
+    return api.post(`/project/${project.name}/commands/_restore`, options);
+  }
+
   return {
     projects,
     project,
@@ -218,5 +241,7 @@ export const useProjectsStore = defineStore('projects', () => {
     reloadDbCommand,
     getState,
     reset,
+    backup,
+    restore,
   };
 });

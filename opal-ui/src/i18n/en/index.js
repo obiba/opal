@@ -309,8 +309,15 @@ export default {
     db_reload_hint: 'Reloading a project database makes its data temporarily inaccessible (no table listing, no import or export) while the connection to the database is being re-initialised. The time taken by this operation depends on the database type and schema.',
     db_reload_confirm: 'Are you sure you want to reload the project database?',
     backup_restore: 'Backup / Restore',
+    backup_project: 'Backup Project',
     backup_hint: 'The project backup task has a limited scope: tables (dictionary and data export), views (either as a logical table or as an exported table), resources, files and report templates. Other project elements that are not part of the backup: user and group permissions, view change history, table analysis, report executions etc.',
+    backup_success: 'Project backup task has been launched. You can follow its progress in the task list.',
+    backup_folder: 'Backup Folder',
+    restore_project: 'Restore Project',
+    restore_folder: 'Backup Folder or Archive',
     restore_hint: 'Restore the data of a project from a backup archive file to be found on the file system.',
+    restore_override: 'Override existing items',
+    views_as_table: 'Views as tables, i.e. export data instead of keeping derivation scripts',
   },
   user_profile: {
     title: 'My profile',
@@ -394,6 +401,9 @@ export default {
     github: {
       org_required: 'Github organization or username is required',
       repo_required: 'Github repository name is required',
+    },
+    project_admin: {
+      backup_folder_required: 'Backup folder is required',
     },
   },
   main: {
@@ -500,6 +510,7 @@ export default {
   authentication: 'Authentication',
   author: 'Author',
   back: 'Back',
+  backup: 'Backup',
   bookmark_add: 'Add to favorites',
   bookmark_remove: 'Remove from favorites',
   bookmarks: 'Favorites',
@@ -740,6 +751,7 @@ export default {
   progress: 'Progress',
   project_destination: 'Destination project',
   project: 'Project',
+  project_backup_success: 'Project backup task has been launched. You can follow its progress in the task list.',
   project_description_hint: 'Optional description of the project.',
   project_filter_placeholder: 'Filter projects...',
   project_acls_empty: 'No granted permissions.',
