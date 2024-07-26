@@ -62,6 +62,7 @@ import { ResourceReferenceDto } from 'src/models/Projects';
 import { ResourceProviderDto } from 'src/models/Resources';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { getDateLabel } from 'src/utils/dates';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -87,6 +88,14 @@ const columns = computed(() => [
   { name: 'type', label: t('type'), align: 'left', field: 'provider' },
   { name: 'description', label: t('description'), align: 'left', field: 'description' },
   { name: 'url', label: 'URL', align: 'left', field: (row: ResourceReferenceDto) => row.resource?.url },
+  {
+    name: 'lastUpdate',
+    required: true,
+    label: t('last_update'),
+    align: 'left',
+    field: 'updated',
+    format: (val: string) => getDateLabel(val),
+  },
 ]);
 const hasProviders = computed(() => resourcesStore.resourceProviders?.providers?.length ?? 0)
 
