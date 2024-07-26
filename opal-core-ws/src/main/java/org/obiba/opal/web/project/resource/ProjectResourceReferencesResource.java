@@ -15,6 +15,7 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.ResourceReferenceService;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import java.util.stream.StreamSupport;
 
 @Component
 @Path("/project/{name}/resources")
-public class ProjectResourceReferencesResource {
+public class ProjectResourceReferencesResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 

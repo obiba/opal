@@ -12,7 +12,7 @@ package org.obiba.opal.web.security;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.web.magma.view.BaseResource;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.support.InvalidRequestException;
 
 import java.util.Collection;

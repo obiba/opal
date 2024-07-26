@@ -18,10 +18,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.web.magma.view.BaseResource;
+import org.obiba.opal.web.BaseResource;
 
 public interface ValueSetsResource extends BaseResource {
 

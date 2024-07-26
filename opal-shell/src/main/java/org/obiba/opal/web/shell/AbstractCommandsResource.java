@@ -15,7 +15,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
-import org.obiba.opal.web.magma.view.BaseResource;
+import org.obiba.opal.web.BaseResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractCommandsResource implements BaseResource {

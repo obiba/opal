@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.magma.view;
+package org.obiba.opal.web;
 
 import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.core.Response;
