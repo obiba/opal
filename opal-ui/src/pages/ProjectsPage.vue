@@ -8,8 +8,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon
-        ><span class="on-right">{{ $t('projects') }}</span>
+        <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ $t('projects') }}</span>
       </div>
       <div v-if="tags.length" class="q-mb-md">
         <q-tabs
@@ -35,47 +34,58 @@
         row-key="name"
         :pagination="initialPagination"
         :loading="loading"
+        :filter="filter"
+        :filter-method="onFilter"
         @row-click="onRowClick"
       >
+        <template v-slot:top-left>
+          <div class="q-gutter-sm">
+            <q-btn no-caps color="primary " icon="add" size="sm" @click="onAddProject" />
+          </div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            dense
+            clearable
+            debounce="400"
+            color="primary"
+            v-model="filter"
+            :placeholder="$t('project_filter_placeholder')"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
-            <router-link
-              :to="`/project/${props.value}`"
-              class="text-primary"
-              >{{ props.value }}</router-link
-            >
+            <router-link :to="`/project/${props.value}`" class="text-primary">{{ props.value }}</router-link>
           </q-td>
         </template>
         <template v-slot:body-cell-tags="props">
           <q-td :props="props">
-            <q-badge
-              color="primary"
-              v-for="tag in props.value"
-              :label="tag"
-              :key="tag"
-              class="on-left"
-            />
+            <q-badge color="primary" v-for="tag in props.value" :label="tag" :key="tag" class="on-left" />
           </q-td>
         </template>
         <template v-slot:body-cell-status="props">
           <q-td :props="props">
-            <q-icon
-              name="circle"
-              size="sm"
-              :color="projectStatusColor(props.value)"
-            />
+            <q-icon name="circle" size="sm" :color="projectStatusColor(props.value)" />
           </q-td>
         </template>
       </q-table>
+
+      <add-project-dialog v-model="showAdd" @update="onProjectUpdate" />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
 import { TimestampsDto } from 'src/models/Magma';
+import { ProjectDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
-
+import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
+import { flattenObjectToString } from 'src/utils/strings';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -84,6 +94,8 @@ const projectsStore = useProjectsStore();
 const tab = ref('__all');
 const tableRef = ref();
 const loading = ref(false);
+const showAdd = ref(false);
+const filter = ref('');
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -91,7 +103,7 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -129,7 +141,7 @@ const columns = [
     align: 'left',
     field: 'datasourceStatus',
   },
-];
+]);
 
 const projects = computed(() => {
   if (!projectsStore.projects) {
@@ -146,13 +158,16 @@ const tags = computed(() => {
     return [];
   }
   const all: string[] = [];
-  projectsStore.projects.filter((p) => p.tags).map((p) => p.tags).forEach((t) => {
-    t.forEach((tag) => {
-      if (!all.includes(tag)) {
-        all.push(tag);
-      }
+  projectsStore.projects
+    .filter((p) => p.tags)
+    .map((p) => p.tags)
+    .forEach((t) => {
+      t.forEach((tag) => {
+        if (!all.includes(tag)) {
+          all.push(tag);
+        }
+      });
     });
-  });
 
   return all.sort();
 });
@@ -174,7 +189,31 @@ function onRowClick(evt: unknown, row: { name: string }) {
   });
 }
 
+function onFilter(tableRows: ProjectDto[], filter: string) {
+  if (filter.length === 0) {
+    return tableRows;
+  }
+  const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
+  const result = tableRows.filter((row) => {
+    const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
+      row.description || {}
+    )}`;
+    return rowString.includes(query);
+  });
+
+  return result;
+}
+
 function onTabChange() {
   tableRef.value.pagination.page = 1;
 }
+
+function onAddProject() {
+  showAdd.value = true;
+}
+
+async function onProjectUpdate() {
+  init();
+}
+
 </script>

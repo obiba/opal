@@ -24,7 +24,7 @@
           <localized-field-large
             v-model="newVocabulary.title"
             :title="$t('title')"
-            :hint="$t('taxonomy.vocabulary.title_hint')"
+            :hint="$t('title_hint')"
           />
 
           <localized-field-large
