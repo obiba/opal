@@ -33,7 +33,7 @@ import java.util.stream.StreamSupport;
 
 @Component
 @Path("/project/{name}/resources")
-public class ProjectResourceReferencesResource implements BaseResource {
+public class ProjectResourceReferencesResource extends BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 

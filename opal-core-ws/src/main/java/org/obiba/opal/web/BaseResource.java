@@ -13,16 +13,16 @@ package org.obiba.opal.web;
 import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.core.Response;
 
-public interface BaseResource {
+public abstract class BaseResource {
 
   /**
-   * Default OPTIONS implementation, so that {@link org.obiba.opal.web.security.AuthorizationInterceptor} can
+   * OPTIONS implementation, so that {@link org.obiba.opal.web.security.AuthorizationInterceptor} can
    * set the Allow header with appropriate HTTP methods.
    *
    * @return
    */
   @OPTIONS
-  default Response getOptions() {
+  public Response getOptions() {
     return Response.ok().build();
   }
 }
