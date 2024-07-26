@@ -2,16 +2,27 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { ResourceProvidersDto } from 'src/models/Resources';
 import { ResourceReferenceDto } from 'src/models/Projects';
+import { Perms } from 'src/utils/authz';
+
+interface ResourcePerms {
+  resources: Perms | undefined;
+  resourcesPermissions: Perms | undefined;
+  resource: Perms | undefined;
+  resourcePermissions: Perms | undefined;
+}
 
 export const useResourcesStore = defineStore('resources', () => {
 
   const resourceProviders = ref<ResourceProvidersDto>();
   const project = ref<string>();
   const resourceReferences = ref<ResourceReferenceDto[]>([]);
+  const perms = ref({} as ResourcePerms);
 
   function reset() {
     project.value = undefined;
     resourceReferences.value = [];
+    resourceProviders.value = undefined;
+    perms.value = {} as ResourcePerms;
   }
 
   async function initResourceReferences(pName: string) {
@@ -30,7 +41,21 @@ export const useResourcesStore = defineStore('resources', () => {
 
   async function loadResourceReferences(pName: string) {
     project.value = pName;
-    return api.get(`/project/${project.value}/resources`).then((response) => resourceReferences.value = response.data);
+    delete perms.value.resources;
+    delete perms.value.resourcesPermissions;
+    return Promise.all([
+      api.get(`/project/${project.value}/resources`)
+      .then((response) => {
+        perms.value.resources = new Perms(response);
+        resourceReferences.value = response.data;
+        return response;
+      }),
+      api.options(`/project/${pName}/permissions/resources`).then((response) => {
+        perms.value.resourcesPermissions = new Perms(response);
+        return response;
+      }),
+    ]);
+    return ;
   }
 
   function getResourceReference(name: string) {
@@ -70,10 +95,26 @@ export const useResourcesStore = defineStore('resources', () => {
     return api.put(`/project/${resourceRef.project}/resource/${resourceRef.name}`, resourceRef);
   }
 
+  async function loadResourcePerms(pName: string, name: string) {
+    delete perms.value.resource;
+    delete perms.value.resourcePermissions;
+    return Promise.all([
+      api.options(`/project/${pName}/resource/${name}`).then((response) => {
+        perms.value.resource = new Perms(response);
+        return response;
+      }),
+      api.options(`/project/${pName}/permissions/resource/${name}`).then((response) => {
+        perms.value.resourcePermissions = new Perms(response);
+        return response;
+      }),
+    ]);
+  }
+
   return {
     project,
     resourceReferences,
     resourceProviders,
+    perms,
     reset,
     initResourceProviders,
     initResourceReferences,
@@ -86,6 +127,7 @@ export const useResourcesStore = defineStore('resources', () => {
     deleteResources,
     addResource,
     saveResource,
+    loadResourcePerms,
   }
 
 });

@@ -32,6 +32,7 @@
       <div class="text-h5 q-mb-md">
         <q-icon name="link" class="on-left"/><span>{{ rName }}</span>
         <q-btn
+          v-if="resourcesStore.perms.resource?.canUpdate()"
           color="secondary"
           size="sm"
           outline
@@ -60,6 +61,7 @@
           class="on-right"
         />
         <q-btn
+          v-if="resourcesStore.perms.resource?.canDelete()"
           outline
           color="red"
           icon="delete"
@@ -78,7 +80,7 @@
         narrow-indicator
       >
         <q-tab name="reference" :label="$t('reference')" />
-        <q-tab name="permissions" :label="$t('permissions')"/>
+        <q-tab name="permissions" :label="$t('permissions')" v-if="resourcesStore.perms.resourcePermissions?.canRead()"/>
       </q-tabs>
 
       <q-separator />
@@ -88,7 +90,7 @@
           <resource-reference />
         </q-tab-panel>
 
-        <q-tab-panel name="permissions">
+        <q-tab-panel name="permissions" v-if="resourcesStore.perms.resourcePermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${pName}/permissions/resource/${rName}`"
@@ -139,8 +141,14 @@ const nextReference = computed(() => {
 });
 
 onMounted(() => {
-  projectsStore.initProject(pName.value);
+  projectsStore.initProject(pName.value).finally(loadPerms);
 });
+
+watch([() => pName.value, () => rName.value], loadPerms);
+
+function loadPerms() {
+  resourcesStore.loadResourcePerms(pName.value, rName.value);
+}
 
 function onTest() {
   resourcesStore.testResource(pName.value, rName.value)

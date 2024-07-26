@@ -19,6 +19,7 @@ import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.spi.r.ResourceAssignROperation;
+import org.obiba.opal.web.magma.view.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import jakarta.ws.rs.core.Response;
 
 @Component
 @Path("/project/{project}/resource/{name}")
-public class ProjectResourceReferenceResource {
+public class ProjectResourceReferenceResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 

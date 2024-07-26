@@ -25,7 +25,7 @@
         narrow-indicator
       >
         <q-tab name="references" :label="$t('references')" />
-        <q-tab name="permissions" :label="$t('permissions')"/>
+        <q-tab name="permissions" :label="$t('permissions')" v-if="resourcesStore.perms.resourcesPermissions?.canRead()" />
       </q-tabs>
 
       <q-separator />
@@ -35,7 +35,7 @@
           <resource-references />
         </q-tab-panel>
 
-        <q-tab-panel name="permissions">
+        <q-tab-panel name="permissions" v-if="resourcesStore.perms.resourcesPermissions?.canRead()">
           <div class="text-h6">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${pName}/permissions/resources`"
@@ -53,6 +53,7 @@ import AccessControlList from 'src/components/permissions/AccessControlList.vue'
 
 const route = useRoute();
 const projectsStore = useProjectsStore();
+const resourcesStore = useResourcesStore();
 
 const pName = computed(() => route.params.id as string);
 const tab = ref('references');

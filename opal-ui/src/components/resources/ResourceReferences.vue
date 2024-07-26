@@ -13,7 +13,7 @@
       v-model:selected="selected"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm" :disable="!hasProviders">
+        <q-btn-dropdown v-if="resourcesStore.perms.resources?.canCreate()" color="primary" :label="$t('add')" icon="add" size="sm" :disable="!hasProviders">
           <q-list>
             <template v-for="provider in resourcesStore.resourceProviders?.providers" :key="provider.name">
               <q-item clickable v-close-popup @click.prevent="onShowAdd(provider)">
@@ -25,7 +25,7 @@
             </template>
           </q-list>
         </q-btn-dropdown>
-        <q-btn :disable="selected.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDelete"  class="on-right"></q-btn>
+        <q-btn v-if="resourcesStore.perms.resources?.canDelete()" :disable="selected.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDelete"  class="on-right"></q-btn>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
