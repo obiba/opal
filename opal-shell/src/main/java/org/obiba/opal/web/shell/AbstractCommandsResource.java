@@ -18,7 +18,7 @@ import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.web.BaseResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractCommandsResource implements BaseResource {
+public abstract class AbstractCommandsResource extends BaseResource {
 
   protected CommandJobService commandJobService;
 

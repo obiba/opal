@@ -20,9 +20,8 @@ import jakarta.ws.rs.core.UriInfo;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.web.BaseResource;
 
-public interface ValueSetsResource extends BaseResource {
+public interface ValueSetsResource {
 
   void setValueTable(ValueTable valueTable);
 

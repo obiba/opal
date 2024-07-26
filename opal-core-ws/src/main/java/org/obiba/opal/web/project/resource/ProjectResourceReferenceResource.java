@@ -29,7 +29,7 @@ import jakarta.ws.rs.core.Response;
 
 @Component
 @Path("/project/{project}/resource/{name}")
-public class ProjectResourceReferenceResource implements BaseResource {
+public class ProjectResourceReferenceResource extends BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
