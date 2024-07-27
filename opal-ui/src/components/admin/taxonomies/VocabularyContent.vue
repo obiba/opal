@@ -198,7 +198,6 @@ const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
-const systemStore = useSystemStore();
 const tableKey = ref(0);
 const showDelete = ref(false);
 const showDeleteTerm = ref(false);
@@ -282,7 +281,6 @@ const columns = computed(() => [
     field: 'keywords',
   },
 ]);
-const locales = computed(() => (systemStore.generalConf || {}).languages || []);
 
 // Functions
 

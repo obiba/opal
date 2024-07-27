@@ -36,7 +36,6 @@ import { Acl } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
 
-const { t } = useI18n();
 const profileAclsStore = useProfileAclsStore();
 const route = useRoute();
 const selectedAcls = ref<Acl[]>([]);

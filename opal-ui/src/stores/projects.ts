@@ -52,6 +52,11 @@ export const useProjectsStore = defineStore('projects', () => {
     return Promise.resolve();
   }
 
+  async function refreshProject(name: string) {
+    project.value = {} as ProjectDto;
+    return loadProject(name);
+  }
+
   async function loadProjects() {
     return api.get('/projects', { params: { digest: true } }).then((response) => {
       projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) => a.name.localeCompare(b.name));
@@ -96,12 +101,20 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.post('/projects', project).then((response) => response.data);
   }
 
-  async function updateProject(updated: ProjectDto) {
-    return api.put(`/project/${updated.name}`, updated).then((response) => {
-      if (updated.name === project.value.name) project.value = updated;
+  async function updateProject(toUpdate: ProjectDto) {
+    return api.put(`/project/${toUpdate.name}`, toUpdate).then((response) => {
+      if (toUpdate.name === project.value.name) project.value = toUpdate;
       return response;
     });
   }
+
+  async function deleteProject(toDelete: ProjectDto) {
+    return api.delete(`/project/${toDelete.name}`).then((response) => {
+      if (toDelete.name === project.value.name) project.value = {} as ProjectDto;
+      return response;
+    });
+  }
+
 
   /**
    * Must load the project first: @see {@link loadProject}.
@@ -214,6 +227,10 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.post(`/project/${project.name}/commands/_restore`, options);
   }
 
+  async function archive(project: ProjectDto) {
+    return api.delete(`/project/${project.name}`, {params: {archive: true}});
+  }
+
   return {
     projects,
     project,
@@ -224,8 +241,10 @@ export const useProjectsStore = defineStore('projects', () => {
     acls,
     initProjects,
     initProject,
+    refreshProject,
     addProject,
     updateProject,
+    deleteProject,
     loadSummary,
     loadCommandStates,
     loadAcls,
@@ -243,5 +262,6 @@ export const useProjectsStore = defineStore('projects', () => {
     reset,
     backup,
     restore,
+    archive,
   };
 });

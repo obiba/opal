@@ -88,7 +88,6 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
 import { VcsCommitInfoDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
-import { get } from 'http';
 
 interface Props {
   taxonomyName: string;

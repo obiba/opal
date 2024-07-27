@@ -8,6 +8,7 @@ import { flattenObjectToString } from 'src/utils/strings';
  * @returns common variables and functions for taxonomy contents
  */
 export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | TermDto>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getProps: any,
   collectionName: string
 ) {

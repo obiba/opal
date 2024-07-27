@@ -170,27 +170,6 @@ async function doDeleteProfiles() {
   }
 }
 
-function sortRows(rows: readonly Row[], sortBy: string, descending: boolean) {
-  const data = [...rows];
-
-  data.sort((a: Row, b: Row): number => {
-    if (sortBy) {
-      const sortA = a['caption'];
-      const sortB = b['caption'];
-      if (sortA < sortB) {
-        return descending ? 1 : -1;
-      }
-      if (sortA > sortB) {
-        return descending ? -1 : 1;
-      }
-      return 0;
-    }
-    return 0; // default when no sorting
-  });
-
-  return data;
-}
-
 const loading = ref(false);
 
 onMounted(async () => {

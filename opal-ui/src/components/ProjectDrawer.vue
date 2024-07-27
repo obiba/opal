@@ -101,7 +101,6 @@ watch(
   (newValue) => {
     if (!!newValue) {
       canSeeAdmin.value = projectsStore.perms.project?.canRead() || false;
-      console.log('canSeeAdmin.value', canSeeAdmin.value)
     }
   },
   { immediate: true }

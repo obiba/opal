@@ -201,6 +201,7 @@ watch(
               value: db.name,
             };
           });
+          databases.value.push({ label: t('none'), value: '' });
           newProject.value.database = (databases.value[0] || {}).value;
           newProject.value.exportFolder = exportFolder.value.path;
         });
@@ -228,8 +229,8 @@ async function onAddProject() {
       editMode.value
         ? await projectsStore.updateProject(newProject.value as ProjectDto)
         : await projectsStore.addProject(newProject.value as ProjectDto),
+        emit('update', newProject.value);
         onHide();
-      emit('update');
     } catch (err) {
       notifyError(err);
     }

@@ -1,5 +1,4 @@
 export default {
-  '_': '',
   '2fa': {
     name: '2FA',
     title: 'Two-Factor Authentication',
@@ -305,6 +304,7 @@ export default {
     },
   },
   project_admin: {
+    properties: 'Project properties',
     db_hint: 'Project tables (dictionaries and data) are stored in the database:',
     db_reload_hint: 'Reloading a project database makes its data temporarily inaccessible (no table listing, no import or export) while the connection to the database is being re-initialised. The time taken by this operation depends on the database type and schema.',
     db_reload_confirm: 'Are you sure you want to reload the project database?',
@@ -318,6 +318,17 @@ export default {
     restore_hint: 'Restore the data of a project from a backup archive file to be found on the file system.',
     restore_override: 'Override existing items',
     views_as_table: 'Views as tables, i.e. export data instead of keeping derivation scripts',
+    danger_zone: 'Danger Zone',
+    danger_zone_info: 'Archiving a project makes its data inaccessible. Project tables, views, files, reports and keystore will remain untouched. These data will be reinstated when a project with the same name is added. Note that project description and permissions will be deleted permanently.',
+    archive_confirm: 'Please confirm that you want to remove the current project and keep all associated data?',
+    archive: 'Archive Project',
+    remove_info: 'Removing a project destroys all associated data and files. It can be a long running task and there is no going back.',
+    remove_confirm: 'Please confirm that you want to remove permanently the current project and all associated data. This operation can\'t be undone.',
+    remove: 'Remove Project',
+    none: '(None)',
+  },
+  q_table: {
+    no_data_label: 'Nada',
   },
   user_profile: {
     title: 'My profile',
