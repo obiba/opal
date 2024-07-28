@@ -38,9 +38,15 @@
               {{ $t('project_admin.no_database_warning') }}
 
               <template v-slot:action>
-                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit"/>
+                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit" />
               </template>
             </q-banner>
+          </q-card-section>
+        </q-card>
+
+        <q-card flat>
+          <q-card-section class="q-px-none">
+            <span class="text-h5">{{ $t('id_mappings') }}</span>
           </q-card-section>
         </q-card>
 
