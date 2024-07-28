@@ -325,7 +325,9 @@ export default {
     remove_info: 'Removing a project destroys all associated data and files. It can be a long running task and there is no going back.',
     remove_confirm: 'Please confirm that you want to remove permanently the current project and all associated data. This operation can\'t be undone.',
     remove: 'Remove Project',
+    edit: 'Edit Project',
     none: '(None)',
+    no_database_warning: 'No database is defined, so data cannot be imported. Only views and resources can be added.'
   },
   q_table: {
     no_data_label: 'Nada',

@@ -12,114 +12,139 @@
       <div class="text-h5">
         <q-icon name="admin_panel_settings" size="sm" class="q-mb-xs"></q-icon
         ><span class="on-right">{{ $t('administration') }} </span>
+        <q-btn
+          v-if="hasAdminPermission"
+          outline
+          color="primary"
+          icon="edit"
+          size="sm"
+          @click="onEdit"
+          class="on-right"
+        ></q-btn>
       </div>
 
       <q-card flat>
         <q-card-section class="q-px-none">
-          <span class="text-help">{{ $t('project_admin.properties') }}</span>
           <fields-list class="col-6" :items="properties" :dbobject="project" />
         </q-card-section>
-        <q-card-section class="q-px-none">
-          <span class="text-help">{{ $t('project_admin.db_hint') }}</span>
-          <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
-        </q-card-section>
       </q-card>
 
-      <q-card flat>
-        <q-card-section class="q-px-none">
-          <span class="text-h5">{{ $t('permissions') }}</span>
-          <access-control-list :resource="`/project/${name}/permissions/project`" :options="[AclAction.PROJECT_ALL]" />
-        </q-card-section>
-      </q-card>
-
-      <q-card flat>
-        <q-card-section class="q-px-none">
-          <span class="text-h5"
-            >{{ $t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
-          /></span>
-          <div class="text-help">{{ $t('project_admin.db_reload_hint') }}</div>
-        </q-card-section>
-        <q-card-section class="q-px-none q-pt-none q-gutter-sm">
-          <q-btn
-            size="sm"
-            icon="cached"
-            color="warning"
-            text-color="black"
-            :label="$t('reload')"
-            @click="onReloadDatabase"
-          ></q-btn>
-          <q-btn size="sm" icon="cached" color="primary" :label="$t('state')" @click="getState"></q-btn>
-        </q-card-section>
-      </q-card>
-
-      <q-card flat>
-        <q-card-section class="q-px-none">
-          <span class="text-h5">{{ $t('project_admin.backup_restore') }}</span>
-        </q-card-section>
-
-        <q-card-section class="q-px-none">
-          <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
-          <q-btn
-            size="sm"
-            class="q-mt-xs"
-            icon="download"
-            color="primary"
-            :label="$t('backup')"
-            @click="onBackup"
-          ></q-btn>
-
+      <template v-if="hasAdminPermission">
+        <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-help">{{ $t('project_admin.restore_hint') }}</div>
-            <q-btn
-              size="sm"
-              class="q-mt-xs"
-              icon="upload"
-              color="primary"
-              :label="$t('restore')"
-              @click="onRestore"
-            ></q-btn>
-          </q-card-section>
-        </q-card-section>
-      </q-card>
+            <span class="text-help">{{ $t('project_admin.db_hint') }}</span>
+            <fields-list v-if="hasDatabase" class="col-6" :items="dsProperties" :dbobject="project || {}" />
+            <q-banner v-else inline-actions rounded class="bg-orange text-white">
+              {{ $t('project_admin.no_database_warning') }}
 
-      <div class="q-my-md">
-        <q-card flat class="q-mt-md o-border-negative rounded-borders">
-          <q-card-section>
-            <span class="text-h5">{{ $t('project_admin.danger_zone') }} </span>
-          </q-card-section>
-          <q-separator />
-          <q-card-section>
-            <div class="text-help">{{ $t('project_admin.danger_zone_info') }}</div>
-            <q-btn
-              size="sm"
-              class="q-mt-xs"
-              icon="archive"
-              color="negative"
-              :label="$t('project_admin.archive')"
-              @click="onArchive"
-            ></q-btn>
-          </q-card-section>
-          <q-card-section>
-            <div class="text-help">{{ $t('project_admin.remove_info') }}</div>
-            <q-btn
-              size="sm"
-              class="q-mt-xs"
-              icon="delete"
-              color="negative"
-              :label="$t('project_admin.remove')"
-              @click="onDelete"
-            ></q-btn>
+              <template v-slot:action>
+                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit"/>
+              </template>
+            </q-banner>
           </q-card-section>
         </q-card>
-      </div>
 
-      <!-- Dialogs -->
+        <q-card flat>
+          <q-card-section class="q-px-none">
+            <span class="text-h5">{{ $t('permissions') }}</span>
+            <access-control-list
+              :resource="`/project/${name}/permissions/project`"
+              :options="[AclAction.PROJECT_ALL]"
+            />
+          </q-card-section>
+        </q-card>
 
-      <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+        <q-card flat>
+          <q-card-section class="q-px-none">
+            <span class="text-h5"
+              >{{ $t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
+            /></span>
+            <div class="text-help">{{ $t('project_admin.db_reload_hint') }}</div>
+          </q-card-section>
+          <q-card-section class="q-px-none q-pt-none q-gutter-sm">
+            <q-btn
+              size="sm"
+              icon="cached"
+              color="warning"
+              text-color="black"
+              :label="$t('reload')"
+              @click="onReloadDatabase"
+            ></q-btn>
+            <q-btn size="sm" icon="cached" color="primary" :label="$t('state')" @click="getState"></q-btn>
+          </q-card-section>
+        </q-card>
 
-      <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
+        <q-card flat>
+          <q-card-section class="q-px-none">
+            <span class="text-h5">{{ $t('project_admin.backup_restore') }}</span>
+          </q-card-section>
 
-      <restore-project-dialog v-model="showRestore" :project="project" @update:model-value="onRestored" />
+          <q-card-section class="q-px-none">
+            <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
+            <q-btn
+              size="sm"
+              class="q-mt-xs"
+              icon="download"
+              color="primary"
+              :label="$t('backup')"
+              @click="onBackup"
+            ></q-btn>
+
+            <q-card-section class="q-px-none">
+              <div class="text-help">{{ $t('project_admin.restore_hint') }}</div>
+              <q-btn
+                size="sm"
+                class="q-mt-xs"
+                icon="upload"
+                color="primary"
+                :label="$t('restore')"
+                @click="onRestore"
+              ></q-btn>
+            </q-card-section>
+          </q-card-section>
+        </q-card>
+
+        <div class="q-my-md">
+          <q-card flat class="q-mt-md o-border-negative rounded-borders">
+            <q-card-section>
+              <span class="text-h5">{{ $t('project_admin.danger_zone') }} </span>
+            </q-card-section>
+            <q-separator />
+            <q-card-section>
+              <div class="text-help">{{ $t('project_admin.danger_zone_info') }}</div>
+              <q-btn
+                size="sm"
+                class="q-mt-xs"
+                icon="archive"
+                color="negative"
+                :label="$t('project_admin.archive')"
+                @click="onArchive"
+              ></q-btn>
+            </q-card-section>
+            <q-card-section>
+              <div class="text-help">{{ $t('project_admin.remove_info') }}</div>
+              <q-btn
+                size="sm"
+                class="q-mt-xs"
+                icon="delete"
+                color="negative"
+                :label="$t('project_admin.remove')"
+                @click="onDelete"
+              ></q-btn>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <!-- Dialogs -->
+
+        <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+
+        <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
+
+        <restore-project-dialog v-model="showRestore" :project="project" @update:model-value="onRestored" />
+
+        <add-project-dialog v-model="showEditProject" :project="project" @update="onProjectEdited" />
+      </template>
     </q-page>
   </div>
 </template>
@@ -135,6 +160,7 @@ import { notifyError } from 'src/utils/notify';
 import { tableStatusColor } from 'src/utils/colors';
 import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue';
 import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vue';
+import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -143,11 +169,14 @@ const { t } = useI18n();
 const showConfirm = ref(false);
 const showBackup = ref(false);
 const showRestore = ref(false);
+const showEditProject = ref(false);
 const confirmText = ref('');
 const onConfirmed = ref(() => ({}));
 const state = ref(ProjectDatasourceStatusDto.NONE);
 const project = computed(() => projectsStore.project);
 const name = computed(() => route.params.id as string);
+const hasAdminPermission = computed(() => projectsStore.perms.project?.canUpdate() || false);
+const hasDatabase = computed(() => !!project.value.database);
 
 const properties: FieldItem<ProjectDto>[] = [
   {
@@ -181,8 +210,8 @@ const dsProperties: FieldItem<ProjectDto>[] = [
     field: 'datasource.type',
     label: 'type',
     html: (val) => {
-      if (val.datasource && !!val.datasource.type) return
-      return t('project_admin.none')
+      if (val.datasource && !!val.datasource.type) return;
+      return t('project_admin.none');
     },
   },
 ];
@@ -252,6 +281,20 @@ function onRestored() {
   showRestore.value = false;
 }
 
+function onEdit() {
+  showEditProject.value = true;
+}
+
+async function onProjectEdited() {
+  showEditProject.value = false;
+  try {
+    await projectsStore.refreshProject(name.value);
+    await getState();
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
 function onArchive() {
   confirmText.value = t('project_admin.archive_confirm');
   onConfirmed.value = async () => await _onArchive();
@@ -265,7 +308,7 @@ function onDelete() {
 }
 
 onMounted(() => {
-  projectsStore.initProject(name.value).then(() => {
+  projectsStore.refreshProject(name.value).then(() => {
     getState();
   });
 });

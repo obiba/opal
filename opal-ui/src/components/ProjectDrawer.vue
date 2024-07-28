@@ -75,7 +75,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item v-show="canSeeAdmin" :to="`/project/${projectsStore.project.name}/admin`">
+      <q-item v-show="hasAdminPermission" :to="`/project/${projectsStore.project.name}/admin`">
         <q-item-section avatar>
           <q-icon name="admin_panel_settings" />
         </q-item-section>
@@ -94,13 +94,13 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 const projectsStore = useProjectsStore();
-const canSeeAdmin = ref(false);
+const hasAdminPermission = ref(false);
 
 watch(
   () => projectsStore.perms.project,
   (newValue) => {
     if (!!newValue) {
-      canSeeAdmin.value = projectsStore.perms.project?.canRead() || false;
+      hasAdminPermission.value = projectsStore.perms.project?.canRead() || false;
     }
   },
   { immediate: true }
