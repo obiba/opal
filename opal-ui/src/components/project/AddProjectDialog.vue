@@ -58,19 +58,19 @@
             @select="onUpdateFolder"
             type="folder"
           />
+          <q-select
+            v-model="newProject.tags"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
+            :label="$t('tags')"
+            :hint="$t('project_tag_hint')"
+            @new-value="addTag"
+            :options="tagsFilters"
+            @filter="onFilterTags"
+          ></q-select>
         </q-form>
-        <q-select
-          v-model="newProject.tags"
-          use-input
-          use-chips
-          multiple
-          input-debounce="0"
-          :label="$t('tags')"
-          :hint="$t('project_tag_hint')"
-          @new-value="addTag"
-          :options="tagsFilters"
-          @filter="onFilterTags"
-        ></q-select>
       </q-card-section>
 
       <q-separator />

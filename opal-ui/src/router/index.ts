@@ -29,18 +29,5 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  let initialLoad = true;
-
-  Router.beforeEach((to, from, next) => {
-
-    // Check if this is the initial load or a manual URL change
-    if (initialLoad || from.fullPath === to.fullPath) {
-      console.log('Initial load or manual URL change');
-      initialLoad = false; // Set initialLoad to false after the first load
-    }
-
-    next();
-  });
-
   return Router;
 });

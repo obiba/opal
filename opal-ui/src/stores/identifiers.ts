@@ -17,7 +17,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function loadIdentifiers() {
-    return api.get('/identifiers/tables', {params: {count: true}}).then((response) => {
+    return api.get('/identifiers/tables', {params: {counts: true}}).then((response) => {
       identifiers.value = response.data
       return response;
     })

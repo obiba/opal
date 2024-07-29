@@ -112,6 +112,7 @@ export default {
     DuplicateTaxonomy: 'The taxonomy already exists',
     TaxonomyImportFailed: 'The taxonomy import failed, make sure to provide valid information',
     NoSuchTaxonomy: 'The taxonomy does not exist',
+    NoSuchProject: 'The project does not exist',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -327,7 +328,13 @@ export default {
     remove: 'Remove Project',
     edit: 'Edit Project',
     none: '(None)',
-    no_database_warning: 'No database is defined, so data cannot be imported. Only views and resources can be added.'
+    no_database_warning: 'No database is defined, so data cannot be imported. Only views and resources can be added.',
+    entity_type: 'Entity Type',
+    entity_type_hint: 'What the identifiers are about.',
+    id_mappings_info: 'Identifiers mappings listed below that match the entity type of the data are automatically selected during an import/export process.',
+    id_mappings_hint: 'The name of the mapping.',
+
+
   },
   q_table: {
     no_data_label: 'Nada',

@@ -46,7 +46,10 @@
 
         <q-card flat>
           <q-card-section class="q-px-none">
-            <span class="text-h5">{{ $t('id_mappings') }}</span>
+            <div class="text-h5">{{ $t('id_mappings') }}</div>
+            <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
+            <id-mappings-list :project="project" @update="onIdMappingsUpdate">
+            </id-mappings-list>
           </q-card-section>
         </q-card>
 
@@ -167,6 +170,7 @@ import { tableStatusColor } from 'src/utils/colors';
 import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue';
 import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vue';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
+import IdMappingsList from 'src/components/project/IdMappingsList.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -216,7 +220,7 @@ const dsProperties: FieldItem<ProjectDto>[] = [
     field: 'datasource.type',
     label: 'type',
     html: (val) => {
-      if (val.datasource && !!val.datasource.type) return;
+      if (val.datasource && !!val.datasource.type) return t(`${val.datasource.type}`);
       return t('project_admin.none');
     },
   },
@@ -289,6 +293,15 @@ function onRestored() {
 
 function onEdit() {
   showEditProject.value = true;
+}
+
+async function onIdMappingsUpdate() {
+  try {
+    await projectsStore.refreshProject(name.value);
+    await getState();
+  } catch (error) {
+    notifyError(error);
+  }
 }
 
 async function onProjectEdited() {

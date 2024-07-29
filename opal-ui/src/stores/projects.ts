@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { ProjectDto, ProjectSummaryDto, ProjectDatasourceStatusDto } from 'src/models/Projects';
+import {
+  ProjectDto,
+  ProjectSummaryDto,
+  ProjectDatasourceStatusDto,
+  ProjectDto_IdentifiersMappingDto,
+} from 'src/models/Projects';
 import { Acl } from 'src/models/Opal';
 import { Subject } from 'src/models/Opal';
 import {
@@ -115,7 +120,6 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
-
   /**
    * Must load the project first: @see {@link loadProject}.
    *
@@ -228,7 +232,33 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function archive(project: ProjectDto) {
-    return api.delete(`/project/${project.name}`, {params: {archive: true}});
+    return api.delete(`/project/${project.name}`, { params: { archive: true } });
+  }
+
+  async function getIdMappings(name: string) {
+    return api.get(`/project/${name}/identifiers-mappings`).then((response) => response.data);
+  }
+
+  async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
+    if (!project.idMappings) project.idMappings = [];
+    const index: number = project.idMappings.findIndex(
+      (m) => m.name === mapping.name && m.entityType === mapping.entityType && m.mapping === mapping.mapping
+    );
+    
+    if (index === -1) {
+      project.idMappings = project.idMappings.concat(mapping);
+      return updateProject(project);
+    }
+
+    return Promise.resolve();
+  }
+
+  async function deleteIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
+    if (!project.idMappings) return Promise.resolve();
+    project.idMappings = project.idMappings.filter(
+      (m) => m.entityType !== mapping.entityType || m.name !== mapping.name
+    );
+    return updateProject(project);
   }
 
   return {
@@ -263,5 +293,8 @@ export const useProjectsStore = defineStore('projects', () => {
     backup,
     restore,
     archive,
+    getIdMappings,
+    addIdMappings,
+    deleteIdMappings,
   };
 });
