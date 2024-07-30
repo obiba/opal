@@ -84,11 +84,11 @@
         </q-card>
 
         <q-card flat>
-          <q-card-section class="q-px-none">
+          <q-card-section class="q-px-none q-pb-none">
             <span class="text-h5">{{ $t('project_admin.backup_restore') }}</span>
           </q-card-section>
 
-          <q-card-section class="q-px-none">
+          <q-card-section class="q-pa-none">
             <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
             <q-btn
               size="sm"

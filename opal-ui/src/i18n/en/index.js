@@ -333,11 +333,7 @@ export default {
     entity_type_hint: 'What the identifiers are about.',
     id_mappings_info: 'Identifiers mappings listed below that match the entity type of the data are automatically selected during an import/export process.',
     id_mappings_hint: 'The name of the mapping.',
-
-
-  },
-  q_table: {
-    no_data_label: 'Nada',
+    id_mapping: 'Identifiers Mapping',
   },
   user_profile: {
     title: 'My profile',

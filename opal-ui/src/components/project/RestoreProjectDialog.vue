@@ -14,7 +14,7 @@
             :folder="filesStore.current"
             selection="single"
             @select="onUpdateFolder"
-            type="file"
+            type="folder"
             :extensions="['.zip']"
           >
             <template v-slot:error>

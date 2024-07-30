@@ -112,6 +112,7 @@ export default {
     DuplicateTaxonomy: 'La taxonomie existe déjà',
     TaxonomyImportFailed:'L\'importation de la taxonomie a échoué, assurez-vous de fournir des informations valides',
     NoSuchTaxonomy:'La taxonomie n\'existe pas',
+    NoSuchProject: 'Le projet n\'existe pas',
   },
   identity_provider: {
     title: "Fournisseur d'identité",
@@ -304,6 +305,7 @@ export default {
     }
   },
   project_admin: {
+    properties: 'Propriétés du projet',
     db_hint: 'Les tables de projet (dictionnaires et données) sont stockées dans la base de données:',
     db_reload_hint: 'Le rechargement d\'une base de données de projet rend ses données temporairement inaccessibles (pas de liste de tables, pas d\'importation ou d\'exportation) pendant que la connexion à la base de données est réinitialisée. Le temps nécessaire à cette opération dépend du type et du schéma de la base de données.',
     db_reload_confirm: 'Êtes-vous sûr de vouloir recharger la base de données du projet?',
@@ -324,6 +326,14 @@ export default {
     remove_info: 'La suppression d\'un projet détruit toutes les données et tous les fichiers qui y sont associés. Il peut s\'agir d\'une tâche de longue haleine et il n\'est pas possible de revenir en arrière.',
     remove_confirm: 'Veuillez confirmer que vous souhaitez supprimer définitivement le projet actuel et toutes les données qui y sont associées. Cette opération ne peut être annulée.',
     remove: 'Supprimer le projet',
+    edit: 'Modifier le projet',
+    none: '(Aucune)',
+    no_database_warning: 'Aucune base de données n\'est définie, il n\'est donc pas possible d\'importer des données. Seules les vues et les ressources peuvent être ajoutées.',
+    entity_type: 'Type d\'entité',
+    entity_type_hint: 'What the identifiers are about.',
+    id_mappings_info: 'Les mappages d\'identifiants énumérés ci-dessous qui correspondent au type d\'entité des données sont automatiquement sélectionnés au cours d\'un processus d\'importation/exportation.',
+    id_mappings_hint: 'Le nom du mappage.',
+    id_mapping: 'Mappage des identifiants',
   },
   user_profile: {
     title: 'Mon profil',
@@ -561,7 +571,7 @@ export default {
   data_format: 'Format des données',
   data_management: 'Gestion des données',
   data_server: 'Serveur de données',
-  dataset: 'Base de données',
+  database: 'Base de données',
   databases_caption: "Gérer les bases de données pour le stockage, l'import et l'export des données",
   databases: 'Base de données',
   datashield_service: 'Service DataSHIELD',

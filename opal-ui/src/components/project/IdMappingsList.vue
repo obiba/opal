@@ -13,7 +13,14 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn :disable="!canAddMappings" color="primary" :label="$t('add')" icon="add" size="sm" @click.prevent="onAdd" />
+      <q-btn
+        :disable="!canAddMappings"
+        color="primary"
+        :label="$t('add')"
+        icon="add"
+        size="sm"
+        @click.prevent="onAdd"
+      />
     </template>
     <template v-slot:body-cell-type="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -26,7 +33,7 @@
             size="sm"
             color="secondary"
             :title="$t('delete')"
-            :icon="toolsVisible[props.row.entityType+props.row.mapping] ? 'delete' : 'none'"
+            :icon="toolsVisible[props.row.entityType + props.row.mapping] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
           />
@@ -40,8 +47,7 @@
     </template>
   </q-table>
 
-  <add-project-id-mappings-dialog v-model="showAddDialog" :project="project" @update="$emit('update')"/>
-
+  <add-project-id-mappings-dialog v-model="showAddDialog" :project="project" @update="$emit('update')" />
 </template>
 
 <script lang="ts">
@@ -87,21 +93,23 @@ const columns = computed(() => [
   },
   {
     name: 'mapping',
-    label: t('id_mappings'),
+    label: t('project_admin.id_mapping'),
     align: 'left',
     field: 'mapping',
   },
 ]);
-const canAddMappings = computed(() => (identifiersStore.identifiers || []).filter((id) => !!id.variableCount && id.variableCount > 0).length > 0);
+const canAddMappings = computed(
+  () => (identifiersStore.identifiers || []).filter((id) => !!id.variableCount && id.variableCount > 0).length > 0
+);
 
 // Handlers
 
 function onOverRow(row: ProjectDto_IdentifiersMappingDto) {
-  toolsVisible.value[row.entityType+row.mapping] = true;
+  toolsVisible.value[row.entityType + row.mapping] = true;
 }
 
 function onLeaveRow(row: ProjectDto_IdentifiersMappingDto) {
-  toolsVisible.value[row.entityType+row.mapping] = false;
+  toolsVisible.value[row.entityType + row.mapping] = false;
 }
 
 function onAdd() {
@@ -119,6 +127,7 @@ async function onDelete(row: ProjectDto_IdentifiersMappingDto) {
 
 onMounted(() => {
   identifiersStore.initIdentifiers();
+
   projectsStore.getIdMappings(props.project.name).then((response) => {
     idMappings.value = response;
   });

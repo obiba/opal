@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api'
+import { api } from 'src/boot/api';
 import { TableDto, VariableDto } from 'src/models/Magma';
 
 export const useIdentifiersStore = defineStore('identifiers', () => {
@@ -17,10 +17,10 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function loadIdentifiers() {
-    return api.get('/identifiers/tables', {params: {counts: true}}).then((response) => {
-      identifiers.value = response.data
+    return api.get('/identifiers/tables', { params: { counts: true } }).then((response) => {
+      identifiers.value = response.data;
       return response;
-    })
+    });
   }
 
   async function addIdentifier(identifier: TableDto) {
@@ -40,7 +40,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return api.get(`/identifiers/table/${idName}/variables`).then((response) => {
       mappings.value = response.data;
       return response;
-    })
+    });
   }
 
   async function addMappings(identifiers: VariableDto[]) {
