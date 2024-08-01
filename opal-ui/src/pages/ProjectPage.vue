@@ -79,17 +79,22 @@
 <script setup lang="ts">
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import { projectStatusColor } from 'src/utils/colors';
+import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
+const router = useRouter();
 const projectsStore = useProjectsStore();
 
 const name = computed(() => route.params.id as string);
 const tags = computed(() => projectsStore.project.tags ? projectsStore.project.tags : []);
 
 onMounted(() => {
-  console.log('ProjectPage mounted', projectsStore.router);
   projectsStore.initProject(name.value).then(() => {
-    projectsStore.loadSummary(name.value);
-  });
+    projectsStore.loadSummary();
+  }).catch((error) => {
+    notifyError(error);
+    router.replace('/projects');
+  }
+  );
 });
 </script>

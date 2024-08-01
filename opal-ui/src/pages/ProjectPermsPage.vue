@@ -77,7 +77,6 @@ const CAPTIONS: Record<string, string> = {
 };
 
 const route = useRoute();
-const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const acls = ref([] as Acl[]);
 const selectedSubject = ref({} as Subject);

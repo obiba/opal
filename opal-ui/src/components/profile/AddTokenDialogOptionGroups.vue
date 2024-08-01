@@ -20,8 +20,9 @@
 
   <script setup lang="ts">
 
-  interface GroupProps {
+interface GroupProps {
     modelValue: string[] | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     groupOptions: { [props: string]: any; label: string; value: any; disable?: boolean | undefined; }[];
     title: string;
     hint: string;

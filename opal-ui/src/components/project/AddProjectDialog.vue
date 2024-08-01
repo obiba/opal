@@ -36,6 +36,7 @@
             :options="databases"
             dense
             :label="$t('database')"
+            :disable="hasTables"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
@@ -57,19 +58,19 @@
             @select="onUpdateFolder"
             type="folder"
           />
+          <q-select
+            v-model="newProject.tags"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
+            :label="$t('tags')"
+            :hint="$t('project_tag_hint')"
+            @new-value="addTag"
+            :options="tagsFilters"
+            @filter="onFilterTags"
+          ></q-select>
         </q-form>
-        <q-select
-          v-model="newProject.tags"
-          use-input
-          use-chips
-          multiple
-          input-debounce="0"
-          :label="$t('tags')"
-          :hint="$t('project_tag_hint')"
-          @new-value="addTag"
-          :options="tagsFilters"
-          @filter="onFilterTags"
-        ></q-select>
       </q-card-section>
 
       <q-separator />
@@ -140,6 +141,7 @@ const exportFolder = ref({ ...emptyFileDto } as FileDto);
 const editMode = computed(() => !!props.project && !!props.project.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('edit_project') : t('add_project')));
+const hasTables = computed(() => (newProject.value?.datasource?.table ?? []).length > 0);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -192,17 +194,8 @@ watch(
         newProject.value = { ...props.project };
       } else {
         // TODO: check for VCF plugin
-        systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
-          newProject.value = { ...emptyProject };
-          databases.value = (dbs || []).map((db) => {
-            return {
-              label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
-              value: db.name,
-            };
-          });
-          newProject.value.database = (databases.value[0] || {}).value;
-          newProject.value.exportFolder = exportFolder.value.path;
-        });
+        newProject.value = { ...emptyProject };
+        newProject.value.database = (databases.value[0] || {}).value;
       }
 
       tagsFilterOptions = (newProject.value.tags || []).slice();
@@ -227,8 +220,8 @@ async function onAddProject() {
       editMode.value
         ? await projectsStore.updateProject(newProject.value as ProjectDto)
         : await projectsStore.addProject(newProject.value as ProjectDto),
-        onHide();
-        emit('update');
+        emit('update', newProject.value);
+      onHide();
     } catch (err) {
       notifyError(err);
     }
@@ -236,10 +229,20 @@ async function onAddProject() {
 }
 
 onMounted(() =>
-  profilesStore.initProfile().then(() =>
-    filesStore.initFiles(`/home/${profile.value.principal}/export`).then(() => {
+  profilesStore.initProfile().then(() => {
+    filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
       exportFolder.value = filesStore.current;
-    })
-  )
+    });
+
+    systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
+      databases.value = (dbs || []).map((db) => {
+        return {
+          label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
+          value: db.name,
+        };
+      });
+      databases.value.push({ label: t('project_admin.none'), value: '' });
+    });
+  })
 );
 </script>

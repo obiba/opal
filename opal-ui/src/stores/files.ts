@@ -25,6 +25,11 @@ export const useFilesStore = defineStore('files', () => {
     return loadFiles(path);
   }
 
+  async function refreshFiles(path: string) {
+    current.value = {} as FileDto;
+    return loadFiles(path);
+  }
+
   async function loadFiles(path: string) {
     return api.get(`/files/_meta${path}`).then((response) => {
       current.value = response.data;
@@ -196,6 +201,7 @@ export const useFilesStore = defineStore('files', () => {
     current,
     getFile,
     initFiles,
+    refreshFiles,
     loadFiles,
     downloadFile,
     downloadFiles,

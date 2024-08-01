@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { ProjectDto, ProjectSummaryDto } from 'src/models/Projects';
+import {
+  ProjectDto,
+  ProjectSummaryDto,
+  ProjectDatasourceStatusDto,
+  ProjectDto_IdentifiersMappingDto,
+} from 'src/models/Projects';
 import { Acl } from 'src/models/Opal';
 import { Subject } from 'src/models/Opal';
 import {
@@ -9,6 +14,8 @@ import {
   ImportCommandOptionsDto,
   ExportCommandOptionsDto,
   CopyCommandOptionsDto,
+  BackupCommandOptionsDto,
+  RestoreCommandOptionsDto,
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 
@@ -16,7 +23,8 @@ interface ProjectPerms {
   export: Perms | undefined;
   copy: Perms | undefined;
   import: Perms | undefined;
-  subjects: Perms | undefined;
+  projects: Perms | undefined;
+  project: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -26,6 +34,7 @@ export const useProjectsStore = defineStore('projects', () => {
   const commandStates = ref([] as CommandStateDto[]);
   const perms = ref({} as ProjectPerms);
   const subjects = ref([] as Subject[]);
+  const acls = ref([] as Acl[]);
 
   function reset() {
     projects.value = [];
@@ -48,10 +57,18 @@ export const useProjectsStore = defineStore('projects', () => {
     return Promise.resolve();
   }
 
+  async function refreshProject(name: string) {
+    project.value = {} as ProjectDto;
+    return loadProject(name);
+  }
+
   async function loadProjects() {
     return api.get('/projects', { params: { digest: true } }).then((response) => {
       projects.value = response.data.sort((a: ProjectDto, b: ProjectDto) => a.name.localeCompare(b.name));
-      return response;
+      return api.options('/projects').then((response) => {
+        perms.value.projects = new Perms(response);
+        return response;
+      });
     });
   }
 
@@ -61,6 +78,10 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(`/project/${name}`).then((response) => {
       project.value = response.data;
       return Promise.all([
+        api.options(`/project/${project.value.name}`).then((response) => {
+          perms.value.project = new Perms(response);
+          return response;
+        }),
         api.options(`/project/${project.value.name}/commands/_export`).then((response) => {
           perms.value.export = new Perms(response);
           return response;
@@ -73,8 +94,8 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.copy = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/permissions/subjects`).then((response) => {
-          perms.value.subjects = new Perms(response);
+        api.options(`/project/${project.value.name}`).then((response) => {
+          perms.value.project = new Perms(response);
           return response;
         }),
       ]);
@@ -85,13 +106,25 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.post('/projects', project).then((response) => response.data);
   }
 
-  async function updateProject(updated: ProjectDto) {
-    return api.put(`/project/${updated.name}`, updated).then((response) => {
-      if (updated.name === project.value.name) project.value = updated;
+  async function updateProject(toUpdate: ProjectDto) {
+    return api.put(`/project/${toUpdate.name}`, toUpdate).then((response) => {
+      if (toUpdate.name === project.value.name) project.value = toUpdate;
       return response;
     });
   }
 
+  async function deleteProject(toDelete: ProjectDto) {
+    return api.delete(`/project/${toDelete.name}`).then((response) => {
+      if (toDelete.name === project.value.name) project.value = {} as ProjectDto;
+      return response;
+    });
+  }
+
+  /**
+   * Must load the project first: @see {@link loadProject}.
+   *
+   * @returns A summary of the project counts (tables, views, variables, etc.)
+   */
   async function loadSummary() {
     summary.value = {} as ProjectSummaryDto;
     return api.get(`/project/${project.value.name}/summary`).then((response) => {
@@ -137,6 +170,22 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function reloadDbCommand(name: string) {
+    return api.post(`/project/${name}/commands/_reload`);
+  }
+
+  async function getState(name: string): Promise<ProjectDatasourceStatusDto> {
+    return api.get(`/project/${name}/state`).then((response) => response.data);
+  }
+
+  async function loadAcls(project: ProjectDto) {
+    acls.value = [];
+    return api.get(`/project/${project.name}/permissions/project`).then((response) => {
+      acls.value = response.data;
+      return response;
+    });
+  }
+
   async function loadSubjects() {
     subjects.value = [] as Subject[];
     return api.get(`/project/${project.value.name}/permissions/subjects`).then((response) => {
@@ -174,6 +223,44 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
+  async function backup(project: ProjectDto, options: BackupCommandOptionsDto) {
+    return api.post(`/project/${project.name}/commands/_backup`, options);
+  }
+
+  async function restore(project: ProjectDto, options: RestoreCommandOptionsDto) {
+    return api.post(`/project/${project.name}/commands/_restore`, options);
+  }
+
+  async function archive(project: ProjectDto) {
+    return api.delete(`/project/${project.name}`, { params: { archive: true } });
+  }
+
+  async function getIdMappings(name: string) {
+    return api.get(`/project/${name}/identifiers-mappings`).then((response) => response.data);
+  }
+
+  async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
+    if (!project.idMappings) project.idMappings = [];
+    const index: number = project.idMappings.findIndex(
+      (m) => m.name === mapping.name && m.entityType === mapping.entityType && m.mapping === mapping.mapping
+    );
+
+    if (index === -1) {
+      project.idMappings = project.idMappings.concat(mapping);
+      return updateProject(project);
+    }
+
+    return Promise.resolve();
+  }
+
+  async function deleteIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
+    if (!project.idMappings) return Promise.resolve();
+    project.idMappings = project.idMappings.filter(
+      (m) => m.entityType !== mapping.entityType || m.name !== mapping.name
+    );
+    return updateProject(project);
+  }
+
   return {
     projects,
     project,
@@ -181,12 +268,16 @@ export const useProjectsStore = defineStore('projects', () => {
     commandStates,
     perms,
     subjects,
+    acls,
     initProjects,
     initProject,
+    refreshProject,
     addProject,
     updateProject,
+    deleteProject,
     loadSummary,
     loadCommandStates,
+    loadAcls,
     loadSubjects,
     deleteSubject,
     getSubjectPermissions,
@@ -196,6 +287,14 @@ export const useProjectsStore = defineStore('projects', () => {
     copyCommand,
     exportCommand,
     importCommand,
+    reloadDbCommand,
+    getState,
     reset,
+    backup,
+    restore,
+    archive,
+    getIdMappings,
+    addIdMappings,
+    deleteIdMappings,
   };
 });

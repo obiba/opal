@@ -32,13 +32,14 @@
         :rows="projects"
         :columns="columns"
         row-key="name"
+        binary-state-sort
         :pagination="initialPagination"
         :loading="loading"
         :filter="filter"
         :filter-method="onFilter"
         @row-click="onRowClick"
       >
-        <template v-slot:top-left>
+        <template v-slot:top-left v-if="projectsStore.perms.projects?.canCreate()">
           <div class="q-gutter-sm">
             <q-btn no-caps color="primary " icon="add" size="sm" @click="onAddProject" />
           </div>
@@ -74,13 +75,12 @@
         </template>
       </q-table>
 
-      <add-project-dialog v-model="showAdd" @update="onProjectUpdate" />
+      <add-project-dialog v-model="showAdd" @update="onProjectAdded" />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TimestampsDto } from 'src/models/Magma';
 import { ProjectDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
@@ -112,6 +112,9 @@ const columns = computed(() => [
     field: 'name',
     format: (val: string) => val,
     sortable: true,
+    headerStyle: 'width: 20%; white-space: normal;',
+    style: 'width: 20%; white-space: normal;',
+    columnSortOrder: 'ad'
   },
   {
     name: 'title',
@@ -119,20 +122,27 @@ const columns = computed(() => [
     align: 'left',
     field: 'title',
     format: (val: string) => val,
+    headerStyle: 'width: 20%; white-space: normal;',
+    style: 'width: 20%; white-space: normal;',
   },
   {
     name: 'tags',
     label: t('tags'),
     align: 'left',
     field: 'tags',
+    headerStyle: 'width: 20%; white-space: normal;',
+    style: 'width: 20%; white-space: normal;',
   },
   {
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
     align: 'left',
-    field: 'timestamps',
-    format: (val: TimestampsDto) => getDateLabel(val.lastUpdate),
+    field: (row: ProjectDto) => (row.timestamps || {}).lastUpdate,
+    format: (val: string) => getDateLabel(val),
+    sortable: true,
+    headerStyle: 'width: 10%; white-space: normal;',
+    style: 'width: 10%; white-space: normal;',
   },
   {
     name: 'status',
@@ -140,6 +150,9 @@ const columns = computed(() => [
     label: t('status'),
     align: 'left',
     field: 'datasourceStatus',
+    headerStyle: 'width: 5%; white-space: normal;',
+    style: 'width: 5%; white-space: normal;',
+
   },
 ]);
 
@@ -178,7 +191,7 @@ onMounted(() => {
 
 function init() {
   loading.value = true;
-  projectsStore.initProjects().then(() => {
+  return projectsStore.initProjects().then(() => {
     loading.value = false;
   });
 }
@@ -212,8 +225,7 @@ function onAddProject() {
   showAdd.value = true;
 }
 
-async function onProjectUpdate() {
-  init();
+async function onProjectAdded(newProject: ProjectDto) {
+  projectsStore.refreshProject(newProject.name).then(() => router.push(`/project/${projectsStore.project.name}`));
 }
-
 </script>

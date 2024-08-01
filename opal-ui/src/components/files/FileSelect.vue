@@ -7,6 +7,7 @@
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
       <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
+    <slot name="error"></slot>
     <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
       {{ hint }}
     </div>
@@ -106,14 +107,14 @@
                       <q-item-label>{{  $t('add_folder') }}</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="type !== 'folder'" clickable v-close-popup @click="onShowUpload">
+                  <q-item v-if="type !== 'folder' || hasExtensions" clickable v-close-popup @click="onShowUpload">
                     <q-item-section>
                       <q-item-label>{{  $t('upload') }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              <span v-if="extensions && extensions.length>0" class="q-ml-xs">
+              <span v-if="hasExtensions" class="q-ml-xs">
                 <q-badge
                   v-for="ext in extensions"
                   :key="ext"
@@ -178,6 +179,8 @@ const initialPagination = { descending: false, page: 1, rowsPerPage: 10 };
 const loading = ref(false);
 const showAddFolder = ref(false);
 const showUpload = ref(false);
+
+const hasExtensions = computed(() => props.extensions && props.extensions.length > 0);
 
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : ''
@@ -252,7 +255,7 @@ const rows = computed(() => {
     });
 
   props.folder.children
-    .filter((file) => props.type !== 'folder' && file.type === FileDto_FileType.FILE)
+    .filter((file) => (props.type !== 'folder' || hasExtensions.value) && file.type === FileDto_FileType.FILE)
     .filter((file) => props.extensions === undefined || props.extensions.length === 0 || props.extensions.some((ext) => file.name.endsWith(ext)))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
@@ -303,12 +306,13 @@ function onRowDblClick(evt: unknown, row: FileDto) {
 }
 
 function onRowClick(evt: unknown, row: FileDto) {
+
   selected.value = [];
   if (props.type === 'folder' && row.type === FileDto_FileType.FOLDER) {
     if (row.name !== '..') {
       selected.value = [row];
     }
-  } else if ( row.type === FileDto_FileType.FILE) {
+  } else if (row.type === FileDto_FileType.FILE || hasExtensions.value) {
     selected.value = [row];
   }
 }
