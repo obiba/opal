@@ -196,7 +196,6 @@ watch(
         // TODO: check for VCF plugin
         newProject.value = { ...emptyProject };
         newProject.value.database = (databases.value[0] || {}).value;
-        newProject.value.exportFolder = exportFolder.value.path;
       }
 
       tagsFilterOptions = (newProject.value.tags || []).slice();

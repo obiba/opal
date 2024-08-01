@@ -113,6 +113,8 @@ const emit = defineEmits(['update:modelValue'])
 
 const pluginsStore = usePluginsStore();
 const projectsStore = useProjectsStore();
+const filesStore = useFilesStore();
+
 const { t } = useI18n();
 
 interface ExporterOption {
@@ -147,6 +149,11 @@ const isFile = computed(() => props.type === 'file');
 
 watch(() => props.modelValue, (value) => {
   showDialog.value = value;
+  if (value) {
+    if (projectsStore.project.exportFolder) {
+      filesStore.refreshFiles(projectsStore.project.exportFolder);
+    }
+  }
 });
 
 function onShow() {

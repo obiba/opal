@@ -79,7 +79,7 @@ export const useProjectsStore = defineStore('projects', () => {
       project.value = response.data;
       return Promise.all([
         api.options(`/project/${project.value.name}`).then((response) => {
-          perms.value.export = new Perms(response);
+          perms.value.project = new Perms(response);
           return response;
         }),
         api.options(`/project/${project.value.name}/commands/_export`).then((response) => {
@@ -244,7 +244,7 @@ export const useProjectsStore = defineStore('projects', () => {
     const index: number = project.idMappings.findIndex(
       (m) => m.name === mapping.name && m.entityType === mapping.entityType && m.mapping === mapping.mapping
     );
-    
+
     if (index === -1) {
       project.idMappings = project.idMappings.concat(mapping);
       return updateProject(project);
