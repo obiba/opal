@@ -7,7 +7,7 @@ import {
   ProjectDto_IdentifiersMappingDto,
 } from 'src/models/Projects';
 import { Acl } from 'src/models/Opal';
-import { Subject } from 'src/models/Opal';
+import { Subject, KeyForm } from 'src/models/Opal';
 import {
   CommandStateDto,
   CommandStateDto_Status,
@@ -261,6 +261,18 @@ export const useProjectsStore = defineStore('projects', () => {
     return updateProject(project);
   }
 
+  async function getKeyPairs(name: string) {
+    return api.get(`/project/${name}/keystore`).then((response) => response.data);
+  }
+
+  async function addKeyPair(name: string, keyPair: KeyForm) {
+    return api.post(`/project/${name}/keystore`, keyPair);
+  }
+
+  async function deleteKeyPair(name: string, alias: string) {
+    return api.delete(`/project/${name}/keystore/${alias}`);
+  }
+
   return {
     projects,
     project,
@@ -296,5 +308,8 @@ export const useProjectsStore = defineStore('projects', () => {
     getIdMappings,
     addIdMappings,
     deleteIdMappings,
+    getKeyPairs,
+    addKeyPair,
+    deleteKeyPair,
   };
 });

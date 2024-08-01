@@ -17,7 +17,7 @@
             :hint="$t('identity_provider.name_hint')"
             class="q-mb-md"
             lazy-rules
-            :rules="[validateRequiredField('validation.identity_provider.name_required')]"
+            :rules="[validateRequiredField('validation.name_required')]"
             :disable="editMode"
           >
           </q-input>

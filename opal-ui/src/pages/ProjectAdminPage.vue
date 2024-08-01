@@ -46,10 +46,17 @@
 
         <q-card flat>
           <q-card-section class="q-px-none">
+            <div class="text-h5">{{ $t('project_admin.encryption_keys') }}</div>
+            <div class="text-help q-mb-sm">{{ $t('project_admin.encryption_keys') }}</div>
+            <KeyPairsList :project="project" @update="onProjectUpdate" />
+          </q-card-section>
+        </q-card>
+
+        <q-card flat>
+          <q-card-section class="q-px-none">
             <div class="text-h5">{{ $t('id_mappings') }}</div>
             <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
-            <id-mappings-list :project="project" @update="onIdMappingsUpdate">
-            </id-mappings-list>
+            <id-mappings-list :project="project" @update="onProjectUpdate" />
           </q-card-section>
         </q-card>
 
@@ -171,6 +178,7 @@ import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue'
 import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vue';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 import IdMappingsList from 'src/components/project/IdMappingsList.vue';
+import KeyPairsList from 'src/components/project/KeyPairsList.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -295,7 +303,7 @@ function onEdit() {
   showEditProject.value = true;
 }
 
-async function onIdMappingsUpdate() {
+async function onProjectUpdate() {
   try {
     await projectsStore.refreshProject(name.value);
     await getState();
