@@ -11,8 +11,8 @@
     <q-page class="q-pa-md">
       <div v-if="hasSubjects" class="row q-gutter-md">
         <div class="col">
-          <div v-for="(subjects, type, index) in subjectTypes" :key="type">
-            <div :class="{ 'q-mt-lg': index !== 0 }">
+          <div v-for="(type, index) in [Subject_SubjectType.USER, Subject_SubjectType.GROUP]" :key="type">
+            <div v-if="subjectTypes[type]" :class="{ 'q-mt-lg': index !== 0 }">
               <div class="col-2 q-px-md bg-grey-1">
                 <div class="text-h5">
                   <q-icon :name="ICONS[type]" size="sm" class="q-mb-xs"></q-icon
@@ -24,7 +24,7 @@
                     clickable
                     active-class="bg-light-blue-1"
                     :active="selectedSubject.principal === subject.principal"
-                    v-for="subject in subjects"
+                    v-for="subject in subjectTypes[type]"
                     :key="subject.principal"
                     @click="onSubject(subject)"
                   >
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { Subject, Acl } from 'src/models/Opal';
+import { Subject, Acl, Subject_SubjectType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -97,7 +97,7 @@ async function doDeleteAcls() {
       await projectsStore.deleteSubject(selectedSubject.value);
       await loadSubjects();
     } else {
-      await Promise.all(toDelete.map((acl) => projectsStore.deleteSubjectPermissions(selectedSubject.value, acl)));
+      await Promise.all(toDelete.map((acl) => projectsStore.deleteSubjectPermission(selectedSubject.value, acl)));
       onSubject(selectedSubject.value);
     }
     await projectsStore.loadSubjects();
@@ -116,7 +116,7 @@ function initializeSubjectTypes() {
 }
 
 function findCandidateSubject() {
-  const candidates = Object.values(subjectTypes.value).flat();
+  const candidates = subjectTypes.value[Subject_SubjectType.USER] || subjectTypes.value[Subject_SubjectType.GROUP] || [];
   return candidates[0] || null;
 }
 

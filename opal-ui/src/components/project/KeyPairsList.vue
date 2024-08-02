@@ -21,7 +21,7 @@
         @click.prevent="onAdd"
       />
     </template>
-    <template v-slot:body-cell-type="props">
+    <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         {{ props.value }}
         <div class="float-right">
@@ -32,7 +32,7 @@
             size="sm"
             color="secondary"
             :title="$t('delete')"
-            :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+            :icon="toolsVisible[props.row.alias] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
           />
@@ -57,7 +57,8 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { t } from 'src/boot/i18n';
-import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+import { ProjectDto } from 'src/models/Projects';
+import { KeyForm, KeyType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import AddKeyPairDialog from 'src/components/project/AddKeyPairDialog.vue';
 
@@ -87,34 +88,35 @@ const columns = computed(() => [
     label: t('name'),
     align: 'left',
     field: 'alias',
-    style: 'width: 30%',
+    headerStyle: 'width: 30%; white-space: normal;',
+    style: 'width: 30%; white-space: normal;',
   },
   {
     name: 'type',
     label: t('type'),
     align: 'left',
     field: 'keyType',
-    format: (val: KeyType) => val.toString(),
+    format: (val: KeyType) => t(`key_type.${val}`),
   },
 ]);
 
 // Handlers
 
-function onOverRow(row: ProjectDto_IdentifiersMappingDto) {
-  toolsVisible.value[row.name] = true;
+function onOverRow(row: KeyForm) {
+  toolsVisible.value[row.alias] = true;
 }
 
-function onLeaveRow(row: ProjectDto_IdentifiersMappingDto) {
-  toolsVisible.value[row.name] = false;
+function onLeaveRow(row: KeyForm) {
+  toolsVisible.value[row.alias] = false;
 }
 
 function onAdd() {
   showAddDialog.value = true;
 }
 
-async function onDelete(row: ProjectDto_IdentifiersMappingDto) {
+async function onDelete(row: KeyForm) {
   try {
-    await projectsStore.deleteIdMappings(props.project, row);
+    await projectsStore.deleteKeyPair(props.project.name, row.alias);
     emit('update');
   } catch (error) {
     notifyError(error);

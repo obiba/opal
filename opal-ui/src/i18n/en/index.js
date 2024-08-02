@@ -304,6 +304,11 @@ export default {
       title: 'Commit Details',
     },
   },
+  key_type: {
+    KEY_PAIR: 'Key Pair',
+    CERTIFICATE: 'Certificate',
+    UNRECOGNIZED: 'Unrecognized',
+  },
   project_admin: {
     properties: 'Project properties',
     db_hint: 'Project tables (dictionaries and data) are stored in the database:',
@@ -339,7 +344,7 @@ export default {
     import_key: 'Import Key Pair',
     import_key_info: 'Paste encryption key in PEM format.',
     private_key: 'Private Key',
-    public_key: 'Public Key',
+    public_key: 'Public Key (Certificate)',
   },
   user_profile: {
     title: 'My profile',
@@ -403,7 +408,6 @@ export default {
       passwords_not_matching: 'Passwords do not match',
     },
     identity_provider: {
-      name_required: 'Name is required',
       clientId_required: 'Client ID is required',
       secret_required: 'Secret is required',
       discovery_uri_required: 'Discovery URI is required',
@@ -424,7 +428,7 @@ export default {
     project_admin: {
       backup_folder_required: 'Backup folder is required',
       private_key_required: 'Private Key in PEM format is required',
-      public_key_required: 'Public Key in PEM format is required',
+      public_key_required: 'Public Key (Certificate) in PEM format is required',
     },
   },
   main: {

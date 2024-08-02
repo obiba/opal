@@ -89,7 +89,8 @@ const columns = computed(() => [
     label: t('project_admin.entity_type'),
     align: 'left',
     field: 'entityType',
-    style: 'width: 30%',
+    headerStyle: 'width: 30%; white-space: normal;',
+    style: 'width: 30%; white-space: normal;',
   },
   {
     name: 'mapping',

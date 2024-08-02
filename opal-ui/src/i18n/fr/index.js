@@ -304,6 +304,11 @@ export default {
       titre: 'Détails de la validation',
     }
   },
+  key_type: {
+    KEY_PAIR: 'Paire de clés',
+    CERTIFICATE: 'Certificat',
+    UNRECOGNIZED: 'Non reconnu',
+  },
   project_admin: {
     properties: 'Propriétés du projet',
     db_hint: 'Les tables de projet (dictionnaires et données) sont stockées dans la base de données:',
@@ -334,6 +339,12 @@ export default {
     id_mappings_info: 'Les mappages d\'identifiants énumérés ci-dessous qui correspondent au type d\'entité des données sont automatiquement sélectionnés au cours d\'un processus d\'importation/exportation.',
     id_mappings_hint: 'Le nom du mappage.',
     id_mapping: 'Mappage des identifiants',
+    encryption_keys: 'Clés de chiffrement',
+    encryption_keys_info: 'Les données chiffrées seront automatiquement déchiffrées au moment de l\'importation en utilisant les paires de clés enregistrées dans le projet.',
+    import_key: 'Importer une paire de clés',
+    import_key_info: 'Collez la clé de chiffrement au format PEM.',
+    private_key: 'Clé privée',
+    public_key: 'Clé publique (certificat)"  ',
   },
   user_profile: {
     title: 'Mon profil',
@@ -389,15 +400,14 @@ export default {
     deleteProject : 'Supprimer',
   },
   validation: {
+    name_required: 'Le nom est requis',
     user: {
-      name_required: 'Le nom est requis',
       password_required: 'Le mot de passe est requis et doit comporter au moins 8 caractères',
       certificate_required: 'Le certificat est requis',
       confirm_password_required: 'La confirmation du mot de passe est requise',
       passwords_not_matching: 'Les mots de passe ne correspondent pas',
     },
     identity_provider: {
-      name_required: 'Le nom est requis',
       clientId_required: "L'ID client est requis",
       secret_required: 'Le secret est requis',
       discovery_uri_required: "L'URI de découverte est requis",
@@ -410,9 +420,6 @@ export default {
       old_password: 'L\'ancien mot de passe est requis',
       new_password: 'Un nouveau mot de passe est requis et doit comporter au moins 8 caractères.',
     },
-    token : {
-      name_required : 'Le nom du jeton est obligatoire',
-    },
     text_required: 'Un texte est requis',
     github: {
       org_required: 'L\'organisation ou le nom d\'utilisateur Github est requis',
@@ -420,7 +427,9 @@ export default {
     },
     project_admin: {
       backup_folder_required: 'Le dossier de sauvegarde est requis',
-    },
+      private_key_required: 'Clé privée au format PEM requise',
+      public_key_required: 'Clé publique (certificat) au format PEM requis'
+  },
   },
   main: {
     brand: 'Opal',

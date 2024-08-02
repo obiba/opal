@@ -25,6 +25,8 @@ interface ProjectPerms {
   import: Perms | undefined;
   projects: Perms | undefined;
   project: Perms | undefined;
+  keystore: Perms | undefined;
+  reload: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -92,6 +94,14 @@ export const useProjectsStore = defineStore('projects', () => {
         }),
         api.options(`/project/${project.value.name}/commands/_copy`).then((response) => {
           perms.value.copy = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/commands/_reload`).then((response) => {
+          perms.value.reload = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/keystore`).then((response) => {
+          perms.value.keystore = new Perms(response);
           return response;
         }),
         api.options(`/project/${project.value.name}`).then((response) => {
@@ -213,7 +223,8 @@ export const useProjectsStore = defineStore('projects', () => {
   async function deleteSubjectPermission(subject: Subject, acl: Acl) {
     const resource = acl.resource
       .replace(/^\//, '')
-      .replace(/^datasource.*/, 'datasource')
+      .replace(/^project.*/, 'project')
+      .replace(/^datasource\/[^\/]+$/, 'datasource')
       .replace(/.*(table|view)/, 'table')
       .replace(/.*report-template/, 'report-template');
 
@@ -293,7 +304,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadSubjects,
     deleteSubject,
     getSubjectPermissions,
-    deleteSubjectPermissions: deleteSubjectPermission,
+    deleteSubjectPermission,
     clearCommandStates,
     cancelCommandState,
     copyCommand,
