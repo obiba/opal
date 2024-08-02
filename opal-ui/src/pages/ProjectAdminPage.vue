@@ -43,16 +43,30 @@
             </q-banner>
           </q-card-section>
         </q-card>
+      </template>
 
+      <template v-if="hasKeystorePermission">
+        <q-card flat>
+          <q-card-section class="q-px-none">
+            <div class="text-h5">{{ $t('project_admin.encryption_keys') }}</div>
+            <div class="text-help q-mb-sm">{{ $t('project_admin.encryption_keys_info') }}</div>
+            <KeyPairsList :project="project" @update="onProjectUpdate" />
+          </q-card-section>
+        </q-card>
+      </template>
+
+      <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
             <div class="text-h5">{{ $t('id_mappings') }}</div>
             <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
-            <id-mappings-list :project="project" @update="onIdMappingsUpdate">
-            </id-mappings-list>
+            <id-mappings-list :project="project" @update="onProjectUpdate" />
           </q-card-section>
         </q-card>
+      </template>
 
+      <!-- FIXME use /project/PROJ/permissions/project when fixed -->
+      <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
             <span class="text-h5">{{ $t('permissions') }}</span>
@@ -62,7 +76,9 @@
             />
           </q-card-section>
         </q-card>
+      </template>
 
+      <template v-if="hasReloadPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
             <span class="text-h5"
@@ -82,7 +98,9 @@
             <q-btn size="sm" icon="cached" color="primary" :label="$t('state')" @click="getState"></q-btn>
           </q-card-section>
         </q-card>
+      </template>
 
+      <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none q-pb-none">
             <span class="text-h5">{{ $t('project_admin.backup_restore') }}</span>
@@ -143,17 +161,17 @@
             </q-card-section>
           </q-card>
         </div>
-
-        <!-- Dialogs -->
-
-        <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
-
-        <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
-
-        <restore-project-dialog v-model="showRestore" :project="project" @update:model-value="onRestored" />
-
-        <add-project-dialog v-model="showEditProject" :project="project" @update="onProjectEdited" />
       </template>
+
+      <!-- Dialogs -->
+
+      <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+
+      <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
+
+      <restore-project-dialog v-model="showRestore" :project="project" @update:model-value="onRestored" />
+
+      <add-project-dialog v-model="showEditProject" :project="project" @update="onProjectEdited" />
     </q-page>
   </div>
 </template>
@@ -171,6 +189,7 @@ import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue'
 import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vue';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 import IdMappingsList from 'src/components/project/IdMappingsList.vue';
+import KeyPairsList from 'src/components/project/KeyPairsList.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -185,7 +204,14 @@ const onConfirmed = ref(() => ({}));
 const state = ref(ProjectDatasourceStatusDto.NONE);
 const project = computed(() => projectsStore.project);
 const name = computed(() => route.params.id as string);
-const hasAdminPermission = computed(() => projectsStore.perms.project?.canUpdate() || false);
+const hasAdminPermission = computed(
+  () =>
+    projectsStore.perms.project?.canCreate() ||
+    projectsStore.perms.project?.canUpdate() ||
+    projectsStore.perms.project?.canDelete()
+);
+const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
+const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);
 const hasDatabase = computed(() => !!project.value.database);
 
 const properties: FieldItem<ProjectDto>[] = [
@@ -295,7 +321,7 @@ function onEdit() {
   showEditProject.value = true;
 }
 
-async function onIdMappingsUpdate() {
+async function onProjectUpdate() {
   try {
     await projectsStore.refreshProject(name.value);
     await getState();

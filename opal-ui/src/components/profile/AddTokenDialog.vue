@@ -153,7 +153,7 @@ watch(
 );
 
 // Validations
-const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.token.name_required');
+const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
 
 // Group options
 const taskGroupOptions: { label: string; value: string }[] = [];

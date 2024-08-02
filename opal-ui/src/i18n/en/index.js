@@ -304,6 +304,11 @@ export default {
       title: 'Commit Details',
     },
   },
+  key_type: {
+    KEY_PAIR: 'Key Pair',
+    CERTIFICATE: 'Certificate',
+    UNRECOGNIZED: 'Unrecognized',
+  },
   project_admin: {
     properties: 'Project properties',
     db_hint: 'Project tables (dictionaries and data) are stored in the database:',
@@ -334,6 +339,12 @@ export default {
     id_mappings_info: 'Identifiers mappings listed below that match the entity type of the data are automatically selected during an import/export process.',
     id_mappings_hint: 'The name of the mapping.',
     id_mapping: 'Identifiers Mapping',
+    encryption_keys: 'Encryption Keys',
+    encryption_keys_info: 'Encrypted data will be automatically decrypted at importation time using the key pairs registered within the project.',
+    import_key: 'Import Key Pair',
+    import_key_info: 'Paste encryption key in PEM format.',
+    private_key: 'Private Key',
+    public_key: 'Public Key (Certificate)',
   },
   user_profile: {
     title: 'My profile',
@@ -389,15 +400,14 @@ export default {
     deleteProject: 'Delete',
   },
   validation: {
+    name_required: 'Name is required',
     user: {
-      name_required: 'Name is required',
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',
       confirm_password_required: 'Confirm password is required',
       passwords_not_matching: 'Passwords do not match',
     },
     identity_provider: {
-      name_required: 'Name is required',
       clientId_required: 'Client ID is required',
       secret_required: 'Secret is required',
       discovery_uri_required: 'Discovery URI is required',
@@ -410,9 +420,6 @@ export default {
       old_password: 'Old password is required',
       new_password: 'New password is required and must be at least 8 characters long',
     },
-    token: {
-      name_required: 'Token name is required',
-    },
     text_required: 'A text is required',
     github: {
       org_required: 'Github organization or username is required',
@@ -420,6 +427,8 @@ export default {
     },
     project_admin: {
       backup_folder_required: 'Backup folder is required',
+      private_key_required: 'Private Key in PEM format is required',
+      public_key_required: 'Public Key (Certificate) in PEM format is required',
     },
   },
   main: {

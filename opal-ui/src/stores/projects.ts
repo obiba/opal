@@ -7,7 +7,7 @@ import {
   ProjectDto_IdentifiersMappingDto,
 } from 'src/models/Projects';
 import { Acl } from 'src/models/Opal';
-import { Subject } from 'src/models/Opal';
+import { Subject, KeyForm } from 'src/models/Opal';
 import {
   CommandStateDto,
   CommandStateDto_Status,
@@ -25,6 +25,8 @@ interface ProjectPerms {
   import: Perms | undefined;
   projects: Perms | undefined;
   project: Perms | undefined;
+  keystore: Perms | undefined;
+  reload: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -92,6 +94,14 @@ export const useProjectsStore = defineStore('projects', () => {
         }),
         api.options(`/project/${project.value.name}/commands/_copy`).then((response) => {
           perms.value.copy = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/commands/_reload`).then((response) => {
+          perms.value.reload = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/keystore`).then((response) => {
+          perms.value.keystore = new Perms(response);
           return response;
         }),
         api.options(`/project/${project.value.name}`).then((response) => {
@@ -213,7 +223,8 @@ export const useProjectsStore = defineStore('projects', () => {
   async function deleteSubjectPermission(subject: Subject, acl: Acl) {
     const resource = acl.resource
       .replace(/^\//, '')
-      .replace(/^datasource.*/, 'datasource')
+      .replace(/^project.*/, 'project')
+      .replace(/^datasource\/[^\/]+$/, 'datasource')
       .replace(/.*(table|view)/, 'table')
       .replace(/.*report-template/, 'report-template');
 
@@ -261,6 +272,18 @@ export const useProjectsStore = defineStore('projects', () => {
     return updateProject(project);
   }
 
+  async function getKeyPairs(name: string) {
+    return api.get(`/project/${name}/keystore`).then((response) => response.data);
+  }
+
+  async function addKeyPair(name: string, keyPair: KeyForm) {
+    return api.post(`/project/${name}/keystore`, keyPair);
+  }
+
+  async function deleteKeyPair(name: string, alias: string) {
+    return api.delete(`/project/${name}/keystore/${alias}`);
+  }
+
   return {
     projects,
     project,
@@ -281,7 +304,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadSubjects,
     deleteSubject,
     getSubjectPermissions,
-    deleteSubjectPermissions: deleteSubjectPermission,
+    deleteSubjectPermission,
     clearCommandStates,
     cancelCommandState,
     copyCommand,
@@ -296,5 +319,8 @@ export const useProjectsStore = defineStore('projects', () => {
     getIdMappings,
     addIdMappings,
     deleteIdMappings,
+    getKeyPairs,
+    addKeyPair,
+    deleteKeyPair,
   };
 });

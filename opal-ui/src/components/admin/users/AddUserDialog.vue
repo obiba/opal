@@ -168,7 +168,7 @@ function addGroup(val: string, done: any) {
 }
 
 // Validation rules
-const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.user.name_required');
+const validateRequiredName = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
 const validateRequiredCertificate = (val: string) =>
   (editMode.value && (!val || val.length === 0)) ||
   (val && val.trim().length > 0) ||

@@ -36,6 +36,7 @@ import jakarta.ws.rs.core.Response;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.KeyStoreService;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ import static jakarta.ws.rs.core.Response.Status;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class KeyStoreResource {
+public class KeyStoreResource implements BaseResource {
 
   private OpalKeyStore keyStore;
 
