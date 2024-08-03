@@ -11,6 +11,11 @@ export default {
     default_charset_hint: 'Le jeu de caractères par défaut pour les dictionnaires.',
     enforced_2fa_hint: "Activer l'authentification à deux facteurs pour tous les utilisateurs. Ne s'applique pas aux utilisateurs de registres extérieurs.",
   },
+  apps: {
+    title: 'Apps',
+    caption: 'Gérer les applications externes fournissants des services',
+    info: 'An application is an external service that can be used by the system. Applications can be discovered from their URL or can register themselves using the application authentication token.',
+  },
   auth: {
     title: 'Identifiez-vous pour commencer une session',
     password: 'Mot de passe',
@@ -528,8 +533,6 @@ export default {
   advanced_options: 'Options avancées',
   all_categories: 'Toutes',
   all_projects: 'Tous',
-  apps_caption: 'Gérer les applications externes fournissants des services',
-  apps: 'Apps',
   attributes: 'Attributs',
   auth_method: "Méthode d'authentification",
   authentication: 'Authentification',

@@ -114,7 +114,7 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/apps">{{ $t('apps') }}</router-link></q-item-label>
+                <q-item-label><router-link to="/admin/apps">{{ $t('apps.title') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('apps_caption') }}</q-item-label>
               </q-item-section>
             </q-item>

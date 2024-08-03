@@ -1,7 +1,10 @@
 <template>
   <q-list v-if="dbobject" separator dense>
+    <!-- Makes a re-render when locale changes. For example, getDateLabel does not account for locale change hence this trick -->
+    <template v-if="locale"></template>
+
     <q-item v-for="item in visibleItems" :key="item.field">
-      <q-item-section style="max-width: 200px;">
+      <q-item-section style="max-width: 200px">
         <q-item-label overline class="text-grey-6">
           {{ $t(item.label ? item.label : item.field) }}
         </q-item-label>
@@ -70,6 +73,7 @@ export interface FieldsListProps {
   items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap>[];
 }
 
+const { locale } = useI18n({ useScope: 'global' });
 const props = withDefaults(defineProps<FieldsListProps>(), {
   dbobject: undefined,
   items: undefined,

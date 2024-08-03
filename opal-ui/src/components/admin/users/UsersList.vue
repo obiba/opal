@@ -139,7 +139,7 @@ const showDelete = ref(false);
 const authenticationType = ref(SubjectCredentialsDto_AuthenticationType.PASSWORD);
 const selectedUser = ref<SubjectCredentialsDto | null>(null);
 
-const columns = [
+const columns = computed(() =>[
   {
     name: 'name',
     required: true,
@@ -170,7 +170,7 @@ const columns = [
     align: 'center  ',
     field: 'enabled',
   },
-];
+]);
 
 const initialPagination = ref({
   sortBy: 'name',
