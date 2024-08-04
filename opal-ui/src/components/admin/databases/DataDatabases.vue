@@ -86,7 +86,7 @@
         </q-tr>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('db.unregister')" :text="$t('db.unregister_confirm', { name: selected?.name })" @confirm="onDelete" />
+    <confirm-dialog v-model="showDelete" :title="$t('unregister')" :text="$t('db.unregister_confirm', { name: selected?.name })" @confirm="onDelete" />
     <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave"/>
   </div>
 </template>

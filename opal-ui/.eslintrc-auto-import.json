@@ -99,6 +99,7 @@
     "TOKEN_TYPES": true,
     "useTaxonomiesStore": true,
     "useResourcesStore": true,
-    "useIdentifiersStore": true
+    "useIdentifiersStore": true,
+    "useAppsStore": true
   }
 }

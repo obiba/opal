@@ -63,7 +63,7 @@
       </q-btn-dropdown>
     </div>
 
-    <confirm-dialog v-model="showDelete" :title="$t('db.unregister')" :text="$t('db.unregister_confirm', { name: database?.name })" @confirm="onDelete" />
+    <confirm-dialog v-model="showDelete" :title="$t('unregister')" :text="$t('db.unregister_confirm', { name: database?.name })" @confirm="onDelete" />
     <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave"/>
 
   </div>

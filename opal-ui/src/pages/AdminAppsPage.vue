@@ -16,12 +16,19 @@
           <apps-registry-list />
         </q-card-section>
       </q-card>
+
+      <q-card flat>
+        <q-card-section class="q-px-none">
+          <apps-config />
+        </q-card-section>
+      </q-card>
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
 import AppsRegistryList from 'src/components/admin/apps/AppsRegistryList.vue';
+import AppsConfig from 'src/components/admin/apps/AppsConfig.vue';
 // onMounted(() => {
 
 // });

@@ -161,6 +161,8 @@ const datashieldStore = useDatashieldStore();
 const profilesStore = useProfilesStore();
 const identityProvidersStore = useIdentityProvidersStore();
 const tokensStore = useTokensStore();
+const identifiersStore = useIdentifiersStore();
+const appsStore = useAppsStore();
 
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -208,6 +210,8 @@ onMounted(() => {
   authStore.getProviders().then((providers) => {
     authProviders.value = providers;
   });
+  identifiersStore.reset();
+  appsStore.reset();
 });
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {

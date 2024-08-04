@@ -10,17 +10,13 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn
-        size="sm"
-        icon="cached"
-        color="primary"
-        :label="$t('refresh')"
-        @click="onRefresh"
-      ></q-btn>
+      <q-btn size="sm" icon="cached" color="primary" :label="$t('refresh')" @click="onRefresh"></q-btn>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <span class="text-primary">{{ props.value }}</span>
+        <span
+          >{{ props.value }} <code :title="props.row.id">{{ props.row.id.replace(/-.*$/, '') }}</code></span
+        >
         <div class="float-right">
           <q-btn
             rounded
@@ -28,32 +24,44 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('edit')"
-            :icon="toolsVisible[props.row.name] ? 'cancel' : 'none'"
+            :title="$t('unregister')"
+            :icon="toolsVisible[props.row.name] ? 'close' : 'none'"
             class="q-ml-xs"
             @click="onUnregister(props.row)"
           />
         </div>
       </q-td>
     </template>
-    <template v-slot:body-cell-groups="props">
+    <template v-slot:body-cell-type="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <q-chip class="q-ml-none" v-for="group in props.col.format(props.row.groups)" :key="group.name">
-          {{ group }}
+        {{ props.value }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-cluster="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        {{ props.value }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-host="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <a :href="props.row.server" target="_blank">{{ props.value }}</a>
+      </q-td>
+    </template>
+    <template v-slot:body-cell-tags="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-chip class="q-ml-none" v-for="(tag, index) in props.value" :key="index">
+          {{ tag }}
         </q-chip>
       </q-td>
     </template>
-    <template v-slot:body-cell-authentication="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <span class="text-caption">{{ props.value }}</span>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-enabled="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <q-icon :name="props.value ? 'check' : 'close'" size="sm" />
-      </q-td>
-    </template>
   </q-table>
+
+  <confirm-dialog
+    v-model="showDelete"
+    :title="$t('unregister')"
+    :text="$t('apps.unregister_confirm', { app: selectedApp.name })"
+    @confirm="doUnregister"
+  />
 </template>
 
 <script lang="ts">
@@ -64,11 +72,15 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { AppDto } from 'src/models/Apps';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { notifyError } from 'src/utils/notify';
 
 const { t } = useI18n();
+const appsStore = useAppsStore();
 const loading = ref(false);
-const apps = computed(() => []);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+const showDelete = ref(false);
+const selectedApp = ref({} as AppDto);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -77,6 +89,7 @@ const initialPagination = ref({
   minRowsForPagination: 10,
 });
 
+const apps = computed(() => appsStore.apps);
 const columns = computed(() => [
   {
     name: 'name',
@@ -85,7 +98,7 @@ const columns = computed(() => [
     align: 'left',
     field: 'name',
     sortable: true,
-    style: 'width: 25%',
+    style: 'width: 30%',
   },
   {
     name: 'type',
@@ -113,6 +126,25 @@ const columns = computed(() => [
   },
 ]);
 
+async function init() {
+  loading.value = true;
+  return appsStore.initApps().then(() => (loading.value = false));
+}
+
+async function doUnregister() {
+  if (!selectedApp.value.id) {
+    return;
+  }
+
+  try {
+    showDelete.value = false;
+    await appsStore.unregisterApp(selectedApp.value.id);
+    await init();
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
 // Handlers
 
 function onOverRow(row: AppDto) {
@@ -124,10 +156,13 @@ function onLeaveRow(row: AppDto) {
 }
 
 async function onUnregister(row: AppDto) {
-  //
+  showDelete.value = true;
+  selectedApp.value = row;
 }
 
 async function onRefresh() {
-  //
+  return init();
 }
+
+onMounted(async () => init());
 </script>
