@@ -28,7 +28,7 @@
             lazy-rules
           >
             <template v-slot:append>
-              <q-btn flat icon="content_copy" @click="onCopyToClipboard" aria-label="Copy to clipboard" />
+              <q-btn flat icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" />
             </template>
           </q-input>
 
@@ -95,9 +95,9 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { copyToClipboard, Notify } from 'quasar';
+import { copyToClipboard } from 'quasar';
 import { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import { notifyError, notifySuccess } from 'src/utils/notify';
 import { generateToken } from 'src/utils/tokens';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
@@ -238,10 +238,10 @@ function onTokenServicesUpdate() {
 function onCopyToClipboard() {
   copyToClipboard(token.value.token || '')
     .then(() => {
-      Notify.create('Text copied to clipboard!');
+      notifySuccess(t('clipboard.copied'));
     })
     .catch(() => {
-      Notify.create('Failed to copy text');
+      notifyError(t('clipboard.failed'));
     });
 }
 

@@ -20,8 +20,6 @@ export const useAppsStore = defineStore('apps', () => {
     return api.get('/apps').then((response) => {
       apps.value = response.data;
       return response.data;
-    }).catch((error) => {
-      console.log('loadApps error', error);
     });
   }
 

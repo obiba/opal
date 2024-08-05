@@ -1,9 +1,11 @@
 <template>
+  <div>
   <q-input
     v-model="name"
     dense
     type="text"
     :label="$t('name') + '*'"
+    :hint="$t('apps.name_hint', {type: type})"
     class="q-mb-md"
     lazy-rules
     :rules="[validateRequiredField('name')]"
@@ -14,12 +16,13 @@
     autocomplete="off"
     type="password"
     :label="$t('password') + '*'"
+    :hint="$t('apps.name_hint', {type: type})"
     v-model="password"
     color="grey-10"
-    :hint="$t('password_hint')"
     lazy-rules
     :rules="[validateRequiredField('password'), validateRequiredPassword]"
   ></q-input>
+</div>
 </template>
 
 <script lang="ts">
@@ -34,6 +37,7 @@ import { AppCredentialsDto } from 'src/models/Apps';
 
 interface Props {
   modelValue: AppCredentialsDto | undefined;
+  type: string,
 }
 
 const { t } = useI18n();

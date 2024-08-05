@@ -1,7 +1,28 @@
 <template>
-  <div class="text-h5">{{ $t('discovery') }}</div>
+  <q-card flat>
+    <div class="text-h5">{{ $t('apps.self_register') }}</div>
+      <html-anchor-hint
+        class="text-help"
+        trKey="apps.self_register_info"
+        :text="$t('apps.apps_admin')"
+        url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+      />
+
+    <q-card-section class="q-px-none q-gutter-sm row items-center">
+      <q-btn size="sm" icon="edit" color="primary" :label="$t('edit')" @click="onEditToken"></q-btn>
+      <q-btn size="sm" icon="delete" color="negative" :label="$t('clear')" @click="onClearToken"></q-btn>
+
+      <span v-if="config.token">
+        <code >{{ config.token }}</code>
+        <q-btn flat icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" />
+      </span>
+
+    </q-card-section>
+  </q-card>
 
   <q-card flat>
+    <div class="text-h5">{{ $t('discovery') }}</div>
+
     <q-card-section class="q-px-none">
       <html-anchor-hint
         class="text-help"
@@ -15,7 +36,6 @@
       <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
     </q-card-section>
   </q-card>
-
   <q-table
     flat
     :rows="rockConfigs"
@@ -66,7 +86,15 @@
     @confirm="doRemove"
   />
 
-  <add-r-server-dialog v-model="showAdd" :config="config" :rock-app-config="selectedConfig" @update="onUpdated" />
+  <add-app-token-dialog v-model="showEditToken" :token="config.token || ''" @update="onTokenEdited" />
+
+  <add-r-server-dialog
+    v-model="showAdd"
+    :config="config"
+    :rock-app-config="selectedConfig"
+    @update:model-value="onClose"
+    @update="onUpdated"
+  />
 </template>
 
 <script lang="ts">
@@ -79,16 +107,19 @@ export default defineComponent({
 import { RockAppConfigDto } from 'src/models/Apps';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
 import AddRServerDialog from 'src/components/admin/apps/AddRServerDialog.vue';
+import AddAppTokenDialog from 'src/components/admin/apps/AddAppTokenDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { notifyError } from 'src/utils/notify';
+import { copyToClipboard } from 'quasar';
+import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const { t } = useI18n();
 const appsStore = useAppsStore();
 const loading = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
-const selectedConfig: RockAppConfigDto = {} as RockAppConfigDto;
+const selectedConfig = ref({} as RockAppConfigDto);
 const showAdd = ref(false);
 const showRemove = ref(false);
+const showEditToken = ref(false);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -119,7 +150,7 @@ async function init() {
 async function doRemove() {
   try {
     const config = { ...appsStore.config };
-    config.rockConfigs = config.rockConfigs.filter((c) => c.host !== selectedConfig.host);
+    config.rockConfigs = config.rockConfigs.filter((c) => c.host !== selectedConfig.value.host);
     await appsStore.updateConfig(config);
     showRemove.value = false;
     return init();
@@ -138,21 +169,49 @@ function onLeaveRow(row: RockAppConfigDto) {
   toolsVisible.value[row.host] = false;
 }
 
+function onEditToken() {
+  showEditToken.value = true;
+}
+
+function onClearToken() {
+  config.value.token = '';
+}
+
+function onTokenEdited(newToken: string) {
+  showEditToken.value = false;
+  config.value.token = newToken;
+}
+
+function onCopyToClipboard() {
+  copyToClipboard(config.value.token || '')
+    .then(() => {
+      notifySuccess(t('clipboard.copied'));
+    })
+    .catch(() => {
+      notifyError(t('clipboard.failed'));
+    });
+}
+
 async function onAdd(row: RockAppConfigDto) {
   showAdd.value = true;
 }
 
 async function onEdit(row: RockAppConfigDto) {
-  //return init();
+  selectedConfig.value = row;
+  showAdd.value = true;
+}
+
+function onClose() {
+  showAdd.value = false;
+  selectedConfig.value = {} as RockAppConfigDto;
 }
 
 function onUpdated() {
-  showAdd.value = false;
   return init();
 }
 
 function onDelete(row: RockAppConfigDto) {
-  selectedConfig.host = row.host;
+  selectedConfig.value = row;
   showRemove.value = true;
 }
 

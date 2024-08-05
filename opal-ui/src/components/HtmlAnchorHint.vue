@@ -9,7 +9,6 @@ defineComponent({
 </script>
 
 <script setup lang="ts">
-
 interface Props {
   trKey: string;
   text: string;
@@ -18,13 +17,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const { t } = useI18n();
-const htmlText = ref('');
+const htmlText = computed(() => t(props.trKey, { url: `<a href="${props.url}" target="_blank">${props.text}</a>` }));
 
 function onClick() {
   window.open(props.url, '_blank');
 }
 
-onMounted(() => {
-    htmlText.value = t(props.trKey, {url: `<a href="${props.url}" target="_blank">${props.text}</a>`});
-});
+// onMounted(() => {
+//   htmlText.value = t(props.trKey, { url: `<a href="${props.url}" target="_blank">${props.text}</a>` });
+// });
 </script>
