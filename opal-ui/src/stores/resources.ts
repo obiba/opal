@@ -80,11 +80,11 @@ export const useResourcesStore = defineStore('resources', () => {
   }
 
   function getResourceFactory(reference: ResourceReferenceDto) {
-    return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider)?.resourceFactories.find((factory) => factory.name === reference.factory);
+    return (resourceProviders.value?.providers ?? []).find((provider) => provider.name === reference.provider)?.resourceFactories.find((factory) => factory.name === reference.factory);
   }
 
   function getResourceProvider(reference: ResourceReferenceDto) {
-    return resourceProviders.value?.providers.find((provider) => provider.name === reference.provider);
+    return (resourceProviders.value?.providers ?? []).find((provider) => provider.name === reference.provider);
   }
 
   async function addResource(resourceRef: ResourceReferenceDto) {

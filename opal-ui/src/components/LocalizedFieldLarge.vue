@@ -53,7 +53,7 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { LocaleTextDto } from 'src/models/Opal';
-import { t } from 'boot/i18n';
+import { t } from 'src/boot/i18n';
 
 interface Props {
   modelValue: LocaleTextDto[] | undefined;
