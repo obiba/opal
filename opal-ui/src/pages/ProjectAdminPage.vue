@@ -31,10 +31,12 @@
 
       <template v-if="hasAdminPermission">
         <q-card flat>
-          <q-card-section class="q-px-none">
+          <q-card-section v-if="hasDatabase"  class="q-px-none">
             <span class="text-help">{{ $t('project_admin.db_hint') }}</span>
-            <fields-list v-if="hasDatabase" class="col-6" :items="dsProperties" :dbobject="project || {}" />
-            <q-banner v-else inline-actions rounded class="bg-orange text-white">
+            <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
+          </q-card-section>
+          <q-card-section v-else  class="q-px-none">
+            <q-banner inline-actions rounded class="bg-orange text-white">
               {{ $t('project_admin.no_database_warning') }}
 
               <template v-slot:action>
@@ -43,6 +45,22 @@
             </q-banner>
           </q-card-section>
         </q-card>
+
+        <q-card flat>
+          <q-card-section v-if="hasVcfStores && !!project.vcfStoreService" class="q-px-none">
+            <span class="text-help">{{ $t('project_admin.vcf_store_hint') }}</span>
+            <fields-list  class="col-6" :items="vcfProperties" :dbobject="project || {}" />
+          </q-card-section>
+        </q-card>
+        <q-card-section v-if="hasVcfStores && !!!project.vcfStoreService" class="q-px-none">
+          <q-banner inline-actions rounded class="bg-orange text-white">
+              {{ $t('project_admin.no_vcf_store_warning') }}
+
+              <template v-slot:action>
+                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit" />
+              </template>
+            </q-banner>
+        </q-card-section>
       </template>
 
       <template v-if="hasKeystorePermission">
@@ -183,6 +201,7 @@ import AccessControlList from 'src/components/permissions/AccessControlList.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { AclAction } from 'src/models/Opal';
 import { ProjectDatasourceStatusDto } from 'src/models/Projects';
+import { PluginPackage } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
 import { tableStatusColor } from 'src/utils/colors';
 import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue';
@@ -194,6 +213,7 @@ import KeyPairsList from 'src/components/project/KeyPairsList.vue';
 const route = useRoute();
 const router = useRouter();
 const projectsStore = useProjectsStore();
+const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 const showConfirm = ref(false);
 const showBackup = ref(false);
@@ -213,6 +233,7 @@ const hasAdminPermission = computed(
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);
 const hasDatabase = computed(() => !!project.value.database);
+const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
 const properties: FieldItem<ProjectDto>[] = [
   {
@@ -249,6 +270,13 @@ const dsProperties: FieldItem<ProjectDto>[] = [
       if (val.datasource && !!val.datasource.type) return t(`${val.datasource.type}`);
       return t('project_admin.none');
     },
+  },
+];
+
+const vcfProperties: FieldItem<ProjectDto>[] = [
+  {
+    field: 'vcfStoreService',
+    label: 'vcf_store',
   },
 ];
 
@@ -355,6 +383,7 @@ function onDelete() {
 onMounted(() => {
   projectsStore.refreshProject(name.value).then(() => {
     getState();
+    pluginsStore.initVcfStorePlugins();
   });
 });
 </script>

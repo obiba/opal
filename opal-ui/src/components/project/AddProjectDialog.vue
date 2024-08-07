@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-    <q-card>
+    <q-card class="dialog-sm">
       <q-card-section>
         <div class="text-h6">{{ dialogTitle }}</div>
       </q-card-section>
@@ -37,6 +37,15 @@
             dense
             :label="$t('database')"
             :disable="hasTables"
+            class="q-mb-md q-pt-md"
+            emit-value
+            map-options
+          />
+          <q-select
+            v-model="newProject.vcfStoreService"
+            :options="vcfStores"
+            dense
+            :label="$t('vcf_store')"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
@@ -94,6 +103,7 @@ import FileSelect from 'src/components/files/FileSelect.vue';
 import { notifyError } from 'src/utils/notify';
 import { DatabaseDto_Usage, DatabaseDto } from 'src/models/Database';
 import { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
+import { PluginPackageDto } from 'src/models/Plugins';
 
 interface Project extends Omit<ProjectDto, 'idMappings'> {
   idMappings?: ProjectDto_IdentifiersMappingDto[];
@@ -127,10 +137,12 @@ const projectsStore = useProjectsStore();
 const systemStore = useSystemStore();
 const filesStore = useFilesStore();
 const profilesStore = useProfilesStore();
+const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 
 const formRef = ref();
 const databases = ref<{ label: string; value: string }[]>([]);
+const vcfStores = ref<{ label: string; value: string }[]>([]);
 const showDialog = ref(props.modelValue);
 const newProject = ref<Project>({} as Project);
 let tagsFilterOptions = Array<string>();
@@ -142,6 +154,7 @@ const editMode = computed(() => !!props.project && !!props.project.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('edit_project') : t('add_project')));
 const hasTables = computed(() => (newProject.value?.datasource?.table ?? []).length > 0);
+const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -193,9 +206,9 @@ watch(
       if (props.project) {
         newProject.value = { ...props.project };
       } else {
-        // TODO: check for VCF plugin
         newProject.value = { ...emptyProject };
         newProject.value.database = (databases.value[0] || {}).value;
+        if (hasVcfStores) newProject.value.vcfStoreService = (vcfStores.value[0] || {}).value;
       }
 
       tagsFilterOptions = (newProject.value.tags || []).slice();
@@ -242,6 +255,19 @@ onMounted(() =>
         };
       });
       databases.value.push({ label: t('project_admin.none'), value: '' });
+    });
+
+    pluginsStore.initVcfStorePlugins().then(() => {
+      if (pluginsStore.vcfStorePlugins.length > 0) {
+        vcfStores.value = pluginsStore.vcfStorePlugins.map((pkg: PluginPackageDto) => {
+          return {
+            label: pkg.name,
+            value: pkg.name,
+          };
+        });
+
+        vcfStores.value.push({ label: t('project_admin.none'), value: '' });
+      }
     });
   })
 );
