@@ -1,3 +1,4 @@
+import { get } from 'http';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { PluginPackage } from 'src/components/models';
@@ -6,6 +7,7 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   const datasourceImportPlugins = ref([] as PluginPackage[]);
   const datasourceExportPlugins = ref([] as PluginPackage[]);
+  const vcfStorePlugins = ref([] as PluginPackage[]);
 
   function reset() {
     datasourceImportPlugins.value = [];
@@ -40,12 +42,25 @@ export const usePluginsStore = defineStore('plugins', () => {
     });
   }
 
+  async function initVcfStorePlugins() {
+    vcfStorePlugins.value = [];
+    return loadPlugin('vcf-store').then((plugins) => {
+      vcfStorePlugins.value = plugins.packages ?? [];
+    });
+  }
+
+  async function loadPlugin(type: string) {
+    return api.get('plugins', {params: {type}}).then((response) => response.data);
+  }
+
   return {
     datasourceImportPlugins,
     datasourceExportPlugins,
+    vcfStorePlugins,
     reset,
     initDatasourcePlugins,
-    getDatasourcePluginForm
+    getDatasourcePluginForm,
+    initVcfStorePlugins
   };
 
 });

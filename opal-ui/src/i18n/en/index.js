@@ -376,6 +376,8 @@ export default {
     import_key_info: 'Paste encryption key in PEM format.',
     private_key: 'Private Key',
     public_key: 'Public Key (Certificate)',
+    vcf_store_hint: 'Project genotypes are stored using the service:',
+    no_vcf_store_warning: 'No VCF store is defined for this project. No genotypes can be imported.'
   },
   user_profile: {
     title: 'My profile',
@@ -943,6 +945,7 @@ export default {
   values: 'Values',
   variables: 'Variables',
   variance: 'Variance',
+  vcf_store: 'VCF Store',
   version: 'Version',
   view: 'View',
   waiting: 'Waiting',

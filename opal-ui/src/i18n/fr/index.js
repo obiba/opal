@@ -376,6 +376,8 @@ export default {
     import_key_info: 'Collez la clé de chiffrement au format PEM.',
     private_key: 'Clé privée',
     public_key: 'Clé publique (certificat)"  ',
+    vcf_store_hint: 'Les génotypes du projet sont stockés à l\'aide du service:',
+    no_vcf_store_warning: 'Aucun magasin VCF n\'est défini pour ce projet. Aucun génotype ne peut être importé.'
   },
   user_profile: {
     title: 'Mon profil',
@@ -943,6 +945,7 @@ export default {
   values: 'Valeurs',
   variables: 'Variables',
   variance: 'Variance',
+  vcf_store: 'Magasin VCF',
   version: 'Version',
   view: 'Vue',
   waiting: 'En attente',
