@@ -876,6 +876,7 @@ export default {
   project_tag_hint: 'Type a new tag and press \'ENTER\'.',
   project: 'Project',
   projects_caption: 'Browse tables and variables, create views, import/export data and dictionaries.',
+  projects_info: 'A project is a repository of data with dictionaries and of resource references. In a project, data can be imported, exported, analysed and transformed. Projects also offer access controls to the dictionaries, the summary statistics and the individual data.',
   projects: 'Projects',
   properties: 'Properties',
   public_url: 'Public URL',

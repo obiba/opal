@@ -876,6 +876,7 @@ export default {
   project_tag_hint: 'Tapez une nouvelle étiquette et appuyez sur \'ENTER\'.',
   project: 'Projet',
   projects_caption: 'Parcourir les tables et les variables, créer des vues, importer/exporter des données et des dictionnaires',
+  projects_info: 'Un projet est un dépôt de données avec dictionnaire et de références à des ressources. Dans un projet, les données peuvent être importées, exportées, analysées and transformées. Les projets permettent de contrôler les accès auc dictionnaires, aux sommaires statistiques et aux données individuelles.',
   projects: 'Projets',
   properties: 'Propriétés',
   public_url: 'URL publique',

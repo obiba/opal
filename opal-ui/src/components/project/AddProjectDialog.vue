@@ -102,7 +102,7 @@ import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Project
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { notifyError } from 'src/utils/notify';
 import { DatabaseDto_Usage, DatabaseDto } from 'src/models/Database';
-import { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
+import { FileDto } from 'src/models/Opal';
 import { PluginPackageDto } from 'src/models/Plugins';
 
 interface Project extends Omit<ProjectDto, 'idMappings'> {
@@ -122,15 +122,6 @@ const emptyProject = {
   tags: [],
 } as Project;
 
-const emptyFileDto = {
-  name: '/',
-  path: '/home',
-  type: FileDto_FileType.FOLDER,
-  readable: true,
-  writable: true,
-  children: [],
-} as FileDto;
-
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const projectsStore = useProjectsStore();
@@ -141,15 +132,14 @@ const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 
 const formRef = ref();
-const databases = ref<{ label: string; value: string }[]>([]);
+const databases = ref<{ label: string; value: string, defaultStorage: boolean }[]>([]);
 const vcfStores = ref<{ label: string; value: string }[]>([]);
 const showDialog = ref(props.modelValue);
 const newProject = ref<Project>({} as Project);
 let tagsFilterOptions = Array<string>();
 const tagsFilters = ref(Array<string>());
 
-const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
-const exportFolder = ref({ ...emptyFileDto } as FileDto);
+const exportFolder = ref<FileDto>();
 const editMode = computed(() => !!props.project && !!props.project.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('edit_project') : t('add_project')));
@@ -192,7 +182,7 @@ function onFilterTags(val: string, update: any) {
 
 function onHide() {
   newProject.value = { ...emptyProject };
-  exportFolder.value = { ...emptyFileDto };
+  exportFolder.value = undefined;
   tagsFilterOptions = [];
   tagsFilters.value = [];
   showDialog.value = false;
@@ -207,8 +197,10 @@ watch(
         newProject.value = { ...props.project };
       } else {
         newProject.value = { ...emptyProject };
-        newProject.value.database = (databases.value[0] || {}).value;
-        if (hasVcfStores) newProject.value.vcfStoreService = (vcfStores.value[0] || {}).value;
+        const defaultDb = databases.value.find((db) => db.defaultStorage);
+        newProject.value.database = (defaultDb || databases.value[0] || {}).value;
+        const defaultVcfStore = vcfStores.value.find((vcf) => vcf.value === '');
+        if (hasVcfStores) newProject.value.vcfStoreService = (defaultVcfStore || vcfStores.value[0] || {}).value;
       }
 
       tagsFilterOptions = (newProject.value.tags || []).slice();
@@ -219,7 +211,7 @@ watch(
 );
 
 function onUpdateFolder() {
-  newProject.value.exportFolder = exportFolder.value.path;
+  newProject.value.exportFolder = exportFolder.value?.path;
 }
 
 async function onAddProject() {
@@ -242,33 +234,37 @@ async function onAddProject() {
 }
 
 onMounted(() =>
-  profilesStore.initProfile().then(() => {
-    filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
-      exportFolder.value = filesStore.current;
-    });
+  {
+    if (!filesStore.current?.path) {
+      filesStore.loadFiles('/');
+    }
 
-    systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
-      databases.value = (dbs || []).map((db) => {
-        return {
-          label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
-          value: db.name,
-        };
-      });
-      databases.value.push({ label: t('project_admin.none'), value: '' });
-    });
+    profilesStore.initProfile().then(() => {
 
-    pluginsStore.initVcfStorePlugins().then(() => {
-      if (pluginsStore.vcfStorePlugins.length > 0) {
-        vcfStores.value = pluginsStore.vcfStorePlugins.map((pkg: PluginPackageDto) => {
+      systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
+        databases.value = (dbs || []).map((db) => {
           return {
-            label: pkg.name,
-            value: pkg.name,
+            label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
+            value: db.name,
+            defaultStorage: db.defaultStorage,
           };
         });
+        databases.value.push({ label: t('project_admin.none'), value: '', defaultStorage: false });
+      });
 
-        vcfStores.value.push({ label: t('project_admin.none'), value: '' });
-      }
-    });
-  })
+      pluginsStore.initVcfStorePlugins().then(() => {
+        if (pluginsStore.vcfStorePlugins.length > 0) {
+          vcfStores.value = pluginsStore.vcfStorePlugins.map((pkg: PluginPackageDto) => {
+            return {
+              label: pkg.name,
+              value: pkg.name,
+            };
+          });
+
+          vcfStores.value.push({ label: t('project_admin.none'), value: '' });
+        }
+      });
+    })
+  }
 );
 </script>

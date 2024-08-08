@@ -192,35 +192,37 @@ const selectedPaths = computed(() => {
 
 const showDialog = ref(false);
 
-const columns = [
-  {
-    name: 'name',
-    required: true,
-    label: t('name'),
-    align: 'left',
-    field: 'name',
-    format: (val: string) => val,
-    sortable: true,
-  },
-  {
-    name: 'size',
-    required: true,
-    label: t('size'),
-    align: 'left',
-    field: 'size',
-    format: (val: number) => getSizeLabel(val),
-    sortable: true,
-  },
-  {
-    name: 'lastModifiedTime',
-    required: true,
-    label: t('last_update'),
-    align: 'left',
-    field: 'lastModifiedTime',
-    format: (val: number) => getDateLabel(val),
-    sortable: true,
-  },
-];
+const columns = computed(() => {
+  return [
+    {
+      name: 'name',
+      required: true,
+      label: t('name'),
+      align: 'left',
+      field: 'name',
+      format: (val: string) => val,
+      sortable: true,
+    },
+    {
+      name: 'size',
+      required: true,
+      label: t('size'),
+      align: 'left',
+      field: 'size',
+      format: (val: number) => getSizeLabel(val),
+      sortable: true,
+    },
+    {
+      name: 'lastModifiedTime',
+      required: true,
+      label: t('last_update'),
+      align: 'left',
+      field: 'lastModifiedTime',
+      format: (val: number) => getDateLabel(val),
+      sortable: true,
+    },
+  ];
+});
 
 watch(() => props.modelValue, (value) => {
   selected.value = value ? (Array.isArray(value) ? value : [value]) : [];

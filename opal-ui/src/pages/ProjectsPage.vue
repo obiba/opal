@@ -10,21 +10,8 @@
       <div class="text-h5 q-mb-md">
         <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ $t('projects') }}</span>
       </div>
-      <div v-if="tags.length" class="q-mb-md">
-        <q-tabs
-          v-model="tab"
-          dense
-          class="text-grey"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-          narrow-indicator
-          @update:model-value="onTabChange"
-        >
-          <q-tab name="__all" :label="$t('all_projects')" />
-          <q-tab v-for="tag in tags" :key="tag" :name="tag" :label="tag" />
-        </q-tabs>
-        <q-separator />
+      <div class="text-help">
+        {{ $t('projects_info') }}
       </div>
       <q-table
         ref="tableRef"
@@ -45,6 +32,17 @@
           </div>
         </template>
         <template v-slot:top-right>
+          <q-select
+            dense
+            multiple
+            use-chips
+            v-model="tagsFilter"
+            :options="tags"
+            :label="$t('tags')"
+            @update:model-value="onTabChange"
+            class="on-left"
+            style="min-width: 200px;"
+          />
           <q-input
             dense
             clearable
@@ -91,7 +89,7 @@ const { t } = useI18n();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 
-const tab = ref('__all');
+const tagsFilter = ref<string[]>([]);
 const tableRef = ref();
 const loading = ref(false);
 const showAdd = ref(false);
@@ -160,10 +158,10 @@ const projects = computed(() => {
   if (!projectsStore.projects) {
     return [];
   }
-  if (tab.value === '__all') {
+  if (tagsFilter.value.length === 0) {
     return projectsStore.projects;
   }
-  return projectsStore.projects.filter((p) => p.tags && p.tags.includes(tab.value));
+  return projectsStore.projects.filter((p) => p.tags && p.tags.some((tg) => tagsFilter.value.includes(tg)));
 });
 
 const tags = computed(() => {
