@@ -26,6 +26,7 @@ interface ProjectPerms {
   projects: Perms | undefined;
   project: Perms | undefined;
   keystore: Perms | undefined;
+  keyStore: Perms | undefined;
   reload: Perms | undefined;
 }
 
@@ -101,6 +102,11 @@ export const useProjectsStore = defineStore('projects', () => {
           return response;
         }),
         api.options(`/project/${project.value.name}/keystore`).then((response) => {
+          perms.value.keystore = new Perms(response);
+          return response;
+        }),
+        // FIXME: the server does not return proper permissions for the vcf-store
+        api.options(`/project/${project.value.name}/vcf-store`).then((response) => {
           perms.value.keystore = new Perms(response);
           return response;
         }),
