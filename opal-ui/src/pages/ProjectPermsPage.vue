@@ -9,36 +9,36 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('permissions') }}
+      </div>
+      <div class="text-help q-mb-md">
+        {{ $t('project_permissions_info') }}
+      </div>
       <div v-if="hasSubjects" class="row q-gutter-md">
         <div class="col">
-          <div v-for="(type, index) in [Subject_SubjectType.USER, Subject_SubjectType.GROUP]" :key="type">
-            <div v-if="subjectTypes[type]" :class="{ 'q-mt-lg': index !== 0 }">
-              <div class="col-2 q-px-md bg-grey-1">
-                <div class="text-h5">
-                  <q-icon :name="ICONS[type]" size="sm" class="q-mb-xs"></q-icon
-                  ><span class="on-right">{{ $t(CAPTIONS[type]) }}</span>
-                </div>
-
-                <q-list dense padding>
-                  <q-item
-                    clickable
-                    active-class="bg-light-blue-1"
-                    :active="selectedSubject.principal === subject.principal"
-                    v-for="subject in subjectTypes[type]"
-                    :key="subject.principal"
-                    @click="onSubject(subject)"
-                  >
-                    <q-item-section class="q-pa-none q-mr-sm"> {{ subject.principal }} </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
+          <div v-for="type in [Subject_SubjectType.USER, Subject_SubjectType.GROUP]" :key="type">
+            <div v-if="subjectTypes[type]">
+              <q-list dense padding>
+                <q-item-label header class="text-weight-bolder">
+                  <q-icon :name="ICONS[type]" size="sm" class="on-left"/>
+                  <span>{{ $t(CAPTIONS[type]) }}</span>
+                </q-item-label>
+                <q-item
+                  clickable
+                  active-class="bg-grey-2"
+                  :active="selectedSubject.principal === subject.principal"
+                  v-for="subject in subjectTypes[type]"
+                  :key="subject.principal"
+                  @click="onSubject(subject)"
+                >
+                  <q-item-section class="q-pa-none q-mr-sm text-caption"> {{ subject.principal }} </q-item-section>
+                </q-item>
+              </q-list>
             </div>
           </div>
         </div>
-        <div class="col-9">
-          <div class="text-h5">
-            <q-icon name="lock" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ $t('permissions') }}</span>
-          </div>
+        <div class="col-10">
           <access-control-table
             class=""
             v-model="selectedAcls"

@@ -34,7 +34,7 @@
           :title="$t('delete')"
           icon="delete"
           size="sm"
-          @click="onShowDelete"
+          @click="onShowDeleteSingle(props.file)"
         />
       </q-breadcrumbs>
     </q-toolbar>
@@ -469,10 +469,10 @@ function onShowDelete() {
 }
 
 function onDelete() {
-  if (props.file.type === FileDto_FileType.FOLDER) {
-    onDeleteSelections();
-  } else {
+  if (props.file.type !== FileDto_FileType.FOLDER || (selected.value.length === 1 && selected.value[0].path === props.file.path)) {
     onDeleteFile();
+  } else {
+    onDeleteSelections();
   }
 }
 

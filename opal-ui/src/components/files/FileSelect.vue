@@ -44,11 +44,7 @@
                   <div v-if="projectName">
                     <q-btn flat no-caps icon="table_chart" color="primary" size="12px" :label="$t('project')" align="left" class="full-width" @click="onFolderSelection(`/projects/${projectName}`)"></q-btn>
                   </div>
-                  <div>
-                    <q-item-label header class="text-weight-bolder">{{
-                      $t('content')
-                    }}</q-item-label>
-                  </div>
+                  <q-separator class="q-mt-md q-mb-md"/>
                   <div>
                     <q-btn flat no-caps icon="group" color="primary" size="12px" :label="$t('users')" align="left" class="full-width" @click="onFolderSelection('/home')"></q-btn>
                   </div>
