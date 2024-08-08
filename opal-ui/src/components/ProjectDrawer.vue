@@ -13,9 +13,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{
-        $t('content')
-      }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ $t('content') }}</q-item-label>
 
       <q-item :to="`/project/${projectsStore.project.name}/tables`">
         <q-item-section avatar>
@@ -32,6 +30,15 @@
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ $t('resources') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-item v-show="hasVcfStorePermission" :to="`/project/${projectsStore.project.name}/genotypes`">
+        <q-item-section avatar>
+          <q-icon name="science" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ $t('project_genotypes.title') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -53,9 +60,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{
-        $t('administration')
-      }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ $t('administration') }}</q-item-label>
 
       <q-item :to="`/project/${projectsStore.project.name}/tasks`">
         <q-item-section avatar>
@@ -95,15 +100,17 @@ export default defineComponent({
 <script setup lang="ts">
 const projectsStore = useProjectsStore();
 const hasAdminPermission = ref(false);
+const hasVcfStorePermission = ref(false);
 
-watch(
-  () => projectsStore.perms.project,
-  (newValue) => {
-    if (!!newValue) {
-      hasAdminPermission.value = projectsStore.perms.project?.canRead() || false;
-    }
-  },
-  { immediate: true }
+watchEffect(
+  () => {
+    hasAdminPermission.value =
+      projectsStore.perms.project?.canCreate() ||
+      projectsStore.perms.project?.canUpdate() ||
+      projectsStore.perms.project?.canDelete() || false;
+    // FIXME: uncomment line below and remove the next once the server is fixed
+    // hasVcfPermission.value = projectsStore.perms.vcfstore?.canRead() || false;
+    hasVcfStorePermission.value = hasAdminPermission.value;
+  }
 );
-
 </script>

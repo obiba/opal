@@ -382,6 +382,9 @@ export default {
     vcf_store_hint: 'Project genotypes are stored using the service:',
     no_vcf_store_warning: 'No VCF store is defined for this project. No genotypes can be imported.'
   },
+  project_genotypes: {
+    title: 'Genotypes',
+  },
   user_profile: {
     title: 'My profile',
     groups: 'Your account belongs to the group | Your account belongs to the {count} groups',
