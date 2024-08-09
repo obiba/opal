@@ -1,15 +1,16 @@
 <template>
   <div v-if="schema">
-
-    <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
-    <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>
-    <div v-for="item in schema.items" :key="item.key">
-      <schema-form-item
-        v-model="data[item.key]"
-        :field="item"
-        :disable="disable"
-        @update:model-value="onUpdate(item.key)" />
-    </div>
+    <form autocomplete="off">
+      <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
+      <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>
+      <div v-for="item in schema.items" :key="item.key">
+        <schema-form-item
+          v-model="data[item.key]"
+          :field="item"
+          :disable="disable"
+          @update:model-value="onUpdate(item.key)" />
+      </div>
+    </form>
   </div>
 </template>
 

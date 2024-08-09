@@ -19,6 +19,7 @@
         :label="field.title"
         :hint="field.description"
         type="password"
+        autocomplete="new-password"
         dense
         :disable="disable"
         class="q-mb-md"
@@ -43,6 +44,7 @@
         v-model="data"
         :label="field.title"
         :hint="field.description"
+        autocomplete="off"
         dense
         :disable="disable"
         class="q-mb-md"
@@ -130,7 +132,7 @@ import FileSelect from 'src/components/files/FileSelect.vue';
 import { FileObject, FormObject, SchemaFormField } from 'src/components/models';
 
 interface Props {
-  modelValue: boolean | number | string | FileObject | FormObject | Array<FormObject> | undefined;
+  modelValue: string | number | boolean | FileObject | FormObject | Array<FormObject> | undefined;
   field: SchemaFormField;
   disable?: boolean;
 }
@@ -144,7 +146,7 @@ const data = ref(props.modelValue);
 const dataFile = ref<FileObject>();
 const dataArray = ref<Array<FormObject>>([]);
 
-onMounted(init);
+//onMounted(init);
 
 watch([() => props.modelValue, () => props.field], init);
 
