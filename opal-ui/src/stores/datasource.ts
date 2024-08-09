@@ -445,6 +445,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.post(`${parentLink}/variables`, [variable]);
   }
 
+  async function reconnectView(pName: string, name: string) {
+    return api.put(`/datasource/${pName}/view/${name}/_init`);
+  }
 
   return {
     datasource,
@@ -488,5 +491,6 @@ export const useDatasourceStore = defineStore('datasource', () => {
     applyAttributes,
     deleteAttributes,
     reset,
+    reconnectView,
   };
 });

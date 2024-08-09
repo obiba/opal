@@ -886,6 +886,7 @@ export default {
   r_service: 'Service R',
   range: 'Plage',
   realm: 'Domaine',
+  reconnect_view: 'Reconnecter la vue',
   records: 'Enregistrements',
   referenced_entity_type_hint: 'Quand les valeurs sont des identifiants, la variable est une référence à une autre entité.',
   referenced_entity_type: "Type d'entité référencée",

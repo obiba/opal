@@ -886,6 +886,7 @@ export default {
   r_service: 'R service',
   range: 'Range',
   realm: 'Realm',
+  reconnect_view: 'Reconnect view',
   records: 'Records',
   referenced_entity_type_hint: 'When the value is an identifier, its entity type can be specified.',
   referenced_entity_type: 'Referenced entity type',

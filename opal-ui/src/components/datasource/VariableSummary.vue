@@ -26,6 +26,7 @@
       @click="init"
       class="q-mt-lg"
       style="height: 2.5em;"
+      :disable="loading"
     />
     <q-btn
       color="primary"
@@ -35,10 +36,14 @@
       @click="onFullSummary"
       class="q-mt-lg"
       style="height: 2.5em;"
+      :disable="loading"
     />
   </div>
   <q-separator class="q-mt-md q-mb-md" />
-  <div v-if="summary['Math.CategoricalSummaryDto.categorical']">
+  <div v-if="loading">
+    <q-spinner-dots size="lg" class="q-mt-md" />
+  </div>
+  <div v-else-if="summary['Math.CategoricalSummaryDto.categorical']">
     <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md"/>
   </div>
   <div v-else-if="summary['Math.TextSummaryDto.textSummary']">
@@ -74,16 +79,20 @@ const STEP_COUNT = 1000;
 
 const summary = ref({});
 const limit = ref(STEP_COUNT);
+const loading = ref(false);
 
 onMounted(() => {
   init();
 });
 
 function init() {
+  loading.value = true;
   datasourceStore
     .loadVariableSummary(props.variable, true, limit.value > props.total ? props.total : limit.value)
     .then((data) => {
       summary.value = data;
+    }).finally(() => {
+      loading.value = false;
     });
 }
 
