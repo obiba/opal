@@ -9,7 +9,7 @@
 
         <q-card-section>
           <file-select
-            v-model="excelFile"
+            v-model="variablesFile"
             :folder="filesStore.current"
             selection="single"
             :extensions="['.xlsx','.xls','.xml']"
@@ -21,37 +21,6 @@
             <span class="on-left">{{ $t('select_dictionary_file_template') }}</span>
             <a :href="`${baseUrl}/templates/OpalVariableTemplate.xlsx`" class="text-primary">OpalVariableTemplate.xlsx</a>
           </div>
-
-          <q-list class="q-mt-md">
-            <q-expansion-item
-              switch-toggle-side
-              dense
-              header-class="text-primary text-caption"
-              :label="$t('advanced_options')"
-            >
-              <div class="q-mt-md">
-                <q-checkbox v-model="merge" :label="$t('merge_variables')"/>
-                <div class="text-help q-pl-sm q-pr-sm">{{ $t('merge_variables_hint') }}</div>
-              </div>
-              <div class="q-mt-md q-pl-sm q-pr-sm">
-                <q-input
-                  v-model="locale"
-                  :label="$t('locale')"
-                  dense
-                  class="q-mb-md"/>
-                <q-input
-                  v-model="charSet"
-                  :label="$t('locale')"
-                  dense
-                  class="q-mb-md"/>
-                <q-input
-                  v-model="entityType"
-                  :label="$t('entity_type')"
-                  dense
-                  class="q-mb-md"/>
-              </div>
-            </q-expansion-item>
-          </q-list>
         </q-card-section>
 
         <q-separator />
@@ -79,7 +48,7 @@ export default defineComponent({
 import { FileDto } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { baseUrl } from 'src/boot/api';
-// import { notifyError } from 'src/utils/notify';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -90,25 +59,19 @@ const emit = defineEmits(['update:modelValue'])
 
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
+const datasourceStore = useDatasourceStore();
+const transientDatasourceStore = useTransientDatasourceStore();
 
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : ''
 );
 
 const showDialog = ref(props.modelValue);
-const excelFile = ref<FileDto>();
-const merge = ref(false);
-const locale = ref('en');
-const charSet = ref('ISO-8859-1');
-const entityType = ref('Participant');
+const variablesFile = ref<FileDto>();
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    excelFile.value = undefined;
-    merge.value = false;
-    locale.value = 'en';
-    charSet.value = 'ISO-8859-1';
-    entityType.value = 'Participant';
+    variablesFile.value = undefined;
   }
   showDialog.value = value;
 });
@@ -121,8 +84,38 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-function onAddTables() {
-  console.log('TODO: Add Tables from Excel File', excelFile.value);
+async function onAddTables() {
+  if (!variablesFile.value) return;
+  try {
+    await transientDatasourceStore.createFileDatasource(variablesFile.value);
+  } catch (err) {
+    notifyError(err);
+    return;
+  }
+
+  for (const tName of transientDatasourceStore.datasource.table) {
+    try {
+      await onAddTable(tName);
+    } catch (err) {
+      notifyError(err);
+    }
+  }
+
+  await datasourceStore.initDatasourceTables(datasourceStore.datasource.name);
+}
+
+async function onAddTable(tName: string) {
+  await transientDatasourceStore.loadTable(tName);
+  await transientDatasourceStore.loadVariables();
+  if (transientDatasourceStore.variables.length === 0) return;
+
+  const variables = [ ...transientDatasourceStore.variables ];
+
+  if (!datasourceStore.tables.map((tbl) => tbl.name).includes(tName)) {
+    const entityType = variables[0].entityType;
+    await datasourceStore.addTable(tName, entityType);
+  }
+  await datasourceStore.addOrUpdateVariables(tName, variables);
 }
 
 </script>

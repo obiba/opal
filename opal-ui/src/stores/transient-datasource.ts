@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { DatasourceDto, TableDto, VariableDto } from 'src/models/Magma';
+import { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
 import { DatasourceFactory } from 'src/components/models';
+import { FileDto } from 'src/models/Opal';
 
 const projectsStore = useProjectsStore();
 
@@ -16,6 +17,36 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
     datasource.value = {} as DatasourceDto;
     table.value = {} as TableDto;
     variables.value = [];
+  }
+
+  async function createFileDatasource(file: FileDto) {
+    if (file.name.endsWith('.xml')) {
+      const fileBaseName = file.name.split('.').slice(0, -1).join('.');
+      const factory = {
+        'Magma.StaticDatasourceFactoryDto.params': {
+          'views': [
+            {
+              name: fileBaseName,
+              from: [],
+              innerFrom: [],
+              'Magma.FileViewDto.view': {
+                filename: file.path,
+                type: 'SERIALIZED_XML'
+              }
+            } as ViewDto
+          ]
+        }
+      } as DatasourceFactory;
+      return createDatasource(factory, false);
+    } else {
+      const factory = {
+        'Magma.ExcelDatasourceFactoryDto.params': {
+          file: file.path,
+          readOnly: true
+        }
+      } as DatasourceFactory;
+      return createDatasource(factory, false);
+    }
   }
 
   async function createDatasource(factory: DatasourceFactory, merge: boolean) {
@@ -67,6 +98,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
     table,
     variables,
     reset,
+    createFileDatasource,
     createDatasource,
     deleteDatasource,
     loadTable,
