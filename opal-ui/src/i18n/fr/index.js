@@ -872,7 +872,6 @@ export default {
   project_description_hint: 'Description optionnelle du projet.',
   project_destination: 'Projet de destination',
   project_files_info: 'Chaque projet a un dossier. Un utilisateur ayant accès à un élément du projet peut également voir le contenu de ce dossier.',
-  project_filter_placeholder: 'Filtrer les projets...',
   project_permissions_info: 'Les permissions sont des autorisations accordées à des utilisateurs ou des groupes pour accéder à des éléments du projet. Les permissions définissent les opérations pouvant être effectuée. Les tables suivantes listes les permissions ayant été accordée à des utilisateurs ou des groupes.',
   project_settings: 'Paramètres du projet',
   project_tag_hint: 'Tapez une nouvelle étiquette et appuyez sur \'ENTER\'.',

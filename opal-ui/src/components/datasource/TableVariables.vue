@@ -12,7 +12,7 @@
       selection="multiple"
       v-model:selected="selected"
     >
-      <template v-slot:top>
+      <template v-slot:top-left>
         <div class="column">
           <div class="row q-gutter-sm">
             <q-btn
@@ -78,6 +78,19 @@
             </q-btn-dropdown>
           </div>
         </div>
+      </template>
+      <template v-slot:top-right>
+        <q-input
+          dense
+          clearable
+          debounce="400"
+          color="primary"
+          v-model="filter"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -152,6 +165,7 @@ const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
 const { locale } = useI18n({ useScope: 'global' });
 
+const filter = ref('');
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
@@ -209,8 +223,10 @@ const columns = computed(() => [
   },
 ]);
 
-const rows = computed(() => datasourceStore.variables);
-
+const rows = computed(() => {
+  const f = filter.value ? filter.value.toLowerCase() : '';
+  return datasourceStore.variables?.filter((v) => v.name.toLowerCase().includes(f));
+});
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 

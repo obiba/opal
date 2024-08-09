@@ -3,7 +3,7 @@
     <q-table
       ref="tableRef"
       flat
-      :rows="resourcesStore.resourceReferences"
+      :rows="rows"
       row-key="name"
       :columns="columns"
       :pagination="initialPagination"
@@ -26,6 +26,19 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn v-if="resourcesStore.perms.resources?.canDelete()" :disable="selected.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDelete"  class="on-right"></q-btn>
+      </template>
+      <template v-slot:top-right>
+        <q-input
+          dense
+          clearable
+          debounce="400"
+          color="primary"
+          v-model="filter"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -69,6 +82,7 @@ const router = useRouter();
 const route = useRoute();
 const resourcesStore = useResourcesStore();
 
+const filter = ref('');
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
@@ -82,6 +96,10 @@ const selectedProvider = ref<ResourceProviderDto>();
 const showAdd = ref(false);
 const showDelete = ref(false);
 
+const rows = computed(() => {
+  const f = filter.value ? filter.value.toLowerCase() : '';
+  return resourcesStore.resourceReferences?.filter((rsrc) => rsrc.name.toLowerCase().includes(f));
+});
 const pName = computed(() => route.params.id as string);
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'name' },

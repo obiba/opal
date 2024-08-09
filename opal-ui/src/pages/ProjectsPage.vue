@@ -49,7 +49,6 @@
             debounce="400"
             color="primary"
             v-model="filter"
-            :placeholder="$t('project_filter_placeholder')"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -161,7 +160,7 @@ const projects = computed(() => {
   if (tagsFilter.value.length === 0) {
     return projectsStore.projects;
   }
-  return projectsStore.projects.filter((p) => p.tags && p.tags.some((tg) => tagsFilter.value.includes(tg)));
+  return projectsStore.projects?.filter((p) => p.tags && p.tags.some((tg) => tagsFilter.value.includes(tg)));
 });
 
 const tags = computed(() => {

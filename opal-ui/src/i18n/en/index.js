@@ -872,7 +872,6 @@ export default {
   project_description_hint: 'Optional description of the project.',
   project_destination: 'Destination project',
   project_files_info: 'Each project has a folder. A user having read access to a project item can also see the content of its folder.',
-  project_filter_placeholder: 'Filter projects...',
   project_permissions_info: 'Permissions are granted to users or groups for an item in the project. They define what operations can be performed. The following tables list the permissions granted to a selected user or group in the context of the current project.',
   project_settings: 'Project Settings',
   project_tag_hint: 'Type a new tag and press \'ENTER\'.',
