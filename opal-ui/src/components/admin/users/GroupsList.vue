@@ -68,7 +68,7 @@ const selectedGroup = ref<GroupDto | null>(null);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showDelete = ref(false);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -86,7 +86,7 @@ const columns = [
     field: 'subjectCredentials',
     format: (val: string[]) => (val || []).filter((val) => !!val && val.length > 0),
   },
-];
+]);
 
 const initialPagination = ref({
   sortBy: 'name',

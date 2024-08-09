@@ -130,7 +130,7 @@ const showUpdate = ref(false);
 const showDelete = ref(false);
 const showView = ref(false);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -178,7 +178,7 @@ const columns = [
     field: 'rserver',
     sortable: true,
   },
-];
+]);
 
 function onFilter() {
   if (filter.value.length === 0) {

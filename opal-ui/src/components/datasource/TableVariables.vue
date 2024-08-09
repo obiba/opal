@@ -167,7 +167,7 @@ const showAddToView = ref(false);
 const showAnnotate = ref(false);
 const annotationOperation = ref('apply');
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -207,7 +207,7 @@ const columns = [
     align: 'left',
     field: 'attributes',
   },
-];
+]);
 
 const rows = computed(() => datasourceStore.variables);
 

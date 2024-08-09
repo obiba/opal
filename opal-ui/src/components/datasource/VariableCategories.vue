@@ -149,7 +149,7 @@ const showEdit = ref(false);
 const showAddRange = ref(false);
 const moveEnabled = ref(true);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -174,7 +174,7 @@ const columns = [
     field: 'isMissing',
     sortable: true,
   },
-];
+]);
 
 const rows = computed(() => datasourceStore.variable?.categories ? datasourceStore.variable.categories : []);
 

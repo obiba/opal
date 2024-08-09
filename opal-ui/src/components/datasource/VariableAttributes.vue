@@ -223,7 +223,7 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 
 const canUpdate = computed(() => datasourceStore.perms.variable?.canUpdate());
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'namespace',
     required: true,
@@ -247,7 +247,7 @@ const columns = [
     label: t('values'),
     field: (row: AttributesBundle) => row.attributes,
   },
-];
+]);
 
 const rows = computed(() => datasourceStore.variable?.attributes || []);
 

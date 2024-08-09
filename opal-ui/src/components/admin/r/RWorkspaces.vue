@@ -69,13 +69,13 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 
-const columns = [
+const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'name', sortable: true },
   { name: 'context', label: t('context'), align: 'left', field: 'context', sortable: true, classes: 'text-caption' },
   { name: 'user', label: t('user'), align: 'left', field: 'user', sortable: true },
   { name: 'lastAccessDate', label: t('last_access'), align: 'left', field: 'lastAccessDate', sortable: true, format: getDateLabel },
   { name: 'size', label: t('size'), align: 'left', field: 'size', sortable: true, format: getSizeLabel },
-];
+]);
 
 function updateRWorkspaces() {
   rStore.initWorkspaces();

@@ -115,10 +115,10 @@ const derivedVariables = ref<VariableDto[]>([]);
 
 const validDerivedVariables = computed(() => derivedVariables.value.filter((v) => v.name));
 
-const columns = [
+const columns = computed(() => [
   { name: 'name', align: 'left', label: t('name'), field: 'name' },
   { name: 'valueType', align: 'left', label: t('value_type'), field: 'valueType' },
-];
+]);
 
 watch(() => props.modelValue, (value) => {
   if (value) {

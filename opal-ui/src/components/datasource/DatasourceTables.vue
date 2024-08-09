@@ -175,7 +175,7 @@ const initialPagination = ref({
 const selected = ref([] as TableDto[]);
 const showDeleteTables = ref(false);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -220,7 +220,7 @@ const columns = [
     align: 'left',
     field: 'status',
   },
-];
+]);
 
 onMounted(() => {
   init();
