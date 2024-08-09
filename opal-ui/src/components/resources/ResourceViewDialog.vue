@@ -68,14 +68,14 @@
         <q-separator />
 
         <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          <q-spinner-dots v-if="processing" class="on-left"/>
+          <q-btn flat :label="$t('cancel')" color="secondary" :disable="processing" v-close-popup />
           <q-btn
             flat
             :label="$t('save')"
             color="primary"
             @click="onSaveView"
-            :disable="!projectDestination || !name"
-            v-close-popup
+            :disable="!projectDestination || !name || processing"
           />
         </q-card-actions>
       </q-card>
@@ -107,6 +107,7 @@ const datasourceStore = useDatasourceStore();
 
 const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
 const editMode = computed(() => props.view);
+const processing = ref(false);
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
@@ -146,6 +147,7 @@ onMounted(() => {
 });
 
 function onHide() {
+  processing.value = false;
   emit('update:modelValue', false);
 }
 
@@ -163,6 +165,8 @@ function onSaveView() {
 
   const newViewPage = `/project/${projectDestination.value}/table/${name.value}`;
 
+  processing.value = true;
+
   if (editMode.value) {
     // update existing
     const currentView = { ...props.view };
@@ -175,7 +179,8 @@ function onSaveView() {
       })
       .catch((error) => {
         notifyError(error);
-      });
+      })
+      .finally(onHide);
   } else {
     // update existing or add
     datasourceStore.getView(projectDestination.value, name.value)
@@ -188,13 +193,14 @@ function onSaveView() {
           })
           .catch((error) => {
             notifyError(error);
-          });
+          })
+          .finally(onHide);
       })
-      .catch((err) => {
+      .catch(() => {
         datasourceStore.addResourceView(projectDestination.value, name.value, resourceFullName.value, resView)
-          .then(() => router.push(newViewPage));
+          .then(() => router.push(newViewPage))
+          .finally(onHide);
       });
   }
-
 }
 </script>

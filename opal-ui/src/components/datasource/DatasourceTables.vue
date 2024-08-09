@@ -124,6 +124,8 @@
 
     <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
 
+    <restore-views-dialog v-model="showRestoreViews" />
+
     <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })" @confirm="onDeleteTables" />
   </div>
 </template>
@@ -141,6 +143,7 @@ import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
 import ImportDataDialog from 'src/components/datasource/import/ImportDataDialog.vue';
 import ExportDataDialog from 'src/components/datasource/export/ExportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
+import RestoreViewsDialog from 'src/components/datasource/RestoreViewsDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -158,6 +161,7 @@ const showCopy = ref(false);
 const showImport = ref(false);
 const importType = ref<'file' | 'server'>('file');
 const showExport = ref(false);
+const showRestoreViews = ref(false);
 const exportType = ref<'file' | 'server'>('file');
 
 const tableRef = ref();
@@ -287,5 +291,9 @@ function onShowExportFile() {
 
 function onShowCopy() {
   showCopy.value = true;
+}
+
+function onRestoreViews() {
+  showRestoreViews.value = true;
 }
 </script>
