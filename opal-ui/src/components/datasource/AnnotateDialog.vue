@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
       <q-card class="dialog-sm">
         <q-card-section>
-          <div class="text-h6">{{ $t('annotate') }}</div>
+          <div class="text-h6">{{ $t(isDeleteOperation ? 'delete_annotation' : 'apply_annotation') }}</div>
         </q-card-section>
 
         <q-separator />
@@ -26,6 +26,7 @@
             @update:model-value="onTaxonomyChange"
           />
           <div class="text-hint q-mb-md">{{  taxonomyHint }}</div>
+
           <q-select
             v-model="vocabularyName"
             :options="vocabulariesOptions"
@@ -37,85 +38,88 @@
             @update:model-value="onVocabularyChange"
           />
           <div class="text-hint q-mb-md">{{  vocabularyHint }}</div>
-          <div v-if="termsOptions.length > 0">
-            <q-select
-              v-model="termName"
-              :options="termsOptions"
-              :label="$t('term')"
-              dense
-              emit-value
-              map-options
-              class="q-mb-sm"
-            />
-            <div class="text-hint q-mb-md">{{  termHint }}</div>
-          </div>
-          <div v-else>
-            <q-tabs
-              v-model="tab"
-              dense
-              class="text-grey"
-              active-color="primary"
-              indicator-color="primary"
-              align="left"
-              narrow-indicator
-              no-caps
-            >
-              <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>
-            </q-tabs>
-            <q-separator />
-            <q-tab-panels v-model="tab">
-              <template v-for="loc in locales" :key="loc">
-                <q-tab-panel v-if="tab === loc" :name="loc">
-                  <q-input
-                    v-if="!previews[loc]"
-                    v-model="texts[loc]"
-                    :label="$t('text')"
-                    type="textarea"
-                    auto-grow
-                    dense/>
-                  <q-card v-if="previews[loc]" bordered flat>
-                    <q-card-section>
-                      <q-markdown :src="texts[loc]" no-heading-anchor-links />
-                    </q-card-section>
-                  </q-card>
-                  <div class=" q-mt-sm">
-                    <q-btn
-                      v-if="!previews[loc]"
-                      flat
-                      no-caps
-                      size="sm"
-                      :label="$t('preview')"
-                      color="secondary"
-                      class="q-pl-none q-pr-none"
-                      @click="previews[loc] = true"
-                    />
-                    <q-btn
-                      v-else
-                      flat
-                      no-caps
-                      size="sm"
-                      :label="$t('edit')"
-                      color="secondary"
-                      class="q-pl-none q-pr-none"
-                      @click="previews[loc] = false"
-                    />
-                    <q-btn
-                      flat
-                      no-caps
-                      size="sm"
-                      icon="help_outline"
-                      :label="$t('markdown_guide')"
-                      color="secondary"
-                      class="float-right q-pl-none q-pr-none"
-                      @click="onMarkdownGuide"
-                    />
 
-                  </div>
-                </q-tab-panel>
-              </template>
-            </q-tab-panels>
-            <div class="text-hint">
-              {{ $t('annotation_texts_hint') }}
+          <div v-if="!isDeleteOperation">
+            <div v-if="termsOptions.length > 0">
+              <q-select
+                v-model="termName"
+                :options="termsOptions"
+                :label="$t('term')"
+                dense
+                emit-value
+                map-options
+                class="q-mb-sm"
+              />
+              <div class="text-hint q-mb-md">{{  termHint }}</div>
+            </div>
+            <div v-else>
+              <q-tabs
+                v-model="tab"
+                dense
+                class="text-grey"
+                active-color="primary"
+                indicator-color="primary"
+                align="left"
+                narrow-indicator
+                no-caps
+              >
+                <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>
+              </q-tabs>
+              <q-separator />
+              <q-tab-panels v-model="tab">
+                <template v-for="loc in locales" :key="loc">
+                  <q-tab-panel v-if="tab === loc" :name="loc">
+                    <q-input
+                      v-if="!previews[loc]"
+                      v-model="texts[loc]"
+                      :label="$t('text')"
+                      type="textarea"
+                      auto-grow
+                      dense/>
+                    <q-card v-if="previews[loc]" bordered flat>
+                      <q-card-section>
+                        <q-markdown :src="texts[loc]" no-heading-anchor-links />
+                      </q-card-section>
+                    </q-card>
+                    <div class=" q-mt-sm">
+                      <q-btn
+                        v-if="!previews[loc]"
+                        flat
+                        no-caps
+                        size="sm"
+                        :label="$t('preview')"
+                        color="secondary"
+                        class="q-pl-none q-pr-none"
+                        @click="previews[loc] = true"
+                      />
+                      <q-btn
+                        v-else
+                        flat
+                        no-caps
+                        size="sm"
+                        :label="$t('edit')"
+                        color="secondary"
+                        class="q-pl-none q-pr-none"
+                        @click="previews[loc] = false"
+                      />
+                      <q-btn
+                        flat
+                        no-caps
+                        size="sm"
+                        icon="help_outline"
+                        :label="$t('markdown_guide')"
+                        color="secondary"
+                        class="float-right q-pl-none q-pr-none"
+                        @click="onMarkdownGuide"
+                      />
+
+                    </div>
+                  </q-tab-panel>
+                </template>
+              </q-tab-panels>
+              <div class="text-hint">
+                {{ $t('annotation_texts_hint') }}
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -126,9 +130,9 @@
           <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
           <q-btn
             flat
-            :label="$t('apply')"
+            :label="$t(isDeleteOperation ? 'delete' : 'apply')"
             color="primary"
-            @click="onApply"
+            @click="onSubmit"
             v-close-popup
           />
         </q-card-actions>
@@ -151,6 +155,7 @@ interface DialogProps {
   table: TableDto;
   variables: VariableDto[];
   annotation?: Annotation;
+  operation?: string;
 }
 
 const props = defineProps<DialogProps>();
@@ -169,6 +174,8 @@ const termName = ref<string>('');
 const texts = ref<{[key: string]: string | undefined}>({});
 const previews = ref<{[key: string]: boolean | undefined}>({});
 const tab = ref(NO_LOCALE);
+
+const isDeleteOperation = computed(() => props.operation === 'delete');
 
 const locales = computed(() => {
   const availableLocales = [...systemStore.generalConf.languages];
@@ -295,11 +302,16 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-async function onApply() {
+async function onSubmit() {
   if (props.annotation) {
+    // case a specific annotation is to be replaced
     await datasourceStore.deleteAnnotation(props.variables, props.annotation.taxonomy.name, props.annotation.vocabulary.name);
   }
-  await datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  if (isDeleteOperation.value) {
+    await datasourceStore.deleteAnnotation(props.variables, taxonomyName.value, vocabularyName.value);
+  } else {
+    await datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
+  }
   datasourceStore.loadTableVariables();
 }
 

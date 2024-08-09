@@ -84,7 +84,7 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 
-const columns = [
+const columns = computed(() => [
   { name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
   { name: 'profile', label: t('profile'), align: 'left', field: 'profile', sortable: true, classes: 'text-caption' },
   { name: 'cluster', label: t('r.cluster'), align: 'left', field: 'cluster', sortable: true, classes: 'text-caption' },
@@ -94,7 +94,7 @@ const columns = [
   { name: 'creationDate', label: t('started'), align: 'left', field: 'creationDate', sortable: true, format: getDateLabel },
   { name: 'lastAccessDate', label: t('last_access'), align: 'left', field: 'lastAccessDate', sortable: true, format: getDateLabel },
   { name: 'status', label: 'Status', align: 'left', field: 'status', sortable: true },
-];
+]);
 
 function getSessionColor(status: string) {
   return status === 'BUSY' ? 'warning' :  (status === 'WAITING' ? 'positive' : 'grey-6');

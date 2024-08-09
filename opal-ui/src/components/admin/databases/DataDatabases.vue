@@ -116,12 +116,12 @@ const showEdit = ref(false);
 const showDelete = ref(false);
 const selected = ref();
 
-const columns = [
+const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'name' },
   { name: 'hasDatasource', label: t('db.in_use'), align: 'left' },
   { name: 'url', label: 'URL', align: 'left' },
   { name: 'usage', label: t('usage'), align: 'left', field: 'usage' },
-];
+]);
 
 onMounted(() => {
   refresh();

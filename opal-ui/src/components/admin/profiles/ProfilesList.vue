@@ -79,7 +79,7 @@ const profiles = computed(() => profilesStore.profiles || []);
 const showDeletes = ref(false);
 const selectedProfiles = ref<SubjectProfileDto[]>([]);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'principal',
     required: true,
@@ -127,7 +127,7 @@ const columns = [
     field: 'lastUpdate',
     format: (val: string) => getDateLabel(val),
   },
-];
+]);
 
 const initialPagination = ref({
   sortBy: 'name',

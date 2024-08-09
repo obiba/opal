@@ -12,7 +12,7 @@
       selection="multiple"
       v-model:selected="selected"
     >
-      <template v-slot:top>
+      <template v-slot:top-left>
         <div class="column">
           <div class="row q-gutter-sm">
             <q-btn
@@ -53,18 +53,44 @@
               size="sm"
               @click="onShowAddToView"
             />
-            <q-btn
-              v-if="selected.length > 0"
+
+            <q-btn-dropdown
+              v-if="datasourceStore.perms.table?.canUpdate()"
+              v-show="selected.length > 0"
               :label="$t('annotate')"
               icon="label"
               no-caps
               dense
               flat
-              size="sm"
-              @click="onShowAnnotate"
-            />
+              size="sm">
+              <q-list>
+                <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
+                  <q-item-section>
+                    <q-item-label>{{ $t('apply_annotation') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup @click.prevent="onShowDeleteAnnotation">
+                  <q-item-section>
+                    <q-item-label>{{ $t('delete_annotation') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
           </div>
         </div>
+      </template>
+      <template v-slot:top-right>
+        <q-input
+          dense
+          clearable
+          debounce="400"
+          color="primary"
+          v-model="filter"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -111,7 +137,7 @@
     </q-table>
 
     <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
-    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" />
+    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" :operation="annotationOperation" />
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
@@ -139,6 +165,7 @@ const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
 const { locale } = useI18n({ useScope: 'global' });
 
+const filter = ref('');
 const tableRef = ref();
 const loading = ref(false);
 const initialPagination = ref({
@@ -152,8 +179,9 @@ const showDeleteVariables = ref(false);
 const showEditVariable = ref(false);
 const showAddToView = ref(false);
 const showAnnotate = ref(false);
+const annotationOperation = ref('apply');
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -193,10 +221,12 @@ const columns = [
     align: 'left',
     field: 'attributes',
   },
-];
+]);
 
-const rows = computed(() => datasourceStore.variables);
-
+const rows = computed(() => {
+  const f = filter.value ? filter.value.toLowerCase() : '';
+  return datasourceStore.variables?.filter((v) => v.name.toLowerCase().includes(f));
+});
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 
@@ -269,7 +299,13 @@ function onShowAddToView() {
   showAddToView.value = true;
 }
 
-function onShowAnnotate() {
+function onShowApplyAnnotation() {
+  annotationOperation.value = 'apply';
+  showAnnotate.value = true;
+}
+
+function onShowDeleteAnnotation() {
+  annotationOperation.value = 'delete';
   showAnnotate.value = true;
 }
 </script>

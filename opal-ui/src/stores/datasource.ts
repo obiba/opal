@@ -126,6 +126,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTables() {
     tables.value = [];
+    table.value = {} as TableDto;
+    view.value = {} as ViewDto;
+    variables.value = [];
+    variable.value = {} as VariableDto;
     delete perms.value.tables;
     return api
       .get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } } )
@@ -186,6 +190,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
+  async function getTableVariables(tName: string) {
+    return api
+      .get(
+        `/datasource/${datasource.value.name}/table/${tName}/variables`
+      )
+      .then((response) => {
+        return response.data;
+      });
+  }
+
   async function loadTableVariable(name: string) {
     variable.value = {} as VariableDto;
     delete perms.value.variable;
@@ -214,7 +228,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         name: name.trim(),
         entityType: entityType ? entityType.trim() : 'Participant'
       }
-    )
+    );
   }
 
   async function addVariablesView(project: string, name: string, from: string[], variables: VariableDto[]) {
@@ -334,6 +348,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function getAllTables(entityType: string | undefined): Promise<TableDto[]> {
     return api.get('/datasources/tables', { params: { entityType } }).then((response) => response.data as TableDto[]);
+  }
+
+  function addOrUpdateVariables(tName: string, localVars: VariableDto[]) {
+    const link = `/datasource/${datasource.value.name}/table/${tName}`;
+    return api.post(`${link}/variables`, localVars);
   }
 
   function addVariable(localVar: VariableDto) {
@@ -464,8 +483,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     initDatasourceTableVariable,
     loadTable,
     loadTableVariables,
+    getTableVariables,
     isNewTableNameValid,
     addTable,
+    addOrUpdateVariables,
     addVariablesView,
     addResourceView,
     updateTable,

@@ -148,7 +148,7 @@ const openIdDefinition = computed(
   () => `<a href="https://en.wikipedia.org/wiki/OpenID_Connect" target="_blank">${t('openid_connect')}</a>`
 );
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -194,7 +194,7 @@ const columns = [
     field: 'enabled',
     format: (val: string) => val,
   },
-];
+]);
 
 const initialPagination = ref({
   sortBy: 'name',

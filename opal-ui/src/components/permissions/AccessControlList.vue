@@ -157,11 +157,11 @@ const suggestions = ref<string[]>([]);
 
 const showSuggestions = ref(false);
 
-const columns = [
+const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'subject' , style: 'width: 30%'},
   { name: 'type', label: t('type'), align: 'left', field: 'subject' },
   { name: 'permissions', label: t('permissions'), align: 'left', field: 'actions' },
-];
+]);
 
 onMounted(async () => {
   authzStore.initAcls(props.resource);

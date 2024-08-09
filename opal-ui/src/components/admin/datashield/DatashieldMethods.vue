@@ -149,7 +149,7 @@ function onFilter () {
   });
 }
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -182,7 +182,7 @@ const columns = [
     label: t('version'),
     align: 'left',
   },
-];
+]);
 
 function isEditable(row: DataShieldMethodDto) {
   if (getType(row) === 'r_script') return true;

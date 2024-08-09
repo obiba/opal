@@ -122,7 +122,7 @@ function onFilter() {
   });
 }
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -139,7 +139,7 @@ const columns = [
     field: 'value',
     sortable: true,
   },
-];
+]);
 
 function onOverRow(row: DataShieldROptionDto) {
   toolsVisible.value[row.name] = true;

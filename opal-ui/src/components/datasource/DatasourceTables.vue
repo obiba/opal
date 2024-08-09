@@ -3,7 +3,7 @@
     <q-table
       ref="tableRef"
       flat
-      :rows="datasourceStore.tables"
+      :rows="rows"
       :columns="columns"
       row-key="name"
       :pagination="initialPagination"
@@ -12,7 +12,7 @@
       selection="multiple"
       v-model:selected="selected"
     >
-      <template v-slot:top>
+      <template v-slot:top-left>
         <div class="row q-gutter-sm">
           <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :title="$t('add')" size="sm"
            >
@@ -95,6 +95,19 @@
           <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDeleteTables"></q-btn>
         </div>
       </template>
+      <template v-slot:top-right>
+        <q-input
+          dense
+          clearable
+          debounce="400"
+          color="primary"
+          v-model="filter"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <span class="text-primary">{{ props.value }}</span>
@@ -154,6 +167,7 @@ const datasourceStore = useDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
+const filter = ref('');
 const showAddTable = ref(false);
 const showAddView = ref(false);
 const showAddTables = ref(false);
@@ -175,7 +189,7 @@ const initialPagination = ref({
 const selected = ref([] as TableDto[]);
 const showDeleteTables = ref(false);
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -220,12 +234,16 @@ const columns = [
     align: 'left',
     field: 'status',
   },
-];
+]);
 
 onMounted(() => {
   init();
 });
 
+const rows = computed(() => {
+  const f = filter.value ? filter.value.toLowerCase() : '';
+  return datasourceStore.tables?.filter((t) => t.name.toLowerCase().includes(f));
+});
 const dsName = computed(() => route.params.id as string);
 const removableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
 const readableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);

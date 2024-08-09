@@ -131,7 +131,7 @@ const rStore = useRStore();
 
 const tab = ref<string>('servers');
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -175,7 +175,7 @@ const columns = [
     align: 'left',
     field: 'running',
   },
-];
+]);
 
 function onClusterLogsDownload() {
   window.open(`${baseUrl}/service/r/cluster/${props.cluster.name}/_log`);

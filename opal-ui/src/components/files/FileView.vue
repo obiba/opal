@@ -311,7 +311,7 @@ const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -339,7 +339,7 @@ const columns = [
     format: (val: number) => getDateLabel(val),
     sortable: true,
   },
-];
+]);
 
 const crumbs = computed(() => {
   if (props.file.path === undefined) {

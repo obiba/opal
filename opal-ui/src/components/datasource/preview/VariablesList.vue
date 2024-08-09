@@ -67,7 +67,7 @@ watch(() => props.variables, (value) => {
   rows.value = value ? value : [];
 });
 
-const columns = [
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -100,7 +100,7 @@ const columns = [
     align: 'left',
     field: 'categories',
   },
-];
+]);
 
 function getCategoryNames(categories: CategoryDto[]) {
   return categories ? categories.map((c) => c.name).join(', ') : undefined;
