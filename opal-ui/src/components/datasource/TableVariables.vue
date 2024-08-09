@@ -53,16 +53,29 @@
               size="sm"
               @click="onShowAddToView"
             />
-            <q-btn
-              v-if="selected.length > 0"
+
+            <q-btn-dropdown
+              v-if="datasourceStore.perms.table?.canUpdate()"
+              v-show="selected.length > 0"
               :label="$t('annotate')"
               icon="label"
               no-caps
               dense
               flat
-              size="sm"
-              @click="onShowAnnotate"
-            />
+              size="sm">
+              <q-list>
+                <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
+                  <q-item-section>
+                    <q-item-label>{{ $t('apply_annotation') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup @click.prevent="onShowDeleteAnnotation">
+                  <q-item-section>
+                    <q-item-label>{{ $t('delete_annotation') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
           </div>
         </div>
       </template>
@@ -111,7 +124,7 @@
     </q-table>
 
     <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
-    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" />
+    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" :operation="annotationOperation" />
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
   </div>
@@ -152,6 +165,7 @@ const showDeleteVariables = ref(false);
 const showEditVariable = ref(false);
 const showAddToView = ref(false);
 const showAnnotate = ref(false);
+const annotationOperation = ref('apply');
 
 const columns = [
   {
@@ -269,7 +283,13 @@ function onShowAddToView() {
   showAddToView.value = true;
 }
 
-function onShowAnnotate() {
+function onShowApplyAnnotation() {
+  annotationOperation.value = 'apply';
+  showAnnotate.value = true;
+}
+
+function onShowDeleteAnnotation() {
+  annotationOperation.value = 'delete';
   showAnnotate.value = true;
 }
 </script>
