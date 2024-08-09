@@ -21,6 +21,7 @@
       <q-space />
       <q-btn
         outline
+        no-caps
         icon="navigate_before"
         size="sm"
         :label="previousTable?.name"
@@ -30,6 +31,7 @@
       />
       <q-btn
         outline
+        no-caps
         icon-right="navigate_next"
         size="sm"
         :label="nextTable?.name"
@@ -142,6 +144,7 @@
       <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view"/>
       <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
         @update:table="onTableUpdate" @update:view="onViewUpdate"/>
+      <resource-view-dialog v-if="isResourceView" v-model="showEditResourceView" :view="datasourceStore.view" @update="onViewUpdate"/>
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
     </q-page>
   </div>
@@ -157,6 +160,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
+import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -171,6 +175,7 @@ const showDelete = ref(false);
 const showCopyData = ref(false);
 const showCopyView = ref(false);
 const showEdit = ref(false);
+const showEditResourceView = ref(false);
 const loading = ref(false);
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
@@ -263,7 +268,11 @@ function onShowCopyView() {
 }
 
 function onShowEdit() {
-  datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+  if (isResourceView.value) {
+    showEditResourceView.value = true;
+  } else {
+    datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+  }
 }
 
 function onShowDelete() {

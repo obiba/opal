@@ -18,6 +18,7 @@
       <q-space />
       <q-btn
         outline
+        no-caps
         icon="navigate_before"
         size="sm"
         :label="previousVariable?.name"
@@ -27,6 +28,7 @@
       />
       <q-btn
         outline
+        no-caps
         icon-right="navigate_next"
         size="sm"
         :label="nextVariable?.name"
