@@ -18,6 +18,7 @@
       <q-space />
       <q-btn
         outline
+        no-caps
         icon="navigate_before"
         size="sm"
         :label="previousVariable?.name"
@@ -27,6 +28,7 @@
       />
       <q-btn
         outline
+        no-caps
         icon-right="navigate_next"
         size="sm"
         :label="nextVariable?.name"
@@ -82,7 +84,7 @@
         narrow-indicator
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="script" :label="$t('script')" v-if="datasourceStore.table.viewType"/>
+        <q-tab name="script" :label="$t('script')" v-if="withScript"/>
         <q-tab name="summary" :label="$t('summary')" />
         <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
         <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.variablePermissions?.canRead()"/>
@@ -121,7 +123,7 @@
           </div>
         </q-tab-panel>
 
-        <q-tab-panel name="script" v-if="datasourceStore.table.viewType">
+        <q-tab-panel name="script" v-if="withScript">
           <variable-script :variable="datasourceStore.variable" />
         </q-tab-panel>
 
@@ -179,6 +181,7 @@ const bundles = computed(() => datasourceStore.variableAttributesBundles || []);
 
 const labelBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'label'));
 const descriptionBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'description'));
+const withScript = computed(() => datasourceStore.table.viewType === 'View');
 
 const previousVariable = computed(() => {
   const idx = datasourceStore.variables.findIndex((v) => v.name === vName.value);

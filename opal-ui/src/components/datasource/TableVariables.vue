@@ -29,7 +29,7 @@
               :title="$t('refresh')"
               outline
               size="sm"
-              @click="init"
+              @click="onRefresh"
             />
             <q-btn
               v-if="datasourceStore.perms.table?.canUpdate()"
@@ -213,14 +213,21 @@ function init() {
   selected.value = [];
   datasourceStore
     .initDatasourceTableVariables(dsName.value, tName.value)
-    .then(() => {
-      loading.value = false;
-    })
     .catch((err) => {
-      loading.value = false;
       notifyError(err);
+    })
+    .finally(() => {
+      loading.value = false;
     });
   taxonomiesStore.init();
+}
+
+function onRefresh() {
+  loading.value = true;
+  datasourceStore.loadTableVariables()
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function getCategoryNames(categories: CategoryDto[]) {

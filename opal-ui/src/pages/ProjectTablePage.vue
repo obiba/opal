@@ -21,6 +21,7 @@
       <q-space />
       <q-btn
         outline
+        no-caps
         icon="navigate_before"
         size="sm"
         :label="previousTable?.name"
@@ -30,6 +31,7 @@
       />
       <q-btn
         outline
+        no-caps
         icon-right="navigate_next"
         size="sm"
         :label="nextTable?.name"
@@ -74,6 +76,15 @@
 
         <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="secondary" icon="edit" size="sm" @click="onShowEdit" class="on-right"></q-btn>
         <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
+        <q-btn v-if="isView && datasourceStore.perms.table?.canUpdate()"
+          no-caps
+          dense
+          flat
+          :label="$t('reconnect_view')"
+          icon="settings_ethernet"
+          size="sm"
+          @click="onReconnect"
+          class="on-right" />
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
@@ -90,44 +101,50 @@
         </div>
       </div>
 
-      <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-        narrow-indicator
-      >
-        <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
-        <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
-      </q-tabs>
+      <div v-if="loading">
+        <q-spinner-dots size="lg" class="q-mt-md" />
+      </div>
+      <div v-else>
+        <q-tabs
+          v-model="tab"
+          dense
+          class="text-grey"
+          active-color="primary"
+          indicator-color="primary"
+          align="justify"
+          narrow-indicator
+        >
+          <q-tab name="dictionary" :label="$t('dictionary')" />
+          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
+          <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
+        </q-tabs>
 
-      <q-separator />
+        <q-separator />
 
-      <q-tab-panels v-model="tab">
-        <q-tab-panel name="dictionary">
-          <table-variables />
-        </q-tab-panel>
+        <q-tab-panels v-model="tab">
+          <q-tab-panel name="dictionary">
+            <table-variables />
+          </q-tab-panel>
 
-        <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-          <table-values />
-        </q-tab-panel>
+          <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
+            <table-values />
+          </q-tab-panel>
 
-        <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
-          <div class="text-h6">{{ $t('permissions') }}</div>
-          <access-control-list
-            :resource="`/project/${dsName}/permissions/table/${tName}`"
-            :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
-          />
-        </q-tab-panel>
-      </q-tab-panels>
+          <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
+            <div class="text-h6">{{ $t('permissions') }}</div>
+            <access-control-list
+              :resource="`/project/${dsName}/permissions/table/${tName}`"
+              :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
 
       <copy-tables-dialog v-model="showCopyData" :tables="[datasourceStore.table]"/>
       <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view"/>
       <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
         @update:table="onTableUpdate" @update:view="onViewUpdate"/>
+      <resource-view-dialog v-if="isResourceView" v-model="showEditResourceView" :view="datasourceStore.view" @update="onViewUpdate"/>
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
     </q-page>
   </div>
@@ -143,6 +160,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
+import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -157,6 +175,12 @@ const showDelete = ref(false);
 const showCopyData = ref(false);
 const showCopyView = ref(false);
 const showEdit = ref(false);
+const showEditResourceView = ref(false);
+const loading = ref(false);
+
+const isView = computed(() => datasourceStore.table.viewType !== undefined);
+const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
+const isResourceView = computed(() => datasourceStore.table.viewType === 'ResourceView');
 
 const previousTable = computed(() => {
   const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);
@@ -185,20 +209,20 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     },
     {
       field: 'from',
-      label: datasourceStore.view.viewType === 'View' ? 'table_references' : 'resource_ref.label',
+      label: isTablesView.value ? 'table_references' : 'resource_ref.label',
       links: (val) => (val ? datasourceStore.view.from?.map((f) => {
         return {
           label: f,
-          to: `/project/${f.split('.')[0]}/${datasourceStore.view.viewType === 'View' ? 'table' : 'resource'}/${f.split('.')[1]}`
+          to: `/project/${f.split('.')[0]}/${isTablesView.value ? 'table' : 'resource'}/${f.split('.')[1]}`
         };
       }) : []),
-      visible: (val) => val.viewType !== undefined,
+      visible: () => isView.value,
     },
     {
       field: 'idColumn',
       label: 'resource_ref.id_column',
       format: () => datasourceStore.view['Magma.ResourceViewDto.view']?.idColumn || '',
-      visible: (val) => val.viewType === 'ResourceView',
+      visible: () => isResourceView.value,
     }
   ];
 });
@@ -218,7 +242,6 @@ const items2: FieldItem<TableDto>[] = [
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
-const isView = computed(() => datasourceStore.table.viewType !== undefined);
 
 watch([dsName, tName], () => {
   init();
@@ -245,7 +268,11 @@ function onShowCopyView() {
 }
 
 function onShowEdit() {
-  datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+  if (isResourceView.value) {
+    showEditResourceView.value = true;
+  } else {
+    datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+  }
 }
 
 function onShowDelete() {
@@ -266,5 +293,13 @@ function onViewUpdate(updated: ViewDto) {
   } else {
     router.push(`/project/${dsName.value}/table/${updated.name}`);
   }
+}
+
+function onReconnect() {
+  loading.value = true;
+  datasourceStore.reconnectView(dsName.value, tName.value)
+    .finally(() => {
+      datasourceStore.loadTable(tName.value).finally(() => loading.value = false);
+    });
 }
 </script>

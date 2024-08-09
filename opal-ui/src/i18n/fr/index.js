@@ -886,6 +886,7 @@ export default {
   r_service: 'Service R',
   range: 'Plage',
   realm: 'Domaine',
+  reconnect_view: 'Reconnecter la vue',
   records: 'Enregistrements',
   referenced_entity_type_hint: 'Quand les valeurs sont des identifiants, la variable est une référence à une autre entité.',
   referenced_entity_type: "Type d'entité référencée",
@@ -1034,5 +1035,6 @@ export default {
     all_columns_hint: 'Quand sélectionné, toutes les colonnes observées (sauf la colonne des identifiants) seront décrites comme des variables quand la connexion avec la ressource sera établie. Cela signifie que quand une nouvelle colonne apparait dans la resource, une variable correspondante sera automatiquement ajoutée.',
     r_server_profile: 'Profile du serveur R',
     r_server_profile_hint: 'Nom (optionnel) du serveur R à utiliser pour établir la connexion avec la ressource. Si non spécifié, le profile sera deviné à partir du package R associé à la ressource.',
+    from_hint: 'Le nom complet de la ressource à laquelle se connecter et à représenter sous forme de tableau.'
   }
 };

@@ -886,6 +886,7 @@ export default {
   r_service: 'R service',
   range: 'Range',
   realm: 'Realm',
+  reconnect_view: 'Reconnect view',
   records: 'Records',
   referenced_entity_type_hint: 'When the value is an identifier, its entity type can be specified.',
   referenced_entity_type: 'Referenced entity type',
@@ -1034,5 +1035,6 @@ export default {
     all_columns_hint: 'When checked, all the observed resource\'s columns (except the identifier\'s column) will be mapped to a variable when the connection with the resource is established. This means that when a new column appears in the resource, a corresponding variable will be automatically added.',
     r_server_profile: 'R server profile',
     r_server_profile_hint: 'Optional R server profile name to be used for establishing the connection with the resource. If not specified, the profile will be guessed based on the R package associated to the resource.',
+    from_hint: 'The full name of the resource to be connected and coerced to its tabular representation.'
   }
 };

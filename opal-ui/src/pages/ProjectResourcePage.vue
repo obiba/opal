@@ -11,6 +11,7 @@
       <q-space />
       <q-btn
         outline
+        no-caps
         icon="navigate_before"
         size="sm"
         :label="previousReference?.name"
@@ -20,6 +21,7 @@
       />
       <q-btn
         outline
+        no-caps
         icon-right="navigate_next"
         size="sm"
         :label="nextReference?.name"
@@ -108,7 +110,7 @@
         </q-tab-panel>
       </q-tab-panels>
 
-      <add-resource-view-dialog v-if="resourceReference" v-model="showAddView" :resource="resourceReference" />
+      <resource-view-dialog v-if="resourceReference" v-model="showAddView" :resource="resourceReference" />
       <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="selected" @saved="onSaved" />
       <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
     </q-page>
@@ -122,7 +124,7 @@ import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import AddResourceViewDialog from 'src/components/resources/AddResourceViewDialog.vue';
+import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const route = useRoute();

@@ -2,13 +2,14 @@
   <q-dialog v-model="showDialog" @hide="onHide">
       <q-card class="dialog-sm">
         <q-card-section>
-          <div class="text-h6">{{ $t('add_view') }}</div>
+          <div class="text-h6">{{ editMode ? $t('edit_view') : $t('add_view') }}</div>
         </q-card-section>
 
         <q-separator />
 
         <q-card-section>
           <q-select
+            v-show="!editMode"
             v-model="projectDestination"
             :options="projectNames"
             :label="$t('project_destination')"
@@ -20,6 +21,15 @@
             type="text"
             :label="$t('view_name')"
             :hint="$t('resource_ref.view_destination_hint')"
+            class="q-mb-md"
+          />
+          <q-input
+            v-show="editMode"
+            v-model="resourceFullName"
+            dense
+            type="text"
+            :label="$t('resource')"
+            :hint="$t('resource_ref.from_hint')"
             class="q-mb-md"
           />
           <q-input
@@ -74,7 +84,7 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'AddResourceViewDialog',
+  name: 'ResourceViewDialog',
 });
 </script>
 <script setup lang="ts">
@@ -84,7 +94,8 @@ import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
-  resource: ResourceReferenceDto;
+  resource?: ResourceReferenceDto;
+  view?: ViewDto;
 }
 
 const props = defineProps<DialogProps>();
@@ -95,10 +106,12 @@ const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
 const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const editMode = computed(() => props.view);
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
 const name = ref('');
+const resourceFullName = ref('');
 const id = ref('');
 const entityType = ref('Participant');
 const allColumns = ref(true);
@@ -106,12 +119,24 @@ const profile = ref('');
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    projectDestination.value = props.resource.project as string;
-    name.value = props.resource.name;
+    projectDestination.value = projectsStore.project.name || datasourceStore.datasource.name;
     id.value = '';
     entityType.value = 'Participant';
     allColumns.value = true;
     profile.value = '';
+    if (props.resource) {
+      name.value = props.resource.name;
+      resourceFullName.value = `${props.resource.project}.${props.resource.name}`;
+    }
+    if (props.view) {
+      name.value = props.view.name || '';
+      resourceFullName.value = props.view.from[0];
+      const resView = props.view['Magma.ResourceViewDto.view'] as ResourceViewDto;
+      id.value = resView.idColumn || '';
+      entityType.value = resView.entityType || 'Participant';
+      allColumns.value = resView.allColumns || true;
+      profile.value = resView.profile || '';
+    }
   }
   showDialog.value = value;
 });
@@ -129,8 +154,6 @@ function onSaveView() {
     return;
   }
 
-  const from = `${props.resource.project}.${props.resource.name}`;
-
   const resView = {
       entityType: entityType.value || 'Participant',
       idColumn: id.value,
@@ -140,23 +163,38 @@ function onSaveView() {
 
   const newViewPage = `/project/${projectDestination.value}/table/${name.value}`;
 
-
-  datasourceStore.getView(projectDestination.value, name.value)
-    .then((view: ViewDto) => {
-      view.from = [from];
-      view['Magma.ResourceViewDto.view'] = resView;
-      datasourceStore.updateView(projectDestination.value, name.value, view, 'Updated from resource')
-        .then(() => {
-          router.push(newViewPage);
-        })
-        .catch((error) => {
-          notifyError(error);
-        });
-    })
-    .catch((err) => {
-      datasourceStore.addResourceView(projectDestination.value, name.value, from, resView)
-        .then(() => router.push(newViewPage));
-    });
+  if (editMode.value) {
+    // update existing
+    const currentView = { ...props.view };
+    currentView.name = name.value;
+    currentView.from = [resourceFullName.value];
+    currentView['Magma.ResourceViewDto.view'] = resView;
+    datasourceStore.updateView(projectDestination.value, props.view?.name || name.value, currentView, 'Updated from resource view')
+      .then(() => {
+        router.push(newViewPage);
+      })
+      .catch((error) => {
+        notifyError(error);
+      });
+  } else {
+    // update existing or add
+    datasourceStore.getView(projectDestination.value, name.value)
+      .then((view: ViewDto) => {
+        view.from = [resourceFullName.value];
+        view['Magma.ResourceViewDto.view'] = resView;
+        datasourceStore.updateView(projectDestination.value, name.value, view, 'Updated from resource')
+          .then(() => {
+            router.push(newViewPage);
+          })
+          .catch((error) => {
+            notifyError(error);
+          });
+      })
+      .catch((err) => {
+        datasourceStore.addResourceView(projectDestination.value, name.value, resourceFullName.value, resView)
+          .then(() => router.push(newViewPage));
+      });
+  }
 
 }
 </script>
