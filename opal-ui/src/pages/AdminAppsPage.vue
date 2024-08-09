@@ -4,7 +4,6 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
         <q-breadcrumbs-el :label="$t('apps.title')" />
       </q-breadcrumbs>
     </q-toolbar>

@@ -22,7 +22,7 @@ export default {
     host_hint: 'URL to connect with the Rock server, required.',
     unregister_confirm: 'Please confirm that you want to unregister the application \'{app}\'. Some system functionalities may be degraded.',
     remove_config_confirm: 'Please confirm that you want to remove the discovery of the Rock R server located at \'{host}\'. Note that this will not affect any corresponding app that would have been already registered.',
-    add_service: 'Add Service Discovery',
+    add_service: 'Add app discovery',
     edit_service: 'Edit Service Discovery',
     manager_user: 'Manager and User',
     credential_hints: {

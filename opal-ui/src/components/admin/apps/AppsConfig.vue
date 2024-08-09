@@ -9,8 +9,8 @@
       />
 
     <q-card-section class="q-px-none q-gutter-sm row items-center">
-      <q-btn size="sm" icon="edit" color="primary" :label="$t('edit')" @click="onEditToken"></q-btn>
-      <q-btn size="sm" icon="delete" color="negative" :label="$t('clear')" @click="onClearToken"></q-btn>
+      <q-btn size="sm" icon="edit" color="primary" :title="$t('edit')" @click="onEditToken"></q-btn>
+      <q-btn size="sm" icon="delete" color="negative" outline :title="$t('delete')" @click="onClearToken"></q-btn>
 
       <span v-if="config.token">
         <code >{{ config.token }}</code>
@@ -46,7 +46,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn size="sm" icon="add" color="primary" :label="$t('add')" @click="onAdd"></q-btn>
+      <q-btn size="sm" icon="add" color="primary" :title="$t('add')" @click="onAdd"></q-btn>
     </template>
     <template v-slot:body-cell-host="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">

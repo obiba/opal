@@ -22,8 +22,8 @@ export default {
     host_hint: 'URL pour se connecter au serveur Rock, requis.',
     unregister_confirm: 'Veuillez confirmer que vous souhaitez désenregistrer l\'application \'{app}\'. Certaines fonctionnalités du système peuvent être dégradées.',
     remove_config_confirm: 'Veuillez confirmer que vous souhaitez supprimer la découverte du serveur R Rock situé à \'{host}\'. Notez que cela n\'affectera pas les applications correspondantes qui auraient déjà été enregistrées.',
-    add_service: 'Ajouter une Découverte de Service',
-    edit_service: 'Modifier la Découverte de Service',
+    add_service: 'Ajouter une app à découvrir',
+    edit_service: 'Modifier l\'app à découvrir',
     manager_user: 'Gestionnaire et Utilisateur',
     credential_hints: {
       default: 'Les identifiants Rock sont les identifiants par défaut, tels que définis dans le fichier de configuration principal d\'Opal.',
