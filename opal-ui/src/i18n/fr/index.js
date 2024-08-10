@@ -935,6 +935,7 @@ export default {
   skewness: 'Skewness',
   source_code: 'Code source',
   sql: 'SQL',
+  sql_info: 'Des requètes SQL peuvent être exécutées sur une ou plusieurs tables du projet. La permission de voir les valeurs des tables considérées est requise. Voir la documentation de l\'API SQL pour une description de la syntaxe et des fonctions.',
   start_time: 'Début',
   start: 'Démarrer',
   started: 'Début',

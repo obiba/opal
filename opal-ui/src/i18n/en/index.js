@@ -935,6 +935,7 @@ export default {
   skewness: 'Skewness',
   source_code: 'Source code',
   sql: 'SQL',
+  sql_info: 'SQL queries can be executed on one or more tables of the project. Permission to access the values of the considered tables is required. See SQL API documentation for a description of the SQL syntax and functions.',
   start_time: 'Start time',
   start: 'Start',
   started: 'Started',

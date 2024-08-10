@@ -85,6 +85,7 @@ declare global {
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
   const useSlots: typeof import('vue')['useSlots']
+  const useSqlStore: typeof import('./stores/sql')['useSqlStore']
   const useSystemStore: typeof import('./stores/system')['useSystemStore']
   const useTaxonomiesStore: typeof import('./stores/taxonomies')['useTaxonomiesStore']
   const useTokensStore: typeof import('./stores/tokens')['useTokensStore']
@@ -186,6 +187,7 @@ declare module 'vue' {
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
+    readonly useSqlStore: UnwrapRef<typeof import('./stores/sql')['useSqlStore']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
     readonly useTaxonomiesStore: UnwrapRef<typeof import('./stores/taxonomies')['useTaxonomiesStore']>
     readonly useTokensStore: UnwrapRef<typeof import('./stores/tokens')['useTokensStore']>
@@ -279,6 +281,7 @@ declare module '@vue/runtime-core' {
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
+    readonly useSqlStore: UnwrapRef<typeof import('./stores/sql')['useSqlStore']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
     readonly useTaxonomiesStore: UnwrapRef<typeof import('./stores/taxonomies')['useTaxonomiesStore']>
     readonly useTokensStore: UnwrapRef<typeof import('./stores/tokens')['useTokensStore']>

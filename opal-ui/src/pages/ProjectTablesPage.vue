@@ -34,7 +34,7 @@
         </q-tab-panel>
 
         <q-tab-panel name="sql">
-          <div class="text-h6">{{ $t('sql') }}</div>
+          <sql-panel />
         </q-tab-panel>
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.datasourcePermissions?.canRead()">
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
+import SqlPanel from 'src/components/datasource/SqlPanel.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const route = useRoute();
