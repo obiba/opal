@@ -90,6 +90,7 @@ export interface Annotation extends AttributesBundle {
 export interface SqlCommand {
   query: string;
   datasource: string;
+  timestamp: number;
   delay: number;
 }
 

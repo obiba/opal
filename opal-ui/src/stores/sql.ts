@@ -8,12 +8,13 @@ export const useSqlStore = defineStore('sql', () => {
   const history = ref<SqlCommand[]>([]);
 
   async function execute(statement: string): Promise<SqlResults> {
+    const currentTimeMillis = Date.now();
     const command = {
       query: statement,
       datasource: datasourceStore.datasource.name,
+      timestamp: currentTimeMillis,
       delay: 0,
     } as SqlCommand;
-    const currentTimeMillis = Date.now();
     return api.post(`/datasource/${command.datasource}/_sql`, command.query, {
         headers: {
           'Content-Type': 'text/plain',

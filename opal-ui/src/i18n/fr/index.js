@@ -1020,6 +1020,8 @@ export default {
   vocabulary: 'Vocabulaire',
   waiting: 'En attente',
   yes: 'Oui',
+  query: 'Requête',
+  history: 'Historique',
   resource_ref: {
     label: 'Ressource référencée',
     provider: 'Fournisseur',
