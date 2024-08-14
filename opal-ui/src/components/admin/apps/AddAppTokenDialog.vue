@@ -50,7 +50,6 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
-const { t } = useI18n();
 const showDialog = ref(props.modelValue);
 const model = ref('');
 

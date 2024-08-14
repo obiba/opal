@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.vcf;
 
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Plugins;
 
 import jakarta.ws.rs.*;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * A REST resource to access to a {@link org.obiba.opal.spi.vcf.VCFStore}.
  */
-public interface VCFStoreResource {
+public interface VCFStoreResource extends BaseResource {
 
   /**
    * The store name for the VCF store service.

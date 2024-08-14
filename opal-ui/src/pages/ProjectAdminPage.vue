@@ -201,7 +201,6 @@ import AccessControlList from 'src/components/permissions/AccessControlList.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { AclAction } from 'src/models/Opal';
 import { ProjectDatasourceStatusDto } from 'src/models/Projects';
-import { PluginPackage } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
 import { tableStatusColor } from 'src/utils/colors';
 import BackupProjectDialog from 'src/components/project/BackupProjectDialog.vue';
