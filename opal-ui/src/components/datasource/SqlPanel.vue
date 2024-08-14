@@ -8,11 +8,16 @@
     </div>
     <q-tab-panels v-model="tab">
       <q-tab-panel name="query">
+        <div class="text-hint q-mb-md">
+          <q-icon name="info" />
+          <span class="q-ml-xs">{{ $t('sql_query_hint') }}</span>
+        </div>
         <q-input
           v-model="sql"
           filled
           placeholder="SELECT * FROM ..."
           autogrow
+          @keydown="onKeydown"
           type="text-area"
           class="q-mb-md" />
         <q-btn
@@ -23,7 +28,16 @@
           :disable="sql.trim().length === 0"
           @click="onExecute"
           class="q-mb-md" />
-
+        <q-btn
+          v-if="rows"
+          outline
+          color="secondary"
+          icon="cleaning_services"
+          :title="$t('clear')"
+          size="sm"
+          @click="onClear"
+          class="on-right q-mb-md"
+        />
         <div v-if="loading">
           <q-spinner-dots size="md" />
         </div>
@@ -32,17 +46,42 @@
             v-if="rows"
             :rows="rows"
             row-key="_id"
-            flat
-            class="q-mt-md" />
+            flat>
+            <template v-slot:header-cell="props">
+              <q-th :props="props">
+                {{ props.col.name }}
+              </q-th>
+            </template>
+          </q-table>
         </div>
       </q-tab-panel>
       <q-tab-panel name="history">
-        <q-table
-          :rows="historyRows"
-          row-key="timestamp"
-          @row-dblclick="onHistoryClick"
-          flat
-          class="q-mt-md" />
+        <div v-if="historyRows.length">
+          <div class="text-hint">
+            <q-icon name="info" />
+            <span class="q-ml-xs">{{ $t('sql_history_hint') }}</span>
+          </div>
+          <q-table
+            :rows="historyRows"
+            :columns="historyColumns"
+            row-key="timestamp"
+            @row-dblclick="onHistoryClick"
+            flat>
+            <template v-slot:body-cell-query="props">
+              <q-td :props="props">
+                <span class="text-caption">{{ props.value }}</span>
+              </q-td>
+            </template>
+            <template v-slot:body-cell-delay="props">
+              <q-td :props="props">
+                {{ props.value }} ms
+              </q-td>
+            </template>
+          </q-table>
+        </div>
+        <div v-else class="text-help">
+          {{ $t('no_sql_history') }}
+        </div>
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -60,6 +99,7 @@ const sql = ref('');
 
 const sqlStore = useSqlStore();
 const datasourceStore = useDatasourceStore();
+const { t } = useI18n();
 
 const tab = ref('query');
 const results = ref<SqlResults | null>(null);
@@ -81,14 +121,24 @@ const rows = computed(() => {
 });
 
 const historyRows = computed(() => {
-  return sqlStore.history.filter((cmd) => cmd.datasource === datasourceStore.datasource.name);
+  return sqlStore.history.filter((cmd) => cmd.datasource === datasourceStore.datasource.name).sort((a, b) => b.timestamp - a.timestamp);
 });
 
+const historyColumns = [
+  { name: 'query', label: t('query'), align: 'left', field: 'query', sortable: true },
+  { name: 'delay', label: t('delay'), align: 'left', field: 'delay', sortable: true },
+];
 
 function onHistoryClick(evt: unknown, row: SqlCommand) {
   sql.value = row.query;
   results.value = null;
   tab.value = 'query';
+}
+
+function onKeydown(evt: KeyboardEvent) {
+  if (evt.key === 'Enter' && evt.ctrlKey) {
+    onExecute();
+  }
 }
 
 function onExecute() {
@@ -101,5 +151,9 @@ function onExecute() {
   }).finally(() => {
     loading.value = false;
   });
+}
+
+function onClear() {
+  results.value = null;
 }
 </script>
