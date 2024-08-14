@@ -86,3 +86,15 @@ export interface Annotation extends AttributesBundle {
   vocabulary: VocabularyDto;
   term: TermDto;
 }
+
+export interface SqlCommand {
+  query: string;
+  datasource: string;
+  timestamp: number;
+  delay: number;
+}
+
+export interface SqlResults {
+  columns: string[];
+  rows: string[][];
+}

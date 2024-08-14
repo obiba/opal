@@ -1,4 +1,3 @@
-import { get } from 'http';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { PluginPackage } from 'src/components/models';
