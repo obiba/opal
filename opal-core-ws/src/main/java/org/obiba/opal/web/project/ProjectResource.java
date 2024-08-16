@@ -12,14 +12,7 @@ package org.obiba.opal.web.project;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
@@ -29,12 +22,10 @@ import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
-import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -42,7 +33,6 @@ import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
-import org.obiba.opal.web.vcf.VCFStoreResource;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -81,8 +71,7 @@ public class ProjectResource implements BaseResource {
       ProjectsKeyStoreService projectsKeyStoreService,
       ApplicationContext applicationContext,
       VCFSamplesMappingService vcfSamplesMappingService,
-      SubjectProfileService subjectProfileService,
-      ProjectsState projectsState) {
+      SubjectProfileService subjectProfileService) {
     this.opalRuntime = opalRuntime;
     this.projectService = projectService;
     this.eventBus = eventBus;
@@ -143,16 +132,6 @@ public class ProjectResource implements BaseResource {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject(name));
     resource.setKeyStore(keyStore);
-    return resource;
-  }
-
-  @Path("/vcf-store")
-  public VCFStoreResource getVCFStoreResource(@PathParam("name") String name) {
-    Project project = getProject(name);
-    if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
-    if (!project.hasVCFStoreService()) throw new NotFoundException("Project has no VCF store: " + project.getName());
-    VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
-    resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
   }
 

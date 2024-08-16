@@ -150,9 +150,9 @@ public class PluginsManager {
 
   private void initServicePlugins() {
     Map<String, PluginResources> pluginsMap = getPlugins().stream().collect(Collectors.toMap(PluginResources::getName, Function.identity()));
-//    VCFStoreServiceLoader.get(pluginsClassLoader).getServices().stream()
-//        .filter(service -> pluginsMap.containsKey(service.getName()))
-//        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
+    VCFStoreServiceLoader.get(pluginsClassLoader).getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
     SearchServiceLoader.get(pluginsClassLoader).getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
         .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
