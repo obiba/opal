@@ -73,6 +73,7 @@ watch(() => props.modelValue, (value) => {
   if (value) {
     variablesFile.value = undefined;
   }
+  transientDatasourceStore.reset();
   showDialog.value = value;
 });
 
@@ -81,6 +82,7 @@ onMounted(() => {
 });
 
 function onHide() {
+  transientDatasourceStore.deleteDatasource();
   emit('update:modelValue', false);
 }
 

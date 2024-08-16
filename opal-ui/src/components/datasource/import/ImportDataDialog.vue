@@ -251,6 +251,8 @@ const serverImporterHint = computed(() => {
 
 watch(() => props.modelValue, (value) => {
   step.value = 1;
+  // reset, not delete, otherwise a transient datasource in a previous import task would be deleted
+  transientDatasourceStore.reset();
   showDialog.value = value;
 });
 

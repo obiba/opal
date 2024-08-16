@@ -14,6 +14,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   const variables = ref([] as VariableDto[]); // selected datasource table variables
 
   function reset() {
+    project.value = '';
     datasource.value = {} as DatasourceDto;
     table.value = {} as TableDto;
     variables.value = [];
