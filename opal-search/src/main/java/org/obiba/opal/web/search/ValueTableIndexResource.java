@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.search;
 
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -20,10 +23,6 @@ import org.obiba.opal.web.model.Opal.OpalMap;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 
 @Component
 @Transactional(readOnly = true)
@@ -37,10 +36,14 @@ public class ValueTableIndexResource extends IndexResource {
   @PathParam("table")
   private String table;
 
-  @GET
   @OPTIONS
+  public Response getOptions() {
+    return Response.ok().build();
+  }
+
+  @GET
   public Response getTableStatus() {
-    if(!opalSearchService.isRunning() || !opalSearchService.isEnabled() || opalSearchService.getValuesIndexManager() == null || !opalSearchService.getValuesIndexManager().isReady()) {
+    if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -75,7 +78,7 @@ public class ValueTableIndexResource extends IndexResource {
 
   @PUT
   public Response updateIndex() {
-    if(!opalSearchService.isEnabled()) {
+    if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -90,7 +93,7 @@ public class ValueTableIndexResource extends IndexResource {
 
   @DELETE
   public Response deleteIndex() {
-    if(!opalSearchService.isEnabled()) {
+    if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -143,6 +146,10 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @Path("_schema")
   public Response search() {
+    if(!isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
+    }
+
     ValueTableValuesIndex index = getValueTableIndex(datasource, table);
     OpalMap.Builder map = OpalMap.newBuilder();
     for(Variable variable : index.getVariables()) {
@@ -152,4 +159,7 @@ public class ValueTableIndexResource extends IndexResource {
     return Response.ok(map.build()).build();
   }
 
+  private boolean isEnabled() {
+    return opalSearchService.isRunning() && opalSearchService.isEnabled() && opalSearchService.getValuesIndexManager() != null && opalSearchService.getValuesIndexManager().isReady();
+  }
 }
