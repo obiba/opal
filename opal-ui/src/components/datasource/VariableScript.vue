@@ -14,7 +14,7 @@
       lang="javascript"
       theme="monokai"
       style="height: 300px" />
-    <edit-script-dialog v-model="showEdit" :variable="variable" @save="onSave"/>
+    <variable-script-dialog v-model="showEdit" :variable="variable" @save="onSave"/>
   </div>
 </template>
 
@@ -26,7 +26,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { VariableDto } from 'src/models/Magma';
 import { VAceEditor } from 'vue3-ace-editor';
-import EditScriptDialog from 'src/components/datasource/EditScriptDialog.vue';
+import VariableScriptDialog from 'src/components/datasource/VariableScriptDialog.vue';
 
 interface VariableScriptProps {
   variable: VariableDto;

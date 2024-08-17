@@ -176,8 +176,13 @@ public final class Dtos {
     if (withVariableCounts)
       builder.setVariableCount(valueTable.getVariableCount());
 
-    if (withValueSetCount && ValueTableStatus.READY.equals(valueTable.getStatus()))
-      builder.setValueSetCount(valueTable.getVariableEntityCount());
+    if (withValueSetCount && ValueTableStatus.READY.equals(valueTable.getStatus())) {
+      try {
+        builder.setValueSetCount(valueTable.getVariableEntityCount());
+      } catch (Exception e) {
+        builder.setValueSetCount(0);
+      }
+    }
 
     Magma.TimestampsDto.Builder tsBuilder = asDto(valueTable.getTimestamps());
     if (tsBuilder != null) {

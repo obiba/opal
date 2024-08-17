@@ -155,6 +155,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
         table.value = response.data;
         return Promise.all([
           table.value.viewType !== undefined ? loadView(name) : Promise.resolve(),
+          loadTableVariables(),
           api.options(`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
             perms.value.tableValueSets = new Perms(response);
             return response;

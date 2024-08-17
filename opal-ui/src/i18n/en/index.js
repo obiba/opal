@@ -739,6 +739,7 @@ export default {
   end_time: 'End time',
   enforced_2fa: 'Enforced 2FA',
   entities: 'Entities',
+  entity_filter: 'Entity filter',
   entity_type: 'Entity type',
   example: 'Example: {text}',
   export_data: 'Export data',

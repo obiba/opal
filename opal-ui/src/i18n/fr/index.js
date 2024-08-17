@@ -739,6 +739,7 @@ export default {
   end_time: 'Fin',
   enforced_2fa: 'Authentification à deux facteurs obligatoire',
   entities: 'Entités',
+  entity_filter: 'Filtre d\'entité',
   entity_type: "Type d'entité",
   example: 'Exemple : {text}',
   export_data: 'Exporter les données',
