@@ -12,13 +12,22 @@ package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import net.jazdw.rql.parser.ASTNode;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.SearchException;
@@ -36,12 +45,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Response;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -53,6 +62,9 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private SQLService sqlService;
 
   private String entityType;
 
@@ -157,16 +169,208 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     ValueTable table1 = getValueTable(var1Resolver);
     // verify variable exists and is accessible
-    table1.getVariable(var1Resolver.getVariableName());
+    Variable var1 = table1.getVariable(var1Resolver.getVariableName());
 
+    List<String> categories = getCategories(var0);
+    if (categories.isEmpty())
+      return Response.status(Response.Status.BAD_REQUEST).build();
+
+    if (searchServiceAvailable()) {
+      return getFacetsFromSearchService(crossVar0, crossVar1, table0, var0, categories);
+    } else {
+      return getFacetsFromSQLService(table0, var0, categories, var1);
+    }
+  }
+
+  private List<String> getCategories(Variable var) {
+    List<String> categories = null;
+    if (var.hasCategories())
+      categories = var.getCategories().stream().map(Category::getName).collect(Collectors.toList());
+    else if (var.getValueType().equals(BooleanType.get())) categories = Lists.newArrayList("true", "false");
+    return categories == null ? Lists.newArrayList() : categories;
+  }
+
+  private Response getFacetsFromSQLService(ValueTable table0, Variable var0, List<String> categories, Variable var1) {
+    if (VariableNature.getNature(var1).equals(VariableNature.CATEGORICAL)) {
+      return getFacetFrequencies(table0, var0, categories, var1);
+    } else if (VariableNature.getNature(var1).equals(VariableNature.CONTINUOUS)) {
+      return getFacetStatistics(table0, var0, categories, var1);
+    }
+    return Response.status(Response.Status.BAD_REQUEST).build();
+  }
+
+  private Response getFacetFrequencies(ValueTable table0, Variable var0, List<String> categories, Variable var1) {
+    String query = String.format("SELECT `%s`, `%s`, count(*) as _count FROM `%s` WHERE `%s` IS NOT NULL AND `%s` IS NOT NULL GROUP BY `%s`, `%s`",
+        var0.getName(), var1.getName(), table0.getName(), // select from
+        var0.getName(), var1.getName(), // where
+        var0.getName(), var1.getName() // group by
+    );
+    File output = sqlService.execute(table0.getDatasource().getName(), query, SQLService.DEFAULT_ID_COLUMN, SQLService.Output.JSON);
+    try {
+      JSONObject result = readJSONObject(output);
+      JSONArray rows = result.getJSONArray("rows");
+      Map<String, Map<String, Integer>> facets = Maps.newHashMap();
+      for (int i = 0; i < rows.length(); i++) {
+        JSONArray row = rows.getJSONArray(i);
+        String cat0 = row.get(0).toString();
+        String cat1 = row.get(1).toString();
+        int count = row.getInt(2);
+        if (!facets.containsKey(cat0)) facets.put(cat0, Maps.newHashMap());
+        facets.get(cat0).put(cat1, count);
+      }
+      List<String> categories1 = getCategories(var1);
+      Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder();
+      int totalHits = 0;
+      Map<String, Integer> totalFreq = Maps.newHashMap();
+      // for each var0 category and each var1 category, get the count
+      for (String category0 : categories.stream().filter(facets::containsKey).toList()) {
+        Map<String, Integer> facet = facets.get(category0);
+        int facetHits = 0;
+        Search.FacetResultDto.Builder facetBuilder = Search.FacetResultDto.newBuilder();
+        facetBuilder.setFacet(category0);
+        for (String category1 : categories1.stream().filter(facet::containsKey).toList()) {
+          Search.FacetResultDto.TermFrequencyResultDto.Builder freqBuilder = Search.FacetResultDto.TermFrequencyResultDto.newBuilder();
+          freqBuilder.setTerm(category1);
+          // find count
+          int count = facet.get(category1);
+          freqBuilder.setCount(count);
+          if (totalFreq.containsKey(category1)) {
+            totalFreq.put(category1, totalFreq.get(category1) + count);
+          } else {
+            totalFreq.put(category1, count);
+          }
+          facetHits = facetHits + count;
+          totalHits = totalHits + count;
+          facetBuilder.addFrequencies(freqBuilder);
+        }
+        facetBuilder.addFilters(Search.FacetResultDto.FilterResultDto.newBuilder().setCount(facetHits));
+        builder.addFacets(facetBuilder);
+      }
+      Search.FacetResultDto.Builder totalFacetBuilder = Search.FacetResultDto.newBuilder();
+      totalFacetBuilder.setFacet("_total");
+      totalFacetBuilder.addAllFrequencies(totalFreq.keySet().stream()
+          .map((cat1) -> Search.FacetResultDto.TermFrequencyResultDto.newBuilder().setTerm(cat1).setCount(totalFreq.get(cat1)).build())
+          .toList());
+      builder.addFacets(totalFacetBuilder);
+      builder.setTotalHits(totalHits);
+      return Response.ok().entity(builder.build()).build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      output.delete();
+    }
+  }
+
+  private Response getFacetStatistics(ValueTable table0, Variable var0, List<String> categories, Variable var1) {
+    String statsStatement = String.format(
+        """
+            count(*) AS _count,
+            total(`%s`) AS _total,
+            min(`%s`) AS _min,
+            max(`%s`) AS _max,
+            avg(`%s`) AS _mean,
+            sum(`%s` * `%s`) AS _sum_of_squares,
+            avg((`%s` - (SELECT avg(`%s`) FROM `%s`)) * (`%s` - (SELECT avg(`%s`) FROM `%s`))) AS _variance,
+            sqrt(avg((`%s` - (SELECT avg(`%s`) FROM `%s`)) * (`%s` - (SELECT avg(`%s`) FROM `%s`)))) AS _stdev
+            FROM `%s`
+            WHERE `%s` IS NOT NULL AND `%s` IS NOT NULL""",
+        var1.getName(), // total
+        var1.getName(), // min
+        var1.getName(), // max
+        var1.getName(), // mean
+        var1.getName(), var1.getName(), // sum of squares
+        var1.getName(), var1.getName(), table0.getName(), var1.getName(), var1.getName(), table0.getName(), // variance
+        var1.getName(), var1.getName(), table0.getName(), var1.getName(), var1.getName(), table0.getName(), // stdev
+        table0.getName(), // select
+        var0.getName(), var1.getName() // where
+    );
+    String query = String.format("""
+            SELECT `%s`,
+            %s
+            GROUP BY `%s`
+            ORDER BY `%s`""",
+        var0.getName(), // select
+        statsStatement, // stats
+        var0.getName(), // group by
+        var0.getName()  // order by
+    );
+    File output = sqlService.execute(table0.getDatasource().getName(), query, SQLService.DEFAULT_ID_COLUMN, SQLService.Output.JSON);
+    query = String.format("SELECT %s", statsStatement);
+    File outputTotal = sqlService.execute(table0.getDatasource().getName(), query, SQLService.DEFAULT_ID_COLUMN, SQLService.Output.JSON);
+    try {
+      JSONObject result = readJSONObject(output);
+      JSONArray rows = result.getJSONArray("rows");
+      Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder();
+      int totalHits = 0;
+      // for each var0 category and each var1 category, get the count
+      for (int i = 0; i < rows.length(); i++) {
+        JSONArray row = rows.getJSONArray(i);
+        String cat0 = row.get(0).toString();
+        int count = row.getInt(1);
+        float total = row.getFloat(2);
+        float min = row.getFloat(3);
+        float max = row.getFloat(4);
+        float mean = row.getFloat(5);
+        float sumOfSquares = row.getFloat(6);
+        float variance = row.getFloat(7);
+        float stdDev = row.getFloat(8);
+        Search.FacetResultDto.Builder facetBuilder = Search.FacetResultDto.newBuilder();
+        facetBuilder.setFacet(cat0);
+        Search.FacetResultDto.StatisticalResultDto.Builder statsBuilder = Search.FacetResultDto.StatisticalResultDto.newBuilder();
+        statsBuilder.setCount(count).setTotal(total)
+            .setMin(min).setMax(max).setMean(mean)
+            .setSumOfSquares(sumOfSquares).setVariance(variance).setStdDeviation(stdDev);
+        facetBuilder.setStatistics(statsBuilder);
+        builder.addFacets(facetBuilder);
+        totalHits = totalHits + count;
+      }
+
+      result = readJSONObject(outputTotal);
+      rows = result.getJSONArray("rows");
+      JSONArray row = rows.getJSONArray(0);
+      int count = row.getInt(0);
+      float total = row.getFloat(1);
+      float min = row.getFloat(2);
+      float max = row.getFloat(3);
+      float mean = row.getFloat(4);
+      float sumOfSquares = row.getFloat(5);
+      float variance = row.getFloat(6);
+      float stdDev = row.getFloat(7);
+      Search.FacetResultDto.Builder facetBuilder = Search.FacetResultDto.newBuilder();
+      facetBuilder.setFacet("_total");
+      Search.FacetResultDto.StatisticalResultDto.Builder statsBuilder = Search.FacetResultDto.StatisticalResultDto.newBuilder();
+      statsBuilder.setCount(count).setTotal(total)
+          .setMin(min).setMax(max).setMean(mean)
+          .setSumOfSquares(sumOfSquares).setVariance(variance).setStdDeviation(stdDev);
+      facetBuilder.setStatistics(statsBuilder);
+      builder.addFacets(facetBuilder);
+
+      builder.setTotalHits(totalHits);
+      return Response.ok().entity(builder.build()).build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      output.delete();
+      outputTotal.delete();
+    }
+  }
+
+  private JSONObject readJSONObject(File input) throws IOException {
+    StringBuilder jsonData = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new FileReader(input))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        jsonData.append(line);
+      }
+    }
+
+    JSONObject jsonObject = new JSONObject(jsonData.toString());
+    return jsonObject;
+  }
+
+  private Response getFacetsFromSearchService(String crossVar0, String crossVar1, ValueTable table0, Variable var0, List<String> categories) throws SearchException {
     // one facet per crossVar0 category
     Search.QueryTermsDto.Builder queryBuilder = Search.QueryTermsDto.newBuilder();
-    List<String> categories;
-    if (var0.hasCategories())
-      categories = var0.getCategories().stream().map(Category::getName).collect(Collectors.toList());
-    else if (var0.getValueType().equals(BooleanType.get())) categories = Lists.newArrayList("true", "false");
-    else
-      return Response.status(Response.Status.BAD_REQUEST).build();
     categories.forEach(ct ->
         queryBuilder.addQueries(Search.QueryTermDto.newBuilder()
             .setFacet(ct)

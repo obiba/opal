@@ -127,7 +127,7 @@ onMounted(() => {
   init();
 });
 
-watch([dsName, tName], () => {
+watch([dsName, tName, () => props.variable], () => {
   init();
 });
 

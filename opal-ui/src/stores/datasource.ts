@@ -3,6 +3,7 @@ import { api, baseUrl } from 'src/boot/api';
 import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
 import { AttributesBundle } from 'src/components/models';
+import { QueryResultDto } from 'src/models/Search';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -332,7 +333,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function loadVariableSummary(localVar: VariableDto | undefined, fullIfCached: boolean, limit: number | undefined) {
-    const link = localVar ? `${localVar.parentLink.link}/variable/${localVar.name}` : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
+    if (!localVar?.parentLink) return Promise.reject('No variable');
+    const link = localVar ? `${localVar.parentLink?.link}/variable/${localVar.name}` : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
     const params = { fullIfCached };
     if (limit) {
       params.limit = limit;
@@ -468,6 +470,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.put(`/datasource/${pName}/view/${name}/_init`);
   }
 
+  async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
+    const tableName = `${datasource.value.name}.${table.value.name}`;
+    return api.get('/datasources/entities/_contingency', {
+      params: {
+        v0: `${tableName}:${var0}`,
+        v1: `${tableName}:${var1}`,
+      }
+    }).then((response) => response.data);
+  }
+
   return {
     datasource,
     tables,
@@ -513,5 +525,6 @@ export const useDatasourceStore = defineStore('datasource', () => {
     deleteAttributes,
     reset,
     reconnectView,
+    getContingencyTable,
   };
 });
