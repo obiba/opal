@@ -66,6 +66,8 @@ export default defineComponent({
 import { VariableDto } from 'src/models/Magma';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
 import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
+
+const route = useRoute();
 const datasourceStore = useDatasourceStore();
 
 interface VariableSummaryProps {
@@ -81,11 +83,22 @@ const summary = ref({});
 const limit = ref(STEP_COUNT);
 const loading = ref(false);
 
+const dsName = computed(() => route.params.id as string);
+const tName = computed(() => route.params.tid as string);
+
 onMounted(() => {
   init();
 });
 
+watch([dsName, tName, () => props.variable], () => {
+  init();
+});
+
 function init() {
+  summary.value = {};
+  if (!props.variable || !props.variable.name) {
+    return;
+  }
   loading.value = true;
   datasourceStore
     .loadVariableSummary(props.variable, true, limit.value > props.total ? props.total : limit.value)

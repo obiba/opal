@@ -129,11 +129,7 @@
                   :loading="variablesLoading" />
               </div>
               <div v-else>
-                <q-spinner
-                  color="grey-6"
-                  size="3em"
-                  :thickness="5"
-                />
+                <q-spinner-dots size="lg" />
               </div>
             </q-step>
           </q-stepper>

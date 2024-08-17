@@ -114,7 +114,8 @@
           align="justify"
           narrow-indicator
         >
-          <q-tab name="dictionary" :label="$t('dictionary')" />
+        <q-tab name="dictionary" :label="$t('dictionary')" />
+        <q-tab name="summary" :label="$t('summary')" />
           <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
           <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
         </q-tabs>
@@ -126,8 +127,32 @@
             <table-variables />
           </q-tab-panel>
 
+          <q-tab-panel name="summary">
+            <div v-if="datasourceStore.table.valueSetCount === 0">
+              <div class="q-mb-md box-info">
+                <q-icon name="error" size="1.2rem"/>
+                <span class="on-right">
+                  {{ $t('no_table_values') }}
+                </span>
+              </div>
+            </div>
+            <div v-else>
+              <contingency-table />
+            </div>
+          </q-tab-panel>
+
           <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-            <table-values />
+            <div v-if="datasourceStore.table.valueSetCount === 0">
+              <div class="q-mb-md box-info">
+                <q-icon name="error" size="1.2rem"/>
+                <span class="on-right">
+                  {{ $t('no_table_values') }}
+                </span>
+              </div>
+            </div>
+            <div v-else>
+              <table-values />
+            </div>
           </q-tab-panel>
 
           <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
@@ -161,6 +186,7 @@ import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
 import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
+import ContingencyTable from 'src/components/datasource/ContingencyTable.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
