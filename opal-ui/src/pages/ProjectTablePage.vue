@@ -105,6 +105,12 @@
         <q-spinner-dots size="lg" class="q-mt-md" />
       </div>
       <div v-else>
+
+        <div v-if="isTablesView" class="q-mb-md">
+          <div class="text-h6">{{ $t('entity_filter') }}</div>
+          <view-where-script :view="datasourceStore.view" />
+        </div>
+
         <q-tabs
           v-model="tab"
           dense
@@ -187,6 +193,7 @@ import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
 import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
 import ContingencyTable from 'src/components/datasource/ContingencyTable.vue';
+import ViewWhereScript from 'src/components/datasource/ViewWhereScript.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';

@@ -13,21 +13,6 @@
         <q-separator />
 
         <q-card-section>
-          <div class="row q-gutter-md q-mb-md">
-            <q-select
-              v-model="valueType"
-              :options="valueTypes"
-              :label="$t('value_type')"
-              dense
-              style="width: 200px;"/>
-            <q-checkbox v-model="isRepeatable" :label="$t('repeatable')" dense />
-            <q-input
-              v-if="isRepeatable"
-              v-model="occurrenceGroup"
-              :label="$t('occurrence_group')"
-              dense
-              style="width: 300px" />
-          </div>
           <v-ace-editor
             v-model:value="scriptEdit"
             @init="onEditorInit"
@@ -65,37 +50,28 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'EditScriptDialog',
+  name: 'ScriptDialog',
 });
 </script>
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
-import { valueTypes } from 'src/utils/magma';
-import { VariableDto, AttributeDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;
-  variable: VariableDto;
+  script?: string;
 }
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue','save'])
 
 const scriptEdit = ref();
-const valueType = ref();
-const isRepeatable = ref(false);
-const occurrenceGroup = ref();
 const comment = ref();
 const showDialog = ref(props.modelValue);
 const maximizedToggle = ref(false);
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    scriptEdit.value = getScript();
-    valueType.value = props.variable.valueType;
-    isRepeatable.value = props.variable.isRepeatable;
-    occurrenceGroup.value = props.variable.occurrenceGroup;
-    comment.value = 'Udpate ' + props.variable.name;
+    scriptEdit.value = props.script;
   }
   showDialog.value = value;
 });
@@ -114,25 +90,7 @@ function onEditorInit(editor: any) {
 }
 
 function onSave() {
-  emit('save', makeNewVariable(), comment.value.trim() ? comment.value.trim() : 'Udpate ' + props.variable.name);
-}
-
-function makeNewVariable() {
-  const attributes = props.variable.attributes ? props.variable.attributes.filter((a) => a.name !== 'script') : [];
-  return {
-    ...props.variable,
-    attributes: [
-      ...attributes,
-      { name: 'script', value: scriptEdit.value },
-    ],
-    valueType: valueType.value,
-    isRepeatable: isRepeatable.value,
-    occurrenceGroup: isRepeatable.value ? occurrenceGroup.value : '',
-  };
-}
-
-function getScript() {
-  return props.variable.attributes?.find((a: AttributeDto) => a.name === 'script')?.value || '';
+  emit('save', scriptEdit.value, comment.value?.trim());
 }
 
 </script>
