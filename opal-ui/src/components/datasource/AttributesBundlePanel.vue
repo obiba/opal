@@ -8,7 +8,6 @@
         active-color="primary"
         indicator-color="primary"
         align="left"
-        narrow-indicator
         no-caps
       >
         <q-tab v-for="loc in locales" :key="loc" :name="loc" :label="loc"/>

@@ -81,7 +81,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        narrow-indicator
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
         <q-tab name="script" :label="$t('script')" v-if="withScript"/>
@@ -136,7 +135,6 @@
         </q-tab-panel>
 
         <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
-          <div class="text-h6">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
             :options="['VARIABLE_READ']"

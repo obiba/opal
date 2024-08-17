@@ -7,7 +7,6 @@
       active-color="primary"
       indicator-color="primary"
       align="justify"
-      narrow-indicator
     >
       <q-tab name="servers" :label="t('servers')" />
       <q-tab name="packages" :label="t('packages')" />

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="datasourceStore.perms.table?.canUpdate" class="row q-gutter-sm q-mb-md">
+    <div v-if="datasourceStore.perms.table?.canUpdate()" class="row q-gutter-sm q-mb-md">
       <q-btn
         outline
         size="sm"
@@ -8,12 +8,13 @@
         icon="edit"
         :title="$t('edit')"
         @click="onShowEdit" />
-        <q-btn
+      <q-btn
         outline
         size="sm"
         color="red"
         icon="delete"
         :title="$t('delete')"
+        :disable="view.where === undefined"
         @click="onDelete" />
     </div>
     <v-ace-editor
@@ -23,6 +24,9 @@
       lang="javascript"
       theme="monokai"
       style="height: 80px" />
+    <div v-else class="text-help">
+      {{ $t('no_entity_filter') }}
+    </div>
     <script-dialog v-model="showEdit" :script="view.where" @save="onSave"/>
   </div>
 </template>

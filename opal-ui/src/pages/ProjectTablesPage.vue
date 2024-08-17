@@ -19,7 +19,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        narrow-indicator
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
         <q-tab name="sql" :label="$t('sql')" />

@@ -84,7 +84,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        narrow-indicator
       >
         <q-tab name="aggregate" :label="$t('aggregate')" />
         <q-tab name="assign" :label="$t('assign')" />

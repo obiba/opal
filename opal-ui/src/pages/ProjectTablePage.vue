@@ -106,11 +106,6 @@
       </div>
       <div v-else>
 
-        <div v-if="isTablesView" class="q-mb-md">
-          <div class="text-h6">{{ $t('entity_filter') }}</div>
-          <view-where-script :view="datasourceStore.view" />
-        </div>
-
         <q-tabs
           v-model="tab"
           dense
@@ -118,10 +113,10 @@
           active-color="primary"
           indicator-color="primary"
           align="justify"
-          narrow-indicator
         >
-        <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="summary" :label="$t('summary')" />
+          <q-tab name="dictionary" :label="$t('dictionary')" />
+          <q-tab name="summary" :label="$t('summary')" />
+          <q-tab name="entity_filter" :label="$t('entity_filter')" v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"/>
           <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
           <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
         </q-tabs>
@@ -133,17 +128,49 @@
             <table-variables />
           </q-tab-panel>
 
+          <q-tab-panel name="entity_filter" v-if="isTablesView">
+            <view-where-script :view="datasourceStore.view" />
+          </q-tab-panel>
+
           <q-tab-panel name="summary">
-            <div v-if="datasourceStore.table.valueSetCount === 0">
-              <div class="q-mb-md box-info">
-                <q-icon name="error" size="1.2rem"/>
-                <span class="on-right">
-                  {{ $t('no_table_values') }}
-                </span>
+            <div class="row">
+              <div class="col-md-auto col-sm-auto col-xs-12">
+                <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
+                  <q-card-section class="text-center">
+                    <div class="text-subtitle2">
+                      <q-icon name="view_column" class="on-left"/>{{ $t('variables') }}
+                    </div>
+                    <div class="text-h6">
+                      {{ datasourceStore.table.variableCount }}
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+              <div class="col-md-auto col-sm-auto col-xs-12">
+                <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
+                  <q-card-section class="text-center">
+                    <div class="text-subtitle2">
+                      <q-icon name="table_rows" class="on-left"/>{{ $t('entities') }}
+                    </div>
+                    <div class="text-h6 text-center">
+                      {{ datasourceStore.table.valueSetCount }}
+                    </div>
+                  </q-card-section>
+                </q-card>
               </div>
             </div>
-            <div v-else>
-              <contingency-table />
+            <div v-if="datasourceStore.perms.tableValueSets?.canRead()">
+              <div v-if="datasourceStore.table.valueSetCount === 0">
+                <div class="q-mb-md box-info">
+                  <q-icon name="error" size="1.2rem"/>
+                  <span class="on-right">
+                    {{ $t('no_table_values') }}
+                  </span>
+                </div>
+              </div>
+              <div v-else>
+                <contingency-table />
+              </div>
             </div>
           </q-tab-panel>
 
@@ -162,7 +189,6 @@
           </q-tab-panel>
 
           <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
-            <div class="text-h6">{{ $t('permissions') }}</div>
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}`"
               :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
@@ -281,7 +307,15 @@ watch([dsName, tName], () => {
 });
 
 function init() {
-  datasourceStore.initDatasourceTable(dsName.value, tName.value);
+  datasourceStore.initDatasourceTable(dsName.value, tName.value)
+    .then(() => {
+      if (!datasourceStore.perms.tableValueSets?.canRead() && ['entity_filter', 'values'].includes(tab.value)) {
+        tab.value = 'dictionary';
+      }
+      if (!isTablesView.value && tab.value === 'entity_filter') {
+        tab.value = 'dictionary';
+      }
+    });
 }
 
 function onDownloadDictionary() {

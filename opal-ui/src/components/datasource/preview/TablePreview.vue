@@ -7,7 +7,6 @@
       active-color="primary"
       indicator-color="primary"
       align="justify"
-      narrow-indicator
     >
       <q-tab name="variables" :label="$t('dictionary')">
         <q-badge v-if="props.table.variableCount !== undefined" color="red">{{ props.table.variableCount }}</q-badge>

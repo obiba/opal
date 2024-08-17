@@ -10,7 +10,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        narrow-indicator
       >
       <q-tab name="annotations" :label="$t('annotations')" />
       <q-tab name="label_description" :label="$t('label_description')" />

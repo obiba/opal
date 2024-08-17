@@ -146,6 +146,7 @@ export default {
     NoSuchProject: 'Le projet n\'existe pas',
     SQLError: 'Une erreur SQL s\'est produite lors de l\'exécution de la requête, veuillez vérifiez sa syntaxe',
     NoSuchVariableInTable: 'La variable n\'existe pas dans la table',
+    AccessDeniedToTableValues: 'L\'accès aux valeurs de la table est refusé',
   },
   identity_provider: {
     title: "Fournisseur d'identité",
@@ -854,6 +855,7 @@ export default {
   namespace: 'Espace de noms',
   new_name: 'Nouveau nom',
   no_bookmarks: 'Aucun favori',
+  no_entity_filter: 'Aucun filtre d\'entité n\'est défini pour la vue.',
   no_sql_history: 'Aucun historique SQL',
   no_table_values: 'Aucune valeur dans la table',
   no_options: 'Aucune option',

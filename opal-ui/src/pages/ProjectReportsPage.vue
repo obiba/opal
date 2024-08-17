@@ -9,7 +9,12 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <pre>{{ projectsStore.project }}</pre>
+      <div class="text-h5 q-mb-md">
+        {{ $t('reports') }}
+      </div>
+      <div class="text-help text-negative">
+        User interface not yet implemented.
+      </div>
     </q-page>
   </div>
 </template>

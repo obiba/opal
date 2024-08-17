@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="datasourceStore.perms.variable?.canUpdate" class="row q-gutter-sm q-mb-md">
+    <div v-if="datasourceStore.perms.variable?.canUpdate()" class="row q-gutter-sm q-mb-md">
       <q-btn
         size="sm"
         color="primary"

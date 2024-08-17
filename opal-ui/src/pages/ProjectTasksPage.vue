@@ -12,6 +12,9 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('tasks') }}
+      </div>
       <command-states
         :commands="commands"
         :project="projectsStore.project.name"

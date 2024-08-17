@@ -10,8 +10,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5">
-        <q-icon name="admin_panel_settings" size="sm" class="q-mb-xs"></q-icon
-        ><span class="on-right">{{ $t('administration') }} </span>
+        <span>{{ $t('administration') }} </span>
         <q-btn
           v-if="hasAdminPermission"
           outline
@@ -66,7 +65,7 @@
       <template v-if="hasKeystorePermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-h5">{{ $t('project_admin.encryption_keys') }}</div>
+            <div class="text-h6">{{ $t('project_admin.encryption_keys') }}</div>
             <div class="text-help q-mb-sm">{{ $t('project_admin.encryption_keys_info') }}</div>
             <KeyPairsList :project="project" @update="onProjectUpdate" />
           </q-card-section>
@@ -76,7 +75,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-h5">{{ $t('id_mappings') }}</div>
+            <div class="text-h6">{{ $t('id_mappings') }}</div>
             <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
             <id-mappings-list :project="project" @update="onProjectUpdate" />
           </q-card-section>
@@ -87,7 +86,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <span class="text-h5">{{ $t('permissions') }}</span>
+            <span class="text-h6">{{ $t('permissions') }}</span>
             <access-control-list
               :resource="`/project/${name}/permissions/project`"
               :options="[AclAction.PROJECT_ALL]"
@@ -99,7 +98,7 @@
       <template v-if="hasReloadPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <span class="text-h5"
+            <span class="text-h6"
               >{{ $t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
             /></span>
             <div class="text-help">{{ $t('project_admin.db_reload_hint') }}</div>
@@ -121,7 +120,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none q-pb-none">
-            <span class="text-h5">{{ $t('project_admin.backup_restore') }}</span>
+            <span class="text-h6">{{ $t('project_admin.backup_restore') }}</span>
           </q-card-section>
 
           <q-card-section class="q-pa-none">
@@ -152,7 +151,7 @@
         <div class="q-my-md">
           <q-card flat class="q-mt-md o-border-negative rounded-borders">
             <q-card-section>
-              <span class="text-h5">{{ $t('project_admin.danger_zone') }} </span>
+              <span class="text-h6">{{ $t('project_admin.danger_zone') }} </span>
             </q-card-section>
             <q-separator />
             <q-card-section>

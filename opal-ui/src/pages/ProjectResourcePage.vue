@@ -88,7 +88,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        narrow-indicator
       >
         <q-tab name="reference" :label="$t('reference')" />
         <q-tab name="permissions" :label="$t('permissions')" v-if="resourcesStore.perms.resourcePermissions?.canRead()"/>
@@ -102,7 +101,6 @@
         </q-tab-panel>
 
         <q-tab-panel name="permissions" v-if="resourcesStore.perms.resourcePermissions?.canRead()">
-          <div class="text-h6">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${pName}/permissions/resource/${rName}`"
             :options="['RESOURCE_VIEW', 'RESOURCE_ALL']"

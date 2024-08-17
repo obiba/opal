@@ -146,6 +146,7 @@ export default {
     NoSuchProject: 'The project does not exist',
     SQLError: 'An error occurred while processing the query: {0}',
     NoSuchVariableInTable: 'The variable does not exist in the table',
+    AccessDeniedToTableValues: 'Access to the table values is denied',
   },
   identity_provider: {
     title: 'Identity Provider',
@@ -854,6 +855,7 @@ export default {
   namespace: 'Namespace',
   new_name: 'New name',
   no_bookmarks: 'No favorites',
+  no_entity_filter: 'No script for filtering the entities of the view is defined.',
   no_sql_history: 'No SQL history',
   no_table_values: 'No table values',
   no_options: 'No options',
