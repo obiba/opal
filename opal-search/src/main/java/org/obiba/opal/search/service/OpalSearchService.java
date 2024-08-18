@@ -181,6 +181,11 @@ public class OpalSearchService implements Service {
   }
 
   @Subscribe
+  public void onValueTableUpdated(ValueTableUpdatedEvent event) {
+    remove(event.getValueTable());
+  }
+
+  @Subscribe
   public void onValueTableDeleted(ValueTableDeletedEvent event) {
     remove(event.getValueTable());
   }
@@ -199,7 +204,7 @@ public class OpalSearchService implements Service {
   public void onVariablesUpdated(VariablesUpdatedEvent event) {
     if (!isRunning()) return;
     // to ensure variable search is correct
-    getVariablesIndexManager().getIndex(event.getValueTable()).delete();
+    getVariablesIndexManager().drop(event.getValueTable());
     // synchronize variable index
     eventBus.post(new SynchronizeIndexEvent(getVariablesIndexManager(), event.getValueTable()));
   }
@@ -207,8 +212,9 @@ public class OpalSearchService implements Service {
   private void remove(@NotNull ValueTable vt) {
     if (!isRunning()) return;
     // Delete index
-    getValuesIndexManager().getIndex(vt).delete();
-    getVariablesIndexManager().getIndex(vt).delete();
+    getValuesIndexManager().drop(vt);
+    getVariablesIndexManager().drop(vt);
+
   }
 
 }

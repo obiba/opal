@@ -61,7 +61,13 @@ public class DefaultValuesIndexManager implements ValuesIndexManager {
 
   @Override
   public void drop() {
+    // TODO
+  }
 
+  @Override
+  public void drop(ValueTable valueTable) {
+    variableSummaryHandler.clearComputingSummaries(valueTable);
+    getIndex(valueTable).delete();
   }
 
   @Override

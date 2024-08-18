@@ -52,7 +52,12 @@ public class DefaultVariablesIndexManager implements VariablesIndexManager {
 
   @Override
   public void drop() {
+    // TODO
+  }
 
+  @Override
+  public void drop(ValueTable valueTable) {
+    getIndex(valueTable).delete();
   }
 
   @Override
