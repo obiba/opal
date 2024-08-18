@@ -472,11 +472,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
-    const tableName = `${datasource.value.name}.${table.value.name}`;
-    return api.get('/datasources/entities/_contingency', {
+    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
       params: {
-        v0: `${tableName}:${var0}`,
-        v1: `${tableName}:${var1}`,
+        v0: var0,
+        v1: var1,
       }
     }).then((response) => response.data);
   }
