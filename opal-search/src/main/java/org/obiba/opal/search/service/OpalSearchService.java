@@ -16,10 +16,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.core.service.OpalGeneralConfigService;
-import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.event.SynchronizeIndexEvent;
 import org.obiba.opal.spi.search.*;
@@ -33,7 +30,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
 
 @Component
 public class OpalSearchService implements Service {
@@ -44,22 +40,19 @@ public class OpalSearchService implements Service {
 
   private final ElasticSearchConfigurationService configService;
 
-  private final OpalGeneralConfigService opalGeneralConfigService;
+  private final VariablesIndexManager variablesIndexManager;
 
-  private final VariableSummaryHandler variableSummaryHandler;
-
-  private final ThreadFactory threadFactory;
+  private final ValuesIndexManager valuesIndexManager;
 
   private final EventBus eventBus;
 
-  private OpalRuntime opalRuntime;
+  private boolean running = false;
 
   @Autowired
-  public OpalSearchService(ElasticSearchConfigurationService configService, OpalGeneralConfigService opalGeneralConfigService, VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory, EventBus eventBus) {
+  public OpalSearchService(ElasticSearchConfigurationService configService, VariablesIndexManager variablesIndexManager, ValuesIndexManager valuesIndexManager, EventBus eventBus) {
     this.configService = configService;
-    this.opalGeneralConfigService = opalGeneralConfigService;
-    this.variableSummaryHandler = variableSummaryHandler;
-    this.threadFactory = threadFactory;
+    this.variablesIndexManager = variablesIndexManager;
+    this.valuesIndexManager = valuesIndexManager;
     this.eventBus = eventBus;
   }
 
@@ -68,32 +61,19 @@ public class OpalSearchService implements Service {
   }
 
   @Override
-  public void initialize(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
-
-  @Override
   public boolean isRunning() {
-    return hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
+    return running;
   }
 
   @Override
   public void start() {
     if (isRunning()) return;
-    SearchSettings esConfig = new OpalSearchSettings(configService.getConfig());
-    if (!esConfig.isEnabled()) return;
-    if (!hasSearchServicePlugin()) {
-      log.warn("No Search Service plugin found.");
-      return;
-    }
-    SearchService service = getSearchServicePlugin();
-    service.configure(esConfig, variableSummaryHandler, threadFactory);
-    service.start();
+    running = true;
   }
 
   @Override
   public void stop() {
-    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) getSearchServicePlugin().stop();
+    running = false;
   }
 
   @Override
@@ -107,18 +87,23 @@ public class OpalSearchService implements Service {
   }
 
   //
-  // Search methods
+  // Index managers
   //
 
   public VariablesIndexManager getVariablesIndexManager() {
     if (!isRunning()) return null;
-    return getSearchServicePlugin().getVariablesIndexManager();
+    return variablesIndexManager;
   }
 
   public ValuesIndexManager getValuesIndexManager() {
     if (!isRunning()) return null;
-    return getSearchServicePlugin().getValuesIndexManager();
+    return valuesIndexManager;
   }
+
+  //
+  // Deprecated operations (related to values indexing),
+  // kept for the case it could be partially re-implemented.
+  //
 
   public Collection<String> executeAllIdentifiersQuery(QuerySettings querySettings, String searchPath) throws SearchException {
     if (!isRunning()) return Lists.newArrayList();
@@ -128,36 +113,34 @@ public class OpalSearchService implements Service {
     while (!callback.hasTotal() || callback.getIdentifiers().size() < callback.getTotal()) {
       querySettings.from(from);
       querySettings.size(size);
-      getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+      // getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
       from = from + size;
+      throw new UnsupportedOperationException("Deprecated");
     }
     return callback.getIdentifiers();
   }
 
   public void executeIdentifiersQuery(QuerySettings querySettings, String searchPath, IdentifiersQueryCallback callback) throws SearchException {
     if (!isRunning()) return;
-    getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+    // getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+    throw new UnsupportedOperationException("Deprecated");
   }
 
   public Search.EntitiesResultDto.Builder executeEntitiesQuery(QuerySettings querySettings, String searchPath, String entityType, String query) throws SearchException {
     if (!isRunning()) return null;
-    return getSearchServicePlugin().executeEntitiesQuery(querySettings, searchPath, entityType, query);
+    // return getSearchServicePlugin().executeEntitiesQuery(querySettings, searchPath, entityType, query);
+    throw new UnsupportedOperationException("Deprecated");
   }
 
   public Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException {
     if (!isRunning()) return null;
-    return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
+    // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
+    throw new UnsupportedOperationException("Deprecated");
   }
 
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws SearchException {
-    if (!isRunning()) return null;
-    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
-  }
-
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws SearchException {
-    if (!isRunning()) return null;
-    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
-  }
+  //
+  // Inner classes
+  //
 
   public static class IdentifiersQueryCallback implements SearchService.HitsQueryCallback<String> {
 
@@ -188,66 +171,9 @@ public class OpalSearchService implements Service {
     }
   }
 
-  public class OpalSearchSettings implements SearchSettings {
-
-    private final ElasticSearchConfiguration elasticSearchConfiguration;
-
-    public OpalSearchSettings(ElasticSearchConfiguration elasticSearchConfiguration) {
-      this.elasticSearchConfiguration = elasticSearchConfiguration;
-    }
-
-    @Override
-    public String getClusterName() {
-      return elasticSearchConfiguration.getClusterName();
-    }
-
-    @Override
-    public String getIndexName() {
-      return elasticSearchConfiguration.getIndexName();
-    }
-
-    @Override
-    public boolean isDataNode() {
-      return elasticSearchConfiguration.isDataNode();
-    }
-
-    @Override
-    public String getEsSettings() {
-      return elasticSearchConfiguration.getEsSettings();
-    }
-
-    @Override
-    public boolean isEnabled() {
-      return elasticSearchConfiguration.isEnabled();
-    }
-
-    @Override
-    public Integer getShards() {
-      return elasticSearchConfiguration.getShards();
-    }
-
-    @Override
-    public Integer getReplicas() {
-      return elasticSearchConfiguration.getReplicas();
-    }
-
-    @Override
-    public List<String> getLocales() {
-      return opalGeneralConfigService.getConfig().getLocalesAsString();
-    }
-  }
-
   //
   // Private methods
   //
-
-  private SearchService getSearchServicePlugin() {
-    return (SearchService) opalRuntime.getServicePlugin(SearchService.class);
-  }
-
-  private boolean hasSearchServicePlugin() {
-    return opalRuntime.hasServicePlugins(SearchService.class);
-  }
 
   @Subscribe
   public void onValueTableRenamed(ValueTableRenamedEvent event) {

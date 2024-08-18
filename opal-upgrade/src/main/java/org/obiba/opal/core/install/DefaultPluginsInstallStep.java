@@ -21,8 +21,6 @@ public class DefaultPluginsInstallStep implements InstallStep {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultPluginsInstallStep.class);
 
-  private static final String OPAL_SEARCH_PLUGIN = "opal-search-es";
-
   @Autowired
   private PluginsService pluginsService;
 
@@ -33,12 +31,6 @@ public class DefaultPluginsInstallStep implements InstallStep {
 
   @Override
   public void execute(Version currentVersion) {
-    log.info("Installing default plugins from update site: {}", pluginsService.getUpdateSite());
-    try {
-      log.info("Installing {} plugin", OPAL_SEARCH_PLUGIN);
-      pluginsService.installPlugin(OPAL_SEARCH_PLUGIN, null);
-    } catch (Exception e) {
-      log.error("Failed to install " + OPAL_SEARCH_PLUGIN + " plugin", e);
-    }
+    log.info("No default plugin is to be installed from update site: {}", pluginsService.getUpdateSite());
   }
 }
