@@ -16,6 +16,7 @@ import org.obiba.plugins.spi.ServicePlugin;
 
 import java.util.concurrent.ThreadFactory;
 
+@Deprecated
 public interface SearchService extends ServicePlugin {
 
   //

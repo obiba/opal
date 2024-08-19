@@ -1,0 +1,100 @@
+<template>
+  <div :class="statusClass">
+    <div>
+    <span>{{ $t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
+    <q-btn
+      v-if="statusActionIcon"
+      color="white"
+      :icon="statusActionIcon"
+      :title="$t(statusActionLabel)"
+      rounded
+      dense
+      outline
+      size="sm"
+      class="on-right"
+      @click="onStatusAction" />
+    <q-btn
+      v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
+      color="white"
+      icon="cleaning_services"
+      :title="$t('clear')"
+      dense
+      flat
+      size="sm"
+      class="on-right"
+      @click="onClear" />
+    </div>
+    <q-linear-progress v-if="datasourceStore.tableIndex.progress"  color="white" :value="datasourceStore.tableIndex.progress" class="q-mt-xs" />
+  </div>
+</template>
+
+
+<script lang="ts">
+export default defineComponent({
+  name: 'TableIndexer',
+});
+</script>
+<script setup lang="ts">
+import { TableIndexationStatus } from 'src/models/Opal';
+
+const datasourceStore = useDatasourceStore();
+
+const statusClass = computed(() => {
+  switch(datasourceStore.tableIndex.status) {
+    case TableIndexationStatus.UPTODATE:
+      return 'box-positive';
+    case TableIndexationStatus.IN_PROGRESS:
+      return 'box-info';
+    case TableIndexationStatus.OUTDATED:
+      return 'box-warning';
+    default:
+      return 'box-negative';
+  }
+});
+
+const statusActionLabel = computed(() => {
+  switch(datasourceStore.tableIndex.status) {
+    case TableIndexationStatus.UPTODATE:
+      return 'refresh';
+    case TableIndexationStatus.IN_PROGRESS:
+      return 'stop';
+    case TableIndexationStatus.OUTDATED:
+      return 'start';
+    default:
+      return '';
+  }
+});
+
+const statusActionIcon = computed(() => {
+  switch(datasourceStore.tableIndex.status) {
+    case TableIndexationStatus.UPTODATE:
+      return 'refresh';
+    case TableIndexationStatus.IN_PROGRESS:
+      return 'stop';
+    case TableIndexationStatus.OUTDATED:
+      return 'play_arrow';
+    default:
+      return '';
+  }
+});
+
+onMounted(() => datasourceStore.loadTableIndex());
+
+function onStatusAction() {
+  if (datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS) {
+    datasourceStore.deleteTableIndex();
+  } else {
+    datasourceStore.updateTableIndex().then(() => {
+      setInterval(() => {
+        if (datasourceStore.tableIndex.progress || datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS) {      
+          datasourceStore.loadTableIndex();
+        }
+      }, 1000); // 1 second
+    });
+  }
+}
+
+function onClear() {
+  datasourceStore.deleteTableIndex();
+}
+</script>

@@ -4,6 +4,7 @@ import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceVi
 import { Perms } from 'src/utils/authz';
 import { AttributesBundle } from 'src/components/models';
 import { QueryResultDto } from 'src/models/Search';
+import { TableIndexStatusDto } from 'src/models/Opal';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -22,6 +23,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   const tables = ref([] as TableDto[]); // current datasource tables
   const table = ref({} as TableDto); // current table
   const view = ref({} as ViewDto); // current view
+  const tableIndex = ref({} as TableIndexStatusDto); // current table index
   const variables = ref([] as VariableDto[]); // current table variables
   const variable = ref({} as VariableDto); // current variable
   const perms = ref({} as DatasourcePerms);
@@ -50,6 +52,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tables.value = [];
     table.value = {} as TableDto;
     view.value = {} as ViewDto;
+    tableIndex.value = {} as TableIndexStatusDto;
     variables.value = [];
     variable.value = {} as VariableDto;
     perms.value = {} as DatasourcePerms;
@@ -129,6 +132,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tables.value = [];
     table.value = {} as TableDto;
     view.value = {} as ViewDto;
+    tableIndex.value = {} as TableIndexStatusDto;
     variables.value = [];
     variable.value = {} as VariableDto;
     delete perms.value.tables;
@@ -144,6 +148,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadTable(name: string) {
     table.value = {} as TableDto;
     view.value = {} as ViewDto;
+    tableIndex.value = {} as TableIndexStatusDto;
     delete perms.value.table;
     delete perms.value.tableValueSets;
     variables.value = [];
@@ -471,14 +476,32 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.put(`/datasource/${pName}/view/${name}/_init`);
   }
 
+  //
+  // Table summary: indexing and contingency 
+  //
+
   async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
-    const tableName = `${datasource.value.name}.${table.value.name}`;
-    return api.get('/datasources/entities/_contingency', {
+    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
       params: {
-        v0: `${tableName}:${var0}`,
-        v1: `${tableName}:${var1}`,
+        v0: var0,
+        v1: var1,
       }
     }).then((response) => response.data);
+  }
+
+  async function loadTableIndex() {
+    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .then((response) => tableIndex.value = response.data);
+  }
+
+  async function updateTableIndex() {
+    return api.put(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .finally(loadTableIndex);
+  }
+
+  async function deleteTableIndex() {
+    return api.delete(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .finally(loadTableIndex);
   }
 
   return {
@@ -486,6 +509,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tables,
     table,
     view,
+    tableIndex,
     variables,
     variable,
     variableAttributesBundles,
@@ -495,6 +519,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
     initDatasourceTableVariables,
     initDatasourceTableVariable,
     loadTable,
+    loadTableIndex,
+    updateTableIndex,
+    deleteTableIndex,
     loadTableVariables,
     getTableVariables,
     isNewTableNameValid,

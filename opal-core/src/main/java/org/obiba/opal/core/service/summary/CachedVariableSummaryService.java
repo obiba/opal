@@ -19,6 +19,7 @@ import org.obiba.magma.math.Distribution;
 import org.obiba.magma.math.summary.*;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.VariableSummaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class CachedVariableSummaryService implements VariableSummaryService {
+public class CachedVariableSummaryService implements VariableSummaryService, SystemService {
 
   private static final Logger log = LoggerFactory.getLogger(CachedVariableSummaryService.class);
 
@@ -113,6 +114,16 @@ public class CachedVariableSummaryService implements VariableSummaryService {
       TVariableSummaryFactory extends VariableSummaryFactory<TVariableSummary>> boolean isSummaryCached(
       @NotNull VariableSummaryFactory<TVariableSummary> summaryFactory) {
     return getService((Class<TVariableSummaryFactory>) summaryFactory.getClass()).isSummaryCached(summaryFactory);
+  }
+
+  @Override
+  public void start() {
+    summaryServices.values().forEach(AbstractVariableSummaryCachedService::loadCache);
+  }
+
+  @Override
+  public void stop() {
+    summaryServices.values().forEach(AbstractVariableSummaryCachedService::saveCache);
   }
 
   private class ContinuousVariableSummaryCachedService extends

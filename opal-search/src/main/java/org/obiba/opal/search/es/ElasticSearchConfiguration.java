@@ -11,8 +11,10 @@ package org.obiba.opal.search.es;
 
 import com.google.common.base.Strings;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.spi.search.SearchSettings;
 
+/**
+ * Only for legacy opal-config.xml
+ */
 public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   private static final String DEFAULT_OPAL_INDEX_NAME = "opal";

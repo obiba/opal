@@ -61,6 +61,12 @@ public interface IndexManager {
   void drop();
 
   /**
+   * Drop the index for a table.
+   *
+   */
+  void drop(ValueTable valueTable);
+
+  /**
    * Returns true of value table is indexed and index is up to date, ie ready to be queried.
    *
    * @param valueTable

@@ -10,41 +10,23 @@
 
 package org.obiba.opal.core.service.summary;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
+import org.obiba.magma.*;
+import org.obiba.magma.math.summary.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import javax.validation.constraints.NotNull;
+import java.io.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import javax.validation.constraints.NotNull;
-
-
-import org.obiba.magma.AttributeAware;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.math.summary.BinaryVariableSummaryFactory;
-import org.obiba.magma.math.summary.CategoricalVariableSummary;
-import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
-import org.obiba.magma.math.summary.ContinuousVariableSummary;
-import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
-import org.obiba.magma.math.summary.DefaultVariableSummary;
-import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
-import org.obiba.magma.math.summary.GeoVariableSummary;
-import org.obiba.magma.math.summary.GeoVariableSummaryFactory;
-import org.obiba.magma.math.summary.TextVariableSummary;
-import org.obiba.magma.math.summary.TextVariableSummaryFactory;
-import org.obiba.magma.math.summary.VariableSummary;
-import org.obiba.magma.math.summary.VariableSummaryFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
-import com.google.common.collect.Maps;
 
 import static org.obiba.magma.math.summary.AbstractVariableSummary.VariableSummaryBuilder;
 
@@ -54,6 +36,8 @@ public abstract class AbstractVariableSummaryCachedService< //
     TVariableSummaryBuilder extends VariableSummaryBuilder<TVariableSummary, TVariableSummaryBuilder>> {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractVariableSummaryCachedService.class);
+
+  private static final String CACHE_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "guava-cache";
 
   private final Cache<String, VariableSummary> summaryCache = CacheBuilder.newBuilder().build();
 
@@ -65,6 +49,35 @@ public abstract class AbstractVariableSummaryCachedService< //
   protected abstract TVariableSummaryBuilder newVariableSummaryBuilder(@NotNull Variable variable);
 
   protected abstract String getCacheName();
+
+  public void loadCache() {
+    File cacheFile = getCacheFile();
+    if (!cacheFile.exists()) return;
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(cacheFile))) {
+      Map<String, VariableSummary> cacheMap = (Map<String, VariableSummary>) ois.readObject();
+      summaryCache.putAll(cacheMap);
+      log.info("Cache loaded from file: {}", cacheFile.getName());
+    } catch (IOException | ClassNotFoundException e) {
+      log.error("Cache cannot be loaded: {}", cacheFile.getName(), e);
+    }
+  }
+
+  public void saveCache() {
+    File cacheFile = getCacheFile();
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(cacheFile))) {
+      Map<String, VariableSummary> cacheMap = summaryCache.asMap();
+      oos.writeObject(new HashMap<>(cacheMap));
+      log.info("Cache saved to file: {}", cacheFile.getName());
+    } catch (IOException e) {
+      log.error("Cache cannot be saved: {}", cacheFile.getName(), e);
+    }
+  }
+
+  private File getCacheFile() {
+    File cacheFile = new File(CACHE_DIR, getCacheName() + ".dat");
+    cacheFile.getParentFile().mkdirs();
+    return cacheFile;
+  }
 
   @NotNull
   protected TVariableSummaryBuilder getSummaryBuilder(@NotNull ValueTable valueTable, @NotNull Variable variable) {

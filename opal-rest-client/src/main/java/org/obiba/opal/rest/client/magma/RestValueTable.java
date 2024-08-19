@@ -141,9 +141,10 @@ public class RestValueTable extends AbstractValueTable {
     return tableDto;
   }
 
-  public Search.QueryResultDto getFacets(Search.QueryTermsDto dtoQueries) {
-    return getOpalClient().postResource(Search.QueryResultDto.class, newReference("facets", "_search"),
-        Search.QueryResultDto.newBuilder(), dtoQueries);
+  public Search.QueryResultDto getContingency(String var0, String var1) {
+    return getOpalClient().getResource(Search.QueryResultDto.class,
+        newUri("_contingency").query("v0", var0).query("v1", var1).build(),
+        Search.QueryResultDto.newBuilder());
   }
 
   private void initialiseValueSetsTimestamps() {
@@ -414,12 +415,6 @@ public class RestValueTable extends AbstractValueTable {
       return getOpalClient()
           .getResource(Math.SummaryStatisticsDto.class, newReference("variable", variable.getName(), "summary"),
               Math.SummaryStatisticsDto.newBuilder());
-    }
-
-    public Search.QueryResultDto getFacet() {
-      return getOpalClient()
-          .getResource(Search.QueryResultDto.class, newReference("facet", "variable", variable.getName(), "_search"),
-              Search.QueryResultDto.newBuilder());
     }
 
   }

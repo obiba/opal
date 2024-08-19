@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.opal.spi.datasource.DatasourceServiceLoader;
 import org.obiba.opal.spi.r.analysis.RAnalysisServiceLoader;
-import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.obiba.plugins.PluginResources;
 import org.obiba.plugins.PluginsClassLoader;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -153,9 +151,6 @@ public class PluginsManager {
     VCFStoreServiceLoader.get(pluginsClassLoader).getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
         .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
-    SearchServiceLoader.get(pluginsClassLoader).getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
     DatasourceServiceLoader.get(pluginsClassLoader).getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
         .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
