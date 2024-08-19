@@ -1069,5 +1069,21 @@ export default {
     total: 'Somme',
     variance: 'Variance',
     count: 'N'
+  },
+  table_index: {
+    status_title: {
+      NOT_INDEXED: 'La table n\'est pas indexée. L\'indexation est recommandée pour de meilleures performances lors de l\'extraction des statistiques récapitulatives de la variable.',
+      OUTDATED: 'L\'index de la table est obsolète. L\'indexation est recommandée pour de meilleures performances lors de l\'extraction des statistiques récapitulatives de la variable.',
+      IN_PROGRESS: 'L\'indexation de la table est en cours. ',
+      UPTODATE: 'L\'index de la table est obsolète. ',
+      UNRECOGNIZED: 'L\'index de la table est dans un état non reconnu. '
+    },
+    status: {
+      NOT_INDEXED: 'Non indexée',
+      OUTDATED: 'Obsolète',
+      IN_PROGRESS: 'En cours',
+      UPTODATE: 'À jour',
+      UNRECOGNIZED: 'Non reconnue'
+    }
   }
 };

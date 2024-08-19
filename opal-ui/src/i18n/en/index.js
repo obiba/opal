@@ -1069,5 +1069,21 @@ export default {
     total: 'Sum',
     variance: 'Variance',
     count: 'N'
+  },
+  table_index: {
+    status_title: {
+      NOT_INDEXED: 'The table index is not indexed. Indexing is recommended for better performance when fetching the variables summary statistics.',
+      OUTDATED: 'The table index is outdated. Indexing is recommended for better performance when fetching the variable summary statistics.',
+      IN_PROGRESS: 'The table indexing is in progress.',
+      UPTODATE: 'The table index is up to date.',
+      UNRECOGNIZED: 'The table index is in an unrecognized state.'
+    },
+    status: {
+      NOT_INDEXED: 'Not indexed',
+      OUTDATED: 'Outdated',
+      IN_PROGRESS: 'In progress',
+      UPTODATE: 'Up to date',
+      UNRECOGNIZED: 'Unrecognized'
+    }
   }
 };

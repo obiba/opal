@@ -133,6 +133,9 @@
           </q-tab-panel>
 
           <q-tab-panel name="summary">
+            <div v-if="datasourceStore.perms.tableValueSets?.canRead()" class="q-mb-md">
+              <table-indexer />
+            </div>
             <div class="row">
               <div class="col-md-auto col-sm-auto col-xs-12">
                 <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
@@ -218,6 +221,7 @@ import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
 import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue';
+import TableIndexer from 'src/components/datasource/TableIndexer.vue';
 import ContingencyTable from 'src/components/datasource/ContingencyTable.vue';
 import ViewWhereScript from 'src/components/datasource/ViewWhereScript.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
