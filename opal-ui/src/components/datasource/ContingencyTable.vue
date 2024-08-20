@@ -4,70 +4,83 @@
     <div class="text-help q-mb-md">{{ $t('contingency_table_info') }}</div>
 
     <div class="row">
-      <q-input
-        v-model="varCat"
-        dense
+      <q-select
         filled
+        dense
         :label="$t('categorical_variable')"
         :hint="$t('categorical_variable_hint')"
-        :disable="loading"
-        debounce="500"
-        @update:model-value="onSearchVarCat">
-        <q-menu
-          v-model="showVarCatSuggestions"
-          no-parent-event
-          auto-close>
-          <q-list style="min-width: 100px">
-            <q-item clickable v-close-popup v-for="sugg in varCatSuggestions" :key="sugg.name" @click="varCat = sugg.name">
-              <q-item-section class="text-caption">
-                <span>{{ sugg.name }}</span>
-                <div v-for="attr in getLabels(sugg.attributes)" :key="attr.locale" class="text-hint">
-                  <q-badge
-                    v-if="attr.locale"
-                    color="grey-3"
-                    :label="attr.locale"
-                    class="q-mr-xs text-grey-6"
-                  />
-                  <span>{{ attr.value }}</span>
-                </div>
+        v-model="varCat"
+        use-input
+        hide-selected
+        fill-input
+        input-debounce="0"
+        :options="varCatOptions"
+        @filter="onFilterVarCat"
+        @update:model-value="onClearResults"
+      >
+        <template v-slot:option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section class="text-caption">
+              <span>{{ scope.opt.label }}</span>
+              <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
+                <q-badge
+                  v-if="attr.locale"
+                  color="grey-3"
+                  :label="attr.locale"
+                  class="q-mr-xs text-grey-6"
+                />
+                <span>{{ attr.value }}</span>
+              </div>
               </q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-input>
-      <q-icon name="close" size="sm" class="q-mt-sm on-right"/>
-      <q-input
-        v-model="varAlt"
-        dense
-        filled
-        :label="$t('other_variable')"
-        :hint="$t('other_variable_hint')"
-        :disable="loading"
-        debounce="500"
-        @update:model-value="onSearchVarAlt"
-        class="on-right">
-        <q-menu
-          v-model="showVarAltSuggestions"
-          no-parent-event
-          auto-close>
-          <q-list style="min-width: 100px">
-            <q-item clickable v-close-popup v-for="sugg in varAltSuggestions" :key="sugg.name" @click="varAlt = sugg.name">
-              <q-item-section>
-                <span>{{ sugg.name }}</span>
-                <div v-for="attr in getLabels(sugg.attributes)" :key="attr.locale" class="text-hint">
-                  <q-badge
-                    v-if="attr.locale"
-                    color="grey-3"
-                    :label="attr.locale"
-                    class="q-mr-xs text-grey-6"
-                  />
-                  <span>{{ attr.value }}</span>
-                </div>
+          </q-item>
+        </template>
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              {{ $t('no_options') }}
             </q-item-section>
           </q-item>
-          </q-list>
-        </q-menu>
-      </q-input>
+        </template>
+      </q-select>
+      <q-icon name="close" size="sm" class="q-mt-sm on-right on-left"/>
+      <q-select
+        filled
+        dense
+        :label="$t('other_variable')"
+        :hint="$t('other_variable_hint')"
+        v-model="varAlt"
+        use-input
+        hide-selected
+        fill-input
+        input-debounce="0"
+        :options="varAltOptions"
+        @filter="onFilterVarAlt"
+        @update:model-value="onClearResults"
+      >
+        <template v-slot:option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section class="text-caption">
+              <span>{{ scope.opt.label }}</span>
+              <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
+                <q-badge
+                  v-if="attr.locale"
+                  color="grey-3"
+                  :label="attr.locale"
+                  class="q-mr-xs text-grey-6"
+                />
+                <span>{{ attr.value }}</span>
+              </div>
+              </q-item-section>
+          </q-item>
+        </template>
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              {{ $t('no_options') }}
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
       <q-btn
         color="primary"
         :label="$t('submit')"
@@ -95,7 +108,7 @@
         <thead>
           <tr class="bg-grey-3">
             <th rowspan="2">
-              <div class="text-bold">{{ varAlt }}</div>
+              <div class="text-bold">{{ variableAlt?.name }}</div>
               <div v-for="attr in getLabels(variableAlt?.attributes)" :key="attr.locale" class="text-hint">
                 <q-badge
                   v-if="attr.locale"
@@ -107,7 +120,7 @@
               </div>
             </th>
             <th :colspan="(variableCatCategories.length || 0) + 1">
-              <div class="text-bold">{{ varCat }}</div>
+              <div class="text-bold">{{ variableAlt?.name }}</div>
               <div v-for="attr in getLabels(variableCat?.attributes)" :key="attr.locale" class="text-hint">
                 <q-badge
                   v-if="attr.locale"
@@ -200,23 +213,35 @@ import { notifyError } from 'src/utils/notify';
 const route = useRoute();
 const datasourceStore = useDatasourceStore();
 
-const varCat = ref('');
-const showVarCatSuggestions = ref(false);
-const varCatSuggestions = ref<VariableDto[]>([]);
-const varAlt = ref('');
-const showVarAltSuggestions = ref(false);
-const varAltSuggestions = ref<VariableDto[]>([]);
+interface VariableOption {
+  label: string;
+  value: string;
+  variable: VariableDto;
+}
+
+const varCat = ref<VariableOption>();
+const varCatOptions = ref<VariableOption[]>([]);
+const varAlt = ref<VariableOption>();
+const varAltOptions = ref<VariableOption[]>([]);
 const loading = ref(false);
 const contingency = ref<QueryResultDto | null>(null);
 
 const measures = ['min', 'max', 'mean', 'stdDeviation', 'total', 'variance', 'count'];
 const booleanCategories = [ { name: 'true', attributes: [] }, { name: 'false', attributes: [] } ];
+
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 
-const variableCat = computed(() => datasourceStore.variables.find((v) => v.name === varCat.value));
+const allVarCatOptions = computed(() => datasourceStore.variables
+  .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean')
+  .map((v) => ({label: v.name, value: v.name, variable: v })));
+const allVarAltOptions = computed(() => datasourceStore.variables
+  .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean' || valueTypesMap.numerical.includes(v.valueType))
+  .map((v) => ({label: v.name, value: v.name, variable: v })));
+
+const variableCat = computed(() => varCat.value?.variable);
 const variableCatCategories = computed(() => (variableCat.value?.valueType === 'boolean' ? booleanCategories : variableCat.value?.categories) || []);
-const variableAlt = computed(() => datasourceStore.variables.find((v) => v.name === varAlt.value));
+const variableAlt = computed(() => varAlt.value?.variable);
 const variableAltCategories = computed(() => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || []);
 const withFrequencies = computed(() => contingency.value?.facets.some((f) => f.frequencies !== undefined));
 const withStatistics = computed(() => contingency.value?.facets.some((f) => f.statistics !== undefined));
@@ -230,42 +255,29 @@ watch([dsName, tName], () => {
       notifyError(err);
     })
     .finally(() => {
+      varCatOptions.value = { ...allVarCatOptions.value };
+      varAltOptions.value = { ...allVarAltOptions.value };
       loading.value = false;
     });
 });
 
-function onSearchVarCat(value: string) {
-  loading.value = false;
-  contingency.value = null;
-  if (value.length < 2) {
-    varCatSuggestions.value = [];
-    showVarCatSuggestions.value = false;
-    return;
-  }
-  varCatSuggestions.value = datasourceStore.variables
-    .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean')
-    .filter((v) => v.name.toLowerCase().includes(value.toLowerCase()));
-  showVarCatSuggestions.value = varCatSuggestions.value.length > 0;
+function onFilterVarCat(val: string, update, abort) {
+  update(() => {
+    const needle = val.toLowerCase().trim();
+    varCatOptions.value = needle === '' ? [ ...allVarCatOptions.value ] : allVarCatOptions.value.filter(v => v.value.toLowerCase().indexOf(needle) > -1)
+  });
 }
 
-function onSearchVarAlt(value: string) {
-  loading.value = false;
-  contingency.value = null;
-  if (value.length < 2) {
-    varAltSuggestions.value = [];
-    showVarAltSuggestions.value = false;
-    return;
-  }
-  varAltSuggestions.value = datasourceStore.variables
-    .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean' || valueTypesMap.numerical.includes(v.valueType))
-    .filter((v) => v.name.toLowerCase().includes(value.toLowerCase()))
-    .filter((v) => v.name !== varCat.value);
-  showVarAltSuggestions.value = varAltSuggestions.value.length > 0;
+function onFilterVarAlt(val: string, update, abort) {
+  update(() => {
+    const needle = val.toLowerCase().trim();
+    varAltOptions.value = needle === '' ? [ ...allVarAltOptions.value ] : allVarAltOptions.value.filter(v => v.value.toLowerCase().indexOf(needle) > -1)
+  });
 }
 
 function onSubmit() {
   loading.value = true;
-  datasourceStore.getContingencyTable(varCat.value, varAlt.value)
+  datasourceStore.getContingencyTable(varCat.value?.value, varAlt.value?.value)
     .then((res) => {
       contingency.value = res;
     })
@@ -278,10 +290,12 @@ function onSubmit() {
 }
 
 function onClear() {
-  varCat.value = '';
-  showVarCatSuggestions.value = false;
-  varAlt.value = '';
-  showVarAltSuggestions.value = false;
+  varCat.value = undefined;
+  varAlt.value = undefined;
+  onClearResults();
+}
+
+function onClearResults() {
   loading.value = false;
   contingency.value = null;
 }
