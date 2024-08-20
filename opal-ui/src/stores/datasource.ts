@@ -130,11 +130,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTables() {
     tables.value = [];
-    table.value = {} as TableDto;
-    view.value = {} as ViewDto;
-    tableIndex.value = {} as TableIndexStatusDto;
-    variables.value = [];
-    variable.value = {} as VariableDto;
+    // table.value = {} as TableDto;
+    // view.value = {} as ViewDto;
+    // tableIndex.value = {} as TableIndexStatusDto;
+    // variables.value = [];
+    // variable.value = {} as VariableDto;
     delete perms.value.tables;
     return api
       .get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } } )
