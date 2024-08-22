@@ -173,8 +173,8 @@ const normalChartData = computed(() => {
   ];
 });
 
-const nonMissingFreq = computed(() => props.data?.frequencies.filter((f) => !f.missing));
-const missingFreq = computed(() => props.data?.frequencies.filter((f) => f.missing));
-const totalFreq = computed(() => props.data?.frequencies.reduce((acc, f) => acc + f.freq, 0));
-const totalPct = computed(() => props.data?.frequencies.reduce((acc, f) => acc + f.pct, 0));
+const nonMissingFreq = computed(() => props.data?.frequencies?.filter((f) => !f.missing));
+const missingFreq = computed(() => props.data?.frequencies?.filter((f) => f.missing));
+const totalFreq = computed(() => props.data?.frequencies?.reduce((acc, f) => acc + f.freq, 0));
+const totalPct = computed(() => props.data?.frequencies?.reduce((acc, f) => acc + f.pct, 0));
 </script>

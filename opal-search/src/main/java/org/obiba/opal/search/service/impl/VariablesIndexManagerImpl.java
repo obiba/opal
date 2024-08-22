@@ -53,7 +53,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   @Override
   public SearchQueryExecutor createQueryExecutor() {
-    return new VariablesQueryExecutor();
+    return new VariablesQueryExecutor(directory);
   }
 
   @Override

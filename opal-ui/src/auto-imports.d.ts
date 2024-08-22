@@ -84,6 +84,7 @@ declare global {
   const useResourcesStore: typeof import('./stores/resources')['useResourcesStore']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
+  const useSearchStore: typeof import('./stores/search')['useSearchStore']
   const useSlots: typeof import('vue')['useSlots']
   const useSqlStore: typeof import('./stores/sql')['useSqlStore']
   const useSystemStore: typeof import('./stores/system')['useSystemStore']
@@ -186,6 +187,7 @@ declare module 'vue' {
     readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
+    readonly useSearchStore: UnwrapRef<typeof import('./stores/search')['useSearchStore']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useSqlStore: UnwrapRef<typeof import('./stores/sql')['useSqlStore']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
@@ -280,6 +282,7 @@ declare module '@vue/runtime-core' {
     readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
+    readonly useSearchStore: UnwrapRef<typeof import('./stores/search')['useSearchStore']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useSqlStore: UnwrapRef<typeof import('./stores/sql')['useSqlStore']>
     readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>

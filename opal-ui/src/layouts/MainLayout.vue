@@ -18,6 +18,39 @@
         </q-toolbar-title>
 
         <div class="q-gutter-sm row items-center no-wrap">
+          <q-input
+            v-model="query"
+            dense
+            filled
+            :placeholder="$t('search') + '...'"
+            bg-color="grey-2"
+            debounce="300"
+            @update:model-value="onSearch"
+            style="width: 200px"
+          >
+            <q-menu
+              v-model="showResults"
+              no-parent-event
+              no-focus
+              auto-close>
+              <q-list style="min-width: 100px">
+                <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
+                  <q-item-section class="text-caption">
+                    <span>{{ item.identifier }}</span>
+                    <div v-for="attr in getVariableLabels(item)" :key="attr.locale" class="text-hint">
+                      <q-badge
+                        v-if="attr.locale"
+                        color="grey-3"
+                        :label="attr.locale"
+                        class="q-mr-xs text-grey-6"
+                      />
+                      <span>{{ attr.value }}</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-input>
           <q-btn to="/admin" no-caps>
             {{ $t('administration') }}
           </q-btn>
@@ -102,11 +135,14 @@ import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
 import { computed } from 'vue';
+import { ItemResultDto, ItemFieldsDto, QueryResultDto } from 'src/models/Search';
 
 const router = useRouter();
 const systemStore = useSystemStore();
 const resourcesStore = useResourcesStore();
 const authStore = useAuthStore();
+const searchStore = useSearchStore();
+
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
 const localeOptions = computed(() => {
@@ -116,8 +152,16 @@ const localeOptions = computed(() => {
   }));
 });
 
+interface ItemFieldsResultDto extends ItemResultDto {
+  'Search.ItemFieldsDto.item': ItemFieldsDto;
+}
 
 const leftDrawerOpen = ref(false);
+const query = ref('');
+const showResults = ref(false);
+const results = ref<QueryResultDto>();
+
+const itemResults = computed(() => results.value?.hits as ItemFieldsResultDto[] || []);
 
 onMounted(() => {
   authStore.userProfile().then(() => {
@@ -178,5 +222,51 @@ function onSignout() {
 
 function onHelp() {
   window.open('https://opaldoc.obiba.org', '_blank');
+}
+
+function onSearch() {
+  if (!query.value) {
+    showResults.value = false;
+    return;
+  }
+  const q = query.value.endsWith('*') ? query.value : `${query.value}*`;
+  searchStore.search(q, 10, ['label', 'label-en']).then((res) => {
+    showResults.value = res.totalHits > 0;
+    results.value = res;
+  });
+}
+
+function getVariableLabels(item: ItemFieldsResultDto) {
+  const fields = item['Search.ItemFieldsDto.item'].fields;
+  if (!fields) {
+    return [];
+  }
+  const labels = [];
+  for (const field of fields) {
+    if (field.key.startsWith('label')) {
+      const tokens = field.key.split('-');
+      labels.push({ value: field.value, locale: tokens.length > 1 ? tokens[1] : undefined });
+    }
+  }
+  return labels;
+}
+
+function goToVariable(item: ItemFieldsResultDto) {
+  const fields = item['Search.ItemFieldsDto.item'].fields;
+  let project;
+  let table;
+  let variable;
+  for (const field of fields) {
+    if (field.key === 'project') {
+      project = field.value;
+    } else if (field.key === 'table') {
+      table = field.value;
+    } else if (field.key === 'name') {
+      variable = field.value;
+    }
+  }
+  if (project || table || variable) {
+    router.push(`/project/${project}/table/${table}/variable/${variable}`);
+  }
 }
 </script>
