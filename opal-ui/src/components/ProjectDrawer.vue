@@ -99,18 +99,24 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 const projectsStore = useProjectsStore();
+const pluginsStore = usePluginsStore();
 const hasAdminPermission = ref(false);
 const hasVcfStorePermission = ref(false);
+const hasVcfPlugins = ref(false);
 
-watchEffect(
-  () => {
-    hasAdminPermission.value =
-      projectsStore.perms.project?.canCreate() ||
-      projectsStore.perms.project?.canUpdate() ||
-      projectsStore.perms.project?.canDelete() || false;
-    // FIXME: uncomment line below and remove the next once the server is fixed
-    // hasVcfPermission.value = projectsStore.perms.vcfstore?.canRead() || false;
-    hasVcfStorePermission.value = hasAdminPermission.value;
-  }
-);
+watchEffect(() => {
+  console.log('watching Drawer');
+  hasAdminPermission.value =
+    projectsStore.perms.project?.canCreate() ||
+    projectsStore.perms.project?.canUpdate() ||
+    projectsStore.perms.project?.canDelete() ||
+    false;
+
+  hasVcfStorePermission.value =
+    hasVcfPlugins && projectsStore.perms.vcfstore?.canRead() && !!projectsStore.project.vcfStoreService ? true : false;
+});
+
+onMounted(() => {
+  pluginsStore.hasPlugin('vcf-store').then((status) => (hasVcfPlugins.value = status));
+});
 </script>

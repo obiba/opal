@@ -45,7 +45,7 @@
             v-model="newProject.vcfStoreService"
             :options="vcfStores"
             dense
-            :label="$t('vcf_store')"
+            :label="$t('vcf_store.label')"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
