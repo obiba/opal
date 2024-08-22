@@ -12,7 +12,7 @@ package org.obiba.opal.search;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.spi.search.QuerySettings;
+import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.web.ws.SortDir;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,8 +25,6 @@ import java.util.List;
 public abstract class AbstractSearchUtility {
 
   protected static final String DEFAULT_SORT_FIELD = "_score";
-
-  protected static final String INDEX_FIELD = "index";
 
   @Autowired
   protected OpalSearchService opalSearchService;
@@ -43,21 +41,17 @@ public abstract class AbstractSearchUtility {
   protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
                                            Collection<String> facets, List<String> sortWithOrder) {
 
-    Collection<String> safeFields = fields == null ? Lists.newArrayList() : fields;
-    addDefaultFields(safeFields);
-    QuerySettings querySettings = QuerySettings.newSettings(query)
+    List<String> safeFields = Lists.newArrayList();
+    if (fields != null)
+      safeFields.addAll(fields);
+    return QuerySettings.newSettings(query)
         .fields(safeFields).facets(facets).from(offset).size(limit) //
         .sortWithOrder(sortWithOrder);
-
-    return querySettings;
   }
 
   protected boolean searchServiceAvailable() {
     return opalSearchService.isRunning() && opalSearchService.isEnabled();
   }
 
-  protected void addDefaultFields(Collection<String> fields) {
-    if (!fields.contains(INDEX_FIELD)) fields.add(INDEX_FIELD);
-  }
 }
 

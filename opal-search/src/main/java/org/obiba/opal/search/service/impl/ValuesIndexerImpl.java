@@ -17,9 +17,9 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.support.VariableNature;
-import org.obiba.opal.spi.search.IndexManager;
-import org.obiba.opal.spi.search.IndexSynchronization;
-import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.search.service.IndexManager;
+import org.obiba.opal.search.service.IndexSynchronization;
+import org.obiba.opal.search.service.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,15 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultValuesIndexer implements IndexSynchronization {
+public class ValuesIndexerImpl implements IndexSynchronization {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultValuesIndexer.class);
+  private static final Logger log = LoggerFactory.getLogger(ValuesIndexerImpl.class);
 
-  private final DefaultValuesIndexManager indexManager;
+  private final ValuesIndexManagerImpl indexManager;
 
   private final ValueTable table;
 
-  private final DefaultValuesIndex index;
+  private final ValuesIndexImpl index;
 
   private final int total;
 
@@ -43,7 +43,7 @@ public class DefaultValuesIndexer implements IndexSynchronization {
 
   protected boolean stop = false;
 
-  DefaultValuesIndexer(DefaultValuesIndexManager indexManager, ValueTable table, DefaultValuesIndex index) {
+  ValuesIndexerImpl(ValuesIndexManagerImpl indexManager, ValueTable table, ValuesIndexImpl index) {
     this.indexManager = indexManager;
     this.table = table;
     this.total = table.getVariableEntityCount();

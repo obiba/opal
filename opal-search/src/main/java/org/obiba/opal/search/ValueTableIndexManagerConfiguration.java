@@ -10,7 +10,7 @@
 package org.obiba.opal.search;
 
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.search.service.ValueTableIndex;
 
 public interface ValueTableIndexManagerConfiguration {
 

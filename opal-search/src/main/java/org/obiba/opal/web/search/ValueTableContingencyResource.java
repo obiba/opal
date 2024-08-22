@@ -10,29 +10,18 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.obiba.magma.Category;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.support.MagmaEngineVariableResolver;
-import org.obiba.magma.support.VariableNature;
-import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.search.service.ContingencyService;
-import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.spi.search.SearchException;
-import org.obiba.opal.web.model.Search;
+import org.obiba.opal.search.service.SearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Contingency query in the scope of a single table.

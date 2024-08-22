@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.search.service.ValueTableIndex;
 import org.obiba.opal.web.model.Opal;
 
 import static org.easymock.EasyMock.createMock;

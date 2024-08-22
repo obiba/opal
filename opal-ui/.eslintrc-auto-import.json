@@ -101,6 +101,7 @@
     "useResourcesStore": true,
     "useIdentifiersStore": true,
     "useAppsStore": true,
-    "useSqlStore": true
+    "useSqlStore": true,
+    "useSearchStore": true
   }
 }

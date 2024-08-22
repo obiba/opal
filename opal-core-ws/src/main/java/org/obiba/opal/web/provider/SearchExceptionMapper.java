@@ -11,7 +11,7 @@
 package org.obiba.opal.web.provider;
 
 import org.obiba.opal.web.model.Ws;
-import org.obiba.opal.spi.search.SearchException;
+import org.obiba.opal.search.service.SearchException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 

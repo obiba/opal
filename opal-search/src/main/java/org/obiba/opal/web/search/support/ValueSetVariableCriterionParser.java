@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.search.support;
 
-import org.obiba.opal.spi.search.QuerySettings;
+import org.obiba.opal.search.service.QuerySettings;
 
 /**
  * Criterion for filtering values based on a variable field.

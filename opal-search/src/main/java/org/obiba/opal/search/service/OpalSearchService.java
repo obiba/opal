@@ -19,8 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.event.SynchronizeIndexEvent;
-import org.obiba.opal.spi.search.*;
-import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
+import org.obiba.opal.search.service.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,15 +133,18 @@ public class OpalSearchService implements Service {
 
   public Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException {
     if (!isRunning()) return null;
+    if (variablesIndexManager.getName().equals(searchPath)) {
+      return variablesIndexManager.createQueryExecutor().execute(querySettings);
+    }
     // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
-    throw new UnsupportedOperationException("Deprecated");
+    return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
   }
 
   //
   // Inner classes
   //
 
-  public static class IdentifiersQueryCallback implements SearchService.HitsQueryCallback<String> {
+  public static class IdentifiersQueryCallback implements HitsQueryCallback<String> {
 
     private int total = -1;
 
@@ -217,4 +219,15 @@ public class OpalSearchService implements Service {
 
   }
 
+  //
+  // Search callbacks
+  //
+
+  interface HitsQueryCallback<T> {
+
+    void onTotal(int total);
+
+    void onIdentifier(T id);
+
+  }
 }

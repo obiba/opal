@@ -10,16 +10,23 @@
 
 package org.obiba.opal.search.service.impl;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.spi.search.*;
+import org.obiba.opal.core.service.VariableSummaryHandler;
+import org.obiba.opal.search.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ThreadFactory;
 
 @Component
-public class DefaultValuesIndexManager implements ValuesIndexManager {
+public class ValuesIndexManagerImpl implements ValuesIndexManager {
+
+  private static final Logger log = LoggerFactory.getLogger(ValuesIndexManagerImpl.class);
 
   private static final String INDEX_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "index";
   public static final String VALUES_INDEX_DIR = INDEX_DIR + File.separatorChar + "opal-values";
@@ -29,7 +36,7 @@ public class DefaultValuesIndexManager implements ValuesIndexManager {
   private final ThreadFactory threadFactory;
 
   @Autowired
-  public DefaultValuesIndexManager(VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory) {
+  public ValuesIndexManagerImpl(VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory) {
     this.variableSummaryHandler = variableSummaryHandler;
     this.threadFactory = threadFactory;
   }
@@ -41,12 +48,17 @@ public class DefaultValuesIndexManager implements ValuesIndexManager {
 
   @Override
   public ValueTableValuesIndex getIndex(ValueTable valueTable) {
-    return new DefaultValuesIndex(getName(), valueTable);
+    return new ValuesIndexImpl(getName(), valueTable);
   }
 
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
-    return new DefaultValuesIndexer(this, valueTable, (DefaultValuesIndex) index);
+    return new ValuesIndexerImpl(this, valueTable, (ValuesIndexImpl) index);
+  }
+
+  @Override
+  public SearchQueryExecutor createQueryExecutor() {
+    throw new UnsupportedOperationException("Deprecated");
   }
 
   @Override
@@ -61,7 +73,11 @@ public class DefaultValuesIndexManager implements ValuesIndexManager {
 
   @Override
   public void drop() {
-    // TODO
+    try {
+      FileUtil.delete(new File(VALUES_INDEX_DIR));
+    } catch (IOException e) {
+      log.warn("Cannot delete index folder: {}", VALUES_INDEX_DIR, e);
+    }
   }
 
   @Override

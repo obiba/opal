@@ -10,23 +10,24 @@
 
 package org.obiba.opal.search.service.impl;
 
+import org.apache.lucene.index.IndexWriter;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.spi.search.IndexManager;
-import org.obiba.opal.spi.search.IndexSynchronization;
-import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.search.service.IndexManager;
+import org.obiba.opal.search.service.IndexSynchronization;
+import org.obiba.opal.search.service.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultVariablesIndexer implements IndexSynchronization {
+public class VariablesIndexerImpl implements IndexSynchronization {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultVariablesIndexer.class);
+  private static final Logger log = LoggerFactory.getLogger(VariablesIndexerImpl.class);
 
-  private final DefaultVariablesIndexManager indexManager;
+  private final VariablesIndexManagerImpl indexManager;
 
   private final ValueTable table;
 
-  private final DefaultVariablesIndex index;
+  private final VariablesIndexImpl index;
 
   private final int total;
 
@@ -34,7 +35,7 @@ public class DefaultVariablesIndexer implements IndexSynchronization {
 
   protected boolean stop = false;
 
-  DefaultVariablesIndexer(DefaultVariablesIndexManager indexManager, ValueTable table, DefaultVariablesIndex index) {
+  VariablesIndexerImpl(VariablesIndexManagerImpl indexManager, ValueTable table, VariablesIndexImpl index) {
     this.indexManager = indexManager;
     this.table = table;
     this.total = table.getVariableCount();
@@ -79,10 +80,13 @@ public class DefaultVariablesIndexer implements IndexSynchronization {
   @Override
   public void run() {
     index.create();
-    for (Variable variable : index.getVariables()) {
-      index.addVariable(variable);
-      done++;
+    try (IndexWriter writer = indexManager.newIndexWriter()) {
+      for (Variable variable : index.getVariables()) {
+        writer.addDocument(index.asDocument(variable));
+        done++;
+      }
+    } catch (Exception e) {
+      log.error("Variables index writing failed", e);
     }
   }
-
 }

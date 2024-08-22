@@ -37,6 +37,8 @@ public class PluginsManager {
 
   private static final String PLUGIN_DIST_SUFFIX = "-dist.zip";
 
+  private static final String[] DEPRECATED_PLUGINS = new String[]{"opal-search-es"};
+
   private final File pluginsDir = new File(OpalRuntime.PLUGINS_DIR);
 
   private final File archiveDir = new File(OpalRuntime.PLUGINS_DIR, ".archive");
@@ -180,8 +182,11 @@ public class PluginsManager {
     File[] children = pluginsDir.listFiles(pathname -> pathname.isDirectory() && !pathname.getName().startsWith("."));
     if (children == null || children.length == 0) return;
     for (File child : children) {
-      PluginResources plugin = new OpalPlugin(child);
-      PluginsManagerHelper.processPlugin(pluginsMap, plugin, archiveDir);
+      boolean deprecated = Arrays.stream(DEPRECATED_PLUGINS).anyMatch((name) -> child.getName().startsWith(name));
+      if (!deprecated) { // deprecated plugin
+        PluginResources plugin = new OpalPlugin(child);
+        PluginsManagerHelper.processPlugin(pluginsMap, plugin, archiveDir);
+      }
     }
   }
 

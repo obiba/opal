@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2024 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -8,17 +8,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.spi.search;
+package org.obiba.opal.search.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.apache.commons.math3.util.Pair;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Settings to be used to build a search query.

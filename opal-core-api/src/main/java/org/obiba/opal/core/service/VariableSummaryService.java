@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
-import org.obiba.opal.spi.search.VariableSummaryHandler;
 
 /**
  *
