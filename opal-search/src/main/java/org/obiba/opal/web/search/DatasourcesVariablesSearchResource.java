@@ -25,7 +25,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
-import org.obiba.opal.spi.search.QuerySettings;
+import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.ws.SortDir;
 import org.slf4j.Logger;

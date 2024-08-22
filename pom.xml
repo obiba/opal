@@ -79,6 +79,7 @@
     <lang-tag.version>1.4.4</lang-tag.version>
     <logback.version>1.5.6</logback.version>
     <logstash-logback.version>7.4</logstash-logback.version>
+    <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
     <magma.version>5.0-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
@@ -411,6 +412,22 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>9.11.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-analysis-common</artifactId>
+        <version>${lucene.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-queryparser</artifactId>
+        <version>${lucene.version}</version>
       </dependency>
 
       <!-- Definition of all Spring modules -->

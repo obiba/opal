@@ -16,8 +16,8 @@ import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.spi.search.QuerySettings;
-import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.search.service.QuerySettings;
+import org.obiba.opal.search.service.ValuesIndexManager;
 
 /**
  * Criterion for filtering values based on a variable field, expressed in RQL.

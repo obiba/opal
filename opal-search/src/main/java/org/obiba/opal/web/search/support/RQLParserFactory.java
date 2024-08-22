@@ -14,7 +14,7 @@ package org.obiba.opal.web.search.support;
 import com.google.common.base.Strings;
 import net.jazdw.rql.parser.ASTNode;
 import net.jazdw.rql.parser.RQLParser;
-import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.search.service.ValuesIndexManager;
 
 import java.util.stream.Collectors;
 

@@ -14,18 +14,18 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.support.Timestampeds;
-import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.search.service.ValueTableIndex;
 
 import java.util.Calendar;
 import java.util.Date;
 
-public abstract class DefaultValueTableIndex implements ValueTableIndex {
+public abstract class AbstractValueTableIndex implements ValueTableIndex {
 
   protected final String name;
 
   protected final ValueTable table;
 
-  protected DefaultValueTableIndex(String name, ValueTable table) {
+  protected AbstractValueTableIndex(String name, ValueTable table) {
     this.name = name;
     this.table = table;
   }
@@ -60,7 +60,7 @@ public abstract class DefaultValueTableIndex implements ValueTableIndex {
   @Override
   public boolean equals(Object obj) {
     return obj != null && (obj == this ||
-        obj instanceof DefaultValueTableIndex && ((ValueTableIndex) obj).getIndexType().equals(getIndexType()));
+        obj instanceof AbstractValueTableIndex && ((ValueTableIndex) obj).getIndexType().equals(getIndexType()));
   }
 
   @Override

@@ -35,10 +35,6 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-spi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-ws</artifactId>
     </dependency>
     <dependency>
@@ -60,6 +56,18 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analysis-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
     </dependency>
     <dependency>
       <groupId>net.jazdw</groupId>

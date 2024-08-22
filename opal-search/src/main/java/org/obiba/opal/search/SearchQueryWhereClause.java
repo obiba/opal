@@ -19,7 +19,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.QueryWhereClause;
-import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.search.service.ValuesIndexManager;
 import org.obiba.opal.web.search.support.RQLParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

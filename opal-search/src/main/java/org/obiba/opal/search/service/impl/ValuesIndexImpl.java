@@ -13,14 +13,14 @@ package org.obiba.opal.search.service.impl;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.search.service.ValueTableValuesIndex;
 
 import java.io.File;
 import java.io.IOException;
 
-public class DefaultValuesIndex extends DefaultValueTableIndex implements ValueTableValuesIndex {
+public class ValuesIndexImpl extends AbstractValueTableIndex implements ValueTableValuesIndex {
 
-  public DefaultValuesIndex(String name, ValueTable table) {
+  public ValuesIndexImpl(String name, ValueTable table) {
     super(name, table);
   }
 
@@ -42,7 +42,7 @@ public class DefaultValuesIndex extends DefaultValueTableIndex implements ValueT
   }
 
   private File getIndexFile() {
-    return new File(DefaultValuesIndexManager.VALUES_INDEX_DIR, getValueTableReference() + ".idx");
+    return new File(ValuesIndexManagerImpl.VALUES_INDEX_DIR, getValueTableReference() + ".idx");
   }
 
   public void create() {

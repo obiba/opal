@@ -11,7 +11,7 @@
 package org.obiba.opal.search.event;
 
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.spi.search.IndexManager;
+import org.obiba.opal.search.service.IndexManager;
 
 public class SynchronizeIndexEvent {
 
