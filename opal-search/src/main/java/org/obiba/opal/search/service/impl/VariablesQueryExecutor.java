@@ -11,7 +11,7 @@
 package org.obiba.opal.search.service.impl;
 
 import com.google.common.collect.Sets;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -55,7 +55,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       IndexSearcher searcher = new IndexSearcher(reader);
 
       // Build a QueryParser
-      StandardAnalyzer analyzer = new StandardAnalyzer();
+      Analyzer analyzer = VariablesAnalyzerFactory.newAnalyzer();
       QueryParser parser = new QueryParser("name", analyzer);
 
       // Parse a query (search for books with "Lucene" in the title)

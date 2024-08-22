@@ -10,7 +10,7 @@
 
 package org.obiba.opal.search.service.impl;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -94,7 +94,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   IndexWriter newIndexWriter() {
     try {
-      StandardAnalyzer analyzer = new StandardAnalyzer();
+      Analyzer analyzer = VariablesAnalyzerFactory.newAnalyzer();
       IndexWriterConfig config = new IndexWriterConfig(analyzer);
       return new IndexWriter(directory, config);
     } catch (IOException e) {
