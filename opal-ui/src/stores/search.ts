@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 
-
 export const useSearchStore = defineStore('search', () => {
 
   async function search(query: string, limit: number, fields: string[] | undefined) {
@@ -14,6 +13,13 @@ export const useSearchStore = defineStore('search', () => {
       .then(response => response.data);
   }
 
-  return { search };
+  async function clearIndex(type: string) {
+    return api.delete('/service/search/indices', { params: { type } });
+  }
+
+  return {
+    search,
+    clearIndex,
+  };
 
 });

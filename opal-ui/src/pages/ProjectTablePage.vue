@@ -227,6 +227,7 @@ import ViewWhereScript from 'src/components/datasource/ViewWhereScript.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
+import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
 const router = useRouter();
@@ -319,6 +320,11 @@ function init() {
       if (!isTablesView.value && tab.value === 'entity_filter') {
         tab.value = 'dictionary';
       }
+    })
+    .catch((err) => {
+      notifyError(err);
+      if (err.response?.status === 404)
+        router.push(`/project/${dsName.value}/tables`);
     });
 }
 

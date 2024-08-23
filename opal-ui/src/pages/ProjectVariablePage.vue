@@ -71,76 +71,81 @@
         />
       </div>
 
-      <attributes-bundle-panel :bundle="labelBundle" />
-      <attributes-bundle-panel :bundle="descriptionBundle" />
+      <div v-if="loading">
+        <q-spinner-dots />
+      </div>
+      <div v-else>
+        <attributes-bundle-panel :bundle="labelBundle" />
+        <attributes-bundle-panel :bundle="descriptionBundle" />
 
-      <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-      >
-        <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="script" :label="$t('script')" v-if="withScript"/>
-        <q-tab name="summary" :label="$t('summary')" />
-        <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
-        <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.variablePermissions?.canRead()"/>
-      </q-tabs>
+        <q-tabs
+          v-model="tab"
+          dense
+          class="text-grey"
+          active-color="primary"
+          indicator-color="primary"
+          align="justify"
+        >
+          <q-tab name="dictionary" :label="$t('dictionary')" />
+          <q-tab name="script" :label="$t('script')" v-if="withScript"/>
+          <q-tab name="summary" :label="$t('summary')" />
+          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
+          <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.variablePermissions?.canRead()"/>
+        </q-tabs>
 
-      <q-separator />
+        <q-separator />
 
-      <q-tab-panels v-model="tab">
-        <q-tab-panel name="dictionary">
-          <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
-          <div class="row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-6">
-              <fields-list
-                :items="items1"
-                :dbobject="datasourceStore.variable"
-                class=""
-              />
+        <q-tab-panels v-model="tab">
+          <q-tab-panel name="dictionary">
+            <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
+            <div class="row q-col-gutter-md q-mb-md">
+              <div class="col-12 col-md-6">
+                <fields-list
+                  :items="items1"
+                  :dbobject="datasourceStore.variable"
+                  class=""
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <fields-list
+                  :items="items2"
+                  :dbobject="datasourceStore.variable"
+                  class=""
+                />
+              </div>
             </div>
-            <div class="col-12 col-md-6">
-              <fields-list
-                :items="items2"
-                :dbobject="datasourceStore.variable"
-                class=""
-              />
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <div class="text-h6">{{ $t('categories') }}</div>
+                <variable-categories />
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="text-h6">{{ $t('attributes') }}</div>
+                <variable-attribues />
+              </div>
             </div>
-          </div>
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <div class="text-h6">{{ $t('categories') }}</div>
-              <variable-categories />
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-h6">{{ $t('attributes') }}</div>
-              <variable-attribues />
-            </div>
-          </div>
-        </q-tab-panel>
+          </q-tab-panel>
 
-        <q-tab-panel name="script" v-if="withScript">
-          <variable-script :variable="datasourceStore.variable" />
-        </q-tab-panel>
+          <q-tab-panel name="script" v-if="withScript">
+            <variable-script :variable="datasourceStore.variable" />
+          </q-tab-panel>
 
-        <q-tab-panel name="summary">
-          <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount"/>
-        </q-tab-panel>
+          <q-tab-panel name="summary">
+            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount"/>
+          </q-tab-panel>
 
-        <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-          <table-values :variable="datasourceStore.variable"/>
-        </q-tab-panel>
+          <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
+            <table-values :variable="datasourceStore.variable"/>
+          </q-tab-panel>
 
-        <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
-          <access-control-list
-            :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
-            :options="['VARIABLE_READ']"
-          />
-        </q-tab-panel>
-      </q-tab-panels>
+          <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
+            <access-control-list
+              :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
+              :options="['VARIABLE_READ']"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
       <edit-variable-dialog
         v-model="showEdit"
         :variable="datasourceStore.variable"
@@ -164,6 +169,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
 import { VariableDto } from 'src/models/Magma';
+import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
 const router = useRouter();
@@ -174,6 +180,7 @@ const showEdit = ref(false);
 const showAddToView = ref(false);
 const showDelete = ref(false);
 const tab = ref('dictionary');
+const loading = ref(false);
 
 const bundles = computed(() => datasourceStore.variableAttributesBundles || []);
 
@@ -249,11 +256,20 @@ const tName = computed(() => route.params.tid as string);
 const vName = computed(() => route.params.vid as string);
 
 function init() {
+  loading.value = true;
   datasourceStore.initDatasourceTableVariable(
     dsName.value,
     tName.value,
     vName.value
-  );
+  )
+  .catch((err) => {
+    notifyError(err);
+    if (err.response?.status === 404)
+      router.push(`/project/${dsName.value}/table/${tName.value}`);
+  })
+  .finally(() => {
+    loading.value = false;
+  });
   taxonomiesStore.init();
 }
 

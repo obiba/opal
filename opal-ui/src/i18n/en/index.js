@@ -1061,6 +1061,10 @@ export default {
   categorical_variable_hint: 'Categorical or logical variable',
   other_variable: 'Other variable',
   other_variable_hint: 'Categorical, logical or numerical variable',
+  variables_index: 'Variables index',
+  variables_index_info: 'Table dictionaries are automatically indexed. Remove the index if you want to re-index all the variables.',
+  variables_index_cleared: 'Variables index cleared.',
+  variables_index_clear_error: 'Variables index clear error.',
   stats: {
     min: 'Minimun',
     max: 'Maximum',
