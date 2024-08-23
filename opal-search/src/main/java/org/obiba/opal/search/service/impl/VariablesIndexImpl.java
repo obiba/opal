@@ -34,8 +34,10 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
   @Override
   public void delete() {
     File file = getIndexFile();
-    if (file.exists())
+    if (file.exists()) {
       getIndexFile().delete();
+
+    }
   }
 
   @Override
@@ -59,7 +61,6 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
 
   public Document asDocument(Variable variable) {
     Document doc = new Document();
-    String fullName = getValueTableReference();
     doc.add(new TextField("project", table.getDatasource().getName(), Field.Store.YES));
     doc.add(new TextField("datasource", table.getDatasource().getName(), Field.Store.YES));
     doc.add(new TextField("table", table.getName(), Field.Store.YES));

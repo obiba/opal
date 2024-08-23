@@ -55,7 +55,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       IndexSearcher searcher = new IndexSearcher(reader);
 
       // Build a QueryParser
-      Analyzer analyzer = VariablesAnalyzerFactory.newAnalyzer();
+      Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
       QueryParser parser = new QueryParser("name", analyzer);
 
       // Parse a query (search for books with "Lucene" in the title)
