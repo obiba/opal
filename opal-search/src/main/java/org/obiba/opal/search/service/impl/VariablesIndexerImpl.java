@@ -85,6 +85,7 @@ public class VariablesIndexerImpl implements IndexSynchronization {
         writer.addDocument(index.asDocument(variable));
         done++;
       }
+      writer.commit();
     } catch (Exception e) {
       log.error("Variables index writing failed", e);
     }

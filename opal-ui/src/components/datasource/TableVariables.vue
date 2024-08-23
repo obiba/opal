@@ -245,6 +245,8 @@ function init() {
     .initDatasourceTableVariables(dsName.value, tName.value)
     .catch((err) => {
       notifyError(err);
+      if (err.response?.status === 404)
+        router.push(`/project/${dsName.value}/tables`);
     })
     .finally(() => {
       loading.value = false;

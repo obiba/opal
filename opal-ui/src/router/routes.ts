@@ -11,6 +11,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin/users', component: () => import('pages/AdminUsersGroupsPage.vue') },
       { path: '/admin/rservers', component: () => import('pages/AdminRPage.vue') },
       { path: '/admin/datashield', component: () => import('pages/AdminDatashieldPage.vue') },
+      { path: '/admin/search', component: () => import('pages/AdminSearchPage.vue') },
       { path: '/admin/settings', component: () => import('pages/AdminConfigurationPage.vue') },
       { path: '/admin/databases', component: () => import('pages/AdminDatabasesPage.vue') },
       { path: '/admin/profiles', component: () => import('pages/AdminProfilesPage.vue') },

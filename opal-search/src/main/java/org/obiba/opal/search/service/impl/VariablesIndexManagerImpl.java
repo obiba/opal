@@ -43,7 +43,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   @Override
   public ValueTableVariablesIndex getIndex(ValueTable valueTable) {
-    return new VariablesIndexImpl(getName(), valueTable);
+    return new VariablesIndexImpl(this, valueTable);
   }
 
   @Override

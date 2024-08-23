@@ -71,7 +71,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       for (ScoreDoc hit : hits) {
         Document doc = storedFields. document(hit. doc);
         log.debug("Document hit: {}", doc);
-        String identifier = doc.get("fullName");
+        String identifier = doc.get("id");
         Search.ItemResultDto.Builder resHit = Search.ItemResultDto.newBuilder().setIdentifier(identifier);
         Search.ItemFieldsDto.Builder resFields = Search.ItemFieldsDto.newBuilder();
         for (String field : Sets.union(Sets.newHashSet(querySettings.getFields()), DEFAULT_FIELDS)) {

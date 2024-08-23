@@ -1061,7 +1061,11 @@ export default {
   categorical_variable_hint: 'Variable catégorielle ou logique.',
   other_variable: 'Autre variable',
   other_variable_hint: 'Variable catégorielle, logique ou numérique.',
-  stats: {
+  variables_index: 'Index des variables',
+  variables_index_info: 'Les dictionnaires des tables sont indexés automatiquement. Supprimer cet index permet de re-indexer toutes les variables.',
+  variables_index_cleared: 'L\'index des variables a été supprimé.',
+  variables_index_clear_error: 'Erreur lors de la suppression de l\'index des variables.',
+stats: {
     min: 'Minimun',
     max: 'Maximum',
     mean: 'Moyenne',
