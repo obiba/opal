@@ -10,13 +10,16 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-
-        <q-toolbar-title>
-          <q-btn flat to="/" no-caps size="lg">
-            {{ appName }}
-          </q-btn>
-        </q-toolbar-title>
-
+        <q-btn flat to="/" no-caps size="lg">
+          {{ appName }}
+        </q-btn>
+        <q-btn flat to="/projects" no-caps>
+          {{ $t('projects') }}
+        </q-btn>
+        <q-btn flat to="/search" no-caps>
+          {{ $t('search') }}
+        </q-btn>
+        <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
           <q-input
             v-model="query"

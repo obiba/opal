@@ -17,9 +17,15 @@ export const useSearchStore = defineStore('search', () => {
     return api.delete('/service/search/indices', { params: { type } });
   }
 
+  async function getEntityTables(type: string, entity: string) {
+    return api.get(`/entity/${entity}/type/${type}/tables`)
+      .then(response => response.data);
+  }
+
   return {
     search,
     clearIndex,
+    getEntityTables,
   };
 
 });

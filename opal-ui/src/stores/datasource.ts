@@ -197,10 +197,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
       });
   }
 
-  async function getTableVariables(tName: string) {
+  async function getTableVariables(dsName: string, tName: string) {
     return api
       .get(
-        `/datasource/${datasource.value.name}/table/${tName}/variables`
+        `/datasource/${dsName}/table/${tName}/variables`
       )
       .then((response) => {
         return response.data;
@@ -477,7 +477,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   //
-  // Table summary: indexing and contingency 
+  // Table summary: indexing and contingency
   //
 
   async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
@@ -502,6 +502,15 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function deleteTableIndex() {
     return api.delete(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
       .finally(loadTableIndex);
+  }
+
+  //
+  // Entities
+  //
+
+  async function getEntityValueSet(datasource: string, table: string, entity: string) {
+    return api.get(`/datasource/${datasource}/table/${table}/valueSet/${entity}`)
+      .then((response) => response.data);
   }
 
   return {
@@ -554,5 +563,6 @@ export const useDatasourceStore = defineStore('datasource', () => {
     reset,
     reconnectView,
     getContingencyTable,
+    getEntityValueSet,
   };
 });

@@ -1065,6 +1065,12 @@ export default {
   variables_index_info: 'Table dictionaries are automatically indexed. Remove the index if you want to re-index all the variables.',
   variables_index_cleared: 'Variables index cleared.',
   variables_index_clear_error: 'Variables index clear error.',
+  variables_search: 'Variables search',
+  variables_search_caption: 'Search for variables by name, label, description, category, attribute or vocabulary term.',
+  entity: 'Entity',
+  entity_search: 'Entity search',
+  entity_search_info: 'Search an entity by providing its type and its identifier. See [Search Entity documentation](http://opaldoc.obiba.org/en/latest/web-user-guide/search/entity.html) for more details.',
+  entity_search_caption: 'Search for entity by identifier.',
   stats: {
     min: 'Minimun',
     max: 'Maximum',

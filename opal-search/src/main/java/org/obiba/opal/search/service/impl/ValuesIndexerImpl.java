@@ -11,6 +11,7 @@
 package org.obiba.opal.search.service.impl;
 
 import com.google.common.base.Stopwatch;
+import org.apache.lucene.index.IndexWriter;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -23,6 +24,7 @@ import org.obiba.opal.search.service.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,12 +106,15 @@ public class ValuesIndexerImpl implements IndexSynchronization {
 
     private final Stopwatch stopwatch = Stopwatch.createUnstarted();
 
+    private IndexWriter writer;
+
     @Override
     public void onBegin(List<VariableEntity> list, Variable... variables) {
       stopwatch.start();
       for(Variable variable : variables) {
         natures.put(variable, VariableNature.getNature(variable));
       }
+      writer = indexManager.newIndexWriter();
     }
 
     @Override
@@ -122,12 +127,23 @@ public class ValuesIndexerImpl implements IndexSynchronization {
       for(int i = 0; i < variables.length; i++) {
         indexManager.getVariableSummaryHandler().stackVariable(getValueTable(), variables[i], values[i]);
       }
+      try {
+        writer.addDocument(index.asDocument(entity));
+      } catch (IOException e) {
+        log.warn("Values entity index failure", e);
+      }
       done++;
     }
 
     @Override
     public void onComplete() {
       stopwatch.stop();
+      try {
+        writer.commit();
+        writer.close();
+      } catch (Exception e) {
+        log.error("Values entity index failure", e);
+      }
       if(stop) {
         index.delete();
         indexManager.getVariableSummaryHandler().clearComputingSummaries(getValueTable());
