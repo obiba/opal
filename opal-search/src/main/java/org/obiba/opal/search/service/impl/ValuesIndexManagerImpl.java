@@ -10,8 +10,14 @@
 
 package org.obiba.opal.search.service.impl;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.VariableSummaryHandler;
 import org.obiba.opal.search.service.*;
 import org.slf4j.Logger;
@@ -24,7 +30,7 @@ import java.io.IOException;
 import java.util.concurrent.ThreadFactory;
 
 @Component
-public class ValuesIndexManagerImpl implements ValuesIndexManager {
+public class ValuesIndexManagerImpl implements ValuesIndexManager, SystemService {
 
   private static final Logger log = LoggerFactory.getLogger(ValuesIndexManagerImpl.class);
 
@@ -34,6 +40,8 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager {
   private final VariableSummaryHandler variableSummaryHandler;
 
   private final ThreadFactory threadFactory;
+
+  private Directory entitiesDirectory;
 
   @Autowired
   public ValuesIndexManagerImpl(VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory) {
@@ -48,7 +56,7 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager {
 
   @Override
   public ValueTableValuesIndex getIndex(ValueTable valueTable) {
-    return new ValuesIndexImpl(getName(), valueTable);
+    return new ValuesIndexImpl(this, valueTable);
   }
 
   @Override
@@ -88,12 +96,22 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager {
 
   @Override
   public boolean isIndexUpToDate(ValueTable valueTable) {
-    return false;
+    return getIndex(valueTable).isUpToDate();
   }
 
   @Override
   public boolean hasIndex(ValueTable valueTable) {
-    return false;
+    return getIndex(valueTable).exists();
+  }
+
+  IndexWriter newIndexWriter() {
+    try {
+      Analyzer analyzer = AnalyzerFactory.newEntitiesAnalyzer();
+      IndexWriterConfig config = new IndexWriterConfig(analyzer);
+      return new IndexWriter(entitiesDirectory, config);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   ThreadFactory getThreadFactory() {
@@ -102,5 +120,26 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager {
 
   VariableSummaryHandler getVariableSummaryHandler() {
     return variableSummaryHandler;
+  }
+
+
+  @Override
+  public void start() {
+    try {
+      this.entitiesDirectory = FSDirectory.open(new File(VALUES_INDEX_DIR, "lucene-entities").toPath());
+    } catch (IOException e) {
+      log.error("Failed at opening lucene entities index", e);
+    }
+  }
+
+  @Override
+  public void stop() {
+    if (this.entitiesDirectory == null) return;
+    try {
+      entitiesDirectory.close();
+      entitiesDirectory = null;
+    } catch (IOException e) {
+      log.error("Failed at closing lucene entities index", e);
+    }
   }
 }

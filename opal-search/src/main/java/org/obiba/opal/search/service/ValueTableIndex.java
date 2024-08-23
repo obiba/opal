@@ -44,6 +44,13 @@ public interface ValueTableIndex extends Timestamped {
   boolean isUpToDate();
 
   /**
+   * Check whether the table was indexed.
+   *
+   * @return
+   */
+  boolean exists();
+
+  /**
    * Delete the index.
    */
   void delete();

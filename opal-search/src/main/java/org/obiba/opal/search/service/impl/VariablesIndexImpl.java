@@ -16,9 +16,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.obiba.magma.*;
@@ -54,7 +51,6 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
       try (IndexWriter writer = indexManager.newIndexWriter()) {
         // Create a query to match the documents to delete
         Query query = new TermQuery(new Term("tableId", getValueTableReference()));
-
         // Delete documents that match the query
         writer.deleteDocuments(query);
         writer.commit();
@@ -67,6 +63,11 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
   @Override
   public Timestamps getTimestamps() {
     return new FileTimestamps(getIndexFile());
+  }
+
+  @Override
+  public boolean exists() {
+    return getIndexFile().exists();
   }
 
   private File getIndexFile() {

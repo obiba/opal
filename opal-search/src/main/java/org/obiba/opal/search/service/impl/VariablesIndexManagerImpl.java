@@ -84,12 +84,12 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   @Override
   public boolean isIndexUpToDate(ValueTable valueTable) {
-    return false;
+    return getIndex(valueTable).isUpToDate();
   }
 
   @Override
   public boolean hasIndex(ValueTable valueTable) {
-    return false;
+    return getIndex(valueTable).exists();
   }
 
   IndexWriter newIndexWriter() {

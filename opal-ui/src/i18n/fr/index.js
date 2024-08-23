@@ -1065,6 +1065,12 @@ export default {
   variables_index_info: 'Les dictionnaires des tables sont indexés automatiquement. Supprimer cet index permet de re-indexer toutes les variables.',
   variables_index_cleared: 'L\'index des variables a été supprimé.',
   variables_index_clear_error: 'Erreur lors de la suppression de l\'index des variables.',
+  variables_search: 'Recherche de variables',
+  variables_search_caption: 'Recherche de variables par nom, type, catégorie, etc.',
+  entity: 'Entité',
+  entity_search: 'Recherche d\'entité',
+  entity_search_info: 'Recherche d\'entité en fournissant son type et son identifiant. Voir [Search Entity documentation](http://opaldoc.obiba.org/en/latest/web-user-guide/search/entity.html) pour plus de détails.',
+  entity_search_caption: 'Recherche d\'entité par identifiant.',
 stats: {
     min: 'Minimun',
     max: 'Maximum',

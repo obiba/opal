@@ -84,6 +84,18 @@ const routes: RouteRecordRaw[] = [
         path: '/tasks/:path*',
         component: () => import('pages/TasksPage.vue'),
       },
+      {
+        path: '/search',
+        component: () => import('pages/SearchPage.vue'),
+      },
+      {
+        path: '/search/variables',
+        component: () => import('pages/SearchVariablesPage.vue'),
+      },
+      {
+        path: '/search/entity',
+        component: () => import('pages/SearchEntityPage.vue'),
+      },
     ],
   },
   {
