@@ -55,7 +55,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       IndexSearcher searcher = new IndexSearcher(reader);
 
       // Build a QueryParser
-      Analyzer analyzer = VariablesAnalyzerFactory.newAnalyzer();
+      Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
       QueryParser parser = new QueryParser("name", analyzer);
 
       // Parse a query (search for books with "Lucene" in the title)
@@ -86,7 +86,11 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
     } catch (IOException e) {
       throw new SearchException("Variables index access failure", e);
     } catch (ParseException e) {
-      throw new SearchException("Wrong search query syntax", e);
+      if (log.isTraceEnabled())
+        log.warn("Wrong search query syntax", e);
+      else
+        log.warn("Wrong search query syntax: {}", e.getMessage());
+      return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
     }
   }
 }

@@ -11,15 +11,11 @@
 package org.obiba.opal.search.service.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
-import java.util.List;
+public class AnalyzerFactory {
 
-public class VariablesAnalyzerFactory {
-
-  public static Analyzer newAnalyzer() {
-    return new StandardAnalyzer(new CharArraySet(List.of(" ", "_", ".", ";", ":", ",", "|", "&"), true));
+  public static Analyzer newVariablesAnalyzer() {
+    return new VariablesAnalyzer(3, 3);
   }
 
 }

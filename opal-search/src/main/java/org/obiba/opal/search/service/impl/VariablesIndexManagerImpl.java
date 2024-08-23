@@ -94,7 +94,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   IndexWriter newIndexWriter() {
     try {
-      Analyzer analyzer = VariablesAnalyzerFactory.newAnalyzer();
+      Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
       IndexWriterConfig config = new IndexWriterConfig(analyzer);
       return new IndexWriter(directory, config);
     } catch (IOException e) {
