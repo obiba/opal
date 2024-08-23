@@ -225,12 +225,11 @@ function onHelp() {
 }
 
 function onSearch() {
-  if (!query.value) {
+  if (!query.value || query.value.length < 3) {
     showResults.value = false;
     return;
   }
-  const q = query.value.endsWith('*') ? query.value : `${query.value}*`;
-  searchStore.search(q, 10, ['label', 'label-en']).then((res) => {
+  searchStore.search(query.value, 10, ['label', 'label-en']).then((res) => {
     showResults.value = res.totalHits > 0;
     results.value = res;
   });

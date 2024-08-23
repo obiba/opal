@@ -19,7 +19,7 @@ import java.util.List;
 public class VariablesAnalyzerFactory {
 
   public static Analyzer newAnalyzer() {
-    return new StandardAnalyzer(new CharArraySet(List.of(" ", "_", ".", ";", ":", ",", "|", "&"), true));
+    return new VariablesAnalyzer(3, 3);
   }
 
 }

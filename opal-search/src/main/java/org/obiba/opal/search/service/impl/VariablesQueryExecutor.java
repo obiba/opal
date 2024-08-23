@@ -86,7 +86,11 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
     } catch (IOException e) {
       throw new SearchException("Variables index access failure", e);
     } catch (ParseException e) {
-      throw new SearchException("Wrong search query syntax", e);
+      if (log.isTraceEnabled())
+        log.warn("Wrong search query syntax", e);
+      else
+        log.warn("Wrong search query syntax: {}", e.getMessage());
+      return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
     }
   }
 }
