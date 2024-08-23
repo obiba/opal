@@ -58,6 +58,20 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
+        <q-btn-dropdown v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" size="sm" :label="$t('export')" class="on-right">
+            <q-list>
+              <q-item clickable v-close-popup @click="onShowExportFile">
+                <q-item-section>
+                  <q-item-label>{{ $t('export_file') }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <!-- <q-item clickable v-close-popup @click="onShowExportServer">
+                <q-item-section>
+                  <q-item-label>{{ $t('export_server') }}</q-item-label>
+                </q-item-section>
+              </q-item> -->
+            </q-list>
+          </q-btn-dropdown>
         <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
         <q-btn-dropdown v-if="isView" color="secondary" icon="content_copy" size="sm" :title="$t('copy')" class="on-right">
           <q-list>
@@ -200,6 +214,7 @@
         </q-tab-panels>
       </div>
 
+      <export-data-dialog v-model="showExport" :type="exportType" :tables="[datasourceStore.table]"/>
       <copy-tables-dialog v-model="showCopyData" :tables="[datasourceStore.table]"/>
       <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view"/>
       <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
@@ -217,6 +232,7 @@ import TableValues from 'src/components/datasource/TableValues.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import ExportDataDialog from 'src/components/datasource/export/ExportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
 import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import EditTableDialog from 'src/components/datasource/EditTableDialog.vue';
@@ -241,6 +257,8 @@ const showCopyView = ref(false);
 const showEdit = ref(false);
 const showEditResourceView = ref(false);
 const loading = ref(false);
+const showExport = ref(false);
+const exportType = ref<'file' | 'server'>('file');
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
@@ -378,5 +396,10 @@ function onReconnect() {
     .finally(() => {
       datasourceStore.loadTable(tName.value).finally(() => loading.value = false);
     });
+}
+
+function onShowExportFile() {
+  exportType.value = 'file';
+  showExport.value = true;
 }
 </script>
