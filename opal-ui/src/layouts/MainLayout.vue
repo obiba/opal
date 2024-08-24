@@ -39,11 +39,11 @@
               <q-list style="min-width: 100px">
                 <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
                   <q-item-section class="text-caption">
-                    <span>{{ getField(item, 'name') }}</span>
+                    <span>{{ searchStore.getField(item, 'name') }}</span>
                     <div>
-                      <span class="text-hint text-primary">{{ getField(item, 'project') }}.{{ getField(item, 'table') }}</span>
+                      <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span>
                     </div>
-                    <div v-for="attr in getVariableLabels(item)" :key="attr.locale" class="text-hint">
+                    <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
                       <q-badge
                         v-if="attr.locale"
                         color="grey-3"
@@ -52,6 +52,13 @@
                       />
                       <span>{{ attr.value }}</span>
                     </div>
+                  </q-item-section>
+                </q-item>
+                <q-item v-if="itemResults.length > 0" clickable class="bg-grey-2">
+                  <q-item-section>
+                    <router-link :to="`/search/variables?q=${query}`" class="text-primary">
+                      <q-icon name="arrow_circle_right" size="sm" class="on-left" />{{ $t('advanced_search') }}
+                    </router-link>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -141,7 +148,8 @@ import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
 import { computed } from 'vue';
-import { ItemResultDto, ItemFieldsDto, QueryResultDto } from 'src/models/Search';
+import { QueryResultDto } from 'src/models/Search';
+import { ItemFieldsResultDto } from 'src/stores/search';
 
 const router = useRouter();
 const systemStore = useSystemStore();
@@ -158,9 +166,6 @@ const localeOptions = computed(() => {
   }));
 });
 
-interface ItemFieldsResultDto extends ItemResultDto {
-  'Search.ItemFieldsDto.item': ItemFieldsDto;
-}
 
 const leftDrawerOpen = ref(false);
 const query = ref('');
@@ -241,28 +246,6 @@ function onSearch() {
   });
 }
 
-function getVariableLabels(item: ItemFieldsResultDto) {
-  const fields = item['Search.ItemFieldsDto.item'].fields;
-  if (!fields) {
-    return [];
-  }
-  const labels = [];
-  for (const field of fields) {
-    if (field.key.startsWith('label')) {
-      const tokens = field.key.split('-');
-      labels.push({ value: field.value, locale: tokens.length > 1 ? tokens[1] : undefined });
-    }
-  }
-  return labels;
-}
-
-function getField(item: ItemFieldsResultDto, key: string) {
-  const fields = item['Search.ItemFieldsDto.item'].fields;
-  if (!fields) {
-    return '';
-  }
-  return fields.find((field) => field.key === key)?.value;
-}
 
 function goToVariable(item: ItemFieldsResultDto) {
   const fields = item['Search.ItemFieldsDto.item'].fields;

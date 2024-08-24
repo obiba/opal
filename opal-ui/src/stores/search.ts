@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
+import { ItemFieldsDto, ItemResultDto } from 'src/models/Search';
+
+export interface ItemFieldsResultDto extends ItemResultDto {
+  'Search.ItemFieldsDto.item': ItemFieldsDto;
+}
 
 export const useSearchStore = defineStore('search', () => {
 
@@ -22,10 +27,45 @@ export const useSearchStore = defineStore('search', () => {
       .then(response => response.data);
   }
 
+  async function getTables() {
+    return api.get('/datasources/tables')
+      .then(response => response.data);
+  }
+
+  //
+  // Results helpers
+  //
+
+  function getLabels(item: ItemFieldsResultDto) {
+    const fields = item['Search.ItemFieldsDto.item'].fields;
+    if (!fields) {
+      return [];
+    }
+    const labels = [];
+    for (const field of fields) {
+      if (field.key.startsWith('label')) {
+        const tokens = field.key.split('-');
+        labels.push({ value: field.value, locale: tokens.length > 1 ? tokens[1] : undefined });
+      }
+    }
+    return labels;
+  }
+
+  function getField(item: ItemFieldsResultDto, key: string) {
+    const fields = item['Search.ItemFieldsDto.item'].fields;
+    if (!fields) {
+      return '';
+    }
+    return fields.find((field) => field.key === key)?.value;
+  }
+
   return {
     search,
     clearIndex,
     getEntityTables,
+    getTables,
+    getLabels,
+    getField,
   };
 
 });

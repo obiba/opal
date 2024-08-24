@@ -21,6 +21,7 @@ public class VariablesAnalyzer extends Analyzer {
   private final int maxGram;
 
   public VariablesAnalyzer(int minGram, int maxGram) {
+    super(PER_FIELD_REUSE_STRATEGY);
     this.minGram = minGram;
     this.maxGram = maxGram;
   }
