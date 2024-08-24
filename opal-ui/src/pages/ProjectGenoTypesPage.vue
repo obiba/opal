@@ -117,7 +117,11 @@
         </q-tab-panel>
 
         <q-tab-panel name="permissions">
-          <span>PERMISSIONS</span>
+          <div class="text-h6">{{ $t('permissions') }}</div>
+          <access-control-list
+            :resource="`/project/${name}/permissions/vcf-store`"
+            :options="['VCF_STORE_VIEW', 'VCF_STORE_VALUES', 'DATASOURCE_ALL']"
+          />
         </q-tab-panel>
       </q-tab-panels>
 
@@ -135,6 +139,7 @@
 
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
+import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import { VCFStoreDto, VCFSummaryDto, VCFSamplesMappingDto } from 'src/models/Plugins';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

@@ -320,17 +320,17 @@ export default {
       description: 'DATABASES_ALL',
     },
     // vcf permissions
-    DATABASES_ALLVCF_STORE_ALL: {
-      label: 'VCF_STORE_ALL',
-      description: 'VCF_STORE_ALL',
+    VCF_STORE_ALL: {
+      label: 'Administrate VCF Store',
+      description: 'Import/Export VCF files, view statistics and set samples-participants mapping table.',
     },
     VCF_STORE_VALUES: {
-      label: 'VCF_STORE_VALUES',
-      description: 'VCF_STORE_VALUES',
+      label: 'View VCF files data and statistics',
+      description: 'Export VCF files and view statistics.',
     },
     VCF_STORE_VIEW: {
-      label: 'VCF_STORE_VIEW',
-      description: 'VCF_STORE_VIEW',
+      label: 'View VCF files statistics',
+      description: 'View VCF files and statistics.',
     },
   },
   git: {
