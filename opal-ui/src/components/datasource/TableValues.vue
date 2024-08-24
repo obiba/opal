@@ -68,7 +68,7 @@
       </template>
       <template v-slot:body-cell-_id="props">
         <q-td :props="props" auto-width>
-          <span class="text-bold">{{ props.value }}</span>
+          <router-link :to="`/search/entity?id=${props.value}&type=${datasourceStore.table?.entityType}`">{{ props.value }}</router-link>
         </q-td>
       </template>
       <template v-for="col in visibleColumns" v-slot:[`body-cell-${col}`]="props" :key="col">

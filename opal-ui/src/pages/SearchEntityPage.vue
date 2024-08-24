@@ -30,6 +30,7 @@
             dense
             size="sm"
             @update:model-value="onClear"
+            @keyup.enter="onSubmit"
           />
           <q-btn
             :label="$t('search')"
@@ -48,7 +49,7 @@
         <q-spinner-dots size="lg" />
       </div>
       <div v-else-if="isValid && tables">
-        <div class="text-h6 q-mb-md">{{ type }} - {{ identifier }}</div>
+        <q-chip class="q-mb-md q-ml-none text-bold">{{ type }} - {{ identifier }}</q-chip>
         <q-select
           v-model="tableId"
           :options="tableOptions"
@@ -89,6 +90,7 @@ import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { TableDto, ValueSetsDto, ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
+const route = useRoute();
 const searchStore = useSearchStore();
 const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
@@ -101,6 +103,9 @@ const tables = ref<TableDto[]>();
 const tableId = ref<string>();
 const valueSets = ref<ValueSetsDto>();
 const variables = ref<VariableDto[]>();
+
+const idParam = computed(() => route.query.id as string);
+const typeParam = computed(() => route.query.type as string);
 
 const isValid = computed(() => !!type.value && !!identifier.value);
 const tableOptions = computed(() => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || []);
@@ -129,6 +134,18 @@ const rows = computed(() => {
   return result;
 });
 
+onMounted(() => {
+  if (idParam.value) {
+    identifier.value = idParam.value;
+  }
+  if (typeParam.value) {
+    type.value = typeParam.value;
+  }
+  if (isValid.value) {
+    onSubmit();
+  }
+});
+
 function onClear() {
   tables.value = undefined;
   tableId.value = undefined;
@@ -137,12 +154,30 @@ function onClear() {
 }
 
 function onSubmit() {
+  if (!isValid.value) {
+    return;
+  }
   loading.value = true;
   onClear();
   searchStore.getEntityTables(type.value, identifier.value)
     .then((response) => {
       tables.value = response;
-      tableId.value = response.length > 0 ? asTableId(response[0]) : undefined;
+      if (response.length > 0) {
+        // if there is a table in the app context state, select it
+        if (datasourceStore.table) {
+          const tbl = tables.value?.find((t) => t.link === datasourceStore.table.link);
+          // check if the table is in the list
+          if (tbl) {
+            tableId.value = asTableId(tbl);
+          }
+        }
+        // otherwise select the first table
+        if (!tableId.value) {
+          tableId.value = asTableId(response[0]);
+        }
+      } else {
+        tableId.value = undefined;
+      }
       onTableSelected();
     })
     .catch((error) => {
