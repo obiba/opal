@@ -39,7 +39,10 @@
               <q-list style="min-width: 100px">
                 <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
                   <q-item-section class="text-caption">
-                    <span>{{ item.identifier }}</span>
+                    <span>{{ getField(item, 'name') }}</span>
+                    <div>
+                      <span class="text-hint text-primary">{{ getField(item, 'project') }}.{{ getField(item, 'table') }}</span>
+                    </div>
                     <div v-for="attr in getVariableLabels(item)" :key="attr.locale" class="text-hint">
                       <q-badge
                         v-if="attr.locale"
@@ -251,6 +254,14 @@ function getVariableLabels(item: ItemFieldsResultDto) {
     }
   }
   return labels;
+}
+
+function getField(item: ItemFieldsResultDto, key: string) {
+  const fields = item['Search.ItemFieldsDto.item'].fields;
+  if (!fields) {
+    return '';
+  }
+  return fields.find((field) => field.key === key)?.value;
 }
 
 function goToVariable(item: ItemFieldsResultDto) {

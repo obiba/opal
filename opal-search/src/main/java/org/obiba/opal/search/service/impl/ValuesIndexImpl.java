@@ -102,13 +102,13 @@ public class ValuesIndexImpl extends AbstractValueTableIndex implements ValueTab
     Document doc = new Document();
     doc.add(new StringField("tableId", getValueTableReference(), Field.Store.YES));
     doc.add(new StringField("id", entity.getIdentifier(), Field.Store.YES));
+    doc.add(new StringField("type", entity.getType(), Field.Store.YES));
+    doc.add(new StringField("project", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new StringField("datasource", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new StringField("table", table.getName(), Field.Store.YES));
 
-    doc.add(new TextField("project", table.getDatasource().getName(), Field.Store.YES));
-    doc.add(new TextField("datasource", table.getDatasource().getName(), Field.Store.YES));
-    doc.add(new TextField("table", table.getName(), Field.Store.YES));
-    doc.add(new TextField("name", entity.getIdentifier(), Field.Store.YES));
-
-    doc.add(new TextField("type", entity.getType(), Field.Store.YES));
+    // tokenized
+    doc.add(new TextField("id-tok", entity.getIdentifier(), Field.Store.YES));
 
     return  doc;
   }
