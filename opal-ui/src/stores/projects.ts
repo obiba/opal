@@ -128,7 +128,7 @@ export const useProjectsStore = defineStore('projects', () => {
       api.options(`/project/${name}/vcf-store/samples`),
       api.options(`/project/${name}/vcf-store/vcfs`),
       api.options(`/project/${name}/commands/_import_vcf`),
-      api.options(`/project/${name}/commands/_export_vcf`)
+      api.options(`/project/${name}/commands/_export_vcf`),
     ]).then(([samples, vcfs, import_vcf, export_vcf]) => {
       perms.value.samples = new Perms(samples);
       perms.value.vcfs = new Perms(vcfs);
@@ -291,6 +291,14 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/vcf-store/samples`);
   }
 
+  async function getVcfs(name: string) {
+    return api.get(`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
+  }
+
+  async function deleteVcf(name: string, file: string) {
+    return api.delete(`/project/${name}/vcf-store/vcfs`, {params: {file}}).then((response) => response.data);
+  }
+
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
     if (!project.idMappings) project.idMappings = [];
     const index: number = project.idMappings.findIndex(
@@ -363,6 +371,8 @@ export const useProjectsStore = defineStore('projects', () => {
     getVcfSamplesMapping,
     addVcfSamplesMapping,
     deleteVcfSamplesMapping,
+    getVcfs,
+    deleteVcf,
     addIdMappings,
     deleteIdMappings,
     getKeyPairs,

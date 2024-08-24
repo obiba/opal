@@ -380,7 +380,7 @@ export default {
     private_key: 'Private Key',
     public_key: 'Public Key (Certificate)',
     vcf_store_hint: 'Project genotypes are stored using the service:',
-    no_vcf_store_warning: 'No VCF store is defined for this project. No genotypes can be imported.'
+    no_vcf_store_warning: 'No VCF store is defined for this project. No genotypes can be imported.',
   },
   project_genotypes: {
     title: 'Genotypes',
@@ -588,7 +588,7 @@ export default {
   },
   vcf_store: {
     label: 'VCF Store',
-    identified_samples: 'Identified samples',
+    identified_samples: 'Identified Samples',
     controls: 'Controls',
     sample_participants_mapping: 'Sample-Participants Mapping',
     add_mapping: 'Add Mapping',
@@ -599,6 +599,9 @@ export default {
     participant_id_hint: 'The participant ID variable name.',
     role: 'Sample Role Variable',
     role_hint: 'The sample Role variable name.',
+    vcf_files: 'VCF Files',
+    variants: 'Variants',
+    genotypes: 'Genotypes',
   },
   account: 'Account',
   actions: 'Actions',
@@ -705,6 +708,7 @@ export default {
   delete_files_confirm: '- | Are you sure you want to delete this file? | Are you sure you want to delete these {count} files?',
   delete_group_confirm: 'Are you sure you want to delete the group \'{group}\'?',
   delete_identity_provider_confirm: 'Are you sure you want to delete the provider \'{provider}\'?',
+  delete_vcf_confirm: 'Please confirm that you want to remove the selected VCF files.',
   delete_vcf_mapping_confirm: 'Please confirm that you want to remove this sample-participant mapping. Note that the corresponding project\'s table won\'t be deleted.?',
   delete_permission_confirm: 'Are you sure you want to delete permission of \'{principal}\'?',
   delete_profile_acl_confirm: 'Are you sure you want to revoke the selected permission? | Are you sure you want to revoke these {count} permissions?',
@@ -995,6 +999,7 @@ export default {
   start: 'Start',
   started: 'Started',
   state: 'State',
+  statistics: 'Statistics',
   status: 'Status',
   std_dev: 'Standard deviation',
   stop: 'Stop',
