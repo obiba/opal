@@ -299,6 +299,10 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/vcf-store/vcfs`, {params: {file}}).then((response) => response.data);
   }
 
+  async function importVcfFiles(name: string, files: string[]) {
+    return api.post(`/project/${name}/commands/_import_vcf`, {files, project: name}).then((response) => response.data.id);
+  }
+
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
     if (!project.idMappings) project.idMappings = [];
     const index: number = project.idMappings.findIndex(
@@ -373,6 +377,7 @@ export const useProjectsStore = defineStore('projects', () => {
     deleteVcfSamplesMapping,
     getVcfs,
     deleteVcf,
+    importVcfFiles,
     addIdMappings,
     deleteIdMappings,
     getKeyPairs,

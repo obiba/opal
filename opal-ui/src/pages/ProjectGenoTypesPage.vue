@@ -43,8 +43,17 @@
             <q-card-section class="q-px-none">
               <div class="text-h6">
                 <span>{{ $t('vcf_store.sample_participants_mapping') }}</span>
-                <q-btn outline color="primary" icon="edit" size="sm" class="on-right" @click="onAddMapping"></q-btn>
                 <q-btn
+                  v-if="canUpdateMapping"
+                  outline
+                  color="primary"
+                  icon="edit"
+                  size="sm"
+                  class="on-right"
+                  @click="onAddMapping"
+                ></q-btn>
+                <q-btn
+                  v-if="canDeleteMapping"
                   outline
                   color="negative"
                   icon="delete"
@@ -53,6 +62,7 @@
                   @click="onDeleteMapping"
                 ></q-btn>
               </div>
+              <div class="text-help q-mb-sm">{{ $t('vcf_store.sample_participants_mapping_info') }}</div>
               <fields-list class="col-6" :items="sampleMappingProperties" :dbobject="samplesMapping" />
             </q-card-section>
           </q-card>
@@ -73,7 +83,25 @@
                 :loading="loading"
               >
                 <template v-slot:top-left>
-                  <q-btn size="sm" icon="cached" color="primary" :label="$t('reload')" @click="onRefreshVcfs"></q-btn>
+                  <div class="q-gutter-sm">
+                    <q-btn size="sm" icon="cached" color="primary" :label="$t('reload')" @click="onRefreshVcfs"></q-btn>
+                    <q-btn
+                      v-if="canImportVcfs"
+                      size="sm"
+                      icon="input"
+                      color="secondary"
+                      :label="$t('import')"
+                      @click="onImportVcfFile"
+                    ></q-btn>
+                    <q-btn
+                      v-if="canExportVcfs"
+                      size="sm"
+                      icon="output"
+                      color="secondary"
+                      :label="$t('export')"
+                      @click="onExportVcfFile"
+                    ></q-btn>
+                  </div>
                 </template>
                 <template v-slot:top-right>
                   <q-input dense clearable debounce="400" color="primary" v-model="filter">
@@ -93,17 +121,18 @@
                         size="sm"
                         color="secondary"
                         :title="$t('statistics')"
-                        :icon="toolsVisible[props.row.name] ? 'download' : 'none'"
+                        :icon="toolsVisible[props.row.name] ? 'description' : 'none'"
                         class="q-ml-xs"
                         @click="onGetStats()"
                       />
                       <q-btn
+                        v-if="canDeleteVcf"
                         rounded
                         dense
                         flat
                         size="sm"
                         color="secondary"
-                        :title="$t('statistics')"
+                        :title="$t('delete')"
                         :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
                         class="q-ml-xs"
                         @click="onDeleteVcf(props.row)"
@@ -120,7 +149,7 @@
           <div class="text-h6">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${name}/permissions/vcf-store`"
-            :options="['VCF_STORE_VIEW', 'VCF_STORE_VALUES', 'DATASOURCE_ALL']"
+            :options="['VCF_STORE_VIEW', 'VCF_STORE_VALUES', 'VCF_STORE_ALL']"
           />
         </q-tab-panel>
       </q-tab-panels>
@@ -133,6 +162,8 @@
         :project="project.name || ''"
         @update="onMappingAdded"
       />
+
+      <import-vcf-file-dialog v-model="showImport" :project="project" />
     </q-page>
   </div>
 </template>
@@ -144,6 +175,7 @@ import { VCFStoreDto, VCFSummaryDto, VCFSamplesMappingDto } from 'src/models/Plu
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVcfMappingTableDialog from 'src/components/project/AddVcfMappingTableDialog.vue';
+import ImportVcfFileDialog from 'src/components/project/ImportVcfFileDialog.vue';
 import { getSizeLabel } from 'src/utils/files';
 import { baseUrl } from 'src/boot/api';
 
@@ -152,6 +184,8 @@ const route = useRoute();
 const projectsStore = useProjectsStore();
 const tab = ref('vcf');
 const showMapping = ref(false);
+const showImport = ref(false);
+const showExport = ref(false);
 const showDelete = ref(false);
 const loading = ref(false);
 const confirmText = ref('');
@@ -204,7 +238,11 @@ const sampleMappingProperties: FieldItem<VCFSamplesMappingDto>[] = [
 ];
 
 const project = computed(() => projectsStore.project);
-
+const canDeleteVcf = computed(() => projectsStore.perms.vcfs?.canDelete());
+const canImportVcfs = computed(() => projectsStore.perms.import_vcf?.canCreate());
+const canExportVcfs = computed(() => projectsStore.perms.export_vcf?.canCreate());
+const canDeleteMapping = computed(() => projectsStore.perms.samples?.canDelete());
+const canUpdateMapping = computed(() => projectsStore.perms.samples?.canUpdate());
 const columns = computed(() => [
   {
     name: 'name',
@@ -278,8 +316,10 @@ function updateVisibleColumns() {
 async function getVcfSummary() {
   if (projectsStore.perms.vcfstore?.canRead()) {
     summary.value = {} as VCFStoreDto;
-    projectsStore.getVcfStore(project.value.name).then((result) => (summary.value = result));
+    return projectsStore.getVcfStore(project.value.name).then((result) => (summary.value = result));
   }
+
+  return Promise.resolve();
 }
 
 async function getVcfSamplesMapping() {
@@ -381,8 +421,17 @@ function onMappingAdded() {
 }
 
 async function onRefreshVcfs() {
+  await getVcfSummary();
   await getVcfs();
   updateVisibleColumns();
+}
+
+function onImportVcfFile() {
+  showImport.value = true;
+}
+
+function onExportVcfFile() {
+  showExport.value = true;
 }
 
 function onFilter() {
