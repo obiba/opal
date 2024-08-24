@@ -89,23 +89,23 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
     doc.add(new StringField("table-ref", getValueTableReference(), Field.Store.YES));
     doc.add(new StringField("id", String.format("%s:%s", getValueTableReference(), variable.getName()), Field.Store.YES));
 
-    doc.add(new StringField("project", table.getDatasource().getName(), Field.Store.YES));
-    doc.add(new StringField("datasource", table.getDatasource().getName(), Field.Store.YES));
-    doc.add(new StringField("table", table.getName(), Field.Store.YES));
-    doc.add(new StringField("name", variable.getName(), Field.Store.YES));
+    doc.add(new TextField("project", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new TextField("datasource", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new TextField("table", table.getName(), Field.Store.YES));
+    doc.add(new TextField("name", variable.getName(), Field.Store.YES));
 
-    doc.add(new StringField("entity-type", variable.getEntityType(), Field.Store.YES));
-    doc.add(new StringField("valueType", variable.getValueType().getName(), Field.Store.YES));
+    doc.add(new TextField("entity-type", variable.getEntityType(), Field.Store.YES));
+    doc.add(new TextField("value-type", variable.getValueType().getName(), Field.Store.YES));
     if (variable.getOccurrenceGroup() != null)
-      doc.add(new StringField("occurrence-group", variable.getOccurrenceGroup(), Field.Store.YES));
-    doc.add(new StringField("repeatable", variable.isRepeatable() + "", Field.Store.YES));
+      doc.add(new TextField("occurrence-group", variable.getOccurrenceGroup(), Field.Store.YES));
+    doc.add(new TextField("repeatable", variable.isRepeatable() + "", Field.Store.YES));
     if (variable.getMimeType() != null)
-      doc.add(new StringField("mimeType", variable.getMimeType(), Field.Store.YES));
+      doc.add(new TextField("mime-type", variable.getMimeType(), Field.Store.YES));
     if (variable.getUnit() != null)
-      doc.add(new StringField("unit", variable.getUnit(), Field.Store.YES));
+      doc.add(new TextField("unit", variable.getUnit(), Field.Store.YES));
     if (variable.getReferencedEntityType() != null)
-      doc.add(new StringField("referenced-entity-type", variable.getReferencedEntityType(), Field.Store.YES));
-    doc.add(new StringField("nature", VariableNature.getNature(variable).name(), Field.Store.YES));
+      doc.add(new TextField("referenced-entity-type", variable.getReferencedEntityType(), Field.Store.YES));
+    doc.add(new TextField("nature", VariableNature.getNature(variable).name(), Field.Store.YES));
 
     String content = String.format("%s %s %s", table.getDatasource().getName(), table.getName(), variable.getName());
 
@@ -113,31 +113,24 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
       for (Attribute attribute : variable.getAttributes()) {
         String value = attribute.getValue().toString();
         if (value != null) {
-          doc.add(new StringField(getFieldName(attribute), value, Field.Store.YES));
-          if (!attribute.hasNamespace() && (attribute.getName().equals("label") || attribute.getName().equals("description"))) {
-            // tokenized labels and descriptions
-            doc.add(new TextField(getFieldName(attribute) + "-tok", value, Field.Store.YES));
-            content = String.format("%s %s", content, value);
-          }
+          doc.add(new TextField(getFieldName(attribute), value, Field.Store.YES));
         }
       }
     }
 
     if (variable.hasCategories()) {
       for (Category category : variable.getCategories()) {
-        doc.add(new StringField("category", category.getName(), Field.Store.YES));
+        doc.add(new TextField("category", category.getName(), Field.Store.YES));
         if (category.hasAttributes()) {
           for (Attribute attribute : category.getAttributes()) {
             String value = attribute.getValue().toString();
             if (value != null)
-              doc.add(new StringField("category-" + getFieldName(attribute), value, Field.Store.YES));
+              doc.add(new TextField("category-" + getFieldName(attribute), value, Field.Store.YES));
           }
         }
       }
     }
 
-    // tokenized
-    doc.add(new TextField("name-tok", variable.getName(), Field.Store.NO));
     doc.add(new TextField("content", content, Field.Store.NO));
 
     return doc;

@@ -30,7 +30,8 @@ public class VariablesAnalyzer extends Analyzer {
     src.setMaxTokenLength(StandardAnalyzer.DEFAULT_MAX_TOKEN_LENGTH);
     TokenStream tok = new LowerCaseFilter(src);
     tok = new StopFilter(tok, CharArraySet.EMPTY_SET);
-    tok = new NGramTokenFilter(tok, minGram, maxGram, true);
+    if (fieldName.equals("content"))
+      tok = new NGramTokenFilter(tok, minGram, maxGram, true);
     return new TokenStreamComponents(
         r -> {
           src.setMaxTokenLength(StandardAnalyzer.DEFAULT_MAX_TOKEN_LENGTH);
