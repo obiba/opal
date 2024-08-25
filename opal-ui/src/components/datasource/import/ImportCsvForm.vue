@@ -29,7 +29,7 @@
       <div class="col">
         <q-select
           v-model="defaultValueType"
-          :options="valueTypes"
+          :options="ValueTypes"
           :label="$t('default_value_type')"
           @update:model-value="onUpdate"
           dense/>
@@ -88,7 +88,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { DatasourceFactory } from 'src/components/models';
 import { FileDto } from 'src/models/Opal';
-import { valueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ImportCsvFormProps {

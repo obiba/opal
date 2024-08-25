@@ -39,7 +39,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
 
   private static final Logger log = LoggerFactory.getLogger(VariablesQueryExecutor.class);
 
-  private final Set<String> DEFAULT_FIELDS = Set.of("name", "project", "table", "valueType", "entityType");
+  private final Set<String> DEFAULT_FIELDS = Set.of("name", "project", "table", "value-type", "entity-type");
 
   private final Directory directory;
 
@@ -56,7 +56,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
 
       // Build a QueryParser
       Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
-      QueryParser parser = new QueryParser("name", analyzer);
+      QueryParser parser = new QueryParser("content", analyzer);
 
       // Parse a query (search for books with "Lucene" in the title)
       Query query = parser.parse(querySettings.getQuery());

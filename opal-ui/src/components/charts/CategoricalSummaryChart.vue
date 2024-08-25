@@ -115,10 +115,9 @@ const isBar = computed(() => chartType.value === 'bar');
 
 const frequencies = computed(() => {
   if (!props.data) return [];
-  const freqs = props.data.frequencies
-    .filter((f: FrequencyDto) => nonMissingsSelection.value === null || (!nonMissingsSelection.value && f.missing) || (nonMissingsSelection.value && !f.missing));
+  const freqs = props.data.frequencies?.filter((f: FrequencyDto) => nonMissingsSelection.value === null || (!nonMissingsSelection.value && f.missing) || (nonMissingsSelection.value && !f.missing));
 
-  if (props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
+  if (props.data.otherFrequency && props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
     freqs.push({
       value: t('other'),
       freq: props.data.otherFrequency,

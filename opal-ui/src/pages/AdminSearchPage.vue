@@ -13,7 +13,7 @@
       <q-btn
         color="secondary"
         icon="cleaning_services"
-        :title="$t('clear')"
+        :label="$t('clear')"
         size="sm"
         @click="onVariablesClear"
         class="q-mb-sm"

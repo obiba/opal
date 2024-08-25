@@ -1,4 +1,4 @@
-export const valueTypes = [
+export const ValueTypes = [
   'text',
   'integer',
   'decimal',
@@ -12,10 +12,19 @@ export const valueTypes = [
   'locale',
 ];
 
-export const valueTypesMap = {
+export const ValueTypesMap = {
   textual: ['text', 'locale'],
   numerical: ['integer', 'decimal'],
   temporal: ['date', 'datetime'],
   geospatial: ['point', 'linestring', 'polygon'],
   other: ['binary', 'boolean'],
+};
+
+export const VariableNatures = {
+  CATEGORICAL: 'CATEGORICAL',
+  CONTINUOUS: 'CONTINUOUS',
+  TEMPORAL: 'TEMPORAL',
+  GEO: 'GEO',
+  BINARY: 'BINARY',
+  UNDETERMINED: 'UNDETERMINED',
 };

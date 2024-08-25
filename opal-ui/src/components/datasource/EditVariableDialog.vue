@@ -18,7 +18,7 @@
           />
           <q-select
             v-model="selected.valueType"
-            :options="valueTypes"
+            :options="ValueTypes"
             :label="$t('value_type')"
             :hint="$t('value_type_hint')"
             :disable="editMode && hasValues"
@@ -103,7 +103,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
-import { valueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 
 interface DialogProps {
   modelValue: boolean;

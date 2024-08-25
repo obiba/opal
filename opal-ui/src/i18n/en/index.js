@@ -1066,11 +1066,18 @@ export default {
   variables_index_cleared: 'Variables index cleared.',
   variables_index_clear_error: 'Variables index clear error.',
   variables_search: 'Variables search',
+  variables_search_info: 'Search variables using controlled vocabularies and full-text search. The controlled vocabularies are defined by the taxonomies. The full-text search applies to the variable name and labels. See [Search Variables documentation](http://opaldoc.obiba.org/en/latest/web-user-guide/search/variables.html) for more details.',
   variables_search_caption: 'Search for variables by name, label, description, category, attribute or vocabulary term.',
   entity: 'Entity',
   entity_search: 'Entity search',
   entity_search_info: 'Search an entity by providing its type and its identifier. See [Search Entity documentation](http://opaldoc.obiba.org/en/latest/web-user-guide/search/entity.html) for more details.',
   entity_search_caption: 'Search for entity by identifier.',
+  advanced_search: 'Advanced search',
+  more_results: 'More results',
+  filters: 'Filters',
+  filter: 'Filter',
+  nature: 'Nature',
+  results: 'Results',
   stats: {
     min: 'Minimun',
     max: 'Maximum',
@@ -1095,5 +1102,13 @@ export default {
       UPTODATE: 'Up to date',
       UNRECOGNIZED: 'Unrecognized'
     }
+  },
+  variable_nature: {
+    CATEGORICAL: 'Categorical',
+    CONTINUOUS: 'Continuous',
+    TEMPORAL: 'Temporal',
+    GEO: 'Geographical',
+    BINARY: 'Binary',
+    UNDETERMINED: 'Undetermined',
   }
 };

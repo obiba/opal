@@ -50,7 +50,7 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
       getIndexFile().delete();
       try (IndexWriter writer = indexManager.newIndexWriter()) {
         // Create a query to match the documents to delete
-        Query query = new TermQuery(new Term("tableId", getValueTableReference()));
+        Query query = new TermQuery(new Term("table-ref", getValueTableReference()));
         // Delete documents that match the query
         writer.deleteDocuments(query);
         writer.commit();
@@ -86,7 +86,7 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
 
   public Document asDocument(Variable variable) {
     Document doc = new Document();
-    doc.add(new StringField("tableId", getValueTableReference(), Field.Store.YES));
+    doc.add(new StringField("table-ref", getValueTableReference(), Field.Store.YES));
     doc.add(new StringField("id", String.format("%s:%s", getValueTableReference(), variable.getName()), Field.Store.YES));
 
     doc.add(new TextField("project", table.getDatasource().getName(), Field.Store.YES));
@@ -94,24 +94,27 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
     doc.add(new TextField("table", table.getName(), Field.Store.YES));
     doc.add(new TextField("name", variable.getName(), Field.Store.YES));
 
-    doc.add(new TextField("entityType", variable.getEntityType(), Field.Store.YES));
-    doc.add(new TextField("valueType", variable.getValueType().getName(), Field.Store.YES));
+    doc.add(new TextField("entity-type", variable.getEntityType(), Field.Store.YES));
+    doc.add(new TextField("value-type", variable.getValueType().getName(), Field.Store.YES));
     if (variable.getOccurrenceGroup() != null)
-      doc.add(new TextField("occurrenceGroup", variable.getOccurrenceGroup(), Field.Store.YES));
+      doc.add(new TextField("occurrence-group", variable.getOccurrenceGroup(), Field.Store.YES));
     doc.add(new TextField("repeatable", variable.isRepeatable() + "", Field.Store.YES));
     if (variable.getMimeType() != null)
-      doc.add(new TextField("mimeType", variable.getMimeType(), Field.Store.YES));
+      doc.add(new TextField("mime-type", variable.getMimeType(), Field.Store.YES));
     if (variable.getUnit() != null)
       doc.add(new TextField("unit", variable.getUnit(), Field.Store.YES));
     if (variable.getReferencedEntityType() != null)
-      doc.add(new TextField("referencedEntityType", variable.getReferencedEntityType(), Field.Store.YES));
+      doc.add(new TextField("referenced-entity-type", variable.getReferencedEntityType(), Field.Store.YES));
     doc.add(new TextField("nature", VariableNature.getNature(variable).name(), Field.Store.YES));
+
+    String content = String.format("%s %s %s", table.getDatasource().getName(), table.getName(), variable.getName());
 
     if (variable.hasAttributes()) {
       for (Attribute attribute : variable.getAttributes()) {
         String value = attribute.getValue().toString();
-        if (value != null)
+        if (value != null) {
           doc.add(new TextField(getFieldName(attribute), value, Field.Store.YES));
+        }
       }
     }
 
@@ -127,6 +130,8 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
         }
       }
     }
+
+    doc.add(new TextField("content", content, Field.Store.NO));
 
     return doc;
   }

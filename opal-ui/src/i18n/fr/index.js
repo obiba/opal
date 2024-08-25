@@ -1066,12 +1066,19 @@ export default {
   variables_index_cleared: 'L\'index des variables a été supprimé.',
   variables_index_clear_error: 'Erreur lors de la suppression de l\'index des variables.',
   variables_search: 'Recherche de variables',
+  variables_search_info: 'Rechercher des variables à l\'aide de vocabulaires contrôlés et d\'une recherche en texte intégral. Les vocabulaires contrôlés sont définis par les taxonomies. La recherche en texte intégral s\'applique au nom et aux libellés des variables. Voir la [documentation sur la recherche de variables](http://opaldoc.obiba.org/en/latest/web-user-guide/search/variables.html) pour plus de détails.',
   variables_search_caption: 'Recherche de variables par nom, type, catégorie, etc.',
   entity: 'Entité',
   entity_search: 'Recherche d\'entité',
   entity_search_info: 'Recherche d\'entité en fournissant son type et son identifiant. Voir [Search Entity documentation](http://opaldoc.obiba.org/en/latest/web-user-guide/search/entity.html) pour plus de détails.',
   entity_search_caption: 'Recherche d\'entité par identifiant.',
-stats: {
+  advanced_search: 'Recherche avancée',
+  more_results: 'Plus de résultats',
+  filters: 'Filtres',
+  filter: 'Filtre',
+  nature: 'Nature',
+  results: 'Résultats',
+  stats: {
     min: 'Minimun',
     max: 'Maximum',
     mean: 'Moyenne',
@@ -1095,5 +1102,13 @@ stats: {
       UPTODATE: 'À jour',
       UNRECOGNIZED: 'Non reconnue'
     }
+  },
+  variable_nature: {
+    CATEGORICAL: 'Catégorielle',
+    CONTINUOUS: 'Continue',
+    TEMPORAL: 'Temporelle',
+    GEO: 'Géographique',
+    BINARY: 'Binaire',
+    UNDETERMINED: 'Indéterminée',
   }
 };
