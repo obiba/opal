@@ -78,7 +78,10 @@
                       <q-item-label>{{ getFieldLabel(field) }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                      <q-icon :name="searchStore.variablesQuery.criteria[field] == undefined ? 'add_circle' : 'delete'" size="xs" color="grey-6" />
+                      <q-icon
+                        :name="isFieldSelected(field) ? 'delete' : 'add_circle'"
+                        size="xs"
+                        :color="isFieldSelected(field) ? 'red-4' : 'grey-6'" />
                     </q-item-section>
                   </q-item>
                 </template>
@@ -144,7 +147,7 @@ const route = useRoute();
 const router = useRouter();
 const searchStore = useSearchStore();
 const taxonomiesStore = useTaxonomiesStore();
-const { t } = useI18n();
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const loading = ref<boolean>(false);
 const showResults = ref(false);
@@ -156,16 +159,37 @@ const queryParam = computed(() => route.query.q as string || '');
 const isValid = computed(() => !!searchStore.variablesQuery.query?.trim() || Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0));
 const itemResults = computed(() => results.value?.hits as ItemFieldsResultDto[] || []);
 
+interface FieldsOptions {
+  [key: string]: { label: string, value: string }[]
+}
+
 const fields = computed(() => Object.keys(searchStore.variablesQuery.criteria));
 const projectsOptions = computed(() => Array.from(new Set(tables.value.map((table) => table.datasourceName))).sort());
 const tablesOptions = computed(() => Array.from(new Set(tables.value.map((table) => table.name))).sort());
-const fieldsOptions = computed<{ [key: string]: { label: string, value: string }[]}>(() => ({
-  project: projectsOptions.value.filter((p) => p !== undefined).map((project) => ({ label: project, value: project })),
-  table: tablesOptions.value.map((table) => ({ label: table, value: table })),
-  nature: Object.keys(VariableNatures).map((key) => ({ label: t(`variable_nature.${key}`), value: key })),
-  'value-type': ValueTypes.map((t) => ({ label: t, value: t })),
-}));
-const fieldsToAdd = computed(() => ['project', 'table', 'nature', 'value-type']);
+const taxonomiesFieldsOptions = computed<FieldsOptions>(() => {
+  const taxonomiesOptions = {} as FieldsOptions;
+  taxonomiesStore.taxonomies.forEach((taxonomy) => {
+    taxonomy.vocabularies.filter((voc) => voc.terms).forEach((vocabulary) => {
+      taxonomiesOptions[`${taxonomy.name}-${vocabulary.name}`] = vocabulary.terms.map((term) => ({
+        label: taxonomiesStore.getLabel(term.title, locale.value),
+        value: term.name
+      }));
+    })
+  });
+  return taxonomiesOptions
+});
+const fieldsOptions = computed<FieldsOptions>(() => {
+  return {
+    project: projectsOptions.value.filter((p) => p !== undefined).map((project) => ({ label: project, value: project })),
+    table: tablesOptions.value.map((table) => ({ label: table, value: table })),
+    nature: Object.keys(VariableNatures).map((key) => ({ label: t(`variable_nature.${key}`), value: key })),
+    'value-type': ValueTypes.map((t) => ({ label: t, value: t })),
+    ...taxonomiesFieldsOptions.value,
+  };
+});
+const fieldsToAdd = computed(() => {
+  return ['project', 'table', 'nature', 'value-type', ...Object.keys(taxonomiesFieldsOptions.value)];
+});
 
 onMounted(() => {
   if (queryParam.value) {
@@ -239,6 +263,15 @@ function getFieldLabel(field: string) {
   } else if (field === 'table') {
     return t('tables');
   }
+  // lookup in taxonomies
+  for (const taxonomy of taxonomiesStore.taxonomies) {
+    for (const vocabulary of taxonomy.vocabularies) {
+      if (field === `${taxonomy.name}-${vocabulary.name}`) {
+        console.log(vocabulary);
+        return taxonomiesStore.getLabel(vocabulary.title, locale.value);
+      }
+    }
+  }
   return t(field.replaceAll('-', '_'));
 }
 
@@ -248,5 +281,9 @@ function onToggleField(field: string) {
   } else {
     delete searchStore.variablesQuery.criteria[field];
   }
+}
+
+function isFieldSelected(field: string) {
+  return searchStore.variablesQuery.criteria[field] != undefined;
 }
 </script>
