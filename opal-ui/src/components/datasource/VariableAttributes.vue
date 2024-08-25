@@ -44,6 +44,17 @@
                       flat
                       size="sm"
                       color="secondary"
+                      :title="$t('search')"
+                      icon="search"
+                      @click="onSearch(annotation)" />
+                  </td>
+                  <td>
+                    <q-btn
+                      rounded
+                      dense
+                      flat
+                      size="sm"
+                      color="secondary"
                       :title="$t('edit')"
                       icon="edit"
                       @click="onShowAnnotate(annotation)" />
@@ -201,8 +212,10 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { AttributeDto } from 'src/models/Magma';
 
 const { t } = useI18n();
+const router = useRouter();
 const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
+const searchStore = useSearchStore();
 
 const tab = ref('annotations');
 const tableRef = ref();
@@ -254,6 +267,14 @@ const bundles = computed(() => datasourceStore.variableAttributesBundles || []);
 
 const labelBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'label'));
 const descriptionBundle = computed(() => bundles.value.find((bndl) => bndl.id === 'description'));
+
+function onSearch(annotation: Annotation | undefined) {
+  if (annotation) {
+    searchStore.reset();
+    searchStore.variablesQuery.criteria[`${annotation.taxonomy.name}-${annotation.vocabulary.name}`] = [annotation.term.name];
+    router.push('/search/variables');
+  }
+}
 
 function onShowAnnotate(annotation: Annotation | undefined) {
   annotationSelected.value = annotation;

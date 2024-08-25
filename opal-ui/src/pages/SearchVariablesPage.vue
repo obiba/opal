@@ -42,7 +42,7 @@
               :label="$t('clear')"
               size="sm"
               style="height: 2.5em;"
-              @click="onClear"
+              @click="onClearAndReset"
               class="q-mt-lg" />
           </div>
         </q-card-section>
@@ -75,13 +75,13 @@
                 <template v-for="field in fieldsToAdd" :key="field">
                   <q-item clickable v-close-popup @click="onToggleField(field)">
                     <q-item-section>
-                      <q-item-label>{{ getFieldLabel(field) }}</q-item-label>
+                      <q-item-label :class="isFieldSelected(field) ? 'text-primary' : ''">{{ getFieldLabel(field) }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
                       <q-icon
                         :name="isFieldSelected(field) ? 'delete' : 'add_circle'"
                         size="xs"
-                        :color="isFieldSelected(field) ? 'red-4' : 'grey-6'" />
+                        :color="isFieldSelected(field) ? 'primary' : 'grey-6'" />
                     </q-item-section>
                   </q-item>
                 </template>
@@ -231,6 +231,11 @@ function onSubmit() {
 function onClearAndSubmit() {
   onClear();
   onSubmit();
+}
+
+function onClearAndReset() {
+  onClear();
+  searchStore.reset();
 }
 
 function goToVariable(item: ItemFieldsResultDto) {
