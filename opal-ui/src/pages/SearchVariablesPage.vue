@@ -62,7 +62,16 @@
                 map-options
                 size="sm"
                 @update:model-value="onClearAndSubmit"
-                style="min-width: 200px;" />
+                style="min-width: 200px;">
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section style="max-width: 400px;">
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                      <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </template>
             <q-btn-dropdown
               color="secondary"
@@ -76,6 +85,7 @@
                   <q-item clickable v-close-popup @click="onToggleField(field)">
                     <q-item-section>
                       <q-item-label :class="isFieldSelected(field) ? 'text-primary' : ''">{{ getFieldLabel(field) }}</q-item-label>
+                      <q-item-label class="text-hint">{{ getFieldGroupLabel(field) }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
                       <q-icon
@@ -172,7 +182,8 @@ const taxonomiesFieldsOptions = computed<FieldsOptions>(() => {
     taxonomy.vocabularies.filter((voc) => voc.terms).forEach((vocabulary) => {
       taxonomiesOptions[`${taxonomy.name}-${vocabulary.name}`] = vocabulary.terms.map((term) => ({
         label: taxonomiesStore.getLabel(term.title, locale.value),
-        value: term.name
+        value: term.name,
+        description: taxonomiesStore.getLabel(term.description, locale.value),
       }));
     })
   });
@@ -272,12 +283,23 @@ function getFieldLabel(field: string) {
   for (const taxonomy of taxonomiesStore.taxonomies) {
     for (const vocabulary of taxonomy.vocabularies) {
       if (field === `${taxonomy.name}-${vocabulary.name}`) {
-        console.log(vocabulary);
         return taxonomiesStore.getLabel(vocabulary.title, locale.value);
       }
     }
   }
   return t(field.replaceAll('-', '_'));
+}
+
+function getFieldGroupLabel(field: string) {
+  // lookup in taxonomies
+  for (const taxonomy of taxonomiesStore.taxonomies) {
+    for (const vocabulary of taxonomy.vocabularies) {
+      if (field === `${taxonomy.name}-${vocabulary.name}`) {
+        return taxonomiesStore.getLabel(taxonomy.title, locale.value);
+      }
+    }
+  }
+  return '';
 }
 
 function onToggleField(field: string) {

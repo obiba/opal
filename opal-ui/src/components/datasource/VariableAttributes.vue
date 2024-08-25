@@ -271,6 +271,8 @@ const descriptionBundle = computed(() => bundles.value.find((bndl) => bndl.id ==
 function onSearch(annotation: Annotation | undefined) {
   if (annotation) {
     searchStore.reset();
+    searchStore.variablesQuery.criteria['project'] = [datasourceStore.datasource.name];
+    searchStore.variablesQuery.criteria['table'] = [datasourceStore.table.name];
     searchStore.variablesQuery.criteria[`${annotation.taxonomy.name}-${annotation.vocabulary.name}`] = [annotation.term.name];
     router.push('/search/variables');
   }
