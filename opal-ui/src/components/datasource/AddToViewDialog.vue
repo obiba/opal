@@ -57,7 +57,7 @@
                 <q-select
                   v-else
                   v-model="props.row[ props.col.name ]"
-                  :options="valueTypes"
+                  :options="ValueTypes"
                   dense
                   borderless
                 ></q-select>
@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
-import { valueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 
 interface DialogProps {
   modelValue: boolean;

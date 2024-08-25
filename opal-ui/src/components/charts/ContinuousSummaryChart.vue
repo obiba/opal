@@ -10,7 +10,7 @@
           {label: $t('density'), value: 'density'},
         ]"
       />
-      <q-badge color="positive" :label="`N:  ${data.summary.n}`"
+      <q-badge color="positive" :label="`N:  ${data.summary?.n || 0}`"
         class="on-right"/>
     </div>
     <div class="row q-mt-md">
@@ -128,7 +128,7 @@ const histoChartData = computed(() => {
   ];
 });
 
-const hasNormal = computed(() => props.data?.summary.min !== props.data?.summary.max);
+const hasNormal = computed(() => props.data?.summary && props.data?.summary.min !== props.data?.summary.max);
 
 const normalLayout = computed(() => {
   if (!props.data) return {};
@@ -151,7 +151,7 @@ const normalLayout = computed(() => {
 });
 
 const normalChartData = computed(() => {
-  if (!props.data) return [];
+  if (!props.data || !props.data.summary) return [];
   const min = props.data.summary.min;
   const max = props.data.summary.max;
   return [

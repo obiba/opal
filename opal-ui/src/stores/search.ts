@@ -6,7 +6,46 @@ export interface ItemFieldsResultDto extends ItemResultDto {
   'Search.ItemFieldsDto.item': ItemFieldsDto;
 }
 
+export interface SearchQuery {
+  query: string;
+  criteria: SearchCriteria;
+}
+
+export interface SearchCriteria {
+  [key: string]: string[];
+}
+
 export const useSearchStore = defineStore('search', () => {
+
+  const variablesQuery = ref({
+    query: '',
+    criteria: {
+      project: [],
+      table: [],
+    } as SearchCriteria,
+  });
+
+  function reset() {
+    variablesQuery.value = {
+      query: '',
+      criteria: {
+        project: [],
+        table: [],
+      } as SearchCriteria
+    };
+  }
+
+  async function searchVariables(limit: number) {
+    let fullQuery = variablesQuery.value.query?.trim() || '';
+    Object.keys(variablesQuery.value.criteria).forEach((key) => {
+      const terms = variablesQuery.value.criteria[key];
+      if (terms.length > 0) {
+        const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`
+        fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
+      }
+    });
+    return search(fullQuery, limit, ['label', 'label-en']);
+  }
 
   async function search(query: string, limit: number, fields: string[] | undefined) {
     return api.get('/datasources/variables/_search', {
@@ -60,7 +99,10 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   return {
+    variablesQuery,
+    reset,
     search,
+    searchVariables,
     clearIndex,
     getEntityTables,
     getTables,

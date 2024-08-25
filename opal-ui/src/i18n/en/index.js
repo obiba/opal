@@ -1076,6 +1076,8 @@ export default {
   more_results: 'More results',
   filters: 'Filters',
   filter: 'Filter',
+  nature: 'Nature',
+  results: 'Results',
   stats: {
     min: 'Minimun',
     max: 'Maximum',
@@ -1100,5 +1102,13 @@ export default {
       UPTODATE: 'Up to date',
       UNRECOGNIZED: 'Unrecognized'
     }
+  },
+  variable_nature: {
+    CATEGORICAL: 'Categorical',
+    CONTINUOUS: 'Continuous',
+    TEMPORAL: 'Temporal',
+    GEO: 'Geographical',
+    BINARY: 'Binary',
+    UNDETERMINED: 'Undetermined',
   }
 };

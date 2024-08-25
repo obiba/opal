@@ -16,7 +16,7 @@
           <div class="row q-gutter-md q-mb-md">
             <q-select
               v-model="valueType"
-              :options="valueTypes"
+              :options="ValueTypes"
               :label="$t('value_type')"
               dense
               style="width: 200px;"/>
@@ -70,7 +70,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
-import { valueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 import { VariableDto, AttributeDto } from 'src/models/Magma';
 
 interface DialogProps {

@@ -32,6 +32,14 @@
               @click="onRefresh"
             />
             <q-btn
+              color="secondary"
+              icon="search"
+              :title="$t('search')"
+              outline
+              size="sm"
+              @click="onSearch"
+            />
+            <q-btn
               v-if="datasourceStore.perms.table?.canUpdate()"
               outline
               color="red"
@@ -163,6 +171,7 @@ const router = useRouter();
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
+const searchStore = useSearchStore();
 const { locale } = useI18n({ useScope: 'global' });
 
 const filter = ref('');
@@ -309,5 +318,12 @@ function onShowApplyAnnotation() {
 function onShowDeleteAnnotation() {
   annotationOperation.value = 'delete';
   showAnnotate.value = true;
+}
+
+function onSearch() {
+  searchStore.reset();
+  searchStore.variablesQuery.criteria['project'] = [dsName.value];
+  searchStore.variablesQuery.criteria['table'] = [tName.value];
+  router.push('/search/variables');
 }
 </script>

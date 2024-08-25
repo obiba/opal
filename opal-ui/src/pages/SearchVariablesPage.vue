@@ -16,7 +16,7 @@
         <q-card-section>
           <div class="row q-gutter-md">
             <q-input
-              v-model="query"
+              v-model="searchStore.variablesQuery.query"
               :label="$t('query')"
               flat
               dense
@@ -27,6 +27,7 @@
             />
             <q-btn
               :label="$t('search')"
+              icon="search"
               color="primary"
               size="sm"
               @click="onSubmit"
@@ -34,45 +35,55 @@
               class="q-mt-lg"
               style="height: 2.5em;"
             />
+            <q-btn
+              outline
+              color="secondary"
+              icon="cleaning_services"
+              :label="$t('clear')"
+              size="sm"
+              style="height: 2.5em;"
+              @click="onClear"
+              class="q-mt-lg" />
           </div>
         </q-card-section>
         <q-card-section class="q-pt-none">
           <div class="row q-gutter-md">
-            <q-select
-              :disable="projectsOptions.length === 0"
-              v-model="projectsCriteria"
-              :options="projectsOptions"
-              :label="$t('projects')"
-              flat
-              dense
-              multiple
-              use-chips
-              size="sm"
-              @update:model-value="onClearAndSubmit"
-              style="min-width: 200px;" />
-            <q-select
-              :disable="tablesOptions.length === 0"
-              v-model="tablesCriteria"
-              :options="tablesOptions"
-              :label="$t('tables')"
-              flat
-              dense
-              multiple
-              use-chips
-              size="sm"
-              @update:model-value="onClearAndSubmit"
-              style="min-width: 200px;" />
-            <q-btn
-              v-show="false"
-              :label="$t('filter')"
-              icon="add"
+            <template v-for="field in fields" :key="field">
+              <q-select
+                :disable="!fieldsOptions[field] || fieldsOptions[field].length === 0"
+                v-model="searchStore.variablesQuery.criteria[field]"
+                :options="fieldsOptions[field]"
+                :label="getFieldLabel(field)"
+                flat
+                dense
+                multiple
+                use-chips
+                emit-value
+                map-options
+                size="sm"
+                @update:model-value="onClearAndSubmit"
+                style="min-width: 200px;" />
+            </template>
+            <q-btn-dropdown
               color="secondary"
+              :label="$t('filters')"
               size="sm"
-              @click="onAddCriteria"
-              :disable="loading || !isValid"
               class="q-mt-lg"
               style="height: 2.5em;"
-            />
+            >
+              <q-list>
+                <template v-for="field in fieldsToAdd" :key="field">
+                  <q-item clickable v-close-popup @click="onToggleField(field)">
+                    <q-item-section>
+                      <q-item-label>{{ getFieldLabel(field) }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-icon :name="searchStore.variablesQuery.criteria[field] == undefined ? 'add_circle' : 'delete'" size="xs" color="grey-6" />
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-list>
+            </q-btn-dropdown>
           </div>
         </q-card-section>
       </q-card>
@@ -86,11 +97,13 @@
         </div>
         <q-list separator>
           <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
-            <q-item-section>
+            <q-item-section avatar>
               <span>{{ searchStore.getField(item, 'name') }}</span>
               <div>
                 <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span>
               </div>
+            </q-item-section>
+            <q-item-section top>
               <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
                 <q-badge
                   v-if="attr.locale"
@@ -100,6 +113,9 @@
                 />
                 <span>{{ attr.value }}</span>
               </div>
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="arrow_circle_right" color="grey-6" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -122,32 +138,39 @@
 import { TableDto } from 'src/models/Magma';
 import { QueryResultDto } from 'src/models/Search';
 import { ItemFieldsResultDto } from 'src/stores/search';
+import { VariableNatures, ValueTypes } from 'src/utils/magma';
 
 const route = useRoute();
 const router = useRouter();
 const searchStore = useSearchStore();
 const taxonomiesStore = useTaxonomiesStore();
+const { t } = useI18n();
 
-const query = ref<string>('');
 const loading = ref<boolean>(false);
 const showResults = ref(false);
 const results = ref<QueryResultDto>();
 const limit = ref<number>(10);
 const tables = ref<TableDto[]>([]);
-const projectsCriteria = ref<string[]>([]);
-const tablesCriteria = ref<string[]>([]);
 
-const queryParam = computed(() => route.query.q as string);
-const isValid = computed(() => !!query.value.trim());
+const queryParam = computed(() => route.query.q as string || '');
+const isValid = computed(() => !!searchStore.variablesQuery.query?.trim() || Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0));
 const itemResults = computed(() => results.value?.hits as ItemFieldsResultDto[] || []);
 
+const fields = computed(() => Object.keys(searchStore.variablesQuery.criteria));
 const projectsOptions = computed(() => Array.from(new Set(tables.value.map((table) => table.datasourceName))).sort());
 const tablesOptions = computed(() => Array.from(new Set(tables.value.map((table) => table.name))).sort());
+const fieldsOptions = computed<{ [key: string]: { label: string, value: string }[]}>(() => ({
+  project: projectsOptions.value.filter((p) => p !== undefined).map((project) => ({ label: project, value: project })),
+  table: tablesOptions.value.map((table) => ({ label: table, value: table })),
+  nature: Object.keys(VariableNatures).map((key) => ({ label: t(`variable_nature.${key}`), value: key })),
+  'value-type': ValueTypes.map((t) => ({ label: t, value: t })),
+}));
+const fieldsToAdd = computed(() => ['project', 'table', 'nature', 'value-type']);
 
 onMounted(() => {
   if (queryParam.value) {
-    query.value = queryParam.value;
-
+    searchStore.reset();
+    searchStore.variablesQuery.query = queryParam.value;
   }
   loading.value = true;
   Promise.all([
@@ -170,15 +193,8 @@ function onClear() {
 
 function onSubmit() {
   if (isValid.value) {
-    let fullQuery = query.value.trim();
-    if (projectsCriteria.value.length > 0) {
-      fullQuery += ' AND (' + projectsCriteria.value.map((p) => `project:"${p}"`).join(' OR ') + ')';
-    }
-    if (tablesCriteria.value.length > 0) {
-      fullQuery += ' AND (' + tablesCriteria.value.map((p) => `table:"${p}"`).join(' OR ') + ')';
-    }
     loading.value = true;
-    searchStore.search(fullQuery, limit.value, ['label', 'label-en']).then((res) => {
+    searchStore.searchVariables(limit.value).then((res) => {
       showResults.value = res.totalHits > 0;
       results.value = res;
     })
@@ -215,5 +231,22 @@ function goToVariable(item: ItemFieldsResultDto) {
 function addLimit() {
   limit.value += 10;
   onSubmit();
+}
+
+function getFieldLabel(field: string) {
+  if (field === 'project') {
+    return t('projects');
+  } else if (field === 'table') {
+    return t('tables');
+  }
+  return t(field.replaceAll('-', '_'));
+}
+
+function onToggleField(field: string) {
+  if (searchStore.variablesQuery.criteria[field] == undefined) {
+    searchStore.variablesQuery.criteria[field] = [];
+  } else {
+    delete searchStore.variablesQuery.criteria[field];
+  }
 }
 </script>

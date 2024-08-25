@@ -1076,7 +1076,9 @@ export default {
   more_results: 'Plus de résultats',
   filters: 'Filtres',
   filter: 'Filtre',
-stats: {
+  nature: 'Nature',
+  results: 'Résultats',
+  stats: {
     min: 'Minimun',
     max: 'Maximum',
     mean: 'Moyenne',
@@ -1100,5 +1102,13 @@ stats: {
       UPTODATE: 'À jour',
       UNRECOGNIZED: 'Non reconnue'
     }
+  },
+  variable_nature: {
+    CATEGORICAL: 'Catégorielle',
+    CONTINUOUS: 'Continue',
+    TEMPORAL: 'Temporelle',
+    GEO: 'Géographique',
+    BINARY: 'Binaire',
+    UNDETERMINED: 'Indéterminée',
   }
 };

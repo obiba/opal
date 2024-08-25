@@ -92,6 +92,7 @@
             </q-list>
           </q-btn-dropdown>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
+          <q-btn v-if="datasourceStore.tables.length" color="secondary" outline icon="search" :title="$t('search_variables')" size="sm" @click="onSearch"></q-btn>
           <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDeleteTables"></q-btn>
         </div>
       </template>
@@ -165,6 +166,7 @@ const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
 const projectsStore = useProjectsStore();
+const searchStore = useSearchStore();
 const { t } = useI18n();
 
 const filter = ref('');
@@ -313,5 +315,11 @@ function onShowCopy() {
 
 function onRestoreViews() {
   showRestoreViews.value = true;
+}
+
+function onSearch() {
+  searchStore.reset();
+  searchStore.variablesQuery.criteria['project'] = [dsName.value];
+  router.push('/search/variables');
 }
 </script>
