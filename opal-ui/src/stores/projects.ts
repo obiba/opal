@@ -16,6 +16,8 @@ import {
   CopyCommandOptionsDto,
   BackupCommandOptionsDto,
   RestoreCommandOptionsDto,
+  ImportVCFCommandOptionsDto,
+  ExportVCFCommandOptionsDto
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 import { VCFSamplesMappingDto } from 'src/models/Plugins';
@@ -295,12 +297,27 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
   }
 
-  async function deleteVcf(name: string, file: string) {
-    return api.delete(`/project/${name}/vcf-store/vcfs`, {params: {file}}).then((response) => response.data);
+  async function deleteVcf(name: string, files: string) {
+    return api
+      .delete(`/project/${name}/vcf-store/vcfs`, {
+        params: { file: files },
+        paramsSerializer: {
+          indexes: null,
+        },
+      })
+      .then((response) => response.data);
   }
 
-  async function importVcfFiles(name: string, files: string[]) {
-    return api.post(`/project/${name}/commands/_import_vcf`, {files, project: name}).then((response) => response.data.id);
+  async function importVcfFiles(name: string, importOptions: ImportVCFCommandOptionsDto) {
+    return api
+      .post(`/project/${name}/commands/_import_vcf`, importOptions)
+      .then((response) => response.data.id);
+  }
+
+  async function exportVcfFiles(name: string, exportOptions: ExportVCFCommandOptionsDto) {
+    return api
+      .post(`/project/${name}/commands/_export_vcf`, exportOptions)
+      .then((response) => response.data.id);
   }
 
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
@@ -378,6 +395,7 @@ export const useProjectsStore = defineStore('projects', () => {
     getVcfs,
     deleteVcf,
     importVcfFiles,
+    exportVcfFiles,
     addIdMappings,
     deleteIdMappings,
     getKeyPairs,

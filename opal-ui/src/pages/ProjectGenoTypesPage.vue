@@ -79,12 +79,20 @@
                 :visible-columns="visibleColumns"
                 :hide-pagination="vcfs.length <= initialPagination.rowsPerPage"
                 row-key="name"
+                selection="multiple"
+                v-model:selected="selectedVcfs"
                 :pagination="initialPagination"
                 :loading="loading"
               >
                 <template v-slot:top-left>
                   <div class="q-gutter-sm">
-                    <q-btn size="sm" icon="cached" color="primary" :label="$t('reload')" @click="onRefreshVcfs"></q-btn>
+                    <q-btn
+                      size="sm"
+                      icon="cached"
+                      color="primary"
+                      :label="$t('refresh')"
+                      @click="onRefreshVcfs"
+                    ></q-btn>
                     <q-btn
                       v-if="canImportVcfs"
                       size="sm"
@@ -99,8 +107,20 @@
                       icon="output"
                       color="secondary"
                       :label="$t('export')"
+                      :disable="selectedVcfs.length === 0"
                       @click="onExportVcfFile"
                     ></q-btn>
+                    <q-btn
+                      v-if="canDeleteVcf"
+                      outline
+                      icon="delete"
+                      size="sm"
+                      color="negative"
+                      :title="$t('delete')"
+                      :disable="selectedVcfs.length === 0"
+                      class="q-ml-xs"
+                      @click="onDeleteVcf()"
+                    />
                   </div>
                 </template>
                 <template v-slot:top-right>
@@ -124,18 +144,6 @@
                         :icon="toolsVisible[props.row.name] ? 'description' : 'none'"
                         class="q-ml-xs"
                         @click="onGetStats()"
-                      />
-                      <q-btn
-                        v-if="canDeleteVcf"
-                        rounded
-                        dense
-                        flat
-                        size="sm"
-                        color="secondary"
-                        :title="$t('delete')"
-                        :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
-                        class="q-ml-xs"
-                        @click="onDeleteVcf(props.row)"
                       />
                     </div>
                   </q-td>
@@ -164,6 +172,8 @@
       />
 
       <import-vcf-file-dialog v-model="showImport" :project="project" />
+
+      <export-vcf-file-dialog v-model="showExport" :project="project" :vcfs="selectedVcfs"/>
     </q-page>
   </div>
 </template>
@@ -176,6 +186,7 @@ import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVcfMappingTableDialog from 'src/components/project/AddVcfMappingTableDialog.vue';
 import ImportVcfFileDialog from 'src/components/project/ImportVcfFileDialog.vue';
+import ExportVcfFileDialog from 'src/components/project/ExportVcfFileDialog.vue';
 import { getSizeLabel } from 'src/utils/files';
 import { baseUrl } from 'src/boot/api';
 
@@ -195,6 +206,7 @@ const summary = ref({} as VCFStoreDto);
 const samplesMapping = ref({} as VCFSamplesMappingDto);
 const vcfs = ref([] as VCFSummaryDto[]);
 const filter = ref('');
+const selectedVcfs = ref([] as VCFSummaryDto[]);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -377,10 +389,12 @@ async function _onDeleteMapping() {
   }
 }
 
-async function _onDeleteVcf(vcf: VCFSummaryDto) {
+async function _onDeleteVcf() {
   try {
+    const toDelete = selectedVcfs.value.map((v) => v.name);
+    selectedVcfs.value = [];
     showDelete.value = false;
-    await projectsStore.deleteVcf(project.value.name, vcf.name);
+    await projectsStore.deleteVcf(project.value.name, toDelete);
     confirmText.value = '';
     onConfirmed.value = () => ({});
     initialize();
@@ -409,9 +423,12 @@ function onDeleteMapping() {
   showDelete.value = true;
 }
 
-function onDeleteVcf(row: VCFSummaryDto) {
-  confirmText.value = t('delete_vcf_confirm');
-  onConfirmed.value = async () => await _onDeleteVcf(row);
+function onDeleteVcf() {
+  confirmText.value = t('delete_vcf_confirm', {
+    count: selectedVcfs.value.length,
+    profile: selectedVcfs.value[0].name,
+  });
+  onConfirmed.value = async () => await _onDeleteVcf();
   showDelete.value = true;
 }
 

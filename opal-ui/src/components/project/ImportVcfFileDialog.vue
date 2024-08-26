@@ -28,7 +28,7 @@
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('backup')" type="submit" color="primary" :disable="importFiles.length == 0" @click="onImport" />
+        <q-btn flat :label="$t('import')" type="submit" color="primary" :disable="importFiles.length == 0" @click="onImport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -45,6 +45,7 @@ import { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { FileDto, SubjectProfileDto } from 'src/models/Opal';
+import { ImportVCFCommandOptionsDto } from 'src/models/Commands';
 
 interface DialogProps {
   modelValue: boolean;
@@ -88,7 +89,12 @@ async function onImportFileSelected(files: FileDto[]) {
 
 async function onImport() {
   try{
-    const taskId = await projectsStore.importVcfFiles(props.project.name, importFiles.value);
+    const importOptions: ImportVCFCommandOptionsDto = {
+      project: props.project.name,
+      files: importFiles.value,
+    };
+
+    const taskId = await projectsStore.importVcfFiles(props.project.name, importOptions);
     notifySuccess(t('vcf_store.import_vcf_command_created', {id: taskId}));
     onHide();
   } catch (error) {

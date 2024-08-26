@@ -26,12 +26,12 @@
             use-input
           >
             <template v-slot:option="scope">
-              <q-item v-if="scope.opt.group" class="text-help" clickable disable :label="scope.opt.group">
-                <q-item-section>
+              <q-item v-if="scope.opt.group" class="text-help" dense clickable disable :label="scope.opt.group">
+                <q-item-section class="q-pa-none">
                   {{ scope.opt.group }}
                 </q-item-section>
               </q-item>
-              <q-item v-else clickable v-close-popup @click="onSelectTable(scope.opt.value)">
+              <q-item v-else dense clickable v-close-popup @click="onSelectTable(scope.opt.value)">
                 <q-item-section class="q-pl-md">
                   {{ scope.opt.label }}
                 </q-item-section>
