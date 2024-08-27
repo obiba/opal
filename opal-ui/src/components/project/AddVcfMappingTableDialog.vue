@@ -17,21 +17,26 @@
         <q-card-section v-else>
           <q-select
             v-model="selectedTable"
-            :options="mappingOptions"
+            :options="filterOptions"
             :label="$t('table')"
             :hint="$t('vcf_store.mapping_table_hint')"
             dense
             emit-value
             map-options
             use-input
+            use-chips
+            hide-selection
+            input-debounce="0"
+            @update:model-value="onSelectTable"
+            @filter="onFilterFn"
           >
             <template v-slot:option="scope">
-              <q-item v-if="scope.opt.group" class="text-help" dense clickable disable :label="scope.opt.group">
+              <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.group">
                 <q-item-section class="q-pa-none">
-                  {{ scope.opt.group }}
+                  {{ scope.opt.label }}
                 </q-item-section>
               </q-item>
-              <q-item v-else dense clickable v-close-popup @click="onSelectTable(scope.opt.value)">
+              <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="onSelectTable(scope.opt.value)">
                 <q-item-section class="q-pl-md">
                   {{ scope.opt.label }}
                 </q-item-section>
@@ -68,7 +73,7 @@
 
         <q-card-actions align="right" class="bg-grey-3">
           <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn flat :label="submitCaption" color="primary" @click="onAdd" v-close-popup />
+          <q-btn flat :label="submitCaption" color="primary" :disable="!canAdd" @click="onAdd" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -88,11 +93,11 @@ import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
-  project: string
+  project: string;
   mapping?: VCFSamplesMappingDto;
 }
 
-type GroupOption = { group: string } | { label: string; value: TableDto };
+type SelectOption = { label: string; value: TableDto | undefined };
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
@@ -102,17 +107,17 @@ const tables = ref([] as TableDto[]);
 const { t } = useI18n();
 const showDialog = ref(props.modelValue);
 const newMapping = ref({} as VCFSamplesMappingDto);
-const editMode = computed(() => !!props.mapping && !!props.mapping.projectName);
-const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
-const dialogTitle = computed(() => (editMode.value ? t('vcf_store.edit_mapping') : t('vcf_store.add_mapping')));
 const selectedTable = ref<TableDto | null>(null);
 const selectedParticipantIdVariable = ref<VariableDto | null>(null);
 const selectedRoleVariable = ref<VariableDto | null>(null);
-const mappingOptions = ref([] as GroupOption[]);
+let mappingOptions = [] as SelectOption[];
+const filterOptions = ref([] as SelectOption[]);
 const participantIdOptions = ref([] as { label: string; value: VariableDto }[]);
 const roleOptions = ref([] as { label: string; value: VariableDto }[]);
-let roleVariableSuggestion: VariableDto | undefined = undefined;
-let participantIdVariableSuggestion: VariableDto | undefined = undefined;
+const editMode = computed(() => !!props.mapping && !!props.mapping.projectName);
+const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
+const dialogTitle = computed(() => (editMode.value ? t('vcf_store.edit_mapping') : t('vcf_store.add_mapping')));
+const canAdd = computed(() => !!selectedTable.value && !!selectedParticipantIdVariable.value && !!selectedRoleVariable.value);
 
 function initMappingOptions() {
   if (tables.value.length > 0) {
@@ -125,14 +130,24 @@ function initMappingOptions() {
 
       if (!!table.datasourceName && table.datasourceName !== lastGroup) {
         lastGroup = table.datasourceName;
-        mappingOptions.value.push({ group: lastGroup });
+        mappingOptions.push({ label: lastGroup } as SelectOption);
       }
-      mappingOptions.value.push({ label: table.name, value: table });
+      mappingOptions.push({ label: table.name, value: table });
     });
+    filterOptions.value = [...mappingOptions];
+
+    if (!!selectedTable.value) {
+      getVariables();
+    }
   }
 }
 
 function initializeVariableOptions(variables: VariableDto[]) {
+  let roleVariableSuggestion: VariableDto | undefined = undefined;
+  let participantIdVariableSuggestion: VariableDto | undefined = undefined;
+  roleOptions.value = [];
+  participantIdOptions.value = [];
+
   (variables || []).forEach((variable) => {
     const variableName = variable.name;
     let roleCategory = null;
@@ -146,13 +161,24 @@ function initializeVariableOptions(variables: VariableDto[]) {
         });
       }
 
-      if (roleCategory || variableName.match(/role/i) != null) {
+      if (!!newMapping.value.sampleRoleVariable) {
+        if (variableName === newMapping.value.sampleRoleVariable) {
+          roleVariableSuggestion = variable;
+        }
+      } else if (!!roleCategory || variableName.match(/role/i) != null) {
         roleVariableSuggestion = variable;
       }
     }
 
-    if (!!!participantIdVariableSuggestion && variableName.match(/participant/i) != null) {
-      participantIdVariableSuggestion = variable;
+    if (!!!participantIdVariableSuggestion ) {
+      if (!!newMapping.value.participantIdVariable) {
+        if (variableName === newMapping.value.participantIdVariable) {
+          participantIdVariableSuggestion = variable;
+        }
+      }
+      else if (variableName.match(/participant/i) != null) {
+        participantIdVariableSuggestion = variable;
+      }
     }
 
     roleOptions.value.push({ label: variableName, value: variable });
@@ -180,6 +206,20 @@ async function getVariables() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onFilterFn(val: string, update: any) {
+  update(() => {
+    if (val.trim().length === 0) {
+      filterOptions.value = [...mappingOptions];
+    } else {
+      const needle = val.toLowerCase();
+      filterOptions.value = [
+        ...mappingOptions.filter((v: SelectOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1),
+      ];
+    }
+  });
+}
+
 // Handlers
 
 watch(
@@ -192,7 +232,7 @@ watch(
         if (props.mapping && props.mapping.projectName) {
           newMapping.value = { ...props.mapping };
         } else {
-          newMapping.value = {projectName: props.project} as VCFSamplesMappingDto;
+          newMapping.value = { projectName: props.project } as VCFSamplesMappingDto;
         }
 
         initMappingOptions();
@@ -203,16 +243,28 @@ watch(
   }
 );
 
-function onSelectTable(table: TableDto) {
+function onSelectTable(table: TableDto | null) {
   selectedTable.value = table;
-  newMapping.value.tableReference = `${table.datasourceName}.${table.name}`;
-  getVariables();
+  if (!!table) {
+    newMapping.value.tableReference = `${table.datasourceName}.${table.name}`;
+    getVariables();
+  } else {
+    selectedParticipantIdVariable.value = null;
+    selectedRoleVariable.value = null;
+    participantIdOptions.value = [];
+    roleOptions.value = [];
+  }
 }
 
 function onHide() {
+  mappingOptions = [];
   newMapping.value = {} as VCFSamplesMappingDto;
   selectedTable.value = null;
-  mappingOptions.value = [];
+  selectedParticipantIdVariable.value = null;
+  selectedRoleVariable.value = null;
+  filterOptions.value = [];
+  roleOptions.value = [];
+  participantIdOptions.value = [];
   emit('update:modelValue', false);
 }
 

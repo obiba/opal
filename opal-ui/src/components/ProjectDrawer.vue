@@ -105,7 +105,6 @@ const hasVcfStorePermission = ref(false);
 const hasVcfPlugins = ref(false);
 
 watchEffect(() => {
-  console.log('watching Drawer');
   hasAdminPermission.value =
     projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||

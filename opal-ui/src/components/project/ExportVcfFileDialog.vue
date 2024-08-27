@@ -36,12 +36,12 @@
               @filter="onFilterFn"
             >
               <template v-slot:option="scope">
-                <q-item v-if="scope.opt.group" class="text-help" dense clickable disable :label="scope.opt.group">
+                <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
                   <q-item-section class="q-pa-none">
-                    {{ scope.opt.group }}
+                    {{ scope.opt.label }}
                   </q-item-section>
                 </q-item>
-                <q-item v-else dense clickable v-close-popup @click="selectedTable = scope.opt.value">
+                <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="selectedTable = scope.opt.value">
                   <q-item-section class="q-pl-md">
                     {{ scope.opt.label }}
                   </q-item-section>
@@ -88,7 +88,8 @@ interface DialogProps {
   vcfs: VCFSummaryDto[];
 }
 
-type GroupOption = { group: string } | { label: string; value: TableDto };
+// type GroupOption = { group: string } | { label: string; value: TableDto };
+type GroupOption = { label: string; value: TableDto | undefined };
 
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
@@ -104,26 +105,21 @@ const importData = ref({} as FileDto);
 const importFiles = ref<string[]>([]);
 const folderError = ref('');
 const selectedTable = ref<TableDto | null>(null);
-const participantsOptions = ref([] as GroupOption[]);
+let participantsOptions = [] as GroupOption[];
 const filterOptions = ref([] as GroupOption[]);
 
 function initMappingOptions(tables: TableDto[]) {
   if (tables.length > 0) {
     let lastGroup = '';
     tables.forEach((table) => {
-      const tableRef = `${table.datasourceName}.${table.name}`;
-      if (!!!selectedTable.value) {
-        selectedTable.value = table;
-      }
-
       if (!!table.datasourceName && table.datasourceName !== lastGroup) {
         lastGroup = table.datasourceName;
-        participantsOptions.value.push({ group: lastGroup });
+        participantsOptions.push({ label: lastGroup } as GroupOption);
       }
-      participantsOptions.value.push({ label: table.name, value: table });
+      participantsOptions.push({ label: table.name, value: table } as GroupOption);
     });
 
-    filterOptions.value = participantsOptions.value;
+    filterOptions.value = [...participantsOptions];
   }
 }
 
@@ -143,10 +139,10 @@ watch(
 function onFilterFn(val: string, update: any) {
   update(() => {
     if (val.trim().length === 0) {
-      filterOptions.value = [...participantsOptions.value];
+      filterOptions.value = [...participantsOptions];
     } else {
       const needle = val.toLowerCase();
-      filterOptions.value = [...participantsOptions.value.filter((v: GroupOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1)];
+      filterOptions.value = [...participantsOptions.filter((v: GroupOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1)];
     }
   });
 }
@@ -157,7 +153,7 @@ function onHide() {
   importData.value = {} as FileDto;
   importFiles.value = [];
   filterOptions.value = [];
-  participantsOptions.value = [];
+  participantsOptions = [];
   selectedTable.value = null;
   emit('update:modelValue', false);
 }
@@ -171,7 +167,7 @@ async function onExportFolderSelected(files: FileDto[]) {
 async function onImport() {
   try {
     // const taskId = await projectsStore.exportVcfFiles(props.project.name, importFiles.value);
-    notifySuccess(t('vcf_store.import_vcf_command_created', { id: taskId }));
+    // notifySuccess(t('vcf_store.import_vcf_command_created', { id: taskId }));
     onHide();
   } catch (error) {
     notifyError(error);
