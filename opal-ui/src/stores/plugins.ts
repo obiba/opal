@@ -52,6 +52,12 @@ export const usePluginsStore = defineStore('plugins', () => {
     return api.get('plugins', {params: {type}}).then((response) => response.data);
   }
 
+  async function hasPlugin(type: string) {
+    return api.get('plugins', {params: {type}}).then((response) => {
+      return (response.data.packages||[]).length > 0;
+    });
+  }
+
   return {
     datasourceImportPlugins,
     datasourceExportPlugins,
@@ -59,7 +65,8 @@ export const usePluginsStore = defineStore('plugins', () => {
     reset,
     initDatasourcePlugins,
     getDatasourcePluginForm,
-    initVcfStorePlugins
+    initVcfStorePlugins,
+    hasPlugin
   };
 
 });

@@ -106,6 +106,12 @@ public class ProjectVCFStoreResource implements BaseResource {
     return Dtos.asDto(vcfSamplesMappingService.getVCFSamplesMapping(name));
   }
 
+  @OPTIONS
+  @Path("/samples")
+  public Response getSamplesMappingOptions() {
+    return Response.ok().build();
+  }
+
   /**
    * Update or create a specific {@link org.obiba.opal.core.domain.VCFSamplesMapping}.
    *
@@ -165,6 +171,11 @@ public class ProjectVCFStoreResource implements BaseResource {
       .collect(Collectors.toList());
   }
 
+  @OPTIONS
+  @Path("/vcfs")
+  public Response getVCFListOptions() {
+    return Response.ok().build();
+  }
   /**
    * Delete a VCF file. Does not fail if such VCF is not found.
    *

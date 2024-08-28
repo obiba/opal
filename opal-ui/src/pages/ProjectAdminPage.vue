@@ -274,7 +274,7 @@ const dsProperties: FieldItem<ProjectDto>[] = [
 const vcfProperties: FieldItem<ProjectDto>[] = [
   {
     field: 'vcfStoreService',
-    label: 'vcf_store',
+    label: 'vcf_store.label',
   },
 ];
 

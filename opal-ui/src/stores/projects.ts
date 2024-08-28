@@ -16,8 +16,11 @@ import {
   CopyCommandOptionsDto,
   BackupCommandOptionsDto,
   RestoreCommandOptionsDto,
+  ImportVCFCommandOptionsDto,
+  ExportVCFCommandOptionsDto
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
+import { VCFSamplesMappingDto } from 'src/models/Plugins';
 
 interface ProjectPerms {
   export: Perms | undefined;
@@ -27,6 +30,12 @@ interface ProjectPerms {
   project: Perms | undefined;
   keystore: Perms | undefined;
   reload: Perms | undefined;
+
+  vcfstore: Perms | undefined;
+  samples: Perms | undefined;
+  vcfs: Perms | undefined;
+  import_vcf: Perms | undefined;
+  export_vcf: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -104,11 +113,29 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.keystore = new Perms(response);
           return response;
         }),
+        api.options(`/project/${project.value.name}/vcf-store`).then((response) => {
+          perms.value.vcfstore = new Perms(response);
+          return response;
+        }),
         api.options(`/project/${project.value.name}`).then((response) => {
           perms.value.project = new Perms(response);
           return response;
         }),
       ]);
+    });
+  }
+
+  async function loadVcfPermissions(name: string) {
+    return Promise.all([
+      api.options(`/project/${name}/vcf-store/samples`),
+      api.options(`/project/${name}/vcf-store/vcfs`),
+      api.options(`/project/${name}/commands/_import_vcf`),
+      api.options(`/project/${name}/commands/_export_vcf`),
+    ]).then(([samples, vcfs, import_vcf, export_vcf]) => {
+      perms.value.samples = new Perms(samples);
+      perms.value.vcfs = new Perms(vcfs);
+      perms.value.import_vcf = new Perms(import_vcf);
+      perms.value.export_vcf = new Perms(export_vcf);
     });
   }
 
@@ -250,6 +277,49 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(`/project/${name}/identifiers-mappings`).then((response) => response.data);
   }
 
+  async function getVcfStore(name: string) {
+    return api.get(`/project/${name}/vcf-store`).then((response) => response.data);
+  }
+
+  async function getVcfSamplesMapping(name: string) {
+    return api.get(`/project/${name}/vcf-store/samples`).then((response) => response.data);
+  }
+
+  async function addVcfSamplesMapping(name: string, mapping: VCFSamplesMappingDto) {
+    return api.put(`/project/${name}/vcf-store/samples`, mapping);
+  }
+
+  async function deleteVcfSamplesMapping(name: string) {
+    return api.delete(`/project/${name}/vcf-store/samples`);
+  }
+
+  async function getVcfs(name: string) {
+    return api.get(`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
+  }
+
+  async function deleteVcf(name: string, files: string[]) {
+    return api
+      .delete(`/project/${name}/vcf-store/vcfs`, {
+        params: { file: files },
+        paramsSerializer: {
+          indexes: null,
+        },
+      })
+      .then((response) => response.data);
+  }
+
+  async function importVcfFiles(name: string, importOptions: ImportVCFCommandOptionsDto) {
+    return api
+      .post(`/project/${name}/commands/_import_vcf`, importOptions)
+      .then((response) => response.data.id);
+  }
+
+  async function exportVcfFiles(name: string, exportOptions: ExportVCFCommandOptionsDto) {
+    return api
+      .post(`/project/${name}/commands/_export_vcf`, exportOptions)
+      .then((response) => response.data.id);
+  }
+
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
     if (!project.idMappings) project.idMappings = [];
     const index: number = project.idMappings.findIndex(
@@ -302,6 +372,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadCommandStates,
     loadAcls,
     loadSubjects,
+    loadVcfPermissions,
     deleteSubject,
     getSubjectPermissions,
     deleteSubjectPermission,
@@ -317,6 +388,14 @@ export const useProjectsStore = defineStore('projects', () => {
     restore,
     archive,
     getIdMappings,
+    getVcfStore,
+    getVcfSamplesMapping,
+    addVcfSamplesMapping,
+    deleteVcfSamplesMapping,
+    getVcfs,
+    deleteVcf,
+    importVcfFiles,
+    exportVcfFiles,
     addIdMappings,
     deleteIdMappings,
     getKeyPairs,
