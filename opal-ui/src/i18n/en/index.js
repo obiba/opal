@@ -344,6 +344,15 @@ export default {
       description: 'View VCF files and statistics.',
     },
   },
+  id_mappings: {
+    title: 'Identifiers Mappings',
+    info: 'Identifiers mappings are defined per entity type. Mapping identifiers consist of associating, for a given entity, its identifier in the system to its identifiers in the data being imported or exported.',
+    ids_list_title: 'Identifiers Tables',
+    mappings_list_title: 'Mappings',
+    manage_caption: 'Manage identifiers mappings',
+    mappings_count: 'Identifier mappings',
+    system_ids_count: 'System identifiers',
+  },
   git: {
     diff_viewer: {
       title: 'Commit Details',
@@ -900,8 +909,6 @@ export default {
   id_column_name_hint: 'Name of the column that identifies the entity. If not provided, the default name applies.',
   id_column_name: 'ID column name',
   id_column: 'ID column',
-  id_mappings_caption: 'Manage identifiers mappings',
-  id_mappings: 'Identifiers Mappings',
   id: 'ID',
   identity_provider_account_login: 'Account Login',
   identity_provider_add: 'Add Identity Provider',

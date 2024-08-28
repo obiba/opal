@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings') }}</div>
+        <div class="text-h6">{{ $t('id_mappings.title') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -24,7 +24,7 @@
             v-model="selectedMappings"
             dense
             :options="mappingOptions"
-            :label="$t('id_mappings')"
+            :label="$t('id_mappings.title')"
             :hint="$t('project_admin.id_mappings_hint')"
             emit-value
             map-options

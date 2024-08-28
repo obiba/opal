@@ -344,6 +344,10 @@ export default {
       description: 'VCF_STORE_VIEW',
     },
   },
+  id_mappings: {
+    title: 'Correspondances d\'identifiants',
+    manage_caption: 'Gérer les correspondances d\'identifiants',
+  },
   git: {
     diff_viewer: {
       titre: 'Détails de la validation',
@@ -900,8 +904,6 @@ export default {
   id_column_name_hint: "Nom de la colonne qui identifie l'entité. S'il n'est pas fourni, le nom par défaut s'applique",
   id_column_name: 'Nom de la colonne ID',
   id_column: 'Colonne ID',
-  id_mappings_caption: 'Gérer les identifiants',
-  id_mappings: 'Identifiants',
   id: 'ID',
   identity_provider_account_login: 'Connexion au compte',
   identity_provider_add: "Ajouter un fournisseur d'identité",

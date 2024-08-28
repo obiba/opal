@@ -82,8 +82,8 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/identifiers">{{ $t('id_mappings') }}</router-link></q-item-label>
-                <q-item-label caption lines="2">{{ $t('id_mappings_caption') }}</q-item-label>
+                <q-item-label><router-link to="/admin/identifiers">{{ $t('id_mappings.title') }}</router-link></q-item-label>
+                <q-item-label caption lines="2">{{ $t('id_mappings.manage_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
