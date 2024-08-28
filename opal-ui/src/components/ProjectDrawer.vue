@@ -38,7 +38,7 @@
           <q-icon name="science" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('project_genotypes.title') }}</q-item-label>
+          <q-item-label>{{ $t('genotypes') }}</q-item-label>
         </q-item-section>
       </q-item>
 

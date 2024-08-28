@@ -20,6 +20,7 @@
             :options="filterOptions"
             :label="$t('table')"
             :hint="$t('vcf_store.mapping_table_hint')"
+            class="q-mb-md"
             dense
             emit-value
             map-options
