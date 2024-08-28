@@ -12,7 +12,7 @@
           <q-banner rounded class="bg-primary text-white">{{
             $t('vcf_store.export_vcf_file_label', { count: vcfs.length })
           }}</q-banner>
-          <pre>{{ exportOptions }}</pre>
+
           <file-select
             v-model="exportData"
             :folder="filesStore.current"
@@ -26,11 +26,10 @@
           </file-select>
 
           <template v-if="showMapping">
-            <pre>{{ idMappings }}</pre>
             <q-select
               v-model="selectedTable"
               :options="filterOptions"
-              :label="$t('table')"
+              :label="$t('vcf_store.export_participants_filter_label')"
               :hint="$t('vcf_store.export_mapping_table_hint')"
               dense
               map-options
@@ -57,6 +56,19 @@
                   </q-item-section>
                 </q-item>
               </template>
+            </q-select>
+
+            <q-select
+              v-model="exportOptions.participantIdentifiersMapping"
+              :disable="!!!selectedTable?.name"
+              :options="idMappings"
+              :label="$t('vcf_store.export_id_mappings_label')"
+              :hint="$t('vcf_store.export_id_mappings_hint')"
+              dense
+              map-options
+              use-input
+            >
+
             </q-select>
 
             <q-checkbox v-model="exportOptions.caseControl" :label="$t('vcf_store.export_case_control_label')" />
@@ -98,24 +110,24 @@ interface DialogProps {
 
 type GroupOption = { label: string; value: TableDto | undefined };
 
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const identifiersStore = useIdentifiersStore();
 const datasourceStore = useDatasourceStore();
 const profilesStore = useProfilesStore();
 const filesStore = useFilesStore();
-const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
-const { t } = useI18n();
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
-const emit = defineEmits(['update:modelValue']);
 const exportData = ref({} as FileDto);
-const idMappings = ref<IdentifiersMappingDto[]>([]);
+const idMappings = ref<string[]>([]);
 const folderError = ref('');
 const selectedTable = ref<TableDto | null>(null);
-let participantsOptions = [] as GroupOption[];
 const filterOptions = ref([] as GroupOption[]);
 const exportOptions = ref({} as ExportVCFCommandOptionsDto);
+let participantsOptions = [] as GroupOption[];
+const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
 const canExport = computed(() => !!exportData.value.path);
 
 function initMappingOptions(tables: TableDto[]) {
@@ -145,8 +157,11 @@ watch(
       } as ExportVCFCommandOptionsDto;
 
       if (props.showMapping) {
-        datasourceStore.getAllTables('Participant').then((response) =>  initMappingOptions(response));
-        identifiersStore.getMappings().then((mappings) => (idMappings.value = mappings)).catch(error => console.error(error));
+        datasourceStore.getAllTables('Participant').then((response) => initMappingOptions(response));
+        identifiersStore
+          .getMappings()
+          .then((mappings: IdentifiersMappingDto[]) => (idMappings.value = mappings.map((m) => m.name)))
+          .catch((error) => console.error(error));
       }
       showDialog.value = value;
     }
@@ -184,6 +199,7 @@ async function onExportFolderSelected(folder: FileDto) {
 async function onExport() {
   try {
     exportOptions.value.destination = exportData.value.path;
+    if (selectedTable.value?.name) exportOptions.value.table = `${selectedTable.value.datasourceName}.${selectedTable.value.name}`;
     const taskId = await projectsStore.exportVcfFiles(props.project.name, exportOptions.value);
     notifySuccess(t('vcf_store.export_vcf_command_created', { id: taskId }));
     onHide();

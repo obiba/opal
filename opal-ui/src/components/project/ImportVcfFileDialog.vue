@@ -52,19 +52,19 @@ interface DialogProps {
   project: ProjectDto;
 }
 
+
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const profilesStore = useProfilesStore();
 const filesStore = useFilesStore();
-
-const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
-const { t } = useI18n();
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
-const emit = defineEmits(['update:modelValue']);
 const importData = ref({} as FileDto);
 const importFiles = ref<string[]>([]);
 const folderError = ref('');
+const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
 
 watch(
   () => props.modelValue,

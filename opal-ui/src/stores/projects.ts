@@ -297,7 +297,7 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
   }
 
-  async function deleteVcf(name: string, files: string) {
+  async function deleteVcf(name: string, files: string[]) {
     return api
       .delete(`/project/${name}/vcf-store/vcfs`, {
         params: { file: files },

@@ -168,12 +168,18 @@
         v-model="showMapping"
         :mapping="samplesMapping"
         :project="project.name || ''"
-        @update="onMappingAdded"
+        @update:modelValue="onMappingAdded"
       />
 
-      <import-vcf-file-dialog v-model="showImport" :project="project" />
+      <import-vcf-file-dialog v-model="showImport" :project="project" @update="onImportedVcfs" />
 
-      <export-vcf-file-dialog v-model="showExport" :project="project" :vcfs="selectedVcfs" :show-mapping="!!samplesMapping.projectName"/>
+      <export-vcf-file-dialog
+        v-model="showExport"
+        :project="project"
+        :vcfs="selectedVcfs"
+        :show-mapping="!!samplesMapping.projectName"
+        @update:modelValue="onExportedVcfs"
+      />
     </q-page>
   </div>
 </template>
@@ -201,7 +207,6 @@ const showDelete = ref(false);
 const loading = ref(false);
 const confirmText = ref('');
 const onConfirmed = ref(() => ({}));
-const name = computed(() => route.params.id as string);
 const summary = ref({} as VCFStoreDto);
 const samplesMapping = ref({} as VCFSamplesMappingDto);
 const vcfs = ref([] as VCFSummaryDto[]);
@@ -233,7 +238,6 @@ const summaryProperties: FieldItem<VCFStoreDto>[] = [
     label: 'vcf_store.controls',
   },
 ];
-
 const sampleMappingProperties: FieldItem<VCFSamplesMappingDto>[] = [
   {
     field: 'tableReference',
@@ -248,7 +252,7 @@ const sampleMappingProperties: FieldItem<VCFSamplesMappingDto>[] = [
     label: 'role',
   },
 ];
-
+const name = computed(() => route.params.id as string);
 const project = computed(() => projectsStore.project);
 const canDeleteVcf = computed(() => projectsStore.perms.vcfs?.canDelete());
 const canImportVcfs = computed(() => projectsStore.perms.import_vcf?.canCreate());
@@ -391,7 +395,7 @@ async function _onDeleteMapping() {
 
 async function _onDeleteVcf() {
   try {
-    const toDelete = selectedVcfs.value.map((v) => v.name);
+    const toDelete: string[] = selectedVcfs.value.map((v) => v.name);
     selectedVcfs.value = [];
     showDelete.value = false;
     await projectsStore.deleteVcf(project.value.name, toDelete);
@@ -463,6 +467,15 @@ function onFilter() {
   });
 
   return result;
+}
+
+function onImportedVcfs() {
+  showImport.value = false;
+}
+
+function onExportedVcfs() {
+  showExport.value = false;
+  selectedVcfs.value = [];
 }
 
 async function onGetStats() {
