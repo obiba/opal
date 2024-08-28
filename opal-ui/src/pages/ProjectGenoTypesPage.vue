@@ -173,7 +173,7 @@
 
       <import-vcf-file-dialog v-model="showImport" :project="project" />
 
-      <export-vcf-file-dialog v-model="showExport" :project="project" :vcfs="selectedVcfs"/>
+      <export-vcf-file-dialog v-model="showExport" :project="project" :vcfs="selectedVcfs" :show-mapping="!!samplesMapping.projectName"/>
     </q-page>
   </div>
 </template>

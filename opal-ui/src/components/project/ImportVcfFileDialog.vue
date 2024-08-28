@@ -104,7 +104,7 @@ async function onImport() {
 
 onMounted(() =>
   profilesStore.initProfile().then(() =>
-    filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
+    filesStore.refreshFiles(`/home/${profile.value.principal}`).then(() => {
       importData.value = filesStore.current;
     })
   )

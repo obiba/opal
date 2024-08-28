@@ -2,15 +2,19 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('vcf_store.import_vcf_file') }}</div>
+        <div class="text-h6">{{ $t('vcf_store.export_vcf_file') }}</div>
       </q-card-section>
 
       <q-separator />
+
       <q-card-section style="max-height: 75vh" class="scroll">
         <q-form ref="formRef" class="q-gutter-md" persistent>
+          <q-banner rounded class="bg-primary text-white">{{
+            $t('vcf_store.export_vcf_file_label', { count: vcfs.length })
+          }}</q-banner>
+          <pre>{{ exportOptions }}</pre>
           <file-select
-            v-model="importData"
-            :label="$t('vcf_store.export_vcf_file_label')"
+            v-model="exportData"
             :folder="filesStore.current"
             selection="single"
             type="folder"
@@ -21,13 +25,13 @@
             </template>
           </file-select>
 
-          <q-card-section>
-            <pre>{{  selectedTable }}</pre>
+          <template v-if="showMapping">
+            <pre>{{ idMappings }}</pre>
             <q-select
               v-model="selectedTable"
               :options="filterOptions"
               :label="$t('table')"
-              :hint="$t('vcf_store.mapping_table_hint')"
+              :hint="$t('vcf_store.export_mapping_table_hint')"
               dense
               map-options
               use-chips
@@ -41,28 +45,29 @@
                     {{ scope.opt.label }}
                   </q-item-section>
                 </q-item>
-                <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="selectedTable = scope.opt.value">
+                <q-item
+                  v-show="!!scope.opt.value"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="selectedTable = scope.opt.value"
+                >
                   <q-item-section class="q-pl-md">
                     {{ scope.opt.label }}
                   </q-item-section>
                 </q-item>
               </template>
             </q-select>
-          </q-card-section>
+
+            <q-checkbox v-model="exportOptions.caseControl" :label="$t('vcf_store.export_case_control_label')" />
+          </template>
         </q-form>
       </q-card-section>
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn
-          flat
-          :label="$t('import')"
-          type="submit"
-          color="primary"
-          :disable="importFiles.length == 0"
-          @click="onImport"
-        />
+        <q-btn flat :label="$t('export')" type="submit" color="primary" :disable="!canExport" @click="onExport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -81,17 +86,20 @@ import FileSelect from 'src/components/files/FileSelect.vue';
 import { FileDto, SubjectProfileDto } from 'src/models/Opal';
 import { TableDto } from 'src/models/Magma';
 import { VCFSummaryDto } from 'src/models/Plugins';
+import { ExportVCFCommandOptionsDto } from 'src/models/Commands';
+import { IdentifiersMappingDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
   project: ProjectDto;
   vcfs: VCFSummaryDto[];
+  showMapping: boolean;
 }
 
-// type GroupOption = { group: string } | { label: string; value: TableDto };
 type GroupOption = { label: string; value: TableDto | undefined };
 
 const projectsStore = useProjectsStore();
+const identifiersStore = useIdentifiersStore();
 const datasourceStore = useDatasourceStore();
 const profilesStore = useProfilesStore();
 const filesStore = useFilesStore();
@@ -101,12 +109,14 @@ const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
 const emit = defineEmits(['update:modelValue']);
-const importData = ref({} as FileDto);
-const importFiles = ref<string[]>([]);
+const exportData = ref({} as FileDto);
+const idMappings = ref<IdentifiersMappingDto[]>([]);
 const folderError = ref('');
 const selectedTable = ref<TableDto | null>(null);
 let participantsOptions = [] as GroupOption[];
 const filterOptions = ref([] as GroupOption[]);
+const exportOptions = ref({} as ExportVCFCommandOptionsDto);
+const canExport = computed(() => !!exportData.value.path);
 
 function initMappingOptions(tables: TableDto[]) {
   if (tables.length > 0) {
@@ -127,9 +137,17 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      datasourceStore.getAllTables('Participant').then((response) => {
-        initMappingOptions(response);
-      });
+      exportOptions.value = {
+        names: props.vcfs.map((vcf) => vcf.name),
+        project: props.project.name,
+        destination: '',
+        caseControl: true,
+      } as ExportVCFCommandOptionsDto;
+
+      if (props.showMapping) {
+        datasourceStore.getAllTables('Participant').then((response) =>  initMappingOptions(response));
+        identifiersStore.getMappings().then((mappings) => (idMappings.value = mappings)).catch(error => console.error(error));
+      }
       showDialog.value = value;
     }
   }
@@ -142,7 +160,9 @@ function onFilterFn(val: string, update: any) {
       filterOptions.value = [...participantsOptions];
     } else {
       const needle = val.toLowerCase();
-      filterOptions.value = [...participantsOptions.filter((v: GroupOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1)];
+      filterOptions.value = [
+        ...participantsOptions.filter((v: GroupOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1),
+      ];
     }
   });
 }
@@ -150,24 +170,22 @@ function onFilterFn(val: string, update: any) {
 function onHide() {
   showDialog.value = false;
   folderError.value = '';
-  importData.value = {} as FileDto;
-  importFiles.value = [];
+  exportData.value = {} as FileDto;
   filterOptions.value = [];
   participantsOptions = [];
   selectedTable.value = null;
   emit('update:modelValue', false);
 }
 
-async function onExportFolderSelected(files: FileDto[]) {
-  importFiles.value = (files || []).map((file) => file.path);
+async function onExportFolderSelected(folder: FileDto) {
+  exportOptions.value.destination = folder.path;
 }
 
-
-
-async function onImport() {
+async function onExport() {
   try {
-    // const taskId = await projectsStore.exportVcfFiles(props.project.name, importFiles.value);
-    // notifySuccess(t('vcf_store.import_vcf_command_created', { id: taskId }));
+    exportOptions.value.destination = exportData.value.path;
+    const taskId = await projectsStore.exportVcfFiles(props.project.name, exportOptions.value);
+    notifySuccess(t('vcf_store.export_vcf_command_created', { id: taskId }));
     onHide();
   } catch (error) {
     notifyError(error);
@@ -177,7 +195,7 @@ async function onImport() {
 onMounted(() =>
   profilesStore.initProfile().then(() =>
     filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
-      importData.value = filesStore.current;
+      exportData.value = filesStore.current;
     })
   )
 );

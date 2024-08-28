@@ -44,11 +44,15 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function addMappings(identifiers: VariableDto[]) {
-    return api.post('/table/keys/variables', identifiers);
+    return api.post('/identifiers/table/keys/variables', identifiers);
   }
 
   async function deleteMapping(idName: string, mappingName: string) {
     return api.delete(`/identifiers/table/${idName}/variable/${mappingName}`);
+  }
+
+  async function getMappings(type = 'Participant') {
+    return api.get('/identifiers/mappings', {params: {type}}).then((response) => response.data);
   }
 
   return {
@@ -61,5 +65,6 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     initMappings,
     addMappings,
     deleteMapping,
+    getMappings
   };
 });
