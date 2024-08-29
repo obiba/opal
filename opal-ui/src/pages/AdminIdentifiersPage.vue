@@ -73,7 +73,35 @@
                 :loading="loading"
               >
                 <template v-slot:top-left>
-                  <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddMapping" />
+                  <div class="q-gutter-sm">
+                    <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddMapping" />
+                    <q-btn-dropdown
+                      color="primary"
+                      :label="$t('id_mappings.import_identifiers')"
+                      icon="input"
+                      size="sm"
+                    >
+                      <q-list>
+                        <q-item clickable v-close-popup @click.prevent="onImportIdentifiersList">
+                          <q-item-section>
+                            <q-item-label>{{ $t('id_mappings.import_identifiers_list') }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+
+                        <q-item clickable v-close-popup @click.prevent="(onAddWithCertificate) => ({})">
+                          <q-item-section>
+                            <q-item-label>{{ $t('id_mappings.import_identifiers_table') }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+
+                        <q-item clickable v-close-popup @click.prevent="(onAddWithCertificate) => ({})">
+                          <q-item-section>
+                            <q-item-label>{{ $t('id_mappings.import_identifiers_mapping') }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-btn-dropdown>
+                  </div>
                 </template>
                 <template v-slot:body-cell-name="props">
                   <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -156,6 +184,8 @@
         @update:model-value="onCloseMappingDialog"
         @update="onGenerateIdentifiers"
       />
+
+      <import-identifiers-list v-model="showImportList" :identifier="selectedIdentifier" @update="onIdentifierAdded" />
     </q-page>
   </div>
 </template>
@@ -169,7 +199,7 @@ import AddIdentifierDialog from 'src/components/admin/identifiers/AddIdentifierD
 import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.vue';
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { get } from 'http';
+import ImportIdentifiersList from 'src/components/admin/identifiers/ImportIdentifiersList.vue';
 
 const { t } = useI18n();
 const initialPagination = ref({
@@ -189,6 +219,7 @@ const showConfirm = ref(false);
 const showAddMapping = ref(false);
 const showAddIdentifier = ref(false);
 const showGenerateIdentifiers = ref(false);
+const showImportList = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const identifiers = ref([] as TableDto[]);
 const hasIdentifiers = computed(() => identifiers.value.length > 0);
@@ -279,7 +310,6 @@ function onAddIdentifier() {
 }
 
 function onIdentifierAdded() {
-  showAddIdentifier.value = false;
   getIdentifiers();
 }
 
@@ -302,21 +332,20 @@ function onDeleteIdentifier() {
   };
 }
 
+function onImportIdentifiersList() {
+  showImportList.value = true;
+}
+
+async function onIdentifiersImported() {
+  //
+}
+
 function onGenerateIdentifiers(row: VariableDto) {
   selectedMapping.value = row;
   showGenerateIdentifiers.value = true;
 }
 
 function onDeleteMapping(row: VariableDto) {
-  //   const ids = `
-  // 1
-  // 2
-  // 3
-  // `
-  //   identifiersStore.importMappingSystemIdentifiers(selectedIdentifier.value.name, ids).then(() => {
-  //     console.log('Imported');
-  //   });
-
   selectedMapping.value = row;
   showConfirm.value = true;
   confirm.value = {

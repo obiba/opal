@@ -369,6 +369,10 @@ export default {
     with_checksum_hint: 'Generate identifiers with its Luhn checksum.',
     identifier_prefix: 'Identifier Prefix',
     leading_zero: 'Allow leading zeros',
+    import_identifiers: 'Import Identifiers',
+    import_identifiers_list: 'System Identifiers from List',
+    import_identifiers_table: 'System Identifiers from Table',
+    import_identifiers_mapping: 'Identifiers Mapping',
   },
   git: {
     diff_viewer: {
@@ -487,6 +491,7 @@ export default {
     name_required: 'Name is required',
     entity_type_required: 'Entity Type is required',
     range: 'Value must be between {min} and {max} inclusively',
+    identifiers_required: 'Identifiers are required',
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',

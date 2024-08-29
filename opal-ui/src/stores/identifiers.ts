@@ -66,13 +66,16 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
       .then((response) => response.data);
   }
 
-  async function importMappingSystemIdentifiers(idName: string, content: string, separator?: string) {
-    //http://localhost:9080/ws/identifiers/mapping/TATA/_import?type=GGGGG&separator=%2C
-    //http://localhost:9080/ws/identifiers/mappings/entities/_import?type=GGGGG
-    //http://localhost:8080/ws/identifiers/mapping/Participant/_import?type=YYYYY
+  async function importSystemIdentifiers(idName: string, content: string, separator?: string) {
+    return api.post('/identifiers/mapping/entities/_import', content, {
+      params: separator ? { type: idName, separator } : { type: idName },
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
 
-    return api.post(`/identifiers/mapping/entities/_import`, content, {
-      params: separator ? { type: idName, separator: "'" } : { type: idName },
+  async function importMappingSystemIdentifiers(idName: string, mappingName: string, content: string, separator?: string) {
+    return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
+      params: separator ? { type: idName, separator } : { type: idName },
       headers: { 'Content-Type': 'text/plain' },
     });
   }
@@ -94,6 +97,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     updateMapping,
     deleteMapping,
     getMappingIdentifiersCount,
+    importSystemIdentifiers,
     importMappingSystemIdentifiers,
     getMappings,
   };
