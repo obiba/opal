@@ -13,7 +13,19 @@
       </div>
       <div class="row q-gutter-md">
         <div class="col">
-          <div class="text-h5 q-mb-md">{{ $t('id_mappings.ids_list_title') }}</div>
+          <div class="text-h5 q-mb-md row q-gutter-sm items-center">
+            <span>{{ $t('id_mappings.ids_list_title') }}</span>
+            <q-btn size="sm" icon="add" color="primary" outline :title="$t('add')" @click="onAddIdentifier"></q-btn>
+            <q-btn
+              v-if="hasIdentifiers"
+              size="sm"
+              icon="delete"
+              color="negative"
+              outline
+              :title="$t('delete')"
+              @click="onDeleteIdentifier"
+            ></q-btn>
+          </div>
           <q-list dense padding>
             <q-item
               clickable
@@ -27,8 +39,9 @@
             </q-item>
           </q-list>
         </div>
-        <div class="col-10">
-          <div class="text-h5 q-mb-md">
+
+        <div v-if="hasIdentifiers" class="col-9">
+          <div class="text-h5">
             {{ selectedIdentifier?.entityType }}
           </div>
 
@@ -58,22 +71,105 @@
                 :pagination="initialPagination"
                 :hide-pagination="mappings.length <= initialPagination.rowsPerPage"
                 :loading="loading"
-              />
+              >
+                <template v-slot:top-left>
+                  <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddMapping" />
+                </template>
+                <template v-slot:body-cell-name="props">
+                  <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+                    {{ props.value }}
+                    <div class="float-right">
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="$t('edit')"
+                        :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
+                        class="q-ml-xs"
+                        @click="onEditMapping(props.row)"
+                      />
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="$t('delete')"
+                        :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
+                        class="q-ml-xs"
+                        @click="onDeleteMapping(props.row)"
+                      />
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="$t('id_mappings.generate_identifiers')"
+                        :icon="toolsVisible[props.row.name] ? 'autorenew' : 'none'"
+                        class="q-ml-xs"
+                        @click="onGenerateIdentifiers(props.row)"
+                      />
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="$t('id_mappings.download_identifiers')"
+                        :icon="toolsVisible[props.row.name] ? 'download' : 'none'"
+                        class="q-ml-xs"
+                        @click="(onEnableUser) => ({})"
+                      />
+                    </div>
+                  </q-td>
+                </template>
+                <template v-slot:body-cell-description="props">
+                  <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+                    <span>{{ props.value }}</span>
+                  </q-td>
+                </template>
+              </q-table>
             </q-tab-panel>
             <q-tab-panel name="identifiers"> </q-tab-panel>
           </q-tab-panels>
         </div>
       </div>
+      <confirm-dialog v-model="showConfirm" :title="confirm.title" :text="confirm.text" @confirm="confirm.onCallback" />
+
+      <add-identifier-dialog v-model="showAddIdentifier" @update="onIdentifierAdded" />
+
+      <add-mapping-dialog
+        v-model="showAddMapping"
+        :identifier="selectedIdentifier"
+        :mapping="selectedMapping"
+        @update:model-value="onCloseMappingDialog"
+        @update="onMappingAdded"
+      />
+
+      <generate-mapping-identifiers-dialog
+        v-model="showGenerateIdentifiers"
+        :identifier="selectedIdentifier"
+        :mapping="selectedMapping"
+        @update:model-value="onCloseMappingDialog"
+        @update="onGenerateIdentifiers"
+      />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import { set } from 'date-fns';
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { getDateLabel } from 'src/utils/dates';
+import AddIdentifierDialog from 'src/components/admin/identifiers/AddIdentifierDialog.vue';
+import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.vue';
+import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { get } from 'http';
 
 const { t } = useI18n();
 const initialPagination = ref({
@@ -86,50 +182,166 @@ const initialPagination = ref({
 const loading = ref(false);
 const tab = ref('mappings');
 const identifiersStore = useIdentifiersStore();
-const selectedIdentifier = ref<TableDto>();
-const identifiers = computed({
-  get: () => identifiersStore.identifiers || [],
-  set: (value: TableDto[]) => {
-    identifiersStore.identifiers = value;
-    onSelectIdentifier(value[0]);
-  },
-});
+const selectedIdentifier = ref({} as TableDto);
+const selectedMapping = ref({} as VariableDto);
+const confirm = ref({ title: '', text: '', onCallback: () => ({}) });
+const showConfirm = ref(false);
+const showAddMapping = ref(false);
+const showAddIdentifier = ref(false);
+const showGenerateIdentifiers = ref(false);
+const toolsVisible = ref<{ [key: string]: boolean }>({});
+const identifiers = ref([] as TableDto[]);
+const hasIdentifiers = computed(() => identifiers.value.length > 0);
 const mappings = computed(() => identifiersStore.mappings || []);
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'name' },
+  {
+    name: 'name',
+    label: t('name'),
+    align: 'left',
+    field: 'name',
+    headerStyle: 'width: 35%; white-space: normal;',
+    style: 'width: 35%; white-space: normal;',
+  },
   { name: 'description', label: t('description'), align: 'left' },
 ]);
+const properties: FieldItem<TableDto>[] = computed(() => {
+  return [
+    {
+      field: 'timestamps',
+      label: 'last_update',
+      format: (val: TableDto) => (val ? getDateLabel(val.timestamps?.lastUpdate) : ''),
+    },
+    {
+      field: 'variableCount',
+      label: 'id_mappings.mappings_count',
+    },
+    {
+      field: 'valueSetCount',
+      label: 'id_mappings.system_ids_count',
+    },
+  ];
+});
 
-async function onSelectIdentifier(identifier: TableDto) {
-  selectedIdentifier.value = identifier;
+async function getIdentifiers() {
+  identifiersStore
+    .initIdentifiers()
+    .then(() => {
+      identifiers.value = identifiersStore.identifiers || [];
+      if (identifiers.value.length > 0) {
+        const candidate = selectedIdentifier.value.name
+          ? identifiers.value.find((id) => id.name === selectedIdentifier.value.name)
+          : identifiers.value[0];
+        if (candidate) onSelectIdentifier(candidate);
+      } else {
+        selectedIdentifier.value = {} as TableDto;
+      }
+    })
+    .catch(notifyError);
+}
+
+async function getMappings(identifierName: string) {
+  console.log('Getting mappings for', identifierName);
   loading.value = true;
-  identifiersStore.initMappings(identifier.name).then(() => {
+  return identifiersStore.initMappings(identifierName).then(() => {
     loading.value = false;
   });
 }
 
-const properties: FieldItem<TableDto>[] = [
-  {
-    field: 'timestamps',
-    label: 'last_update',
-    format: (val) => (val ? getDateLabel(val.timestamps?.lastUpdate) : ''),
-  },
-  {
-    field: 'variableCount',
-    label: t('id_mappings.mappings_count'),
-  },
-  {
-    field: 'valueSetCount',
-    label: t('id_mappings.system_ids_count'),
-  },
-];
+async function onSelectIdentifier(identifier: TableDto) {
+  selectedIdentifier.value = identifier;
+  getMappings(identifier.name);
+}
 
-onMounted(() => {
-  identifiersStore
-    .initIdentifiers()
-    .then(
-      () => (identifiers.value = identifiersStore.identifiers.sort((a, b) => a.entityType.localeCompare(b.entityType)))
-    )
-    .catch(notifyError);
-});
+async function _onDeleteIdentifier() {
+  try {
+    await identifiersStore.deleteIdentifier(selectedIdentifier.value);
+    selectedIdentifier.value = {} as TableDto;
+    confirm.value = { title: '', text: '', onCallback: () => ({}) };
+    await getIdentifiers();
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
+async function _onDeleteMapping() {
+  try {
+    await identifiersStore.deleteMapping(selectedIdentifier.value.name, selectedMapping.value.name);
+    selectedMapping.value = {} as VariableDto;
+    confirm.value = { title: '', text: '', onCallback: () => ({}) };
+    await getIdentifiers();
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
+function onAddIdentifier() {
+  showAddIdentifier.value = true;
+}
+
+function onIdentifierAdded() {
+  showAddIdentifier.value = false;
+  getIdentifiers();
+}
+
+function onAddMapping() {
+  showAddMapping.value = true;
+  selectedMapping.value = {} as VariableDto;
+}
+
+function onEditMapping(row: VariableDto) {
+  showAddMapping.value = true;
+  selectedMapping.value = row;
+}
+
+function onDeleteIdentifier() {
+  showConfirm.value = true;
+  confirm.value = {
+    title: t('id_mappings.delete_identifier'),
+    text: t('id_mappings.delete_identifier_confirm', { entityType: selectedIdentifier.value.entityType }),
+    onCallback: async () => await _onDeleteIdentifier(),
+  };
+}
+
+function onGenerateIdentifiers(row: VariableDto) {
+  selectedMapping.value = row;
+  showGenerateIdentifiers.value = true;
+}
+
+function onDeleteMapping(row: VariableDto) {
+  //   const ids = `
+  // 1
+  // 2
+  // 3
+  // `
+  //   identifiersStore.importMappingSystemIdentifiers(selectedIdentifier.value.name, ids).then(() => {
+  //     console.log('Imported');
+  //   });
+
+  selectedMapping.value = row;
+  showConfirm.value = true;
+  confirm.value = {
+    title: t('id_mappings.delete_mapping'),
+    text: t('id_mappings.delete_mapping_confirm', { name: row.name }),
+    onCallback: async () => await _onDeleteMapping(),
+  };
+}
+
+function onOverRow(row: VariableDto) {
+  toolsVisible.value[row.name] = true;
+}
+
+function onLeaveRow(row: VariableDto) {
+  toolsVisible.value[row.name] = false;
+}
+
+function onCloseMappingDialog() {
+  selectedMapping.value = {} as VariableDto;
+}
+
+async function onMappingAdded() {
+  onCloseMappingDialog();
+  getIdentifiers();
+}
+
+onMounted(() => getIdentifiers());
 </script>

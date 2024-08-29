@@ -13,7 +13,7 @@
             v-model="selectedId"
               dense
             :options="idOptions"
-            :label="$t('project_admin.entity_type')"
+            :label="$t('entity_type')"
             :hint="$t('project_admin.entity_type_hint')"
             class="q-mb-md q-pt-md"
             emit-value

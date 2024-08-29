@@ -1,3 +1,4 @@
+import { add } from 'date-fns';
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { TableDto, VariableDto } from 'src/models/Magma';
@@ -43,16 +44,41 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     });
   }
 
-  async function addMappings(identifiers: VariableDto[]) {
-    return api.post('/identifiers/table/keys/variables', identifiers);
+  async function addMappings(idName: string, mappings: VariableDto[]) {
+    return api.post(`/identifiers/table/${idName}/variables`, mappings);
+  }
+
+  async function addMapping(idName: string, mappings: VariableDto) {
+    return addMappings(idName, [mappings]);
+  }
+
+  async function updateMapping(idName: string, mapping: VariableDto) {
+    return api.put(`/identifiers/table/${idName}/variable/${mapping.name}`, mapping);
   }
 
   async function deleteMapping(idName: string, mappingName: string) {
     return api.delete(`/identifiers/table/${idName}/variable/${mappingName}`);
   }
 
+  async function getMappingIdentifiersCount(idName: string, mappingName: string) {
+    return api
+      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: idName } })
+      .then((response) => response.data);
+  }
+
+  async function importMappingSystemIdentifiers(idName: string, content: string, separator?: string) {
+    //http://localhost:9080/ws/identifiers/mapping/TATA/_import?type=GGGGG&separator=%2C
+    //http://localhost:9080/ws/identifiers/mappings/entities/_import?type=GGGGG
+    //http://localhost:8080/ws/identifiers/mapping/Participant/_import?type=YYYYY
+
+    return api.post(`/identifiers/mapping/entities/_import`, content, {
+      params: separator ? { type: idName, separator: "'" } : { type: idName },
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
   async function getMappings(type = 'Participant') {
-    return api.get('/identifiers/mappings', {params: {type}}).then((response) => response.data);
+    return api.get('/identifiers/mappings', { params: { type } }).then((response) => response.data);
   }
 
   return {
@@ -64,7 +90,11 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     deleteIdentifier,
     initMappings,
     addMappings,
+    addMapping,
+    updateMapping,
     deleteMapping,
-    getMappings
+    getMappingIdentifiersCount,
+    importMappingSystemIdentifiers,
+    getMappings,
   };
 });
