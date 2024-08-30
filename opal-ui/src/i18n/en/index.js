@@ -1116,6 +1116,12 @@ export default {
   filter: 'Filter',
   nature: 'Nature',
   results: 'Results',
+  minutes: 'Minutes',
+  hour: 'Hour',
+  day: 'Day',
+  at: 'At',
+  on: 'On',
+  schedule: 'Schedule',
   stats: {
     min: 'Minimun',
     max: 'Maximum',
@@ -1148,5 +1154,25 @@ export default {
     GEO: 'Geographical',
     BINARY: 'Binary',
     UNDETERMINED: 'Undetermined',
+  },
+  schedule_type: {
+    NOT_SCHEDULED: 'Not scheduled',
+    MINUTES_5: 'Every 5 minutes',
+    MINUTES_15: 'Every 15 minutes',
+    MINUTES_30: 'Every 30 minutes',
+    HOURLY: 'Hourly',
+    DAILY: 'Daily',
+    WEEKLY: 'Weekly',
+    UNRECOGNIZED: 'Unrecognized'
+  },
+  weekdays: {
+    SUNDAY: 'Sunday',
+    MONDAY: 'Monday',
+    TUESDAY: 'Tuesday',
+    WEDNESDAY: 'Wednesday',
+    THURSDAY: 'Thursday',
+    FRIDAY: 'Friday',
+    SATURDAY: 'Saturday',
+    UNRECOGNIZED: 'Unrecognized'
   }
 };

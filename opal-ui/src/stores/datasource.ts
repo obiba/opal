@@ -4,7 +4,7 @@ import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceVi
 import { Perms } from 'src/utils/authz';
 import { AttributesBundle } from 'src/components/models';
 import { QueryResultDto } from 'src/models/Search';
-import { TableIndexStatusDto } from 'src/models/Opal';
+import { ScheduleDto, TableIndexStatusDto } from 'src/models/Opal';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -504,6 +504,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
       .finally(loadTableIndex);
   }
 
+  async function scheduleTableIndex(schedule: ScheduleDto) {
+    return api.put(`/datasource/${datasource.value.name}/table/${table.value.name}/index/schedule`, schedule)
+      .finally(loadTableIndex);
+  }
+
   //
   // Entities
   //
@@ -531,6 +536,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     loadTableIndex,
     updateTableIndex,
     deleteTableIndex,
+    scheduleTableIndex,
     loadTableVariables,
     getTableVariables,
     isNewTableNameValid,
