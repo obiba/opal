@@ -65,11 +65,11 @@
                   <q-item-label>{{ $t('export_file') }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <!-- <q-item clickable v-close-popup @click="onShowExportServer">
+              <q-item clickable v-close-popup @click="onShowExportDatabase">
                 <q-item-section>
-                  <q-item-label>{{ $t('export_server') }}</q-item-label>
+                  <q-item-label>{{ $t('export_database') }}</q-item-label>
                 </q-item-section>
-              </q-item> -->
+              </q-item>
             </q-list>
           </q-btn-dropdown>
         <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
@@ -258,7 +258,7 @@ const showEdit = ref(false);
 const showEditResourceView = ref(false);
 const loading = ref(false);
 const showExport = ref(false);
-const exportType = ref<'file' | 'server'>('file');
+const exportType = ref<'file' | 'server' | 'database'>('file');
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
@@ -402,4 +402,10 @@ function onShowExportFile() {
   exportType.value = 'file';
   showExport.value = true;
 }
+
+function onShowExportDatabase() {
+  exportType.value = 'database';
+  showExport.value = true;
+}
+
 </script>

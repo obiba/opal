@@ -197,6 +197,17 @@ export default {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
     },
   },
+  exporter: {
+    file: {
+      csv: 'This file will use a "delimiter separated values" format (default delimiter being comma). The first column will represent the participant identifiers and the subsequent column names identify variables.',
+      opal: 'This format will be a .zip file, containing a folder for each table having: the full data dictionary in a XML file, a XML data file per entity.',
+      haven_rds: 'This file will be in RDS format, containing an R object of tibble class. This export procedure requires a functional R server with the tibble package installed.',
+      haven_sas: 'This file will be in SAS format, containing the variables and the data. This export procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_sast: 'This file will be in SAS Transport format, containing the variables and the data. This export procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_spss: 'This file will be in SPSS format, containing the variables and the data. This export procedure requires a functional R server with the tibble and haven packages installed.',
+      haven_stata: 'This file will in Stata format, containing the variables and the data. This export procedure requires a functional R server with the tibble and haven packages installed.',
+    },
+  },
   access: {
     undefined: '',
     DEFAULT: 'Default',

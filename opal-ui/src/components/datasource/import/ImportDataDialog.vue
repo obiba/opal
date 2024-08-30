@@ -255,10 +255,9 @@ const builtinServerImporters: ImporterOption[] = [
 ];
 const serverImporters = ref([...builtinServerImporters]);
 const serverImporter = ref();
-
 const databaseImporter = ref();
-
 const databases = ref<DatabaseDto[]>([]);
+
 const databaseImporters = computed(() => {
   return databases.value.map((db) => ({ label: db.name, value: db }));
 });
@@ -314,7 +313,6 @@ function onShow() {
       if (databaseImporters.value.length > 0)
         databaseImporter.value = databaseImporters.value[0].value;
     }).catch((err) => {
-      console.error(err);
       notifyError(err);
     });
   }

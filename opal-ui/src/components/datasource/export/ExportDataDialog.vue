@@ -64,6 +64,15 @@
               </q-expansion-item>
             </q-list>
           </div>
+          <div v-else-if="isDatabase">
+            <q-select
+              v-model="databaseExporter"
+              :options="databaseExporters"
+              :label="$t('database')"
+              dense
+              emit-value
+              map-options />
+          </div>
         </q-card-section>
 
         <q-separator />
@@ -80,7 +89,7 @@
             :label="$t('export')"
             color="primary"
             @click="onExportData"
-            :disable="out === undefined"
+            :disable="isFile ? out === undefined : databaseExporter === undefined"
             v-close-popup
           />
         </q-card-actions>
@@ -101,7 +110,7 @@ import ExportFsForm from 'src/components/datasource/export/ExportFsForm.vue';
 import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vue';
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import { DatabaseDto_Usage } from 'src/models/Database';
+import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 
 interface DialogProps {
   modelValue: boolean;
@@ -140,6 +149,12 @@ const out = ref<string>(); // output parameters
 const entityIdNames = ref('');
 const fileExporters = ref([...builtinFileExporters]);
 const fileExporter = ref();
+const databaseExporter = ref();
+const databases = ref<DatabaseDto[]>([]);
+
+const databaseExporters = computed(() => {
+  return databases.value.map((db) => ({ label: db.name, value: db }));
+});
 
 const exportTablesText = computed(() => t('export_tables_text', { count: props.tables.length }));
 
@@ -148,6 +163,7 @@ const fileExporterHint = computed(() => {
 });
 
 const isFile = computed(() => props.type === 'file');
+const isDatabase = computed(() => props.type === 'database');
 
 watch(() => props.modelValue, (value) => {
   showDialog.value = value;
@@ -169,7 +185,16 @@ function onShow() {
       }
     });
   });
-  systemStore.getDatabases(DatabaseDto_Usage.EXPORT);
+  if (isDatabase.value) {
+    databaseExporter.value = null;
+    systemStore.getDatabases(DatabaseDto_Usage.EXPORT).then((response) => {
+      databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
+      if (databaseExporters.value.length > 0)
+        databaseExporter.value = databaseExporters.value[0].value;
+    }).catch((err) => {
+      notifyError(err);
+    });
+  }
   fileExporter.value = fileExporters.value[0];
 }
 
@@ -178,6 +203,24 @@ function onHide() {
 }
 
 function onExportData() {
+  let options: ExportCommandOptionsDto | undefined;
+  if (isFile.value) {
+    options = exportFile();
+  } else if (isDatabase.value) {
+    options = exportDatabase();
+  }
+  if (!options) {
+    return;
+  }
+  projectsStore.exportCommand(projectsStore.project.name, options).then((response) => {
+    notifySuccess(t('export_tables_task_created', { id: response.data.id }));
+  }).catch((err) => {
+    console.error(err);
+    notifyError(err);
+  });
+}
+
+function exportFile() {
   if (!out.value) {
     notifyError(t('destination_folder_required'));
     return;
@@ -191,12 +234,23 @@ function onExportData() {
     noVariables: false,
     nonIncremental: true,
   } as ExportCommandOptionsDto;
-  projectsStore.exportCommand(projectsStore.project.name, options).then((response) => {
-    notifySuccess(t('export_tables_task_created', { id: response.data.id }));
-  }).catch((err) => {
-    console.error(err);
-    notifyError(err);
-  });
+  return options;
+}
+
+function exportDatabase() {
+  if (!databaseExporter.value) {
+    notifyError(t('database_required'));
+    return;
+  }
+  const options = {
+    format: 'JDBC',
+    out: databaseExporter.value.name,
+    tables: props.tables.map((t) => `${t.datasourceName}.${t.name}`),
+    copyNullValues: true,
+    noVariables: false,
+    nonIncremental: true,
+  } as ExportCommandOptionsDto;
+  return options;
 }
 
 </script>
