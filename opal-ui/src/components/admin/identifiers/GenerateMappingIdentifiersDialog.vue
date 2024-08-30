@@ -158,7 +158,7 @@ async function onAddMapping() {
   const valid = await formRef.value.validate();
   if (valid) {
     identifiersStore
-      .addIdentifier(newIdentifier.value)
+      .addIdentifierTable(newIdentifier.value)
       .then(() => {
         emit('update');
         onHide();

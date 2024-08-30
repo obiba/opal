@@ -127,7 +127,7 @@ async function onDelete(row: ProjectDto_IdentifiersMappingDto) {
 }
 
 onMounted(() => {
-  identifiersStore.initIdentifiers();
+  identifiersStore.initIdentifiersTables();
 
   projectsStore.getIdMappings(props.project.name).then((response) => {
     idMappings.value = response;
