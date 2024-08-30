@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div class="q-mt-none q-mb-none q-pa-md text-bold text-grey-6">
-      <span v-if="authStore.isAuthenticated">{{  username }}</span>
-      <span v-else>&nbsp;</span>
+    <div v-if="authStore.isAuthenticated" class="q-mt-none q-mb-none q-pa-md">
+      <span class="text-bold text-grey-6">{{  username }}</span>
     </div>
     <q-list>
       <q-item to="/profile" v-if="authStore.isAuthenticated">
@@ -13,6 +12,15 @@
           <q-item-label>{{ $t('my_profile') }}</q-item-label>
         </q-item-section>
       </q-item>
+      <q-item clickable @click="onSignout" v-if="authStore.isAuthenticated">
+        <q-item-section avatar>
+          <q-icon name="logout" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ $t('auth.signout') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-separator v-if="authStore.isAuthenticated" />
       <q-item to="/projects">
         <q-item-section avatar>
           <q-icon name="table_chart" />
@@ -27,6 +35,14 @@
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ $t('files') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item :to="`/tasks`">
+        <q-item-section avatar>
+          <q-icon name="splitscreen" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ $t('tasks') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item to="/admin">
@@ -72,7 +88,9 @@ import EssentialLink, {
 } from 'components/EssentialLink.vue';
 import { t } from 'src/boot/i18n';
 
+const router = useRouter();
 const authStore = useAuthStore();
+const systemStore = useSystemStore();
 
 const username = computed(() =>
   authStore.profile.principal ? authStore.profile.principal : '?'
@@ -92,4 +110,24 @@ const essentialLinks: EssentialLinkProps[] = [
     link: 'https://github.com/obiba/opal',
   },
 ];
+
+function onSignout() {
+  const logoutURL = systemStore.generalConf.logoutURL;
+  authStore
+    .signout()
+    .then(() => {
+      if (logoutURL) {
+        window.location.href = logoutURL;
+        return;
+      }
+      router.push('/signin');
+    })
+    .catch(() => {
+      if (logoutURL) {
+        window.location.href = logoutURL;
+        return;
+      }
+      router.push('/signin');
+    });
+}
 </script>

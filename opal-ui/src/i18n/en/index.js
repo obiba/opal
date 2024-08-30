@@ -1005,7 +1005,7 @@ export default {
   sql: 'SQL',
   sql_query_hint: 'Type a SQL query and press Ctrl-ENTER to execute.',
   sql_history_hint: 'Double click on a query to load it in the SQL editor.',
-  sql_info: 'SQL queries can be executed on one or more tables of the project. Permission to access the values of the considered tables is required. See SQL API documentation for a description of the SQL syntax and functions.',
+  sql_info: 'SQL queries can be executed on one or more tables of the project. Permission to access the values of the considered tables is required. See [SQL API documentation](https://opaldoc.obiba.org/en/latest/web-user-guide/projects/tables.html#sql) for a description of the SQL syntax and functions.',
   start_time: 'Start time',
   start: 'Start',
   started: 'Started',

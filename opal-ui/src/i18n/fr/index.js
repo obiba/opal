@@ -1005,7 +1005,7 @@ export default {
   sql: 'SQL',
   sql_query_hint: 'Saisissez une requête SQL et appuyez sur Ctrl-Entrée pour l\'exécuter.',
   sql_history_hint: 'Cliquer deux fois sur une requête pour la copier dans l\'éditeur SQL.',
-  sql_info: 'Des requètes SQL peuvent être exécutées sur une ou plusieurs tables du projet. La permission de voir les valeurs des tables considérées est requise. Voir la documentation de l\'API SQL pour une description de la syntaxe et des fonctions.',
+  sql_info: 'Des requètes SQL peuvent être exécutées sur une ou plusieurs tables du projet. La permission de voir les valeurs des tables considérées est requise. Voir la [documentation de l\'API SQL](https://opaldoc.obiba.org/en/latest/web-user-guide/projects/tables.html#sql) pour une description de la syntaxe et des fonctions.',
   start_time: 'Début',
   start: 'Démarrer',
   started: 'Début',

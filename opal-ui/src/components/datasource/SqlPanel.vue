@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div class="text-help q-mb-md">{{ $t('sql_info') }}</div>
-
+    <div class="text-help q-mb-md">
+      <q-markdown :src="$t('sql_info')" no-heading-anchor-links />
+    </div>
     <div>
       <q-chip clickable :color="tab === 'query' ? 'primary' : 'grey-6'" :label="$t('query')" class="text-white" @click="tab = 'query'"/>
       <q-chip clickable :color="tab === 'history' ? 'primary' : 'grey-6'" :label="$t('history')" class="text-white" @click="tab = 'history'"/>

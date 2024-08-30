@@ -7,6 +7,9 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('files') }}
+      </div>
       <file-view :file="filesStore.current" />
     </q-page>
   </div>

@@ -8,7 +8,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ $t('projects') }}</span>
+        {{ $t('projects') }}
       </div>
       <div class="text-help">
         {{ $t('projects_info') }}

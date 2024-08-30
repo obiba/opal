@@ -17,8 +17,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="dashboard" size="sm" class="q-mb-xs"></q-icon
-        ><span class="on-right">{{ name }}</span>
+        <span>{{ name }}</span>
         <q-badge v-for="tag in tags" :key="tag" class="on-right">{{ tag }}</q-badge>
       </div>
       <div class="row">
