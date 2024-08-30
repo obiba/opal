@@ -21,7 +21,7 @@ export const useSystemStore = defineStore('system', () => {
     return api.put('/system/conf/general', data).then(initGeneralConf);
   }
 
-  async function getDatabases(usage: string) {
+  async function getDatabases(usage: string): Promise<DatabaseDto[]> {
     return api.get('/system/databases', { params: { usage } }).then((response) => response.data);
   }
 

@@ -1,5 +1,5 @@
 import { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
-import { ViewDto, VariableListViewDto, DatasourceFactoryDto, StaticDatasourceFactoryDto, ExcelDatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto, AttributeDto } from 'src/models/Magma';
+import { ViewDto, VariableListViewDto, DatasourceFactoryDto, StaticDatasourceFactoryDto, ExcelDatasourceFactoryDto, CsvDatasourceFactoryDto, FsDatasourceFactoryDto, RHavenDatasourceFactoryDto, PluginDatasourceFactoryDto, RestDatasourceFactoryDto, AttributeDto, JdbcDatasourceFactoryDto } from 'src/models/Magma';
 import { TaxonomyDto, VocabularyDto, TermDto } from 'src/models/Opal';
 
 export interface StringMap {
@@ -42,6 +42,7 @@ export interface DatasourceFactory extends DatasourceFactoryDto {
   'Magma.RestDatasourceFactoryDto.params'?: RestDatasourceFactoryDto;
   'Magma.StaticDatasourceFactoryDto.params'?: StaticDatasourceFactoryDto;
   'Magma.ExcelDatasourceFactoryDto.params'?: ExcelDatasourceFactoryDto;
+  'Magma.JdbcDatasourceFactoryDto.params'?: JdbcDatasourceFactoryDto;
 }
 
 export interface EnumOption {
