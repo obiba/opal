@@ -88,13 +88,13 @@
                           </q-item-section>
                         </q-item>
 
-                        <q-item clickable v-close-popup @click.prevent="(onAddWithCertificate) => ({})">
+                        <q-item clickable v-close-popup @click.prevent="() => ({})">
                           <q-item-section>
                             <q-item-label>{{ $t('id_mappings.import_identifiers_table') }}</q-item-label>
                           </q-item-section>
                         </q-item>
 
-                        <q-item clickable v-close-popup @click.prevent="(onAddWithCertificate) => ({})">
+                        <q-item clickable v-close-popup @click.prevent="onImportMappedIdentifiers">
                           <q-item-section>
                             <q-item-label>{{ $t('id_mappings.import_identifiers_mapping') }}</q-item-label>
                           </q-item-section>
@@ -186,6 +186,7 @@
       />
 
       <import-identifiers-list v-model="showImportList" :identifier="selectedIdentifier" @update="onIdentifierAdded" />
+      <import-mapped-identifiers v-model="showImportMapped" :identifier="selectedIdentifier" @update="onIdentifierAdded" />
     </q-page>
   </div>
 </template>
@@ -200,6 +201,7 @@ import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ImportIdentifiersList from 'src/components/admin/identifiers/ImportIdentifiersList.vue';
+import ImportMappedIdentifiers from 'src/components/admin/identifiers/ImportMappedIdentifiers.vue';
 
 const { t } = useI18n();
 const initialPagination = ref({
@@ -220,6 +222,7 @@ const showAddMapping = ref(false);
 const showAddIdentifier = ref(false);
 const showGenerateIdentifiers = ref(false);
 const showImportList = ref(false);
+const showImportMapped = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const identifiers = ref([] as TableDto[]);
 const hasIdentifiers = computed(() => identifiers.value.length > 0);
@@ -336,8 +339,8 @@ function onImportIdentifiersList() {
   showImportList.value = true;
 }
 
-async function onIdentifiersImported() {
-  //
+async function onImportMappedIdentifiers() {
+  showImportMapped.value = true;
 }
 
 function onGenerateIdentifiers(row: VariableDto) {

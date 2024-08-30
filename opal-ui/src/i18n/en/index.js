@@ -370,9 +370,11 @@ export default {
     identifier_prefix: 'Identifier Prefix',
     leading_zero: 'Allow leading zeros',
     import_identifiers: 'Import Identifiers',
-    import_identifiers_list: 'System Identifiers from List',
-    import_identifiers_table: 'System Identifiers from Table',
-    import_identifiers_mapping: 'Identifiers Mapping',
+    import_identifiers_list: 'Import System Identifiers from List',
+    import_identifiers_table: 'Import System Identifiers from Table',
+    import_identifiers_mapping: 'Import Identifiers Mapping',
+    system_identifiers: 'System Identifiers',
+    mapped_identifiers: 'Mapped Identifiers',
   },
   git: {
     diff_viewer: {

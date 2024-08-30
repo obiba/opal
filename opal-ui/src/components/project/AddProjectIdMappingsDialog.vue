@@ -11,7 +11,7 @@
         <q-form class="q-gutter-md" persistent>
           <q-select
             v-model="selectedId"
-              dense
+            dense
             :options="idOptions"
             :label="$t('entity_type')"
             :hint="$t('project_admin.entity_type_hint')"
