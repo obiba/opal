@@ -858,6 +858,7 @@ export default {
   export_tables_text: 'No tables to be exported | One table will be exported | {count} tables will be exported.',
   export: 'Export',
   extract: 'Extract',
+  extract_archive_password_hint: 'The password to extract the archive\'s content, if applicable.',
   field_separator: 'Field separator',
   file_already_exists: 'File already exists',
   file_selection: 'File selection',
