@@ -115,19 +115,19 @@
       <import-identifiers-list
         v-model="showImportList"
         :identifier="selectedIdentifierTable"
-        @update="onIdentifierAdded"
+        @update="onMappingUpdated"
       />
       <import-mapped-identifiers
         v-model="showImportMapped"
         :identifier="selectedIdentifierTable"
-        @update="onIdentifierAdded"
+        @update="onMappingUpdated"
       />
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import { TableDto, ValueSetsDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { getDateLabel } from 'src/utils/dates';
@@ -176,18 +176,17 @@ async function getIdentifiersTables() {
       identifiersTables.value = identifiersStore.identifiers || [];
       if (identifiersTables.value.length > 0) {
         const candidate = selectedIdentifierTable.value.name
-          ? identifiersTables.value.find((id) => id.name === selectedIdentifierTable.value.name)
-          : identifiersTables.value[0];
+        ? identifiersTables.value.find((id) => id.name === selectedIdentifierTable.value.name)
+        : identifiersTables.value[0];
         if (candidate) onSelectIdentifierTable(candidate);
       } else {
         selectedIdentifierTable.value = {} as TableDto;
       }
     })
     .catch(notifyError);
-}
+  }
 
 async function getMappings(identifierName: string) {
-  console.log('Getting mappings for', identifierName);
   loading.value = true;
   return identifiersStore.initMappings(identifierName).then(() => {
     loading.value = false;
@@ -237,7 +236,6 @@ async function onImportMappedIdentifiers() {
 }
 
 async function onMappingUpdated() {
-  console.log('Mapping updated');
   getIdentifiersTables();
 }
 

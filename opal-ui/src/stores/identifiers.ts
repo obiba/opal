@@ -89,7 +89,6 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function loadIdentifiers(idTableName: string, offset = 0, limit = 20) {
-//    http://localhost:9080/ws/identifiers/table/ssss/valueSets?select=true&offset=0&limit=20
     return api
     .get(`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
     .then((response) =>  response.data);

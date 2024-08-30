@@ -372,6 +372,7 @@ export default {
     import_identifiers_list: 'Import System Identifiers from List',
     import_identifiers_table: 'Import System Identifiers from Table',
     import_identifiers_mapping: 'Import Identifiers Mapping',
+    mapping_name_hint: 'An identifiers mapping must have a unique name. If the mapping does not exist, it will be created when you type a new name and press ENTER.',
     system_identifiers: 'System Identifiers',
     mapped_identifiers: 'Mapped Identifiers',
   },

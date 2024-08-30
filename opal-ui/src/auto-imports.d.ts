@@ -12,6 +12,8 @@ declare global {
   const $ref: typeof import('vue/macros')['$ref']
   const $shallowRef: typeof import('vue/macros')['$shallowRef']
   const $toRef: typeof import('vue/macros')['$toRef']
+  const DEFAULT_SEPARATOR: typeof import('./stores/identifiers')['DEFAULT_SEPARATOR']
+  const DEFAULT_SEPARTOR: typeof import('./stores/identifiers')['DEFAULT_SEPARTOR']
   const EffectScope: typeof import('vue')['EffectScope']
   const TOKEN_TYPES: typeof import('./stores/tokens')['TOKEN_TYPES']
   const computed: typeof import('vue')['computed']
