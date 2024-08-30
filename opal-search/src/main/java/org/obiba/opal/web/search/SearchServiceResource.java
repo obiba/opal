@@ -67,9 +67,9 @@ public class SearchServiceResource extends IndexResource {
   @DELETE
   public Response dropIndices(@QueryParam("type") String type) {
     if (opalSearchService.isRunning()) {
-      if (Strings.isNullOrEmpty(type) || "values".equals(type.toLowerCase()))
+      if (Strings.isNullOrEmpty(type) || "values".equalsIgnoreCase(type))
         opalSearchService.getValuesIndexManager().drop();
-      if (Strings.isNullOrEmpty(type) || "variables".equals(type.toLowerCase()))
+      if (Strings.isNullOrEmpty(type) || "variables".equalsIgnoreCase(type))
         opalSearchService.getVariablesIndexManager().drop();
     }
     return Response.noContent().build();

@@ -4,7 +4,7 @@
     <span>{{ $t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
     <q-btn
       v-if="statusActionIcon"
-      color="white"
+      :color="statusActionColor"
       :icon="statusActionIcon"
       :title="$t(statusActionLabel)"
       rounded
@@ -15,7 +15,7 @@
       @click="onStatusAction" />
     <q-btn
       v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
-      color="white"
+      :color="statusActionColor"
       icon="cleaning_services"
       :title="$t('clear')"
       dense
@@ -23,8 +23,20 @@
       size="sm"
       class="on-right"
       @click="onClear" />
+    <q-btn
+      v-if="statusActionIcon"
+      :color="statusActionColor"
+      icon="event"
+      :title="$t('schedule')"
+      flat
+      dense
+      size="sm"
+      class="on-right"
+      @click="onSchedule" />
     </div>
     <q-linear-progress v-if="datasourceStore.tableIndex.progress"  color="white" :value="datasourceStore.tableIndex.progress" class="q-mt-xs" />
+
+    <table-indexer-dialog v-model="showDialog" />
   </div>
 </template>
 
@@ -36,8 +48,11 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { TableIndexationStatus } from 'src/models/Opal';
+import TableIndexerDialog from 'src/components/datasource/TableIndexerDialog.vue';
 
 const datasourceStore = useDatasourceStore();
+
+const showDialog = ref(false);
 
 const statusClass = computed(() => {
   switch(datasourceStore.tableIndex.status) {
@@ -78,6 +93,15 @@ const statusActionIcon = computed(() => {
   }
 });
 
+const statusActionColor = computed(() => {
+  switch(datasourceStore.tableIndex.status) {
+    case TableIndexationStatus.OUTDATED:
+      return 'black';
+    default:
+      return 'white';
+  }
+});
+
 onMounted(() => datasourceStore.loadTableIndex());
 
 function onStatusAction() {
@@ -86,7 +110,7 @@ function onStatusAction() {
   } else {
     datasourceStore.updateTableIndex().then(() => {
       setInterval(() => {
-        if (datasourceStore.tableIndex.progress || datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS) {      
+        if (datasourceStore.tableIndex.progress || datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS) {
           datasourceStore.loadTableIndex();
         }
       }, 1000); // 1 second
@@ -96,5 +120,9 @@ function onStatusAction() {
 
 function onClear() {
   datasourceStore.deleteTableIndex();
+}
+
+function onSchedule() {
+  showDialog.value = true;
 }
 </script>

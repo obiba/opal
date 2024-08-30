@@ -82,7 +82,9 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager, SystemService
   @Override
   public void drop() {
     try {
+      stop();
       FileUtil.delete(new File(VALUES_INDEX_DIR));
+      start();
     } catch (IOException e) {
       log.warn("Cannot delete index folder: {}", VALUES_INDEX_DIR, e);
     }
