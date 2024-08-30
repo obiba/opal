@@ -38,7 +38,6 @@
         />
       </q-breadcrumbs>
     </q-toolbar>
-    <pre>{{ selected }}</pre>
     <div v-if="props.file.type === 'FOLDER'">
       <q-table
         ref="tableRef"
