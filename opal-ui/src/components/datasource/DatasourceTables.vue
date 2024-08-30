@@ -75,6 +75,11 @@
                   <q-item-label>{{ $t('import_server') }}</q-item-label>
                 </q-item-section>
               </q-item>
+              <q-item clickable v-close-popup @click="onShowImportDatabase">
+                <q-item-section>
+                  <q-item-label>{{ $t('import_database') }}</q-item-label>
+                </q-item-section>
+              </q-item>
             </q-list>
           </q-btn-dropdown>
           <q-btn-dropdown v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" size="sm" :label="$t('export')">
@@ -84,11 +89,11 @@
                   <q-item-label>{{ $t('export_file') }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <!-- <q-item clickable v-close-popup @click="onShowExportServer">
+              <q-item clickable v-close-popup @click="onShowExportDatabase">
                 <q-item-section>
-                  <q-item-label>{{ $t('export_server') }}</q-item-label>
+                  <q-item-label>{{ $t('export_database') }}</q-item-label>
                 </q-item-section>
-              </q-item> -->
+              </q-item>
             </q-list>
           </q-btn-dropdown>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
@@ -175,10 +180,10 @@ const showAddView = ref(false);
 const showAddTables = ref(false);
 const showCopy = ref(false);
 const showImport = ref(false);
-const importType = ref<'file' | 'server'>('file');
+const importType = ref<'file' | 'server' | 'database'>('file');
 const showExport = ref(false);
 const showRestoreViews = ref(false);
-const exportType = ref<'file' | 'server'>('file');
+const exportType = ref<'file' | 'server' | 'database'>('file');
 
 const tableRef = ref();
 const loading = ref(false);
@@ -304,8 +309,18 @@ function onShowImportServer() {
   showImport.value = true;
 }
 
+function onShowImportDatabase() {
+  importType.value = 'database';
+  showImport.value = true;
+}
+
 function onShowExportFile() {
   exportType.value = 'file';
+  showExport.value = true;
+}
+
+function onShowExportDatabase() {
+  exportType.value = 'database';
   showExport.value = true;
 }
 

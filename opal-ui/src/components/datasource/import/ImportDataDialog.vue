@@ -35,7 +35,7 @@
                   {{ fileImporterHint }}
                 </div>
               </div>
-              <div v-else>
+              <div v-else-if="isServer">
                 <q-select
                   v-model="serverImporter"
                   :options="serverImporters"
@@ -46,6 +46,19 @@
                 <div class="text-hint">
                   {{ serverImporterHint }}
                 </div>
+              </div>
+              <div v-else-if="isDatabase">
+                <q-select
+                  v-model="databaseImporter"
+                  :options="databaseImporters"
+                  :label="$t('database')"
+                  dense
+                  @update:model-value="onImporterSelection"
+                  emit-value
+                  map-options />
+              </div>
+              <div v-else>
+                <div class="text-negative">Unidentified data source.</div>
               </div>
             </q-step>
 
@@ -69,13 +82,16 @@
                   <import-plugin-form v-model="factory" :type="fileImporter.value" />
                 </div>
               </div>
-              <div v-else>
+              <div v-else-if="isServer">
                 <div v-if="serverImporter.value === 'opal'">
                   <import-opal-form v-model="factory" />
                 </div>
                 <div v-else>
                   <import-plugin-form v-model="factory" :type="serverImporter.value" />
                 </div>
+              </div>
+              <div v-else-if="isDatabase">
+                <import-database-form v-model="factory" :database="databaseImporter" />
               </div>
             </q-step>
 
@@ -188,17 +204,20 @@ import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';
 import ImportOpalForm from 'src/components/datasource/import/ImportOpalForm.vue';
 import ImportPluginForm from 'src/components/datasource/import/ImportPluginForm.vue';
+import ImportDatabaseForm from 'src/components/datasource/import/ImportDatabaseForm.vue';
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 
 interface DialogProps {
   modelValue: boolean;
-  type: 'file' | 'server';
+  type: 'file' | 'server' | 'database';
 }
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
+const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
@@ -237,6 +256,13 @@ const builtinServerImporters: ImporterOption[] = [
 const serverImporters = ref([...builtinServerImporters]);
 const serverImporter = ref();
 
+const databaseImporter = ref();
+
+const databases = ref<DatabaseDto[]>([]);
+const databaseImporters = computed(() => {
+  return databases.value.map((db) => ({ label: db.name, value: db }));
+});
+
 const fileImporterHint = computed(() => {
   return fileImporter.value ? (fileImporter.value.hint ? fileImporter.value.hint : t(`importer.file.${fileImporter.value.value}`)) : '';
 });
@@ -253,6 +279,9 @@ watch(() => props.modelValue, (value) => {
 });
 
 const canNext = computed(() => {
+  if (isDatabase.value && databaseImporters.value.length === 0) {
+    return false;
+  }
   if (step.value === 2) {
     return factory.value !== undefined;
   }
@@ -260,6 +289,8 @@ const canNext = computed(() => {
 });
 
 const isFile = computed(() => props.type === 'file');
+const isServer = computed(() => props.type === 'server');
+const isDatabase = computed(() => props.type === 'database');
 
 function onShow() {
   fileImporter.value = [...builtinFileImporters];
@@ -276,6 +307,17 @@ function onShow() {
       }
     });
   });
+  if (isDatabase.value) {
+    databaseImporter.value = null;
+    systemStore.getDatabases(DatabaseDto_Usage.IMPORT).then((response) => {
+      databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
+      if (databaseImporters.value.length > 0)
+        databaseImporter.value = databaseImporters.value[0].value;
+    }).catch((err) => {
+      console.error(err);
+      notifyError(err);
+    });
+  }
   fileImporter.value = fileImporters.value[0];
   serverImporter.value = serverImporters.value[0];
   factory.value = undefined;

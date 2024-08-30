@@ -101,16 +101,18 @@ import ExportFsForm from 'src/components/datasource/export/ExportFsForm.vue';
 import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vue';
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DatabaseDto_Usage } from 'src/models/Database';
 
 interface DialogProps {
   modelValue: boolean;
   tables: TableDto[];
-  type: 'file' | 'server';
+  type: 'file' | 'server' | 'database';
 }
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue'])
 
+const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
 const projectsStore = useProjectsStore();
 const filesStore = useFilesStore();
@@ -167,6 +169,7 @@ function onShow() {
       }
     });
   });
+  systemStore.getDatabases(DatabaseDto_Usage.EXPORT);
   fileExporter.value = fileExporters.value[0];
 }
 
