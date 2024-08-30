@@ -38,6 +38,7 @@
         />
       </q-breadcrumbs>
     </q-toolbar>
+    <pre>{{ selected }}</pre>
     <div v-if="props.file.type === 'FOLDER'">
       <q-table
         ref="tableRef"
@@ -86,6 +87,7 @@
               :label="$t('extract')"
               :disable="!isArchiveSelected"
               size="sm"
+              @click="onShowExtract"
             >
             </q-btn>
             <q-btn-group>
@@ -191,6 +193,8 @@
       </q-card>
     </div>
 
+    <extract-archive-dialog v-if="selectedSingle" v-model="showExtract" :file="selectedSingle" />
+
     <add-folder-dialog v-model="showAddFolder" :file="props.file"/>
 
     <edit-file-name-dialog v-if="selectedSingle" v-model="showEditName" :file="selectedSingle" />
@@ -278,6 +282,7 @@ import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import EditFileNameDialog from 'src/components/files/EditFileNameDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue';
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
@@ -285,11 +290,11 @@ import { getDateLabel } from 'src/utils/dates';
 const { t } = useI18n();
 const filesStore = useFilesStore();
 
-interface FolderViewProps {
+interface Props {
   file: FileDto;
 }
 
-const props = defineProps<FolderViewProps>();
+const props = defineProps<Props>();
 
 const tableRef = ref();
 const loading = ref(false);
@@ -306,10 +311,15 @@ const encryptContent = ref(false);
 const encryptPassword = ref('');
 const showPwd = ref(false);
 const showAddFolder = ref(false);
+const showExtract = ref(false);
 const showUpload = ref(false);
 const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+
+watch(() => props.file, () => {
+  selected.value = [];
+});
 
 const columns = computed(() => [
   {
@@ -423,6 +433,11 @@ function onShowAddFolder() {
 function onShowEditName(file: FileDto) {
   selectedSingle.value = file;
   showEditName.value = true;
+}
+
+function onShowExtract() {
+  selectedSingle.value = selected.value[0];
+  showExtract.value = true;
 }
 
 function onShowUpload() {

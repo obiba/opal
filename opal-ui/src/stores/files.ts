@@ -102,6 +102,18 @@ export const useFilesStore = defineStore('files', () => {
     });
   }
 
+
+  function extractArchive(path: string, destination: FileDto, key: string | undefined) {
+    if (destination.type !== FileDto_FileType.FOLDER) return Promise.reject('Invalid destination');
+    const params = {
+      action: 'unzip',
+      destination: destination.path,
+      key,
+    };
+
+    return api.post(`/files${path}`, {}, { params });
+  }
+
   function deleteFile(path: string) {
     return api.delete(`/files${path}`);
   }
@@ -206,6 +218,7 @@ export const useFilesStore = defineStore('files', () => {
     downloadFile,
     downloadFiles,
     addFolder,
+    extractArchive,
     uploadFiles,
     deleteFile,
     deleteFiles,
