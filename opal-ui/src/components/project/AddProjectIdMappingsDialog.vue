@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings') }}</div>
+        <div class="text-h6">{{ $t('id_mappings.title') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,9 +11,9 @@
         <q-form class="q-gutter-md" persistent>
           <q-select
             v-model="selectedId"
-              dense
+            dense
             :options="idOptions"
-            :label="$t('project_admin.entity_type')"
+            :label="$t('entity_type')"
             :hint="$t('project_admin.entity_type_hint')"
             class="q-mb-md q-pt-md"
             emit-value
@@ -24,7 +24,7 @@
             v-model="selectedMappings"
             dense
             :options="mappingOptions"
-            :label="$t('id_mappings')"
+            :label="$t('id_mappings.title')"
             :hint="$t('project_admin.id_mappings_hint')"
             emit-value
             map-options

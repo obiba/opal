@@ -75,7 +75,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-h6">{{ $t('id_mappings') }}</div>
+            <div class="text-h6">{{ $t('id_mappings.title') }}</div>
             <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
             <id-mappings-list :project="project" @update="onProjectUpdate" />
           </q-card-section>

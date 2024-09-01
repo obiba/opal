@@ -1,70 +1,135 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { TableDto, VariableDto } from 'src/models/Magma';
+import { TableDto, VariableDto, ValueSetsDto } from 'src/models/Magma';
+
+export interface GenerateIdentifiersOptions {
+  prefix: string | '';
+  size: number;
+  zeros: boolean | false;
+  checksum: boolean | false;
+}
 
 export const useIdentifiersStore = defineStore('identifiers', () => {
-  const identifiers = ref([] as TableDto[]);
+  const identifiersTables = ref([] as TableDto[]);
   const mappings = ref([] as VariableDto[]);
 
   function reset() {
-    identifiers.value = [];
+    identifiersTables.value = [];
     mappings.value = [];
   }
 
-  async function initIdentifiers() {
-    identifiers.value = [];
-    return loadIdentifiers();
+  async function initIdentifiersTables() {
+    identifiersTables.value = [];
+    return loadIdentifiersTables();
   }
 
-  async function loadIdentifiers() {
+  async function loadIdentifiersTables() {
     return api.get('/identifiers/tables', { params: { counts: true } }).then((response) => {
-      identifiers.value = response.data;
+      identifiersTables.value = response.data;
       return response;
     });
   }
 
-  async function addIdentifier(identifier: TableDto) {
+  async function addIdentifierTable(identifier: TableDto) {
     return api.post('/identifiers/tables', identifier).then((response) => response.data);
   }
 
-  async function deleteIdentifier(identifier: TableDto) {
+  async function deleteIdentifierTable(identifier: TableDto) {
     return api.delete(`/identifiers/table/${identifier.name}`);
   }
 
-  async function initMappings(idName: string) {
+  async function initMappings(idTableName: string) {
     mappings.value = [];
-    return loadMappings(idName);
+    return loadMappings(idTableName);
   }
 
-  async function loadMappings(idName: string) {
-    return api.get(`/identifiers/table/${idName}/variables`).then((response) => {
+  async function loadMappings(idTableName: string) {
+    return api.get(`/identifiers/table/${idTableName}/variables`).then((response) => {
       mappings.value = response.data;
       return response;
     });
   }
 
-  async function addMappings(identifiers: VariableDto[]) {
-    return api.post('/identifiers/table/keys/variables', identifiers);
+  async function addMappings(idTableName: string, mappings: VariableDto[]) {
+    return api.post(`/identifiers/table/${idTableName}/variables`, mappings);
   }
 
-  async function deleteMapping(idName: string, mappingName: string) {
-    return api.delete(`/identifiers/table/${idName}/variable/${mappingName}`);
+  async function addMapping(idTableName: string, mappings: VariableDto) {
+    return addMappings(idTableName, [mappings]);
   }
 
-  async function getMappings(type = 'Participant') {
-    return api.get('/identifiers/mappings', {params: {type}}).then((response) => response.data);
+
+  async function updateMapping(idTableName: string, mapping: VariableDto) {
+    return api.put(`/identifiers/table/${idTableName}/variable/${mapping.name}`, mapping);
+  }
+
+  async function deleteMapping(idTableName: string, mappingName: string) {
+    return api.delete(`/identifiers/table/${idTableName}/variable/${mappingName}`);
+  }
+
+  async function getMappingIdentifiersCount(idTableName: string, mappingName: string) {
+    return api
+      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: idTableName } })
+      .then((response) => response.data);
+  }
+
+  async function generateMapping(idTableName: string, mappingName: string, options: GenerateIdentifiersOptions) {
+    return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
+      params: { type: idTableName, ...options }
+    });
+  }
+
+  async function importSystemIdentifiers(idTableName: string, content: string, separator?: string) {
+    return api.post('/identifiers/mapping/entities/_import', content, {
+      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
+  async function importTableSystemIdentifiers(datasource: string, table: string) {
+    return api.post('/identifiers/mappings/entities/_sync', null, { params: { datasource, table } });
+  }
+
+  async function importMappingSystemIdentifiers(
+    idTableName: string,
+    mappingName: string,
+    content: string,
+    separator?: string
+  ) {
+    return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
+      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
+  async function getMappings(type = 'Participant'): Promise<ValueSetsDto> {
+    return api.get('/identifiers/mappings', { params: { type } }).then((response) => response.data);
+  }
+
+  async function loadIdentifiers(idTableName: string, offset = 0, limit = 20) {
+    return api
+      .get(`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
+      .then((response) => response.data);
   }
 
   return {
-    identifiers,
+    identifiers: identifiersTables,
     mappings,
     reset,
-    initIdentifiers,
-    addIdentifier,
-    deleteIdentifier,
+    initIdentifiersTables,
+    addIdentifierTable,
+    deleteIdentifierTable,
     initMappings,
     addMappings,
+    addMapping,
+    updateMapping,
     deleteMapping,
-    getMappings
+    getMappingIdentifiersCount,
+    generateMapping,
+    importSystemIdentifiers,
+    importTableSystemIdentifiers,
+    importMappingSystemIdentifiers,
+    getMappings,
+    loadIdentifiers,
   };
 });
