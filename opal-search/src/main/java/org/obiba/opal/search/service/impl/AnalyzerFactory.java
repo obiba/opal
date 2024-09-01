@@ -19,6 +19,10 @@ public class AnalyzerFactory {
     return new VariablesAnalyzer(3, 3);
   }
 
+  public static Analyzer newTablesAnalyzer() {
+    return new VariablesAnalyzer(3, 3);
+  }
+
   public static Analyzer newEntitiesAnalyzer() {
     return new StandardAnalyzer();
   }

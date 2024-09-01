@@ -66,7 +66,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       ScoreDoc[] hits = results.scoreDocs;
 
       // Build results
-      Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder().setTotalHits(hits.length);
+      Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder().setTotalHits((int) results.totalHits.value);
       StoredFields storedFields = reader. storedFields();
       for (ScoreDoc hit : hits) {
         Document doc = storedFields. document(hit. doc);

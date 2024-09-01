@@ -80,7 +80,13 @@ public class VariablesIndexerImpl implements IndexSynchronization {
   @Override
   public void run() {
     index.create();
-    try (IndexWriter writer = indexManager.newIndexWriter()) {
+    try (IndexWriter writer = indexManager.newTablesIndexWriter()) {
+      writer.addDocument(index.asDocument());
+      writer.commit();
+    } catch (Exception e) {
+      log.error("Tables index writing failed", e);
+    }
+    try (IndexWriter writer = indexManager.newVariablesIndexWriter()) {
       for (Variable variable : index.getVariables()) {
         writer.addDocument(index.asDocument(variable));
         done++;

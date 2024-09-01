@@ -48,7 +48,16 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
     File file = getIndexFile();
     if (file.exists()) {
       getIndexFile().delete();
-      try (IndexWriter writer = indexManager.newIndexWriter()) {
+      try (IndexWriter writer = indexManager.newTablesIndexWriter()) {
+        // Create a query to match the documents to delete
+        Query query = new TermQuery(new Term("table-ref", getValueTableReference()));
+        // Delete documents that match the query
+        writer.deleteDocuments(query);
+        writer.commit();
+      } catch (Exception e) {
+        log.error("Tables index delete failed", e);
+      }
+      try (IndexWriter writer = indexManager.newVariablesIndexWriter()) {
         // Create a query to match the documents to delete
         Query query = new TermQuery(new Term("table-ref", getValueTableReference()));
         // Delete documents that match the query
@@ -82,6 +91,21 @@ public class VariablesIndexImpl extends AbstractValueTableIndex implements Value
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public Document asDocument() {
+    Document doc = new Document();
+    doc.add(new StringField("table-ref", getValueTableReference(), Field.Store.YES));
+    doc.add(new StringField("id", getValueTableReference(), Field.Store.YES));
+
+    doc.add(new TextField("project", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new TextField("datasource", table.getDatasource().getName(), Field.Store.YES));
+    doc.add(new TextField("name", table.getName(), Field.Store.YES));
+
+    String content = String.format("%s %s", table.getDatasource().getName(), table.getName());
+    doc.add(new TextField("content", content, Field.Store.NO));
+
+    return doc;
   }
 
   public Document asDocument(Variable variable) {
