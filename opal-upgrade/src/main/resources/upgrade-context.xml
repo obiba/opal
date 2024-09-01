@@ -125,6 +125,16 @@
           <property name="appliesTo" value="4.5.0"/>
         </bean>
 
+        <!-- 5.0.0 -->
+        <bean class="org.obiba.opal.core.upgrade.v5_0_x.EhCacheFolderUpgradeStep">
+          <property name="description" value="Upgrade EhCache folder"/>
+          <property name="appliesTo" value="5.0.0"/>
+        </bean>
+        <bean class="org.obiba.opal.core.upgrade.v5_0_x.ElasticSearchUpgradeStep">
+          <property name="description" value="Upgrade ES folder"/>
+          <property name="appliesTo" value="5.0.0"/>
+        </bean>
+
       </list>
     </property>
 
