@@ -23,7 +23,7 @@
             :rules="[validateRequiredField('name')]"
           ></q-select>
 
-          <q-card flat>
+          <q-card flat class="q-mt-lg">
             <q-card-section class="q-px-none">
               <div class="row items-center justify-center">
                 <div class="col">

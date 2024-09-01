@@ -2,6 +2,13 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { TableDto, VariableDto, ValueSetsDto } from 'src/models/Magma';
 
+export interface GenerateIdentifiersOptions {
+  prefix: string | '';
+  size: number;
+  zeros: boolean | false;
+  checksum: boolean | false;
+}
+
 export const useIdentifiersStore = defineStore('identifiers', () => {
   const identifiersTables = ref([] as TableDto[]);
   const mappings = ref([] as VariableDto[]);
@@ -51,6 +58,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return addMappings(idTableName, [mappings]);
   }
 
+
   async function updateMapping(idTableName: string, mapping: VariableDto) {
     return api.put(`/identifiers/table/${idTableName}/variable/${mapping.name}`, mapping);
   }
@@ -63,6 +71,12 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return api
       .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: idTableName } })
       .then((response) => response.data);
+  }
+
+  async function generateMapping(idTableName: string, mappingName: string, options: GenerateIdentifiersOptions) {
+    return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
+      params: { type: idTableName, ...options }
+    });
   }
 
   async function importSystemIdentifiers(idTableName: string, content: string, separator?: string) {
@@ -111,6 +125,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     updateMapping,
     deleteMapping,
     getMappingIdentifiersCount,
+    generateMapping,
     importSystemIdentifiers,
     importTableSystemIdentifiers,
     importMappingSystemIdentifiers,

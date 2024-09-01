@@ -55,7 +55,7 @@
         <div v-if="hasIdentifiersTables" class="col-9">
           <div class="text-h6">
             {{ selectedIdentifierTable?.entityType }}
-            <q-btn :label="'export'" color="secondary" icon="output" @click="onDownloadIdentifiers" size="sm"/>
+            <q-btn :label="$t('export')" color="secondary" icon="output" @click="onExportIdentifiers" size="sm"/>
             <q-btn-dropdown class="q-ml-sm" color="secondary" :label="$t('import')" icon="input" size="sm">
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onImportSystemIdentifiersList">
@@ -239,7 +239,7 @@ function onDeleteIdentifierTable() {
   };
 }
 
-function onDownloadIdentifiers() {
+function onExportIdentifiers() {
   window.open(`${baseUrl}/identifiers/mappings/_export?type=${selectedIdentifierTable.value.name}`);
 }
 

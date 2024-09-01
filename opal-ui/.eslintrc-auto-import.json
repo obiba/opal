@@ -102,8 +102,6 @@
     "useIdentifiersStore": true,
     "useAppsStore": true,
     "useSqlStore": true,
-    "useSearchStore": true,
-    "DEFAULT_SEPARTOR": true,
-    "DEFAULT_SEPARATOR": true
+    "useSearchStore": true
   }
 }

@@ -14,9 +14,8 @@
         <div v-else class="text-help">
           {{ $t('id_mappings.generate_identifiers_info', { count: mappingIdentifiersCount }) }}
         </div>
-
         <q-form ref="formRef" class="q-gutter-md" persistent>
-          <div>{{ $t('id_mappings.sample_identifier', { sampleIdentifier }) }}</div>
+          <div>{{ $t('id_mappings.sample_identifier', { sample: sampleIdentifier }) }}</div>
           <q-input
             v-model.number="options.size"
             dense
@@ -36,9 +35,11 @@
             :disable="!hasSystemIdentifiers"
             v-model="useChecksum"
             :label="$t('id_mappings.with_checksum')"
-            :hint="$t('id_mappings_hint.with_checksum')"
             dense
           />
+          <div class="text-hint q-mb-md q-mt-none">
+            {{ $t('id_mappings.with_checksum_hint') }}
+          </div>
 
           <q-input
             v-model.number="options.prefix"
@@ -53,11 +54,10 @@
 
           <q-checkbox
             :disable="!hasSystemIdentifiers"
-            v-model="useChecksum"
+            v-model="useLeadingZeros"
             :label="$t('id_mappings.leading_zero')"
             dense
           />
-
         </q-form>
       </q-card-section>
 
@@ -80,6 +80,7 @@ export default defineComponent({
 import { TableDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 import { generateIdentifier } from 'src/utils/identifiers';
+import { GenerateIdentifiersOptions } from 'src/stores/identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -87,26 +88,21 @@ interface DialogProps {
   mapping: VariableDto;
 }
 
-interface GenerateIdentifiersOptions {
-  prefix: string | '';
-  size: number;
-  zeros: boolean | false;
-  checksum: boolean | false;
-}
-
 const MIN_IDENTIFIER_SIZE = 5;
 const MAX_IDENTIFIER_SIZE = 20;
+const DEFAULT_IDENTIFIER_SIZE = 10;
+
 const { t } = useI18n();
 const identifiersStore = useIdentifiersStore();
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
-const newIdentifier = ref<TableDto>({} as TableDto);
 const mappingIdentifiersCount = ref(0);
 const sampleIdentifier = ref('');
 const options = ref({} as GenerateIdentifiersOptions);
-const hasSystemIdentifiers = computed(() => mappingIdentifiersCount.value > 0);
+const initialized = ref(false);
+const hasSystemIdentifiers = computed(() => !initialized.value || (props.identifier?.valueSetCount ?? 0) > 0);
 const useLeadingZeros = computed({
   get: () => options.value.zeros,
   set: (val: boolean) => {
@@ -129,28 +125,49 @@ const validateRange = (val: number) =>
   (val >= MIN_IDENTIFIER_SIZE && val <= MAX_IDENTIFIER_SIZE) ||
   t('validation.range', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE });
 
+function updateSampleIdentifier() {
+  sampleIdentifier.value = generateIdentifier(
+    options.value.size,
+    options.value.zeros,
+    options.value.checksum,
+    options.value.prefix
+  );
+}
+
 watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      sampleIdentifier.value = generateIdentifier(4, true, false, 'Test-');
+      const total = props.identifier?.valueSetCount ?? 0;
       identifiersStore.getMappingIdentifiersCount(props.identifier.name, props.mapping.name).then((count) => {
-        mappingIdentifiersCount.value = count;
+        initialized.value = true;
+        mappingIdentifiersCount.value = total - count;
       });
       options.value = {
         prefix: `${props.mapping.name}-`,
-        size: 10,
+        size: DEFAULT_IDENTIFIER_SIZE,
         zeros: false,
         checksum: false,
       } as GenerateIdentifiersOptions;
+      updateSampleIdentifier();
       showDialog.value = value;
     }
   }
 );
 
+
+watch(
+  () => options.value,
+  () => {
+    updateSampleIdentifier();
+  },
+  { deep: true }
+);
+
 function onHide() {
-  newIdentifier.value = {} as TableDto;
+  options.value = {} as GenerateIdentifiersOptions;
   showDialog.value = false;
+  initialized.value = false;
   emit('update:modelValue', false);
 }
 
@@ -158,7 +175,7 @@ async function onAddMapping() {
   const valid = await formRef.value.validate();
   if (valid) {
     identifiersStore
-      .addIdentifierTable(newIdentifier.value)
+      .generateMapping(props.identifier.name, props.mapping.name, options.value)
       .then(() => {
         emit('update');
         onHide();

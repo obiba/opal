@@ -59,7 +59,7 @@
             :title="$t('id_mappings.download_identifiers')"
             :icon="toolsVisible[props.row.name] ? 'download' : 'none'"
             class="q-ml-xs"
-            @click="(onEnableUser) => ({})"
+            @click="onExportMappingIdentifiers(props.row.name)"
           />
         </div>
       </q-td>
@@ -103,6 +103,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.vue';
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { baseUrl } from 'src/boot/api';
 
 interface Props {
   identifierTable: TableDto;
@@ -191,6 +192,11 @@ async function onMappingAdded() {
   onCloseMappingDialog();
   emits('update');
 }
+
+function onExportMappingIdentifiers(mappingName: string) {
+  window.open(`${baseUrl}/identifiers/mapping/${mappingName}/_export?type=${props.identifierTable.name}`);
+}
+
 function onOverRow(row: VariableDto) {
   toolsVisible.value[row.name] = true;
 }
@@ -198,4 +204,5 @@ function onOverRow(row: VariableDto) {
 function onLeaveRow(row: VariableDto) {
   toolsVisible.value[row.name] = false;
 }
+
 </script>

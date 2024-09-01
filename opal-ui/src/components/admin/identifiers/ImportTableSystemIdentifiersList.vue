@@ -9,7 +9,7 @@
 
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-md" persistent>
-          <q-banner rounded class="bg-negative text-white" v-if="!hasTables">
+          <q-banner v-if="!hasTables" rounded class="bg-negative text-white">
              {{ $t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
           </q-banner>
           <q-select
@@ -77,9 +77,10 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
 const selectedTable = ref<TableDto | null>(null);
+const initialized = ref(false);
 const filterOptions = ref([] as GroupOption[]);
 let identifiersOptions = [] as GroupOption[];
-const hasTables = computed(() => filterOptions.value.length > 0);
+const hasTables = computed(() => !initialized.value || filterOptions.value.length > 0);
 
 const validateRequiredField = (val: TableDto | string) => {
   if (val) {
@@ -93,6 +94,7 @@ const validateRequiredField = (val: TableDto | string) => {
 };
 
 function initMappingOptions(tables: TableDto[]) {
+  initialized.value = true;
   if (tables.length > 0) {
     let lastGroup = '';
     tables.forEach((table) => {
@@ -140,6 +142,7 @@ function onHide() {
   identifiersOptions = [];
   filterOptions.value = [];
   showDialog.value = false;
+  initialized.value = false;
   emit('update:modelValue', false);
 }
 
