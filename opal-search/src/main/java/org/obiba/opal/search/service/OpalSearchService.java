@@ -19,6 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.event.SynchronizeIndexEvent;
+import org.obiba.opal.search.service.impl.TablesIndexManagerImpl;
 import org.obiba.opal.search.service.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
@@ -39,20 +40,25 @@ public class OpalSearchService implements Service {
 
   private final ElasticSearchConfigurationService configService;
 
+  private final TablesIndexManager tablesIndexManager;
+
   private final VariablesIndexManager variablesIndexManager;
 
   private final ValuesIndexManager valuesIndexManager;
 
   private final EventBus eventBus;
+  private final TablesIndexManagerImpl tablesIndexManagerImpl;
 
   private boolean running = false;
 
   @Autowired
-  public OpalSearchService(ElasticSearchConfigurationService configService, VariablesIndexManager variablesIndexManager, ValuesIndexManager valuesIndexManager, EventBus eventBus) {
+  public OpalSearchService(ElasticSearchConfigurationService configService, TablesIndexManager tablesIndexManager, VariablesIndexManager variablesIndexManager, ValuesIndexManager valuesIndexManager, EventBus eventBus, TablesIndexManagerImpl tablesIndexManagerImpl) {
     this.configService = configService;
+    this.tablesIndexManager = tablesIndexManager;
     this.variablesIndexManager = variablesIndexManager;
     this.valuesIndexManager = valuesIndexManager;
     this.eventBus = eventBus;
+    this.tablesIndexManagerImpl = tablesIndexManagerImpl;
   }
 
   public boolean isEnabled() {
@@ -88,6 +94,11 @@ public class OpalSearchService implements Service {
   //
   // Index managers
   //
+
+  public TablesIndexManager getTablesIndexManager() {
+    if (!isRunning()) return null;
+    return tablesIndexManager;
+  }
 
   public VariablesIndexManager getVariablesIndexManager() {
     if (!isRunning()) return null;
@@ -135,6 +146,8 @@ public class OpalSearchService implements Service {
     if (!isRunning()) return null;
     if (variablesIndexManager.getName().equals(searchPath)) {
       return variablesIndexManager.createQueryExecutor().execute(querySettings);
+    } else if (tablesIndexManager.getName().equals(searchPath)) {
+      return tablesIndexManager.createQueryExecutor().execute(querySettings);
     }
     // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
     return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
@@ -204,11 +217,7 @@ public class OpalSearchService implements Service {
 
   @Subscribe
   public void onVariablesUpdated(VariablesUpdatedEvent event) {
-    if (!isRunning()) return;
-    // to ensure variable search is correct
-    getVariablesIndexManager().drop(event.getValueTable());
-    // synchronize variable index
-    eventBus.post(new SynchronizeIndexEvent(getVariablesIndexManager(), event.getValueTable()));
+    remove(event.getValueTable());
   }
 
   private void remove(@NotNull ValueTable vt) {
@@ -216,6 +225,7 @@ public class OpalSearchService implements Service {
     // Delete index
     getValuesIndexManager().drop(vt);
     getVariablesIndexManager().drop(vt);
+    getTablesIndexManager().drop(vt);
 
   }
 

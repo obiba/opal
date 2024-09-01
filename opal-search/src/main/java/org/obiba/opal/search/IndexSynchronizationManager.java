@@ -141,8 +141,13 @@ public class IndexSynchronizationManager {
           for(ValueTable table : ds.getValueTables()) {
             if (ValueTableStatus.READY.equals(table.getStatus())) {
               log.debug("Check index for table: {}.{}", ds.getName(), table.getName());
-              IndexManager indexManager = opalSearchService.getVariablesIndexManager();
+              // tables
+              IndexManager indexManager = opalSearchService.getTablesIndexManager();
               checkIndexable(indexManager, table, indexManager.isReady() && !indexManager.getIndex(table).isUpToDate());
+              // variables
+              indexManager = opalSearchService.getVariablesIndexManager();
+              checkIndexable(indexManager, table, indexManager.isReady() && !indexManager.getIndex(table).isUpToDate());
+              // values
               indexManager = opalSearchService.getValuesIndexManager();
               checkIndexable(indexManager, table, indexManager.isReady() && indexConfig.getConfig().isReadyForIndexing(table, indexManager.getIndex(table)));
             }

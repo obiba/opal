@@ -18,7 +18,10 @@ import org.apache.lucene.store.FSDirectory;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.SystemService;
-import org.obiba.opal.search.service.*;
+import org.obiba.opal.search.service.IndexSynchronization;
+import org.obiba.opal.search.service.SearchQueryExecutor;
+import org.obiba.opal.search.service.TablesIndexManager;
+import org.obiba.opal.search.service.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,53 +31,53 @@ import java.io.IOException;
 import java.util.Set;
 
 @Component
-public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemService {
+public class TablesIndexManagerImpl implements TablesIndexManager, SystemService {
 
-  private static final Logger log = LoggerFactory.getLogger(VariablesIndexManagerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(TablesIndexManagerImpl.class);
 
   private static final String INDEX_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "index";
-  public static final String VARIABLES_INDEX_DIR = INDEX_DIR + File.separatorChar + "opal-variables";
+  public static final String TABLES_INDEX_DIR = INDEX_DIR + File.separatorChar + "opal-tables";
 
-  private Directory variablesDirectory;
+  private Directory tablesDirectory;
 
   @Override
   public String getName() {
-    return "opal-variables";
+    return "opal-tables";
   }
 
   @Override
-  public ValueTableVariablesIndex getIndex(ValueTable valueTable) {
-    return new VariablesIndexImpl(this, valueTable);
+  public ValueTableIndex getIndex(ValueTable valueTable) {
+    return new TablesIndexImpl(this, valueTable);
   }
 
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
-    return new VariablesIndexerImpl(this, valueTable, (VariablesIndexImpl) index);
+    return new TablesIndexerImpl(this, valueTable, (TablesIndexImpl) index);
   }
 
   @Override
   public SearchQueryExecutor createQueryExecutor() {
-    return new ContentQueryExecutor(variablesDirectory, Set.of("name", "project", "table", "value-type", "entity-type"), AnalyzerFactory.newVariablesAnalyzer());
+    return new ContentQueryExecutor(tablesDirectory, Set.of("name", "project", "entity-type"), AnalyzerFactory.newTablesAnalyzer());
   }
 
   @Override
   public boolean isEnabled() {
-    return variablesDirectory != null;
+    return tablesDirectory != null;
   }
 
   @Override
   public boolean isReady() {
-    return variablesDirectory != null;
+    return tablesDirectory != null;
   }
 
   @Override
   public void drop() {
     try {
       stop();
-      FileUtil.delete(new File(VARIABLES_INDEX_DIR));
+      FileUtil.delete(new File(TABLES_INDEX_DIR));
       start();
     } catch (IOException e) {
-      log.warn("Cannot delete index folder: {}", VARIABLES_INDEX_DIR, e);
+      log.warn("Cannot delete index folder: {}", TABLES_INDEX_DIR, e);
     }
   }
 
@@ -93,11 +96,11 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
     return getIndex(valueTable).exists();
   }
 
-  IndexWriter newVariablesIndexWriter() {
+  IndexWriter newTablesIndexWriter() {
     try {
-      Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
+      Analyzer analyzer = AnalyzerFactory.newTablesAnalyzer();
       IndexWriterConfig config = new IndexWriterConfig(analyzer);
-      return new IndexWriter(variablesDirectory, config);
+      return new IndexWriter(tablesDirectory, config);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -106,7 +109,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
   @Override
   public void start() {
     try {
-      this.variablesDirectory = FSDirectory.open(new File(VARIABLES_INDEX_DIR, "lucene").toPath());
+      this.tablesDirectory = FSDirectory.open(new File(TABLES_INDEX_DIR, "lucene").toPath());
     } catch (IOException e) {
       log.error("Failed at opening lucene tables/variables index", e);
     }
@@ -114,8 +117,8 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   @Override
   public void stop() {
-    close(variablesDirectory);
-    this.variablesDirectory = null;
+    close(tablesDirectory);
+    this.tablesDirectory = null;
   }
 
   private void close(Directory directory) {
@@ -123,7 +126,7 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
     try {
       directory.close();
     } catch (IOException e) {
-      log.error("Failed at closing lucene variables index", e);
+      log.error("Failed at closing lucene tables index", e);
     }
   }
 }

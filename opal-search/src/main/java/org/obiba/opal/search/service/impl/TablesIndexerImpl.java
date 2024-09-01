@@ -12,33 +12,29 @@ package org.obiba.opal.search.service.impl;
 
 import org.apache.lucene.index.IndexWriter;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.opal.search.service.IndexManager;
 import org.obiba.opal.search.service.IndexSynchronization;
 import org.obiba.opal.search.service.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VariablesIndexerImpl implements IndexSynchronization {
+public class TablesIndexerImpl implements IndexSynchronization {
 
-  private static final Logger log = LoggerFactory.getLogger(VariablesIndexerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(TablesIndexerImpl.class);
 
-  private final VariablesIndexManagerImpl indexManager;
+  private final TablesIndexManagerImpl indexManager;
 
   private final ValueTable table;
 
-  private final VariablesIndexImpl index;
-
-  private final int total;
+  private final TablesIndexImpl index;
 
   protected int done = 0;
 
   protected boolean stop = false;
 
-  VariablesIndexerImpl(VariablesIndexManagerImpl indexManager, ValueTable table, VariablesIndexImpl index) {
+  TablesIndexerImpl(TablesIndexManagerImpl indexManager, ValueTable table, TablesIndexImpl index) {
     this.indexManager = indexManager;
     this.table = table;
-    this.total = table.getVariableCount();
     this.index = index;
   }
 
@@ -64,12 +60,12 @@ public class VariablesIndexerImpl implements IndexSynchronization {
 
   @Override
   public boolean isComplete() {
-    return total > 0 && done >= total;
+    return done == 2;
   }
 
   @Override
   public float getProgress() {
-    return done / (float) total;
+    return done / 2f;
   }
 
   @Override
@@ -80,14 +76,13 @@ public class VariablesIndexerImpl implements IndexSynchronization {
   @Override
   public void run() {
     index.create();
-    try (IndexWriter writer = indexManager.newVariablesIndexWriter()) {
-      for (Variable variable : index.getVariables()) {
-        writer.addDocument(index.asDocument(variable));
-        done++;
-      }
+    try (IndexWriter writer = indexManager.newTablesIndexWriter()) {
+      done = 1;
+      writer.addDocument(index.asDocument());
+      done = 2;
       writer.commit();
     } catch (Exception e) {
-      log.error("Variables index writing failed", e);
+      log.error("Tables index writing failed", e);
     }
   }
 }

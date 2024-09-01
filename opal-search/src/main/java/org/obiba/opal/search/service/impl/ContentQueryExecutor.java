@@ -35,16 +35,20 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Set;
 
-public class VariablesQueryExecutor implements SearchQueryExecutor {
+public class ContentQueryExecutor implements SearchQueryExecutor {
 
-  private static final Logger log = LoggerFactory.getLogger(VariablesQueryExecutor.class);
+  private static final Logger log = LoggerFactory.getLogger(ContentQueryExecutor.class);
 
-  private final Set<String> DEFAULT_FIELDS = Set.of("name", "project", "table", "value-type", "entity-type");
+  private final Set<String> defaultFields;
 
   private final Directory directory;
 
-  public VariablesQueryExecutor(Directory directory) {
+  private final Analyzer analyzer;
+
+  public ContentQueryExecutor(Directory directory, Set<String> defaultFields, Analyzer analyzer) {
     this.directory = directory;
+    this.defaultFields = defaultFields;
+    this.analyzer = analyzer;
   }
 
   @Override
@@ -55,7 +59,6 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       IndexSearcher searcher = new IndexSearcher(reader);
 
       // Build a QueryParser
-      Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
       QueryParser parser = new QueryParser("content", analyzer);
 
       // Parse a query (search for books with "Lucene" in the title)
@@ -74,7 +77,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
         String identifier = doc.get("id");
         Search.ItemResultDto.Builder resHit = Search.ItemResultDto.newBuilder().setIdentifier(identifier);
         Search.ItemFieldsDto.Builder resFields = Search.ItemFieldsDto.newBuilder();
-        for (String field : Sets.union(Sets.newHashSet(querySettings.getFields()), DEFAULT_FIELDS)) {
+        for (String field : Sets.union(Sets.newHashSet(querySettings.getFields()), defaultFields)) {
           IndexableField idxField = doc.getField(field);
           if (idxField != null)
             resFields.addFields(Opal.EntryDto.newBuilder().setKey(field).setValue(idxField.stringValue()).build());
@@ -84,7 +87,7 @@ public class VariablesQueryExecutor implements SearchQueryExecutor {
       }
       return builder.build();
     } catch (IOException e) {
-      throw new SearchException("Variables index access failure", e);
+      throw new SearchException("Tables index access failure", e);
     } catch (ParseException e) {
       if (log.isTraceEnabled())
         log.warn("Wrong search query syntax", e);
