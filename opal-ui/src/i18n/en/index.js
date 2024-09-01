@@ -375,6 +375,8 @@ export default {
     mapping_name_hint: 'An identifiers mapping must have a unique name. If the mapping does not exist, it will be created when you type a new name and press ENTER.',
     system_identifiers: 'System Identifiers',
     mapped_identifiers: 'Mapped Identifiers',
+    import_table_sys_ids_info: 'The table which entity identifiers will be copied as system identifiers. New identifiers will be added, existing ones will be ignored.',
+    entity_type_no_tables: 'There are no tables for entity type \'{entityType}\'.',
   },
   git: {
     diff_viewer: {
@@ -494,6 +496,7 @@ export default {
     entity_type_required: 'Entity Type is required',
     range: 'Value must be between {min} and {max} inclusively',
     identifiers_required: 'Identifiers are required',
+    table_name_required: 'Table name is required',
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',

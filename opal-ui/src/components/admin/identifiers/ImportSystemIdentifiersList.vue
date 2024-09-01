@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">{{ $t('id_mappings.add_identifier') }}</div>
       </q-card-section>
-
+      
       <q-separator />
 
       <q-card-section>
@@ -35,7 +35,7 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'ImportIdentifiersList',
+  name: 'ImportSystemIdentifiersList',
 });
 </script>
 <script setup lang="ts">

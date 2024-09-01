@@ -72,6 +72,10 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     });
   }
 
+  async function importTableSystemIdentifiers(datasource: string, table: string) {
+    return api.post('/identifiers/mappings/entities/_sync', null, { params: { datasource, table } });
+  }
+
   async function importMappingSystemIdentifiers(
     idTableName: string,
     mappingName: string,
@@ -90,8 +94,8 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
 
   async function loadIdentifiers(idTableName: string, offset = 0, limit = 20) {
     return api
-    .get(`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
-    .then((response) =>  response.data);
+      .get(`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
+      .then((response) => response.data);
   }
 
   return {
@@ -108,6 +112,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     deleteMapping,
     getMappingIdentifiersCount,
     importSystemIdentifiers,
+    importTableSystemIdentifiers,
     importMappingSystemIdentifiers,
     getMappings,
     loadIdentifiers,
