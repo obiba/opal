@@ -106,7 +106,7 @@
       </div>
       <div v-else-if="itemResults.length">
         <div class="text-bold q-mb-md">
-          {{ $t('results') }} ({{ itemResults.length }})
+          {{ $t('results') }} ({{ itemResults.length }}/{{ results?.totalHits }})
         </div>
         <q-list separator>
           <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">

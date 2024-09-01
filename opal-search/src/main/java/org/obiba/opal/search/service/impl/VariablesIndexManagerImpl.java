@@ -34,7 +34,8 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
   private static final String INDEX_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "index";
   public static final String VARIABLES_INDEX_DIR = INDEX_DIR + File.separatorChar + "opal-variables";
 
-  private Directory directory;
+  private Directory tablesDirectory;
+  private Directory variablesDirectory;
 
   @Override
   public String getName() {
@@ -53,17 +54,17 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
 
   @Override
   public SearchQueryExecutor createQueryExecutor() {
-    return new VariablesQueryExecutor(directory);
+    return new VariablesQueryExecutor(variablesDirectory);
   }
 
   @Override
   public boolean isEnabled() {
-    return directory != null;
+    return variablesDirectory != null;
   }
 
   @Override
   public boolean isReady() {
-    return directory != null;
+    return variablesDirectory != null;
   }
 
   @Override
@@ -92,11 +93,21 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
     return getIndex(valueTable).exists();
   }
 
-  IndexWriter newIndexWriter() {
+  IndexWriter newVariablesIndexWriter() {
     try {
       Analyzer analyzer = AnalyzerFactory.newVariablesAnalyzer();
       IndexWriterConfig config = new IndexWriterConfig(analyzer);
-      return new IndexWriter(directory, config);
+      return new IndexWriter(variablesDirectory, config);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  IndexWriter newTablesIndexWriter() {
+    try {
+      Analyzer analyzer = AnalyzerFactory.newTablesAnalyzer();
+      IndexWriterConfig config = new IndexWriterConfig(analyzer);
+      return new IndexWriter(tablesDirectory, config);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -105,18 +116,25 @@ public class VariablesIndexManagerImpl implements VariablesIndexManager, SystemS
   @Override
   public void start() {
     try {
-      this.directory = FSDirectory.open(new File(VARIABLES_INDEX_DIR, "lucene").toPath());
+      this.variablesDirectory = FSDirectory.open(new File(VARIABLES_INDEX_DIR, "lucene-variables").toPath());
+      this.tablesDirectory = FSDirectory.open(new File(VARIABLES_INDEX_DIR, "lucene-tables").toPath());
     } catch (IOException e) {
-      log.error("Failed at opening lucene variables index", e);
+      log.error("Failed at opening lucene tables/variables index", e);
     }
   }
 
   @Override
   public void stop() {
-    if (this.directory == null) return;
+    close(variablesDirectory);
+    this.variablesDirectory = null;
+    close(tablesDirectory);
+    this.variablesDirectory = null;
+  }
+
+  private void close(Directory directory) {
+    if (directory == null) return;
     try {
       directory.close();
-      directory = null;
     } catch (IOException e) {
       log.error("Failed at closing lucene variables index", e);
     }
