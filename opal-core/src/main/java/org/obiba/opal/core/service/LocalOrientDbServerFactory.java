@@ -10,12 +10,14 @@
 
 package org.obiba.opal.core.service;
 
+import com.google.common.base.Strings;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
 import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
+import org.obiba.core.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -80,11 +82,24 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
   @Override
   public void start() throws Exception {
     stop();
+    String orientDBHome = url.replaceFirst("^" + DEFAULT_SCHEME + ":", "");
+    System.setProperty("ORIENTDB_HOME", orientDBHome);
+    System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
+
+    File osysFolder = new File(orientDBHome, "databases" + File.separator + "OSystem");
+    if (osysFolder.exists()) {
+      File osysFolderBackup = new File(orientDBHome, "databases" + File.separator + ".OSystem.bak");
+      if (!osysFolderBackup.exists()) {
+        FileUtil.copyDirectory(osysFolder, osysFolderBackup);
+        FileUtil.delete(osysFolder);
+      }
+    }
+
+    if (Strings.isNullOrEmpty(url)) {
+      this.url = URL;
+    }
     log.info("Start OrientDB server ({})", url);
 
-    System.setProperty("ORIENTDB_HOME", url.replaceFirst("^" + DEFAULT_SCHEME + ":", ""));
-    System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
-    //System.setProperty("java.util.logging.manager", "com.orientechnologies.common.log.OLogManager$DebugLogManager");
 
     ensureSecurityConfig();
 

@@ -7,6 +7,9 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('search') }}
+      </div>
       <div class="row q-col-gutter-lg q-mb-lg">
         <div class="col-6 col-sm-6 col-xs-12">
           <q-list separator>

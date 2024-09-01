@@ -157,6 +157,7 @@ public class OpalServer {
 
       if (args.length>0) {
         if ("--upgrade".equals(args[0])) {
+
           new OpalServer(true);
           System.exit(0);
         } else {
