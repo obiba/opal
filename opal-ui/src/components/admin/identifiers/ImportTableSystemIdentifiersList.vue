@@ -10,36 +10,34 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-banner v-if="!hasTables" rounded class="bg-negative text-white">
-             {{ $t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
+            {{ $t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
           </q-banner>
-          <q-select
-            v-else
-            v-model="selectedTable"
-            :options="filterOptions"
-            :label="$t('table')"
-            :hint="$t('id_mappings.import_table_sys_ids_info')"
+          <pre> {{ showSuggestions }}</pre>
+          <pre> {{ selectedTable }}</pre>
+          <q-input
+            v-model="tableName"
             dense
-            map-options
-            use-chips
-            use-input
-            input-debounce="0"
-            @filter="onFilterFn"
+            :label="$t('table')"
+            class="q-mb-md"
+            debounce="300"
             lazy-rules
             :rules="[validateRequiredField]"
+            @update:model-value="onSearchSubject"
           >
-            <template v-slot:option="scope">
-              <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
-                <q-item-section class="q-pa-none">
-                  {{ scope.opt.label }}
-                </q-item-section>
-              </q-item>
-              <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="selectedTable = scope.opt.value">
-                <q-item-section class="q-pl-md">
-                  {{ scope.opt.label }}
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+            <q-menu v-model="showSuggestions" no-parent-event auto-close>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-for="sugg in filterOptions"
+                  :key="sugg.name"
+                  @click="selectedTable = sugg"
+                >
+                  <q-item-section>{{ sugg.name }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-input>
         </q-form>
       </q-card-section>
 
@@ -47,7 +45,7 @@
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" :disable="!hasTables" @click="onImport" />
+        <q-btn flat :label="$t('add')" type="submit" color="primary" :disable="!!!selectedTable" @click="onImport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -67,8 +65,6 @@ interface DialogProps {
   identifier: TableDto;
 }
 
-type GroupOption = { label: string; value: TableDto | undefined };
-
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 const identifiersStore = useIdentifiersStore();
@@ -76,11 +72,13 @@ const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
+const showSuggestions = ref(false);
+const tableName = ref();
 const selectedTable = ref<TableDto | null>(null);
 const initialized = ref(false);
-const filterOptions = ref([] as GroupOption[]);
-let identifiersOptions = [] as GroupOption[];
-const hasTables = computed(() => !initialized.value || filterOptions.value.length > 0);
+const filterOptions = ref([] as TableDto[]);
+let identifiersOptions = [] as TableDto[];
+const hasTables = ref(true);
 
 const validateRequiredField = (val: TableDto | string) => {
   if (val) {
@@ -94,18 +92,10 @@ const validateRequiredField = (val: TableDto | string) => {
 };
 
 function initMappingOptions(tables: TableDto[]) {
-  initialized.value = true;
+  hasTables.value = tables.length > 0;
   if (tables.length > 0) {
-    let lastGroup = '';
-    tables.forEach((table) => {
-      if (!!table.datasourceName && table.datasourceName !== lastGroup) {
-        lastGroup = table.datasourceName;
-        identifiersOptions.push({ label: lastGroup } as GroupOption);
-      }
-      identifiersOptions.push({ label: table.name, value: table } as GroupOption);
-    });
-
-    filterOptions.value = [...identifiersOptions];
+    identifiersOptions = [...tables];
+    filterOptions.value = [];
   }
 }
 
@@ -123,18 +113,19 @@ watch(
   }
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function onFilterFn(val: string, update: any) {
-  update(() => {
-    if (val.trim().length === 0) {
-      filterOptions.value = [...identifiersOptions];
-    } else {
-      const needle = val.toLowerCase();
-      filterOptions.value = [
-        ...identifiersOptions.filter((v: GroupOption) => 'label' in v && v.label.toLowerCase().indexOf(needle) > -1),
-      ];
-    }
-  });
+function onSearchSubject(val: string) {
+  filterOptions.value = [];
+  selectedTable.value = null;
+
+  if ((val || '').trim().length < 3) {
+    showSuggestions.value = false;
+    return;
+  }
+
+  const needle = val.toLowerCase();
+  filterOptions.value = [...identifiersOptions.filter((v) => v.name.toLowerCase().indexOf(needle) > -1)];
+
+  showSuggestions.value = filterOptions.value.length > 0;
 }
 
 function onHide() {
