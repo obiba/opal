@@ -12,8 +12,6 @@
           <q-banner v-if="!hasTables" rounded class="bg-negative text-white">
             {{ $t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
           </q-banner>
-          <pre> {{ showSuggestions }}</pre>
-          <pre> {{ selectedTable }}</pre>
           <q-input
             v-model="tableName"
             dense
@@ -22,16 +20,20 @@
             debounce="300"
             lazy-rules
             :rules="[validateRequiredField]"
-            @update:model-value="onSearchSubject"
+            @update:model-value="onSearchTable"
           >
-            <q-menu v-model="showSuggestions" no-parent-event auto-close>
+            <q-menu
+              v-model="showSuggestions"
+              no-focus
+              no-parent-event
+              auto-close>
               <q-list style="min-width: 100px">
                 <q-item
                   clickable
                   v-close-popup
                   v-for="sugg in filterOptions"
                   :key="sugg.name"
-                  @click="selectedTable = sugg"
+                  @click="onTableSuggestionSelected(sugg)"
                 >
                   <q-item-section>{{ sugg.name }}</q-item-section>
                 </q-item>
@@ -113,7 +115,7 @@ watch(
   }
 );
 
-function onSearchSubject(val: string) {
+function onSearchTable(val: string) {
   filterOptions.value = [];
   selectedTable.value = null;
 
@@ -126,6 +128,12 @@ function onSearchSubject(val: string) {
   filterOptions.value = [...identifiersOptions.filter((v) => v.name.toLowerCase().indexOf(needle) > -1)];
 
   showSuggestions.value = filterOptions.value.length > 0;
+}
+
+function onTableSuggestionSelected(table: TableDto) {
+  tableName.value = table.name;
+  selectedTable.value = table;
+  showSuggestions.value = false;
 }
 
 function onHide() {
