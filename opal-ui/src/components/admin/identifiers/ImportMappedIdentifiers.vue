@@ -173,7 +173,7 @@ async function onImport() {
       .addMapping(props.identifier.name, newMapping)
       .then(() => {
         identifiersStore
-          .importMappingSystemIdentifiers(props.identifier.name, mappingName.value ?? '', createCsvContent())
+          .importMappingSystemIdentifiers(props.identifier.entityType, mappingName.value ?? '', createCsvContent())
           .then(() => {
             emit('update');
             onHide();

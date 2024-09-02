@@ -79,9 +79,9 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     });
   }
 
-  async function importSystemIdentifiers(idTableName: string, content: string, separator?: string) {
+  async function importSystemIdentifiers(entityType: string, content: string, separator?: string) {
     return api.post('/identifiers/mapping/entities/_import', content, {
-      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      params: separator ? { type: entityType, separator } : { type: entityType },
       headers: { 'Content-Type': 'text/plain' },
     });
   }
@@ -91,13 +91,13 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function importMappingSystemIdentifiers(
-    idTableName: string,
+    entityType: string,
     mappingName: string,
     content: string,
     separator?: string
   ) {
     return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
-      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      params: separator ? { type: entityType, separator } : { type: entityType },
       headers: { 'Content-Type': 'text/plain' },
     });
   }
