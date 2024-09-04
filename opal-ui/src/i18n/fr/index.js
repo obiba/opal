@@ -377,6 +377,7 @@ export default {
     mapped_identifiers: 'Identifiants Correspondants',
     import_table_sys_ids_info: 'La table dont les identifiants d\'entité seront copiés en tant qu\'identifiants système. Les nouveaux identifiants seront ajoutés, les existants seront ignorés.',
     entity_type_no_tables: 'Il n\'y a pas de tables pour le type d\'entité \'{entityType}\'.',
+    no_database_warning: 'Aucune base de données d\'identifiants n\'est configurée.'
   },
   git: {
     diff_viewer: {
@@ -781,6 +782,7 @@ export default {
   comment: 'Commentaire',
   compare: 'Comparer',
   configuration: 'Configuration',
+  configure: 'Configurer',
   configure_import_source: 'Configurer la source de données',
   confirm: 'Confirmer',
   content: 'Contenu',

@@ -67,15 +67,15 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return api.delete(`/identifiers/table/${idTableName}/variable/${mappingName}`);
   }
 
-  async function getMappingIdentifiersCount(idTableName: string, mappingName: string) {
+  async function getMappingIdentifiersCount(entityType: string, mappingName: string) {
     return api
-      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: idTableName } })
+      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: entityType } })
       .then((response) => response.data);
   }
 
-  async function generateMapping(idTableName: string, mappingName: string, options: GenerateIdentifiersOptions) {
+  async function generateMapping(entityType: string, mappingName: string, options: GenerateIdentifiersOptions) {
     return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
-      params: { type: idTableName, ...options }
+      params: { type: entityType, ...options }
     });
   }
 

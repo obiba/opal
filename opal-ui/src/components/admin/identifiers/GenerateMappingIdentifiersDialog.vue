@@ -139,7 +139,7 @@ watch(
   (value) => {
     if (value) {
       const total = props.identifier?.valueSetCount ?? 0;
-      identifiersStore.getMappingIdentifiersCount(props.identifier.name, props.mapping.name).then((count) => {
+      identifiersStore.getMappingIdentifiersCount(props.identifier.entityType, props.mapping.name).then((count) => {
         initialized.value = true;
         mappingIdentifiersCount.value = total - count;
       });
@@ -175,7 +175,7 @@ async function onAddMapping() {
   const valid = await formRef.value.validate();
   if (valid) {
     identifiersStore
-      .generateMapping(props.identifier.name, props.mapping.name, options.value)
+      .generateMapping(props.identifier.entityType, props.mapping.name, options.value)
       .then(() => {
         emit('update');
         onHide();
