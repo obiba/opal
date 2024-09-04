@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">{{ $t('id_mappings.add_identifier') }}</div>
       </q-card-section>
-      
+
       <q-separator />
 
       <q-card-section>
@@ -78,7 +78,7 @@ async function onImport() {
   const valid = await formRef.value.validate();
   if (valid) {
     identifiersStore
-      .importSystemIdentifiers(props.identifier.name, systemIdentifiers.value)
+      .importSystemIdentifiers(props.identifier.entityType, systemIdentifiers.value)
       .then(() => {
         emit('update');
         onHide();

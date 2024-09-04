@@ -194,7 +194,7 @@ async function onMappingAdded() {
 }
 
 function onExportMappingIdentifiers(mappingName: string) {
-  window.open(`${baseUrl}/identifiers/mapping/${mappingName}/_export?type=${props.identifierTable.name}`);
+  window.open(`${baseUrl}/identifiers/mapping/${mappingName}/_export?type=${props.identifierTable.entityType}`);
 }
 
 function onOverRow(row: VariableDto) {

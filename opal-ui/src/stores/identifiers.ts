@@ -67,21 +67,21 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return api.delete(`/identifiers/table/${idTableName}/variable/${mappingName}`);
   }
 
-  async function getMappingIdentifiersCount(idTableName: string, mappingName: string) {
+  async function getMappingIdentifiersCount(entityType: string, mappingName: string) {
     return api
-      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: idTableName } })
+      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: entityType } })
       .then((response) => response.data);
   }
 
-  async function generateMapping(idTableName: string, mappingName: string, options: GenerateIdentifiersOptions) {
+  async function generateMapping(entityType: string, mappingName: string, options: GenerateIdentifiersOptions) {
     return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
-      params: { type: idTableName, ...options }
+      params: { type: entityType, ...options }
     });
   }
 
-  async function importSystemIdentifiers(idTableName: string, content: string, separator?: string) {
+  async function importSystemIdentifiers(entityType: string, content: string, separator?: string) {
     return api.post('/identifiers/mapping/entities/_import', content, {
-      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      params: separator ? { type: entityType, separator } : { type: entityType },
       headers: { 'Content-Type': 'text/plain' },
     });
   }
@@ -91,13 +91,13 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function importMappingSystemIdentifiers(
-    idTableName: string,
+    entityType: string,
     mappingName: string,
     content: string,
     separator?: string
   ) {
     return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
-      params: separator ? { type: idTableName, separator } : { type: idTableName },
+      params: separator ? { type: entityType, separator } : { type: entityType },
       headers: { 'Content-Type': 'text/plain' },
     });
   }

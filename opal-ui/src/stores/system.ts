@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { DatabaseDto } from 'src/models/Database';
+import { DatabaseDto, DatabasesStatusDto } from 'src/models/Database';
 import { GeneralConf } from 'src/models/Opal';
 
 
@@ -19,6 +19,10 @@ export const useSystemStore = defineStore('system', () => {
 
   async function saveGeneralConf(data: GeneralConf) {
     return api.put('/system/conf/general', data).then(initGeneralConf);
+  }
+
+  async function getDatabasesStatus(): Promise<DatabasesStatusDto> {
+    return api.get('/system/status/databases').then((response) => response.data);
   }
 
   async function getDatabases(usage: string): Promise<DatabaseDto[]> {
@@ -53,6 +57,7 @@ export const useSystemStore = defineStore('system', () => {
     generalConf,
     initGeneralConf,
     saveGeneralConf,
+    getDatabasesStatus,
     getDatabases,
     getDatabasesWithSettings,
     getIdentifiersDatabase,
