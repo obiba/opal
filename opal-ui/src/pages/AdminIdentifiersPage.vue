@@ -250,7 +250,7 @@ function onDeleteIdentifierTable() {
 }
 
 function onExportIdentifiers() {
-  window.open(`${baseUrl}/identifiers/mappings/_export?type=${selectedIdentifierTable.value.name}`);
+  window.open(`${baseUrl}/identifiers/mappings/_export?type=${selectedIdentifierTable.value.entityType}`);
 }
 
 function onImportSystemIdentifiersList() {
