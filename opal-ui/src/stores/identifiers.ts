@@ -50,6 +50,12 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     });
   }
 
+  async function getAllMappings() {
+    return api.get('/identifiers/mappings').then((response) => {
+      return response.data;
+    });
+  }
+
   async function addMappings(idTableName: string, mappings: VariableDto[]) {
     return api.post(`/identifiers/table/${idTableName}/variables`, mappings);
   }
@@ -120,6 +126,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     addIdentifierTable,
     deleteIdentifierTable,
     initMappings,
+    getAllMappings,
     addMappings,
     addMapping,
     updateMapping,

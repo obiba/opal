@@ -1,195 +1,195 @@
 <template>
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
-      <q-card class="dialog-md">
-        <q-card-section>
-          <div class="text-h6">{{ $t('import_data') }}</div>
-        </q-card-section>
+    <q-card class="dialog-md">
+      <q-card-section>
+        <div class="text-h6">{{ $t('import_data') }}</div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-section>
-          <q-stepper
-            v-model="step"
-            ref="stepper"
-            flat
-            vertical
-            animated
-            class="q-pt-none q-pb-none"
-            @update:model-value="onStepChange"
+      <q-card-section>
+        <q-stepper
+          v-model="step"
+          ref="stepper"
+          flat
+          vertical
+          animated
+          class="q-pt-none q-pb-none"
+          @update:model-value="onStepChange"
+        >
+          <q-step :name="1" :title="$t('select_import_source')" icon="settings" :done="step > 1">
+            <div v-if="isFile">
+              <q-select
+                v-model="fileImporter"
+                :options="fileImporters"
+                :label="$t('data_format')"
+                dense
+                @update:model-value="onImporterSelection"
+                class="q-mb-md"
+              />
+              <div class="text-hint">
+                {{ fileImporterHint }}
+              </div>
+            </div>
+            <div v-else-if="isServer">
+              <q-select
+                v-model="serverImporter"
+                :options="serverImporters"
+                :label="$t('data_server')"
+                dense
+                @update:model-value="onImporterSelection"
+                class="q-mb-md"
+              />
+              <div class="text-hint">
+                {{ serverImporterHint }}
+              </div>
+            </div>
+            <div v-else-if="isDatabase">
+              <q-select
+                v-model="databaseImporter"
+                :options="databaseImporters"
+                :label="$t('database')"
+                dense
+                @update:model-value="onImporterSelection"
+                emit-value
+                map-options
+              />
+            </div>
+            <div v-else>
+              <div class="text-negative">Unidentified data source.</div>
+            </div>
+          </q-step>
+
+          <q-step :name="2" :title="$t('configure_import_source')" icon="table_chart" :done="step > 2">
+            <div v-if="isFile">
+              <div v-if="fileImporter.value === 'csv'">
+                <import-csv-form v-model="factory" />
+              </div>
+              <div v-else-if="fileImporter.value === 'opal'">
+                <import-fs-form v-model="factory" />
+              </div>
+              <div v-else-if="fileImporter.value.startsWith('haven_')">
+                <import-haven-form v-model="factory" :type="fileImporter.value" />
+              </div>
+              <div v-else>
+                <import-plugin-form v-model="factory" :type="fileImporter.value" />
+              </div>
+            </div>
+            <div v-else-if="isServer">
+              <div v-if="serverImporter.value === 'opal'">
+                <import-opal-form v-model="factory" />
+              </div>
+              <div v-else>
+                <import-plugin-form v-model="factory" :type="serverImporter.value" />
+              </div>
+            </div>
+            <div v-else-if="isDatabase">
+              <import-database-form v-model="factory" :database="databaseImporter" />
+            </div>
+          </q-step>
+
+          <q-step
+            :name="3"
+            :title="$t('select_import_options')"
+            :caption="$t('optional')"
+            icon="assignment"
+            :done="step > 3"
           >
-            <q-step
-              :name="1"
-              :title="$t('select_import_source')"
-              icon="settings"
-              :done="step > 1"
-            >
-              <div v-if="isFile">
-                <q-select
-                  v-model="fileImporter"
-                  :options="fileImporters"
-                  :label="$t('data_format')"
-                  dense
-                  @update:model-value="onImporterSelection"
-                  class="q-mb-md"/>
-                <div class="text-hint">
-                  {{ fileImporterHint }}
-                </div>
+            <div>
+              <q-checkbox v-model="merge" :label="$t('merge_dictionaries')" />
+              <div class="text-hint q-mb-md">
+                {{ $t('merge_dictionaries_hint') }}
               </div>
-              <div v-else-if="isServer">
-                <q-select
-                  v-model="serverImporter"
-                  :options="serverImporters"
-                  :label="$t('data_server')"
-                  dense
-                  @update:model-value="onImporterSelection"
-                  class="q-mb-md"/>
-                <div class="text-hint">
-                  {{ serverImporterHint }}
-                </div>
+              <q-input
+                v-model="limit"
+                :label="$t('limit')"
+                dense
+                type="number"
+                min="0"
+                step="1000"
+                class="q-mb-md"
+                :hint="$t('import_limit_hint')"
+              />
+              <q-checkbox v-model="incremental" :label="$t('incremental_import')" />
+              <div class="text-hint q-mb-md">
+                {{ $t('incremental_import_hint') }}
               </div>
-              <div v-else-if="isDatabase">
-                <q-select
-                  v-model="databaseImporter"
-                  :options="databaseImporters"
-                  :label="$t('database')"
-                  dense
-                  @update:model-value="onImporterSelection"
-                  emit-value
-                  map-options />
+              <q-select
+                v-model="idConfig.name"
+                dense
+                :options="mappingNames"
+                :label="$t('id_mappings.title')"
+                :hint="$t('importer.id_mappings.hint')"
+                class="q-mb-md q-pt-md"
+                emit-value
+                map-options
+              />
+              <div class="q-ml-none" v-show="!!idConfig.name">
+                <q-option-group dense :options="mappingOptions" type="radio" v-model="mappingOption" >
+                  <template v-slot:label="opt">
+                    <div class="row q-pt-md">
+                      <span>{{ $t(opt.label) }}</span>
+                      <span class="text-caption text-secondary">{{ $t(opt.hint)}}</span>
+                    </div>
+                  </template>
+                </q-option-group>
               </div>
-              <div v-else>
-                <div class="text-negative">Unidentified data source.</div>
-              </div>
-            </q-step>
+            </div>
+          </q-step>
 
-            <q-step
-              :name="2"
-              :title="$t('configure_import_source')"
-              icon="table_chart"
-              :done="step > 2"
-            >
-              <div v-if="isFile">
-                <div v-if="fileImporter.value === 'csv'">
-                  <import-csv-form v-model="factory" />
-                </div>
-                <div v-else-if="fileImporter.value === 'opal'">
-                  <import-fs-form v-model="factory" />
-                </div>
-                <div v-else-if="fileImporter.value.startsWith('haven_')">
-                  <import-haven-form v-model="factory" :type="fileImporter.value" />
-                </div>
-                <div v-else>
-                  <import-plugin-form v-model="factory" :type="fileImporter.value" />
-                </div>
-              </div>
-              <div v-else-if="isServer">
-                <div v-if="serverImporter.value === 'opal'">
-                  <import-opal-form v-model="factory" />
-                </div>
-                <div v-else>
-                  <import-plugin-form v-model="factory" :type="serverImporter.value" />
-                </div>
-              </div>
-              <div v-else-if="isDatabase">
-                <import-database-form v-model="factory" :database="databaseImporter" />
-              </div>
-            </q-step>
+          <q-step :name="4" :title="$t('preview_import_source')" icon="table_chart">
+            <div v-if="transientDatasourceStore.datasource.table">
+              <q-select
+                v-show="transientDatasourceStore.datasource?.table?.length > 1"
+                v-model="selectedTable"
+                :options="transientDatasourceStore.datasource.table"
+                :label="$t('tables')"
+                dense
+                @update:model-value="onTableSelection"
+                class="q-mb-md"
+              />
+              <table-preview
+                v-if="transientDatasourceStore.datasource"
+                :table="transientDatasourceStore.table"
+                :variables="transientDatasourceStore.variables"
+                :loading="variablesLoading"
+              />
+            </div>
+            <div v-else>
+              <q-spinner-dots size="lg" />
+            </div>
+          </q-step>
+        </q-stepper>
+      </q-card-section>
 
-            <q-step
-              :name="3"
-              :title="$t('select_import_options')"
-              :caption="$t('optional')"
-              icon="assignment"
-              :done="step > 3"
-            >
-              <div>
-                <q-checkbox v-model="merge" :label="$t('merge_dictionaries')" />
-                <div class="text-hint q-mb-md">
-                  {{  $t('merge_dictionaries_hint') }}
-                </div>
-                <q-input
-                  v-model="limit"
-                  :label="$t('limit')"
-                  dense
-                  type="number"
-                  min="0"
-                  step="1000"
-                  class="q-mb-md"
-                  :hint="$t('import_limit_hint')"
-                />
-                <q-checkbox v-model="incremental" :label="$t('incremental_import')" />
-                <div class="text-hint q-mb-md">
-                  {{  $t('incremental_import_hint') }}
-                </div>
-              </div>
-            </q-step>
+      <q-separator />
 
-            <q-step
-              :name="4"
-              :title="$t('preview_import_source')"
-              icon="table_chart"
-            >
-              <div v-if="transientDatasourceStore.datasource.table">
-                <q-select
-                  v-show="transientDatasourceStore.datasource?.table?.length > 1"
-                  v-model="selectedTable"
-                  :options="transientDatasourceStore.datasource.table"
-                  :label="$t('tables')"
-                  dense
-                  @update:model-value="onTableSelection"
-                  class="q-mb-md"/>
-                <table-preview
-                  v-if="transientDatasourceStore.datasource"
-                  :table="transientDatasourceStore.table"
-                  :variables="transientDatasourceStore.variables"
-                  :loading="variablesLoading" />
-              </div>
-              <div v-else>
-                <q-spinner-dots size="lg" />
-              </div>
-            </q-step>
-          </q-stepper>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn
-            v-if="step > 1"
-            flat
-            icon="navigate_before"
-            color="primary"
-            @click="$refs.stepper.previous()"
-            :label="$t('back')" />
-          <q-btn
-            v-if="step < 4"
-            flat
-            icon-right="navigate_next"
-            @click="$refs.stepper.next()"
-            color="primary"
-            :label="$t('continue')"
-            :disable="!canNext"
-            class="on-right"/>
-          <q-btn
-            flat
-            :label="$t('cancel')"
-            color="secondary"
-            v-close-popup
-            @click="onCancel"
-          />
-          <q-btn
-            :disable="step < 4"
-            flat
-            :label="$t('import')"
-            color="primary"
-            @click="onImportData"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+      <q-card-actions align="right" class="bg-grey-3">
+        <q-btn
+          v-if="step > 1"
+          flat
+          icon="navigate_before"
+          color="primary"
+          @click="$refs.stepper.previous()"
+          :label="$t('back')"
+        />
+        <q-btn
+          v-if="step < 4"
+          flat
+          icon-right="navigate_next"
+          @click="$refs.stepper.next()"
+          color="primary"
+          :label="$t('continue')"
+          :disable="!canNext"
+          class="on-right"
+        >
+        </q-btn>
+        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup @click="onCancel" />
+        <q-btn :disable="step < 4" flat :label="$t('import')" color="primary" @click="onImportData" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({
@@ -208,6 +208,8 @@ import ImportDatabaseForm from 'src/components/datasource/import/ImportDatabaseF
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { IdentifiersMappingDto, IdentifiersMappingConfigDto } from 'src/models/Identifiers';
+import { ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 
 interface DialogProps {
   modelValue: boolean;
@@ -215,10 +217,11 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
+const identifiersStore = useIdentifiersStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
@@ -231,6 +234,37 @@ const incremental = ref(false);
 const limit = ref();
 const selectedTable = ref<string>();
 const variablesLoading = ref(false);
+const mappingNames = ref<{ label: string; value: string }[]>([]);
+const mappingOption = computed({
+  get: () =>
+    idConfig.value.allowIdentifierGeneration ? 'allow' : idConfig.value.ignoreUnknownIdentifier ? 'ignore' : 'default',
+  set: (value) => {
+    idConfig.value.allowIdentifierGeneration = value === 'allow';
+    idConfig.value.ignoreUnknownIdentifier = value === 'ignore';
+  },
+});
+const mappingOptions = ref<{ label: string; value: string; hint: string }[]>([
+  {
+    label: 'importer.id_mappings.mapping_default',
+    hint: 'importer.id_mappings.mapping_default_hint',
+    value: 'default',
+  },
+  {
+    label: 'importer.id_mappings.mapping_ignore',
+    hint: 'importer.id_mappings.mapping_ignore_hint',
+    value: 'ignore',
+  },
+  {
+    label: 'importer.id_mappings.mapping_allow',
+    hint: 'importer.id_mappings.mapping_allow_hint',
+    value: 'allow',
+  },
+]);
+const idConfig = ref({
+  name: '',
+  allowIdentifierGeneration: false,
+  ignoreUnknownIdentifier: false,
+} as IdentifiersMappingConfigDto);
 
 interface ImporterOption {
   label: string;
@@ -250,9 +284,7 @@ const builtinFileImporters: ImporterOption[] = [
 const fileImporters = ref([...builtinFileImporters]);
 const fileImporter = ref();
 
-const builtinServerImporters: ImporterOption[] = [
-  { label: 'Opal', value: 'opal' },
-];
+const builtinServerImporters: ImporterOption[] = [{ label: 'Opal', value: 'opal' }];
 const serverImporters = ref([...builtinServerImporters]);
 const serverImporter = ref();
 const databaseImporter = ref();
@@ -263,19 +295,30 @@ const databaseImporters = computed(() => {
 });
 
 const fileImporterHint = computed(() => {
-  return fileImporter.value ? (fileImporter.value.hint ? fileImporter.value.hint : t(`importer.file.${fileImporter.value.value}`)) : '';
+  return fileImporter.value
+    ? fileImporter.value.hint
+      ? fileImporter.value.hint
+      : t(`importer.file.${fileImporter.value.value}`)
+    : '';
 });
 
 const serverImporterHint = computed(() => {
-  return serverImporter.value ? (serverImporter.value.hint ? serverImporter.value.hint : t(`importer.server.${serverImporter.value.value}`)) : '';
+  return serverImporter.value
+    ? serverImporter.value.hint
+      ? serverImporter.value.hint
+      : t(`importer.server.${serverImporter.value.value}`)
+    : '';
 });
 
-watch(() => props.modelValue, (value) => {
-  step.value = 1;
-  // reset, not delete, otherwise a transient datasource in a previous import task would be deleted
-  transientDatasourceStore.reset();
-  showDialog.value = value;
-});
+watch(
+  () => props.modelValue,
+  (value) => {
+    step.value = 1;
+    // reset, not delete, otherwise a transient datasource in a previous import task would be deleted
+    transientDatasourceStore.reset();
+    showDialog.value = value;
+  }
+);
 
 const canNext = computed(() => {
   if (isDatabase.value && databaseImporters.value.length === 0) {
@@ -295,27 +338,46 @@ function onShow() {
   fileImporter.value = [...builtinFileImporters];
   serverImporter.value = [...builtinServerImporters];
   pluginsStore.initDatasourcePlugins('import').then(() => {
-    pluginsStore.datasourceImportPlugins
-    .forEach((plugin) => {
+    pluginsStore.datasourceImportPlugins.forEach((plugin) => {
       if (plugin['Plugins.DatasourcePluginPackageDto.datasource']?.group === 'FILE') {
         if (!fileImporters.value.find((importer) => importer.value === plugin.name))
-          fileImporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description});
+          fileImporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description });
       } else if (plugin['Plugins.DatasourcePluginPackageDto.datasource']?.group === 'SERVER') {
         if (!serverImporters.value.find((importer) => importer.value === plugin.name))
-          serverImporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description});
+          serverImporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description });
       }
     });
   });
   if (isDatabase.value) {
     databaseImporter.value = null;
-    systemStore.getDatabases(DatabaseDto_Usage.IMPORT).then((response) => {
-      databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
-      if (databaseImporters.value.length > 0)
-        databaseImporter.value = databaseImporters.value[0].value;
-    }).catch((err) => {
+    systemStore
+      .getDatabases(DatabaseDto_Usage.IMPORT)
+      .then((response) => {
+        databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
+        if (databaseImporters.value.length > 0) databaseImporter.value = databaseImporters.value[0].value;
+      })
+      .catch((err) => {
+        notifyError(err);
+      });
+  }
+
+  // init mappings
+  Promise.all([projectsStore.getIdMappings(projectsStore.project.name), identifiersStore.getAllMappings()])
+    .then(([projectMappings, allMappings]) => {
+      const projectMapping = projectMappings[0] || ({} as ProjectDto_IdentifiersMappingDto);
+      mappingNames.value = allMappings.map((mapping: IdentifiersMappingDto) => ({
+        label: mapping.name,
+        value: mapping.name,
+      }));
+      mappingNames.value.push({ label: t('none_value'), value: '' });
+
+      idConfig.value.name =
+        (allMappings.find((mapping: IdentifiersMappingDto) => mapping.name === projectMapping.mapping)||{}).name || '';
+    })
+    .catch((err) => {
       notifyError(err);
     });
-  }
+
   fileImporter.value = fileImporters.value[0];
   serverImporter.value = serverImporters.value[0];
   factory.value = undefined;
@@ -335,12 +397,20 @@ function onImportData() {
     destination: projectsStore.project.name,
     tables: transientDatasourceStore.datasource.table.map((tbl) => `${dsName}.${tbl}`),
   } as ImportCommandOptionsDto;
-  projectsStore.importCommand(projectsStore.project.name, options).then((response) => {
-    notifySuccess(t('import_data_task_created', { id: response.data.id }));
-  }).catch((err) => {
-    console.error(err);
-    notifyError(err);
-  });
+
+  if (!!idConfig.value.name) {
+    options.idConfig = idConfig.value;
+  }
+
+  projectsStore
+    .importCommand(projectsStore.project.name, options)
+    .then((response) => {
+      notifySuccess(t('import_data_task_created', { id: response.data.id }));
+    })
+    .catch((err) => {
+      console.error(err);
+      notifyError(err);
+    });
 }
 
 function onStepChange(value: string | number) {
@@ -356,15 +426,18 @@ function onStepChange(value: string | number) {
       factory.value.incrementalConfig = {
         incremental: true,
         incrementalDestinationName: projectsStore.project.name,
-      }
+      };
     }
-    transientDatasourceStore.createDatasource(factory.value, merge.value).then(() => {
-      selectedTable.value = transientDatasourceStore.datasource.table[0];
-      onTableSelection();
-    }).catch((err) => {
-      console.error(err);
-      notifyError(err);
-    })
+    transientDatasourceStore
+      .createDatasource(factory.value, merge.value)
+      .then(() => {
+        selectedTable.value = transientDatasourceStore.datasource.table[0];
+        onTableSelection();
+      })
+      .catch((err) => {
+        console.error(err);
+        notifyError(err);
+      });
   }
 }
 
@@ -373,16 +446,22 @@ function onTableSelection() {
     return;
   }
   variablesLoading.value = true;
-  transientDatasourceStore.loadTable(selectedTable.value).then(() => {
-    transientDatasourceStore.loadVariables().catch((err) => {
-      notifyError(err);
-    }).finally(() => {
+  transientDatasourceStore
+    .loadTable(selectedTable.value)
+    .then(() => {
+      transientDatasourceStore
+        .loadVariables()
+        .catch((err) => {
+          notifyError(err);
+        })
+        .finally(() => {
+          variablesLoading.value = false;
+        });
+    })
+    .catch((err) => {
       variablesLoading.value = false;
+      notifyError(err);
     });
-  }).catch((err) => {
-    variablesLoading.value = false;
-    notifyError(err);
-  });
 }
 
 function onImporterSelection(value: string) {

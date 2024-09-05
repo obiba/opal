@@ -249,7 +249,7 @@ onMounted(() =>
             defaultStorage: db.defaultStorage,
           };
         });
-        databases.value.push({ label: t('project_admin.none'), value: '', defaultStorage: false });
+        databases.value.push({ label: t('none_value'), value: '', defaultStorage: false });
       });
 
       pluginsStore.initVcfStorePlugins().then(() => {
@@ -261,7 +261,7 @@ onMounted(() =>
             };
           });
 
-          vcfStores.value.push({ label: t('project_admin.none'), value: '' });
+          vcfStores.value.push({ label: t('none_value'), value: '' });
         }
       });
     })
