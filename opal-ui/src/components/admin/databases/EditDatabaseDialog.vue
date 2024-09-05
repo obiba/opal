@@ -40,27 +40,33 @@
             dense
             emit-value
             map-options
-            class="q-mb-md" />
+            class="q-mb-md"
+            @update:model-value="onDriverChange"/>
           <q-input
             v-model="database.sqlSettings.url"
             label="URL"
-            :hint="$t('example', { text: dbUrlPlaceholder })"
             dense
             class="q-mb-md" />
-          <div class="row q-col-gutter-md q-mb-md">
-            <div class="col">
-              <q-input
-                v-model="database.sqlSettings.username"
-                :label="$t('username')"
-                dense />
-            </div>
-            <div class="col">
-              <q-input
-                v-model="database.sqlSettings.password"
-                :label="$t('password')"
-                dense />
-            </div>
-          </div>
+            <q-form ref="formRef">
+              <div class="row q-col-gutter-md q-mb-md">
+                <div class="col">
+                  <q-input
+                    v-model="database.sqlSettings.username"
+                    :label="$t('username')"
+                    dense />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="database.sqlSettings.password"
+                    autocomplete="off"
+                    type="password"
+                    :label="$t('password')"
+                    lazy-rules
+                    :rules="[validateRequiredPassword]"
+                    dense />
+                </div>
+              </div>
+          </q-form>
           <div v-if="database.usage !== DatabaseDto_Usage.STORAGE">
             <q-input
               v-model="jdbcDatasourceSettings.defaultEntityType"
@@ -119,24 +125,25 @@
           <q-input
             v-model="database.mongoDbSettings.url"
             label="URL"
-            :hint="$t('example', { text: dbUrlPlaceholder })"
             dense
             class="q-mb-md" />
           <div class="row q-col-gutter-md">
-            <div class="col">
-              <q-input
-                v-model="database.mongoDbSettings.username"
-                :label="$t('username')"
-                dense
-                class="q-mb-md" />
-            </div>
-            <div class="col">
-              <q-input
-                v-model="database.mongoDbSettings.password"
-                :label="$t('password')"
-                dense
-                class="q-mb-md" />
-            </div>
+            <q-form ref="formRef">
+              <div class="col">
+                <q-input
+                  v-model="database.mongoDbSettings.username"
+                  :label="$t('username')"
+                  dense
+                  class="q-mb-md" />
+              </div>
+              <div class="col">
+                <q-input
+                  v-model="database.mongoDbSettings.password"
+                  :label="$t('password')"
+                  dense
+                  class="q-mb-md" />
+              </div>
+            </q-form>
           </div>
           <q-list>
             <q-expansion-item
@@ -171,7 +178,6 @@
           color="primary"
           :disable="!database.name || !hasUrl"
           @click="onSubmit"
-          v-close-popup
         />
       </q-card-actions>
     </q-card>
@@ -186,51 +192,65 @@ export default defineComponent({
 import { DatabaseDto, DatabaseDto_Usage, SqlSettingsDto_SqlSchema } from 'src/models/Database';
 import { JdbcDatasourceSettingsDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
+import { JdbcDriverDto } from 'src/models/Database';
 
 interface DialogProps {
   modelValue: boolean
   database: DatabaseDto
 }
 
-const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue', 'save'])
+const props = withDefaults(defineProps<DialogProps>(), {
+  database: () => ({} as DatabaseDto) 
+});
 
+const emit = defineEmits(['update:modelValue', 'save'])
+const formRef = ref();
 const systemStore = useSystemStore();
 const { t } = useI18n();
 
 const showDialog = ref(props.modelValue);
-const database = ref<DatabaseDto>(props.database);
+const database = ref<DatabaseDto>(props.database || {} as DatabaseDto);
 const jdbcDatasourceSettings = ref<JdbcDatasourceSettingsDto>({} as JdbcDatasourceSettingsDto);
 const editMode = ref<boolean>(false);
 const hasDatasource = ref<boolean>(false);
+let jdbcDrivers = [] as JdbcDriverDto[];
+const driverOptions = ref([] as { label: string; value: string }[] );
+
 
 const hasUrl = computed(() => database.value.sqlSettings?.url || database.value.mongoDbSettings?.url);
-const dbUrlPlaceholder = computed(() => {
-  if (database.value.sqlSettings) {
-    if (database.value.sqlSettings.driverClass === 'org.postgresql.Driver') {
-      return 'jdbc:postgresql://localhost:5432/opal';
-    } else if (database.value.sqlSettings.driverClass === 'org.mariadb.jdbc.Driver') {
-      return 'jdbc:mariadb://localhost:4306/opal';
-    } else if (database.value.sqlSettings.driverClass === 'com.mysql.jdbc.Driver') {
-      return 'jdbc:mysql://localhost:3306/opal';
-    }
-    return 'jdbc:';
-  } else if (database.value.mongoDbSettings) {
-    return 'mongodb://localhost:27017/opal';
-  }
-});
-
 const usageOptions = [
   { label: t('storage'), value: DatabaseDto_Usage.STORAGE },
   { label: t('import'), value: DatabaseDto_Usage.IMPORT },
   { label: t('export'), value: DatabaseDto_Usage.EXPORT },
 ];
 
-const driverOptions = [
-  { label: 'MariaDB', value: 'org.mariadb.jdbc.Driver' },
-  { label: 'MySQL', value: 'com.mysql.jdbc.Driver' },
-  { label: 'PostgreSQL', value: 'org.postgresql.Driver' },
-];
+const validateRequiredPassword = (value: string) => {
+  if (!!database.value.sqlSettings) {
+    return (!!database.value.sqlSettings.username && !!value) || t('validation.password_required');
+  }
+
+  return true;
+}
+
+function initializeJdbcDrivers() {
+  if (!jdbcDrivers.length) {
+    systemStore.getJdbcDrivers().then((drivers) => {
+      jdbcDrivers = drivers;
+      (jdbcDrivers || []).forEach((driver: JdbcDriverDto) => {
+        driverOptions.value.push({label: driver.driverName, value: driver.driverClass});
+      });
+
+    });
+  }
+}
+
+function onDriverChange(driverClass: string) {
+  if (database.value.sqlSettings) {
+    const jdbcDriver: JdbcDriverDto | undefined = jdbcDrivers.find((d) => d.driverClass === driverClass);
+    if (jdbcDriver) database.value.sqlSettings.url = jdbcDriver.jdbcUrlExample;
+  }
+
+}
 
 watch(() => props.modelValue, (value) => {
   showDialog.value = value;
@@ -245,7 +265,7 @@ watch(() => props.modelValue, (value) => {
     if (props.database.sqlSettings) {
       database.value.sqlSettings = { ...props.database.sqlSettings };
       if (!database.value.sqlSettings.driverClass) {
-        database.value.sqlSettings.driverClass = driverOptions[0].value;
+        database.value.sqlSettings.driverClass = driverOptions.value[0].value;
       }
       jdbcDatasourceSettings.value = database.value.sqlSettings.jdbcDatasourceSettings ?
         { ...database.value.sqlSettings.jdbcDatasourceSettings } :
@@ -273,18 +293,30 @@ watch(() => props.modelValue, (value) => {
 });
 
 function onHide() {
+  showDialog.value = false;
   emit('update:modelValue', false);
 }
 
-function onSubmit() {
+async function onSubmit() {
+  let valid = true;
   if (database.value.sqlSettings) {
     database.value.sqlSettings.jdbcDatasourceSettings = jdbcDatasourceSettings.value;
     database.value.sqlSettings.sqlSchema = SqlSettingsDto_SqlSchema.JDBC;
+    valid = await formRef.value.validate();
   }
-  systemStore.saveDatabase(database.value, editMode.value).then(() => {
-    emit('save', true);
-  }).catch((error) => {
-    notifyError(t('db.save_error', { error: error.response.data.message }));
-  });
+  if (valid) {
+
+    systemStore.saveDatabase(database.value, editMode.value).then(() => {
+      emit('save', true);
+      onHide();
+    }).catch((error) => {
+      notifyError(t('db.save_error', { error: error.response.data.message }));
+    });
+  }
 }
+
+onMounted(() => {
+  initializeJdbcDrivers();
+});
+
 </script>

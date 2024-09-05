@@ -37,6 +37,10 @@ export const useSystemStore = defineStore('system', () => {
     return api.get('/system/databases/identifiers').then((response) => response.data);
   }
 
+  async function getJdbcDrivers() {
+    return api.get('/system/databases/jdbc-drivers').then((response) => response.data);
+  }
+
   async function testDatabase(name: string) {
     return api.post(`/system/database/${name}/connections`);
   }
@@ -61,6 +65,7 @@ export const useSystemStore = defineStore('system', () => {
     getDatabases,
     getDatabasesWithSettings,
     getIdentifiersDatabase,
+    getJdbcDrivers,
     testDatabase,
     deleteDatabase,
     saveDatabase,

@@ -494,6 +494,7 @@ export default {
   locale: 'Locale',
   validation: {
     name_required: 'Le nom est requis',
+    password_required: 'Le mot de passe est requis',
     entity_type_required: 'Le type d\'entité est requis',
     range: 'La valeur doit être comprise entre {min} et {max} inclusivement',
     identifiers_required: 'Les identifiants sont requis',
