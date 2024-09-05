@@ -114,26 +114,7 @@
               <div class="text-hint q-mb-md">
                 {{ $t('incremental_import_hint') }}
               </div>
-              <q-select
-                v-model="idConfig.name"
-                dense
-                :options="mappingNames"
-                :label="$t('id_mappings.title')"
-                :hint="$t('importer.id_mappings.hint')"
-                class="q-mb-md q-pt-md"
-                emit-value
-                map-options
-              />
-              <div class="q-ml-none" v-show="!!idConfig.name">
-                <q-option-group dense :options="mappingOptions" type="radio" v-model="mappingOption" >
-                  <template v-slot:label="opt">
-                    <div class="row q-pt-md">
-                      <span>{{ $t(opt.label) }}</span>
-                      <span class="text-caption text-secondary">{{ $t(opt.hint)}}</span>
-                    </div>
-                  </template>
-                </q-option-group>
-              </div>
+              <identifiers-mapping-select v-model="idConfig" :for-import="true"/>
             </div>
           </q-step>
 
@@ -208,8 +189,8 @@ import ImportDatabaseForm from 'src/components/datasource/import/ImportDatabaseF
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
-import { IdentifiersMappingDto, IdentifiersMappingConfigDto } from 'src/models/Identifiers';
-import { ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
+import { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -221,7 +202,6 @@ const emit = defineEmits(['update:modelValue']);
 
 const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
-const identifiersStore = useIdentifiersStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
@@ -234,37 +214,6 @@ const incremental = ref(false);
 const limit = ref();
 const selectedTable = ref<string>();
 const variablesLoading = ref(false);
-const mappingNames = ref<{ label: string; value: string }[]>([]);
-const mappingOption = computed({
-  get: () =>
-    idConfig.value.allowIdentifierGeneration ? 'allow' : idConfig.value.ignoreUnknownIdentifier ? 'ignore' : 'default',
-  set: (value) => {
-    idConfig.value.allowIdentifierGeneration = value === 'allow';
-    idConfig.value.ignoreUnknownIdentifier = value === 'ignore';
-  },
-});
-const mappingOptions = ref<{ label: string; value: string; hint: string }[]>([
-  {
-    label: 'importer.id_mappings.mapping_default',
-    hint: 'importer.id_mappings.mapping_default_hint',
-    value: 'default',
-  },
-  {
-    label: 'importer.id_mappings.mapping_ignore',
-    hint: 'importer.id_mappings.mapping_ignore_hint',
-    value: 'ignore',
-  },
-  {
-    label: 'importer.id_mappings.mapping_allow',
-    hint: 'importer.id_mappings.mapping_allow_hint',
-    value: 'allow',
-  },
-]);
-const idConfig = ref({
-  name: '',
-  allowIdentifierGeneration: false,
-  ignoreUnknownIdentifier: false,
-} as IdentifiersMappingConfigDto);
 
 interface ImporterOption {
   label: string;
@@ -289,6 +238,7 @@ const serverImporters = ref([...builtinServerImporters]);
 const serverImporter = ref();
 const databaseImporter = ref();
 const databases = ref<DatabaseDto[]>([]);
+const idConfig = ref<IdentifiersMappingConfigDto | undefined>();
 
 const databaseImporters = computed(() => {
   return databases.value.map((db) => ({ label: db.name, value: db }));
@@ -361,23 +311,6 @@ function onShow() {
       });
   }
 
-  // init mappings
-  Promise.all([projectsStore.getIdMappings(projectsStore.project.name), identifiersStore.getAllMappings()])
-    .then(([projectMappings, allMappings]) => {
-      const projectMapping = projectMappings[0] || ({} as ProjectDto_IdentifiersMappingDto);
-      mappingNames.value = allMappings.map((mapping: IdentifiersMappingDto) => ({
-        label: mapping.name,
-        value: mapping.name,
-      }));
-      mappingNames.value.push({ label: t('none_value'), value: '' });
-
-      idConfig.value.name =
-        (allMappings.find((mapping: IdentifiersMappingDto) => mapping.name === projectMapping.mapping)||{}).name || '';
-    })
-    .catch((err) => {
-      notifyError(err);
-    });
-
   fileImporter.value = fileImporters.value[0];
   serverImporter.value = serverImporters.value[0];
   factory.value = undefined;
@@ -398,7 +331,7 @@ function onImportData() {
     tables: transientDatasourceStore.datasource.table.map((tbl) => `${dsName}.${tbl}`),
   } as ImportCommandOptionsDto;
 
-  if (!!idConfig.value.name) {
+  if (idConfig.value && !!idConfig.value.name) {
     options.idConfig = idConfig.value;
   }
 
