@@ -109,6 +109,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
         .filter(PluginPackage::hasOpalVersion)
+        .filter(pp -> !"opal-search".equals(pp.getType()))
         .filter(pp -> registeredPlugins.stream().anyMatch(rp -> pp.isNewerThan(rp.getName(), rp.getVersion())))
         .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion()) >= 0)
         .collect(Collectors.toList());
@@ -120,6 +121,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
         .filter(PluginPackage::hasOpalVersion)
+        .filter(pp -> !"opal-search".equals(pp.getType()))
         .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName())))
         .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion()) >= 0)
         .collect(Collectors.toList());

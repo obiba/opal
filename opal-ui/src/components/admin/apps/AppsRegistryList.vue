@@ -1,5 +1,5 @@
 <template>
-  <div class="text-h5">{{ $t('apps.registry_list') }}</div>
+  <div class="text-h6">{{ $t('apps.registry_list') }}</div>
   <q-table
     flat
     :rows="apps"

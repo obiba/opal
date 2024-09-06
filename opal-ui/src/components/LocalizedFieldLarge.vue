@@ -4,7 +4,7 @@
     <slot name="header"></slot>
     <span
       v-if="!$slots.header && !!title"
-      class="text-subtitle1"
+      class="text-body2"
       :class="{ 'text-primary': dirty, 'text-secondary': !dirty }"
       >{{ title }}</span
     >
