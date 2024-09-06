@@ -544,6 +544,9 @@ export default {
   main: {
     brand: 'Opal',
     powered_by: 'Powered by',
+    python_api: 'Learn how to use the Python API and command line tools.\n\n[Python user guide](https://opaldoc.obiba.org/en/latest/python-user-guide/index.html)',
+    r_api: 'Learn how to use the R API to manage data and perform DataSHIELD operations.\n\n[R/DataSHIELD user guide](https://opaldoc.obiba.org/en/latest/r-user-guide/index.html)',
+    javascript_api: 'Learn how to use the Javascript API to derive variables.\n\n[Javascript user guide](https://opaldoc.obiba.org/en/latest/magma-user-guide/index.html)',
   },
   plugin: {
     installed: 'Installed',

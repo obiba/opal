@@ -150,31 +150,33 @@
             <div v-if="datasourceStore.perms.tableValueSets?.canRead()" class="q-mb-md">
               <table-indexer />
             </div>
-            <div class="row">
-              <div class="col-md-auto col-sm-auto col-xs-12">
-                <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
-                  <q-card-section class="text-center">
-                    <div class="text-subtitle2">
-                      <q-icon name="view_column" class="on-left"/>{{ $t('variables') }}
-                    </div>
-                    <div class="text-h6">
-                      {{ datasourceStore.table.variableCount }}
-                    </div>
-                  </q-card-section>
-                </q-card>
-              </div>
-              <div class="col-md-auto col-sm-auto col-xs-12">
-                <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
-                  <q-card-section class="text-center">
-                    <div class="text-subtitle2">
-                      <q-icon name="table_rows" class="on-left"/>{{ $t('entities') }}
-                    </div>
-                    <div class="text-h6 text-center">
-                      {{ datasourceStore.table.valueSetCount }}
-                    </div>
-                  </q-card-section>
-                </q-card>
-              </div>
+            <div class="row q-gutter-md">
+              <q-card flat bordered class="on-left q-mb-md o-card-md">
+                <q-card-section class="text-subtitle2 text-center bg-grey-2">
+                  <div>
+                    <q-icon name="view_column" class="on-left"/>{{ $t('variables') }}
+                  </div>
+                </q-card-section>
+                <q-separator />
+                <q-card-section>
+                  <div class="text-h6 text-center">
+                    {{ datasourceStore.table.variableCount }}
+                  </div>
+                </q-card-section>
+              </q-card>
+              <q-card flat bordered class="on-left q-mb-md o-card-md">
+                <q-card-section class="text-subtitle2 text-center bg-grey-2">
+                  <div>
+                    <q-icon name="table_rows" class="on-left"/>{{ $t('entities') }}
+                  </div>
+                </q-card-section>
+                <q-separator />
+                <q-card-section>
+                  <div class="text-h6 text-center">
+                    {{ datasourceStore.table.valueSetCount }}
+                  </div>
+                </q-card-section>
+              </q-card>
             </div>
             <div v-if="datasourceStore.perms.tableValueSets?.canRead()">
               <div v-if="datasourceStore.table.valueSetCount === 0">

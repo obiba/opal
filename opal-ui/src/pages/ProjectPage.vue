@@ -20,56 +20,52 @@
         <span>{{ name }}</span>
         <q-badge v-for="tag in tags" :key="tag" class="on-right">{{ tag }}</q-badge>
       </div>
-      <div class="row">
-        <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
-            <q-card-section>
-              <div class="text-h4 text-center">
-                {{ projectsStore.summary.tableCount }}
-                <span v-if="projectsStore.summary.viewCount"
-                  >({{ projectsStore.summary.viewCount }})</span
-                >
-              </div>
-            </q-card-section>
-            <q-separator />
-            <q-card-section>
-              <div class="text-subtitle2">
-                {{ $t('tables_views') }}
-                <q-btn
-                  flat
-                  rounded
-                  icon="arrow_forward"
-                  size="sm"
-                  class="q-pa-sm bg-primary text-white q-ml-sm"
-                  :to="`/project/${name}/tables`"
-                ></q-btn>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-        <div class="col-md-auto col-sm-auto col-xs-12">
-          <q-card flat bordered class="on-left bg-grey-2 q-mb-md o-card">
-            <q-card-section>
-              <div class="text-h4 text-center">
-                {{ projectsStore.summary.resourceCount }}
-              </div>
-            </q-card-section>
-            <q-separator />
-            <q-card-section>
-              <div class="text-subtitle2">
-                {{ $t('resources') }}
-                <q-btn
-                  flat
-                  rounded
-                  icon="arrow_forward"
-                  size="sm"
-                  class="q-pa-sm bg-primary text-white q-ml-sm"
-                  :to="`/project/${name}/resources`"
-                ></q-btn>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
+      <div class="row q-gutter-md">
+        <q-card flat bordered class="on-left q-mb-md o-card-md">
+          <q-card-section class="text-h4 text-center bg-grey-2">
+            <div>
+              {{ projectsStore.summary.tableCount }}
+              <span v-if="projectsStore.summary.viewCount"
+                >({{ projectsStore.summary.viewCount }})</span
+              >
+            </div>
+          </q-card-section>
+          <q-separator />
+          <q-card-section>
+            <div class="text-subtitle2">
+              {{ $t('tables_views') }}
+              <q-btn
+                flat
+                rounded
+                icon="arrow_forward"
+                size="sm"
+                class="q-pa-sm bg-primary text-white q-ml-sm"
+                :to="`/project/${name}/tables`"
+              ></q-btn>
+            </div>
+          </q-card-section>
+        </q-card>
+        <q-card flat bordered class="on-left q-mb-md o-card-md">
+          <q-card-section class="text-h4 text-center bg-grey-2">
+            <div>
+              {{ projectsStore.summary.resourceCount }}
+            </div>
+          </q-card-section>
+          <q-separator />
+          <q-card-section>
+            <div class="text-subtitle2">
+              {{ $t('resources') }}
+              <q-btn
+                flat
+                rounded
+                icon="arrow_forward"
+                size="sm"
+                class="q-pa-sm bg-primary text-white q-ml-sm"
+                :to="`/project/${name}/resources`"
+              ></q-btn>
+            </div>
+          </q-card-section>
+        </q-card>
       </div>
     </q-page>
   </div>

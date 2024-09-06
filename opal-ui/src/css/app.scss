@@ -27,7 +27,10 @@ code {
   white-space: nowrap;
 }
 
-.q-card.o-card {
+.q-card.o-card-sm {
+  width: 200px;
+}
+.q-card.o-card-md {
   width: 250px;
 }
 
