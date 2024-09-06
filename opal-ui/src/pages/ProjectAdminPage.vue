@@ -266,7 +266,7 @@ const dsProperties: FieldItem<ProjectDto>[] = [
     label: 'type',
     html: (val) => {
       if (val.datasource && !!val.datasource.type) return t(`${val.datasource.type}`);
-      return t('project_admin.none');
+      return t('none_value');
     },
   },
 ];

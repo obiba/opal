@@ -196,6 +196,15 @@ export default {
     server: {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
     },
+    id_mappings: {
+      hint: 'When a mapping of identifiers is selected, each identifier in the imported data will be mapped to a system identifier. Otherwise the imported identifier will be added to the system identifiers.',
+      mapping_default: 'Default Each identifiers must be mapped prior importation',
+      mapping_default_hint: 'Importation will fail if one imported identifier is not mapped to a system identifier.',
+      mapping_ignore: 'Ignore unknown identifiers at import',
+      mapping_ignore_hint: 'Data which identifier cannot be mapped to a system identifier will not be imported.',
+      mapping_allow: 'Generate a system identifier for each unknown imported identifiers',
+      mapping_allow_hint: 'A system identifier will be generated for each unknown imported identifier.',
+    }
   },
   exporter: {
     file: {
@@ -412,7 +421,6 @@ export default {
     remove_confirm: "Please confirm that you want to remove permanently the current project and all associated data. This operation can't be undone.",
     remove: 'Remove Project',
     edit: 'Edit Project',
-    none: '(None)',
     no_database_warning: 'No database is defined, so data cannot be imported. Only views and resources can be added.',
     entity_type_hint: 'What the identifiers are about.',
     id_mappings_info: 'Identifiers mappings listed below that match the entity type of the data are automatically selected during an import/export process.',
@@ -1019,6 +1027,8 @@ export default {
   no_table_values: 'No table values',
   no: 'No',
   non_missings: 'Non missings',
+  none: 'None',
+  none_value: '(None)',
   normal_distribution: 'Normal distribution',
   normal: 'Normal',
   not_empty: 'Not empty',

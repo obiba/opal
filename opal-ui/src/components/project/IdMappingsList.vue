@@ -2,7 +2,6 @@
   <slot name="title"></slot>
 
   <!-- TODO: instead of disabling Add button, put a message and a link to admin/id mappings page if has permission -->
-
   <q-table
     flat
     :rows="idMappings"
@@ -86,7 +85,7 @@ const columns = computed(() => [
   {
     name: 'type',
     required: true,
-    label: t('project_admin.entity_type'),
+    label: t('entity_type'),
     align: 'left',
     field: 'entityType',
     headerStyle: 'width: 30%; white-space: normal;',

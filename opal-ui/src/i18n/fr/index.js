@@ -196,6 +196,15 @@ export default {
     server: {
       opal: 'Ce format importe des dictionnaires de variables et des données depuis un Opal distant.',
     },
+    id_mappings: {
+      hint: 'Lorsqu\'un mappage d\'identifiants est sélectionné, chaque identifiant dans les données importées sera mappé à un identifiant système. Sinon, l\'identifiant importé sera ajouté aux identifiants système.',
+      mapping_default: 'Par défaut, chaque identifiant doit être mappé avant l\'importation',
+      mapping_default_hint: 'L\'importation échouera si un identifiant importé n\'est pas mappé à un identifiant système.',
+      mapping_ignore: 'Ignorer les identifiants inconnus lors de l\'importation',
+      mapping_ignore_hint: 'Les données dont l\'identifiant ne peut pas être mappé à un identifiant système ne seront pas importées.',
+      mapping_allow: 'Générer un identifiant système pour chaque identifiant importé inconnu',
+      mapping_allow_hint: 'Un identifiant système sera généré pour chaque identifiant importé inconnu.',
+    }
   },
   exporter: {
     file: {
@@ -412,7 +421,6 @@ export default {
     remove_confirm: 'Veuillez confirmer que vous souhaitez supprimer définitivement le projet actuel et toutes les données qui y sont associées. Cette opération ne peut être annulée.',
     remove: 'Supprimer le projet',
     edit: 'Modifier le projet',
-    none: '(Aucune)',
     no_database_warning: 'Aucune base de données n\'est définie, il n\'est donc pas possible d\'importer des données. Seules les vues et les ressources peuvent être ajoutées.',
     entity_type_hint: 'What the identifiers are about.',
     id_mappings_info: 'Les mappages d\'identifiants énumérés ci-dessous qui correspondent au type d\'entité des données sont automatiquement sélectionnés au cours d\'un processus d\'importation/exportation.',
@@ -1019,6 +1027,8 @@ export default {
   no_table_values: 'Aucune valeur dans la table',
   no: 'Non',
   non_missings: 'Non manquantes',
+  none: 'Aucun',
+  none_value: '(Aucun)',
   normal_distribution: 'Distribution normale',
   normal: 'Normal',
   not_empty: 'Non vide',

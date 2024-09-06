@@ -73,6 +73,7 @@
               emit-value
               map-options />
           </div>
+          <identifiers-mapping-select v-model="idConfig" :for-import="false"/>
         </q-card-section>
 
         <q-separator />
@@ -109,8 +110,10 @@ import ExportCsvForm from 'src/components/datasource/export/ExportCsvForm.vue';
 import ExportFsForm from 'src/components/datasource/export/ExportFsForm.vue';
 import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vue';
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
+import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -125,8 +128,8 @@ const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
 const projectsStore = useProjectsStore();
 const filesStore = useFilesStore();
-
 const { t } = useI18n();
+const idConfig = ref<IdentifiersMappingConfigDto | undefined>();
 
 interface ExporterOption {
   label: string;
@@ -212,6 +215,11 @@ function onExportData() {
   if (!options) {
     return;
   }
+
+  if (idConfig.value && !!idConfig.value.name) {
+    options.idConfig = idConfig.value;
+  }
+
   projectsStore.exportCommand(projectsStore.project.name, options).then((response) => {
     notifySuccess(t('export_tables_task_created', { id: response.data.id }));
   }).catch((err) => {
