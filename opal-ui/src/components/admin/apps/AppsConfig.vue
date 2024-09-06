@@ -1,41 +1,32 @@
 <template>
-  <q-card flat>
-    <div class="text-h5">{{ $t('apps.self_register') }}</div>
-      <html-anchor-hint
-        class="text-help"
-        trKey="apps.self_register_info"
-        :text="$t('apps.apps_admin')"
-        url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-      />
+  <div class="text-h6">{{ $t('apps.self_register') }}</div>
+  <html-anchor-hint
+    class="text-help"
+    trKey="apps.self_register_info"
+    :text="$t('apps.apps_admin')"
+    url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+  />
 
-    <q-card-section class="q-px-none q-gutter-sm row items-center">
-      <q-btn size="sm" icon="edit" color="primary" :title="$t('edit')" @click="onEditToken"></q-btn>
-      <q-btn size="sm" icon="delete" color="negative" outline :title="$t('delete')" @click="onClearToken"></q-btn>
+  <div class="q-mt-sm q-gutter-sm row items-center">
+    <q-btn size="sm" icon="edit" color="primary" :title="$t('edit')" @click="onEditToken"></q-btn>
+    <q-btn size="sm" icon="delete" color="negative" outline :title="$t('delete')" @click="onClearToken"></q-btn>
 
-      <span v-if="config.token">
-        <code >{{ config.token }}</code>
-        <q-btn flat icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" />
-      </span>
+    <span v-if="config.token" class="on-right">
+      <code >{{ config.token }}</code>
+      <q-btn flat dense size="sm" icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" class="on-right" />
+    </span>
+  </div>
 
-    </q-card-section>
-  </q-card>
+  <div class="text-h6 q-mt-md">{{ $t('discovery') }}</div>
+  <html-anchor-hint
+    class="text-help"
+    trKey="apps.discovery_info"
+    :text="$t('apps.apps_admin')"
+    url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+  />
 
-  <q-card flat>
-    <div class="text-h5">{{ $t('discovery') }}</div>
-
-    <q-card-section class="q-px-none">
-      <html-anchor-hint
-        class="text-help"
-        trKey="apps.discovery_info"
-        :text="$t('apps.apps_admin')"
-        url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-      />
-    </q-card-section>
-    <q-card-section class="q-px-none">
-      <div class="text-h6">Rock</div>
-      <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
-    </q-card-section>
-  </q-card>
+  <div class="text-h6 q-mt-md">Rock</div>
+  <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
   <q-table
     flat
     :rows="rockConfigs"

@@ -7,6 +7,9 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('user_profile.title') }}
+      </div>
       <profile-user></profile-user>
     </q-page>
   </div>

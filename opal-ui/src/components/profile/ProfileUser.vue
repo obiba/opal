@@ -1,8 +1,5 @@
 <template>
   <div v-show="!loading">
-    <div class="text-h5 q-mb-md">
-      {{ $t('user_profile.title') }}
-    </div>
     <div>
       <!-- Account -->
       <div class="text-h6">{{ $t('account') }}</div>

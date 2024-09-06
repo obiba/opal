@@ -8,8 +8,10 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('apps.title') }}
+      </div>
       <div class="text-help">{{ $t('apps.info') }}</div>
-
       <q-card flat>
         <q-card-section class="q-px-none">
           <apps-registry-list />

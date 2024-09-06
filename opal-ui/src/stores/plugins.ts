@@ -1,14 +1,17 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { PluginPackage } from 'src/components/models';
+import { PluginPackagesDto } from 'src/models/Plugins';
 
 export const usePluginsStore = defineStore('plugins', () => {
 
+  const plugins = ref({} as PluginPackagesDto);
   const datasourceImportPlugins = ref([] as PluginPackage[]);
   const datasourceExportPlugins = ref([] as PluginPackage[]);
   const vcfStorePlugins = ref([] as PluginPackage[]);
 
   function reset() {
+    plugins.value = {} as PluginPackagesDto;
     datasourceImportPlugins.value = [];
     datasourceExportPlugins.value = [];
   }
@@ -43,12 +46,17 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   async function initVcfStorePlugins() {
     vcfStorePlugins.value = [];
-    return loadPlugin('vcf-store').then((plugins) => {
+    return getPlugins('vcf-store').then((plugins) => {
       vcfStorePlugins.value = plugins.packages ?? [];
     });
   }
 
-  async function loadPlugin(type: string) {
+  async function loadPlugins() {
+    return api.get('plugins')
+      .then((response) => plugins.value = response.data);
+  }
+
+  async function getPlugins(type: string) {
     return api.get('plugins', {params: {type}}).then((response) => response.data);
   }
 
@@ -58,15 +66,70 @@ export const usePluginsStore = defineStore('plugins', () => {
     });
   }
 
+  async function getPlugin(name: string) {
+    return api.get(`plugin/${name}`).then((response) => response.data);
+  }
+
+  async function configurePlugin(name: string, config: string | undefined) {
+    if (!config) return Promise.resolve();
+    return api.put(`plugin/${name}/cfg`, config, { headers: { 'Content-Type': 'text/plain' } });
+  }
+
+  async function restartPlugin(name: string) {
+    return api.delete(`plugin/${name}/service`)
+      .then(() => api.put(`plugin/${name}/service`));
+  }
+
+  async function installPlugin(name: string, version: string) {
+    return api.post('plugins', {}, { params: {name, version} })
+      .then(() => loadPlugins());
+  }
+
+  async function installPluginFile(file: string) {
+    return api.post('plugins', {}, { params: {file} })
+      .then(() => loadPlugins());
+  }
+
+  async function uninstallPlugin(name: string) {
+    return api.delete(`plugin/${name}`)
+      .then(() => loadPlugins());
+  }
+
+  async function cancelUninstallPlugin(name: string) {
+    return api.put(`plugin/${name}`)
+      .then(() => loadPlugins());
+  }
+
+  async function getPluginsUpdates() {
+    return api.get('plugins/_updates')
+      .then((response) => response.data);
+  }
+
+  async function getPluginsAvailable() {
+    return api.get('plugins/_available')
+      .then((response) => response.data);
+  }
+
   return {
+    plugins,
     datasourceImportPlugins,
     datasourceExportPlugins,
     vcfStorePlugins,
     reset,
+    loadPlugins,
     initDatasourcePlugins,
     getDatasourcePluginForm,
     initVcfStorePlugins,
-    hasPlugin
+    hasPlugin,
+    getPlugin,
+    configurePlugin,
+    uninstallPlugin,
+    cancelUninstallPlugin,
+    restartPlugin,
+    getPluginsUpdates,
+    getPluginsAvailable,
+    installPlugin,
+    installPluginFile,
   };
 
 });
