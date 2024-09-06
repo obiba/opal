@@ -57,7 +57,7 @@
     <guava.version>33.2.1-jre</guava.version>
     <hsqldb.version>2.7.1</hsqldb.version>
     <httpclient.version>5.2.1</httpclient.version>
-    <jackson.version>2.16.1</jackson.version>
+    <jackson.version>2.17.2</jackson.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
@@ -1270,6 +1270,14 @@
         <artifactId>orientdb-core</artifactId>
         <version>${orientdb.version}</version>
         <exclusions>
+          <exclusion>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>javax.activation</groupId>
             <artifactId>javax.activation-api</artifactId>
