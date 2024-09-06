@@ -1127,7 +1127,7 @@ export default {
   save: 'Sauvegarder',
   schedule: 'Planification',
   script: 'Script',
-  search_caption: 'Configurer les paramètres de recherche',
+  search_caption: 'Gérer les index de recherche',
   search: 'Recherche',
   select_columns: 'Sélectionner des colonnes',
   select_dictionary_file_template: 'Utilisez le modèle Excel suivant pour ajouter de nouvelles variables ou mettre à jour des variables existantes:',

@@ -1127,7 +1127,7 @@ export default {
   save: 'Save',
   schedule: 'Schedule',
   script: 'Script',
-  search_caption: 'Configure search engine, schedule table indexing',
+  search_caption: 'Manage search indexes',
   search: 'Search',
   select_columns: 'Select columns',
   select_dictionary_file_template: 'Use the following Excel template to add new variables or update existing ones:',
