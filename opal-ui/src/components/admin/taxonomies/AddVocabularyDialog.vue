@@ -85,7 +85,7 @@ const emptyVocabulary = {
 
 const newVocabulary = ref<VocabularyDto>({ ...emptyVocabulary });
 const editMode = computed(() => !!props.vocabulary);
-const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
+const submitCaption = computed(() => (editMode.value ? t('update_action') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.vocabulary.edit') : t('taxonomy.vocabulary.add')));
 
 // Validation rules
