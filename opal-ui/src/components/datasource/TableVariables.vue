@@ -84,6 +84,16 @@
                 </q-item>
               </q-list>
             </q-btn-dropdown>
+            <q-btn
+              v-if="selected.length > 0"
+              :label="$t('add_to_cart')"
+              icon="add_shopping_cart"
+              no-caps
+              dense
+              flat
+              size="sm"
+              @click="onAddToCart"
+            />
           </div>
         </div>
       </template>
@@ -172,6 +182,7 @@ const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
 const searchStore = useSearchStore();
+const cartStore = useCartStore();
 const { locale } = useI18n({ useScope: 'global' });
 
 const filter = ref('');
@@ -325,5 +336,9 @@ function onSearch() {
   searchStore.variablesQuery.criteria['project'] = [dsName.value];
   searchStore.variablesQuery.criteria['table'] = [tName.value];
   router.push('/search/variables');
+}
+
+function onAddToCart() {
+  cartStore.addVariables(selected.value);
 }
 </script>

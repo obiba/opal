@@ -69,6 +69,28 @@
           @click="onAddToView"
           class="on-right"
         />
+        <q-btn
+          v-if="!cartStore.isInCart(datasourceStore.variable)"
+          :label="$t('add_to_cart')"
+          icon="add_shopping_cart"
+          no-caps
+          dense
+          flat
+          size="sm"
+          @click="onAddToCart"
+          class="on-right"
+        />
+        <q-btn
+          v-if="cartStore.isInCart(datasourceStore.variable)"
+          :label="$t('remove_from_cart')"
+          icon="remove_shopping_cart"
+          no-caps
+          dense
+          flat
+          size="sm"
+          @click="onRemoveFromCart"
+          class="on-right"
+        />
       </div>
 
       <div v-if="loading">
@@ -175,6 +197,7 @@ const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
 const taxonomiesStore = useTaxonomiesStore();
+const cartStore = useCartStore();
 
 const showEdit = ref(false);
 const showAddToView = ref(false);
@@ -283,6 +306,14 @@ function onShowDelete() {
 
 function onAddToView() {
   showAddToView.value = true;
+}
+
+function onAddToCart() {
+  cartStore.addVariables([datasourceStore.variable]);
+}
+
+function onRemoveFromCart() {
+  cartStore.removeVariables([datasourceStore.variable]);
 }
 
 function onDeleteVariable() {

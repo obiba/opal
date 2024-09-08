@@ -64,6 +64,7 @@ declare global {
   const useAttrs: typeof import('vue')['useAttrs']
   const useAuthStore: typeof import('./stores/auth')['useAuthStore']
   const useAuthzStore: typeof import('./stores/authz')['useAuthzStore']
+  const useCartStore: typeof import('./stores/cart')['useCartStore']
   const useCommandsStore: typeof import('./stores/commands')['useCommandsStore']
   const useCounterStore: typeof import('./stores/auth')['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
@@ -103,6 +104,9 @@ declare global {
   // @ts-ignore
   export type { Component, ComponentPublicInstance, ComputedRef, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { TOKEN_TYPES } from './stores/tokens'
+  import('./stores/tokens')
 }
 // for vue template auto import
 import { UnwrapRef } from 'vue'
@@ -168,101 +172,7 @@ declare module 'vue' {
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
     readonly useAuthStore: UnwrapRef<typeof import('./stores/auth')['useAuthStore']>
     readonly useAuthzStore: UnwrapRef<typeof import('./stores/authz')['useAuthzStore']>
-    readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
-    readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
-    readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
-    readonly useDatashieldStore: UnwrapRef<typeof import('./stores/datashield')['useDatashieldStore']>
-    readonly useDatasourceStore: UnwrapRef<typeof import('./stores/datasource')['useDatasourceStore']>
-    readonly useFilesStore: UnwrapRef<typeof import('./stores/files')['useFilesStore']>
-    readonly useGroupsStore: UnwrapRef<typeof import('./stores/groups')['useGroupsStore']>
-    readonly useI18n: UnwrapRef<typeof import('vue-i18n')['useI18n']>
-    readonly useIdentifiersStore: UnwrapRef<typeof import('./stores/identifiers')['useIdentifiersStore']>
-    readonly useIdentityProvidersStore: UnwrapRef<typeof import('./stores/identity-providers')['useIdentityProvidersStore']>
-    readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
-    readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
-    readonly useProfileAclsStore: UnwrapRef<typeof import('./stores/profile-acls')['useProfileAclsStore']>
-    readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>
-    readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
-    readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
-    readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
-    readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
-    readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
-    readonly useSearchStore: UnwrapRef<typeof import('./stores/search')['useSearchStore']>
-    readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
-    readonly useSqlStore: UnwrapRef<typeof import('./stores/sql')['useSqlStore']>
-    readonly useSystemStore: UnwrapRef<typeof import('./stores/system')['useSystemStore']>
-    readonly useTaxonomiesStore: UnwrapRef<typeof import('./stores/taxonomies')['useTaxonomiesStore']>
-    readonly useTokensStore: UnwrapRef<typeof import('./stores/tokens')['useTokensStore']>
-    readonly useTransientDatasourceStore: UnwrapRef<typeof import('./stores/transient-datasource')['useTransientDatasourceStore']>
-    readonly useUsersStore: UnwrapRef<typeof import('./stores/users')['useUsersStore']>
-    readonly watch: UnwrapRef<typeof import('vue')['watch']>
-    readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
-    readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>
-    readonly watchSyncEffect: UnwrapRef<typeof import('vue')['watchSyncEffect']>
-  }
-}
-declare module '@vue/runtime-core' {
-  interface GlobalComponents {}
-  interface ComponentCustomProperties {
-    readonly $$: UnwrapRef<typeof import('vue/macros')['$$']>
-    readonly $: UnwrapRef<typeof import('vue/macros')['$']>
-    readonly $computed: UnwrapRef<typeof import('vue/macros')['$computed']>
-    readonly $customRef: UnwrapRef<typeof import('vue/macros')['$customRef']>
-    readonly $ref: UnwrapRef<typeof import('vue/macros')['$ref']>
-    readonly $shallowRef: UnwrapRef<typeof import('vue/macros')['$shallowRef']>
-    readonly $toRef: UnwrapRef<typeof import('vue/macros')['$toRef']>
-    readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
-    readonly TOKEN_TYPES: UnwrapRef<typeof import('./stores/tokens')['TOKEN_TYPES']>
-    readonly computed: UnwrapRef<typeof import('vue')['computed']>
-    readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
-    readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
-    readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
-    readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
-    readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
-    readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
-    readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
-    readonly h: UnwrapRef<typeof import('vue')['h']>
-    readonly inject: UnwrapRef<typeof import('vue')['inject']>
-    readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
-    readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
-    readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
-    readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
-    readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
-    readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
-    readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
-    readonly onBeforeMount: UnwrapRef<typeof import('vue')['onBeforeMount']>
-    readonly onBeforeRouteLeave: UnwrapRef<typeof import('vue-router')['onBeforeRouteLeave']>
-    readonly onBeforeRouteUpdate: UnwrapRef<typeof import('vue-router')['onBeforeRouteUpdate']>
-    readonly onBeforeUnmount: UnwrapRef<typeof import('vue')['onBeforeUnmount']>
-    readonly onBeforeUpdate: UnwrapRef<typeof import('vue')['onBeforeUpdate']>
-    readonly onDeactivated: UnwrapRef<typeof import('vue')['onDeactivated']>
-    readonly onErrorCaptured: UnwrapRef<typeof import('vue')['onErrorCaptured']>
-    readonly onMounted: UnwrapRef<typeof import('vue')['onMounted']>
-    readonly onRenderTracked: UnwrapRef<typeof import('vue')['onRenderTracked']>
-    readonly onRenderTriggered: UnwrapRef<typeof import('vue')['onRenderTriggered']>
-    readonly onScopeDispose: UnwrapRef<typeof import('vue')['onScopeDispose']>
-    readonly onServerPrefetch: UnwrapRef<typeof import('vue')['onServerPrefetch']>
-    readonly onUnmounted: UnwrapRef<typeof import('vue')['onUnmounted']>
-    readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
-    readonly provide: UnwrapRef<typeof import('vue')['provide']>
-    readonly reactive: UnwrapRef<typeof import('vue')['reactive']>
-    readonly readonly: UnwrapRef<typeof import('vue')['readonly']>
-    readonly ref: UnwrapRef<typeof import('vue')['ref']>
-    readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
-    readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
-    readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
-    readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
-    readonly stores: UnwrapRef<typeof import('./stores/index')['default']>
-    readonly toRaw: UnwrapRef<typeof import('vue')['toRaw']>
-    readonly toRef: UnwrapRef<typeof import('vue')['toRef']>
-    readonly toRefs: UnwrapRef<typeof import('vue')['toRefs']>
-    readonly toValue: UnwrapRef<typeof import('vue')['toValue']>
-    readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
-    readonly unref: UnwrapRef<typeof import('vue')['unref']>
-    readonly useAppsStore: UnwrapRef<typeof import('./stores/apps')['useAppsStore']>
-    readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
-    readonly useAuthStore: UnwrapRef<typeof import('./stores/auth')['useAuthStore']>
-    readonly useAuthzStore: UnwrapRef<typeof import('./stores/authz')['useAuthzStore']>
+    readonly useCartStore: UnwrapRef<typeof import('./stores/cart')['useCartStore']>
     readonly useCommandsStore: UnwrapRef<typeof import('./stores/commands')['useCommandsStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>

@@ -151,7 +151,7 @@ import { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
-  table: TableDto;
+  table?: TableDto;
   variables: VariableDto[];
   annotation?: Annotation;
   operation?: string;
@@ -311,7 +311,8 @@ async function onSubmit() {
   } else {
     await datasourceStore.annotate(props.variables, taxonomyName.value, vocabularyName.value, termsOptions.value.length ? termName.value : texts.value);
   }
-  datasourceStore.loadTableVariables();
+  if (props.table)
+    datasourceStore.loadTableVariables();
 }
 
 function onMarkdownGuide() {

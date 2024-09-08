@@ -21,6 +21,9 @@
         </q-btn>
         <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
+          <q-btn icon="shopping_cart" size="sm" to="/cart" class="q-mr-sm">
+            <q-badge v-if="cartStore.variables?.length" color="orange" floating>{{ cartStore.variables.length }}</q-badge>
+          </q-btn>
           <q-input
             v-model="query"
             dense
@@ -156,6 +159,7 @@ const systemStore = useSystemStore();
 const resourcesStore = useResourcesStore();
 const authStore = useAuthStore();
 const searchStore = useSearchStore();
+const cartStore = useCartStore();
 
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
