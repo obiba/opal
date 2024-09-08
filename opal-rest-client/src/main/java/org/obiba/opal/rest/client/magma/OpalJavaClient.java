@@ -9,74 +9,55 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import com.google.protobuf.ExtensionRegistry;
+import com.google.protobuf.Message;
+import jakarta.annotation.Nullable;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.util.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.annotation.Nullable;
-
-import org.apache.http.Header;
-import org.apache.http.HttpMessage;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
-import org.apache.http.auth.params.AuthParams;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeSocketFactory;
-import org.apache.http.conn.ssl.PrivateKeyDetails;
-import org.apache.http.conn.ssl.PrivateKeyStrategy;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.cache.CacheConfig;
-import org.apache.http.impl.client.cache.CachingHttpClient;
-import org.apache.http.impl.client.cache.FileResourceFactory;
-import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
-import com.google.protobuf.ExtensionRegistry;
-import com.google.protobuf.Message;
 
 /**
  * A Java client for Opal RESTful services.
@@ -93,11 +74,6 @@ public class OpalJavaClient {
 
   public static final int DEFAULT_MAX_ATTEMPT = 5;
 
-  // 5MB
-  private static final int MAX_OBJECT_SIZE_BYTES = 1024 * 1024 * 5;
-
-  private static final int HTTPS_PORT = 443;
-
   private final URI opalURI;
 
   private KeyStore keyStore;
@@ -110,15 +86,9 @@ public class OpalJavaClient {
 
   private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
-  private HttpClient client;
-
-  private BasicHttpContext ctx;
-
-  private ManagedHttpCacheStorage cacheStorage;
+  private CloseableHttpClient client;
 
   private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
-
-  private File cacheFolder;
 
   /**
    * Authenticate by username/password.
@@ -160,14 +130,11 @@ public class OpalJavaClient {
     if(password == null) throw new IllegalArgumentException("password cannot be null");
 
     this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
-    this.credentials = new UsernamePasswordCredentials(username, password);
+    this.credentials = new UsernamePasswordCredentials(username, password.toCharArray());
     this.token = null;
     this.keyStore = keyStore;
   }
 
-  /**
-   * @see CoreConnectionPNames#SO_TIMEOUT
-   */
   public void setSoTimeout(Integer soTimeout) {
     this.soTimeout = soTimeout == null ? DEFAULT_SO_TIMEOUT : soTimeout;
   }
@@ -176,7 +143,7 @@ public class OpalJavaClient {
     this.connectionTimeout = connectionTimeout;
   }
 
-  private HttpClient getClient() {
+  private CloseableHttpClient getClient() {
     if(client == null) {
       createClient();
     }
@@ -185,68 +152,18 @@ public class OpalJavaClient {
 
   private void createClient() {
     log.info("Connecting to Opal: {}", opalURI);
-    DefaultHttpClient httpClient = new DefaultHttpClient();
-    if(keyStore == null && credentials != null)
-      httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
-
-    httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
-    httpClient.getParams()
-        .setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuthScheme.SCHEME_NAME));
-    httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME,
-        OpalClientConnectionManagerFactory.class.getName());
-    httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
-    httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
-    httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(DEFAULT_MAX_ATTEMPT, false));
-    httpClient.getAuthSchemes().register(OpalAuthScheme.SCHEME_NAME, new OpalAuthScheme.Factory());
-
-    try {
-      httpClient.getConnectionManager().getSchemeRegistry()
-          .register(new Scheme("https", HTTPS_PORT, getSocketFactory()));
-    } catch(NoSuchAlgorithmException | KeyManagementException e) {
-      throw new RuntimeException(e);
-    }
-    client = enableCaching(httpClient);
-
-    ctx = new BasicHttpContext();
-    ctx.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
-  }
-
-  private SchemeSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
-    SSLContextBuilder builder = SSLContexts.custom().useTLS();
-    try {
-      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-    } catch(KeyStoreException e) {
-      log.error("Unable to set SSL trust manager: {}", e.getMessage(), e);
-    }
-
-    if(keyStore != null) {
-      try {
-        builder.loadKeyMaterial(keyStore, credentials.getPassword().toCharArray(), new PrivateKeyStrategy() {
-          @Override
-          public String chooseAlias(Map<String, PrivateKeyDetails> aliases, Socket socket) {
-            return credentials.getUserPrincipal().getName();
-          }
-        });
-      } catch(KeyStoreException | UnrecoverableKeyException e) {
-        log.error("Unable to set SSL key manager: {}", e.getMessage(), e);
-      }
-    }
-
-    return new SSLSocketFactory(builder.build(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    client = createHttpClient();
   }
 
   public void close() {
     if(client != null) {
       log.info("Disconnecting from Opal: {}", opalURI);
-      getClient().getConnectionManager().shutdown();
-    }
-    if(cacheStorage != null) {
-      cacheStorage.close();
-      cacheStorage.shutdown();
-    }
-    if (cacheFolder != null && cacheFolder.exists()) {
-      delete(cacheFolder);
-      cacheFolder = null;
+      try {
+        getClient().close();
+      } catch (IOException e) {
+        // ignore
+      }
+      ;
     }
   }
 
@@ -274,11 +191,10 @@ public class OpalJavaClient {
     InputStream is = null;
     Message.Builder messageBuilder = builder;
 
-    try {
-      HttpResponse response = get(uri);
-      if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+    try (CloseableHttpResponse response = get(uri)) {
+      if(response.getCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
-        throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+        throw new RuntimeException(response.getReasonPhrase());
       }
       is = response.getEntity().getContent();
 
@@ -296,8 +212,8 @@ public class OpalJavaClient {
   }
 
   public <T extends Message> T getResource(Class<T> messageType, URI uri, Message.Builder builder) {
-    try {
-      return readResource(messageType, uri, get(uri), builder);
+    try (CloseableHttpResponse response = get(uri)) {
+      return readResource(messageType, uri, response, builder);
     } catch(IOException e) {
       //noinspection CallToPrintStackTrace
       e.printStackTrace();
@@ -306,8 +222,8 @@ public class OpalJavaClient {
   }
 
   public <T extends Message> T postResource(Class<T> messageType, URI uri, Message.Builder builder, Message message) {
-    try {
-      return readResource(messageType, uri, post(uri, message), builder);
+    try (CloseableHttpResponse response = post(uri, message)) {
+      return readResource(messageType, uri, response, builder);
     } catch(IOException e) {
       //noinspection CallToPrintStackTrace
       e.printStackTrace();
@@ -315,12 +231,12 @@ public class OpalJavaClient {
     }
   }
 
-  public <T extends Message> T readResource(Class<T> messageType, URI uri, HttpResponse response, Message.Builder builder) {
+  public <T extends Message> T readResource(Class<T> messageType, URI uri, CloseableHttpResponse response, Message.Builder builder) {
     InputStream is = null;
     try {
-      if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+      if(response.getCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
-        throw new RestRuntimeException(uri, response.getStatusLine());
+        throw new RestRuntimeException(uri, new StatusLine(response));
       }
       is = response.getEntity().getContent();
       ExtensionRegistry extensionRegistry = extensionRegistryFactory.forMessage((Class<Message>) messageType);
@@ -334,70 +250,135 @@ public class OpalJavaClient {
     }
   }
 
-  public HttpResponse put(URI uri, Message msg) throws IOException {
+  public CloseableHttpResponse put(URI uri, Message msg) throws IOException {
     HttpPut put = new HttpPut(uri);
-    put.setEntity(new ByteArrayEntity(asByteArray(msg)));
+    put.setEntity(new ByteArrayEntity(asByteArray(msg), ContentType.create("application/x-protobuf")));
     return execute(put);
   }
 
-  public HttpResponse post(URI uri, Message msg) throws IOException {
+  public CloseableHttpResponse post(URI uri, Message msg) throws IOException {
     HttpPost post = new HttpPost(uri);
-    ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg));
-    e.setContentType("application/x-protobuf");
+    ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg), ContentType.create("application/x-protobuf"));
     post.setEntity(e);
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, Iterable<? extends Message> msg) throws IOException {
+  public CloseableHttpResponse post(URI uri, Iterable<? extends Message> msg) throws IOException {
     HttpPost post = new HttpPost(uri);
-    ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg));
-    e.setContentType("application/x-protobuf");
+    ByteArrayEntity e = new ByteArrayEntity(asByteArray(msg), ContentType.create("application/x-protobuf"));
     post.setEntity(e);
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, String entity) throws IOException {
+  public CloseableHttpResponse post(URI uri, String entity) throws IOException {
     HttpPost post = new HttpPost(uri);
     post.setEntity(new StringEntity(entity));
     return execute(post);
   }
 
-  public HttpResponse post(URI uri, File file) throws IOException {
+  public CloseableHttpResponse post(URI uri, File file) throws IOException {
     HttpPost post = new HttpPost(uri);
-    MultipartEntity me = new MultipartEntity();
-    me.addPart("fileToUpload", new FileBody(file));
+    HttpEntity me = MultipartEntityBuilder.create().addBinaryBody("fileToUpload", file).build();
     post.setEntity(me);
     return execute(post);
   }
 
-  public HttpResponse get(URI uri) throws IOException {
+  public CloseableHttpResponse get(URI uri) throws IOException {
     return execute(new HttpGet(uri));
   }
 
-  public HttpResponse delete(URI uri) throws IOException {
+  public CloseableHttpResponse delete(URI uri) throws IOException {
     return execute(new HttpDelete(uri));
   }
 
-  private HttpResponse execute(HttpUriRequest msg) throws IOException {
+  private CloseableHttpClient createHttpClient() {
+    HttpClientBuilder builder = HttpClients.custom();
+
+    // Set the connection manager
+    try {
+      SSLConnectionSocketFactory sslsf = getSocketFactory();
+      Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+          .register("https", sslsf)
+          .register("http", new PlainConnectionSocketFactory())
+          .build();
+      PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+      connectionManager.setMaxTotal(50);  // Maximum total connections
+      connectionManager.setDefaultMaxPerRoute(10);  // Maximum connections per route (endpoint)
+      connectionManager.setValidateAfterInactivity(Timeout.ofSeconds(30)); // Time after which idle connections will be validated
+      builder.setConnectionManager(connectionManager);
+    } catch(NoSuchAlgorithmException | KeyManagementException e) {
+      throw new RuntimeException(e);
+    }
+
+    // Set the cookie store
+    CookieStore cookieStore = new BasicCookieStore();
+    builder.setDefaultCookieStore(cookieStore);
+
+    // Set some timeouts
+    RequestConfig requestConfig = RequestConfig.custom()
+        .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeout)) // Set connection timeout
+        .setResponseTimeout(Timeout.ofMilliseconds(soTimeout)) // Set response (socket) timeout
+        .build();
+    builder.setDefaultRequestConfig(requestConfig);
+
+    // Set the retry strategy
+    DefaultHttpRequestRetryStrategy retryStrategy = new DefaultHttpRequestRetryStrategy(DEFAULT_MAX_ATTEMPT, Timeout.ofSeconds(1));
+    builder.setRetryStrategy(retryStrategy);
+
+    return builder.build();
+  }
+
+  /**
+   * Do not check anything from the remote host (Opal server is trusted).
+   * @return
+   * @throws NoSuchAlgorithmException
+   * @throws KeyManagementException
+   */
+  private SSLConnectionSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
+    // Accepts any SSL certificate
+    TrustManager tm = new X509TrustManager() {
+
+      @Override
+      public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+
+      }
+
+      @Override
+      public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+
+      }
+
+      @Override
+      public X509Certificate[] getAcceptedIssuers() {
+        return null;
+      }
+    };
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(null, new TrustManager[] { tm }, null);
+
+    return new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+  }
+
+  private CloseableHttpResponse execute(HttpUriRequest msg) throws IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
-    log.debug("{} {}", msg.getMethod(), msg.getURI());
+    try {
+      log.debug("{} {}", msg.getMethod(), msg.getUri());
+    } catch (URISyntaxException e) {
+      // ignore
+    }
     if(log.isTraceEnabled()) {
-      for(Header allHeader : msg.getAllHeaders()) {
+      for(Header allHeader : msg.getHeaders()) {
         log.trace("  {} {}", allHeader.getName(), allHeader.getValue());
       }
     }
-    try {
-      return getClient().execute(msg, ctx);
-    } finally {
-      cleanupCache();
-    }
+    return getClient().execute(msg);
   }
 
   private void authenticate(HttpMessage msg) {
     if(keyStore == null) {
       if (credentials != null)
-        msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
+        msg.addHeader(OpalAuthScheme.authenticate(credentials));
       else
         msg.addHeader(OpalAuthScheme.SCHEME_NAME, token);
     }
@@ -434,21 +415,6 @@ public class OpalJavaClient {
       throw new RuntimeException(e);
     } finally {
       closeQuietly(baos);
-    }
-  }
-
-  private HttpClient enableCaching(HttpClient httpClient) {
-    CacheConfig config = new CacheConfig();
-    config.setSharedCache(false);
-    config.setMaxObjectSizeBytes(MAX_OBJECT_SIZE_BYTES);
-    cacheFolder = Files.createTempDir();
-    return new CachingHttpClient(httpClient, new FileResourceFactory(cacheFolder),
-        cacheStorage = new ManagedHttpCacheStorage(config), config);
-  }
-
-  private void cleanupCache() {
-    if(cacheStorage != null) {
-      cacheStorage.cleanResources();
     }
   }
 

@@ -11,9 +11,10 @@ package org.obiba.opal.rest.client.magma;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.ValueSetBean;
@@ -118,8 +119,7 @@ public class RestValueTable extends AbstractValueTable {
 
   @Override
   public void dropValueSets() {
-    try {
-      getOpalClient().delete(newReference("valueSets"));
+    try (CloseableHttpResponse response = getOpalClient().delete(newReference("valueSets"))) {
       refresh();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -263,11 +263,11 @@ public class RestValueTable extends AbstractValueTable {
       URI uri = getOpalClient().newUri().link(valueDto.getLink()).build();
 
       InputStream is = null;
-      try {
-        HttpResponse response = getOpalClient().get(uri);
-        if (response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+      try (CloseableHttpResponse response = getOpalClient().get(uri)) {
+
+        if (response.getCode() >= HttpStatus.SC_BAD_REQUEST) {
           EntityUtils.consume(response.getEntity());
-          throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+          throw new RuntimeException(response.getReasonPhrase());
         }
         is = response.getEntity().getContent();
         return BinaryType.get().valueOf(ByteStreams.toByteArray(is));
@@ -297,14 +297,13 @@ public class RestValueTable extends AbstractValueTable {
       }
     }
 
-    synchronized ValueSetsDto loadValueSet() {
+    synchronized void loadValueSet() {
       if (valueSet == null) {
         valueSet = getOpalClient().getResource(ValueSetsDto.class,
             newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "true").build(),
             ValueSetsDto.newBuilder());
         timestamps = new ValueSetTimestamps(valueSet.getValueSets(0).getTimestamps());
       }
-      return valueSet;
     }
   }
 

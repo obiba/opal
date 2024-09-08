@@ -16,7 +16,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.audit.OpalUserProvider;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
