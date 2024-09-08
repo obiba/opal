@@ -97,7 +97,7 @@
             </q-list>
           </q-btn-dropdown>
           <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
-          <q-btn v-if="datasourceStore.tables.length" color="secondary" outline icon="search" :title="$t('search_variables')" size="sm" @click="onSearch"></q-btn>
+          <q-btn v-if="datasourceStore.tables.length" color="secondary" outline icon="search" :title="$t('variables_search')" size="sm" @click="onSearch"></q-btn>
           <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDeleteTables"></q-btn>
         </div>
       </template>

@@ -422,7 +422,7 @@ const writables = computed(() => {
 });
 
 function isEditable(file: FileDto) {
-  return file.writable && ['/', '/home', '/projects', '/reports', '/tmp'].includes(file.path) === false;
+  return file.writable && ['/', '/home', '/projects', '/tmp'].includes(file.path) === false;
 }
 
 function onShowAddFolder() {

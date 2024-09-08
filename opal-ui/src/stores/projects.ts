@@ -252,8 +252,7 @@ export const useProjectsStore = defineStore('projects', () => {
       .replace(/^\//, '')
       .replace(/^project.*/, 'project')
       .replace(/^datasource\/[^\/]+$/, 'datasource')
-      .replace(/.*(table|view)/, 'table')
-      .replace(/.*report-template/, 'report-template');
+      .replace(/.*(table|view)/, 'table');
 
     const params = { principal: subject.principal, type: subject.type };
     return api.delete(`/project/${project.value.name}/permissions/${resource}`, {

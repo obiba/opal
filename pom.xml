@@ -113,7 +113,6 @@
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
-    <velocity.version>1.7</velocity.version>
     <xmlunit.version>1.6</xmlunit.version>
     <xstream.version>1.4.20</xstream.version>
 
@@ -154,7 +153,6 @@
     <module>opal-ui</module>
     <module>opal-server</module>
     <module>opal-fs</module>
-    <module>opal-reporting</module>
     <module>opal-r</module>
     <module>opal-httpd</module>
     <module>opal-ws</module>
@@ -212,19 +210,6 @@
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-fs</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-reporting</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-reporting</artifactId>
-        <version>${project.version}</version>
-        <classifier>dist</classifier>
-        <scope>runtime</scope>
-        <type>zip</type>
       </dependency>
       <dependency>
         <groupId>org.obiba.opal</groupId>
@@ -1098,11 +1083,6 @@
             <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>${velocity.version}</version>
       </dependency>
 
       <dependency>

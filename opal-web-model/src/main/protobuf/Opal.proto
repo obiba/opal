@@ -62,26 +62,6 @@ message LocaleDto {
   optional string display = 2; // Locale.getDisplayName(clientLocale)
 }
 
-
-message ReportTemplateDto {
-  required string name = 1;
-  required string design = 2;
-  required string format = 3 [default = "html"];
-  repeated ParameterDto parameters = 4;
-  optional string cron = 5;
-  repeated string emailNotification = 6;
-  required string project = 7;
-  repeated string failureEmailNotification = 8;
-}
-
-message ReportDto {
-  required string name = 1;
-  required string link = 2;
-  optional string publicLink = 3;
-  optional int64 size = 4;
-  optional int64 lastModifiedTime = 5;
-}
-
 message ParameterDto {
   required string key = 1;
   required string value = 2;
@@ -130,8 +110,6 @@ enum AclAction {
   FILES_ALL = 18;
   FILES_READ = 19;
   FILES_SHARE = 20;
-  REPORT_TEMPLATE_ALL = 21;
-  REPORT_TEMPLATE_READ = 22;
   PROJECT_ALL = 23;
   TABLE_VALUES_EDIT = 24;
   PROJECT_ADD = 25;

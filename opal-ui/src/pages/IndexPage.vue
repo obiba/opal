@@ -11,30 +11,57 @@
           <q-item-label header class="text-uppercase">{{ $t('data_management') }}</q-item-label>
           <div class="row">
             <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
-              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-2" >
+              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4" >
                 <router-link to="/projects">{{ $t('projects') }}</router-link>
               </q-card-section>
               <q-separator />
               <q-card-section class="text-hint">
                 {{ $t('projects_caption') }}
+                <q-btn
+                  flat
+                  rounded
+                  dense
+                  icon="arrow_forward"
+                  size="xs"
+                  color="primary"
+                  :to="`/projects`"
+                />
               </q-card-section>
             </q-card>
             <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
-              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-2" >
+              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4" >
                 <router-link to="/files">{{ $t('files') }}</router-link>
               </q-card-section>
               <q-separator />
               <q-card-section class="text-hint">
                 {{ $t('files_caption') }}
+                <q-btn
+                  flat
+                  rounded
+                  dense
+                  icon="arrow_forward"
+                  size="xs"
+                  color="primary"
+                  :to="`/files`"
+                />
               </q-card-section>
             </q-card>
             <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
-              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-2" >
+              <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4" >
                 <router-link to="/tasks">{{ $t('tasks') }}</router-link>
               </q-card-section>
               <q-separator />
               <q-card-section class="text-hint">
                 {{ $t('tasks_caption') }}
+                <q-btn
+                  flat
+                  rounded
+                  dense
+                  icon="arrow_forward"
+                  size="xs"
+                  color="primary"
+                  :to="`/tasks`"
+                />
               </q-card-section>
             </q-card>
           </div>

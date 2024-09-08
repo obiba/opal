@@ -16,11 +16,7 @@ import jakarta.ws.rs.core.UriBuilder;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
-import org.obiba.opal.shell.commands.Command;
-import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
-import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
-import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,16 +113,6 @@ public class WebShellResource extends AbstractCommandsResource {
     } catch(IllegalStateException ex) {
       return Response.status(Status.BAD_REQUEST).entity("SetCommandStatus_BadRequest_NotCancellable").build();
     }
-  }
-
-  @POST
-  @Path("/report")
-  public Response createReport(Commands.ReportCommandOptionsDto options) {
-    ReportCommandOptions reportOptions = new ReportCommandOptionsDtoImpl(options);
-    Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
-    reportCommand.setOptions(reportOptions);
-
-    return launchCommand(reportCommand);
   }
 
   //

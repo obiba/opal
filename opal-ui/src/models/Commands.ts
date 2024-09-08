@@ -84,11 +84,6 @@ export interface ExportCommandOptionsDto {
   entityIdNames?: string | undefined;
 }
 
-export interface ReportCommandOptionsDto {
-  name: string;
-  project: string;
-}
-
 export interface ImportVCFCommandOptionsDto {
   /** store location */
   project: string;

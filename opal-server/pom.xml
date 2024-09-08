@@ -50,11 +50,6 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-reporting</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-r</artifactId>
       <scope>runtime</scope>
     </dependency>

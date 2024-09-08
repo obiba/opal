@@ -86,7 +86,6 @@
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>org.obiba.opal:opal-reporting:zip:dist</exclude>
         <exclude>org.obiba.commons:obiba-password-hasher:jar:cli</exclude>
         <exclude>org.apache.shiro.tools:shiro-tools-hasher:*</exclude>
       </excludes>

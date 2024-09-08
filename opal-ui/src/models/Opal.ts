@@ -30,8 +30,6 @@ export enum AclAction {
   FILES_ALL = "FILES_ALL",
   FILES_READ = "FILES_READ",
   FILES_SHARE = "FILES_SHARE",
-  REPORT_TEMPLATE_ALL = "REPORT_TEMPLATE_ALL",
-  REPORT_TEMPLATE_READ = "REPORT_TEMPLATE_READ",
   PROJECT_ALL = "PROJECT_ALL",
   TABLE_VALUES_EDIT = "TABLE_VALUES_EDIT",
   PROJECT_ADD = "PROJECT_ADD",
@@ -139,25 +137,6 @@ export interface LocaleDto {
   name: string;
   /** Locale.getDisplayName(clientLocale) */
   display?: string | undefined;
-}
-
-export interface ReportTemplateDto {
-  name: string;
-  design: string;
-  format: string;
-  parameters: ParameterDto[];
-  cron?: string | undefined;
-  emailNotification: string[];
-  project: string;
-  failureEmailNotification: string[];
-}
-
-export interface ReportDto {
-  name: string;
-  link: string;
-  publicLink?: string | undefined;
-  size?: number | undefined;
-  lastModifiedTime?: number | undefined;
 }
 
 export interface ParameterDto {

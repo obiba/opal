@@ -50,10 +50,6 @@
       <artifactId>opal-r</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-reporting</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-security</artifactId>
     </dependency>
@@ -104,10 +100,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
     </dependency>
   </dependencies>
 
