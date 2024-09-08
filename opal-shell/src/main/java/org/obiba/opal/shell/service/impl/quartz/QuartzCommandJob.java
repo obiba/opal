@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.shell.service.impl.quartz;
 
-import java.util.Arrays;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -19,20 +17,16 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandLines;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
-import org.obiba.opal.shell.commands.ReportCommand;
 import org.obiba.opal.shell.service.CommandJobService;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
-
 import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
+
+import java.util.Arrays;
 
 /**
  *
@@ -60,9 +54,6 @@ public class QuartzCommandJob implements Job {
 
     Command<?> command = getCommand(context);
     CommandJob commandJob = new CommandJob(command);
-    if(command instanceof ReportCommand) {
-      commandJob.setProject(((ReportCommand) command).getOptions().getProject());
-    }
     commandJobService.launchCommand(commandJob, getSubject(context));
   }
 

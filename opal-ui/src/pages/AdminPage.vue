@@ -76,12 +76,6 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/reports">{{ $t('reports') }}</router-link></q-item-label>
-                <q-item-label caption lines="2">{{ $t('reports_caption') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
                 <q-item-label><router-link to="/admin/identifiers">{{ $t('id_mappings.title') }}</router-link></q-item-label>
                 <q-item-label caption lines="2">{{ $t('id_mappings.manage_caption') }}</q-item-label>
               </q-item-section>

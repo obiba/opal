@@ -170,7 +170,6 @@ function initializeTaskGroupOptions() {
     taskGroupOptions.push(
       { label: t('command_types.copy'), value: 'copy' },
       { label: t('command_types.analyse'), value: 'analyse' },
-      { label: t('command_types.report'), value: 'report' },
       { label: t('command_types.import_vcf'), value: 'import_vcf' },
       { label: t('command_types.export_vcf'), value: 'export_vcf' },
       { label: t('command_types.backup'), value: 'backup' },

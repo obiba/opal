@@ -29,13 +29,4 @@
     </property>
   </bean>
 
-  <bean class="org.obiba.opal.core.runtime.velocity.VelocityEngineFactoryBean">
-    <property name="velocityProperties">
-      <value>
-        resource.loader=class
-        class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
-      </value>
-    </property>
-  </bean>
-
 </beans>

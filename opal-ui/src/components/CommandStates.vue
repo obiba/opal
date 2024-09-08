@@ -108,7 +108,7 @@
                   {{ `${props.row.progress.percent}% (${props.row.progress.current}/${props.row.progress.end})` }}
                 </span>
               </div>
-              <q-linear-progress :value="props.row.progress.percent" />
+              <q-linear-progress :value="props.row.progress.percent / 100" />
             </div>
           </q-td>
         </q-tr>

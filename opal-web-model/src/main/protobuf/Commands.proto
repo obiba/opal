@@ -80,11 +80,6 @@ message ExportCommandOptionsDto {
   optional string entityIdNames = 14;
 }
 
-message ReportCommandOptionsDto {
-  required string name = 1;
-  required string project = 2;
-}
-
 message ImportVCFCommandOptionsDto {
   required string project = 1; // store location
   repeated string files = 2; // VCF files location

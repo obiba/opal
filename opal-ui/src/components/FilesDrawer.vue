@@ -35,15 +35,6 @@
         </q-item-section>
       </q-item>
 
-      <q-item to="/files/reports">
-        <q-item-section avatar>
-          <q-icon name="summarize" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>{{ $t('reports') }}</q-item-label>
-        </q-item-section>
-      </q-item>
-
       <q-item to="/files/">
         <q-item-section avatar>
           <q-icon name="dns" />

@@ -9,13 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import jakarta.ws.rs.core.Response;
-
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Test;
@@ -24,19 +18,17 @@ import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
-import org.obiba.opal.shell.commands.ReportCommand;
-import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
-import org.obiba.opal.web.model.Commands.ReportCommandOptionsDto;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -325,43 +317,6 @@ public class WebShellResourceTest {
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
-  @Test
-  public void testCreateReport() {
-    // Setup
-    Integer jobId = 1;
-    CommandRegistry mockCommandRegistry = createMockCommandRegistry();
-    ReportCommand reportCommand = createReportCommand();
-    expect(mockCommandRegistry.<ReportCommandOptions>newCommand(reportCommand.getName())).andReturn(reportCommand)
-        .atLeastOnce();
-
-    CommandJobService mockCommandJobService = createMockCommandJobService();
-    CommandJob job = createCommandJob(jobId, reportCommand, null);
-    expect(mockCommandJobService.launchCommand(eqCommandJob(job)))
-        .andReturn(job).atLeastOnce();
-
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
-    sut.setCommandRegistry(mockCommandRegistry);
-
-    replay(mockCommandRegistry, mockCommandJobService);
-
-    // Exercise
-    ReportCommandOptionsDto optionsDto = createReportCommandOptionsDto("test report", "project1");
-    Response response = sut.createReport(optionsDto);
-
-    // Verify mocks
-    verify(mockCommandRegistry, mockCommandJobService);
-
-    // Verify that the options in the dto were applied to the launched command
-    ReportCommandOptions importOptions = reportCommand.getOptions();
-    assertThat(optionsDto.getName()).isEqualTo(importOptions.getName());
-
-    // Verify that the HTTP response code was CREATED (201) and that the "Location"
-    // header was set to '/shell/command/{jobId}'.
-    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
-    assertThat(response.getMetadata().getFirst("Location").toString()).isEqualTo("/shell/command/" + jobId);
-  }
-
   //
   // Private Methods
   //
@@ -421,10 +376,6 @@ public class WebShellResourceTest {
     return new ArrayList<>();
   }
 
-  private ReportCommandOptionsDto createReportCommandOptionsDto(String name, String project) {
-    return ReportCommandOptionsDto.newBuilder().setName(name).setProject(project).build();
-  }
-
   private CommandJob createCommandJob(Integer id, Command<?> command, Date submitTime) {
     CommandJob commandJob = new CommandJob(command);
 
@@ -451,26 +402,6 @@ public class WebShellResourceTest {
       @Override
       public String toString() {
         return "import args";
-      }
-
-      @Override
-      public int execute() {
-        return 0;
-      }
-    };
-  }
-
-  private ReportCommand createReportCommand() {
-
-    return new ReportCommand() {
-      @Override
-      public String getName() {
-        return "report";
-      }
-
-      @Override
-      public String toString() {
-        return "report args";
       }
 
       @Override

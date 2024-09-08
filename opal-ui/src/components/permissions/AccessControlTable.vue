@@ -112,7 +112,6 @@ const cases = [
   { regex: /\/datasource\/(.*)$/, type: 'project' },
   { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
   { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
-  { regex: /\/project\/(.*)\/report-template/, type: 'report', url: '/admin/datashield' },
   { regex: /\/project\/(.*)$/, type: 'project' },
   { regex: /\/r$/, type: 'r_service', url: '/admin/rservers' },
   { regex: /\/datashield$/, type: 'datashield_service', url: '/admin/datashield' },
@@ -162,10 +161,6 @@ const rows = computed(() => {
             break;
           case 'resource':
             result.title = `${match[1]}.${match[2]}`;
-            break;
-          case 'report':
-            result.title = `${match[1]}`;
-            result.caption = t(item.type);
             break;
           case 'r_service':
             result.title = 'R';

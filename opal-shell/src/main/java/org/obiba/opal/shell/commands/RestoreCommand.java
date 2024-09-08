@@ -24,19 +24,16 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.service.ProjectsState;
-import org.obiba.opal.core.service.ProjectsState.State;
-import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.ReportTemplateService;
+import org.obiba.opal.core.service.ProjectsState;
+import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.shell.commands.options.RestoreCommandOptions;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,9 +77,6 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
-  @Autowired
-  private ReportTemplateService reportTemplateService;
-
   private File archiveFolder;
 
   private File workDir;
@@ -107,7 +101,6 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
           restoreViews();
           restoreResources();
           restoreFiles();
-          restoreReports();
           errorCode = CommandResultCode.SUCCESS;
         } catch (Exception e) {
           if (!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
@@ -293,35 +286,6 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       }
     }
     log.info("Restore of {} files done in {}", getProjectName(), stopwatch.stop());
-  }
-
-  private void restoreReports() {
-    Stopwatch stopwatch = Stopwatch.createStarted();
-    log.debug("Restore of {} reports started", getProjectName());
-    File reportsFolder = getReportsFolder();
-    if (reportsFolder.exists()) {
-      File[] reportFiles = reportsFolder.listFiles(file -> !file.isDirectory() && file.getName().endsWith(".json"));
-      if (reportFiles != null) {
-        for (File reportDtoFile : reportFiles) {
-          try (FileReader reader = new FileReader(reportDtoFile)) {
-            Opal.ReportTemplateDto.Builder builder = Opal.ReportTemplateDto.newBuilder();
-            ExtensionRegistry registry = ExtensionRegistry.newInstance();
-            Opal.registerAllExtensions(registry);
-            JsonFormat.merge(reader, registry, builder);
-            builder.setProject(getProjectName());
-            ReportTemplate reportTemplate = org.obiba.opal.web.reporting.Dtos.fromDto(builder.build());
-            if (reportTemplateService.hasReportTemplate(reportTemplate.getName(), reportTemplate.getProject()) && !getOptions().getOverride()) {
-              throw new RuntimeException("Report template already exists, use override option: " + reportTemplate.getName());
-            }
-            reportTemplateService.save(reportTemplate);
-          } catch (IOException e) {
-            log.error("Report template restore failed: {}", reportDtoFile.getAbsolutePath(), e);
-            throw new RuntimeException("Report template restore failed", e);
-          }
-        }
-      }
-    }
-    log.info("Restore of {} reports done in {}", getProjectName(), stopwatch.stop());
   }
 
   private Datasource getSourceDatasource(Map<String, File> tableFoldersMap) {

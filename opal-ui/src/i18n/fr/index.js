@@ -58,7 +58,6 @@ export default {
     export: 'exporter',
     copy: 'Copier',
     analyse: 'Analyser',
-    report: 'Rapport',
     import_vcf: 'Importer VCF',
     export_vcf: 'Exporter VCF',
     backup: 'Sauvegarde',
@@ -308,15 +307,6 @@ export default {
       label: 'Administrer les dossiers',
       description: 'Accès complet aux dossiers.',
     },
-    // report permissions
-    REPORT_TEMPLATE_ALL: {
-      label: 'Administrer les rapports',
-      description: 'Accès complet au modèle de rapport (paramètres et rapports).',
-    },
-    REPORT_TEMPLATE_READ: {
-      label: 'Voir les rapports',
-      description: 'Voir les rapports uniquement.',
-    },
     // resource permissions
     RESOURCE_ALL: {
       label: 'Administrer',
@@ -405,7 +395,7 @@ export default {
     db_reload_confirm: 'Êtes-vous sûr de vouloir recharger la base de données du projet?',
     backup_restore: 'Sauvegarder / Restaurer',
     backup_project: 'Sauvegarder le projet',
-    backup_hint: 'La tâche de sauvegarde du projet a une portée limitée : tables (dictionnaire et exportation de données), vues (soit en tant que table logique, soit en tant que table exportée), ressources, fichiers et modèles de rapport. D\'autres éléments du projet ne font pas partie de la sauvegarde : les autorisations des utilisateurs et des groupes, l\'historique des modifications des vues, l\'analyse des tables, l\'exécution des rapports, etc.',
+    backup_hint: 'La tâche de sauvegarde du projet a une portée limitée : tables (dictionnaire et exportation de données), vues (soit en tant que table logique, soit en tant que table exportée), ressources et fichiers. D\'autres éléments du projet ne font pas partie de la sauvegarde : les autorisations des utilisateurs et des groupes, l\'historique des modifications des vues, l\'analyse des tables etc.',
     backup_success: 'La tâche de sauvegarde du projet a été lancée. Vous pouvez suivre sa progression dans la liste des tâches.',
     backup_folder: 'Dossier de sauvegarde',
     restore_project: 'Restaurer le projet',
@@ -414,7 +404,7 @@ export default {
     restore_override: 'Remplacer les items existants',
     views_as_table: 'Vues en tant que tableaux, c\'est-à-dire exporter des données au lieu de conserver des scripts de dérivation',
     danger_zone: 'Zone de danger',
-    danger_zone_info: 'L\'archivage d\'un projet rend ses données inaccessibles. Les tables, les vues, les fichiers, les rapports et la base de données du projet restent intacts. Ces données seront rétablies lorsqu\'un projet portant le même nom sera ajouté. Notez que la description et les permissions du projet seront définitivement supprimées.',
+    danger_zone_info: 'L\'archivage d\'un projet rend ses données inaccessibles. Les tables, les vues, les fichiers et la base de données du projet restent intacts. Ces données seront rétablies lorsqu\'un projet portant le même nom sera ajouté. Notez que la description et les permissions du projet seront définitivement supprimées.',
     archive_confirm: 'Veuillez confirmer que vous souhaitez supprimer le projet actuel et conserver toutes les données qui y sont associées ?',
     archive: 'Archives le projet',
     remove_info: 'La suppression d\'un projet détruit toutes les données et tous les fichiers qui y sont associés. Il peut s\'agir d\'une tâche de longue haleine et il n\'est pas possible de revenir en arrière.',
@@ -1133,9 +1123,6 @@ export default {
   remove: 'Supprimer',
   repeatable_hint: 'Quand une entitié peut avoir plusieurs valeurs pour cette variable.',
   repeatable: 'Répétable',
-  report: 'Rapport',
-  reports_caption: 'Configurer et planifier des rapports',
-  reports: 'Rapports',
   reset: 'Réinitialiser',
   resource: 'Ressource',
   resources_info: 'Les ressources sont des ensembles de données ou des unités de calcul dont l\'emplacement est décrit par une URL et dont l\'accès est protégé par des informations d\'identification. Lorsqu\'ils sont affectés à une session de serveur R/DataSHIELD, des ensembles de données distants volumineux/complexes ou des ordinateurs hautes performances sont rendus accessibles aux analystes de données.',

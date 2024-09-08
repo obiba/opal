@@ -70,9 +70,6 @@ public class OpalRSessionManager implements DisposableBean {
   @Value("${org.obiba.opal.r.sessionTimeout.Export}")
   private Long rSessionTimeoutExport;
 
-  @Value("${org.obiba.opal.r.sessionTimeout.Report}")
-  private Long rSessionTimeoutReport;
-
   @Value("${org.obiba.opal.r.sessionTimeout.Analyse}")
   private Long rSessionTimeoutAnalyse;
 
@@ -360,8 +357,6 @@ public class OpalRSessionManager implements DisposableBean {
         return rSessionTimeoutImport;
       case "Export":
         return rSessionTimeoutExport;
-      case "Report":
-        return rSessionTimeoutReport;
       case "SQL":
         return rSessionTimeoutSQL;
       case "Analyse":
