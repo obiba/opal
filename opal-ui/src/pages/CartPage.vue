@@ -16,7 +16,7 @@
         flat
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        :row-key="(v) => `${v.parentLink.link}/variable/${v.name}`"
         :pagination="initialPagination"
         :loading="loading"
         selection="multiple"
@@ -209,7 +209,8 @@ const rows = computed(() => {
 });
 
 onMounted(() => {
-  cartStore.refresh();
+  loading.value = true;
+  cartStore.refresh().finally(() => loading.value = false);
 });
 
 function getTableRoute(link: string) {
@@ -249,6 +250,7 @@ function onShowDeleteAnnotation() {
 }
 
 function onRefresh() {
-  cartStore.refresh();
+  loading.value = true;
+  cartStore.refresh().finally(() => loading.value = false);
 }
 </script>
