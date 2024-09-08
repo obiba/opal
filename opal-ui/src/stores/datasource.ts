@@ -411,42 +411,56 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function annotate(variables: VariableDto[], taxonomy: string, vocabulary: string, termOrTexts: string | { [key: string]: string | undefined}) {
-    const parentLink = variables[0].parentLink?.link;
-    if (!parentLink) return Promise.reject('No parent link found');
+    const grouped = groupVariablesByTableLink(variables);
 
-    variables.forEach((v) => {
-      if (v.attributes === undefined) {
-        v.attributes = [];
-      }
-      // filter out existing annotations
-      v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
-      // add new annotations
-      if (typeof termOrTexts === 'string') {
-        v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrTexts });
-      } else {
-        for (const [key, value] of Object.entries(termOrTexts)) {
-          if (value !== undefined && value.trim() !== '') {
-            const locale = key === 'default' ? undefined : key;
-            v.attributes.push({ namespace: taxonomy, name: vocabulary, locale,  value });
+    return Promise.all(Object.keys(grouped).map((tableLink) => {
+      grouped[tableLink].forEach((v) => {
+        if (v.attributes === undefined) {
+          v.attributes = [];
+        }
+        // filter out existing annotations
+        v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+        // add new annotations
+        if (typeof termOrTexts === 'string') {
+          v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrTexts });
+        } else {
+          for (const [key, value] of Object.entries(termOrTexts)) {
+            if (value !== undefined && value.trim() !== '') {
+              const locale = key === 'default' ? undefined : key;
+              v.attributes.push({ namespace: taxonomy, name: vocabulary, locale,  value });
+            }
           }
         }
-      }
-    });
-
-    return api.post(`${parentLink}/variables`, variables);
+      });
+      return api.post(`${tableLink}/variables`, variables);
+    }));
   }
 
   async function deleteAnnotation(variables: VariableDto[], taxonomy: string, vocabulary: string) {
-    const parentLink = variables[0].parentLink?.link;
-    if (!parentLink) return Promise.reject('No parent link found');
+    const grouped = groupVariablesByTableLink(variables);
 
+    return Promise.all(Object.keys(grouped).map((tableLink) => {
+      grouped[tableLink].forEach((v) => {
+        if (v.attributes !== undefined) {
+          v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+        }
+      });
+      return api.post(`${tableLink}/variables`, variables);
+    }));
+  }
+
+  function groupVariablesByTableLink(variables: VariableDto[]) {
+    const grouped: { [key: string]: VariableDto[] } = {};
     variables.forEach((v) => {
-      if (v.attributes !== undefined) {
-        v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+      const key = v.parentLink?.link;
+      if (key){
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(v);
       }
     });
-
-    return api.post(`${parentLink}/variables`, variables);
+    return grouped;
   }
 
   async function applyAttributes(variable: VariableDto, attributes: AttributeDto[]) {

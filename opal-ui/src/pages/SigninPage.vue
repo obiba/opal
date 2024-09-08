@@ -164,6 +164,7 @@ const tokensStore = useTokensStore();
 const identifiersStore = useIdentifiersStore();
 const appsStore = useAppsStore();
 const searchStore = useSearchStore();
+const cartStore = useCartStore();
 
 const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -214,6 +215,7 @@ onMounted(() => {
   identifiersStore.reset();
   appsStore.reset();
   searchStore.reset();
+  cartStore.reset();
 });
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {

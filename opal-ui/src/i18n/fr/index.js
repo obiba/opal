@@ -1260,4 +1260,7 @@ export default {
   vocabulary: 'Vocabulaire',
   waiting: 'En attente',
   yes: 'Oui',
+  add_to_cart: 'Ajouter au panier',
+  remove_from_cart: 'Retirer du panier',
+  empty_cart: 'Le panier est vide',
 };

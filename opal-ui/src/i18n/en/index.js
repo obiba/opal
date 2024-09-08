@@ -1260,4 +1260,7 @@ export default {
   vocabulary: 'Vocabulary',
   waiting: 'Waiting',
   yes: 'Yes',
+  add_to_cart: 'Add to cart',
+  remove_from_cart: 'Remove from cart',
+  empty_cart: 'The cart is empty',
 };

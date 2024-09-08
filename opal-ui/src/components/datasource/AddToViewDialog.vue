@@ -94,7 +94,7 @@ import { ValueTypes } from 'src/utils/magma';
 
 interface DialogProps {
   modelValue: boolean;
-  table: TableDto;
+  table?: TableDto;
   variables: VariableDto[];
 }
 
@@ -122,16 +122,18 @@ const columns = computed(() => [
 
 watch(() => props.modelValue, (value) => {
   if (value) {
-    projectDestination.value = props.table.datasourceName as string;
+    projectDestination.value = props.table?.datasourceName as string;
     newTableName.value = '';
     const tableNames = datasourceStore.tables.map((t) => t.name);
-    let idx = 1;
-    while (newTableName.value === '') {
-      const name = `${props.table.name}_${idx}`;
-      if (!tableNames.includes(name)) {
-        newTableName.value = name;
+    if (props.table) {
+      let idx = 1;
+      while (newTableName.value === '') {
+        const name = `${props.table.name}_${idx}`;
+        if (!tableNames.includes(name)) {
+          newTableName.value = name;
+        }
+        idx += 1;
       }
-      idx += 1;
     }
     derivedVariables.value = makeDerivedVariables();
   }
@@ -151,22 +153,27 @@ function onSaveView() {
     return;
   }
 
-  const from = `${props.table.datasourceName}.${props.table.name}`;
+  const from = getFromTables();
   const newViewPage = `/project/${projectDestination.value}/table/${newTableName.value}`;
 
   datasourceStore.getView(projectDestination.value, newTableName.value)
     .then((view) => {
-      if (!view.from.includes(from)) {
-        view.from.push(from);
-      }
+      const merged = [...view.from, ...from];
+      view.from = merged.filter((f, idx) => merged.indexOf(f) === idx);
       view['Magma.VariableListViewDto.view'].variables = mergeVariables(view['Magma.VariableListViewDto.view'].variables, validDerivedVariables.value);
       datasourceStore.updateView(projectDestination.value, newTableName.value, view, `Added variables from ${from} to view`)
         .then(() => router.push(newViewPage));
     })
     .catch((err) => {
-      datasourceStore.addVariablesView(projectDestination.value, newTableName.value, [from], validDerivedVariables.value)
+      datasourceStore.addVariablesView(projectDestination.value, newTableName.value, from, validDerivedVariables.value)
         .then(() => router.push(newViewPage));
     });
+}
+
+function getFromTables() {
+  const tables = props.variables
+    .map((v) => v.parentLink?.link.replace('/datasource/', '').replace('/table/', '.'));
+  return tables.filter((table, idx) => table && tables.indexOf(table) === idx);
 }
 
 function makeDerivedVariables() {
