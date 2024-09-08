@@ -9,14 +9,12 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.security.KeyStore;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.http.params.CoreConnectionPNames;
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
+
+import javax.validation.constraints.NotNull;
+import java.security.KeyStore;
 
 /**
  * Factory of a datasource that connects to Opal using its RESTful services.
@@ -86,9 +84,6 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     this.keyStore = keyStore;
   }
 
-  /**
-   * @see CoreConnectionPNames#SO_TIMEOUT
-   */
   @SuppressWarnings("UnusedDeclaration")
   public void setSoTimeout(int soTimeout) {
     this.soTimeout = soTimeout;

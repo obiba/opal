@@ -12,7 +12,7 @@ package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 
-import org.apache.http.StatusLine;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.obiba.magma.MagmaRuntimeException;
 
 /**

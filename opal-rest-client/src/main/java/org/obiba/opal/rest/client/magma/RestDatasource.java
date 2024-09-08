@@ -9,23 +9,14 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.TimestampsBean;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.type.DateTimeType;
@@ -34,10 +25,12 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Set;
 
 public class RestDatasource extends AbstractDatasource {
 
@@ -112,11 +105,10 @@ public class RestDatasource extends AbstractDatasource {
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
     if(!hasValueTable(tableName)) {
       URI tableUri = newReference("tables");
-      try {
-        HttpResponse response = getOpalClient()
-            .post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build());
-        if(response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
-          throw new RuntimeException("cannot create table " + response.getStatusLine().getReasonPhrase());
+      try (CloseableHttpResponse response = getOpalClient()
+          .post(tableUri, TableDto.newBuilder().setName(tableName).setEntityType(entityType).build())) {
+        if(response.getCode() != HttpStatus.SC_CREATED) {
+          throw new RuntimeException("cannot create table " + response.getReasonPhrase());
         }
         addValueTable(tableName);
         EntityUtils.consume(response.getEntity());

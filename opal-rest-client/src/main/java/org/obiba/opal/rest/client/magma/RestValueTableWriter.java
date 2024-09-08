@@ -9,13 +9,13 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -25,12 +25,10 @@ import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
 
 class RestValueTableWriter implements ValueTableWriter {
 
@@ -62,8 +60,8 @@ class RestValueTableWriter implements ValueTableWriter {
               }
             }, Dtos.asDtoFunc(null)));
 
-        try {
-          checkResponse(restValueTable.getOpalClient().post(variablesResource, variableDtos));
+        try (CloseableHttpResponse response = restValueTable.getOpalClient().post(variablesResource, variableDtos)) {
+          checkResponse(response);
         } catch(IOException e) {
           throw new RuntimeException(e);
         }
@@ -99,8 +97,8 @@ class RestValueTableWriter implements ValueTableWriter {
       public void close() {
         valueSetsDtoBuilder.addValueSets(valueSetDtoBuilder);
         URI valueSetUri = restValueTable.newReference("valueSet");
-        try {
-          checkResponse(restValueTable.getOpalClient().post(valueSetUri, valueSetsDtoBuilder.build()));
+        try (CloseableHttpResponse response = restValueTable.getOpalClient().post(valueSetUri, valueSetsDtoBuilder.build())) {
+          checkResponse(response);
         } catch(IOException e) {
           throw new RuntimeException(e);
         }
@@ -109,8 +107,8 @@ class RestValueTableWriter implements ValueTableWriter {
       @Override
       public void remove() {
         URI valueSetUri = restValueTable.newReference("valueSet", entity.getIdentifier());
-        try {
-          checkResponse(restValueTable.getOpalClient().delete(valueSetUri));
+        try (CloseableHttpResponse response = restValueTable.getOpalClient().delete(valueSetUri)) {
+          checkResponse(response);
         } catch(IOException e) {
           throw new RuntimeException(e);
         }
@@ -124,10 +122,10 @@ class RestValueTableWriter implements ValueTableWriter {
     };
   }
 
-  private void checkResponse(HttpResponse response) throws IOException {
+  private void checkResponse(CloseableHttpResponse response) throws IOException {
     EntityUtils.consume(response.getEntity());
-    if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-      throw new IOException(response.getStatusLine().getReasonPhrase());
+    if(response.getCode() >= HttpStatus.SC_BAD_REQUEST) {
+      throw new IOException(response.getReasonPhrase());
     }
   }
 }

@@ -81,7 +81,7 @@
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.0-SNAPSHOT</magma.version>
+    <magma.version>5.0.1</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
@@ -90,7 +90,7 @@
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
     <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
-    <obiba-commons.version>4.2-SNAPSHOT</obiba-commons.version>
+    <obiba-commons.version>4.2.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.27</orientdb.version>
@@ -1039,28 +1039,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient-cache</artifactId>
-        <version>4.5.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpmime</artifactId>
-        <version>4.5.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
 
       <dependency>
         <groupId>org.json</groupId>
@@ -1152,18 +1130,6 @@
         <artifactId>MockFtpServer</artifactId>
         <version>${mockftpserver.version}</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>${commons-httpclient.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
