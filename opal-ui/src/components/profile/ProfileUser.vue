@@ -18,6 +18,16 @@
           :label="$t('user_profile.update_password')"
           @click="onUpdatePassword"
         />
+        <div v-else-if="profile?.accountUrl">
+          <q-btn
+            no-caps
+            color="primary"
+            size="sm"
+            icon-right="open_in_new"
+            :label="$t('user_profile.external_account')"
+            @click="onAccountLink"
+          />
+        </div>
         <div v-else square class="box-info q-mt-md" text-color="white" icon="warning">
           <q-icon name="info" size="1.2rem" />
           <span class="on-right">{{ $t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
@@ -310,9 +320,10 @@ const columns = computed(() => [
 
 const tokenNames = computed(() => tokens.value.map((t) => t.name));
 const otpIcon = computed(() => (profile.value?.otpEnabled ? 'lock_open' : 'lock'));
-const isOpalUserRealm = computed(() => profile.value && 'opal-user-realm' === profile.value.realm);
+const realms = computed(() => profile.value?.realm?.split(',') || []);
+const isOpalUserRealm = computed(() => realms.value?.includes('opal-user-realm'));
 const isAnOpalRealm = computed(
-  () => profile.value && ['opal-ini-realm', 'opal-user-realm'].includes(profile.value.realm)
+  () => profile.value && (realms.value?.includes('opal-user-realm') || realms.value?.includes('opal-ini-realm'))
 );
 const androidOtpUrl = computed(() => {
   return `<a href="https://play.google.com/store/apps/details?id=com.azure.authenticator" target="_blank">${t(
@@ -435,4 +446,8 @@ onMounted(() => {
     loading.value = false;
   });
 });
+
+function onAccountLink() {
+  window.open(profile.value?.accountUrl, '_blank');
+}
 </script>

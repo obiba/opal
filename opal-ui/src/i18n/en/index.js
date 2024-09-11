@@ -434,6 +434,7 @@ export default {
     android_only_otp: 'Android only',
     ios_otp: 'iOS',
     update_password: 'Update Password',
+    external_account: 'External account',
     enable_2fa: 'Enable 2FA',
     disable_2fa: 'Disable 2FA',
     otp_qr_core_info: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator:',
