@@ -52,13 +52,9 @@
           </q-card-section>
         </q-card>
         <q-card-section v-if="hasVcfStores && !!!project.vcfStoreService" class="q-px-none">
-          <q-banner inline-actions rounded class="bg-orange text-white">
-              {{ $t('project_admin.no_vcf_store_warning') }}
-
-              <template v-slot:action>
-                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit" />
-              </template>
-            </q-banner>
+          <div class="box-warning">
+            {{ $t('project_admin.no_vcf_store_warning') }}
+          </div>
         </q-card-section>
       </template>
 

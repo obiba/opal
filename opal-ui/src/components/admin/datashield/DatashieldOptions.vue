@@ -20,15 +20,15 @@
           color="primary"
           text-color="white"
           icon="add"
-          :label="$t('add_option')"
+          :title="$t('add_option')"
           size="sm"
           @click="onShowEdit(null)"
         />
         <q-btn
+          outline
           color="secondary"
-          text-color="white"
           icon="refresh"
-          :label="$t('refresh')"
+          :title="$t('refresh')"
           size="sm"
           class="on-right"
           @click="updateOptions" />

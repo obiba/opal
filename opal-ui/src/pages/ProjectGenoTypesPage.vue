@@ -87,10 +87,11 @@
                 <template v-slot:top-left>
                   <div class="q-gutter-sm">
                     <q-btn
+                      outline
                       size="sm"
-                      icon="cached"
-                      color="primary"
-                      :label="$t('refresh')"
+                      icon="refresh"
+                      color="secondary"
+                      :title="$t('refresh')"
                       @click="onRefreshVcfs"
                     ></q-btn>
                     <q-btn

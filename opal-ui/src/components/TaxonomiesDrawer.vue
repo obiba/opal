@@ -24,37 +24,25 @@
           :label="$t('taxonomy.add')"
           :title="$t('user_profile.add_token')"
           icon="add"
-          size="md"
+          size="sm"
         >
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onAddTaxonomy">
-              <q-item-section avatar style="min-width: auto; padding-right: 0.8rem">
-                <q-icon name="sell" />
-              </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('taxonomy.new_taxonomy') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportMlstrTaxonomies">
-              <q-item-section avatar style="min-width: auto; padding-right: 0.8rem">
-                <q-icon name="input" />
-              </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('taxonomy.import_mlstr.label') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportGithubTaxonomies">
-              <q-item-section avatar style="min-width: auto; padding-right: 0.8rem">
-                <q-icon name="fab fa-github" />
-              </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('taxonomy.import_github.label') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportFileTaxonomy">
-              <q-item-section avatar style="min-width: auto; padding-right: 0.8rem">
-                <q-icon name="description" />
-              </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('taxonomy.import_file.label') }}</q-item-label>
               </q-item-section>

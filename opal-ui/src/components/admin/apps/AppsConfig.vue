@@ -17,7 +17,7 @@
     </span>
   </div>
 
-  <div class="text-h6 q-mt-md">{{ $t('discovery') }}</div>
+  <div class="text-h6 q-mt-lg">{{ $t('discovery') }}</div>
   <html-anchor-hint
     class="text-help"
     trKey="apps.discovery_info"
@@ -25,7 +25,7 @@
     url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
   />
 
-  <div class="text-h6 q-mt-md">Rock</div>
+  <div class="text-bold q-mt-md">Rock</div>
   <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
   <q-table
     flat

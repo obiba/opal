@@ -160,7 +160,13 @@
           </template>
           <template v-slot:body-cell-inactive="props">
             <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              {{ props.col.format(props.row.inactiveAt) }}
+              <span :title="getDateLabel(props.row.inactiveAt)" :class="props.row.inactive ? 'text-negative' : ''">{{ getDateDistanceLabel(props.row.inactiveAt) }}</span>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-expires="props">
+            <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+              <span v-if="props.row.expiresAt" :title="getDateLabel(props.row.expiresAt)">{{ getDateDistanceLabel(props.row.expiresAt) }}</span>
+              <span v-else class="text-help">-</span>
             </q-td>
           </template>
         </q-table>
@@ -207,11 +213,11 @@ export default defineComponent({
 import { onMounted } from 'vue';
 import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
-import { getDateLabel } from 'src/utils/dates';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
 import BookmarksList from 'src/components/BookmarksList.vue';
+import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
 
 const loading = ref(false);
 const authStore = useAuthStore();
@@ -288,6 +294,13 @@ const columns = computed(() => [
     label: t('inactive'),
     align: 'left  ',
     field: 'inactiveAt',
+    format: (val: string) => getDateLabel(val),
+  },
+  {
+    name: 'expires',
+    label: t('expires'),
+    align: 'left  ',
+    field: 'expiresAt',
     format: (val: string) => getDateLabel(val),
   },
 ]);

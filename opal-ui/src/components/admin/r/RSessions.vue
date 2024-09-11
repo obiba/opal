@@ -11,10 +11,10 @@
       v-model:selected="selected" >
         <template v-slot:top-left>
           <q-btn
+            outline
             color="secondary"
-            text-color="white"
             icon="refresh"
-            :label="$t('refresh')"
+            :title="$t('refresh')"
             size="sm"
             @click="updateRSessions"
            />

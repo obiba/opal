@@ -85,11 +85,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function initDatasourceTableVariables(dsName: string, tName: string) {
     if (datasource.value?.name !== dsName) {
-      return initDatasourceTable(dsName, tName).then(() =>
-        loadTableVariables()
-      );
+      return initDatasourceTable(dsName, tName);
     } else if (table.value?.name !== tName) {
-      return loadTable(tName).then(() => loadTableVariables());
+      return loadTable(tName);
     } else if (variables.value.length === 0) {
       return loadTableVariables();
     } else {
@@ -104,10 +102,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   ) {
     if (datasource.value?.name !== dsName || table.value?.name !== tName) {
       return initDatasourceTable(dsName, tName).then(() =>
-        Promise.all([
-          loadTableVariables(),
-          loadTableVariable(vName)
-        ])
+        loadTableVariable(vName)
       );
     } else {
       return loadTableVariable(vName);

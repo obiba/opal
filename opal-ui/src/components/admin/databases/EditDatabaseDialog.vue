@@ -47,25 +47,25 @@
             label="URL"
             dense
             class="q-mb-md" />
-            <q-form ref="formRef">
-              <div class="row q-col-gutter-md q-mb-md">
-                <div class="col">
-                  <q-input
-                    v-model="database.sqlSettings.username"
-                    :label="$t('username')"
-                    dense />
-                </div>
-                <div class="col">
-                  <q-input
-                    v-model="database.sqlSettings.password"
-                    autocomplete="off"
-                    type="password"
-                    :label="$t('password')"
-                    lazy-rules
-                    :rules="[validateRequiredPassword]"
-                    dense />
-                </div>
+          <q-form ref="formRef">
+            <div class="row q-col-gutter-md q-mb-md">
+              <div class="col">
+                <q-input
+                  v-model="database.sqlSettings.username"
+                  :label="$t('username')"
+                  dense />
               </div>
+              <div class="col">
+                <q-input
+                  v-model="database.sqlSettings.password"
+                  autocomplete="off"
+                  type="password"
+                  :label="$t('password')"
+                  lazy-rules
+                  :rules="[validateRequiredPassword]"
+                  dense />
+              </div>
+            </div>
           </q-form>
           <div v-if="database.usage !== DatabaseDto_Usage.STORAGE">
             <q-input
@@ -127,24 +127,22 @@
             label="URL"
             dense
             class="q-mb-md" />
-          <div class="row q-col-gutter-md">
-            <q-form ref="formRef">
+          <q-form ref="formRef">
+            <div class="row q-col-gutter-md q-mb-md">
               <div class="col">
                 <q-input
                   v-model="database.mongoDbSettings.username"
                   :label="$t('username')"
-                  dense
-                  class="q-mb-md" />
+                  dense />
               </div>
               <div class="col">
                 <q-input
                   v-model="database.mongoDbSettings.password"
                   :label="$t('password')"
-                  dense
-                  class="q-mb-md" />
+                  dense />
               </div>
-            </q-form>
-          </div>
+            </div>
+          </q-form>
           <q-list>
             <q-expansion-item
               switch-toggle-side
@@ -200,7 +198,7 @@ interface DialogProps {
 }
 
 const props = withDefaults(defineProps<DialogProps>(), {
-  database: () => ({} as DatabaseDto) 
+  database: () => ({} as DatabaseDto)
 });
 
 const emit = defineEmits(['update:modelValue', 'save'])

@@ -72,6 +72,9 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "type");
+    // upgrade procedure: delete any permission related to report templates
+    deletePermissionPermissions("REPORT_TEMPLATE_READ");
+    deletePermissionPermissions("REPORT_TEMPLATE_ALL");
   }
 
   @Override
@@ -98,6 +101,18 @@ public class SubjectAclServiceImpl implements SubjectAclService {
     Iterable<SubjectAcl> subjectAcls = orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ? or node like ?",
             node, node + "/%");
+    Set<Subject> subjects = Sets.newTreeSet();
+    for (SubjectAcl acl : subjectAcls) {
+      subjects.add(acl.getSubject());
+      delete(acl);
+    }
+    notifyListeners(subjects);
+  }
+
+  public void deletePermissionPermissions(String permission) {
+    Iterable<SubjectAcl> subjectAcls = orientDbService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where permission = ?",
+            permission);
     Set<Subject> subjects = Sets.newTreeSet();
     for (SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());

@@ -11,7 +11,7 @@
       <div class="text-h5 q-mb-md">{{ $t('packages') }}</div>
       <div class="text-help q-mb-md">{{ $t('datashield.packages_info') }}</div>
       <datashield-clusters />
-      <div class="row q-col-gutter-md">
+      <div class="row q-col-gutter-md q-mb-lg">
         <div class="col-12 col-md-6">
           <div class="text-h5 q-mb-md">{{ $t('permissions') }}</div>
           <access-control-list

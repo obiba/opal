@@ -21,10 +21,10 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn
+          outline
           color="secondary"
-          text-color="white"
           icon="refresh"
-          :label="$t('refresh')"
+          :title="$t('refresh')"
           size="sm"
           @click="updateRPackages" />
       </template>

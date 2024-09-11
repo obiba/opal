@@ -80,18 +80,16 @@
       </template>
       <template v-slot:body-cell-providerUrl="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <a :href="props.value" target="_blank"
-            ><q-chip square color="secondary" class="q-ml-none text-white">{{ $t('identity_provider_url') }}</q-chip></a
-          >
+          <a :href="props.value" target="_blank">
+            {{ $t('identity_provider_url') }}<q-icon name="open_in_new" style="margin-left: 3px;"></q-icon>
+          </a>
         </q-td>
       </template>
       <template v-slot:body-cell-parameters="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <a :href="props.value" target="_blank" class="ml-0"
-            ><q-chip square color="secondary" class="q-ml-none text-white">{{
-              $t('identity_provider_discovery_uri')
-            }}</q-chip></a
-          >
+          <a :href="props.value" target="_blank">
+            {{ $t('identity_provider_discovery_uri') }}<q-icon name="open_in_new" style="margin-left: 3px;"></q-icon>
+          </a>
         </q-td>
       </template>
       <template v-slot:body-cell-enabled="props">

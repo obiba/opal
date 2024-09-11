@@ -4,7 +4,7 @@
     v-model="name"
     dense
     type="text"
-    :label="$t('name') + '*'"
+    :label="$t('name') + ' *'"
     :hint="$t('apps.name_hint', {type: type})"
     class="q-mb-md"
     lazy-rules
@@ -15,7 +15,7 @@
   <q-input
     autocomplete="off"
     type="password"
-    :label="$t('password') + '*'"
+    :label="$t('password') + ' *'"
     :hint="$t('apps.name_hint', {type: type})"
     v-model="password"
     color="grey-10"

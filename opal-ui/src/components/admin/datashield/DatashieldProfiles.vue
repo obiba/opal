@@ -1,23 +1,25 @@
 <template>
   <div>
-    <div class="q-mb-md">
-      <q-btn
-        color="primary"
-        text-color="white"
-        icon="add"
-        :label="$t('add_profile')"
-        size="sm"
-        @click="onAddProfile" />
-    </div>
-    <div class="row q-col-gutter-md">
-      <div :class="$q.screen.lt.lg ? 'col-3' : 'col-2'">
+    <q-btn
+      color="primary"
+      text-color="white"
+      icon="add"
+      :label="$t('add_profile')"
+      size="sm"
+      @click="onAddProfile"
+      class="q-mb-md" />
+
+    <q-card v-if="datashieldStore.profiles?.length" bordered flat>
+      <q-card-section class="q-pa-none">
         <q-tabs
           v-model="tab"
           no-caps
-          vertical
+          dense
+          inline-label
           class="text-grey"
           active-color="primary"
           indicator-color="primary"
+          align="justify"
         >
           <q-tab v-for="profile in datashieldStore.profiles" :key="profile.name"
             :name="profile.name"
@@ -26,16 +28,14 @@
             :icon="getProfileIcon(profile)"
           />
         </q-tabs>
-
-      </div>
-      <div :class="$q.screen.lt.lg ? 'col-9' : 'col-10'">
-        <q-tab-panels v-model="tab">
+        <q-separator />
+        <q-tab-panels v-model="tab" class="q-pl-md q-pr-md">
           <q-tab-panel v-for="profile in datashieldStore.profiles" :key="profile.name" :name="profile.name" style="padding-top: 0;">
-            <datashield-profile :profile="profile" />
+            <datashield-profile :profile="profile" class="q-mt-md"/>
           </q-tab-panel>
         </q-tab-panels>
-      </div>
-    </div>
+      </q-card-section>
+    </q-card>
     <add-datashield-profile-dialog v-model="showAdd" />
   </div>
 </template>

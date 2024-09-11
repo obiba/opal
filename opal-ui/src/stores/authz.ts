@@ -4,41 +4,42 @@ import { Acl, SuggestionsDto } from 'src/models/Opal';
 
 export const useAuthzStore = defineStore('authz', () => {
 
-  const resource = ref<string>(''); // the path of the current resource
-  const acls = ref<Acl[]>([]); // the list of ACLs for the current resource
+  const acls = ref<{[key: string]: Acl[]}>({}); // the list of ACLs for the current resource
 
   function reset() {
-    resource.value = '';
-    acls.value = [];
+    acls.value = {};
   }
 
   async function initAcls(path: string) {
-    resource.value = path;
-    acls.value = [];
-    return api.get(resource.value).then((response) => {
+    acls.value[path] = [];
+    return api.get(path).then((response) => {
       if (response.status === 200) {
-        acls.value = response.data;
+        acls.value[path] = response.data;
       }
       return response;
     });
   }
 
-  async function setAcl(acl: Acl) {
-    return api.post(resource.value, {}, { params: {
+  function resetAcls(path: string) {
+    delete acls.value[path];
+  }
+
+  async function setAcl(path: string, acl: Acl) {
+    return api.post(path, {}, { params: {
       type: acl.subject?.type,
       principal: acl.subject?.principal,
       permission: acl.actions.join(','),
     }}).then(() => {
-      return initAcls(resource.value);
+      return initAcls(path);
     });
   }
 
-  async function deleteAcl(acl: Acl) {
-    return api.delete(resource.value, { params: {
+  async function deleteAcl(path: string, acl: Acl) {
+    return api.delete(path, { params: {
       type: acl.subject?.type,
       principal: acl.subject?.principal,
     }}).then(() => {
-      return initAcls(resource.value);
+      return initAcls(path);
     });
   }
 
@@ -55,6 +56,7 @@ export const useAuthzStore = defineStore('authz', () => {
     acls,
     reset,
     initAcls,
+    resetAcls,
     setAcl,
     deleteAcl,
     searchSubjects,

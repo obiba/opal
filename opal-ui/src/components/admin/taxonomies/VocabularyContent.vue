@@ -1,6 +1,6 @@
 <template>
   <div class="text-h5">
-    <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ vocabulary.name }}</span>
+    <span>{{ vocabulary.name }}</span>
     <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
     <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
   </div>

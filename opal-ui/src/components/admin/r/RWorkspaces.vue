@@ -11,22 +11,21 @@
       v-model:selected="selected" >
         <template v-slot:top-left>
           <q-btn
+            outline
             color="secondary"
-            text-color="white"
             icon="refresh"
-            :label="$t('refresh')"
+            :title="$t('refresh')"
             size="sm"
             @click="updateRWorkspaces"
            />
-            <q-btn
-              outline
-              color="red"
-              icon="delete"
-              size="sm"
-              class="on-right"
-              :disable="selected.length === 0"
-              @click="onShowDeleteWorkspaces" />
-
+          <q-btn
+            outline
+            color="red"
+            icon="delete"
+            size="sm"
+            class="on-right"
+            :disable="selected.length === 0"
+            @click="onShowDeleteWorkspaces" />
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">

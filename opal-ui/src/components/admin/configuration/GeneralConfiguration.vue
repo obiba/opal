@@ -3,7 +3,7 @@
     <div class="col-12 col-md-6">
       <div class="q-mb-md">
         <q-btn
-          :label="$t('edit')"
+          :title="$t('edit')"
           icon="edit"
           color="primary"
           size="sm"

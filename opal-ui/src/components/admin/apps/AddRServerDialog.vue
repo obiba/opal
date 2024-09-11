@@ -37,14 +37,17 @@
 
           <q-card flat v-if="adminCredentials">
             <q-card-section class="q-px-none">
+              <div class="text-bold">{{ $t('administrator') }}</div>
               <app-credentials-form type="administrator" v-model="newRockAppConfig.administratorCredentials" />
             </q-card-section>
           </q-card>
           <q-card flat v-else-if="managerCredentials">
             <q-card-section class="q-px-none">
+              <div class="text-bold">{{ $t('manager') }}</div>
               <app-credentials-form type="manager" v-model="newRockAppConfig.managerCredentials" />
             </q-card-section>
             <q-card-section class="q-px-none">
+              <div class="text-bold">{{ $t('user') }}</div>
               <app-credentials-form type="user" v-model="newRockAppConfig.userCredentials" />
             </q-card-section>
           </q-card>

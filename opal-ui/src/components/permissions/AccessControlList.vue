@@ -1,7 +1,8 @@
 <template>
   <div>
     <q-table
-      :rows="authzStore.acls"
+      v-if="rows?.length > 0"
+      :rows="rows"
       flat
       :row-key="getRowKey"
       :columns="columns"
@@ -73,6 +74,23 @@
         </q-tr>
       </template>
     </q-table>
+    <div v-else class="q-mt-sm">
+      <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm">
+        <q-list>
+          <q-item clickable v-close-popup @click.prevent="onShowAddUser">
+            <q-item-section>
+              <q-item-label>{{ $t('add_user_permission') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup @click.prevent="onShowAddGroup">
+            <q-item-section>
+              <q-item-label>{{ $t('add_group_permission') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+    </div>
 
     <confirm-dialog
       v-if="selected && selected.subject"
@@ -157,6 +175,8 @@ const suggestions = ref<string[]>([]);
 
 const showSuggestions = ref(false);
 
+const rows = computed(() => authzStore.acls[props.resource]);
+
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'subject' , style: 'width: 30%'},
   { name: 'type', label: t('type'), align: 'left', field: 'subject' },
@@ -165,6 +185,10 @@ const columns = computed(() => [
 
 onMounted(async () => {
   authzStore.initAcls(props.resource);
+});
+
+onUnmounted(() => {
+  authzStore.resetAcls(props.resource);
 });
 
 watch(() => props.resource, async (resource) => {
@@ -197,9 +221,9 @@ function onShowDelete(row: Acl) {
 
 function onFilter() {
   if (!filter.value) {
-    return authzStore.acls;
+    return authzStore.acls[props.resource];
   }
-  return authzStore.acls.filter((row) => {
+  return authzStore.acls[props.resource].filter((row) => {
     return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
   });
 }
@@ -222,11 +246,11 @@ function onShowAddGroup() {
 
 function onSubmitPermission() {
   selected.value.actions = [action.value];
-  authzStore.setAcl(selected.value);
+  authzStore.setAcl(props.resource, selected.value);
 }
 
 function deletePermission() {
-  authzStore.deleteAcl(selected.value);
+  authzStore.deleteAcl(props.resource, selected.value);
 }
 
 function onSearchSubject(value: string) {

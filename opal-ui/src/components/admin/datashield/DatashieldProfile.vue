@@ -1,23 +1,6 @@
 <template>
   <div>
-    <div class="text-h5 q-mb-md">
-      {{ profile.name }}
-      <q-icon
-        name="circle"
-        size="sm"
-        :color="profile.enabled ? 'green' : 'red'"
-      />
-      <q-btn
-        v-if="!builtinProfile"
-        outline
-        color="red"
-        icon="delete"
-        size="sm"
-        class="on-right"
-        @click="onShowDeleteProfile" />
-    </div>
-    <q-separator class="q-mb-md"/>
-    <div v-if="missingCluster" class="bg-warning q-pa-md q-mb-md">
+    <div v-if="missingCluster" class="box-warning q-mb-md">
       <q-icon name="warning" />
       {{ $t('datashield.profile_missing_cluster') }}
     </div>
@@ -35,6 +18,14 @@
           :items="items"
           :dbobject="profile"
         />
+        <q-btn
+          v-if="!builtinProfile"
+          color="red"
+          icon="delete"
+          :label="$t('delete')"
+          size="sm"
+          @click="onShowDeleteProfile"
+          class="q-mt-md" />
       </div>
       <div class="col-md-6 col-xs-12">
         <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
@@ -59,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="text-h6 q-mb-md">{{ $t('settings') }}</div>
+    <div class="text-h6 q-mt-lg">{{ $t('settings') }}</div>
     <div class="text-help q-mb-md">
       {{ $t('datashield.profile_settings_help') }}
     </div>
@@ -98,6 +89,7 @@
           <datashield-options />
         </q-tab-panel>
       </q-tab-panels>
+
     </div>
 
     <datashield-profile-init-dialog v-model="showInitSettings" @before-init="onBeforeInit" @after-init="onAfterInit" />

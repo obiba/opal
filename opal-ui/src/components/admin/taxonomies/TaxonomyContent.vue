@@ -1,7 +1,7 @@
 <template>
   <div v-if="taxonomyName">
     <div class="text-h5">
-      <q-icon name="sell" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ taxonomy.name }}</span>
+      <span>{{ taxonomy.name }}</span>
       <q-btn outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
       <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
       <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
