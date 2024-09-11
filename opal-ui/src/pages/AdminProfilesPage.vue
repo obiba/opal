@@ -15,6 +15,4 @@
 
 <script setup lang="ts">
 import ProfilesList from 'src/components/admin/profiles/ProfilesList.vue';
-
-
 </script>

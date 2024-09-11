@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Ws";
+export const protobufPackage = 'Ws';
 
 export interface ClientErrorDto {
   /** Holds the HTTP status code (4xx) */

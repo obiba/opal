@@ -32,7 +32,6 @@
           <q-chip class="q-ml-none" v-for="user in props.col.format(props.row.subjectCredentials)" :key="user.name">
             {{ user }}
           </q-chip>
-
         </q-td>
       </template>
     </q-table>
@@ -44,7 +43,6 @@
       :text="$t('delete_group_confirm', { group: selectedGroup.name })"
       @confirm="doDeleteGroup"
     />
-
   </div>
 </template>
 

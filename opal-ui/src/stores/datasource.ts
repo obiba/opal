@@ -33,11 +33,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
     // bundle attributes by namespace and name into a AttributesBundle array
     const bundles = variable.value.attributes.reduce((acc: AttributesBundle[], attr) => {
       const id = attr.namespace ? `${attr.namespace}::${attr.name}` : attr.name;
-      const index = acc.findIndex(bundle => bundle.id === id);
+      const index = acc.findIndex((bundle) => bundle.id === id);
       if (index === -1) {
         acc.push({
           id,
-          attributes: [attr]
+          attributes: [attr],
         } as AttributesBundle);
       } else {
         acc[index].attributes.push(attr);
@@ -95,15 +95,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
     }
   }
 
-  async function initDatasourceTableVariable(
-    dsName: string,
-    tName: string,
-    vName: string
-  ) {
+  async function initDatasourceTableVariable(dsName: string, tName: string, vName: string) {
     if (datasource.value?.name !== dsName || table.value?.name !== tName) {
-      return initDatasourceTable(dsName, tName).then(() =>
-        loadTableVariable(vName)
-      );
+      return initDatasourceTable(dsName, tName).then(() => loadTableVariable(vName));
     } else {
       return loadTableVariable(vName);
     }
@@ -131,13 +125,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
     // variables.value = [];
     // variable.value = {} as VariableDto;
     delete perms.value.tables;
-    return api
-      .get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } } )
-      .then((response) => {
-        perms.value.tables = new Perms(response);
-        tables.value = response.data;
-        return response;
-      });
+    return api.get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } }).then((response) => {
+      perms.value.tables = new Perms(response);
+      tables.value = response.data;
+      return response;
+    });
   }
 
   async function loadTable(name: string) {
@@ -170,52 +162,42 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadView(name: string) {
     view.value = {} as ViewDto;
-    return api
-      .get(`/datasource/${datasource.value.name}/view/${name}`)
-      .then((response) => {
-        view.value = response.data;
-        return response;
-      });
+    return api.get(`/datasource/${datasource.value.name}/view/${name}`).then((response) => {
+      view.value = response.data;
+      return response;
+    });
   }
 
   async function loadTableVariables() {
     variables.value = [];
     delete perms.value.variables;
-    return api
-      .get(
-        `/datasource/${datasource.value.name}/table/${table.value.name}/variables`
-      )
-      .then((response) => {
-        perms.value.variables = new Perms(response);
-        variables.value = response.data;
-        return response;
-      });
+    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/variables`).then((response) => {
+      perms.value.variables = new Perms(response);
+      variables.value = response.data;
+      return response;
+    });
   }
 
   async function getTableVariables(dsName: string, tName: string) {
-    return api
-      .get(
-        `/datasource/${dsName}/table/${tName}/variables`
-      )
-      .then((response) => {
-        return response.data;
-      });
+    return api.get(`/datasource/${dsName}/table/${tName}/variables`).then((response) => {
+      return response.data;
+    });
   }
 
   async function loadTableVariable(name: string) {
     variable.value = {} as VariableDto;
     delete perms.value.variable;
     return api
-      .get(
-        `/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`
-      )
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`)
       .then((response) => {
         perms.value.variable = new Perms(response);
         variable.value = response.data;
-        return api.options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`).then((response) => {
-          perms.value.variablePermissions = new Perms(response);
-          return response;
-        });
+        return api
+          .options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`)
+          .then((response) => {
+            perms.value.variablePermissions = new Perms(response);
+            return response;
+          });
       });
   }
 
@@ -224,73 +206,59 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function addTable(name: string, entityType: string) {
-    return api.post(
-      `/datasource/${datasource.value.name}/tables`,
-      {
-        name: name.trim(),
-        entityType: entityType ? entityType.trim() : 'Participant'
-      }
-    );
+    return api.post(`/datasource/${datasource.value.name}/tables`, {
+      name: name.trim(),
+      entityType: entityType ? entityType.trim() : 'Participant',
+    });
   }
 
   async function addVariablesView(project: string, name: string, from: string[], variables: VariableDto[]) {
-    return api.post(
-      `/datasource/${project}/views`,
-      {
-        name: name.trim(),
-        from: from,
-        'Magma.VariableListViewDto.view':{variables}
-      }
-    )
+    return api.post(`/datasource/${project}/views`, {
+      name: name.trim(),
+      from: from,
+      'Magma.VariableListViewDto.view': { variables },
+    });
   }
 
   async function addResourceView(project: string, name: string, from: string, view: ResourceViewDto) {
-    return api.post(
-      `/datasource/${project}/views`,
-      {
-        name: name.trim(),
-        from: [from],
-        'Magma.ResourceViewDto.view': view
-      }
-    )
+    return api.post(`/datasource/${project}/views`, {
+      name: name.trim(),
+      from: [from],
+      'Magma.ResourceViewDto.view': view,
+    });
   }
 
   async function updateTable(original: TableDto, updated: TableDto) {
-    return api.put(
-      `/datasource/${datasource.value.name}/table/${original.name}`,
-      updated)
+    return api.put(`/datasource/${datasource.value.name}/table/${original.name}`, updated);
   }
 
   async function updateView(project: string, name: string, updated: ViewDto, comment: string) {
-    return api.put(
-      `/datasource/${project}/view/${name}`,
-      updated, { params: { comment } })
+    return api.put(`/datasource/${project}/view/${name}`, updated, { params: { comment } });
   }
 
   async function deleteTable(name: string) {
-    return api.delete(
-      `/datasource/${datasource.value.name}/table/${name}`)
+    return api.delete(`/datasource/${datasource.value.name}/table/${name}`);
   }
 
   async function deleteTables(tables: string[] | undefined) {
-    return api.delete(
-      `/datasource/${datasource.value.name}/tables`, {
-        params: { table: tables },
-        paramsSerializer: {
-          indexes: null, // no brackets at all
-        },
-      })
+    return api.delete(`/datasource/${datasource.value.name}/tables`, {
+      params: { table: tables },
+      paramsSerializer: {
+        indexes: null, // no brackets at all
+      },
+    });
   }
 
   async function deleteVariables(variables: string[] | undefined) {
     const type = table.value.viewType ? 'view' : 'table';
-    return api.delete(
-      `/datasource/${datasource.value.name}/${type}/${table.value.name}/variables`, {
+    return api
+      .delete(`/datasource/${datasource.value.name}/${type}/${table.value.name}/variables`, {
         params: { variable: variables },
         paramsSerializer: {
           indexes: null, // no brackets at all
         },
-      }).then(() => loadTableVariables());
+      })
+      .then(() => loadTableVariables());
   }
 
   function downloadTablesDictionary(tables: string[] | undefined) {
@@ -324,7 +292,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
     const params = { offset, limit };
     if (select && select.length > 0) {
-      params.select = `name().matches(/^${select.join('$|^')}$/)`
+      params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }
     return api
       .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
@@ -335,18 +303,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   function loadVariableSummary(localVar: VariableDto | undefined, fullIfCached: boolean, limit: number | undefined) {
     if (!localVar?.parentLink) return Promise.reject('No variable');
-    const link = localVar ? `${localVar.parentLink?.link}/variable/${localVar.name}` : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
+    const link = localVar
+      ? `${localVar.parentLink?.link}/variable/${localVar.name}`
+      : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
     const params = { fullIfCached };
     if (limit) {
       params.limit = limit;
     } else {
       params.resetCache = true;
     }
-    return api
-      .get(`${link}/summary`, { params })
-      .then((response) => {
-        return response.data;
-      });
+    return api.get(`${link}/summary`, { params }).then((response) => {
+      return response.data;
+    });
   }
 
   async function getAllTables(entityType: string | undefined): Promise<TableDto[]> {
@@ -376,18 +344,20 @@ export const useDatasourceStore = defineStore('datasource', () => {
   function updateVariable(localVar: VariableDto) {
     const tableType = table.value.viewType ? 'view' : 'table';
     localVar.entityType = table.value.entityType;
-    return api.put(`/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`, localVar).then(() => {
-      return loadTableVariables();
-    });
+    return api
+      .put(
+        `/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`,
+        localVar
+      )
+      .then(() => {
+        return loadTableVariables();
+      });
   }
 
   function saveDerivedVariable(localVar: VariableDto, comment: string | undefined) {
     const link = `/datasource/${datasource.value.name}/view/${table.value.name}`;
     return api.put(`${link}/variable/${variable.value.name}`, localVar, { params: { comment } }).then(() => {
-      return Promise.all([
-        loadTableVariable(localVar.name),
-        loadTableVariables(),
-      ]);
+      return Promise.all([loadTableVariable(localVar.name), loadTableVariables()]);
     });
   }
 
@@ -398,57 +368,64 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function getView(project: string, name: string) {
-    return api
-      .get(`/datasource/${project}/view/${name}`)
-      .then((response) => {
-        return response.data;
-      });
+    return api.get(`/datasource/${project}/view/${name}`).then((response) => {
+      return response.data;
+    });
   }
 
-  async function annotate(variables: VariableDto[], taxonomy: string, vocabulary: string, termOrTexts: string | { [key: string]: string | undefined}) {
+  async function annotate(
+    variables: VariableDto[],
+    taxonomy: string,
+    vocabulary: string,
+    termOrTexts: string | { [key: string]: string | undefined }
+  ) {
     const grouped = groupVariablesByTableLink(variables);
 
-    return Promise.all(Object.keys(grouped).map((tableLink) => {
-      grouped[tableLink].forEach((v) => {
-        if (v.attributes === undefined) {
-          v.attributes = [];
-        }
-        // filter out existing annotations
-        v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
-        // add new annotations
-        if (typeof termOrTexts === 'string') {
-          v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrTexts });
-        } else {
-          for (const [key, value] of Object.entries(termOrTexts)) {
-            if (value !== undefined && value.trim() !== '') {
-              const locale = key === 'default' ? undefined : key;
-              v.attributes.push({ namespace: taxonomy, name: vocabulary, locale,  value });
+    return Promise.all(
+      Object.keys(grouped).map((tableLink) => {
+        grouped[tableLink].forEach((v) => {
+          if (v.attributes === undefined) {
+            v.attributes = [];
+          }
+          // filter out existing annotations
+          v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+          // add new annotations
+          if (typeof termOrTexts === 'string') {
+            v.attributes.push({ namespace: taxonomy, name: vocabulary, value: termOrTexts });
+          } else {
+            for (const [key, value] of Object.entries(termOrTexts)) {
+              if (value !== undefined && value.trim() !== '') {
+                const locale = key === 'default' ? undefined : key;
+                v.attributes.push({ namespace: taxonomy, name: vocabulary, locale, value });
+              }
             }
           }
-        }
-      });
-      return api.post(`${tableLink}/variables`, variables);
-    }));
+        });
+        return api.post(`${tableLink}/variables`, variables);
+      })
+    );
   }
 
   async function deleteAnnotation(variables: VariableDto[], taxonomy: string, vocabulary: string) {
     const grouped = groupVariablesByTableLink(variables);
 
-    return Promise.all(Object.keys(grouped).map((tableLink) => {
-      grouped[tableLink].forEach((v) => {
-        if (v.attributes !== undefined) {
-          v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
-        }
-      });
-      return api.post(`${tableLink}/variables`, variables);
-    }));
+    return Promise.all(
+      Object.keys(grouped).map((tableLink) => {
+        grouped[tableLink].forEach((v) => {
+          if (v.attributes !== undefined) {
+            v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
+          }
+        });
+        return api.post(`${tableLink}/variables`, variables);
+      })
+    );
   }
 
   function groupVariablesByTableLink(variables: VariableDto[]) {
     const grouped: { [key: string]: VariableDto[] } = {};
     variables.forEach((v) => {
       const key = v.parentLink?.link;
-      if (key){
+      if (key) {
         if (!grouped[key]) {
           grouped[key] = [];
         }
@@ -490,31 +467,33 @@ export const useDatasourceStore = defineStore('datasource', () => {
   //
 
   async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
-    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
-      params: {
-        v0: var0,
-        v1: var1,
-      }
-    }).then((response) => response.data);
+    return api
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
+        params: {
+          v0: var0,
+          v1: var1,
+        },
+      })
+      .then((response) => response.data);
   }
 
   async function loadTableIndex() {
-    return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
-      .then((response) => tableIndex.value = response.data);
+    return api
+      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .then((response) => (tableIndex.value = response.data));
   }
 
   async function updateTableIndex() {
-    return api.put(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
-      .finally(loadTableIndex);
+    return api.put(`/datasource/${datasource.value.name}/table/${table.value.name}/index`).finally(loadTableIndex);
   }
 
   async function deleteTableIndex() {
-    return api.delete(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
-      .finally(loadTableIndex);
+    return api.delete(`/datasource/${datasource.value.name}/table/${table.value.name}/index`).finally(loadTableIndex);
   }
 
   async function scheduleTableIndex(schedule: ScheduleDto) {
-    return api.put(`/datasource/${datasource.value.name}/table/${table.value.name}/index/schedule`, schedule)
+    return api
+      .put(`/datasource/${datasource.value.name}/table/${table.value.name}/index/schedule`, schedule)
       .finally(loadTableIndex);
   }
 
@@ -523,8 +502,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   //
 
   async function getEntityValueSet(datasource: string, table: string, entity: string) {
-    return api.get(`/datasource/${datasource}/table/${table}/valueSet/${entity}`)
-      .then((response) => response.data);
+    return api.get(`/datasource/${datasource}/table/${table}/valueSet/${entity}`).then((response) => response.data);
   }
 
   return {

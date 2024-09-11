@@ -21,7 +21,7 @@
               flat
               dense
               size="sm"
-              style="min-width: 400px;"
+              style="min-width: 400px"
               @update:model-value="onClear"
               @keyup.enter="onSubmit"
             />
@@ -33,7 +33,7 @@
               @click="onSubmit"
               :disable="loading || !isValid"
               class="q-mt-lg"
-              style="height: 2.5em;"
+              style="height: 2.5em"
             />
             <q-btn
               outline
@@ -41,9 +41,10 @@
               icon="cleaning_services"
               :label="$t('clear')"
               size="sm"
-              style="height: 2.5em;"
+              style="height: 2.5em"
               @click="onClearAndReset"
-              class="q-mt-lg" />
+              class="q-mt-lg"
+            />
           </div>
         </q-card-section>
         <q-card-section class="q-pt-none">
@@ -62,10 +63,11 @@
                 map-options
                 size="sm"
                 @update:model-value="onClearAndSubmit"
-                style="min-width: 200px;">
+                style="min-width: 200px"
+              >
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
-                    <q-item-section style="max-width: 400px;">
+                    <q-item-section style="max-width: 400px">
                       <q-item-label>{{ scope.opt.label }}</q-item-label>
                       <q-item-label caption>{{ scope.opt.description }}</q-item-label>
                     </q-item-section>
@@ -73,25 +75,22 @@
                 </template>
               </q-select>
             </template>
-            <q-btn-dropdown
-              color="secondary"
-              :label="$t('filters')"
-              size="sm"
-              class="q-mt-lg"
-              style="height: 2.5em;"
-            >
+            <q-btn-dropdown color="secondary" :label="$t('filters')" size="sm" class="q-mt-lg" style="height: 2.5em">
               <q-list>
                 <template v-for="field in fieldsToAdd" :key="field">
                   <q-item clickable v-close-popup @click="onToggleField(field)">
                     <q-item-section>
-                      <q-item-label :class="isFieldSelected(field) ? 'text-primary' : ''">{{ getFieldLabel(field) }}</q-item-label>
+                      <q-item-label :class="isFieldSelected(field) ? 'text-primary' : ''">{{
+                        getFieldLabel(field)
+                      }}</q-item-label>
                       <q-item-label class="text-hint">{{ getFieldGroupLabel(field) }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
                       <q-icon
                         :name="isFieldSelected(field) ? 'delete' : 'add_circle'"
                         size="xs"
-                        :color="isFieldSelected(field) ? 'primary' : 'grey-6'" />
+                        :color="isFieldSelected(field) ? 'primary' : 'grey-6'"
+                      />
                     </q-item-section>
                   </q-item>
                 </template>
@@ -105,25 +104,26 @@
         <q-spinner-dots size="lg" />
       </div>
       <div v-else-if="itemResults.length">
-        <div class="text-bold q-mb-md">
-          {{ $t('results') }} ({{ itemResults.length }}/{{ results?.totalHits }})
-        </div>
+        <div class="text-bold q-mb-md">{{ $t('results') }} ({{ itemResults.length }}/{{ results?.totalHits }})</div>
         <q-list separator>
-          <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
+          <q-item
+            clickable
+            v-close-popup
+            v-for="item in itemResults"
+            :key="item.identifier"
+            @click="goToVariable(item)"
+          >
             <q-item-section avatar>
               <span>{{ searchStore.getField(item, 'name') }}</span>
               <div>
-                <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span>
+                <span class="text-hint text-primary"
+                  >{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span
+                >
               </div>
             </q-item-section>
             <q-item-section top>
               <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </q-item-section>
@@ -133,14 +133,7 @@
           </q-item>
         </q-list>
         <div v-if="limit <= itemResults.length" class="q-mt-md">
-          <q-btn
-            no-caps
-            icon="add_circle"
-            :label="$t('more_results')"
-            color="primary"
-            size="sm"
-            @click="addLimit"
-          />
+          <q-btn no-caps icon="add_circle" :label="$t('more_results')" color="primary" size="sm" @click="addLimit" />
         </div>
       </div>
     </q-page>
@@ -165,12 +158,16 @@ const results = ref<QueryResultDto>();
 const limit = ref<number>(10);
 const tables = ref<TableDto[]>([]);
 
-const queryParam = computed(() => route.query.q as string || '');
-const isValid = computed(() => !!searchStore.variablesQuery.query?.trim() || Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0));
-const itemResults = computed(() => results.value?.hits as ItemFieldsResultDto[] || []);
+const queryParam = computed(() => (route.query.q as string) || '');
+const isValid = computed(
+  () =>
+    !!searchStore.variablesQuery.query?.trim() ||
+    Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0)
+);
+const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]) || []);
 
 interface FieldsOptions {
-  [key: string]: { label: string, value: string }[]
+  [key: string]: { label: string; value: string }[];
 }
 
 const fields = computed(() => Object.keys(searchStore.variablesQuery.criteria));
@@ -179,19 +176,23 @@ const tablesOptions = computed(() => Array.from(new Set(tables.value.map((table)
 const taxonomiesFieldsOptions = computed<FieldsOptions>(() => {
   const taxonomiesOptions = {} as FieldsOptions;
   taxonomiesStore.taxonomies.forEach((taxonomy) => {
-    taxonomy.vocabularies.filter((voc) => voc.terms).forEach((vocabulary) => {
-      taxonomiesOptions[`${taxonomy.name}-${vocabulary.name}`] = vocabulary.terms.map((term) => ({
-        label: taxonomiesStore.getLabel(term.title, locale.value),
-        value: term.name,
-        description: taxonomiesStore.getLabel(term.description, locale.value),
-      }));
-    })
+    taxonomy.vocabularies
+      .filter((voc) => voc.terms)
+      .forEach((vocabulary) => {
+        taxonomiesOptions[`${taxonomy.name}-${vocabulary.name}`] = vocabulary.terms.map((term) => ({
+          label: taxonomiesStore.getLabel(term.title, locale.value),
+          value: term.name,
+          description: taxonomiesStore.getLabel(term.description, locale.value),
+        }));
+      });
   });
-  return taxonomiesOptions
+  return taxonomiesOptions;
 });
 const fieldsOptions = computed<FieldsOptions>(() => {
   return {
-    project: projectsOptions.value.filter((p) => p !== undefined).map((project) => ({ label: project, value: project })),
+    project: projectsOptions.value
+      .filter((p) => p !== undefined)
+      .map((project) => ({ label: project, value: project })),
     table: tablesOptions.value.map((table) => ({ label: table, value: table })),
     nature: Object.keys(VariableNatures).map((key) => ({ label: t(`variable_nature.${key}`), value: key })),
     'value-type': ValueTypes.map((t) => ({ label: t, value: t })),
@@ -208,16 +209,13 @@ onMounted(() => {
     searchStore.variablesQuery.query = queryParam.value;
   }
   loading.value = true;
-  Promise.all([
-    searchStore.getTables().then((res) => tables.value = res),
-    taxonomiesStore.init(),
-  ])
+  Promise.all([searchStore.getTables().then((res) => (tables.value = res)), taxonomiesStore.init()])
     .then(() => onSubmit())
     .catch(() => {
       showResults.value = false;
       results.value = undefined;
     })
-    .finally(() => loading.value = false);
+    .finally(() => (loading.value = false));
 });
 
 function onClear() {
@@ -229,11 +227,13 @@ function onClear() {
 function onSubmit() {
   if (isValid.value) {
     loading.value = true;
-    searchStore.searchVariables(limit.value).then((res) => {
-      showResults.value = res.totalHits > 0;
-      results.value = res;
-    })
-    .finally(() => loading.value = false);
+    searchStore
+      .searchVariables(limit.value)
+      .then((res) => {
+        showResults.value = res.totalHits > 0;
+        results.value = res;
+      })
+      .finally(() => (loading.value = false));
   } else {
     loading.value = false;
   }

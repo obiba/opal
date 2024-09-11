@@ -203,7 +203,7 @@ export default {
       mapping_ignore_hint: 'Data which identifier cannot be mapped to a system identifier will not be imported.',
       mapping_allow: 'Generate a system identifier for each unknown imported identifiers',
       mapping_allow_hint: 'A system identifier will be generated for each unknown imported identifier.',
-    }
+    },
   },
   exporter: {
     file: {
@@ -376,7 +376,7 @@ export default {
     mapped_identifiers: 'Mapped Identifiers',
     import_table_sys_ids_info: 'The table which entity identifiers will be copied as system identifiers. New identifiers will be added, existing ones will be ignored.',
     entity_type_no_tables: "There are no tables for entity type '{entityType}'.",
-    no_database_warning: 'There are no identifiers database configured.'
+    no_database_warning: 'There are no identifiers database configured.',
   },
   git: {
     diff_viewer: {

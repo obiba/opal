@@ -20,14 +20,19 @@
       <span v-else>{{ value.value }}</span>
     </div>
     <div v-else-if="value.values">
-      <value-cell v-for="(val, idx) in value.values" :key="idx" :value="val" :variable="variable" :occurrence="idx + 1"></value-cell>
+      <value-cell
+        v-for="(val, idx) in value.values"
+        :key="idx"
+        :value="val"
+        :variable="variable"
+        :occurrence="idx + 1"
+      ></value-cell>
     </div>
     <div v-else>
       <span class="text-caption text-grey-5">null</span>
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({
@@ -52,7 +57,7 @@ const props = withDefaults(defineProps<ValueCellProps>(), {
 
 function onDownload() {
   if (props.value?.link) {
-    window.open(`${baseUrl}${props.value.link.replace('/entity/','/')}`, '_blank');
+    window.open(`${baseUrl}${props.value.link.replace('/entity/', '/')}`, '_blank');
   }
 }
 </script>

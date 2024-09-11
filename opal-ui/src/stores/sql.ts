@@ -15,7 +15,8 @@ export const useSqlStore = defineStore('sql', () => {
       timestamp: currentTimeMillis,
       delay: 0,
     } as SqlCommand;
-    return api.post(`/datasource/${command.datasource}/_sql`, command.query, {
+    return api
+      .post(`/datasource/${command.datasource}/_sql`, command.query, {
         headers: {
           'Content-Type': 'text/plain',
         },

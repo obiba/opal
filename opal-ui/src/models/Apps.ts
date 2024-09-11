@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Apps";
+export const protobufPackage = 'Apps';
 
 export interface AppDto {
   id?: string | undefined;

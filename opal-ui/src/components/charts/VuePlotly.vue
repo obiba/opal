@@ -33,12 +33,7 @@ const ready = ref(false);
 
 function setGraph() {
   if (!ready.value || !plotlyId.value || !props.data || !props.layout) return;
-  Plotly.newPlot(
-    plotlyId.value,
-    props.data as Plotly.Data[],
-    props.layout as Plotly.Layout,
-    props.config
-  );
+  Plotly.newPlot(plotlyId.value, props.data as Plotly.Data[], props.layout as Plotly.Layout, props.config);
 }
 
 onMounted(() => {

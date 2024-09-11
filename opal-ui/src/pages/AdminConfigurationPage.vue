@@ -11,10 +11,7 @@
       <div class="text-h5 q-mb-md">{{ $t('configuration') }}</div>
       <general-configuration />
       <div class="text-h5 q-mb-md q-mt-lg">{{ $t('permissions') }}</div>
-      <access-control-list
-        resource="/system/permissions/administration"
-        :options="['PROJECT_ADD', 'SYSTEM_ALL']"
-      />
+      <access-control-list resource="/system/permissions/administration" :options="['PROJECT_ADD', 'SYSTEM_ALL']" />
     </q-page>
   </div>
 </template>

@@ -3,8 +3,7 @@ import { api } from 'src/boot/api';
 import { Acl, SuggestionsDto } from 'src/models/Opal';
 
 export const useAuthzStore = defineStore('authz', () => {
-
-  const acls = ref<{[key: string]: Acl[]}>({}); // the list of ACLs for the current resource
+  const acls = ref<{ [key: string]: Acl[] }>({}); // the list of ACLs for the current resource
 
   function reset() {
     acls.value = {};
@@ -25,31 +24,47 @@ export const useAuthzStore = defineStore('authz', () => {
   }
 
   async function setAcl(path: string, acl: Acl) {
-    return api.post(path, {}, { params: {
-      type: acl.subject?.type,
-      principal: acl.subject?.principal,
-      permission: acl.actions.join(','),
-    }}).then(() => {
-      return initAcls(path);
-    });
+    return api
+      .post(
+        path,
+        {},
+        {
+          params: {
+            type: acl.subject?.type,
+            principal: acl.subject?.principal,
+            permission: acl.actions.join(','),
+          },
+        }
+      )
+      .then(() => {
+        return initAcls(path);
+      });
   }
 
   async function deleteAcl(path: string, acl: Acl) {
-    return api.delete(path, { params: {
-      type: acl.subject?.type,
-      principal: acl.subject?.principal,
-    }}).then(() => {
-      return initAcls(path);
-    });
+    return api
+      .delete(path, {
+        params: {
+          type: acl.subject?.type,
+          principal: acl.subject?.principal,
+        },
+      })
+      .then(() => {
+        return initAcls(path);
+      });
   }
 
   async function searchSubjects(type: string, query: string): Promise<SuggestionsDto> {
-    return api.get('/system/subject-profiles/_search', { params: {
-      type,
-      query,
-    }}).then((response) => {
-      return response.data;
-    });
+    return api
+      .get('/system/subject-profiles/_search', {
+        params: {
+          type,
+          query,
+        },
+      })
+      .then((response) => {
+        return response.data;
+      });
   }
 
   return {
@@ -60,5 +75,5 @@ export const useAuthzStore = defineStore('authz', () => {
     setAcl,
     deleteAcl,
     searchSubjects,
-  }
+  };
 });

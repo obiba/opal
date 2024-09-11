@@ -3,7 +3,6 @@ import { api } from 'src/boot/api';
 import { RServerClusterDto, RSessionDto, RWorkspaceDto, RPackageDto } from 'src/models/OpalR';
 
 export const useRStore = defineStore('r', () => {
-
   const clusters = ref<RServerClusterDto[]>([]);
   const sessions = ref<RSessionDto[]>([]);
   const workspaces = ref<RWorkspaceDto[]>([]);
@@ -57,7 +56,7 @@ export const useRStore = defineStore('r', () => {
 
   async function stopRServer(clusterId: string, serverId: string) {
     return api.delete(`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
-      Promise.all([ initClusters(), initSessions()]);
+      Promise.all([initClusters(), initSessions()]);
     });
   }
 
@@ -72,11 +71,13 @@ export const useRStore = defineStore('r', () => {
   }
 
   async function deleteWorkspace(ws: RWorkspaceDto) {
-    return api.delete('/service/r/workspaces', { params: {
-      name: ws.name,
-      user: ws.user,
-      context: ws.context,
-    } });
+    return api.delete('/service/r/workspaces', {
+      params: {
+        name: ws.name,
+        user: ws.user,
+        context: ws.context,
+      },
+    });
   }
 
   async function deleteWorkspaces(workspaces: RWorkspaceDto[]) {
@@ -85,13 +86,22 @@ export const useRStore = defineStore('r', () => {
     });
   }
 
-  async function installRPackage(clusterId: string, manager: 'cran' | 'gh' | 'bioc', packageName: string, ref?: string) {
-    return api.post(`/service/r/cluster/${clusterId}/commands/_install`, {
-      cluster: clusterId,
-      manager: manager,
-      name: packageName,
-      ref: ref,
-    }, { params: { name: packageName } });
+  async function installRPackage(
+    clusterId: string,
+    manager: 'cran' | 'gh' | 'bioc',
+    packageName: string,
+    ref?: string
+  ) {
+    return api.post(
+      `/service/r/cluster/${clusterId}/commands/_install`,
+      {
+        cluster: clusterId,
+        manager: manager,
+        name: packageName,
+        ref: ref,
+      },
+      { params: { name: packageName } }
+    );
   }
 
   async function updateRPackages(clusterId: string) {

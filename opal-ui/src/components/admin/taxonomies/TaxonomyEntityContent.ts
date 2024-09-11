@@ -134,7 +134,6 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
       canSort.value = false;
       rows.value = clone;
     }
-
   }
 
   return {

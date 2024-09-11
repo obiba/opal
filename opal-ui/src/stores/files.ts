@@ -41,11 +41,7 @@ export const useFilesStore = defineStore('files', () => {
     downloadFiles(path, [], undefined);
   }
 
-  function downloadFiles(
-    path: string,
-    files: FileDto[],
-    password: string | undefined
-  ) {
+  function downloadFiles(path: string, files: FileDto[], password: string | undefined) {
     if (password) {
       return api
         .get(`/files${path}`, {
@@ -102,7 +98,6 @@ export const useFilesStore = defineStore('files', () => {
     });
   }
 
-
   function extractArchive(path: string, destination: FileDto, key: string | undefined) {
     if (destination.type !== FileDto_FileType.FOLDER) return Promise.reject('Invalid destination');
     const params = {
@@ -141,9 +136,7 @@ export const useFilesStore = defineStore('files', () => {
     const params = {
       action: copySelection.value.length > 0 ? 'copy' : 'move',
       file:
-        copySelection.value.length > 0
-          ? copySelection.value.map((f) => f.path)
-          : cutSelection.value.map((f) => f.path),
+        copySelection.value.length > 0 ? copySelection.value.map((f) => f.path) : cutSelection.value.map((f) => f.path),
     };
     return api
       .put(
@@ -167,9 +160,7 @@ export const useFilesStore = defineStore('files', () => {
     // selections not in own parent folder or in itself when is a folder
     function canPaste(files: FileDto[]) {
       return files.every(
-        (f) =>
-          path !== getParentFolder(f.path) &&
-          (f.type === FileDto_FileType.FILE || !path.startsWith(f.path))
+        (f) => path !== getParentFolder(f.path) && (f.type === FileDto_FileType.FILE || !path.startsWith(f.path))
       );
     }
     return (

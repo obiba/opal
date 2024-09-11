@@ -23,22 +23,8 @@
               size="sm"
               @click="onShowAddVariable"
             />
-            <q-btn
-              color="secondary"
-              icon="refresh"
-              :title="$t('refresh')"
-              outline
-              size="sm"
-              @click="onRefresh"
-            />
-            <q-btn
-              color="secondary"
-              icon="search"
-              :title="$t('search')"
-              outline
-              size="sm"
-              @click="onSearch"
-            />
+            <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="onRefresh" />
+            <q-btn color="secondary" icon="search" :title="$t('search')" outline size="sm" @click="onSearch" />
             <q-btn
               v-if="datasourceStore.perms.table?.canUpdate()"
               outline
@@ -70,7 +56,8 @@
               no-caps
               dense
               flat
-              size="sm">
+              size="sm"
+            >
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
                   <q-item-section>
@@ -98,13 +85,7 @@
         </div>
       </template>
       <template v-slot:top-right>
-        <q-input
-          dense
-          clearable
-          debounce="400"
-          color="primary"
-          v-model="filter"
-        >
+        <q-input dense clearable debounce="400" color="primary" v-model="filter">
           <template v-slot:append>
             <q-icon name="search" />
           </template>
@@ -123,12 +104,7 @@
       <template v-slot:body-cell-label="props">
         <q-td :props="props">
           <div v-for="attr in getLabels(props.value)" :key="attr.locale">
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
+            <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
         </q-td>
@@ -140,10 +116,8 @@
       </template>
       <template v-slot:body-cell-annotations="props">
         <q-td :props="props">
-
           <template v-for="annotation in taxonomiesStore.getAnnotations(props.value, true)" :key="annotation.id">
-            <q-chip
-              class="on-left">
+            <q-chip class="on-left">
               {{ taxonomiesStore.getLabel(annotation.term.title, locale) }}
               <q-tooltip>
                 <annotation-panel :annotation="annotation" max-width="400px" class="bg-grey-7" />
@@ -155,9 +129,19 @@
     </q-table>
 
     <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="selected" />
-    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="selected" :operation="annotationOperation" />
+    <annotate-dialog
+      v-model="showAnnotate"
+      :table="datasourceStore.table"
+      :variables="selected"
+      :operation="annotationOperation"
+    />
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
-    <confirm-dialog v-model="showDeleteVariables" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: selected.length || rows.length })" @confirm="onDeleteVariables" />
+    <confirm-dialog
+      v-model="showDeleteVariables"
+      :title="$t('delete')"
+      :text="$t('delete_variables_confirm', { count: selected.length || rows.length })"
+      @confirm="onDeleteVariables"
+    />
   </div>
 </template>
 
@@ -265,8 +249,7 @@ function init() {
     .initDatasourceTableVariables(dsName.value, tName.value)
     .catch((err) => {
       notifyError(err);
-      if (err.response?.status === 404)
-        router.push(`/project/${dsName.value}/tables`);
+      if (err.response?.status === 404) router.push(`/project/${dsName.value}/tables`);
     })
     .finally(() => {
       loading.value = false;
@@ -276,10 +259,9 @@ function init() {
 
 function onRefresh() {
   loading.value = true;
-  datasourceStore.loadTableVariables()
-    .finally(() => {
-      loading.value = false;
-    });
+  datasourceStore.loadTableVariables().finally(() => {
+    loading.value = false;
+  });
 }
 
 function getCategoryNames(categories: CategoryDto[]) {
@@ -287,9 +269,7 @@ function getCategoryNames(categories: CategoryDto[]) {
 }
 
 function onRowClick(evt: unknown, row: { name: string }) {
-  router.push(
-    `/project/${dsName.value}/table/${tName.value}/variable/${row.name}`
-  );
+  router.push(`/project/${dsName.value}/table/${tName.value}/variable/${row.name}`);
 }
 
 function onShowDeleteVariables() {
@@ -298,12 +278,10 @@ function onShowDeleteVariables() {
 
 function onDeleteVariables() {
   const names = (selected.value.length === 0 ? rows.value : selected.value).map((v) => v.name);
-  datasourceStore
-    .deleteVariables(names)
-    .then(() => {
-      selected.value = [];
-      init();
-    });
+  datasourceStore.deleteVariables(names).then(() => {
+    selected.value = [];
+    init();
+  });
 }
 
 function onShowAddVariable() {

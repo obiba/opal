@@ -21,7 +21,7 @@
             <div v-if="subjectTypes[type]">
               <q-list dense padding>
                 <q-item-label header class="text-weight-bolder">
-                  <q-icon :name="ICONS[type]" size="sm" class="on-left"/>
+                  <q-icon :name="ICONS[type]" size="sm" class="on-left" />
                   <span>{{ $t(CAPTIONS[type]) }}</span>
                 </q-item-label>
                 <q-item
@@ -116,7 +116,8 @@ function initializeSubjectTypes() {
 }
 
 function findCandidateSubject() {
-  const candidates = subjectTypes.value[Subject_SubjectType.USER] || subjectTypes.value[Subject_SubjectType.GROUP] || [];
+  const candidates =
+    subjectTypes.value[Subject_SubjectType.USER] || subjectTypes.value[Subject_SubjectType.GROUP] || [];
   return candidates[0] || null;
 }
 

@@ -13,9 +13,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{
-        $t('content')
-      }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ $t('content') }}</q-item-label>
 
       <q-item to="/files/home">
         <q-item-section avatar>
@@ -57,9 +55,7 @@ const route = useRoute();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : '?'
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
 watch(
   () => route.params.path,

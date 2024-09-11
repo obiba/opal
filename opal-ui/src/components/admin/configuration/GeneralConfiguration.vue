@@ -2,17 +2,9 @@
   <div class="row">
     <div class="col-12 col-md-6">
       <div class="q-mb-md">
-        <q-btn
-          :title="$t('edit')"
-          icon="edit"
-          color="primary"
-          size="sm"
-          @click="onShowEdit" />
+        <q-btn :title="$t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
       </div>
-      <fields-list
-        :items="items"
-        :dbobject="systemStore.generalConf"
-      />
+      <fields-list :items="items" :dbobject="systemStore.generalConf" />
     </div>
 
     <q-dialog v-model="showEdit">
@@ -27,19 +19,22 @@
             dense
             :label="$t('name')"
             :hint="$t('app_configuration.name_hint')"
-            class="q-mb-md"/>
+            class="q-mb-md"
+          />
           <q-input
             v-model="config.publicURL"
             dense
             :label="$t('public_url')"
             :hint="$t('app_configuration.public_url_hint')"
-            class="q-mb-md"/>
+            class="q-mb-md"
+          />
           <q-input
             v-model="config.logoutURL"
             dense
             :label="$t('logout_url')"
             :hint="$t('app_configuration.logout_url_hint')"
-            class="q-mb-md"/>
+            class="q-mb-md"
+          />
           <q-select
             v-model="config.languages"
             :options="languages"
@@ -48,18 +43,16 @@
             use-chips
             :label="$t('laguages')"
             :hint="$t('app_configuration.languages_hint')"
-            class="q-mb-md"/>
+            class="q-mb-md"
+          />
           <q-input
             v-model="config.defaultCharSet"
             dense
             :label="$t('default_charset')"
             :hint="$t('app_configuration.default_charset_hint')"
-            class="q-mb-md"/>
-          <q-toggle
-            v-model="config.enforced2FA"
-            dense
-            :label="$t('enforced_2fa')"
-            class="q-mb-sm"/>
+            class="q-mb-md"
+          />
+          <q-toggle v-model="config.enforced2FA" dense :label="$t('enforced_2fa')" class="q-mb-sm" />
           <div class="text-hint">
             {{ $t('app_configuration.enforced_2fa_hint') }}
           </div>
@@ -74,7 +67,6 @@
   </div>
 </template>
 
-
 <script lang="ts">
 export default defineComponent({
   name: 'GeneralConfiguration',
@@ -86,17 +78,51 @@ import { StringMap } from 'src/components/models';
 
 const items: FieldItem<StringMap>[] = [
   { field: 'name' },
-  { field: 'publicURL', label: 'public_url', html: (val) => val.publicURL ? `<a href="${val.publicURL}" target="_blank">${val.publicURL}</a>` : '-' },
-  { field: 'logoutURL', label: 'logout_url', html: (val) => val.logoutURL ? `<a href="${val.logoutURL}" target="_blank">${val.logoutURL}</a>` : '-' },
-  { field: 'languages', label: 'laguages', format: (val) => val.languages ? (val.languages as string[]).join(', ') : '-' },
+  {
+    field: 'publicURL',
+    label: 'public_url',
+    html: (val) => (val.publicURL ? `<a href="${val.publicURL}" target="_blank">${val.publicURL}</a>` : '-'),
+  },
+  {
+    field: 'logoutURL',
+    label: 'logout_url',
+    html: (val) => (val.logoutURL ? `<a href="${val.logoutURL}" target="_blank">${val.logoutURL}</a>` : '-'),
+  },
+  {
+    field: 'languages',
+    label: 'laguages',
+    format: (val) => (val.languages ? (val.languages as string[]).join(', ') : '-'),
+  },
   { field: 'defaultCharSet', label: 'default_charset' },
-  { field: 'enforced2FA', label: 'enforced_2fa', icon: (val) => val.enforced2FA ? 'check' : 'close' },
-
+  { field: 'enforced2FA', label: 'enforced_2fa', icon: (val) => (val.enforced2FA ? 'check' : 'close') },
 ];
 
 // list of all the european two-letters language codes
 const languages = [
-  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga', 'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv',
+  'bg',
+  'cs',
+  'da',
+  'de',
+  'el',
+  'en',
+  'es',
+  'et',
+  'fi',
+  'fr',
+  'ga',
+  'hr',
+  'hu',
+  'it',
+  'lt',
+  'lv',
+  'mt',
+  'nl',
+  'pl',
+  'pt',
+  'ro',
+  'sk',
+  'sl',
+  'sv',
 ];
 const systemStore = useSystemStore();
 

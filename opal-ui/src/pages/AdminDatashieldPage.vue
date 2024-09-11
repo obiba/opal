@@ -22,12 +22,7 @@
         <div class="col-12 col-md-6">
           <div class="text-h5 q-mb-md">{{ $t('datashield.audit') }}</div>
           <div class="text-help q-mb-md">{{ $t('datashield.audit_info') }}</div>
-          <q-btn-dropdown
-            :label="$t('download')"
-            icon="download"
-            size="sm"
-            color="primary"
-            >
+          <q-btn-dropdown :label="$t('download')" icon="download" size="sm" color="primary">
             <q-list>
               <q-item clickable v-close-popup @click="onDownloadLogs(true)">
                 <q-item-section>

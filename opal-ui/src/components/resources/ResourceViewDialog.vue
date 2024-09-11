@@ -1,85 +1,82 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-      <q-card class="dialog-sm">
-        <q-card-section>
-          <div class="text-h6">{{ editMode ? $t('edit_view') : $t('add_view') }}</div>
-        </q-card-section>
+    <q-card class="dialog-sm">
+      <q-card-section>
+        <div class="text-h6">{{ editMode ? $t('edit_view') : $t('add_view') }}</div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-section>
-          <q-select
-            v-show="!editMode"
-            v-model="projectDestination"
-            :options="projectNames"
-            :label="$t('project_destination')"
-            dense
-            class="q-mb-md"/>
-          <q-input
-            v-model="name"
-            dense
-            type="text"
-            :label="$t('view_name')"
-            :hint="$t('resource_ref.view_destination_hint')"
-            class="q-mb-md"
-          />
-          <q-input
-            v-show="editMode"
-            v-model="resourceFullName"
-            dense
-            type="text"
-            :label="$t('resource')"
-            :hint="$t('resource_ref.from_hint')"
-            class="q-mb-md"
-          />
-          <q-input
-            v-model="id"
-            dense
-            type="text"
-            :label="$t('resource_ref.id_column')"
-            :hint="$t('resource_ref.id_column_hint')"
-            class="q-mb-md"
-          />
-          <q-input
-            v-model="entityType"
-            dense
-            type="text"
-            :label="$t('entity_type')"
-            :hint="$t('resource_ref.entity_type_hint')"
-            class="q-mb-md"
-          />
-          <q-checkbox
-            dense
-            v-model="allColumns"
-            :label="$t('resource_ref.all_columns')"
-          />
-          <div class="text-hint q-mt-sm q-mb-md">{{ $t('resource_ref.all_columns_hint') }}</div>
+      <q-card-section>
+        <q-select
+          v-show="!editMode"
+          v-model="projectDestination"
+          :options="projectNames"
+          :label="$t('project_destination')"
+          dense
+          class="q-mb-md"
+        />
+        <q-input
+          v-model="name"
+          dense
+          type="text"
+          :label="$t('view_name')"
+          :hint="$t('resource_ref.view_destination_hint')"
+          class="q-mb-md"
+        />
+        <q-input
+          v-show="editMode"
+          v-model="resourceFullName"
+          dense
+          type="text"
+          :label="$t('resource')"
+          :hint="$t('resource_ref.from_hint')"
+          class="q-mb-md"
+        />
+        <q-input
+          v-model="id"
+          dense
+          type="text"
+          :label="$t('resource_ref.id_column')"
+          :hint="$t('resource_ref.id_column_hint')"
+          class="q-mb-md"
+        />
+        <q-input
+          v-model="entityType"
+          dense
+          type="text"
+          :label="$t('entity_type')"
+          :hint="$t('resource_ref.entity_type_hint')"
+          class="q-mb-md"
+        />
+        <q-checkbox dense v-model="allColumns" :label="$t('resource_ref.all_columns')" />
+        <div class="text-hint q-mt-sm q-mb-md">{{ $t('resource_ref.all_columns_hint') }}</div>
 
-          <q-input
-            v-model="profile"
-            dense
-            type="text"
-            :label="$t('resource_ref.r_server_profile')"
-            :hint="$t('resource_ref.r_server_profile_hint')"
-            class="q-mb-md"
-          />
-        </q-card-section>
+        <q-input
+          v-model="profile"
+          dense
+          type="text"
+          :label="$t('resource_ref.r_server_profile')"
+          :hint="$t('resource_ref.r_server_profile_hint')"
+          class="q-mb-md"
+        />
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-spinner-dots v-if="processing" class="on-left"/>
-          <q-btn flat :label="$t('cancel')" color="secondary" :disable="processing" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('save')"
-            color="primary"
-            @click="onSaveView"
-            :disable="!projectDestination || !name || processing"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+      <q-card-actions align="right" class="bg-grey-3">
+        <q-spinner-dots v-if="processing" class="on-left" />
+        <q-btn flat :label="$t('cancel')" color="secondary" :disable="processing" v-close-popup />
+        <q-btn
+          flat
+          :label="$t('save')"
+          color="primary"
+          @click="onSaveView"
+          :disable="!projectDestination || !name || processing"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -99,7 +96,7 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
 const projectsStore = useProjectsStore();
@@ -118,29 +115,32 @@ const entityType = ref('Participant');
 const allColumns = ref(true);
 const profile = ref('');
 
-watch(() => props.modelValue, (value) => {
-  if (value) {
-    projectDestination.value = projectsStore.project.name || datasourceStore.datasource.name;
-    id.value = '';
-    entityType.value = 'Participant';
-    allColumns.value = true;
-    profile.value = '';
-    if (props.resource) {
-      name.value = props.resource.name;
-      resourceFullName.value = `${props.resource.project}.${props.resource.name}`;
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value) {
+      projectDestination.value = projectsStore.project.name || datasourceStore.datasource.name;
+      id.value = '';
+      entityType.value = 'Participant';
+      allColumns.value = true;
+      profile.value = '';
+      if (props.resource) {
+        name.value = props.resource.name;
+        resourceFullName.value = `${props.resource.project}.${props.resource.name}`;
+      }
+      if (props.view) {
+        name.value = props.view.name || '';
+        resourceFullName.value = props.view.from[0];
+        const resView = props.view['Magma.ResourceViewDto.view'] as ResourceViewDto;
+        id.value = resView.idColumn || '';
+        entityType.value = resView.entityType || 'Participant';
+        allColumns.value = resView.allColumns || true;
+        profile.value = resView.profile || '';
+      }
     }
-    if (props.view) {
-      name.value = props.view.name || '';
-      resourceFullName.value = props.view.from[0];
-      const resView = props.view['Magma.ResourceViewDto.view'] as ResourceViewDto;
-      id.value = resView.idColumn || '';
-      entityType.value = resView.entityType || 'Participant';
-      allColumns.value = resView.allColumns || true;
-      profile.value = resView.profile || '';
-    }
+    showDialog.value = value;
   }
-  showDialog.value = value;
-});
+);
 
 onMounted(() => {
   projectsStore.initProjects();
@@ -157,11 +157,11 @@ function onSaveView() {
   }
 
   const resView = {
-      entityType: entityType.value || 'Participant',
-      idColumn: id.value,
-      profile: profile.value || 'default',
-      allColumns: allColumns.value,
-    } as ResourceViewDto;
+    entityType: entityType.value || 'Participant',
+    idColumn: id.value,
+    profile: profile.value || 'default',
+    allColumns: allColumns.value,
+  } as ResourceViewDto;
 
   const newViewPage = `/project/${projectDestination.value}/table/${name.value}`;
 
@@ -173,7 +173,8 @@ function onSaveView() {
     currentView.name = name.value;
     currentView.from = [resourceFullName.value];
     currentView['Magma.ResourceViewDto.view'] = resView;
-    datasourceStore.updateView(projectDestination.value, props.view?.name || name.value, currentView, 'Updated from resource view')
+    datasourceStore
+      .updateView(projectDestination.value, props.view?.name || name.value, currentView, 'Updated from resource view')
       .then(() => {
         router.push(newViewPage);
       })
@@ -183,11 +184,13 @@ function onSaveView() {
       .finally(onHide);
   } else {
     // update existing or add
-    datasourceStore.getView(projectDestination.value, name.value)
+    datasourceStore
+      .getView(projectDestination.value, name.value)
       .then((view: ViewDto) => {
         view.from = [resourceFullName.value];
         view['Magma.ResourceViewDto.view'] = resView;
-        datasourceStore.updateView(projectDestination.value, name.value, view, 'Updated from resource')
+        datasourceStore
+          .updateView(projectDestination.value, name.value, view, 'Updated from resource')
           .then(() => {
             router.push(newViewPage);
           })
@@ -197,7 +200,8 @@ function onSaveView() {
           .finally(onHide);
       })
       .catch(() => {
-        datasourceStore.addResourceView(projectDestination.value, name.value, resourceFullName.value, resView)
+        datasourceStore
+          .addResourceView(projectDestination.value, name.value, resourceFullName.value, resView)
           .then(() => router.push(newViewPage))
           .finally(onHide);
       });

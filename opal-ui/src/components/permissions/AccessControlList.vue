@@ -36,10 +36,10 @@
         </q-input>
       </template>
       <template v-slot:body="props">
-      <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-td key="name" :props="props">
-            <span class="text-primary">{{  props.row.subject.principal }}</span>
-            <div class="float-right" >
+            <span class="text-primary">{{ props.row.subject.principal }}</span>
+            <div class="float-right">
               <q-btn
                 rounded
                 dense
@@ -107,38 +107,48 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-            <q-input
-              v-model="selected.subject.principal"
-              dense
-              :label="$t(selected.subject.type.toLowerCase())"
-              :disable="editMode"
-              class="q-mb-md"
-              debounce="300"
-              @update:model-value="onSearchSubject"
-            >
-              <q-menu
-                v-model="showSuggestions"
-                no-parent-event
-                auto-close>
-                <q-list style="min-width: 100px">
-                  <q-item clickable v-close-popup v-for="sugg in suggestions" :key="sugg" @click="selected.subject.principal = sugg">
-                    <q-item-section>{{ sugg }}</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-input>
-            <div>
-              {{ $t('permission') }}
-            </div>
-            <div v-for="option in props.options" :key="option">
-              <q-radio v-model="action" :label="$t(`acls.${option}.label`)" :val="option" />
-              <div class="text-hint q-ml-sm">{{ $t(`acls.${option}.description`) }}</div>
-            </div>
+          <q-input
+            v-model="selected.subject.principal"
+            dense
+            :label="$t(selected.subject.type.toLowerCase())"
+            :disable="editMode"
+            class="q-mb-md"
+            debounce="300"
+            @update:model-value="onSearchSubject"
+          >
+            <q-menu v-model="showSuggestions" no-parent-event auto-close>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-for="sugg in suggestions"
+                  :key="sugg"
+                  @click="selected.subject.principal = sugg"
+                >
+                  <q-item-section>{{ sugg }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-input>
+          <div>
+            {{ $t('permission') }}
+          </div>
+          <div v-for="option in props.options" :key="option">
+            <q-radio v-model="action" :label="$t(`acls.${option}.label`)" :val="option" />
+            <div class="text-hint q-ml-sm">{{ $t(`acls.${option}.description`) }}</div>
+          </div>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right" class="bg-grey-3"
           ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn flat :label="$t('submit')" color="primary" :disable="selected.subject.principal" @click="onSubmitPermission" v-close-popup />
+          <q-btn
+            flat
+            :label="$t('submit')"
+            color="primary"
+            :disable="selected.subject.principal"
+            @click="onSubmitPermission"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -178,7 +188,7 @@ const showSuggestions = ref(false);
 const rows = computed(() => authzStore.acls[props.resource]);
 
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'subject' , style: 'width: 30%'},
+  { name: 'name', label: t('name'), align: 'left', field: 'subject', style: 'width: 30%' },
   { name: 'type', label: t('type'), align: 'left', field: 'subject' },
   { name: 'permissions', label: t('permissions'), align: 'left', field: 'actions' },
 ]);
@@ -191,9 +201,12 @@ onUnmounted(() => {
   authzStore.resetAcls(props.resource);
 });
 
-watch(() => props.resource, async (resource) => {
-  authzStore.initAcls(resource);
-});
+watch(
+  () => props.resource,
+  async (resource) => {
+    authzStore.initAcls(resource);
+  }
+);
 
 function getRowKey(row: Acl) {
   return `${row.subject?.principal}:${row.subject?.type}`;

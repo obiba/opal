@@ -76,13 +76,13 @@ watch(
   (value) => {
     if (value) {
       const emptyMapping: VariableDto = {
-          isNewVariable: true,
-          name: '',
-          entityType: props.identifier.entityType,
-          valueType: 'text',
-          isRepeatable: false,
-          attributes: [{ name: 'description', value: '' } as AttributeDto],
-        } as VariableDto;
+        isNewVariable: true,
+        name: '',
+        entityType: props.identifier.entityType,
+        valueType: 'text',
+        isRepeatable: false,
+        attributes: [{ name: 'description', value: '' } as AttributeDto],
+      } as VariableDto;
 
       if (props.mapping) {
         newMapping.value = { ...emptyMapping, ...props.mapping };
@@ -104,7 +104,10 @@ function onHide() {
 async function onAddMapping() {
   const valid = await formRef.value.validate();
   if (valid) {
-    (editMode.value ? identifiersStore.updateMapping(props.identifier.name, newMapping.value) : identifiersStore.addMapping(props.identifier.name, newMapping.value))
+    (editMode.value
+      ? identifiersStore.updateMapping(props.identifier.name, newMapping.value)
+      : identifiersStore.addMapping(props.identifier.name, newMapping.value)
+    )
       .then(() => {
         emit('update');
         onHide();

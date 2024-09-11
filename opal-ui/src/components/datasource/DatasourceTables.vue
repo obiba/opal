@@ -14,8 +14,13 @@
     >
       <template v-slot:top-left>
         <div class="row q-gutter-sm">
-          <q-btn-dropdown v-if="datasourceStore.perms.tables?.canCreate()" color="primary" icon="add" :title="$t('add')" size="sm"
-           >
+          <q-btn-dropdown
+            v-if="datasourceStore.perms.tables?.canCreate()"
+            color="primary"
+            icon="add"
+            :title="$t('add')"
+            size="sm"
+          >
             <q-list>
               <q-item clickable v-close-popup @click="onShowAddTable">
                 <q-item-section>
@@ -40,15 +45,7 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn
-            color="secondary"
-            icon="refresh"
-            :title="$t('refresh')"
-            outline
-            size="sm"
-            @click="init"
-
-          />
+          <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="init" />
           <q-btn-dropdown outline color="primary" icon="download" size="sm" :title="$t('download')">
             <q-list>
               <q-item clickable v-close-popup @click="onDownloadDictionary">
@@ -63,7 +60,13 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn-dropdown v-if="projectsStore.perms.import?.canCreate()" color="secondary" icon="input" size="sm" :label="$t('import')">
+          <q-btn-dropdown
+            v-if="projectsStore.perms.import?.canCreate()"
+            color="secondary"
+            icon="input"
+            size="sm"
+            :label="$t('import')"
+          >
             <q-list>
               <q-item clickable v-close-popup @click="onShowImportFile">
                 <q-item-section>
@@ -82,7 +85,13 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn-dropdown v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" size="sm" :label="$t('export')">
+          <q-btn-dropdown
+            v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()"
+            color="secondary"
+            icon="output"
+            size="sm"
+            :label="$t('export')"
+          >
             <q-list>
               <q-item clickable v-close-popup @click="onShowExportFile">
                 <q-item-section>
@@ -96,19 +105,37 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopy"></q-btn>
-          <q-btn v-if="datasourceStore.tables.length" color="secondary" outline icon="search" :title="$t('variables_search')" size="sm" @click="onSearch"></q-btn>
-          <q-btn v-if="datasourceStore.perms.tables?.canDelete()" :disable="removableTables.length === 0" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onShowDeleteTables"></q-btn>
+          <q-btn
+            v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()"
+            color="secondary"
+            icon="content_copy"
+            :title="$t('copy')"
+            size="sm"
+            @click="onShowCopy"
+          ></q-btn>
+          <q-btn
+            v-if="datasourceStore.tables.length"
+            color="secondary"
+            outline
+            icon="search"
+            :title="$t('variables_search')"
+            size="sm"
+            @click="onSearch"
+          ></q-btn>
+          <q-btn
+            v-if="datasourceStore.perms.tables?.canDelete()"
+            :disable="removableTables.length === 0"
+            outline
+            color="red"
+            icon="delete"
+            :title="$t('delete')"
+            size="sm"
+            @click="onShowDeleteTables"
+          ></q-btn>
         </div>
       </template>
       <template v-slot:top-right>
-        <q-input
-          dense
-          clearable
-          debounce="400"
-          color="primary"
-          v-model="filter"
-        >
+        <q-input dense clearable debounce="400" color="primary" v-model="filter">
           <template v-slot:append>
             <q-icon name="search" />
           </template>
@@ -122,11 +149,7 @@
       </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-icon
-            name="circle"
-            size="sm"
-            :color="tableStatusColor(props.value)"
-          />
+          <q-icon name="circle" size="sm" :color="tableStatusColor(props.value)" />
         </q-td>
       </template>
     </q-table>
@@ -137,15 +160,20 @@
 
     <add-tables-dialog v-model="showAddTables" />
 
-    <import-data-dialog v-model="showImport" :type="importType"/>
+    <import-data-dialog v-model="showImport" :type="importType" />
 
-    <export-data-dialog v-model="showExport" :type="exportType" :tables="readableTables"/>
+    <export-data-dialog v-model="showExport" :type="exportType" :tables="readableTables" />
 
-    <copy-tables-dialog v-model="showCopy" :tables="readableTables"/>
+    <copy-tables-dialog v-model="showCopy" :tables="readableTables" />
 
     <restore-views-dialog v-model="showRestoreViews" />
 
-    <confirm-dialog v-model="showDeleteTables" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })" @confirm="onDeleteTables" />
+    <confirm-dialog
+      v-model="showDeleteTables"
+      :title="$t('delete')"
+      :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })"
+      @confirm="onDeleteTables"
+    />
   </div>
 </template>
 
@@ -252,8 +280,8 @@ const rows = computed(() => {
   return datasourceStore.tables?.filter((t) => t.name.toLowerCase().includes(f));
 });
 const dsName = computed(() => route.params.id as string);
-const removableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
-const readableTables = computed(() => selected.value.length === 0 ? datasourceStore.tables : selected.value);
+const removableTables = computed(() => (selected.value.length === 0 ? datasourceStore.tables : selected.value));
+const readableTables = computed(() => (selected.value.length === 0 ? datasourceStore.tables : selected.value));
 
 function init() {
   loading.value = true;

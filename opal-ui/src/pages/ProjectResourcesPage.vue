@@ -24,7 +24,11 @@
         align="justify"
       >
         <q-tab name="references" :label="$t('references')" />
-        <q-tab name="permissions" :label="$t('permissions')" v-if="resourcesStore.perms.resourcesPermissions?.canRead()" />
+        <q-tab
+          name="permissions"
+          :label="$t('permissions')"
+          v-if="resourcesStore.perms.resourcesPermissions?.canRead()"
+        />
       </q-tabs>
 
       <q-separator />

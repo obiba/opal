@@ -13,28 +13,24 @@
           type="textarea"
           dense
           autogrow
-          class="q-mb-md" />
+          class="q-mb-md"
+        />
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn
-          flat
-          :label="$t('submit')"
-          color="primary"
-          @click="onSubmit"
-        />
+        <q-btn flat :label="$t('submit')" color="primary" @click="onSubmit" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-
 <script lang="ts">
 export default defineComponent({
   name: 'PluginConfigurationDialog',
 });
-</script><script setup lang="ts">
+</script>
+<script setup lang="ts">
 import { PluginPackageDto, PluginDto } from 'src/models/Plugins';
 
 interface DialogProps {
@@ -44,16 +40,19 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const pluginsStore = usePluginsStore();
 
 const config = ref<string>('');
 
-watch(() => props.modelValue, () => {
-  showDialog.value = props.modelValue;
-  if (props.modelValue) init();
-});
+watch(
+  () => props.modelValue,
+  () => {
+    showDialog.value = props.modelValue;
+    if (props.modelValue) init();
+  }
+);
 
 onMounted(init);
 

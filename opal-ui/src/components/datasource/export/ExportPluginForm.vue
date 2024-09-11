@@ -21,7 +21,7 @@ interface ExportPluginFormProps {
 }
 
 const props = defineProps<ExportPluginFormProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const pluginsStore = usePluginsStore();
 
@@ -32,9 +32,12 @@ onMounted(() => {
   onInit();
 });
 
-watch(() => props.type, () => {
-  onInit();
-});
+watch(
+  () => props.type,
+  () => {
+    onInit();
+  }
+);
 
 function onInit() {
   pluginsStore.getDatasourcePluginForm(props.type, 'export').then((form) => {

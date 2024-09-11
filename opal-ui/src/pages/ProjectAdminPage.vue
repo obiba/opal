@@ -30,11 +30,11 @@
 
       <template v-if="hasAdminPermission">
         <q-card flat>
-          <q-card-section v-if="hasDatabase"  class="q-px-none">
+          <q-card-section v-if="hasDatabase" class="q-px-none">
             <span class="text-help">{{ $t('project_admin.db_hint') }}</span>
             <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
           </q-card-section>
-          <q-card-section v-else  class="q-px-none">
+          <q-card-section v-else class="q-px-none">
             <q-banner inline-actions rounded class="bg-orange text-white">
               {{ $t('project_admin.no_database_warning') }}
 
@@ -48,7 +48,7 @@
         <q-card flat>
           <q-card-section v-if="hasVcfStores && !!project.vcfStoreService" class="q-px-none">
             <span class="text-help">{{ $t('project_admin.vcf_store_hint') }}</span>
-            <fields-list  class="col-6" :items="vcfProperties" :dbobject="project || {}" />
+            <fields-list class="col-6" :items="vcfProperties" :dbobject="project || {}" />
           </q-card-section>
         </q-card>
         <q-card-section v-if="hasVcfStores && !!!project.vcfStoreService" class="q-px-none">

@@ -31,7 +31,8 @@
           :title="$t('refresh')"
           size="sm"
           class="on-right"
-          @click="updateMethods" />
+          @click="updateMethods"
+        />
         <q-btn
           outline
           color="red"
@@ -39,7 +40,8 @@
           size="sm"
           class="on-right"
           :disable="selected.length === 0"
-          @click="onShowDelete" />
+          @click="onShowDelete"
+        />
       </template>
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
@@ -50,8 +52,8 @@
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-primary">{{  props.row.name }}</span>
-          <div class="float-right" >
+          <span class="text-primary">{{ props.row.name }}</span>
+          <div class="float-right">
             <q-btn
               v-if="isEditable(props.row)"
               rounded
@@ -84,7 +86,7 @@
       </template>
       <template v-slot:body-cell-code="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <pre style="margin: 0;">{{ getCode(props.row) }}</pre>
+          <pre style="margin: 0">{{ getCode(props.row) }}</pre>
         </q-td>
       </template>
       <template v-slot:body-cell-package="props">
@@ -98,7 +100,12 @@
         </q-td>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('datashield.delete_methods_confirm', { count: selected.length })" @confirm="onDeleteMethods" />
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('datashield.delete_methods_confirm', { count: selected.length })"
+      @confirm="onDeleteMethods"
+    />
     <edit-datashield-method-dialog v-model="showEdit" :env="env" :method="method" />
   </div>
 </template>
@@ -138,7 +145,7 @@ const methods = computed(() => {
   return datashieldStore.methods[props.env];
 });
 
-function onFilter () {
+function onFilter() {
   if (filter.value.length === 0) {
     return methods.value;
   }
@@ -243,14 +250,18 @@ function onShowDelete() {
 }
 
 function onDeleteMethods() {
-  datashieldStore.deleteMethods(props.env, selected.value.map((m) => m.name)).then(() => {
-    selected.value = [];
-    datashieldStore.loadProfileSettings();
-  });
+  datashieldStore
+    .deleteMethods(
+      props.env,
+      selected.value.map((m) => m.name)
+    )
+    .then(() => {
+      selected.value = [];
+      datashieldStore.loadProfileSettings();
+    });
 }
 
 function updateMethods() {
   datashieldStore.loadProfileSettings();
 }
-
 </script>

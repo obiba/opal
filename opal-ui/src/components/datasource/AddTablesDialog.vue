@@ -1,42 +1,37 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide">
-      <q-card class="dialog-md">
-        <q-card-section>
-          <div class="text-h6">{{ $t('add_tables') }}</div>
-        </q-card-section>
+    <q-card class="dialog-md">
+      <q-card-section>
+        <div class="text-h6">{{ $t('add_tables') }}</div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-section>
-          <file-select
-            v-model="variablesFile"
-            :folder="filesStore.current"
-            selection="single"
-            :extensions="['.xlsx','.xls','.xml']"
-            class="q-mb-md"/>
-          <div class="text-help q-mb-md">
-            {{  $t('select_dictionary_file') }}
-          </div>
-          <div class="text-help q-mb-md">
-            <span class="on-left">{{ $t('select_dictionary_file_template') }}</span>
-            <a :href="`${baseUrl}/templates/OpalVariableTemplate.xlsx`" class="text-primary">OpalVariableTemplate.xlsx</a>
-          </div>
-        </q-card-section>
+      <q-card-section>
+        <file-select
+          v-model="variablesFile"
+          :folder="filesStore.current"
+          selection="single"
+          :extensions="['.xlsx', '.xls', '.xml']"
+          class="q-mb-md"
+        />
+        <div class="text-help q-mb-md">
+          {{ $t('select_dictionary_file') }}
+        </div>
+        <div class="text-help q-mb-md">
+          <span class="on-left">{{ $t('select_dictionary_file_template') }}</span>
+          <a :href="`${baseUrl}/templates/OpalVariableTemplate.xlsx`" class="text-primary">OpalVariableTemplate.xlsx</a>
+        </div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('add')"
-            color="primary"
-            @click="onAddTables"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+      <q-card-actions align="right" class="bg-grey-3">
+        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="$t('add')" color="primary" @click="onAddTables" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -55,27 +50,28 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 const datasourceStore = useDatasourceStore();
 const transientDatasourceStore = useTransientDatasourceStore();
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : ''
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : ''));
 
 const showDialog = ref(props.modelValue);
 const variablesFile = ref<FileDto>();
 
-watch(() => props.modelValue, (value) => {
-  if (value) {
-    variablesFile.value = undefined;
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value) {
+      variablesFile.value = undefined;
+    }
+    transientDatasourceStore.reset();
+    showDialog.value = value;
   }
-  transientDatasourceStore.reset();
-  showDialog.value = value;
-});
+);
 
 onMounted(() => {
   filesStore.initFiles(`/home/${username.value}`);
@@ -111,7 +107,7 @@ async function onAddTable(tName: string) {
   await transientDatasourceStore.loadVariables();
   if (transientDatasourceStore.variables.length === 0) return;
 
-  const variables = [ ...transientDatasourceStore.variables ];
+  const variables = [...transientDatasourceStore.variables];
 
   if (!datasourceStore.tables.map((tbl) => tbl.name).includes(tName)) {
     const entityType = variables[0].entityType;
@@ -119,5 +115,4 @@ async function onAddTable(tName: string) {
   }
   await datasourceStore.addOrUpdateVariables(tName, variables);
 }
-
 </script>

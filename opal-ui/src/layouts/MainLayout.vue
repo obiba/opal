@@ -2,14 +2,7 @@
   <q-layout v-show="authStore.isAuthenticated" view="lHh Lpr lFf">
     <q-header elevated class="bg-dark text-white">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
         <q-btn flat to="/" no-caps size="lg">
           {{ appName }}
         </q-btn>
@@ -22,7 +15,9 @@
         <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn icon="shopping_cart" size="sm" to="/cart" class="q-mr-sm">
-            <q-badge v-if="cartStore.variables?.length" color="orange" floating>{{ cartStore.variables.length }}</q-badge>
+            <q-badge v-if="cartStore.variables?.length" color="orange" floating>{{
+              cartStore.variables.length
+            }}</q-badge>
           </q-btn>
           <q-input
             v-model="query"
@@ -34,25 +29,24 @@
             @update:model-value="onSearch"
             style="width: 200px"
           >
-            <q-menu
-              v-model="showResults"
-              no-parent-event
-              no-focus
-              auto-close>
+            <q-menu v-model="showResults" no-parent-event no-focus auto-close>
               <q-list style="min-width: 100px">
-                <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier" @click="goToVariable(item)">
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-for="item in itemResults"
+                  :key="item.identifier"
+                  @click="goToVariable(item)"
+                >
                   <q-item-section class="text-caption">
                     <span>{{ searchStore.getField(item, 'name') }}</span>
                     <div>
-                      <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span>
+                      <span class="text-hint text-primary"
+                        >{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span
+                      >
                     </div>
                     <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
-                      <q-badge
-                        v-if="attr.locale"
-                        color="grey-3"
-                        :label="attr.locale"
-                        class="q-mr-xs text-grey-6"
-                      />
+                      <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                       <span>{{ attr.value }}</span>
                     </div>
                   </q-item-section>
@@ -93,22 +87,12 @@
           </q-btn-dropdown>
           <q-btn-dropdown flat no-caps :label="username">
             <q-list>
-              <q-item
-                clickable
-                v-close-popup
-                to="/profile"
-                v-if="authStore.isAuthenticated"
-              >
+              <q-item clickable v-close-popup to="/profile" v-if="authStore.isAuthenticated">
                 <q-item-section>
                   <q-item-label>{{ $t('my_profile') }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item
-                clickable
-                v-close-popup
-                @click="onSignout"
-                v-if="authStore.isAuthenticated"
-              >
+              <q-item clickable v-close-popup @click="onSignout" v-if="authStore.isAuthenticated">
                 <q-item-section>
                   <q-item-label>{{ $t('auth.signout') }}</q-item-label>
                 </q-item-section>
@@ -120,7 +104,6 @@
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-
       <div v-if="projectPage">
         <project-drawer />
       </div>
@@ -136,7 +119,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view/>
+      <router-view />
     </q-page-container>
   </q-layout>
 </template>
@@ -170,29 +153,29 @@ const localeOptions = computed(() => {
   }));
 });
 
-
 const leftDrawerOpen = ref(false);
 const query = ref('');
 const showResults = ref(false);
 const results = ref<QueryResultDto>();
 
-const itemResults = computed(() => results.value?.hits as ItemFieldsResultDto[] || []);
+const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]) || []);
 
 onMounted(() => {
-  authStore.userProfile().then(() => {
-    systemStore.initGeneralConf();
-    resourcesStore.initResourceProviders();
-    authStore.loadBookmarks();
-  }).catch(() => {
-    router.push('/signin');
-  });
+  authStore
+    .userProfile()
+    .then(() => {
+      systemStore.initGeneralConf();
+      resourcesStore.initResourceProviders();
+      authStore.loadBookmarks();
+    })
+    .catch(() => {
+      router.push('/signin');
+    });
 });
 
 const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : '?'
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
 const taxonomiesPage = computed(() => {
   return router.currentRoute.value.path.startsWith('/admin/taxonomies');
@@ -249,7 +232,6 @@ function onSearch() {
     results.value = res;
   });
 }
-
 
 function goToVariable(item: ItemFieldsResultDto) {
   const fields = item['Search.ItemFieldsDto.item'].fields;

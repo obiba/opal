@@ -38,7 +38,6 @@
             :title="$t('keywords')"
             :hint="$t('taxonomy.term.keywords_hint')"
           />
-
         </q-form>
       </q-card-section>
 
@@ -84,7 +83,6 @@ const emptyTerm = {
   keywords: [],
   attributes: [],
 } as TermDto;
-
 
 const newTerm = ref<TermDto>({ ...emptyTerm });
 const editMode = computed(() => !!props.term && !!props.term.name);

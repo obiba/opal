@@ -37,4 +37,5 @@ npm run build
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
 
 ### CORS Setting during development
+
 Add `cors.allowed=http://localhost:9000` in `OPAL_HOME/config/opal-config.properties` to make sure REST calls do not fail.

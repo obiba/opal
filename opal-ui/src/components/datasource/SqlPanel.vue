@@ -4,8 +4,20 @@
       <q-markdown :src="$t('sql_info')" no-heading-anchor-links />
     </div>
     <div>
-      <q-chip clickable :color="tab === 'query' ? 'primary' : 'grey-6'" :label="$t('query')" class="text-white" @click="tab = 'query'"/>
-      <q-chip clickable :color="tab === 'history' ? 'primary' : 'grey-6'" :label="$t('history')" class="text-white" @click="tab = 'history'"/>
+      <q-chip
+        clickable
+        :color="tab === 'query' ? 'primary' : 'grey-6'"
+        :label="$t('query')"
+        class="text-white"
+        @click="tab = 'query'"
+      />
+      <q-chip
+        clickable
+        :color="tab === 'history' ? 'primary' : 'grey-6'"
+        :label="$t('history')"
+        class="text-white"
+        @click="tab = 'history'"
+      />
     </div>
     <q-tab-panels v-model="tab">
       <q-tab-panel name="query">
@@ -20,7 +32,8 @@
           autogrow
           @keydown="onKeydown"
           type="text-area"
-          class="q-mb-md" />
+          class="q-mb-md"
+        />
         <q-btn
           :label="$t('execute')"
           color="primary"
@@ -28,7 +41,8 @@
           icon="play_arrow"
           :disable="sql.trim().length === 0"
           @click="onExecute"
-          class="q-mb-md" />
+          class="q-mb-md"
+        />
         <q-btn
           v-if="rows"
           outline
@@ -43,11 +57,7 @@
           <q-spinner-dots size="md" />
         </div>
         <div v-else>
-          <q-table
-            v-if="rows"
-            :rows="rows"
-            row-key="_id"
-            flat>
+          <q-table v-if="rows" :rows="rows" row-key="_id" flat>
             <template v-slot:header-cell="props">
               <q-th :props="props">
                 {{ props.col.name }}
@@ -67,16 +77,15 @@
             :columns="historyColumns"
             row-key="timestamp"
             @row-dblclick="onHistoryClick"
-            flat>
+            flat
+          >
             <template v-slot:body-cell-query="props">
               <q-td :props="props">
                 <span class="text-caption">{{ props.value }}</span>
               </q-td>
             </template>
             <template v-slot:body-cell-delay="props">
-              <q-td :props="props">
-                {{ props.value }} ms
-              </q-td>
+              <q-td :props="props"> {{ props.value }} ms </q-td>
             </template>
           </q-table>
         </div>
@@ -114,15 +123,19 @@ const rows = computed(() => {
   return results.value?.rows.map((row) => {
     const rowObj = {} as RowResult;
     const columns = results.value?.columns;
-    return columns ? row.reduce((acc, val, i) => {
-      acc[columns[i]] = val;
-      return acc;
-    }, rowObj) : rowObj;
+    return columns
+      ? row.reduce((acc, val, i) => {
+          acc[columns[i]] = val;
+          return acc;
+        }, rowObj)
+      : rowObj;
   });
 });
 
 const historyRows = computed(() => {
-  return sqlStore.history.filter((cmd) => cmd.datasource === datasourceStore.datasource.name).sort((a, b) => b.timestamp - a.timestamp);
+  return sqlStore.history
+    .filter((cmd) => cmd.datasource === datasourceStore.datasource.name)
+    .sort((a, b) => b.timestamp - a.timestamp);
 });
 
 const historyColumns = [
@@ -144,14 +157,18 @@ function onKeydown(evt: KeyboardEvent) {
 
 function onExecute() {
   loading.value = true;
-  sqlStore.execute(sql.value).then((res) => {
-    results.value = res;
-  }).catch((err) => {
-    notifyError(err);
-    results.value = null;
-  }).finally(() => {
-    loading.value = false;
-  });
+  sqlStore
+    .execute(sql.value)
+    .then((res) => {
+      results.value = res;
+    })
+    .catch((err) => {
+      notifyError(err);
+      results.value = null;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onClear() {

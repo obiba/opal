@@ -132,7 +132,7 @@ const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 
 const formRef = ref();
-const databases = ref<{ label: string; value: string, defaultStorage: boolean }[]>([]);
+const databases = ref<{ label: string; value: string; defaultStorage: boolean }[]>([]);
 const vcfStores = ref<{ label: string; value: string }[]>([]);
 const showDialog = ref(props.modelValue);
 const newProject = ref<Project>({} as Project);
@@ -233,38 +233,35 @@ async function onAddProject() {
   }
 }
 
-onMounted(() =>
-  {
-    if (!filesStore.current?.path) {
-      filesStore.loadFiles('/');
-    }
+onMounted(() => {
+  if (!filesStore.current?.path) {
+    filesStore.loadFiles('/');
+  }
 
-    profilesStore.initProfile().then(() => {
+  profilesStore.initProfile().then(() => {
+    systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
+      databases.value = (dbs || []).map((db) => {
+        return {
+          label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
+          value: db.name,
+          defaultStorage: db.defaultStorage,
+        };
+      });
+      databases.value.push({ label: t('none_value'), value: '', defaultStorage: false });
+    });
 
-      systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
-        databases.value = (dbs || []).map((db) => {
+    pluginsStore.initVcfStorePlugins().then(() => {
+      if (pluginsStore.vcfStorePlugins.length > 0) {
+        vcfStores.value = pluginsStore.vcfStorePlugins.map((pkg: PluginPackageDto) => {
           return {
-            label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
-            value: db.name,
-            defaultStorage: db.defaultStorage,
+            label: pkg.name,
+            value: pkg.name,
           };
         });
-        databases.value.push({ label: t('none_value'), value: '', defaultStorage: false });
-      });
 
-      pluginsStore.initVcfStorePlugins().then(() => {
-        if (pluginsStore.vcfStorePlugins.length > 0) {
-          vcfStores.value = pluginsStore.vcfStorePlugins.map((pkg: PluginPackageDto) => {
-            return {
-              label: pkg.name,
-              value: pkg.name,
-            };
-          });
-
-          vcfStores.value.push({ label: t('none_value'), value: '' });
-        }
-      });
-    })
-  }
-);
+        vcfStores.value.push({ label: t('none_value'), value: '' });
+      }
+    });
+  });
+});
 </script>

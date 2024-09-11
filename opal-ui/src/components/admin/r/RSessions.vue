@@ -8,58 +8,53 @@
       :pagination="initialPagination"
       wrap-cells
       selection="multiple"
-      v-model:selected="selected" >
-        <template v-slot:top-left>
-          <q-btn
-            outline
-            color="secondary"
-            icon="refresh"
-            :title="$t('refresh')"
+      v-model:selected="selected"
+    >
+      <template v-slot:top-left>
+        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRSessions" />
+        <q-btn
+          outline
+          color="red"
+          icon="highlight_off"
+          size="sm"
+          class="on-right"
+          :disable="selected.length === 0"
+          @click="onShowTerminateSessions"
+        />
+      </template>
+      <template v-slot:body-cell-id="props">
+        <q-td :props="props">
+          <code :title="props.value">{{ props.value.split('-')[0] }}</code>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-server="props">
+        <q-td :props="props">
+          <span>{{ props.value.split('~')[0] }}</span>
+          <code class="on-right">{{ props.value.split('~')[1].split('-')[0] }}</code>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-user="props">
+        <q-td :props="props">
+          <q-chip>{{ props.value }}</q-chip>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-status="props">
+        <q-td :props="props">
+          <q-icon
+            name="circle"
             size="sm"
-            @click="updateRSessions"
-           />
-            <q-btn
-              outline
-              color="red"
-              icon="highlight_off"
-              size="sm"
-              class="on-right"
-              :disable="selected.length === 0"
-              @click="onShowTerminateSessions" />
-
-        </template>
-        <template v-slot:body-cell-id="props">
-          <q-td :props="props">
-            <code :title="props.value">{{  props.value.split('-')[0] }}</code>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-server="props">
-          <q-td :props="props">
-            <span>{{  props.value.split('~')[0] }}</span>
-            <code class="on-right">{{  props.value.split('~')[1].split('-')[0] }}</code>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-user="props">
-          <q-td :props="props">
-            <q-chip>{{  props.value }}</q-chip>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-status="props">
-          <q-td :props="props">
-            <q-icon
-              name="circle"
-              size="sm"
-              :title="$t(props.value.toLowerCase())"
-              :color="getSessionColor(props.value)"
-            />
-          </q-td>
-        </template>
-      </q-table>
-      <confirm-dialog
-        v-model="showTerminate"
-        :title="$t('terminate')"
-        :text="$t('terminate_r_sessions_confirm', { count: selected.length })"
-        @confirm="onTerminateSessions" />
+            :title="$t(props.value.toLowerCase())"
+            :color="getSessionColor(props.value)"
+          />
+        </q-td>
+      </template>
+    </q-table>
+    <confirm-dialog
+      v-model="showTerminate"
+      :title="$t('terminate')"
+      :text="$t('terminate_r_sessions_confirm', { count: selected.length })"
+      @confirm="onTerminateSessions"
+    />
   </div>
 </template>
 
@@ -91,13 +86,27 @@ const columns = computed(() => [
   { name: 'server', label: t('server'), align: 'left', field: 'server', sortable: true },
   { name: 'context', label: t('context'), align: 'left', field: 'context', sortable: true, classes: 'text-caption' },
   { name: 'user', label: t('user'), align: 'left', field: 'user', sortable: true },
-  { name: 'creationDate', label: t('started'), align: 'left', field: 'creationDate', sortable: true, format: getDateLabel },
-  { name: 'lastAccessDate', label: t('last_access'), align: 'left', field: 'lastAccessDate', sortable: true, format: getDateLabel },
+  {
+    name: 'creationDate',
+    label: t('started'),
+    align: 'left',
+    field: 'creationDate',
+    sortable: true,
+    format: getDateLabel,
+  },
+  {
+    name: 'lastAccessDate',
+    label: t('last_access'),
+    align: 'left',
+    field: 'lastAccessDate',
+    sortable: true,
+    format: getDateLabel,
+  },
   { name: 'status', label: 'Status', align: 'left', field: 'status', sortable: true },
 ]);
 
 function getSessionColor(status: string) {
-  return status === 'BUSY' ? 'warning' :  (status === 'WAITING' ? 'positive' : 'grey-6');
+  return status === 'BUSY' ? 'warning' : status === 'WAITING' ? 'positive' : 'grey-6';
 }
 
 function updateRSessions() {

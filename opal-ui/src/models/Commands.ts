@@ -5,9 +5,9 @@
 // source: Commands.proto
 
 /* eslint-disable */
-import { type IdentifiersMappingConfigDto } from "./Identifiers";
+import { type IdentifiersMappingConfigDto } from './Identifiers';
 
-export const protobufPackage = "Opal";
+export const protobufPackage = 'Opal';
 
 export interface Message {
   msg: string;
@@ -29,13 +29,13 @@ export interface CommandStateDto {
 }
 
 export enum CommandStateDto_Status {
-  NOT_STARTED = "NOT_STARTED",
-  IN_PROGRESS = "IN_PROGRESS",
-  SUCCEEDED = "SUCCEEDED",
-  FAILED = "FAILED",
-  CANCEL_PENDING = "CANCEL_PENDING",
-  CANCELED = "CANCELED",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUCCEEDED = 'SUCCEEDED',
+  FAILED = 'FAILED',
+  CANCEL_PENDING = 'CANCEL_PENDING',
+  CANCELED = 'CANCELED',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface CommandStateDto_ProgressDto {
@@ -124,9 +124,7 @@ export interface ReloadDatasourceCommandOptionsDto {
 
 export interface BackupCommandOptionsDto {
   archive: string;
-  override?:
-    | boolean
-    | undefined;
+  override?: boolean | undefined;
   /** backup as a view (logical) or a table (data dump) */
   viewsAsTables?: boolean | undefined;
 }

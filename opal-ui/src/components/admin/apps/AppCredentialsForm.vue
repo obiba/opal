@@ -1,28 +1,28 @@
 <template>
   <div>
-  <q-input
-    v-model="name"
-    dense
-    type="text"
-    :label="$t('name') + ' *'"
-    :hint="$t('apps.name_hint', {type: type})"
-    class="q-mb-md"
-    lazy-rules
-    :rules="[validateRequiredField('name')]"
-  >
-  </q-input>
+    <q-input
+      v-model="name"
+      dense
+      type="text"
+      :label="$t('name') + ' *'"
+      :hint="$t('apps.name_hint', { type: type })"
+      class="q-mb-md"
+      lazy-rules
+      :rules="[validateRequiredField('name')]"
+    >
+    </q-input>
 
-  <q-input
-    autocomplete="off"
-    type="password"
-    :label="$t('password') + ' *'"
-    :hint="$t('apps.name_hint', {type: type})"
-    v-model="password"
-    color="grey-10"
-    lazy-rules
-    :rules="[validateRequiredField('password'), validateRequiredPassword]"
-  ></q-input>
-</div>
+    <q-input
+      autocomplete="off"
+      type="password"
+      :label="$t('password') + ' *'"
+      :hint="$t('apps.name_hint', { type: type })"
+      v-model="password"
+      color="grey-10"
+      lazy-rules
+      :rules="[validateRequiredField('password'), validateRequiredPassword]"
+    ></q-input>
+  </div>
 </template>
 
 <script lang="ts">
@@ -32,12 +32,11 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-
 import { AppCredentialsDto } from 'src/models/Apps';
 
 interface Props {
   modelValue: AppCredentialsDto | undefined;
-  type: string,
+  type: string;
 }
 
 const { t } = useI18n();
@@ -57,7 +56,6 @@ const password = computed({
     emit('update:modelValue', { ...props.modelValue, password: value });
   },
 });
-
 
 const validateRequiredField = (id: string) => (val: string) => (val && val.trim().length > 0) || t(id);
 const validateRequiredPassword = (val: string) =>

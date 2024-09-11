@@ -3,14 +3,7 @@
     <div class="text-help q-mb-md">
       {{ $t('attributes_info') }}
     </div>
-    <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-      >
+    <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
       <q-tab name="annotations" :label="$t('annotations')" />
       <q-tab name="label_description" :label="$t('label_description')" />
       <q-tab name="records" :label="$t('records')" />
@@ -22,17 +15,16 @@
           {{ $t('attributes_annotations_info') }}
         </div>
         <div v-if="canUpdate" class="q-mb-sm">
-          <q-btn
-            color="primary"
-            icon="edit"
-            :title="$t('add')"
-            size="sm"
-            @click="onShowAnnotate(undefined)" />
+          <q-btn color="primary" icon="edit" :title="$t('add')" size="sm" @click="onShowAnnotate(undefined)" />
         </div>
         <q-list separator>
-          <q-item v-for="annotation in taxonomiesStore.getAnnotations(rows, false)" :key="annotation.id" class="q-pl-none q-pr-none">
+          <q-item
+            v-for="annotation in taxonomiesStore.getAnnotations(rows, false)"
+            :key="annotation.id"
+            class="q-pl-none q-pr-none"
+          >
             <q-item-section>
-              <annotation-panel :annotation="annotation" header/>
+              <annotation-panel :annotation="annotation" header />
             </q-item-section>
             <q-item-section v-if="canUpdate" side>
               <table>
@@ -46,7 +38,8 @@
                       color="secondary"
                       :title="$t('search')"
                       icon="search"
-                      @click="onSearch(annotation)" />
+                      @click="onSearch(annotation)"
+                    />
                   </td>
                   <td>
                     <q-btn
@@ -57,7 +50,8 @@
                       color="secondary"
                       :title="$t('edit')"
                       icon="edit"
-                      @click="onShowAnnotate(annotation)" />
+                      @click="onShowAnnotate(annotation)"
+                    />
                   </td>
                   <td>
                     <q-btn
@@ -69,7 +63,8 @@
                       :title="$t('delete')"
                       icon="delete"
                       class="q-ml-xs"
-                      @click="onShowDelete(annotation)" />
+                      @click="onShowDelete(annotation)"
+                    />
                   </td>
                 </tr>
               </table>
@@ -85,7 +80,7 @@
             icon="edit"
             :title="$t('add')"
             size="sm"
-            @click="onShowAttribute(labelBundle || { id: 'label', attributes: [{name: 'label'} as AttributeDto] })"
+            @click="onShowAttribute(labelBundle || { id: 'label', attributes: [{ name: 'label' } as AttributeDto] })"
           />
           <q-btn
             v-if="labelBundle"
@@ -105,7 +100,11 @@
             icon="edit"
             :title="$t('add')"
             size="sm"
-            @click="onShowAttribute(descriptionBundle || { id: 'description', attributes: [{name: 'description'} as AttributeDto] })"
+            @click="
+              onShowAttribute(
+                descriptionBundle || { id: 'description', attributes: [{ name: 'description' } as AttributeDto] }
+              )
+            "
           />
           <q-btn
             v-if="descriptionBundle"
@@ -139,7 +138,8 @@
               icon="edit"
               :title="$t('add')"
               size="sm"
-              @click="onShowAttribute(undefined)" />
+              @click="onShowAttribute(undefined)"
+            />
           </template>
           <template v-slot:body-cell-namespace="props">
             <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -159,7 +159,8 @@
                   :title="$t('edit')"
                   :icon="toolsVisible[props.row.id] ? 'edit' : 'none'"
                   class="q-ml-xs"
-                  @click="onShowEditBundle(props.row)" />
+                  @click="onShowEditBundle(props.row)"
+                />
                 <q-btn
                   rounded
                   dense
@@ -169,19 +170,15 @@
                   :title="$t('delete')"
                   :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
                   class="q-ml-xs"
-                  @click="onShowDeleteBundle(props.row)" />
+                  @click="onShowDeleteBundle(props.row)"
+                />
               </div>
             </q-td>
           </template>
           <template v-slot:body-cell-values="props">
             <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
               <div v-for="attr in props.value" :key="attr.id">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-6"
-                  :label="attr.locale"
-                  class="on-left"
-                />
+                <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
                 <pre class="q-ma-none">{{ attr.value }}</pre>
               </div>
             </q-td>
@@ -190,10 +187,30 @@
       </q-tab-panel>
     </q-tab-panels>
 
-    <confirm-dialog v-model="showDeleteAnnotation" :title="$t('delete')" :text="$t('delete_annotation_confirm')" @confirm="onConfirmDeleteAnnotation" />
-    <annotate-dialog v-model="showAnnotate" :table="datasourceStore.table" :variables="[datasourceStore.variable]" :annotation="annotationSelected"/>
-    <confirm-dialog v-model="showDeleteAttributes" :title="$t('delete')" :text="$t('delete_attributes_confirm')" @confirm="onConfirmDeleteAttributes" />
-    <attribute-dialog v-model="showAttributes" :table="datasourceStore.table" :variable="datasourceStore.variable" :bundle="bundleSelected" />
+    <confirm-dialog
+      v-model="showDeleteAnnotation"
+      :title="$t('delete')"
+      :text="$t('delete_annotation_confirm')"
+      @confirm="onConfirmDeleteAnnotation"
+    />
+    <annotate-dialog
+      v-model="showAnnotate"
+      :table="datasourceStore.table"
+      :variables="[datasourceStore.variable]"
+      :annotation="annotationSelected"
+    />
+    <confirm-dialog
+      v-model="showDeleteAttributes"
+      :title="$t('delete')"
+      :text="$t('delete_attributes_confirm')"
+      @confirm="onConfirmDeleteAttributes"
+    />
+    <attribute-dialog
+      v-model="showAttributes"
+      :table="datasourceStore.table"
+      :variable="datasourceStore.variable"
+      :bundle="bundleSelected"
+    />
   </div>
 </template>
 
@@ -273,7 +290,9 @@ function onSearch(annotation: Annotation | undefined) {
     searchStore.reset();
     searchStore.variablesQuery.criteria['project'] = [datasourceStore.datasource.name];
     searchStore.variablesQuery.criteria['table'] = [datasourceStore.table.name];
-    searchStore.variablesQuery.criteria[`${annotation.taxonomy.name}-${annotation.vocabulary.name}`] = [annotation.term.name];
+    searchStore.variablesQuery.criteria[`${annotation.taxonomy.name}-${annotation.vocabulary.name}`] = [
+      annotation.term.name,
+    ];
     router.push('/search/variables');
   }
 }
@@ -290,9 +309,15 @@ function onShowDelete(annotation: Annotation) {
 
 function onConfirmDeleteAnnotation() {
   if (annotationSelected.value) {
-    datasourceStore.deleteAnnotation([datasourceStore.variable], annotationSelected.value.taxonomy.name, annotationSelected.value.vocabulary.name).then(() => {
-      datasourceStore.loadTableVariables();
-    });
+    datasourceStore
+      .deleteAnnotation(
+        [datasourceStore.variable],
+        annotationSelected.value.taxonomy.name,
+        annotationSelected.value.vocabulary.name
+      )
+      .then(() => {
+        datasourceStore.loadTableVariables();
+      });
   }
 }
 
@@ -322,9 +347,15 @@ function onShowDeleteBundle(row: AttributesBundle) {
 
 function onConfirmDeleteAttributes() {
   if (bundleSelected.value) {
-    datasourceStore.deleteAttributes(datasourceStore.variable, bundleSelected.value.attributes[0].namespace, bundleSelected.value.attributes[0].name).then(() => {
-      datasourceStore.loadTableVariables();
-    });
+    datasourceStore
+      .deleteAttributes(
+        datasourceStore.variable,
+        bundleSelected.value.attributes[0].namespace,
+        bundleSelected.value.attributes[0].name
+      )
+      .then(() => {
+        datasourceStore.loadTableVariables();
+      });
   }
 }
 </script>

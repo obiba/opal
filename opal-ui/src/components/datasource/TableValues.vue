@@ -49,17 +49,11 @@
       </template>
       <template v-slot:header="props">
         <q-tr :props="props">
-          <q-th
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
             <span>{{ col.label }}</span>
             <div v-if="col.variable" class="text-grey-5 text-caption">
-              <span>{{  col.variable.valueType }}</span>
-              <q-badge
-                v-if="col.variable.isRepeatable && col.variable.occurrenceGroup"
-                color="grey-6 on-right">
+              <span>{{ col.variable.valueType }}</span>
+              <q-badge v-if="col.variable.isRepeatable && col.variable.occurrenceGroup" color="grey-6 on-right">
                 {{ col.variable.occurrenceGroup }}
               </q-badge>
             </div>
@@ -68,7 +62,9 @@
       </template>
       <template v-slot:body-cell-_id="props">
         <q-td :props="props" auto-width>
-          <router-link :to="`/search/entity?id=${props.value}&type=${datasourceStore.table?.entityType}`">{{ props.value }}</router-link>
+          <router-link :to="`/search/entity?id=${props.value}&type=${datasourceStore.table?.entityType}`">{{
+            props.value
+          }}</router-link>
         </q-td>
       </template>
       <template v-for="col in visibleColumns" v-slot:[`body-cell-${col}`]="props" :key="col">
@@ -121,7 +117,11 @@ const varFilter = ref<string>('');
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
-const selectableColumns = computed(() => columns.value.filter((c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)));
+const selectableColumns = computed(() =>
+  columns.value.filter(
+    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)
+  )
+);
 
 onMounted(() => {
   init();
@@ -146,7 +146,10 @@ function init() {
         required: false,
         variable: v,
       }));
-      visibleColumns.value = columns.value.map((c) => c.name).filter((n) => props.variable ? props.variable.name === n : true).slice(0, COLUMNS_COUNT);
+      visibleColumns.value = columns.value
+        .map((c) => c.name)
+        .filter((n) => (props.variable ? props.variable.name === n : true))
+        .slice(0, COLUMNS_COUNT);
       columns.value.unshift({
         name: '_id',
         required: true,
@@ -156,7 +159,8 @@ function init() {
         format: (val: string) => val,
         sortable: false,
       });
-    }).then(() => {
+    })
+    .then(() => {
       tableRef.value.requestServerInteraction();
     });
 }
@@ -164,7 +168,7 @@ function init() {
 function onFilter(val: string, update, abort) {
   update(() => {
     varFilter.value = val.toLowerCase();
-  })
+  });
 }
 
 function onRequest(props) {
@@ -174,28 +178,31 @@ function onRequest(props) {
   const limit = rowsPerPage;
   const select = visibleColumns.value;
   loading.value = true;
-  datasourceStore.loadValueSets(offset, limit, select).then((res: ValueSetsDto) => {
-    if (res.valueSets) {
-      rows.value = res.valueSets.map((vs) => {
-        const row = { _id: vs.identifier };
-        vs.values.forEach((val, idx: number) => {
-          row[res.variables[idx]] = val;
+  datasourceStore
+    .loadValueSets(offset, limit, select)
+    .then((res: ValueSetsDto) => {
+      if (res.valueSets) {
+        rows.value = res.valueSets.map((vs) => {
+          const row = { _id: vs.identifier };
+          vs.values.forEach((val, idx: number) => {
+            row[res.variables[idx]] = val;
+          });
+          return row;
         });
-        return row;
-      });
-    } else {
-      rows.value = [];
-    }
-    // don't forget to update local pagination object
-    pagination.value.page = page
-    pagination.value.rowsPerPage = rowsPerPage
-    pagination.value.sortBy = sortBy
-    pagination.value.descending = descending
-    loading.value = false;
-  }).catch((err) => {
-    notifyError(err);
-    loading.value = false;
-  });
+      } else {
+        rows.value = [];
+      }
+      // don't forget to update local pagination object
+      pagination.value.page = page;
+      pagination.value.rowsPerPage = rowsPerPage;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
+      loading.value = false;
+    })
+    .catch((err) => {
+      notifyError(err);
+      loading.value = false;
+    });
 }
 
 function onVariableSelection() {

@@ -49,17 +49,11 @@
       </template>
       <template v-slot:header="props">
         <q-tr :props="props">
-          <q-th
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
             <span>{{ col.label }}</span>
             <div v-if="col.variable" class="text-grey-5 text-caption">
-              <span>{{  col.variable.valueType }}</span>
-              <q-badge
-                v-if="col.variable.isRepeatable && col.variable.occurrenceGroup"
-                color="grey-6 on-right">
+              <span>{{ col.variable.valueType }}</span>
+              <q-badge v-if="col.variable.isRepeatable && col.variable.occurrenceGroup" color="grey-6 on-right">
                 {{ col.variable.occurrenceGroup }}
               </q-badge>
             </div>
@@ -116,7 +110,11 @@ const columns = ref<QTableColumn[]>([]);
 const visibleColumns = ref<string[]>([]);
 const varFilter = ref<string>('');
 
-const selectableColumns = computed(() => columns.value.filter((c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)));
+const selectableColumns = computed(() =>
+  columns.value.filter(
+    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)
+  )
+);
 
 onMounted(() => {
   init();
@@ -148,7 +146,7 @@ function init() {
 function onFilter(val: string, update, abort) {
   update(() => {
     varFilter.value = val.toLowerCase();
-  })
+  });
 }
 
 function onRequest(props) {
@@ -171,10 +169,10 @@ function onRequest(props) {
       rows.value = [];
     }
     // don't forget to update local pagination object
-    pagination.value.page = page
-    pagination.value.rowsPerPage = rowsPerPage
-    pagination.value.sortBy = sortBy
-    pagination.value.descending = descending
+    pagination.value.page = page;
+    pagination.value.rowsPerPage = rowsPerPage;
+    pagination.value.sortBy = sortBy;
+    pagination.value.descending = descending;
     loading.value = false;
   });
 }

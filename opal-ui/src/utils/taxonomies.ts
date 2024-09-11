@@ -14,4 +14,3 @@ export function getCreativeCommonsLicenseAnchor(taxonomy: TaxonomyDto, locale = 
     return theLicense;
   }
 }
-

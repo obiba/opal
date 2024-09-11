@@ -15,24 +15,26 @@
           <q-list separator>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/search/variables">{{ $t('variables_search') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/search/variables">{{ $t('variables_search') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ $t('variables_search_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/search/entity">{{ $t('entity_search') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/search/entity">{{ $t('entity_search') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ $t('entity_search_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
         </div>
-        <div class="col-6 col-sm-6 col-xs-12">
-        </div>
+        <div class="col-6 col-sm-6 col-xs-12"></div>
       </div>
     </q-page>
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

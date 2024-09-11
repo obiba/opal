@@ -2,13 +2,7 @@
   <div>
     <div v-if="hasDatabase">
       <div class="row">
-        <q-btn
-          :label="$t('edit')"
-          icon="edit"
-          color="primary"
-          size="sm"
-          class="on-left"
-          @click="onShowEdit" />
+        <q-btn :label="$t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
         <q-btn
           outline
           :label="$t('test')"
@@ -16,23 +10,16 @@
           color="secondary"
           size="sm"
           class="on-left"
-          @click="onTest" />
-        <q-btn
-          outline
-          color="red"
-          icon="delete"
-          size="sm"
-          :disable="database?.hasDatasource"
-          @click="onShowDelete" />
+          @click="onTest"
+        />
+        <q-btn outline color="red" icon="delete" size="sm" :disable="database?.hasDatasource" @click="onShowDelete" />
       </div>
       <div class="row q-mt-md">
         <div class="col-6">
           <q-list separator dense>
             <q-item>
-              <q-item-section style="max-width: 50px;">
-                <q-item-label overline class="text-grey-6">
-                  URL
-                </q-item-label>
+              <q-item-section style="max-width: 50px">
+                <q-item-label overline class="text-grey-6"> URL </q-item-label>
               </q-item-section>
               <q-item-section>
                 <q-item-label class="text-help">
@@ -63,9 +50,13 @@
       </q-btn-dropdown>
     </div>
 
-    <confirm-dialog v-model="showDelete" :title="$t('unregister')" :text="$t('db.unregister_confirm', { name: database?.name })" @confirm="onDelete" />
-    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave"/>
-
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('unregister')"
+      :text="$t('db.unregister_confirm', { name: database?.name })"
+      @confirm="onDelete"
+    />
+    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
   </div>
 </template>
 
@@ -95,11 +86,14 @@ onMounted(() => {
 });
 
 function refresh() {
-  systemStore.getIdentifiersDatabase().then((data) => {
-    database.value = data;
-  }).catch((error) => {
-    database.value = {} as DatabaseDto;
-  });
+  systemStore
+    .getIdentifiersDatabase()
+    .then((data) => {
+      database.value = data;
+    })
+    .catch((error) => {
+      database.value = {} as DatabaseDto;
+    });
 }
 
 function onShowDelete() {
@@ -119,7 +113,8 @@ function onTest() {
   if (!database.value?.name) {
     return;
   }
-  systemStore.testDatabase(database.value.name)
+  systemStore
+    .testDatabase(database.value.name)
     .then(() => {
       notifySuccess(t('db.test_success'));
     })
@@ -159,7 +154,6 @@ function onShowAddMondoDB() {
   } as DatabaseDto;
   showEdit.value = true;
 }
-
 
 function onSave() {
   refresh();

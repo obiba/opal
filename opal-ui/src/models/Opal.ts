@@ -6,83 +6,83 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Opal";
+export const protobufPackage = 'Opal';
 
 export enum KeyType {
-  KEY_PAIR = "KEY_PAIR",
-  CERTIFICATE = "CERTIFICATE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  KEY_PAIR = 'KEY_PAIR',
+  CERTIFICATE = 'CERTIFICATE',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum AclAction {
-  DATASOURCE_ALL = "DATASOURCE_ALL",
-  DATASOURCE_VIEW = "DATASOURCE_VIEW",
-  TABLE_ADD = "TABLE_ADD",
-  TABLE_ALL = "TABLE_ALL",
-  TABLE_READ = "TABLE_READ",
-  TABLE_VALUES = "TABLE_VALUES",
-  TABLE_EDIT = "TABLE_EDIT",
-  VARIABLE_READ = "VARIABLE_READ",
-  DATABASES_ALL = "DATABASES_ALL",
-  R_USE = "R_USE",
-  DATASHIELD_ALL = "DATASHIELD_ALL",
-  DATASHIELD_USE = "DATASHIELD_USE",
-  FILES_ALL = "FILES_ALL",
-  FILES_READ = "FILES_READ",
-  FILES_SHARE = "FILES_SHARE",
-  PROJECT_ALL = "PROJECT_ALL",
-  TABLE_VALUES_EDIT = "TABLE_VALUES_EDIT",
-  PROJECT_ADD = "PROJECT_ADD",
-  SYSTEM_ALL = "SYSTEM_ALL",
-  VCF_STORE_VIEW = "VCF_STORE_VIEW",
-  VCF_STORE_VALUES = "VCF_STORE_VALUES",
-  VCF_STORE_ALL = "VCF_STORE_ALL",
-  RESOURCES_ALL = "RESOURCES_ALL",
-  RESOURCES_VIEW = "RESOURCES_VIEW",
-  RESOURCE_ALL = "RESOURCE_ALL",
-  RESOURCE_VIEW = "RESOURCE_VIEW",
-  DATASHIELD_PROFILE_USE = "DATASHIELD_PROFILE_USE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  DATASOURCE_ALL = 'DATASOURCE_ALL',
+  DATASOURCE_VIEW = 'DATASOURCE_VIEW',
+  TABLE_ADD = 'TABLE_ADD',
+  TABLE_ALL = 'TABLE_ALL',
+  TABLE_READ = 'TABLE_READ',
+  TABLE_VALUES = 'TABLE_VALUES',
+  TABLE_EDIT = 'TABLE_EDIT',
+  VARIABLE_READ = 'VARIABLE_READ',
+  DATABASES_ALL = 'DATABASES_ALL',
+  R_USE = 'R_USE',
+  DATASHIELD_ALL = 'DATASHIELD_ALL',
+  DATASHIELD_USE = 'DATASHIELD_USE',
+  FILES_ALL = 'FILES_ALL',
+  FILES_READ = 'FILES_READ',
+  FILES_SHARE = 'FILES_SHARE',
+  PROJECT_ALL = 'PROJECT_ALL',
+  TABLE_VALUES_EDIT = 'TABLE_VALUES_EDIT',
+  PROJECT_ADD = 'PROJECT_ADD',
+  SYSTEM_ALL = 'SYSTEM_ALL',
+  VCF_STORE_VIEW = 'VCF_STORE_VIEW',
+  VCF_STORE_VALUES = 'VCF_STORE_VALUES',
+  VCF_STORE_ALL = 'VCF_STORE_ALL',
+  RESOURCES_ALL = 'RESOURCES_ALL',
+  RESOURCES_VIEW = 'RESOURCES_VIEW',
+  RESOURCE_ALL = 'RESOURCE_ALL',
+  RESOURCE_VIEW = 'RESOURCE_VIEW',
+  DATASHIELD_PROFILE_USE = 'DATASHIELD_PROFILE_USE',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum ServiceStatus {
-  RUNNING = "RUNNING",
-  STOPPED = "STOPPED",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  RUNNING = 'RUNNING',
+  STOPPED = 'STOPPED',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum TableIndexationStatus {
   /** NOT_INDEXED - this table is not indexable */
-  NOT_INDEXED = "NOT_INDEXED",
+  NOT_INDEXED = 'NOT_INDEXED',
   /** OUTDATED - this table is indexable, index is not up-to-date and is not in progress */
-  OUTDATED = "OUTDATED",
+  OUTDATED = 'OUTDATED',
   /** IN_PROGRESS - this table is indexable, index is not up-to-date and is in progress */
-  IN_PROGRESS = "IN_PROGRESS",
+  IN_PROGRESS = 'IN_PROGRESS',
   /** UPTODATE - this table is indexable and index is up-to-date */
-  UPTODATE = "UPTODATE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  UPTODATE = 'UPTODATE',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum ScheduleType {
-  NOT_SCHEDULED = "NOT_SCHEDULED",
-  MINUTES_5 = "MINUTES_5",
-  MINUTES_15 = "MINUTES_15",
-  MINUTES_30 = "MINUTES_30",
-  HOURLY = "HOURLY",
-  DAILY = "DAILY",
-  WEEKLY = "WEEKLY",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  NOT_SCHEDULED = 'NOT_SCHEDULED',
+  MINUTES_5 = 'MINUTES_5',
+  MINUTES_15 = 'MINUTES_15',
+  MINUTES_30 = 'MINUTES_30',
+  HOURLY = 'HOURLY',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum Day {
-  SUNDAY = "SUNDAY",
-  MONDAY = "MONDAY",
-  TUESDAY = "TUESDAY",
-  WEDNESDAY = "WEDNESDAY",
-  THURSDAY = "THURSDAY",
-  FRIDAY = "FRIDAY",
-  SATURDAY = "SATURDAY",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  SUNDAY = 'SUNDAY',
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface KeyDto {
@@ -127,9 +127,9 @@ export interface FileDto {
 }
 
 export enum FileDto_FileType {
-  FILE = "FILE",
-  FOLDER = "FOLDER",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  FILE = 'FILE',
+  FOLDER = 'FOLDER',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface LocaleDto {
@@ -156,9 +156,9 @@ export interface Subject {
 }
 
 export enum Subject_SubjectType {
-  USER = "USER",
-  GROUP = "GROUP",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  USER = 'USER',
+  GROUP = 'GROUP',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface Acl {
@@ -210,15 +210,11 @@ export interface TableIndexStatusDto {
   table: string;
   indexCreated?: string | undefined;
   indexLastUpdate?: string | undefined;
-  tableLastUpdate?:
-    | string
-    | undefined;
+  tableLastUpdate?: string | undefined;
   /** if no schedule is defined in the index manager configuration, the default one is returned */
   schedule: ScheduleDto | undefined;
   status: TableIndexationStatus;
-  progress?:
-    | number
-    | undefined;
+  progress?: number | undefined;
   /** link to this index */
   link: string;
 }
@@ -247,9 +243,9 @@ export interface SubjectCredentialsDto {
 }
 
 export enum SubjectCredentialsDto_AuthenticationType {
-  PASSWORD = "PASSWORD",
-  CERTIFICATE = "CERTIFICATE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  PASSWORD = 'PASSWORD',
+  CERTIFICATE = 'CERTIFICATE',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface GroupDto {
@@ -290,9 +286,9 @@ export interface SubjectTokenDto {
 }
 
 export enum SubjectTokenDto_AccessType {
-  READ_NO_VALUES = "READ_NO_VALUES",
-  READ = "READ",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  READ_NO_VALUES = 'READ_NO_VALUES',
+  READ = 'READ',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface LinkDto {
@@ -308,10 +304,10 @@ export interface BookmarkDto {
 }
 
 export enum BookmarkDto_ResourceType {
-  PROJECT = "PROJECT",
-  TABLE = "TABLE",
-  VARIABLE = "VARIABLE",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  PROJECT = 'PROJECT',
+  TABLE = 'TABLE',
+  VARIABLE = 'VARIABLE',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 /** Extracts from RuntimeMXBean */
@@ -454,13 +450,9 @@ export interface VcsCommitInfoDto {
   comment: string;
   commitId: string;
   diffEntries: string[];
-  blob?:
-    | string
-    | undefined;
+  blob?: string | undefined;
   /** head of the commit tree */
-  isHead?:
-    | boolean
-    | undefined;
+  isHead?: boolean | undefined;
   /** current (latest) commit for a given path */
   isCurrent?: boolean | undefined;
 }

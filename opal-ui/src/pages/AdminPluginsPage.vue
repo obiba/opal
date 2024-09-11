@@ -15,7 +15,7 @@
         {{ $t('plugins_info') }}
       </div>
       <div v-if="pluginsStore.plugins.restart" class="q-mb-md box-warning">
-        <q-icon name="error" size="1.2rem"/>
+        <q-icon name="error" size="1.2rem" />
         <span class="on-right">
           {{ $t('plugin.system_restart_required') }}
         </span>

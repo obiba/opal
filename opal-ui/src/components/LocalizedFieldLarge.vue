@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <slot name="header"></slot>
     <span
       v-if="!$slots.header && !!title"
@@ -8,11 +7,11 @@
       :class="{ 'text-primary': dirty, 'text-secondary': !dirty }"
       >{{ title }}</span
     >
-    <q-card flat >
-      <q-tabs inline-label v-model="tab" dense class="text-grey" active-color="primary" active-bg-color="grey-1" >
+    <q-card flat>
+      <q-tabs inline-label v-model="tab" dense class="text-grey" active-color="primary" active-bg-color="grey-1">
         <q-tab v-for="label in labels" :key="label.locale" :name="label.locale" :label="label.locale">
           <template v-slot:default>
-            <q-icon @click.prevent="onDeleteLocale(label)" name="close" color="red" class="q-pl-xs"/>
+            <q-icon @click.prevent="onDeleteLocale(label)" name="close" color="red" class="q-pl-xs" />
           </template>
         </q-tab>
       </q-tabs>
@@ -40,7 +39,6 @@
         :label="labels.length ? '' : $t('add')"
         @click="onAddLocale"
       />
-
     </q-card>
   </div>
 </template>

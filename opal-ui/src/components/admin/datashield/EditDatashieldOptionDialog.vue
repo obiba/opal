@@ -12,13 +12,15 @@
           :hint="$t('datashield.option_name_hint')"
           :disable="!isCreation"
           dense
-          class="q-mb-md" />
+          class="q-mb-md"
+        />
         <q-input
           v-model="optValue"
           :label="$t('value')"
           :hint="$t('datashield.option_value_hint')"
           dense
-          class="q-mb-md" />
+          class="q-mb-md"
+        />
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
@@ -45,13 +47,13 @@ export default defineComponent({
 import { DataShieldROptionDto } from 'src/models/DataShield';
 
 interface DialogProps {
-  modelValue: boolean
-  option: DataShieldROptionDto | null
+  modelValue: boolean;
+  option: DataShieldROptionDto | null;
 }
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const datashieldStore = useDatashieldStore();
 
@@ -60,13 +62,16 @@ const optValue = ref('');
 
 const isCreation = computed(() => props.option === null);
 
-watch(() => props.modelValue, (value) => {
-  showDialog.value = value;
-  if (value) {
-    optName.value = props.option ? props.option.name : '';
-    optValue.value = props.option ? props.option.value : '';
+watch(
+  () => props.modelValue,
+  (value) => {
+    showDialog.value = value;
+    if (value) {
+      optName.value = props.option ? props.option.name : '';
+      optValue.value = props.option ? props.option.value : '';
+    }
   }
-});
+);
 
 function onHide() {
   emit('update:modelValue', false);

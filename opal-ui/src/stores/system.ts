@@ -3,9 +3,7 @@ import { api } from 'src/boot/api';
 import { DatabaseDto, DatabasesStatusDto } from 'src/models/Database';
 import { GeneralConf } from 'src/models/Opal';
 
-
 export const useSystemStore = defineStore('system', () => {
-
   const generalConf = ref<GeneralConf>({} as GeneralConf);
 
   async function initGeneralConf() {

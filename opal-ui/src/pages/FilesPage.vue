@@ -22,9 +22,7 @@ const route = useRoute();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : '?'
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
 onMounted(() => {
   if (route.params.path) {

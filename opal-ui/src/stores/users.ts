@@ -16,8 +16,8 @@ export const useUsersStore = defineStore('users', () => {
 
   async function loadUsers() {
     return api.get('/system/subject-credentials').then((response) => {
-      users.value = response.data
-    })
+      users.value = response.data;
+    });
   }
 
   async function addUser(user: SubjectCredentialsDto) {
@@ -45,5 +45,4 @@ export const useUsersStore = defineStore('users', () => {
     deleteUser,
     updateCurrentPassword,
   };
-
 });

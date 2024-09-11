@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="authStore.isAuthenticated" class="q-mt-none q-mb-none q-pa-md">
-      <span class="text-bold text-grey-6">{{  username }}</span>
+      <span class="text-bold text-grey-6">{{ username }}</span>
     </div>
     <q-list>
       <q-item to="/profile" v-if="authStore.isAuthenticated">
@@ -54,23 +54,12 @@
         </q-item-section>
       </q-item>
       <q-item-label header>{{ $t('other_links') }}</q-item-label>
-      <EssentialLink
-        v-for="link in essentialLinks"
-        :key="link.title"
-        v-bind="link"
-      />
+      <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
       <q-item class="fixed-bottom text-caption">
         <div>
           {{ $t('main.powered_by') }}
-          <a
-            class="text-weight-bold"
-            href="https://www.obiba.org/pages/products/opal"
-            target="_blank"
-            >OBiBa Opal</a
-          >
-          <span class="q-ml-xs" style="font-size: smaller">{{
-            authStore.version
-          }}</span>
+          <a class="text-weight-bold" href="https://www.obiba.org/pages/products/opal" target="_blank">OBiBa Opal</a>
+          <span class="q-ml-xs" style="font-size: smaller">{{ authStore.version }}</span>
         </div>
       </q-item>
     </q-list>
@@ -83,18 +72,14 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import EssentialLink, {
-  EssentialLinkProps,
-} from 'components/EssentialLink.vue';
+import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
 import { t } from 'src/boot/i18n';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const systemStore = useSystemStore();
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : '?'
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
 const essentialLinks: EssentialLinkProps[] = [
   {

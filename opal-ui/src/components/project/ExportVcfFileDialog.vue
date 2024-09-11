@@ -68,7 +68,6 @@
               map-options
               use-input
             >
-
             </q-select>
 
             <q-checkbox v-model="exportOptions.caseControl" :label="$t('vcf_store.export_case_control_label')" />
@@ -199,7 +198,8 @@ async function onExportFolderSelected(folder: FileDto) {
 async function onExport() {
   try {
     exportOptions.value.destination = exportData.value.path;
-    if (selectedTable.value?.name) exportOptions.value.table = `${selectedTable.value.datasourceName}.${selectedTable.value.name}`;
+    if (selectedTable.value?.name)
+      exportOptions.value.table = `${selectedTable.value.datasourceName}.${selectedTable.value.name}`;
     const taskId = await projectsStore.exportVcfFiles(props.project.name, exportOptions.value);
     notifySuccess(t('vcf_store.export_vcf_command_created', { id: taskId }));
     onHide();

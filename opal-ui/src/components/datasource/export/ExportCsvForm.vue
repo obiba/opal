@@ -6,7 +6,8 @@
       :folder="filesStore.current"
       selection="single"
       @select="onUpdate"
-      type="folder"/>
+      type="folder"
+    />
   </div>
 </template>
 
@@ -26,18 +27,22 @@ interface ExportCsvFormProps {
 }
 
 const props = defineProps<ExportCsvFormProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 
 const destinationFolder = ref<FileDto>();
 
-const currentTime = computed(() => new Date().toISOString().replace(/[:T\-]/g, '').split('.')[0]);
-
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : ''
+const currentTime = computed(
+  () =>
+    new Date()
+      .toISOString()
+      .replace(/[:T\-]/g, '')
+      .split('.')[0]
 );
+
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : ''));
 
 onMounted(() => {
   if (props.modelValue) {
@@ -48,7 +53,7 @@ onMounted(() => {
       readable: true,
       writable: true,
       children: [],
-    }
+    };
   }
 });
 
@@ -57,7 +62,10 @@ function onUpdate() {
     emit('update:modelValue', undefined);
     return;
   }
-  const prefix = props.tables.length === 1 ? `${props.tables[0].datasourceName}-${props.tables[0].name}` : props.tables[0].datasourceName;
+  const prefix =
+    props.tables.length === 1
+      ? `${props.tables[0].datasourceName}-${props.tables[0].name}`
+      : props.tables[0].datasourceName;
   const out = `${destinationFolder.value.path}/${prefix}-${currentTime.value}`;
   emit('update:modelValue', out);
 }

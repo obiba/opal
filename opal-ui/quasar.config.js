@@ -63,9 +63,7 @@ module.exports = configure(function (ctx) {
 
       // publicPath,
       env: {
-        API: ctx.dev
-          ? 'http://localhost:8080/ws'
-          : (process.env.OPAL_URL ? process.env.OPAL_URL : '') + '/ws',
+        API: ctx.dev ? 'http://localhost:8080/ws' : (process.env.OPAL_URL ? process.env.OPAL_URL : '') + '/ws',
       },
       // rawDefine: {}
       // ignorePublicFolder: true,

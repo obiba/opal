@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Plugins";
+export const protobufPackage = 'Plugins';
 
 export interface PluginPackageDto {
   name: string;

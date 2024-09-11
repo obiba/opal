@@ -9,19 +9,18 @@
 
       <q-card-section class="row items-center q-gutter-sm">
         <div class="col-8">
-          <q-input
-            clearable
-            v-model="model"
-            dense
-            type="text"
-            :label="$t('token')"
-            class="q-mb-md"
-            lazy-rules
-          >
+          <q-input clearable v-model="model" dense type="text" :label="$t('token')" class="q-mb-md" lazy-rules>
           </q-input>
         </div>
         <div class="col-auto">
-          <q-btn  class="on-right" size="sm" icon="cached" color="primary" :label="$t('generate')" @click="onGenerateToken"></q-btn>
+          <q-btn
+            class="on-right"
+            size="sm"
+            icon="cached"
+            color="primary"
+            :label="$t('generate')"
+            @click="onGenerateToken"
+          ></q-btn>
         </div>
       </q-card-section>
 

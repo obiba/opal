@@ -1,13 +1,9 @@
 <template>
   <q-card flat>
     <q-card-section v-if="header" class="q-pa-none q-mb-sm">
-      <q-breadcrumbs
-        separator=">"
-        class="float-left on-left">
-        <q-breadcrumbs-el
-          :label="taxonomiesStore.getLabel(annotation.taxonomy.title, locale)"/>
-        <q-breadcrumbs-el
-          :label="taxonomiesStore.getLabel(annotation.vocabulary.title, locale)"/>
+      <q-breadcrumbs separator=">" class="float-left on-left">
+        <q-breadcrumbs-el :label="taxonomiesStore.getLabel(annotation.taxonomy.title, locale)" />
+        <q-breadcrumbs-el :label="taxonomiesStore.getLabel(annotation.vocabulary.title, locale)" />
       </q-breadcrumbs>
       <q-btn
         :icon="showDetails ? 'expand_less' : 'expand_more'"
@@ -24,13 +20,19 @@
       <div class="q-mb-md">
         <div class="text-bold">{{ taxonomiesStore.getLabel(annotation.taxonomy.title, locale) }}</div>
         <div :style="maxWidth ? `max-width: ${maxWidth}` : ''">
-          <q-markdown :src="taxonomiesStore.getLabel(annotation.taxonomy.description, locale)" no-heading-anchor-links />
+          <q-markdown
+            :src="taxonomiesStore.getLabel(annotation.taxonomy.description, locale)"
+            no-heading-anchor-links
+          />
         </div>
       </div>
       <div>
         <div class="text-bold">{{ taxonomiesStore.getLabel(annotation.vocabulary.title, locale) }}</div>
         <div :style="maxWidth ? `max-width: ${maxWidth}` : ''">
-          <q-markdown :src="taxonomiesStore.getLabel(annotation.vocabulary.description, locale)" no-heading-anchor-links />
+          <q-markdown
+            :src="taxonomiesStore.getLabel(annotation.vocabulary.description, locale)"
+            no-heading-anchor-links
+          />
         </div>
       </div>
     </q-card-section>
@@ -45,7 +47,6 @@
     </q-card-section>
   </q-card>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({

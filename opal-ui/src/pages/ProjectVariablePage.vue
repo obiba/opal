@@ -5,14 +5,8 @@
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="dsName" :to="`/project/${dsName}`" />
-        <q-breadcrumbs-el
-          :label="$t('tables')"
-          :to="`/project/${dsName}/tables`"
-        />
-        <q-breadcrumbs-el
-          :label="tName"
-          :to="`/project/${dsName}/table/${tName}`"
-        />
+        <q-breadcrumbs-el :label="$t('tables')" :to="`/project/${dsName}/tables`" />
+        <q-breadcrumbs-el :label="tName" :to="`/project/${dsName}/table/${tName}`" />
         <q-breadcrumbs-el :label="vName" />
       </q-breadcrumbs>
       <q-space />
@@ -39,8 +33,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h6 q-mb-md">
-        <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon
-        ><span class="on-right">{{ vName }}</span>
+        <q-icon name="table_chart" size="sm" class="q-mb-xs"></q-icon><span class="on-right">{{ vName }}</span>
         <q-btn
           v-if="datasourceStore.perms.variable?.canUpdate()"
           color="secondary"
@@ -100,19 +93,16 @@
         <attributes-bundle-panel :bundle="labelBundle" />
         <attributes-bundle-panel :bundle="descriptionBundle" />
 
-        <q-tabs
-          v-model="tab"
-          dense
-          class="text-grey"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-        >
+        <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="$t('dictionary')" />
-          <q-tab name="script" :label="$t('script')" v-if="withScript"/>
+          <q-tab name="script" :label="$t('script')" v-if="withScript" />
           <q-tab name="summary" :label="$t('summary')" />
-          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
-          <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.variablePermissions?.canRead()"/>
+          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
+          <q-tab
+            name="permissions"
+            :label="$t('permissions')"
+            v-if="datasourceStore.perms.variablePermissions?.canRead()"
+          />
         </q-tabs>
 
         <q-separator />
@@ -122,18 +112,10 @@
             <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
             <div class="row q-col-gutter-md q-mb-md">
               <div class="col-12 col-md-6">
-                <fields-list
-                  :items="items1"
-                  :dbobject="datasourceStore.variable"
-                  class=""
-                />
+                <fields-list :items="items1" :dbobject="datasourceStore.variable" class="" />
               </div>
               <div class="col-12 col-md-6">
-                <fields-list
-                  :items="items2"
-                  :dbobject="datasourceStore.variable"
-                  class=""
-                />
+                <fields-list :items="items2" :dbobject="datasourceStore.variable" class="" />
               </div>
             </div>
             <div class="row q-col-gutter-md">
@@ -153,11 +135,11 @@
           </q-tab-panel>
 
           <q-tab-panel name="summary">
-            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount"/>
+            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount" />
           </q-tab-panel>
 
           <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
-            <table-values :variable="datasourceStore.variable"/>
+            <table-values :variable="datasourceStore.variable" />
           </q-tab-panel>
 
           <q-tab-panel name="permissions" v-if="datasourceStore.perms.variablePermissions?.canRead()">
@@ -168,12 +150,18 @@
           </q-tab-panel>
         </q-tab-panels>
       </div>
-      <edit-variable-dialog
-        v-model="showEdit"
-        :variable="datasourceStore.variable"
-        @save="onSaved" />
-      <add-to-view-dialog v-model="showAddToView" :table="datasourceStore.table" :variables="[datasourceStore.variable]" />
-      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_variables_confirm', { count: 1 })" @confirm="onDeleteVariable" />
+      <edit-variable-dialog v-model="showEdit" :variable="datasourceStore.variable" @save="onSaved" />
+      <add-to-view-dialog
+        v-model="showAddToView"
+        :table="datasourceStore.table"
+        :variables="[datasourceStore.variable]"
+      />
+      <confirm-dialog
+        v-model="showDelete"
+        :title="$t('delete')"
+        :text="$t('delete_variables_confirm', { count: 1 })"
+        @confirm="onDeleteVariable"
+      />
     </q-page>
   </div>
 </template>
@@ -228,8 +216,7 @@ const items1: FieldItem<VariableDto>[] = [
   {
     field: 'name',
     label: 'full_name',
-    html: (val) =>
-      val ? `<code>${dsName.value}.${tName.value}:${val.name}</code>` : '',
+    html: (val) => (val ? `<code>${dsName.value}.${tName.value}:${val.name}</code>` : ''),
   },
   {
     field: 'entityType',
@@ -280,19 +267,15 @@ const vName = computed(() => route.params.vid as string);
 
 function init() {
   loading.value = true;
-  datasourceStore.initDatasourceTableVariable(
-    dsName.value,
-    tName.value,
-    vName.value
-  )
-  .catch((err) => {
-    notifyError(err);
-    if (err.response?.status === 404)
-      router.push(`/project/${dsName.value}/table/${tName.value}`);
-  })
-  .finally(() => {
-    loading.value = false;
-  });
+  datasourceStore
+    .initDatasourceTableVariable(dsName.value, tName.value, vName.value)
+    .catch((err) => {
+      notifyError(err);
+      if (err.response?.status === 404) router.push(`/project/${dsName.value}/table/${tName.value}`);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
   taxonomiesStore.init();
 }
 

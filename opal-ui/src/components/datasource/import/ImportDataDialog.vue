@@ -114,7 +114,7 @@
               <div class="text-hint q-mb-md">
                 {{ $t('incremental_import_hint') }}
               </div>
-              <identifiers-mapping-select v-model="idConfig" :for-import="true"/>
+              <identifiers-mapping-select v-model="idConfig" :for-import="true" />
             </div>
           </q-step>
 

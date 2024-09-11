@@ -5,7 +5,7 @@
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="pName" :to="`/project/${pName}`" />
-        <q-breadcrumbs-el :label="$t('resources')" :to="`/project/${pName}/resources`"/>
+        <q-breadcrumbs-el :label="$t('resources')" :to="`/project/${pName}/resources`" />
         <q-breadcrumbs-el :label="rName" />
       </q-breadcrumbs>
       <q-space />
@@ -32,7 +32,7 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="link" class="on-left"/><span>{{ rName }}</span>
+        <q-icon name="link" class="on-left" /><span>{{ rName }}</span>
         <q-btn
           v-if="resourcesStore.perms.resource?.canUpdate()"
           color="secondary"
@@ -90,7 +90,11 @@
         align="justify"
       >
         <q-tab name="reference" :label="$t('reference')" />
-        <q-tab name="permissions" :label="$t('permissions')" v-if="resourcesStore.perms.resourcePermissions?.canRead()"/>
+        <q-tab
+          name="permissions"
+          :label="$t('permissions')"
+          v-if="resourcesStore.perms.resourcePermissions?.canRead()"
+        />
       </q-tabs>
 
       <q-separator />
@@ -109,8 +113,18 @@
       </q-tab-panels>
 
       <resource-view-dialog v-if="resourceReference" v-model="showAddView" :resource="resourceReference" />
-      <resource-reference-dialog v-model="showEdit" :provider="resourceProvider" :resource="selected" @saved="onSaved" />
-      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_resources_confirm', { count: 1 })" @confirm="onDeleteResource" />
+      <resource-reference-dialog
+        v-model="showEdit"
+        :provider="resourceProvider"
+        :resource="selected"
+        @saved="onSaved"
+      />
+      <confirm-dialog
+        v-model="showDelete"
+        :title="$t('delete')"
+        :text="$t('delete_resources_confirm', { count: 1 })"
+        @confirm="onDeleteResource"
+      />
     </q-page>
   </div>
 </template>
@@ -140,7 +154,9 @@ const showAddView = ref(false);
 const selected = ref({} as ResourceReferenceDto);
 
 const resourceReference = computed(() => resourcesStore.getResourceReference(rName.value));
-const resourceProvider = computed(() => resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined);
+const resourceProvider = computed(() =>
+  resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined
+);
 
 const previousReference = computed(() => {
   const idx = resourcesStore.resourceReferences.findIndex((rsrc) => rsrc.name === rName.value);
@@ -163,7 +179,8 @@ function loadPerms() {
 }
 
 function onTest() {
-  resourcesStore.testResource(pName.value, rName.value)
+  resourcesStore
+    .testResource(pName.value, rName.value)
     .then(() => {
       notifySuccess(t('resource_ref.test_success'));
     })
@@ -177,7 +194,8 @@ function onShowDelete() {
 }
 
 function onDeleteResource() {
-  resourcesStore.deleteResource(pName.value, rName.value)
+  resourcesStore
+    .deleteResource(pName.value, rName.value)
     .then(() => {
       return resourcesStore.loadResourceReferences(pName.value);
     })
@@ -187,18 +205,20 @@ function onDeleteResource() {
 }
 
 function onShowEdit() {
-  selected.value = resourceReference.value ? { ...resourceReference.value } : {} as ResourceReferenceDto;
+  selected.value = resourceReference.value ? { ...resourceReference.value } : ({} as ResourceReferenceDto);
   showEdit.value = true;
 }
 
 function onShowDuplicate() {
-  selected.value = resourceReference.value ? { ...resourceReference.value } : {} as ResourceReferenceDto;
+  selected.value = resourceReference.value ? { ...resourceReference.value } : ({} as ResourceReferenceDto);
   selected.value.name = '';
   showEdit.value = true;
 }
 
 function onSaved(resource: ResourceReferenceDto) {
-  resourcesStore.loadResourceReferences(pName.value).then(() => router.push(`/project/${pName.value}/resource/${resource.name}`));
+  resourcesStore
+    .loadResourceReferences(pName.value)
+    .then(() => router.push(`/project/${pName.value}/resource/${resource.name}`));
 }
 
 function onAddView() {

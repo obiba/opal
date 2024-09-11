@@ -148,5 +148,4 @@ async function onImportedTaxonomies() {
     })
     .catch(notifyError);
 }
-
 </script>

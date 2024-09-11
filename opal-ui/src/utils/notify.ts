@@ -4,22 +4,22 @@ import { t } from 'src/boot/i18n';
 export function notifySuccess(message: string) {
   Notify.create({
     type: 'positive',
-    message: t(message)
-  })
+    message: t(message),
+  });
 }
 
 export function notifyInfo(message: string) {
   Notify.create({
     type: 'info',
-    message: t(message)
-  })
+    message: t(message),
+  });
 }
 
 export function notifyWarning(message: string) {
   Notify.create({
     type: 'warning',
-    message: t(message)
-  })
+    message: t(message),
+  });
 }
 
 export function notifyError(error) {
@@ -35,6 +35,6 @@ export function notifyError(error) {
   }
   Notify.create({
     type: 'negative',
-    message
-  })
+    message,
+  });
 }

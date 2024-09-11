@@ -15,33 +15,26 @@
       <q-card flat class="bg-grey-2 q-mb-md">
         <q-card-section>
           <div class="row q-gutter-md">
-          <q-input
-            v-model="type"
-            :label="$t('entity_type')"
-            flat
-            dense
-            size="sm"
-            @update:model-value="onClear"
-          />
-          <q-input
-            v-model="identifier"
-            :label="$t('id')"
-            flat
-            dense
-            size="sm"
-            @update:model-value="onClear"
-            @keyup.enter="onSubmit"
-          />
-          <q-btn
-            :label="$t('search')"
-            color="primary"
-            size="sm"
-            @click="onSubmit"
-            :disable="loading || !isValid"
-            class="q-mt-lg"
-            style="height: 2.5em;"
-          />
-        </div>
+            <q-input v-model="type" :label="$t('entity_type')" flat dense size="sm" @update:model-value="onClear" />
+            <q-input
+              v-model="identifier"
+              :label="$t('id')"
+              flat
+              dense
+              size="sm"
+              @update:model-value="onClear"
+              @keyup.enter="onSubmit"
+            />
+            <q-btn
+              :label="$t('search')"
+              color="primary"
+              size="sm"
+              @click="onSubmit"
+              :disable="loading || !isValid"
+              class="q-mt-lg"
+              style="height: 2.5em"
+            />
+          </div>
         </q-card-section>
       </q-card>
 
@@ -58,7 +51,7 @@
           dense
           emit-value
           @update:model-value="onTableSelected"
-          style="width: 300px;"
+          style="width: 300px"
         />
         <q-table
           :rows="rows"
@@ -67,16 +60,20 @@
           :loading="loadingValues"
           :rows-per-page-options="[10, 20, 50, 100, 0]"
           flat
-          class="q-mt-md">
-
+          class="q-mt-md"
+        >
           <template v-slot:body-cell-variable="props">
             <q-td :props="props">
-              <router-link :to="`/project/${table?.datasourceName}/table/${table?.name}/variable/${props.value}`" class="text-primary">{{ props.value }}</router-link>
+              <router-link
+                :to="`/project/${table?.datasourceName}/table/${table?.name}/variable/${props.value}`"
+                class="text-primary"
+                >{{ props.value }}</router-link
+              >
             </q-td>
           </template>
           <template v-slot:body-cell-value="props">
             <q-td :props="props">
-              <value-cell :value="props.value" :variable="getVariable(props.row.variable)"/>
+              <value-cell :value="props.value" :variable="getVariable(props.row.variable)" />
             </q-td>
           </template>
         </q-table>
@@ -108,7 +105,9 @@ const idParam = computed(() => route.query.id as string);
 const typeParam = computed(() => route.query.type as string);
 
 const isValid = computed(() => !!type.value && !!identifier.value);
-const tableOptions = computed(() => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || []);
+const tableOptions = computed(
+  () => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || []
+);
 const table = computed(() => tables.value?.find((t) => asTableId(t) === tableId.value));
 
 const columns = computed(() => {
@@ -124,7 +123,7 @@ const rows = computed(() => {
     return [];
   }
   const values = valueSets.value?.valueSets[0].values;
-  const result: { variable: string, value?: ValueSetsDto_ValueDto }[] = [];
+  const result: { variable: string; value?: ValueSetsDto_ValueDto }[] = [];
   values.forEach((value, idx: number) => {
     result.push({
       variable: variables[idx],
@@ -159,7 +158,8 @@ function onSubmit() {
   }
   loading.value = true;
   onClear();
-  searchStore.getEntityTables(type.value, identifier.value)
+  searchStore
+    .getEntityTables(type.value, identifier.value)
     .then((response) => {
       tables.value = response;
       if (response.length > 0) {
@@ -198,7 +198,8 @@ function onTableSelected() {
     return;
   }
   loadingValues.value = true;
-  datasourceStore.getTableVariables(table.datasourceName, table.name)
+  datasourceStore
+    .getTableVariables(table.datasourceName, table.name)
     .then((res) => {
       variables.value = res;
       getEntityValueSets(table, identifier.value);
@@ -206,7 +207,6 @@ function onTableSelected() {
     .catch((error) => {
       notifyError(error);
     });
-
 }
 
 function getEntityValueSets(table: TableDto, identifier: string) {
@@ -215,7 +215,8 @@ function getEntityValueSets(table: TableDto, identifier: string) {
     loadingValues.value = false;
     return;
   }
-  datasourceStore.getEntityValueSet(table.datasourceName, table.name, identifier)
+  datasourceStore
+    .getEntityValueSet(table.datasourceName, table.name, identifier)
     .then((response) => {
       valueSets.value = response;
     })
@@ -230,5 +231,4 @@ function getEntityValueSets(table: TableDto, identifier: string) {
 function getVariable(name: string) {
   return variables.value?.find((v) => v.name === name);
 }
-
 </script>

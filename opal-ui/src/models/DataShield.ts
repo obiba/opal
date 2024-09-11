@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "DataShield";
+export const protobufPackage = 'DataShield';
 
 export interface DataShieldProfileDto {
   name: string;

@@ -14,10 +14,23 @@
         :commands="commandsStore.commandStates"
         @refresh="onRefresh"
         @clear="onClear"
-        @cancel="onCancel" />
+        @cancel="onCancel"
+      />
     </q-page>
-    <confirm-dialog v-model="showConfirmClear" :title="$t('clear')" :text="$t('clear_tasks_confirm', { count: selectedToClear.length })" @confirm="onClearConfirmed" @cancel="onClearCancel"/>
-    <confirm-dialog v-model="showConfirmCancel" :title="$t('cancel')" :text="$t('cancel_task_confirm')" @confirm="onCancelConfirmed" @cancel="onCancelCancel"/>
+    <confirm-dialog
+      v-model="showConfirmClear"
+      :title="$t('clear')"
+      :text="$t('clear_tasks_confirm', { count: selectedToClear.length })"
+      @confirm="onClearConfirmed"
+      @cancel="onClearCancel"
+    />
+    <confirm-dialog
+      v-model="showConfirmCancel"
+      :title="$t('cancel')"
+      :text="$t('cancel_task_confirm')"
+      @confirm="onCancelConfirmed"
+      @cancel="onCancelCancel"
+    />
   </div>
 </template>
 
@@ -47,11 +60,14 @@ function onClear(command: CommandStateDto) {
 }
 
 function onClearConfirmed() {
-  commandsStore.clear(selectedToClear.value).then(() => {
-    onRefresh();
-  }).catch(() => {
-    onRefresh();
-  });
+  commandsStore
+    .clear(selectedToClear.value)
+    .then(() => {
+      onRefresh();
+    })
+    .catch(() => {
+      onRefresh();
+    });
 }
 
 function onClearCancel() {
@@ -68,11 +84,14 @@ function onCancelConfirmed() {
   if (!selectedToCancel.value) {
     return;
   }
-  commandsStore.cancel(selectedToCancel.value).then(() => {
-    onRefresh();
-  }).catch(() => {
-    onRefresh();
-  });
+  commandsStore
+    .cancel(selectedToCancel.value)
+    .then(() => {
+      onRefresh();
+    })
+    .catch(() => {
+      onRefresh();
+    });
 }
 
 function onCancelCancel() {

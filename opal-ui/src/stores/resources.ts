@@ -12,7 +12,6 @@ interface ResourcePerms {
 }
 
 export const useResourcesStore = defineStore('resources', () => {
-
   const resourceProviders = ref<ResourceProvidersDto>();
   const project = ref<string>();
   const resourceReferences = ref<ResourceReferenceDto[]>([]);
@@ -36,7 +35,7 @@ export const useResourcesStore = defineStore('resources', () => {
   }
 
   async function loadResourceProviders() {
-    return api.get('/resource-providers').then((response) => resourceProviders.value = response.data);
+    return api.get('/resource-providers').then((response) => (resourceProviders.value = response.data));
   }
 
   async function loadResourceReferences(pName: string) {
@@ -44,8 +43,7 @@ export const useResourcesStore = defineStore('resources', () => {
     delete perms.value.resources;
     delete perms.value.resourcesPermissions;
     return Promise.all([
-      api.get(`/project/${project.value}/resources`)
-      .then((response) => {
+      api.get(`/project/${project.value}/resources`).then((response) => {
         perms.value.resources = new Perms(response);
         resourceReferences.value = response.data;
         return response;
@@ -55,7 +53,7 @@ export const useResourcesStore = defineStore('resources', () => {
         return response;
       }),
     ]);
-    return ;
+    return;
   }
 
   function getResourceReference(name: string) {
@@ -75,12 +73,14 @@ export const useResourcesStore = defineStore('resources', () => {
       params: { names },
       paramsSerializer: {
         indexes: null,
-      }
+      },
     });
   }
 
   function getResourceFactory(reference: ResourceReferenceDto) {
-    return (resourceProviders.value?.providers ?? []).find((provider) => provider.name === reference.provider)?.resourceFactories.find((factory) => factory.name === reference.factory);
+    return (resourceProviders.value?.providers ?? [])
+      .find((provider) => provider.name === reference.provider)
+      ?.resourceFactories.find((factory) => factory.name === reference.factory);
   }
 
   function getResourceProvider(reference: ResourceReferenceDto) {
@@ -128,6 +128,5 @@ export const useResourcesStore = defineStore('resources', () => {
     addResource,
     saveResource,
     loadResourcePerms,
-  }
-
+  };
 });

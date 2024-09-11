@@ -11,7 +11,8 @@
         :type="field.format"
         :extensions="field.fileFormats"
         @select="onFileSelect()"
-        class="q-mb-md"/>
+        class="q-mb-md"
+      />
     </div>
     <div v-else-if="isPasswordItem()">
       <q-input
@@ -24,7 +25,8 @@
         :disable="disable"
         class="q-mb-md"
         :debounce="500"
-        @update:model-value="onUpdate"/>
+        @update:model-value="onUpdate"
+      />
     </div>
     <div v-else-if="field.type === 'string'">
       <q-select
@@ -38,7 +40,8 @@
         emit-value
         map-options
         :options="field.enum.map((opt) => ({ label: opt.title, value: opt.key }))"
-        @update:model-value="onUpdate"/>
+        @update:model-value="onUpdate"
+      />
       <q-input
         v-else
         v-model="data"
@@ -49,7 +52,8 @@
         :disable="disable"
         class="q-mb-md"
         :debounce="500"
-        @update:model-value="onUpdate"/>
+        @update:model-value="onUpdate"
+      />
     </div>
     <div v-else-if="field.type === 'integer'">
       <q-input
@@ -61,7 +65,8 @@
         :disable="disable"
         class="q-mb-md"
         :debounce="500"
-        @update:model-value="onUpdate"/>
+        @update:model-value="onUpdate"
+      />
     </div>
     <div v-else-if="field.type === 'boolean'">
       <q-toggle
@@ -70,8 +75,9 @@
         :hint="field.description"
         dense
         :disable="disable"
-        :class="field.description ? 'q-mb-xs': 'q-mb-md'"
-        @update:model-value="onUpdate"/>
+        :class="field.description ? 'q-mb-xs' : 'q-mb-md'"
+        @update:model-value="onUpdate"
+      />
       <div v-if="field.description" class="text-hint q-mb-md">
         {{ field.description }}
       </div>
@@ -88,20 +94,20 @@
                 :field="item"
                 :disable="disable"
                 @update:model-value="onArrayUpdate(index)"
-                />
+              />
             </div>
           </q-item-section>
           <q-item-section v-if="!disable" avatar>
             <q-btn
-                rounded
-                dense
-                flat
-                size="sm"
-                color="secondary"
-                :title="$t('delete')"
-                icon="delete"
-                @click="dataArray.splice(index, 1)"
-              />
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="$t('delete')"
+              icon="delete"
+              @click="dataArray.splice(index, 1)"
+            />
           </q-item-section>
         </q-item>
       </q-list>
@@ -120,7 +126,6 @@
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({
@@ -153,9 +158,8 @@ watch([() => props.modelValue, () => props.field], init);
 function init() {
   data.value = props.modelValue;
   if (isArray()) {
-    dataArray.value = data.value ? data.value as Array<FormObject> : [];
-  }
-  else if (isFileItem()) {
+    dataArray.value = data.value ? (data.value as Array<FormObject>) : [];
+  } else if (isFileItem()) {
     if (props.modelValue && typeof props.modelValue === 'string') {
       filesStore.getFile(props.modelValue).then((file) => {
         dataFile.value = file;

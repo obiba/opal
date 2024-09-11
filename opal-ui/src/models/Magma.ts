@@ -5,16 +5,16 @@
 // source: Magma.proto
 
 /* eslint-disable */
-import { type IdentifiersMappingConfigDto } from "./Identifiers";
+import { type IdentifiersMappingConfigDto } from './Identifiers';
 
-export const protobufPackage = "Magma";
+export const protobufPackage = 'Magma';
 
 export enum TableStatusDto {
-  CLOSED = "CLOSED",
-  LOADING = "LOADING",
-  READY = "READY",
-  ERROR = "ERROR",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  CLOSED = 'CLOSED',
+  LOADING = 'LOADING',
+  READY = 'READY',
+  ERROR = 'ERROR',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface DatasourceIncrementalConfigDto {
@@ -140,11 +140,9 @@ export interface SpssDatasourceFactoryDto {
   idVariable?: string | undefined;
 }
 
-export interface HCDatasourceFactoryDto {
-}
+export interface HCDatasourceFactoryDto {}
 
-export interface GNPostalCodesDatasourceFactoryDto {
-}
+export interface GNPostalCodesDatasourceFactoryDto {}
 
 export interface MongoDBDatasourceFactoryDto {
   database?: string | undefined;
@@ -238,9 +236,7 @@ export interface VariableAttributeDto {
   variable: string;
   name: string;
   namespace?: string | undefined;
-  locale?:
-    | string
-    | undefined;
+  locale?: string | undefined;
   /** if missing: update is a deletion */
   value?: string | undefined;
 }
@@ -258,13 +254,9 @@ export interface ValueSetsDto_ValueSetDto {
 }
 
 export interface ValueSetsDto_ValueDto {
-  value?:
-    | string
-    | undefined;
+  value?: string | undefined;
   /** link to the value */
-  link?:
-    | string
-    | undefined;
+  link?: string | undefined;
   /** value sequence */
   values: ValueSetsDto_ValueDto[];
   /** length of the value */
@@ -319,9 +311,9 @@ export interface FileViewDto {
 }
 
 export enum FileViewDto_FileViewType {
-  SERIALIZED_XML = "SERIALIZED_XML",
-  EXCEL = "EXCEL",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  SERIALIZED_XML = 'SERIALIZED_XML',
+  EXCEL = 'EXCEL',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface ResourceViewDto {
@@ -340,21 +332,15 @@ export interface JavaScriptErrorDto {
   /** RhinoException.lineNumber() */
   lineNumber: number;
   /** RhinoException.lineSource() */
-  lineSource?:
-    | string
-    | undefined;
+  lineSource?: string | undefined;
   /** RhinoException.columnNumber() */
   columnNumber?: number | undefined;
 }
 
 export interface TableCompareDto {
-  compared:
-    | TableDto
-    | undefined;
+  compared: TableDto | undefined;
   /** optional because this is absent when the destination table does not exist */
-  withTable?:
-    | TableDto
-    | undefined;
+  withTable?: TableDto | undefined;
   /** list of all variables present in "compared" but not in "with" */
   newVariables: VariableDto[];
   /** list of all variables present in both and whose definitions are compatible and are not modified */

@@ -19,7 +19,7 @@
           @click="onUpdatePassword"
         />
         <div v-else square class="box-info q-mt-md" text-color="white" icon="warning">
-          <q-icon name="info" size="1.2rem"/>
+          <q-icon name="info" size="1.2rem" />
           <span class="on-right">{{ $t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
         </div>
       </div>
@@ -160,12 +160,16 @@
           </template>
           <template v-slot:body-cell-inactive="props">
             <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              <span :title="getDateLabel(props.row.inactiveAt)" :class="props.row.inactive ? 'text-negative' : ''">{{ getDateDistanceLabel(props.row.inactiveAt) }}</span>
+              <span :title="getDateLabel(props.row.inactiveAt)" :class="props.row.inactive ? 'text-negative' : ''">{{
+                getDateDistanceLabel(props.row.inactiveAt)
+              }}</span>
             </q-td>
           </template>
           <template v-slot:body-cell-expires="props">
             <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              <span v-if="props.row.expiresAt" :title="getDateLabel(props.row.expiresAt)">{{ getDateDistanceLabel(props.row.expiresAt) }}</span>
+              <span v-if="props.row.expiresAt" :title="getDateLabel(props.row.expiresAt)">{{
+                getDateDistanceLabel(props.row.expiresAt)
+              }}</span>
               <span v-else class="text-help">-</span>
             </q-td>
           </template>
@@ -198,7 +202,6 @@
         @update:modelValue="onTokenAdded"
       ></add-token-dialog>
       <!-- !Dialogs -->
-
     </div>
   </div>
 </template>
@@ -327,7 +330,6 @@ const iosOtpUrl = computed(() => {
   )}</a>`;
 });
 
-
 function getServicesField(row: SubjectTokenDto): string[] {
   const services: string[] = [];
   if (row.useR) services.push('useR');
@@ -344,7 +346,6 @@ function getAdministrationField(row: SubjectTokenDto): string[] {
   if (row.deleteProject) admin.push('deleteProject');
   return admin;
 }
-
 
 async function onToggleOtp() {
   if (profile.value) {

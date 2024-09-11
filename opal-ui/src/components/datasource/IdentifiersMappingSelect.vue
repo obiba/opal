@@ -12,7 +12,13 @@
       @update:model-value="onMappingConfigUpdated"
     />
     <div class="q-ml-none" v-show="forImport && !!idConfig.name">
-      <q-option-group dense :options="mappingOptions" type="radio" v-model="mappingOption" @update:model-value="onMappingConfigUpdated">
+      <q-option-group
+        dense
+        :options="mappingOptions"
+        type="radio"
+        v-model="mappingOption"
+        @update:model-value="onMappingConfigUpdated"
+      >
         <template v-slot:label="opt">
           <div class="row q-pt-md">
             <span>{{ $t(opt.label) }}</span>
@@ -93,7 +99,8 @@ onMounted(() => {
       mappingNames.value.push({ label: t('none_value'), value: '' });
 
       idConfig.value.name =
-        (allMappings.find((mapping: IdentifiersMappingDto) => mapping.name === projectMapping.mapping)||{}).name || '';
+        (allMappings.find((mapping: IdentifiersMappingDto) => mapping.name === projectMapping.mapping) || {}).name ||
+        '';
     })
     .catch((err) => {
       notifyError(err);

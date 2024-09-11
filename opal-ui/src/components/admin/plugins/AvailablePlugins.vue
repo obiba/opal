@@ -5,40 +5,41 @@
     </div>
     <div v-if="packages">
       <q-list bordered separator>
-      <template v-for="pkg in packages" :key="pkg.name">
-        <q-item>
-          <q-item-section top>
-            <q-item-label class="text-subtitle1">
-              {{ pkg.title }}
-            </q-item-label>
-            <q-item-label lines="1">
-              <span class="text-weight-medium">{{ pkg.name }}</span>
-              <span class="text-help on-right">[{{ pkg.type }}]</span>
-            </q-item-label>
-            <q-item-label caption>
-              {{ pkg.description }}
-            </q-item-label>
-            <q-item-label lines="1" class="text-body2 text-primary">
-              <span v-if="pkg.website && pkg.website.startsWith('http')"><a :href="pkg.website">{{ pkg.author }}</a></span>
-              <span v-else>{{ pkg.author }}</span>
-              <span class="text-help on-right">{{ pkg.maintainer }}</span>
-              <code class="on-right">{{ pkg.license }}</code>
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-item-label caption lines="1">
-              <span :title="`Opal: ${pkg.opalVersion}`">{{ pkg.version }}</span>
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <div class="row">
-              <q-btn round flat size="sm" icon="download" :title="$t('install')" @click="onUpdate(pkg)" />
-            </div>
-          </q-item-section>
-        </q-item>
-      </template>
-    </q-list>
-
+        <template v-for="pkg in packages" :key="pkg.name">
+          <q-item>
+            <q-item-section top>
+              <q-item-label class="text-subtitle1">
+                {{ pkg.title }}
+              </q-item-label>
+              <q-item-label lines="1">
+                <span class="text-weight-medium">{{ pkg.name }}</span>
+                <span class="text-help on-right">[{{ pkg.type }}]</span>
+              </q-item-label>
+              <q-item-label caption>
+                {{ pkg.description }}
+              </q-item-label>
+              <q-item-label lines="1" class="text-body2 text-primary">
+                <span v-if="pkg.website && pkg.website.startsWith('http')"
+                  ><a :href="pkg.website">{{ pkg.author }}</a></span
+                >
+                <span v-else>{{ pkg.author }}</span>
+                <span class="text-help on-right">{{ pkg.maintainer }}</span>
+                <code class="on-right">{{ pkg.license }}</code>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption lines="1">
+                <span :title="`Opal: ${pkg.opalVersion}`">{{ pkg.version }}</span>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <div class="row">
+                <q-btn round flat size="sm" icon="download" :title="$t('install')" @click="onUpdate(pkg)" />
+              </div>
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-list>
     </div>
     <div v-else-if="loading">
       <q-spinner-dots />
@@ -71,7 +72,8 @@ const packages = computed(() => available.value?.packages);
 onMounted(() => {
   loading.value = true;
   available.value = null;
-  pluginsStore.getPluginsAvailable()
+  pluginsStore
+    .getPluginsAvailable()
     .then((data) => {
       available.value = data;
     })
@@ -81,7 +83,8 @@ onMounted(() => {
 });
 
 function onUpdate(pkg: PluginPackageDto) {
-  pluginsStore.installPlugin(pkg.name, pkg.version)
+  pluginsStore
+    .installPlugin(pkg.name, pkg.version)
     .then(() => {
       notifySuccess(t('plugin.install_success'));
     })

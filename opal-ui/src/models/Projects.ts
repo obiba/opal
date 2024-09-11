@@ -5,26 +5,26 @@
 // source: Projects.proto
 
 /* eslint-disable */
-import { type DatasourceDto, type TimestampsDto } from "./Magma";
+import { type DatasourceDto, type TimestampsDto } from './Magma';
 
-export const protobufPackage = "Projects";
+export const protobufPackage = 'Projects';
 
 export enum ProjectDatasourceStatusDto {
-  LOADING = "LOADING",
-  READY = "READY",
-  BUSY = "BUSY",
-  NONE = "NONE",
-  ERRORS = "ERRORS",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  LOADING = 'LOADING',
+  READY = 'READY',
+  BUSY = 'BUSY',
+  NONE = 'NONE',
+  ERRORS = 'ERRORS',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export enum AnalysisStatusDto {
-  IN_PROGRESS = "IN_PROGRESS",
-  PASSED = "PASSED",
-  FAILED = "FAILED",
-  ERROR = "ERROR",
-  IGNORED = "IGNORED",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  IN_PROGRESS = 'IN_PROGRESS',
+  PASSED = 'PASSED',
+  FAILED = 'FAILED',
+  ERROR = 'ERROR',
+  IGNORED = 'IGNORED',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface ProjectDto {

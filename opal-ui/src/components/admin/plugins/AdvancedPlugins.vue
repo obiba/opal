@@ -13,7 +13,8 @@
       selection="single"
       :extensions="['-dist.zip']"
       @select="onFileSelect"
-      class="q-mb-md"/>
+      class="q-mb-md"
+    />
     <q-spinner-dots v-if="loading" class="q-mb-md" />
     <div class="text-h6">
       {{ $t('plugin.update_site') }}
@@ -25,7 +26,9 @@
       <q-markdown :src="siteLinkMd" no-heading-anchor-links />
     </div>
     <div v-if="pluginsStore.plugins.updated">
-      <span class="text-hint" :title="getDateLabel(pluginsStore.plugins.updated)">{{ $t('plugin.last_update', { ago: getDateDistanceLabel(pluginsStore.plugins.updated) }) }}</span>
+      <span class="text-hint" :title="getDateLabel(pluginsStore.plugins.updated)">{{
+        $t('plugin.last_update', { ago: getDateDistanceLabel(pluginsStore.plugins.updated) })
+      }}</span>
     </div>
   </div>
 </template>
@@ -57,7 +60,8 @@ function onFileSelect() {
     return;
   }
   loading.value = true;
-  pluginsStore.installPluginFile(file.value.path)
+  pluginsStore
+    .installPluginFile(file.value.path)
     .then(() => {
       file.value = undefined;
       notifySuccess(t('plugin.install_success'));

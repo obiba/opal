@@ -8,38 +8,38 @@
       </tr>
     </thead>
     <tbody>
-      <template v-if="nonMissingTotalFreq>0">
+      <template v-if="nonMissingTotalFreq > 0">
         <tr class="bg-grey-2 text-bold">
-          <td colspan="3">{{  $t('non_missings') }}</td>
+          <td colspan="3">{{ $t('non_missings') }}</td>
         </tr>
         <tr v-for="f in nonMissingFreq" :key="f.value">
           <td>{{ getLabel(f.value) }}</td>
           <td>{{ f.freq }}</td>
           <td class="text-grey-6">
             {{ (f.pct * 100).toFixed(2) }}%
-            <span v-if="nonMissingFreq.length>1">({{ getGroupPct(f.freq, nonMissingTotalFreq).toFixed(2) }}%)</span>
+            <span v-if="nonMissingFreq.length > 1">({{ getGroupPct(f.freq, nonMissingTotalFreq).toFixed(2) }}%)</span>
           </td>
         </tr>
-        <tr class="text-italic" v-if="nonMissingFreq.length>1">
+        <tr class="text-italic" v-if="nonMissingFreq.length > 1">
           <td>{{ $t('sub_total') }}</td>
           <td>{{ nonMissingTotalFreq }}</td>
           <td class="text-grey-6">{{ (nonMissingTotalPct * 100).toFixed(2) }}% (100%)</td>
         </tr>
       </template>
 
-      <template v-if="missingTotalFreq>0">
+      <template v-if="missingTotalFreq > 0">
         <tr class="bg-grey-2 text-bold">
-          <td colspan="3">{{  $t('missings') }}</td>
+          <td colspan="3">{{ $t('missings') }}</td>
         </tr>
         <tr v-for="f in missingFreq" :key="f.value">
           <td>{{ getLabel(f.value) }}</td>
           <td>{{ f.freq }}</td>
           <td class="text-grey-6">
             {{ (f.pct * 100).toFixed(2) }}%
-            <span v-if="missingFreq.length>1">({{ getGroupPct(f.freq, missingTotalFreq).toFixed(2) }}%)</span>
+            <span v-if="missingFreq.length > 1">({{ getGroupPct(f.freq, missingTotalFreq).toFixed(2) }}%)</span>
           </td>
         </tr>
-        <tr class="text-italic" v-if="missingFreq.length>1">
+        <tr class="text-italic" v-if="missingFreq.length > 1">
           <td>{{ $t('sub_total') }}</td>
           <td>{{ missingTotalFreq }}</td>
           <td class="text-grey-6">{{ (missingTotalPct * 100).toFixed(2) }}% (100%)</td>

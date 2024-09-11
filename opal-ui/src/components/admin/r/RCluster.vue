@@ -1,13 +1,6 @@
 <template>
   <div>
-    <q-tabs
-      v-model="tab"
-      dense
-      class="text-grey"
-      active-color="primary"
-      indicator-color="primary"
-      align="justify"
-    >
+    <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
       <q-tab name="servers" :label="t('servers')" />
       <q-tab name="packages" :label="t('packages')" />
     </q-tabs>
@@ -21,7 +14,8 @@
             :label="$t('download_logs')"
             icon="download"
             size="sm"
-            @click="onClusterLogsDownload" />
+            @click="onClusterLogsDownload"
+          />
         </div>
         <q-table
           flat
@@ -33,7 +27,7 @@
         >
           <template v-slot:body-cell-name="props">
             <q-td :props="props">
-              <span class="text-primary">{{  props.row.app.name }}</span>
+              <span class="text-primary">{{ props.row.app.name }}</span>
               <code class="on-right" :title="props.value">{{ props.row.app.id.split('-')[0] }}</code>
               <div class="float-right">
                 <q-btn
@@ -76,13 +70,7 @@
           </template>
           <template v-slot:body-cell-tags="props">
             <q-td :props="props">
-              <q-badge
-                color="primary"
-                v-for="tag in props.value"
-                :label="tag"
-                :key="tag"
-                class="on-left"
-              />
+              <q-badge color="primary" v-for="tag in props.value" :label="tag" :key="tag" class="on-left" />
             </q-td>
           </template>
           <template v-slot:body-cell-url="props">
@@ -92,11 +80,7 @@
           </template>
           <template v-slot:body-cell-running="props">
             <q-td :props="props">
-              <q-icon
-                name="circle"
-                size="sm"
-                :color="props.value ? 'green' : 'red'"
-              />
+              <q-icon name="circle" size="sm" :color="props.value ? 'green' : 'red'" />
             </q-td>
           </template>
         </q-table>
@@ -104,7 +88,7 @@
       <q-tab-panel name="packages">
         <r-packages :cluster="cluster" />
       </q-tab-panel>
-   </q-tab-panels>
+    </q-tab-panels>
   </div>
 </template>
 
@@ -120,7 +104,7 @@ import { getSizeLabel } from 'src/utils/files';
 import RPackages from 'src/components/admin/r/RPackages.vue';
 
 interface Props {
-  cluster: RServerClusterDto
+  cluster: RServerClusterDto;
 }
 
 const props = defineProps<Props>();
@@ -191,5 +175,4 @@ function onRServerStart(server: RServerDto) {
 function onRServerStop(server: RServerDto) {
   rStore.stopRServer(props.cluster.name, server.name);
 }
-
 </script>

@@ -17,17 +17,22 @@
     >
       <template v-slot:top>
         <div class="row items-center q-gutter-sm">
-          <span :class="{'text-secondary': selectedProfiles.length === 0}">{{ $t("delete_profiles_selected") }}</span>
-          <q-btn outline color="red" icon="delete" size="sm" :disable="selectedProfiles.length === 0" @click="onDeleteProfiles"></q-btn>
+          <span :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ $t('delete_profiles_selected') }}</span>
+          <q-btn
+            outline
+            color="red"
+            icon="delete"
+            size="sm"
+            :disable="selectedProfiles.length === 0"
+            @click="onDeleteProfiles"
+          ></q-btn>
         </div>
       </template>
       <template v-slot:body-cell-principal="props">
         <q-td :props="props">
-          <router-link
-            :to="`/admin/profile/${props.value}/permissions`"
-            class="text-primary"
-            >{{ props.value }}</router-link
-          >
+          <router-link :to="`/admin/profile/${props.value}/permissions`" class="text-primary">{{
+            props.value
+          }}</router-link>
         </q-td>
       </template>
       <template v-slot:body-cell-realm="props">
@@ -44,8 +49,10 @@
       </template>
       <template v-slot:body-cell-otpEnabled="props">
         <q-td :props="props">
-          <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)"/>
-          <q-tooltip>{{ $t((props.value ? 'profile_otp_disable' : 'profile_otp_disabled'), {user: props.row.principal})  }}</q-tooltip>
+          <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)" />
+          <q-tooltip>{{
+            $t(props.value ? 'profile_otp_disable' : 'profile_otp_disabled', { user: props.row.principal })
+          }}</q-tooltip>
         </q-td>
       </template>
     </q-table>
@@ -53,7 +60,7 @@
     <confirm-dialog
       v-model="showDeletes"
       :title="$t('delete')"
-      :text="$t('delete_profiles_confirm', { count: selectedProfiles.length, profile: principalsToDelete})"
+      :text="$t('delete_profiles_confirm', { count: selectedProfiles.length, profile: principalsToDelete })"
       @confirm="doDeleteProfiles"
     />
   </div>
@@ -151,7 +158,6 @@ async function disableOtp(profile: SubjectProfileDto) {
 function onDeleteProfiles() {
   showDeletes.value = true;
 }
-
 
 async function doDeleteProfiles() {
   showDeletes.value = false;

@@ -1,13 +1,6 @@
 <template>
   <div v-if="props.table">
-    <q-tabs
-      v-model="tableTab"
-      dense
-      class="text-grey"
-      active-color="primary"
-      indicator-color="primary"
-      align="justify"
-    >
+    <q-tabs v-model="tableTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
       <q-tab name="variables" :label="$t('dictionary')">
         <q-badge v-if="props.table.variableCount !== undefined" color="red">{{ props.table.variableCount }}</q-badge>
       </q-tab>
@@ -18,13 +11,10 @@
     <q-separator />
     <q-tab-panels v-model="tableTab">
       <q-tab-panel name="variables">
-        <variables-list
-          :variables="props.variables" :loading="props.loading" />
+        <variables-list :variables="props.variables" :loading="props.loading" />
       </q-tab-panel>
       <q-tab-panel name="values">
-        <values-list
-          :table="props.table"
-          :variables="props.variables" />
+        <values-list :table="props.table" :variables="props.variables" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -50,10 +40,12 @@ const props = defineProps<TablePreviewProps>();
 
 const tableTab = ref('variables');
 
-watch(() => props.table, (value) => {
-  if (value) {
-    tableTab.value = 'variables';
+watch(
+  () => props.table,
+  (value) => {
+    if (value) {
+      tableTab.value = 'variables';
+    }
   }
-});
-
+);
 </script>

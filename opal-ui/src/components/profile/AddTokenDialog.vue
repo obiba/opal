@@ -28,7 +28,13 @@
             lazy-rules
           >
             <template v-slot:append>
-              <q-btn flat icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" />
+              <q-btn
+                flat
+                icon="content_copy"
+                :title="$t('clipboard.copy')"
+                @click="onCopyToClipboard"
+                aria-label="Copy to clipboard"
+              />
             </template>
           </q-input>
 

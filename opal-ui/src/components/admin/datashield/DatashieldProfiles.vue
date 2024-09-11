@@ -7,7 +7,8 @@
       :label="$t('add_profile')"
       size="sm"
       @click="onAddProfile"
-      class="q-mb-md" />
+      class="q-mb-md"
+    />
 
     <q-card v-if="datashieldStore.profiles?.length" bordered flat>
       <q-card-section class="q-pa-none">
@@ -21,7 +22,9 @@
           indicator-color="primary"
           align="justify"
         >
-          <q-tab v-for="profile in datashieldStore.profiles" :key="profile.name"
+          <q-tab
+            v-for="profile in datashieldStore.profiles"
+            :key="profile.name"
             :name="profile.name"
             :label="getProfileLabel(profile)"
             :alert="profile.enabled ? 'green' : 'red'"
@@ -30,8 +33,13 @@
         </q-tabs>
         <q-separator />
         <q-tab-panels v-model="tab" class="q-pl-md q-pr-md">
-          <q-tab-panel v-for="profile in datashieldStore.profiles" :key="profile.name" :name="profile.name" style="padding-top: 0;">
-            <datashield-profile :profile="profile" class="q-mt-md"/>
+          <q-tab-panel
+            v-for="profile in datashieldStore.profiles"
+            :key="profile.name"
+            :name="profile.name"
+            style="padding-top: 0"
+          >
+            <datashield-profile :profile="profile" class="q-mt-md" />
           </q-tab-panel>
         </q-tab-panels>
       </q-card-section>
@@ -55,12 +63,15 @@ const datashieldStore = useDatashieldStore();
 const tab = ref<string>(datashieldStore.profiles.length ? datashieldStore.profiles[0].name : '');
 const showAdd = ref(false);
 
-watch(() => datashieldStore.profiles, () => {
-  if (datashieldStore.profiles.length) {
-    if (tab.value === '' || !datashieldStore.profiles.find((profile) => profile.name === tab.value))
-      tab.value = datashieldStore.profiles[0].name;
+watch(
+  () => datashieldStore.profiles,
+  () => {
+    if (datashieldStore.profiles.length) {
+      if (tab.value === '' || !datashieldStore.profiles.find((profile) => profile.name === tab.value))
+        tab.value = datashieldStore.profiles[0].name;
+    }
   }
-});
+);
 
 function getProfileIcon(profile: DataShieldProfileDto) {
   return profile.name === profile.cluster ? 'push_pin' : 'chevron_right';
@@ -73,5 +84,4 @@ function getProfileLabel(profile: DataShieldProfileDto) {
 function onAddProfile() {
   showAdd.value = true;
 }
-
 </script>

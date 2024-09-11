@@ -22,7 +22,11 @@
       >
         <q-tab name="dictionary" :label="$t('dictionary')" />
         <q-tab name="sql" :label="$t('sql')" />
-        <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.datasourcePermissions?.canRead()"/>
+        <q-tab
+          name="permissions"
+          :label="$t('permissions')"
+          v-if="datasourceStore.perms.datasourcePermissions?.canRead()"
+        />
       </q-tabs>
 
       <q-separator />

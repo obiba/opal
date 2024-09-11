@@ -26,7 +26,7 @@
 
       <q-separator />
 
-      <q-card-section :style="`max-height: ${fullscreen ? '75vh': '50vh'}`" class="scroll">
+      <q-card-section :style="`max-height: ${fullscreen ? '75vh' : '50vh'}`" class="scroll">
         <git-diff-viewer :commit-info="commitInfo" :show-header="false" />
       </q-card-section>
 

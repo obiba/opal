@@ -7,7 +7,7 @@
       :columns="columns"
       row-key="name"
       :loading="props.loading"
-      :pagination="{page: 1, rowsPerPage: 5,}"
+      :pagination="{ page: 1, rowsPerPage: 5 }"
     >
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
@@ -22,12 +22,7 @@
       <template v-slot:body-cell-label="props">
         <q-td :props="props">
           <div v-for="attr in getLabels(props.value)" :key="attr.locale">
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
+            <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
         </q-td>
@@ -63,9 +58,12 @@ const tableRef = ref();
 
 const rows = ref(props.variables ? props.variables : []);
 
-watch(() => props.variables, (value) => {
-  rows.value = value ? value : [];
-});
+watch(
+  () => props.variables,
+  (value) => {
+    rows.value = value ? value : [];
+  }
+);
 
 const columns = computed(() => [
   {

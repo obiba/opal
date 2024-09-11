@@ -28,7 +28,14 @@
 
       <q-card-actions align="right" class="bg-grey-3"
         ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('import')" type="submit" color="primary" :disable="importFiles.length == 0" @click="onImport" />
+        <q-btn
+          flat
+          :label="$t('import')"
+          type="submit"
+          color="primary"
+          :disable="importFiles.length == 0"
+          @click="onImport"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -51,7 +58,6 @@ interface DialogProps {
   modelValue: boolean;
   project: ProjectDto;
 }
-
 
 const emit = defineEmits(['update:modelValue']);
 const { t } = useI18n();
@@ -88,14 +94,14 @@ async function onImportFileSelected(files: FileDto[]) {
 }
 
 async function onImport() {
-  try{
+  try {
     const importOptions: ImportVCFCommandOptionsDto = {
       project: props.project.name,
       files: importFiles.value,
     };
 
     const taskId = await projectsStore.importVcfFiles(props.project.name, importOptions);
-    notifySuccess(t('vcf_store.import_vcf_command_created', {id: taskId}));
+    notifySuccess(t('vcf_store.import_vcf_command_created', { id: taskId }));
     onHide();
   } catch (error) {
     notifyError(error);

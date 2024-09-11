@@ -12,8 +12,17 @@
     <q-btn size="sm" icon="delete" color="negative" outline :title="$t('delete')" @click="onClearToken"></q-btn>
 
     <span v-if="config.token" class="on-right">
-      <code >{{ config.token }}</code>
-      <q-btn flat dense size="sm" icon="content_copy" :title="$t('clipboard.copy')" @click="onCopyToClipboard" aria-label="Copy to clipboard" class="on-right" />
+      <code>{{ config.token }}</code>
+      <q-btn
+        flat
+        dense
+        size="sm"
+        icon="content_copy"
+        :title="$t('clipboard.copy')"
+        @click="onCopyToClipboard"
+        aria-label="Copy to clipboard"
+        class="on-right"
+      />
     </span>
   </div>
 

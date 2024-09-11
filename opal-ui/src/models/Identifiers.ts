@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Identifiers";
+export const protobufPackage = 'Identifiers';
 
 export interface IdentifiersMappingDto {
   name: string;

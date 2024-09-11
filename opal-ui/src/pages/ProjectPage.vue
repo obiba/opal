@@ -25,9 +25,7 @@
           <q-card-section class="text-h4 text-center bg-grey-2">
             <div>
               {{ projectsStore.summary.tableCount }}
-              <span v-if="projectsStore.summary.viewCount"
-                >({{ projectsStore.summary.viewCount }})</span
-              >
+              <span v-if="projectsStore.summary.viewCount">({{ projectsStore.summary.viewCount }})</span>
             </div>
           </q-card-section>
           <q-separator />
@@ -81,15 +79,17 @@ const router = useRouter();
 const projectsStore = useProjectsStore();
 
 const name = computed(() => route.params.id as string);
-const tags = computed(() => projectsStore.project.tags ? projectsStore.project.tags : []);
+const tags = computed(() => (projectsStore.project.tags ? projectsStore.project.tags : []));
 
 onMounted(() => {
-  projectsStore.initProject(name.value).then(() => {
-    projectsStore.loadSummary();
-  }).catch((error) => {
-    notifyError(error);
-    router.replace('/projects');
-  }
-  );
+  projectsStore
+    .initProject(name.value)
+    .then(() => {
+      projectsStore.loadSummary();
+    })
+    .catch((error) => {
+      notifyError(error);
+      router.replace('/projects');
+    });
 });
 </script>

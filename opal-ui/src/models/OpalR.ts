@@ -5,15 +5,15 @@
 // source: OpalR.proto
 
 /* eslint-disable */
-import { type AppDto } from "./Apps";
-import { type EntryDto } from "./Opal";
+import { type AppDto } from './Apps';
+import { type EntryDto } from './Opal';
 
-export const protobufPackage = "OpalR";
+export const protobufPackage = 'OpalR';
 
 export enum RSessionStatus {
-  WAITING = "WAITING",
-  BUSY = "BUSY",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  WAITING = 'WAITING',
+  BUSY = 'BUSY',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface RProfileDto {
@@ -81,8 +81,7 @@ export interface RWorkspaceDto {
   size: number;
 }
 
-export interface RRuntimeErrorDto {
-}
+export interface RRuntimeErrorDto {}
 
 export interface RSessionActivityDto {
   user: string;

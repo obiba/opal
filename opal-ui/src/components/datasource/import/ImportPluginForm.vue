@@ -19,7 +19,7 @@ interface ImportPluginFormProps {
 }
 
 const props = defineProps<ImportPluginFormProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const pluginsStore = usePluginsStore();
 

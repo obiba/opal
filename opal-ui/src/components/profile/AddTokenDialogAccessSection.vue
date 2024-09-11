@@ -11,7 +11,8 @@
       map-options
     />
   </div>
-</template>access
+</template>
+access
 
 <script lang="ts">
 export default defineComponent({
@@ -39,5 +40,4 @@ const accessMapping = computed({
   get: () => props.modelValue || 'DEFAULT',
   set: (value) => emit('update:modelValue', value === 'DEFAULT' ? undefined : value),
 });
-
 </script>

@@ -21,11 +21,7 @@
           >
           </q-input>
 
-          <localized-field-large
-            v-model="newVocabulary.title"
-            :title="$t('title')"
-            :hint="$t('title_hint')"
-          />
+          <localized-field-large v-model="newVocabulary.title" :title="$t('title')" :hint="$t('title_hint')" />
 
           <localized-field-large
             v-model="newVocabulary.description"
@@ -33,7 +29,11 @@
             :hint="$t('taxonomy.vocabulary.description_hint')"
           />
 
-          <q-checkbox v-model="newVocabulary.repeatable" class="q-ml-sm" :label="$t('taxonomy.vocabulary.repeatable')" />
+          <q-checkbox
+            v-model="newVocabulary.repeatable"
+            class="q-ml-sm"
+            :label="$t('taxonomy.vocabulary.repeatable')"
+          />
           <div class="text-hint q-mb-md q-mt-none">
             {{ $t('taxonomy.vocabulary.repeatable_hint') }}
           </div>
@@ -58,7 +58,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { VocabularyDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
-import LocalizedFieldLarge  from 'src/components/LocalizedFieldLarge.vue';
+import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
 
 interface DialogProps {
   modelValue: boolean;

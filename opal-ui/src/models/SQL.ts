@@ -6,14 +6,12 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "SQL";
+export const protobufPackage = 'SQL';
 
 export interface SQLExecutionDto {
   user: string;
   query: string;
-  datasource?:
-    | string
-    | undefined;
+  datasource?: string | undefined;
   /** millis */
   start: number;
   /** millis */

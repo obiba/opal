@@ -5,15 +5,15 @@
 // source: Search.proto
 
 /* eslint-disable */
-import { type ValueSetsDto, type VariableDto } from "./Magma";
-import { type EntryDto } from "./Opal";
+import { type ValueSetsDto, type VariableDto } from './Magma';
+import { type EntryDto } from './Opal';
 
-export const protobufPackage = "Search";
+export const protobufPackage = 'Search';
 
 export enum TermOperator {
-  AND_OP = "AND_OP",
-  OR_OP = "OR_OP",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  AND_OP = 'AND_OP',
+  OR_OP = 'OR_OP',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface QueryTermsDto {
@@ -21,9 +21,7 @@ export interface QueryTermsDto {
 }
 
 export interface QueryTermDto {
-  global?:
-    | boolean
-    | undefined;
+  global?: boolean | undefined;
   /** name of the facet, if not provided no facet is returned for this term */
   facet?: string | undefined;
 }
@@ -35,12 +33,12 @@ export interface VariableTermDto {
 }
 
 export enum VariableTermDto_AggType {
-  MISSING = "MISSING",
-  CARDINALITY = "CARDINALITY",
-  TERMS = "TERMS",
-  STATS = "STATS",
-  PERCENTILES = "PERCENTILES",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  MISSING = 'MISSING',
+  CARDINALITY = 'CARDINALITY',
+  TERMS = 'TERMS',
+  STATS = 'STATS',
+  PERCENTILES = 'PERCENTILES',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface FilterDto {

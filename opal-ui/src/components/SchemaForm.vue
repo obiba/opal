@@ -8,12 +8,12 @@
           v-model="data[item.key]"
           :field="item"
           :disable="disable"
-          @update:model-value="onUpdate(item.key)" />
+          @update:model-value="onUpdate(item.key)"
+        />
       </div>
     </form>
   </div>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({
@@ -67,5 +67,4 @@ function onUpdate(key: string) {
   if (!isValid()) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);
 }
-
 </script>

@@ -23,15 +23,10 @@
             <q-item-section class="text-caption">
               <span>{{ scope.opt.label }}</span>
               <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
-              </q-item-section>
+            </q-item-section>
           </q-item>
         </template>
         <template v-slot:no-option>
@@ -42,7 +37,7 @@
           </q-item>
         </template>
       </q-select>
-      <q-icon name="close" size="sm" class="q-mt-sm on-right on-left"/>
+      <q-icon name="close" size="sm" class="q-mt-sm on-right on-left" />
       <q-select
         filled
         dense
@@ -62,15 +57,10 @@
             <q-item-section class="text-caption">
               <span>{{ scope.opt.label }}</span>
               <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
-              </q-item-section>
+            </q-item-section>
           </q-item>
         </template>
         <template v-slot:no-option>
@@ -85,19 +75,21 @@
         color="primary"
         :label="$t('submit')"
         size="sm"
-        style="height: 2.5em;"
+        style="height: 2.5em"
         @click="onSubmit"
         :disable="!varCat || !varAlt || loading || variableCatCategories.length === 0"
-        class="q-mt-sm on-right" />
+        class="q-mt-sm on-right"
+      />
       <q-btn
         outline
         color="secondary"
         icon="cleaning_services"
         :label="$t('clear')"
         size="sm"
-        style="height: 2.5em;"
+        style="height: 2.5em"
         @click="onClear"
-        class="q-mt-sm on-right" />
+        class="q-mt-sm on-right"
+      />
     </div>
 
     <div v-if="loading">
@@ -110,24 +102,14 @@
             <th rowspan="2">
               <div class="text-bold">{{ variableAlt?.name }}</div>
               <div v-for="attr in getLabels(variableAlt?.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </th>
             <th :colspan="(variableCatCategories.length || 0) + 1">
               <div class="text-bold">{{ variableAlt?.name }}</div>
               <div v-for="attr in getLabels(variableCat?.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </th>
@@ -136,12 +118,7 @@
             <th v-for="cat in variableCatCategories" :key="cat.name" class="bg-grey-2">
               <div class="text-bold">{{ cat.name }}</div>
               <div v-for="attr in getLabels(cat.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </th>
@@ -153,12 +130,7 @@
             <td class="bg-grey-2">
               <div class="text-bold">{{ catAlt.name }}</div>
               <div v-for="attr in getLabels(catAlt.attributes)" :key="attr.locale" class="text-hint">
-                <q-badge
-                  v-if="attr.locale"
-                  color="grey-3"
-                  :label="attr.locale"
-                  class="q-mr-xs text-grey-6"
-                />
+                <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </td>
@@ -166,7 +138,7 @@
               {{ getFrequency(cat.name, catAlt.name) }}
             </td>
             <td class="text-caption">
-              {{ getFrequency("_total", catAlt.name) }}
+              {{ getFrequency('_total', catAlt.name) }}
             </td>
           </tr>
           <tr>
@@ -175,7 +147,7 @@
               {{ getFrequency(cat.name, undefined) }}
             </td>
             <td class="text-caption">
-              {{ getFrequency("_total", undefined) }}
+              {{ getFrequency('_total', undefined) }}
             </td>
           </tr>
         </tbody>
@@ -188,13 +160,12 @@
               {{ getStatistic(cat.name, measure) }}
             </td>
             <td class="text-caption">
-              {{ getStatistic("_total", measure) }}
+              {{ getStatistic('_total', measure) }}
             </td>
           </tr>
         </tbody>
       </q-markup-table>
     </div>
-
   </div>
 </template>
 
@@ -227,22 +198,35 @@ const loading = ref(false);
 const contingency = ref<QueryResultDto | null>(null);
 
 const measures = ['min', 'max', 'mean', 'stdDeviation', 'total', 'variance', 'count'];
-const booleanCategories = [ { name: 'true', attributes: [] }, { name: 'false', attributes: [] } ];
+const booleanCategories = [
+  { name: 'true', attributes: [] },
+  { name: 'false', attributes: [] },
+];
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 
-const allVarCatOptions = computed(() => datasourceStore.variables
-  .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean')
-  .map((v) => ({label: v.name, value: v.name, variable: v })));
-const allVarAltOptions = computed(() => datasourceStore.variables
-  .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean' || ValueTypesMap.numerical.includes(v.valueType))
-  .map((v) => ({label: v.name, value: v.name, variable: v })));
+const allVarCatOptions = computed(() =>
+  datasourceStore.variables
+    .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean')
+    .map((v) => ({ label: v.name, value: v.name, variable: v }))
+);
+const allVarAltOptions = computed(() =>
+  datasourceStore.variables
+    .filter(
+      (v) => v.categories?.length > 0 || v.valueType === 'boolean' || ValueTypesMap.numerical.includes(v.valueType)
+    )
+    .map((v) => ({ label: v.name, value: v.name, variable: v }))
+);
 
 const variableCat = computed(() => varCat.value?.variable);
-const variableCatCategories = computed(() => (variableCat.value?.valueType === 'boolean' ? booleanCategories : variableCat.value?.categories) || []);
+const variableCatCategories = computed(
+  () => (variableCat.value?.valueType === 'boolean' ? booleanCategories : variableCat.value?.categories) || []
+);
 const variableAlt = computed(() => varAlt.value?.variable);
-const variableAltCategories = computed(() => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || []);
+const variableAltCategories = computed(
+  () => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || []
+);
 const withFrequencies = computed(() => contingency.value?.facets.some((f) => f.frequencies !== undefined));
 const withStatistics = computed(() => contingency.value?.facets.some((f) => f.statistics !== undefined));
 
@@ -264,20 +248,27 @@ watch([dsName, tName], () => {
 function onFilterVarCat(val: string, update, abort) {
   update(() => {
     const needle = val.toLowerCase().trim();
-    varCatOptions.value = needle === '' ? [ ...allVarCatOptions.value ] : allVarCatOptions.value.filter(v => v.value.toLowerCase().indexOf(needle) > -1)
+    varCatOptions.value =
+      needle === ''
+        ? [...allVarCatOptions.value]
+        : allVarCatOptions.value.filter((v) => v.value.toLowerCase().indexOf(needle) > -1);
   });
 }
 
 function onFilterVarAlt(val: string, update, abort) {
   update(() => {
     const needle = val.toLowerCase().trim();
-    varAltOptions.value = needle === '' ? [ ...allVarAltOptions.value ] : allVarAltOptions.value.filter(v => v.value.toLowerCase().indexOf(needle) > -1)
+    varAltOptions.value =
+      needle === ''
+        ? [...allVarAltOptions.value]
+        : allVarAltOptions.value.filter((v) => v.value.toLowerCase().indexOf(needle) > -1);
   });
 }
 
 function onSubmit() {
   loading.value = true;
-  datasourceStore.getContingencyTable(varCat.value?.value, varAlt.value?.value)
+  datasourceStore
+    .getContingencyTable(varCat.value?.value, varAlt.value?.value)
     .then((res) => {
       contingency.value = res;
     })
@@ -308,8 +299,7 @@ function getFrequency(cat: string, catAlt: string | undefined) {
   if (!contingency.value) return 0;
   const facet = getFacet(cat);
   if (!facet) return 0;
-  if (catAlt === undefined)
-    return facet.frequencies.reduce((acc, f) => acc + f.count, 0);
+  if (catAlt === undefined) return facet.frequencies.reduce((acc, f) => acc + f.count, 0);
   return facet.frequencies.find((f) => f.term === catAlt)?.count || 0;
 }
 

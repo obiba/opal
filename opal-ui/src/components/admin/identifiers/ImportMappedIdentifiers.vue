@@ -178,7 +178,7 @@ async function onImport() {
             emit('update');
             onHide();
           })
-          .catch(notifyError)
+          .catch(notifyError);
       })
       .catch(notifyError);
   }

@@ -43,7 +43,7 @@ export const useAppsStore = defineStore('apps', () => {
     return api.put('/apps/config', data);
   }
 
-  return{
+  return {
     apps,
     config,
     reset,
@@ -51,6 +51,5 @@ export const useAppsStore = defineStore('apps', () => {
     unregisterApp,
     initConfig,
     updateConfig,
-  }
-
+  };
 });

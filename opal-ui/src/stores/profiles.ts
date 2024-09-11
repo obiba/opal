@@ -23,8 +23,8 @@ export const useProfilesStore = defineStore('profiles', () => {
 
   async function loadProfiles() {
     return api.get('/system/subject-profiles').then((response) => {
-      profiles.value = response.data
-    })
+      profiles.value = response.data;
+    });
   }
 
   async function loadProfile(principal: string) {
@@ -39,13 +39,13 @@ export const useProfilesStore = defineStore('profiles', () => {
 
   async function deleteProfiles(profiles: SubjectProfileDto[]) {
     const principals = profiles.map((profile) => profile.principal);
-    return api.delete('/system/subject-profiles',{
+    return api.delete('/system/subject-profiles', {
       params: {
-          p: principals
+        p: principals,
       },
       paramsSerializer: {
         indexes: null,
-      }
+      },
     });
   }
 
@@ -54,7 +54,7 @@ export const useProfilesStore = defineStore('profiles', () => {
   }
 
   async function enableCurrentOtp(): Promise<string> {
-    return api.put('/system/subject-profile/_current/otp').then(response => response.data);
+    return api.put('/system/subject-profile/_current/otp').then((response) => response.data);
   }
 
   async function disableCurrentOtp() {
@@ -71,7 +71,6 @@ export const useProfilesStore = defineStore('profiles', () => {
     deleteProfiles,
     disableOtp,
     enableCurrentOtp,
-    disableCurrentOtp
+    disableCurrentOtp,
   };
-
 });

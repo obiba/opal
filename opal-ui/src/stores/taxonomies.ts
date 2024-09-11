@@ -178,7 +178,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
         params: {
           file,
           override,
-        }
+        },
       })
       .then((response) => response.data);
   }

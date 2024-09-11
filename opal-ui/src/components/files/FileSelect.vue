@@ -5,7 +5,15 @@
     </div>
     <div class="row q-gutter-sm">
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
-      <q-btn outline no-caps icon="more_horiz" :label="$t('select')" color="primary" size="12px" @click="onShowDialog" />
+      <q-btn
+        outline
+        no-caps
+        icon="more_horiz"
+        :label="$t('select')"
+        color="primary"
+        size="12px"
+        @click="onShowDialog"
+      />
     </div>
     <slot name="error"></slot>
     <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
@@ -15,20 +23,15 @@
       <q-card class="dialog-lg">
         <q-card-section>
           <q-breadcrumbs>
-              <q-breadcrumbs-el
-                icon="dns"
-                @click="onFolderSelection('/')"
-                class="cursor-pointer"
-              />
-              <q-breadcrumbs-el
-                v-for="crumb in crumbs"
-                :key="crumb.to"
-                :label="crumb.label"
-                :class="crumb.to !== props.folder.path ? 'cursor-pointer' : ''"
-                @click="onFolderSelection(crumb.to)"
-              />
-            </q-breadcrumbs>
-
+            <q-breadcrumbs-el icon="dns" @click="onFolderSelection('/')" class="cursor-pointer" />
+            <q-breadcrumbs-el
+              v-for="crumb in crumbs"
+              :key="crumb.to"
+              :label="crumb.label"
+              :class="crumb.to !== props.folder.path ? 'cursor-pointer' : ''"
+              @click="onFolderSelection(crumb.to)"
+            />
+          </q-breadcrumbs>
         </q-card-section>
 
         <q-separator />
@@ -36,27 +39,77 @@
         <q-card-section>
           <table class="full-width">
             <tr>
-              <td style="width: 150px;vertical-align: top;">
+              <td style="width: 150px; vertical-align: top">
                 <div class="text-grey-8">
                   <div>
-                    <q-btn flat no-caps icon="person" color="primary" size="12px" :label="$t('user')" align="left" class="full-width" @click="onFolderSelection(`/home/${username}`)"></q-btn>
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="person"
+                      color="primary"
+                      size="12px"
+                      :label="$t('user')"
+                      align="left"
+                      class="full-width"
+                      @click="onFolderSelection(`/home/${username}`)"
+                    ></q-btn>
                   </div>
                   <div v-if="projectName">
-                    <q-btn flat no-caps icon="table_chart" color="primary" size="12px" :label="$t('project')" align="left" class="full-width" @click="onFolderSelection(`/projects/${projectName}`)"></q-btn>
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="table_chart"
+                      color="primary"
+                      size="12px"
+                      :label="$t('project')"
+                      align="left"
+                      class="full-width"
+                      @click="onFolderSelection(`/projects/${projectName}`)"
+                    ></q-btn>
                   </div>
-                  <q-separator class="q-mt-md q-mb-md"/>
+                  <q-separator class="q-mt-md q-mb-md" />
                   <div>
-                    <q-btn flat no-caps icon="group" color="primary" size="12px" :label="$t('users')" align="left" class="full-width" @click="onFolderSelection('/home')"></q-btn>
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="group"
+                      color="primary"
+                      size="12px"
+                      :label="$t('users')"
+                      align="left"
+                      class="full-width"
+                      @click="onFolderSelection('/home')"
+                    ></q-btn>
                   </div>
                   <div>
-                    <q-btn flat no-caps icon="table_chart" color="primary" size="12px" :label="$t('projects')" align="left" class="full-width" @click="onFolderSelection('/projects')"></q-btn>
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="table_chart"
+                      color="primary"
+                      size="12px"
+                      :label="$t('projects')"
+                      align="left"
+                      class="full-width"
+                      @click="onFolderSelection('/projects')"
+                    ></q-btn>
                   </div>
                   <div>
-                    <q-btn flat no-caps icon="dns" color="primary" size="12px" :label="$t('file_system')" align="left" class="full-width" @click="onFolderSelection('/')"></q-btn>
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="dns"
+                      color="primary"
+                      size="12px"
+                      :label="$t('file_system')"
+                      align="left"
+                      class="full-width"
+                      @click="onFolderSelection('/')"
+                    ></q-btn>
                   </div>
                 </div>
               </td>
-              <td style="vertical-align: top;">
+              <td style="vertical-align: top">
                 <div>
                   <q-table
                     ref="tableRef"
@@ -89,7 +142,6 @@
               </td>
             </tr>
           </table>
-
         </q-card-section>
 
         <q-separator />
@@ -97,25 +149,22 @@
         <q-card-actions class="bg-grey-3">
           <div>
             <q-btn-dropdown outline icon="add" :label="$t('add')" size="sm">
-                <q-list>
-                  <q-item clickable v-close-popup @click="onShowAddFolder">
-                    <q-item-section>
-                      <q-item-label>{{  $t('add_folder') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item v-if="type !== 'folder' || hasExtensions" clickable v-close-popup @click="onShowUpload">
-                    <q-item-section>
-                      <q-item-label>{{  $t('upload') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-              <span v-if="hasExtensions" class="q-ml-xs">
-                <q-badge
-                  v-for="ext in extensions"
-                  :key="ext"
-                  class="bg-warning text-black q-ml-xs">{{ ext }}</q-badge>
-              </span>
+              <q-list>
+                <q-item clickable v-close-popup @click="onShowAddFolder">
+                  <q-item-section>
+                    <q-item-label>{{ $t('add_folder') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item v-if="type !== 'folder' || hasExtensions" clickable v-close-popup @click="onShowUpload">
+                  <q-item-section>
+                    <q-item-label>{{ $t('upload') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <span v-if="hasExtensions" class="q-ml-xs">
+              <q-badge v-for="ext in extensions" :key="ext" class="bg-warning text-black q-ml-xs">{{ ext }}</q-badge>
+            </span>
           </div>
           <q-space />
           <div>
@@ -129,7 +178,6 @@
               v-close-popup
             />
           </div>
-
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -162,7 +210,7 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue', 'select'])
+const emit = defineEmits(['update:modelValue', 'select']);
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -170,7 +218,9 @@ const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
 
 const tableRef = ref();
-const selected = ref<FileDto[]>(props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]): []);
+const selected = ref<FileDto[]>(
+  props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]) : []
+);
 const initialPagination = { descending: false, page: 1, rowsPerPage: 10 };
 const loading = ref(false);
 const showAddFolder = ref(false);
@@ -178,13 +228,9 @@ const showUpload = ref(false);
 
 const hasExtensions = computed(() => props.extensions && props.extensions.length > 0);
 
-const username = computed(() =>
-  authStore.profile.principal ? authStore.profile.principal : ''
-);
+const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : ''));
 
-const projectName = computed(() =>
-  projectsStore.project?.name ? projectsStore.project.name : ''
-);
+const projectName = computed(() => (projectsStore.project?.name ? projectsStore.project.name : ''));
 
 const selectedPaths = computed(() => {
   return selected.value.map((file) => file.path).join(', ');
@@ -224,9 +270,12 @@ const columns = computed(() => {
   ];
 });
 
-watch(() => props.modelValue, (value) => {
-  selected.value = value ? (Array.isArray(value) ? value : [value]) : [];
-});
+watch(
+  () => props.modelValue,
+  (value) => {
+    selected.value = value ? (Array.isArray(value) ? value : [value]) : [];
+  }
+);
 
 const rows = computed(() => {
   const result: FileDto[] =
@@ -254,7 +303,12 @@ const rows = computed(() => {
 
   props.folder.children
     .filter((file) => (props.type !== 'folder' || hasExtensions.value) && file.type === FileDto_FileType.FILE)
-    .filter((file) => props.extensions === undefined || props.extensions.length === 0 || props.extensions.some((ext) => file.name.endsWith(ext)))
+    .filter(
+      (file) =>
+        props.extensions === undefined ||
+        props.extensions.length === 0 ||
+        props.extensions.some((ext) => file.name.endsWith(ext))
+    )
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
@@ -304,7 +358,6 @@ function onRowDblClick(evt: unknown, row: FileDto) {
 }
 
 function onRowClick(evt: unknown, row: FileDto) {
-
   selected.value = [];
   if (props.type === 'folder' && row.type === FileDto_FileType.FOLDER) {
     if (row.name !== '..') {

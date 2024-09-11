@@ -10,35 +10,30 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn
-          flat
-          :label="$t('close')"
-          color="primary"
-          v-close-popup
-        />
+        <q-btn flat :label="$t('close')" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-
 <script lang="ts">
 export default defineComponent({
   name: 'ViewRPackageDialog',
 });
-</script><script setup lang="ts">
+</script>
+<script setup lang="ts">
 import { RPackageDto } from 'src/models/OpalR';
 import { StringMap } from 'src/components/models';
 import FieldsList from 'src/components/FieldsList.vue';
 
 interface DialogProps {
-  modelValue: boolean
-  pkg?: RPackageDto
+  modelValue: boolean;
+  pkg?: RPackageDto;
 }
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const dbobject = computed(() => {
   if (!props.pkg) return undefined;
@@ -58,9 +53,12 @@ const fields = computed(() => {
   }));
 });
 
-watch(() => props.modelValue, (value) => {
-  showDialog.value = value;
-});
+watch(
+  () => props.modelValue,
+  (value) => {
+    showDialog.value = value;
+  }
+);
 
 function onHide() {
   emit('update:modelValue', false);

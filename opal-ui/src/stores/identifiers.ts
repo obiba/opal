@@ -64,7 +64,6 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     return addMappings(idTableName, [mappings]);
   }
 
-
   async function updateMapping(idTableName: string, mapping: VariableDto) {
     return api.put(`/identifiers/table/${idTableName}/variable/${mapping.name}`, mapping);
   }
@@ -81,7 +80,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
 
   async function generateMapping(entityType: string, mappingName: string, options: GenerateIdentifiersOptions) {
     return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
-      params: { type: entityType, ...options }
+      params: { type: entityType, ...options },
     });
   }
 

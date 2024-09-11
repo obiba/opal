@@ -8,16 +8,14 @@
       <div class="col-md-6 col-xs-12">
         <div class="text-h6 q-mb-md">{{ $t('status') }}</div>
         <div class="q-mb-md">
-          <q-toggle v-model="enabled"
+          <q-toggle
+            v-model="enabled"
             :label="$t('datashield.profile_status_toggle')"
             left-label
             @update:model-value="datashieldStore.updateProfileStatus(enabled)"
           />
         </div>
-        <fields-list
-          :items="items"
-          :dbobject="profile"
-        />
+        <fields-list :items="items" :dbobject="profile" />
         <q-btn
           v-if="!builtinProfile"
           color="red"
@@ -25,11 +23,13 @@
           :label="$t('delete')"
           size="sm"
           @click="onShowDeleteProfile"
-          class="q-mt-md" />
+          class="q-mt-md"
+        />
       </div>
       <div class="col-md-6 col-xs-12">
         <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
-        <q-toggle v-model="restricted"
+        <q-toggle
+          v-model="restricted"
           :label="$t('datashield.profile_access_toggle')"
           left-label
           @update:model-value="datashieldStore.applyProfileAccess(!profile.restrictedAccess)"
@@ -62,20 +62,14 @@
         :label="$t('initialize')"
         :title="$t('datashield.settings_init')"
         size="sm"
-        @click="onShowInitSettings" />
+        @click="onShowInitSettings"
+      />
     </div>
     <div v-if="loading">
       <q-spinner-dots size="lg" />
     </div>
     <div v-else>
-      <q-tabs
-        v-model="tab"
-        dense
-        class="text-grey"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-      >
+      <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
         <q-tab name="aggregate" :label="$t('aggregate')" />
         <q-tab name="assign" :label="$t('assign')" />
         <q-tab name="options" :label="$t('options')" />
@@ -83,13 +77,12 @@
       <q-separator />
       <q-tab-panels v-model="tab">
         <q-tab-panel v-for="env in ['aggregate', 'assign']" :key="env" :name="env">
-          <datashield-methods :env="env"/>
+          <datashield-methods :env="env" />
         </q-tab-panel>
         <q-tab-panel name="options">
           <datashield-options />
         </q-tab-panel>
       </q-tab-panels>
-
     </div>
 
     <datashield-profile-init-dialog v-model="showInitSettings" @before-init="onBeforeInit" @after-init="onAfterInit" />
@@ -97,7 +90,8 @@
       v-model="showDelete"
       :title="$t('delete')"
       :text="$t('datashield.profile_delete_confirm')"
-      @confirm="onDeleteProfile" />
+      @confirm="onDeleteProfile"
+    />
   </div>
 </template>
 
@@ -137,7 +131,9 @@ const showDelete = ref(false);
 const showInitSettings = ref(false);
 const loading = ref(false);
 
-const missingCluster = computed(() => props.profile === undefined || (rStore.clusters.length > 0 && getCluster(props.profile) === undefined))
+const missingCluster = computed(
+  () => props.profile === undefined || (rStore.clusters.length > 0 && getCluster(props.profile) === undefined)
+);
 const builtinProfile = computed(() => props.profile?.name === props.profile?.cluster);
 
 const items: FieldItem<DataShieldProfileDto>[] = [
@@ -147,13 +143,12 @@ const items: FieldItem<DataShieldProfileDto>[] = [
   {
     field: 'cluster',
     label: 'r.cluster',
-    html: (val: DataShieldProfileDto) =>
-      val ? `<code>${val.cluster}</code>` : '',
+    html: (val: DataShieldProfileDto) => (val ? `<code>${val.cluster}</code>` : ''),
   },
-]
+];
 
 function getCluster(profile: DataShieldProfileDto) {
-  return rStore.clusters.find((c) => c.name === profile.cluster)
+  return rStore.clusters.find((c) => c.name === profile.cluster);
 }
 
 function onShowDeleteProfile() {

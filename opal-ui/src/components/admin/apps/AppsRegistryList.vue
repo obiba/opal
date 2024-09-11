@@ -10,13 +10,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn
-        size="sm"
-        outline
-        color="secondary"
-        icon="refresh"
-        :title="$t('refresh')"
-        @click="onRefresh"></q-btn>
+      <q-btn size="sm" outline color="secondary" icon="refresh" :title="$t('refresh')" @click="onRefresh"></q-btn>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">

@@ -42,7 +42,4 @@ export const useTokensStore = defineStore('tokens', () => {
     deleteToken,
     addToken,
   };
-
-
 });
-

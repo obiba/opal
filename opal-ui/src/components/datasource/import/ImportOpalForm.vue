@@ -7,14 +7,16 @@
       dense
       class="q-mb-md"
       :debounce="500"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
     <q-select
       v-model="authMethod"
       :options="authOptions"
       :label="$t('auth_method')"
       dense
       class="q-mb-md"
-      @update:model-value="onAuthSelection"/>
+      @update:model-value="onAuthSelection"
+    />
     <q-input
       v-if="!isCredentials"
       v-model="token"
@@ -22,7 +24,8 @@
       dense
       class="q-mb-md"
       :debounce="500"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
     <q-input
       v-if="isCredentials"
       v-model="username"
@@ -30,7 +33,8 @@
       dense
       class="q-mb-md"
       :debounce="500"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
     <q-input
       v-if="isCredentials"
       v-model="password"
@@ -39,14 +43,16 @@
       dense
       class="q-mb-md"
       :debounce="500"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
     <q-input
       v-model="remoteDatasource"
       :label="$t('project')"
       dense
       class="q-mb-md"
       :debounce="500"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
   </div>
 </template>
 
@@ -63,7 +69,7 @@ interface ImportOpalFormProps {
 }
 
 const props = defineProps<ImportOpalFormProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const { t } = useI18n();
 
@@ -71,13 +77,17 @@ const url = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.param
 const username = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ?? '');
 const password = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.password ?? '');
 const token = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.token ?? '');
-const remoteDatasource = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.remoteDatasource ?? '');
+const remoteDatasource = ref<string>(
+  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.remoteDatasource ?? ''
+);
 
 const authOptions = [
   { label: t('token'), value: 'token' },
   { label: t('credentials'), value: 'credentials' },
 ];
-const authMethod = ref(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ? authOptions[1] : authOptions[0]);
+const authMethod = ref(
+  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ? authOptions[1] : authOptions[0]
+);
 
 function onAuthSelection() {
   if (authMethod.value.value === 'token') {
@@ -92,7 +102,10 @@ function onAuthSelection() {
 const isCredentials = computed(() => authMethod.value.value === 'credentials');
 
 function isValid() {
-  return !!url.value && !!remoteDatasource.value && (!isCredentials.value || (!!username.value && !!password.value)) || (!!token.value);
+  return (
+    (!!url.value && !!remoteDatasource.value && (!isCredentials.value || (!!username.value && !!password.value))) ||
+    !!token.value
+  );
 }
 
 function onUpdate() {

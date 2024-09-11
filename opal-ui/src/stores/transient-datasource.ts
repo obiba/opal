@@ -7,7 +7,6 @@ import { FileDto } from 'src/models/Opal';
 const projectsStore = useProjectsStore();
 
 export const useTransientDatasourceStore = defineStore('transientDatasource', () => {
-
   const project = ref(''); // current project
   const datasource = ref({} as DatasourceDto); // current datasource
   const table = ref({} as TableDto); // selected datasource table
@@ -25,26 +24,26 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
       const fileBaseName = file.name.split('.').slice(0, -1).join('.');
       const factory = {
         'Magma.StaticDatasourceFactoryDto.params': {
-          'views': [
+          views: [
             {
               name: fileBaseName,
               from: [],
               innerFrom: [],
               'Magma.FileViewDto.view': {
                 filename: file.path,
-                type: 'SERIALIZED_XML'
-              }
-            } as ViewDto
-          ]
-        }
+                type: 'SERIALIZED_XML',
+              },
+            } as ViewDto,
+          ],
+        },
       } as DatasourceFactory;
       return createDatasource(factory, false);
     } else {
       const factory = {
         'Magma.ExcelDatasourceFactoryDto.params': {
           file: file.path,
-          readOnly: true
-        }
+          readOnly: true,
+        },
       } as DatasourceFactory;
       return createDatasource(factory, false);
     }
@@ -52,29 +51,31 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
 
   async function createDatasource(factory: DatasourceFactory, merge: boolean) {
     project.value = projectsStore.project.name;
-    return api.post<DatasourceDto>(`/project/${project.value}/transient-datasources`, factory, { params: { merge } })
+    return api
+      .post<DatasourceDto>(`/project/${project.value}/transient-datasources`, factory, { params: { merge } })
       .then((response) => {
         datasource.value = response.data;
       });
   }
 
   async function deleteDatasource() {
-    if (!datasource.value.name)
-      return Promise.resolve();
+    if (!datasource.value.name) return Promise.resolve();
     return api.delete(`/datasource/${datasource.value.name}`).then(() => {
       reset();
     });
   }
 
   async function loadTable(tableName: string) {
-    return api.get<TableDto>(`/datasource/${datasource.value.name}/table/${tableName}`, { params: { counts: true } })
+    return api
+      .get<TableDto>(`/datasource/${datasource.value.name}/table/${tableName}`, { params: { counts: true } })
       .then((response) => {
         table.value = response.data;
       });
   }
 
   async function loadVariables() {
-    return api.get<VariableDto[]>(`/datasource/${datasource.value.name}/table/${table.value.name}/variables`)
+    return api
+      .get<VariableDto[]>(`/datasource/${datasource.value.name}/table/${table.value.name}/variables`)
       .then((response) => {
         variables.value = response.data;
       });
@@ -83,7 +84,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
     const params = { offset, limit };
     if (select && select.length > 0) {
-      params.select = `name().matches(/^${select.join('$|^')}$/)`
+      params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }
     return api
       .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
@@ -91,7 +92,6 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
         return response.data;
       });
   }
-
 
   return {
     project,

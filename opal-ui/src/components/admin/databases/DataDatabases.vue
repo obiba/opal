@@ -1,12 +1,6 @@
 <template>
   <div>
-    <q-table
-      :rows="databases"
-      flat
-      row-key="name"
-      :columns="columns"
-      :pagination="initialPagination"
-    >
+    <q-table :rows="databases" flat row-key="name" :columns="columns" :pagination="initialPagination">
       <template v-slot:top-left>
         <q-btn-dropdown color="primary" :label="$t('register')" icon="add" size="sm">
           <q-list>
@@ -25,16 +19,17 @@
         </q-btn-dropdown>
       </template>
       <template v-slot:body="props">
-      <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-td key="name" :props="props">
-            <span class="text-primary">{{  props.row.name }}</span>
+            <span class="text-primary">{{ props.row.name }}</span>
             <q-icon
               v-if="props.row.defaultStorage"
               name="check"
               size="sm"
               class="on-right"
-              :title="$t('default_storage')" />
-            <div class="float-right" >
+              :title="$t('default_storage')"
+            />
+            <div class="float-right">
               <q-btn
                 rounded
                 dense
@@ -74,7 +69,8 @@
           <q-td key="hasDatasource" :props="props">
             <q-icon
               :name="props.row.hasDatasource ? 'check' : 'close'"
-              :class="props.row.hasDatasource ? 'text-positive' : ''" />
+              :class="props.row.hasDatasource ? 'text-positive' : ''"
+            />
           </q-td>
           <q-td key="url" :props="props" class="text-help">
             <span v-if="props.row.sqlSettings">{{ props.row.sqlSettings.url }}</span>
@@ -86,8 +82,13 @@
         </q-tr>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('unregister')" :text="$t('db.unregister_confirm', { name: selected?.name })" @confirm="onDelete" />
-    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave"/>
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('unregister')"
+      :text="$t('db.unregister_confirm', { name: selected?.name })"
+      @confirm="onDelete"
+    />
+    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
   </div>
 </template>
 
@@ -142,7 +143,8 @@ function onLeaveRow(row: DatabaseDto) {
 }
 
 function onTest(row: DatabaseDto) {
-  systemStore.testDatabase(row.name)
+  systemStore
+    .testDatabase(row.name)
     .then(() => {
       notifySuccess(t('db.test_success'));
     })

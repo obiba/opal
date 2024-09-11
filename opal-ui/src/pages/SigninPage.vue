@@ -2,14 +2,7 @@
   <q-layout>
     <q-page-container>
       <q-page class="flex flex-center bg-blue-grey-1">
-        <div
-          class="column"
-          :style="
-            $q.screen.lt.sm
-              ? { width: '80%' }
-              : { width: '360px' }
-          "
-        >
+        <div class="column" :style="$q.screen.lt.sm ? { width: '80%' } : { width: '360px' }">
           <div class="col text-center">
             <div class="text-h4 q-mb-lg">{{ appName }}</div>
           </div>
@@ -22,44 +15,27 @@
                 <div class="text-help text-center q-pt-xs q-pb-xs">{{ $t('auth.title') }}</div>
                 <q-card-section v-show="!withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
-                    <q-input
-                      autofocus
-                      color="grey-10"
-                      v-model="username"
-                      :label="$t('auth.username')"
-                      lazy-rules
-                    >
+                    <q-input autofocus color="grey-10" v-model="username" :label="$t('auth.username')" lazy-rules>
                       <template v-slot:prepend>
                         <q-icon name="fas fa-user" size="xs" />
                       </template>
                     </q-input>
 
-                    <q-input
-                      type="password"
-                      color="grey-10"
-                      v-model="password"
-                      :label="$t('auth.password')"
-                      lazy-rules
-                    >
+                    <q-input type="password" color="grey-10" v-model="password" :label="$t('auth.password')" lazy-rules>
                       <template v-slot:prepend>
                         <q-icon name="fas fa-lock" size="xs" />
                       </template>
                     </q-input>
 
                     <div>
-                      <q-btn
-                        :label="$t('auth.signin')"
-                        type="submit"
-                        color="primary"
-                        :disable="disableSubmit"
-                      />
+                      <q-btn :label="$t('auth.signin')" type="submit" color="primary" :disable="disableSubmit" />
                     </div>
                     <div v-if="authProviders.length > 0">
-                      <q-separator class="q-mb-md"/>
+                      <q-separator class="q-mb-md" />
                       <div v-for="provider in authProviders" :key="provider.name">
                         <q-btn
                           no-caps
-                          :label="$t('signin_with', {provider: provider.name})"
+                          :label="$t('signin_with', { provider: provider.name })"
                           @click="onSigninProvider(provider)"
                           color="primary"
                           class="full-width"
@@ -92,19 +68,8 @@
                       </template>
                     </q-input>
                     <div>
-                      <q-btn
-                        :label="$t('auth.validate')"
-                        type="submit"
-                        color="primary"
-                        :disable="token.length !== 6"
-                      />
-                      <q-btn
-                        :label="$t('cancel')"
-                        @click="onCancelToken"
-                        flat
-                        stretch
-                        class="text-bold q-ml-md"
-                      />
+                      <q-btn :label="$t('auth.validate')" type="submit" color="primary" :disable="token.length !== 6" />
+                      <q-btn :label="$t('cancel')" @click="onCancelToken" flat stretch class="text-bold q-ml-md" />
                     </div>
                   </q-form>
                 </q-card-section>
@@ -229,7 +194,7 @@ async function onSubmit() {
     if (authStore.sid) {
       router.push('/');
     }
-  } catch(err) {
+  } catch (err) {
     authMethod.value = err.response?.headers['www-authenticate'];
     if (authMethod.value) {
       withToken.value = true;

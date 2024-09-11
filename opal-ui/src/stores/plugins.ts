@@ -4,7 +4,6 @@ import { PluginPackage } from 'src/components/models';
 import { PluginPackagesDto } from 'src/models/Plugins';
 
 export const usePluginsStore = defineStore('plugins', () => {
-
   const plugins = ref({} as PluginPackagesDto);
   const datasourceImportPlugins = ref([] as PluginPackage[]);
   const datasourceExportPlugins = ref([] as PluginPackage[]);
@@ -17,14 +16,17 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function initDatasourcePlugins(usage: 'import' | 'export') {
-    if ((usage === 'import' && datasourceImportPlugins.value.length === 0) || (usage === 'export' && datasourceExportPlugins.value.length === 0)) {
+    if (
+      (usage === 'import' && datasourceImportPlugins.value.length === 0) ||
+      (usage === 'export' && datasourceExportPlugins.value.length === 0)
+    ) {
       return loadDatasourcePlugins(usage);
     }
     return Promise.resolve();
   }
 
   async function getDatasourcePluginForm(pluginId: string, usage: 'import' | 'export') {
-    return api.get(`datasource-plugin/${pluginId}/form`, { params: { usage }}).then((response) => response.data);
+    return api.get(`datasource-plugin/${pluginId}/form`, { params: { usage } }).then((response) => response.data);
   }
 
   async function loadDatasourcePlugins(usage: 'import' | 'export') {
@@ -33,8 +35,8 @@ export const usePluginsStore = defineStore('plugins', () => {
     } else {
       datasourceExportPlugins.value = [];
     }
-    return api.get('datasource-plugins', { params: { usage }}).then((response) => {
-      const plugins = response.data.packages ? response.data.packages as PluginPackage[] : [];
+    return api.get('datasource-plugins', { params: { usage } }).then((response) => {
+      const plugins = response.data.packages ? (response.data.packages as PluginPackage[]) : [];
       if (usage === 'import') {
         datasourceImportPlugins.value = plugins;
       } else {
@@ -52,17 +54,16 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function loadPlugins() {
-    return api.get('plugins')
-      .then((response) => plugins.value = response.data);
+    return api.get('plugins').then((response) => (plugins.value = response.data));
   }
 
   async function getPlugins(type: string) {
-    return api.get('plugins', {params: {type}}).then((response) => response.data);
+    return api.get('plugins', { params: { type } }).then((response) => response.data);
   }
 
   async function hasPlugin(type: string) {
-    return api.get('plugins', {params: {type}}).then((response) => {
-      return (response.data.packages||[]).length > 0;
+    return api.get('plugins', { params: { type } }).then((response) => {
+      return (response.data.packages || []).length > 0;
     });
   }
 
@@ -76,38 +77,31 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function restartPlugin(name: string) {
-    return api.delete(`plugin/${name}/service`)
-      .then(() => api.put(`plugin/${name}/service`));
+    return api.delete(`plugin/${name}/service`).then(() => api.put(`plugin/${name}/service`));
   }
 
   async function installPlugin(name: string, version: string) {
-    return api.post('plugins', {}, { params: {name, version} })
-      .then(() => loadPlugins());
+    return api.post('plugins', {}, { params: { name, version } }).then(() => loadPlugins());
   }
 
   async function installPluginFile(file: string) {
-    return api.post('plugins', {}, { params: {file} })
-      .then(() => loadPlugins());
+    return api.post('plugins', {}, { params: { file } }).then(() => loadPlugins());
   }
 
   async function uninstallPlugin(name: string) {
-    return api.delete(`plugin/${name}`)
-      .then(() => loadPlugins());
+    return api.delete(`plugin/${name}`).then(() => loadPlugins());
   }
 
   async function cancelUninstallPlugin(name: string) {
-    return api.put(`plugin/${name}`)
-      .then(() => loadPlugins());
+    return api.put(`plugin/${name}`).then(() => loadPlugins());
   }
 
   async function getPluginsUpdates() {
-    return api.get('plugins/_updates')
-      .then((response) => response.data);
+    return api.get('plugins/_updates').then((response) => response.data);
   }
 
   async function getPluginsAvailable() {
-    return api.get('plugins/_available')
-      .then((response) => response.data);
+    return api.get('plugins/_available').then((response) => response.data);
   }
 
   return {
@@ -131,5 +125,4 @@ export const usePluginsStore = defineStore('plugins', () => {
     installPlugin,
     installPluginFile,
   };
-
 });

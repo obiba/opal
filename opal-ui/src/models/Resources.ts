@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Resources";
+export const protobufPackage = 'Resources';
 
 export interface ResourceProvidersStatusDto {
   providersCount: number;

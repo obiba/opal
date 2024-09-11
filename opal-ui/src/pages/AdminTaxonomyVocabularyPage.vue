@@ -4,13 +4,18 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies"/>
+        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
         <q-breadcrumbs-el :label="taxonomyName" :to="`/admin/taxonomies/${taxonomyName}`" />
         <q-breadcrumbs-el :label="vocabularyName" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page v-if="vocabulary" class="q-pa-md">
-      <vocabulary-content :taxonomy="taxonomyName" :vocabulary="vocabulary" @update="onUpdate" @refresh="onRefresh"></vocabulary-content>
+      <vocabulary-content
+        :taxonomy="taxonomyName"
+        :vocabulary="vocabulary"
+        @update="onUpdate"
+        @refresh="onRefresh"
+      ></vocabulary-content>
     </q-page>
   </div>
 </template>
@@ -33,7 +38,6 @@ watch(vocabularyName, (newVocabulary) => {
     taxonomiesStore.getVocabulary(taxonomyName.value, newVocabulary).catch(notifyError);
   }
 });
-
 
 async function onUpdate(updated: VocabularyDto) {
   try {

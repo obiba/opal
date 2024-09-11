@@ -12,7 +12,8 @@
       :step="STEP_COUNT"
       debounce="500"
       @update:model-value="init"
-      style="width: 200px;">
+      style="width: 200px"
+    >
       <template v-slot:after>
         <span class="on-right text-body1">/ {{ total }}</span>
       </template>
@@ -25,7 +26,7 @@
       size="sm"
       @click="init"
       class="q-mt-lg"
-      style="height: 2.5em;"
+      style="height: 2.5em"
       :disable="loading"
     />
     <q-btn
@@ -35,7 +36,7 @@
       size="sm"
       @click="onFullSummary"
       class="q-mt-lg"
-      style="height: 2.5em;"
+      style="height: 2.5em"
       :disable="loading"
     />
   </div>
@@ -44,13 +45,13 @@
     <q-spinner-dots size="lg" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.CategoricalSummaryDto.categorical']">
-    <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md"/>
+    <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.TextSummaryDto.textSummary']">
-    <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md"/>
+    <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.ContinuousSummaryDto.continuous']">
-    <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md"/>
+    <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md" />
   </div>
   <div v-else-if="total > 0">
     <pre>{{ summary }}</pre>
@@ -104,7 +105,8 @@ function init() {
     .loadVariableSummary(props.variable, true, limit.value > props.total ? props.total : limit.value)
     .then((data) => {
       summary.value = data;
-    }).finally(() => {
+    })
+    .finally(() => {
       loading.value = false;
     });
 }
@@ -113,5 +115,4 @@ function onFullSummary() {
   limit.value = undefined;
   init();
 }
-
 </script>

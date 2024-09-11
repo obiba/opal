@@ -1,20 +1,10 @@
 <template>
   <div>
     <div v-if="datasourceStore.perms.variable?.canUpdate()" class="row q-gutter-sm q-mb-md">
-      <q-btn
-        size="sm"
-        color="primary"
-        icon="edit"
-        :title="$t('edit')"
-        @click="onShowEdit" />
+      <q-btn size="sm" color="primary" icon="edit" :title="$t('edit')" @click="onShowEdit" />
     </div>
-    <v-ace-editor
-      v-model:value="script"
-      @init="onEditorInit"
-      lang="javascript"
-      theme="monokai"
-      style="height: 300px" />
-    <variable-script-dialog v-model="showEdit" :variable="variable" @save="onSave"/>
+    <v-ace-editor v-model:value="script" @init="onEditorInit" lang="javascript" theme="monokai" style="height: 300px" />
+    <variable-script-dialog v-model="showEdit" :variable="variable" @save="onSave" />
   </div>
 </template>
 
@@ -56,5 +46,4 @@ function onEditorInit(editor: any) {
 function onSave(newVariable: VariableDto, comment: string) {
   datasourceStore.saveDerivedVariable(newVariable, comment);
 }
-
 </script>

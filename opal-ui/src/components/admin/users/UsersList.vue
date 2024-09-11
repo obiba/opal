@@ -29,13 +29,7 @@
         </q-btn-dropdown>
       </template>
       <template v-slot:top-right>
-        <q-input
-          dense
-          clearable
-          debounce="400"
-          color="primary"
-          v-model="filter"
-        >
+        <q-input dense clearable debounce="400" color="primary" v-model="filter">
           <template v-slot:append>
             <q-icon name="search" />
           </template>
@@ -139,7 +133,7 @@ const showDelete = ref(false);
 const authenticationType = ref(SubjectCredentialsDto_AuthenticationType.PASSWORD);
 const selectedUser = ref<SubjectCredentialsDto | null>(null);
 
-const columns = computed(() =>[
+const columns = computed(() => [
   {
     name: 'name',
     required: true,
@@ -194,7 +188,7 @@ function onFilter() {
   });
 
   return result;
-};
+}
 
 function onOverRow(row: SubjectCredentialsDto) {
   toolsVisible.value[row.name] = true;

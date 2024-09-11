@@ -31,7 +31,8 @@
           :title="$t('refresh')"
           size="sm"
           class="on-right"
-          @click="updateOptions" />
+          @click="updateOptions"
+        />
         <q-btn
           outline
           color="red"
@@ -39,7 +40,8 @@
           size="sm"
           class="on-right"
           :disable="selected.length === 0"
-          @click="onShowDelete" />
+          @click="onShowDelete"
+        />
       </template>
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
@@ -50,8 +52,8 @@
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-primary">{{  props.row.name }}</span>
-          <div class="float-right" >
+          <span class="text-primary">{{ props.row.name }}</span>
+          <div class="float-right">
             <q-btn
               rounded
               dense
@@ -78,12 +80,17 @@
       </template>
       <template v-slot:body-cell-value="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <pre style="margin: 0;">{{ props.row.value }}</pre>
+          <pre style="margin: 0">{{ props.row.value }}</pre>
         </q-td>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('datashield.delete_options_confirm', { count: selected.length })" @confirm="onDeleteOptions" />
-    <edit-datashield-option-dialog v-model="showEdit" :option="opt"/>
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('datashield.delete_options_confirm', { count: selected.length })"
+      @confirm="onDeleteOptions"
+    />
+    <edit-datashield-option-dialog v-model="showEdit" :option="opt" />
   </div>
 </template>
 
@@ -173,5 +180,4 @@ function onDeleteOptions() {
 function updateOptions() {
   datashieldStore.loadProfileSettings();
 }
-
 </script>

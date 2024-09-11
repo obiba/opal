@@ -12,26 +12,20 @@
     >
       <template v-slot:top-left>
         <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left">
-        <q-list>
-          <q-item clickable v-close-popup @click="onShowInstallPackages">
-            <q-item-section>
-              <q-item-label>{{ $t('install_r_package') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup @click="onShowUpdatePackages">
-            <q-item-section>
-              <q-item-label>{{ $t('update_all_r_packages') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
-        <q-btn
-          outline
-          color="secondary"
-          icon="refresh"
-          :title="$t('refresh')"
-          size="sm"
-          @click="updateRPackages" />
+          <q-list>
+            <q-item clickable v-close-popup @click="onShowInstallPackages">
+              <q-item-section>
+                <q-item-label>{{ $t('install_r_package') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click="onShowUpdatePackages">
+              <q-item-section>
+                <q-item-label>{{ $t('update_all_r_packages') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRPackages" />
       </template>
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
@@ -43,8 +37,8 @@
       <template v-slot:body="props">
         <q-tr :props="props" @mouseover="onOverPackage(props.row)" @mouseleave="onLeavePackage(props.row)">
           <q-td key="name" :props="props">
-            <span class="text-primary">{{  props.row.name }}</span>
-            <div class="float-right" >
+            <span class="text-primary">{{ props.row.name }}</span>
+            <div class="float-right">
               <q-btn
                 rounded
                 dense
@@ -69,25 +63,30 @@
             </div>
           </q-td>
           <q-td key="title" :props="props">
-            {{  getDescriptionValue(props.row, 'Title') }}
+            {{ getDescriptionValue(props.row, 'Title') }}
           </q-td>
           <q-td key="version" :props="props">
-            {{  getDescriptionValue(props.row, 'Version') }}
+            {{ getDescriptionValue(props.row, 'Version') }}
           </q-td>
           <q-td key="built" :props="props">
-            {{  `R ${getDescriptionValue(props.row, 'Built')}` }}
+            {{ `R ${getDescriptionValue(props.row, 'Built')}` }}
           </q-td>
           <q-td key="libpath" :props="props">
-            {{  getDescriptionValue(props.row, 'LibPath') }}
+            {{ getDescriptionValue(props.row, 'LibPath') }}
           </q-td>
           <q-td key="rserver" :props="props">
-            <span>{{  props.row.rserver.split('~')[0] }}</span>
-            <code class="on-right">{{  props.row.rserver.split('~')[1].split('-')[0] }}</code>
+            <span>{{ props.row.rserver.split('~')[0] }}</span>
+            <code class="on-right">{{ props.row.rserver.split('~')[1].split('-')[0] }}</code>
           </q-td>
         </q-tr>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_r_package_confirm', { name: pkg?.name })" @confirm="onDeletePackage" />
+    <confirm-dialog
+      v-model="showDelete"
+      :title="$t('delete')"
+      :text="$t('delete_r_package_confirm', { name: pkg?.name })"
+      @confirm="onDeletePackage"
+    />
     <install-r-package-dialog v-model="showInstall" :cluster="cluster" />
     <update-r-packages-dialog v-model="showUpdate" :cluster="cluster" />
     <view-r-package-dialog v-model="showView" :pkg="pkg" />
@@ -108,7 +107,7 @@ import ViewRPackageDialog from 'src/components/admin/r/ViewRPackageDialog.vue';
 import { getDescriptionValue, getPackageKey } from 'src/utils/r';
 
 interface Props {
-  cluster: RServerClusterDto
+  cluster: RServerClusterDto;
 }
 
 const props = defineProps<Props>();
@@ -195,9 +194,12 @@ onMounted(() => {
   updateRPackages();
 });
 
-watch(() => props.cluster, () => {
-  updateRPackages();
-});
+watch(
+  () => props.cluster,
+  () => {
+    updateRPackages();
+  }
+);
 
 function updateRPackages() {
   if (props.cluster.servers.length) {
@@ -243,5 +245,4 @@ function onOverPackage(row: RPackageDto) {
 function onLeavePackage(row: RPackageDto) {
   packageToolsVisible.value[getPackageKey(row)] = false;
 }
-
 </script>

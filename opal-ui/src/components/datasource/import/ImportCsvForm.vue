@@ -7,7 +7,8 @@
       selection="single"
       :extensions="fileExtensions"
       @select="onFileSelect"
-      class="q-mb-md"/>
+      class="q-mb-md"
+    />
     <q-input
       v-model="name"
       :label="$t('table_name')"
@@ -15,7 +16,8 @@
       class="q-mb-md"
       :debounce="500"
       :disable="dataFile === undefined"
-      @update:model-value="onUpdate"/>
+      @update:model-value="onUpdate"
+    />
     <div class="row q-gutter-md">
       <div class="col">
         <q-input
@@ -24,7 +26,8 @@
           dense
           class="q-mb-md"
           :debounce="500"
-          @update:model-value="onUpdate"/>
+          @update:model-value="onUpdate"
+        />
       </div>
       <div class="col">
         <q-select
@@ -32,7 +35,8 @@
           :options="ValueTypes"
           :label="$t('default_value_type')"
           @update:model-value="onUpdate"
-          dense/>
+          dense
+        />
       </div>
     </div>
     <div class="row q-gutter-md">
@@ -43,7 +47,8 @@
           dense
           class="q-mb-md"
           :debounce="500"
-          @update:model-value="onUpdate"/>
+          @update:model-value="onUpdate"
+        />
       </div>
       <div class="col">
         <q-input
@@ -52,7 +57,8 @@
           dense
           class="q-mb-md"
           :debounce="500"
-          @update:model-value="onUpdate"/>
+          @update:model-value="onUpdate"
+        />
       </div>
     </div>
     <div class="row q-gutter-md">
@@ -65,7 +71,8 @@
           dense
           class="q-mb-md"
           :debounce="500"
-          @update:model-value="onUpdate"/>
+          @update:model-value="onUpdate"
+        />
       </div>
       <div class="col">
         <q-input
@@ -74,7 +81,8 @@
           dense
           class="q-mb-md"
           :debounce="500"
-          @update:model-value="onUpdate"/>
+          @update:model-value="onUpdate"
+        />
       </div>
     </div>
   </div>
@@ -96,7 +104,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const projectsStore = useProjectsStore();
 const filesStore = useFilesStore();
@@ -179,7 +187,7 @@ function onUpdate() {
           entityType: entityType.value,
           data: dataFile.value.path,
           refTable: `${projectsStore.project.name}.${name.value}`,
-        }
+        },
       ],
     },
   } as DatasourceFactory);

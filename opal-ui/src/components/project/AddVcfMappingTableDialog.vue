@@ -118,7 +118,9 @@ const roleOptions = ref([] as { label: string; value: VariableDto }[]);
 const editMode = computed(() => !!props.mapping && !!props.mapping.projectName);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('vcf_store.edit_mapping') : t('vcf_store.add_mapping')));
-const canAdd = computed(() => !!selectedTable.value && !!selectedParticipantIdVariable.value && !!selectedRoleVariable.value);
+const canAdd = computed(
+  () => !!selectedTable.value && !!selectedParticipantIdVariable.value && !!selectedRoleVariable.value
+);
 
 function initMappingOptions() {
   if (tables.value.length > 0) {
@@ -171,13 +173,12 @@ function initializeVariableOptions(variables: VariableDto[]) {
       }
     }
 
-    if (!!!participantIdVariableSuggestion ) {
+    if (!!!participantIdVariableSuggestion) {
       if (!!newMapping.value.participantIdVariable) {
         if (variableName === newMapping.value.participantIdVariable) {
           participantIdVariableSuggestion = variable;
         }
-      }
-      else if (variableName.match(/participant/i) != null) {
+      } else if (variableName.match(/participant/i) != null) {
         participantIdVariableSuggestion = variable;
       }
     }

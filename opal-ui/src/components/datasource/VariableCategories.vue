@@ -34,7 +34,8 @@
           :title="$t('move_up')"
           @click="onUp"
           :disable="selected.length === 0 || !moveEnabled"
-          class="on-right" />
+          class="on-right"
+        />
         <q-btn
           v-if="canUpdate"
           color="secondary"
@@ -43,7 +44,8 @@
           :title="$t('move_down')"
           @click="onDown"
           :disable="selected.length === 0 || !moveEnabled"
-          class="on-right" />
+          class="on-right"
+        />
         <q-btn
           v-if="canUpdate"
           outline
@@ -52,7 +54,8 @@
           size="sm"
           @click="onShowDelete"
           :disable="selected.length === 0"
-          class="on-right" />
+          class="on-right"
+        />
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -67,7 +70,8 @@
               :title="$t('edit')"
               :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
               class="q-ml-xs"
-              @click="onShowEdit(props.row)" />
+              @click="onShowEdit(props.row)"
+            />
             <q-btn
               rounded
               dense
@@ -77,7 +81,8 @@
               :title="$t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
-              @click="onShowDeleteSingle(props.row)" />
+              @click="onShowDeleteSingle(props.row)"
+            />
           </div>
         </q-td>
       </template>
@@ -89,12 +94,7 @@
       <template v-slot:body-cell-label="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <div v-for="attr in getLabels(props.value)" :key="attr.locale">
-            <q-badge
-              v-if="attr.locale"
-              color="grey-6"
-              :label="attr.locale"
-              class="on-left"
-            />
+            <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
         </q-td>
@@ -105,18 +105,17 @@
       v-model="showDelete"
       :title="$t('delete')"
       :text="$t('delete_categories_confirm', { count: selected.length })"
-      @confirm="onDelete" />
+      @confirm="onDelete"
+    />
 
-      <category-dialog
+    <category-dialog
       v-model="showEdit"
       :variable="datasourceStore.variable"
       :category="selectedSingle"
-      @saved="onUpdate" />
+      @saved="onUpdate"
+    />
 
-    <categories-range-dialog
-      v-model="showAddRange"
-      :variable="datasourceStore.variable"
-      @saved="onUpdate" />
+    <categories-range-dialog v-model="showAddRange" :variable="datasourceStore.variable" @saved="onUpdate" />
   </div>
 </template>
 
@@ -176,7 +175,7 @@ const columns = computed(() => [
   },
 ]);
 
-const rows = computed(() => datasourceStore.variable?.categories ? datasourceStore.variable.categories : []);
+const rows = computed(() => (datasourceStore.variable?.categories ? datasourceStore.variable.categories : []));
 
 const canUpdate = computed(() => datasourceStore.perms.variable?.canUpdate());
 
@@ -214,9 +213,12 @@ function onShowDelete() {
 function onDelete() {
   const newVariable = {
     ...datasourceStore.variable,
-    categories: datasourceStore.variable.categories.filter((c) => !selected.value.map((cs) => cs.name).includes(c.name)),
+    categories: datasourceStore.variable.categories.filter(
+      (c) => !selected.value.map((cs) => cs.name).includes(c.name)
+    ),
   };
-  datasourceStore.updateVariable(newVariable)
+  datasourceStore
+    .updateVariable(newVariable)
     .then(onUpdate)
     .then(() => {
       selected.value = [];
@@ -236,7 +238,8 @@ function onUp() {
     categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.updateVariable({ ...datasourceStore.variable, categories })
+  datasourceStore
+    .updateVariable({ ...datasourceStore.variable, categories })
     .then(onUpdate)
     .finally(() => {
       moveEnabled.value = true;
@@ -256,7 +259,8 @@ function onDown() {
     categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
-  datasourceStore.updateVariable({ ...datasourceStore.variable, categories })
+  datasourceStore
+    .updateVariable({ ...datasourceStore.variable, categories })
     .then(onUpdate)
     .finally(() => {
       moveEnabled.value = true;

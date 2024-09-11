@@ -5,9 +5,9 @@
 // source: Database.proto
 
 /* eslint-disable */
-import { type JdbcDatasourceSettingsDto } from "./Magma";
+import { type JdbcDatasourceSettingsDto } from './Magma';
 
-export const protobufPackage = "Database";
+export const protobufPackage = 'Database';
 
 export interface JdbcDriverDto {
   /** e.g., "MySQL 5.1" */
@@ -16,9 +16,7 @@ export interface JdbcDriverDto {
   driverClass: string;
   /** e.g., "jdbc:mysql://{hostname}:{port}/{databaseName}" */
   jdbcUrlTemplate: string;
-  version?:
-    | string
-    | undefined;
+  version?: string | undefined;
   /** e.g., "jdbc:mysql://localhost:3306/opal" */
   jdbcUrlExample: string;
   supportedSchemas: string[];
@@ -40,10 +38,10 @@ export interface DatabaseDto {
 }
 
 export enum DatabaseDto_Usage {
-  IMPORT = "IMPORT",
-  STORAGE = "STORAGE",
-  EXPORT = "EXPORT",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  IMPORT = 'IMPORT',
+  STORAGE = 'STORAGE',
+  EXPORT = 'EXPORT',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface SqlSettingsDto {
@@ -58,9 +56,9 @@ export interface SqlSettingsDto {
 }
 
 export enum SqlSettingsDto_SqlSchema {
-  HIBERNATE = "HIBERNATE",
-  JDBC = "JDBC",
-  UNRECOGNIZED = "UNRECOGNIZED",
+  HIBERNATE = 'HIBERNATE',
+  JDBC = 'JDBC',
+  UNRECOGNIZED = 'UNRECOGNIZED',
 }
 
 export interface MongoDbSettingsDto {

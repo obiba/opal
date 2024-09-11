@@ -17,7 +17,7 @@ export const useGroupsStore = defineStore('groups', () => {
   async function loadGroups() {
     return api.get('/system/groups').then((response) => {
       groups.value = response.data;
-    })
+    });
   }
 
   async function deleteGroup(group: GroupDto) {
@@ -30,5 +30,4 @@ export const useGroupsStore = defineStore('groups', () => {
     initGroups,
     deleteGroup,
   };
-
 });

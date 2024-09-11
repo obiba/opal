@@ -10,11 +10,7 @@
           {{ $t('datashield.settings_init_help') }}
         </div>
         <q-spinner-dots v-if="loading" />
-        <q-option-group
-          v-model="selected"
-          :options="options"
-          type="checkbox"
-        />
+        <q-option-group v-model="selected" :options="options" type="checkbox" />
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
@@ -41,33 +37,36 @@ export default defineComponent({
 import { RPackageDto } from 'src/models/OpalR';
 
 interface DialogProps {
-  modelValue: boolean
+  modelValue: boolean;
 }
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
-const emit = defineEmits(['update:modelValue', 'beforeInit', 'afterInit'])
+const emit = defineEmits(['update:modelValue', 'beforeInit', 'afterInit']);
 
 const selected = ref<string[]>([]);
-const options = ref<{ label: string; value: string}[]>();
+const options = ref<{ label: string; value: string }[]>();
 const loading = ref(false);
 
 const datashieldStore = useDatashieldStore();
 
-watch(() => props.modelValue, (value) => {
-  showDialog.value = value;
-  if (value) {
-    selected.value = [];
-    options.value = [];
-    loading.value = true;
-    datashieldStore.getPackages().then((packages: RPackageDto[]) => {
-      const uniquePackages = Array.from(new Set(packages.map((p) => p.name)));
-      options.value = uniquePackages.map((name) => ({ label: name, value: name }));
-      selected.value = uniquePackages;
-      loading.value = false;
-    });
+watch(
+  () => props.modelValue,
+  (value) => {
+    showDialog.value = value;
+    if (value) {
+      selected.value = [];
+      options.value = [];
+      loading.value = true;
+      datashieldStore.getPackages().then((packages: RPackageDto[]) => {
+        const uniquePackages = Array.from(new Set(packages.map((p) => p.name)));
+        options.value = uniquePackages.map((name) => ({ label: name, value: name }));
+        selected.value = uniquePackages;
+        loading.value = false;
+      });
+    }
   }
-});
+);
 
 function onHide() {
   emit('update:modelValue', false);

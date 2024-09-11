@@ -22,11 +22,7 @@
             :rules="[validateRequiredField]"
             @update:model-value="onSearchTable"
           >
-            <q-menu
-              v-model="showSuggestions"
-              no-focus
-              no-parent-event
-              auto-close>
+            <q-menu v-model="showSuggestions" no-focus no-parent-event auto-close>
               <q-list style="min-width: 100px">
                 <q-item
                   clickable

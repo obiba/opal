@@ -39,5 +39,4 @@ const properties: FieldItem<VcsCommitInfoDto>[] = [
     label: 'comment',
   },
 ];
-
 </script>

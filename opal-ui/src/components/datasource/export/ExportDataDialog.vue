@@ -1,101 +1,84 @@
 <template>
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
-      <q-card class="dialog-sm">
-        <q-card-section>
-          <div class="text-h6">{{ $t('export_data') }}</div>
-        </q-card-section>
+    <q-card class="dialog-sm">
+      <q-card-section>
+        <div class="text-h6">{{ $t('export_data') }}</div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <q-card-section>
-          <div class="q-mb-md box-info">
-            <q-icon name="info" size="1.2rem"/>
-            <span class="on-right">
-              {{ exportTablesText }}
-            </span>
+      <q-card-section>
+        <div class="q-mb-md box-info">
+          <q-icon name="info" size="1.2rem" />
+          <span class="on-right">
+            {{ exportTablesText }}
+          </span>
+        </div>
+
+        <div v-if="isFile">
+          <q-select v-model="fileExporter" :options="fileExporters" :label="$t('data_format')" dense class="q-mb-md" />
+          <div class="text-hint q-mb-md">
+            {{ fileExporterHint }}
           </div>
 
-          <div v-if="isFile">
-            <q-select
-              v-model="fileExporter"
-              :options="fileExporters"
-              :label="$t('data_format')"
+          <div class="q-mb-md">
+            <export-csv-form v-if="fileExporter.value === 'csv'" v-model="out" :tables="props.tables" />
+            <export-fs-form v-else-if="fileExporter.value === 'opal'" v-model="out" :tables="props.tables" />
+            <export-haven-form
+              v-else-if="fileExporter.value.startsWith('haven_')"
+              v-model="out"
+              :tables="props.tables"
+              :type="fileExporter.value"
+            />
+            <export-plugin-form v-else v-model="out" :tables="props.tables" :type="fileExporter.value" />
+          </div>
+
+          <q-list class="q-mt-lg">
+            <q-expansion-item
+              switch-toggle-side
               dense
-              class="q-mb-md"/>
-            <div class="text-hint q-mb-md">
-              {{ fileExporterHint }}
-            </div>
-
-            <div class="q-mb-md">
-              <export-csv-form
-                v-if="fileExporter.value === 'csv'"
-                v-model="out"
-                :tables="props.tables"/>
-              <export-fs-form
-                v-else-if="fileExporter.value === 'opal'"
-                v-model="out"
-                :tables="props.tables"/>
-              <export-haven-form
-                v-else-if="fileExporter.value.startsWith('haven_')"
-                v-model="out"
-                :tables="props.tables"
-                :type="fileExporter.value" />
-              <export-plugin-form
-                v-else
-                v-model="out"
-                :tables="props.tables"
-                :type="fileExporter.value" />
-            </div>
-
-            <q-list class="q-mt-lg">
-              <q-expansion-item
-                switch-toggle-side
+              header-class="text-primary text-caption"
+              :label="$t('advanced_options')"
+            >
+              <q-input
+                v-model="entityIdNames"
+                :label="$t('id_column_name')"
+                :hint="$t('id_column_name_hint')"
                 dense
-                header-class="text-primary text-caption"
-                :label="$t('advanced_options')"
-              >
-                <q-input
-                  v-model="entityIdNames"
-                  :label="$t('id_column_name')"
-                  :hint="$t('id_column_name_hint')"
-                  dense
-                  class="q-mb-md"
-                  :debounce="500"/>
-              </q-expansion-item>
-            </q-list>
-          </div>
-          <div v-else-if="isDatabase">
-            <q-select
-              v-model="databaseExporter"
-              :options="databaseExporters"
-              :label="$t('database')"
-              dense
-              emit-value
-              map-options />
-          </div>
-          <identifiers-mapping-select v-model="idConfig" :for-import="false"/>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right" class="bg-grey-3">
-          <q-btn
-            flat
-            :label="$t('cancel')"
-            color="secondary"
-            v-close-popup
+                class="q-mb-md"
+                :debounce="500"
+              />
+            </q-expansion-item>
+          </q-list>
+        </div>
+        <div v-else-if="isDatabase">
+          <q-select
+            v-model="databaseExporter"
+            :options="databaseExporters"
+            :label="$t('database')"
+            dense
+            emit-value
+            map-options
           />
-          <q-btn
-            flat
-            :label="$t('export')"
-            color="primary"
-            @click="onExportData"
-            :disable="isFile ? out === undefined : databaseExporter === undefined"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+        </div>
+        <identifiers-mapping-select v-model="idConfig" :for-import="false" />
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-actions align="right" class="bg-grey-3">
+        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn
+          flat
+          :label="$t('export')"
+          color="primary"
+          @click="onExportData"
+          :disable="isFile ? out === undefined : databaseExporter === undefined"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -122,7 +105,7 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
@@ -162,41 +145,49 @@ const databaseExporters = computed(() => {
 const exportTablesText = computed(() => t('export_tables_text', { count: props.tables.length }));
 
 const fileExporterHint = computed(() => {
-  return fileExporter.value ? (fileExporter.value.hint ? fileExporter.value.hint : t(`exporter.file.${fileExporter.value.value}`)) : '';
+  return fileExporter.value
+    ? fileExporter.value.hint
+      ? fileExporter.value.hint
+      : t(`exporter.file.${fileExporter.value.value}`)
+    : '';
 });
 
 const isFile = computed(() => props.type === 'file');
 const isDatabase = computed(() => props.type === 'database');
 
-watch(() => props.modelValue, (value) => {
-  showDialog.value = value;
-  if (value) {
-    if (projectsStore.project.exportFolder) {
-      filesStore.refreshFiles(projectsStore.project.exportFolder);
+watch(
+  () => props.modelValue,
+  (value) => {
+    showDialog.value = value;
+    if (value) {
+      if (projectsStore.project.exportFolder) {
+        filesStore.refreshFiles(projectsStore.project.exportFolder);
+      }
     }
   }
-});
+);
 
 function onShow() {
   fileExporter.value = [...builtinFileExporters];
   pluginsStore.initDatasourcePlugins('export').then(() => {
-    pluginsStore.datasourceExportPlugins
-    .forEach((plugin) => {
+    pluginsStore.datasourceExportPlugins.forEach((plugin) => {
       if (plugin['Plugins.DatasourcePluginPackageDto.datasource']?.group === 'FILE') {
         if (!fileExporters.value.find((exporter) => exporter.value === plugin.name))
-          fileExporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description});
+          fileExporters.value.push({ label: plugin.title, value: plugin.name, hint: plugin.description });
       }
     });
   });
   if (isDatabase.value) {
     databaseExporter.value = null;
-    systemStore.getDatabases(DatabaseDto_Usage.EXPORT).then((response) => {
-      databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
-      if (databaseExporters.value.length > 0)
-        databaseExporter.value = databaseExporters.value[0].value;
-    }).catch((err) => {
-      notifyError(err);
-    });
+    systemStore
+      .getDatabases(DatabaseDto_Usage.EXPORT)
+      .then((response) => {
+        databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
+        if (databaseExporters.value.length > 0) databaseExporter.value = databaseExporters.value[0].value;
+      })
+      .catch((err) => {
+        notifyError(err);
+      });
   }
   fileExporter.value = fileExporters.value[0];
 }
@@ -220,12 +211,15 @@ function onExportData() {
     options.idConfig = idConfig.value;
   }
 
-  projectsStore.exportCommand(projectsStore.project.name, options).then((response) => {
-    notifySuccess(t('export_tables_task_created', { id: response.data.id }));
-  }).catch((err) => {
-    console.error(err);
-    notifyError(err);
-  });
+  projectsStore
+    .exportCommand(projectsStore.project.name, options)
+    .then((response) => {
+      notifySuccess(t('export_tables_task_created', { id: response.data.id }));
+    })
+    .catch((err) => {
+      console.error(err);
+      notifyError(err);
+    });
 }
 
 function exportFile() {
@@ -260,5 +254,4 @@ function exportDatabase() {
   } as ExportCommandOptionsDto;
   return options;
 }
-
 </script>

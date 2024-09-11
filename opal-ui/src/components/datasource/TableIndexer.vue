@@ -1,45 +1,52 @@
 <template>
   <div :class="statusClass">
     <div>
-    <span>{{ $t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
-    <q-btn
-      v-if="statusActionIcon"
-      :color="statusActionColor"
-      :icon="statusActionIcon"
-      :title="$t(statusActionLabel)"
-      rounded
-      dense
-      outline
-      size="sm"
-      class="on-right"
-      @click="onStatusAction" />
-    <q-btn
-      v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
-      :color="statusActionColor"
-      icon="cleaning_services"
-      :title="$t('clear')"
-      dense
-      flat
-      size="sm"
-      class="on-right"
-      @click="onClear" />
-    <q-btn
-      v-if="statusActionIcon"
-      :color="statusActionColor"
-      icon="event"
-      :title="$t('schedule')"
-      flat
-      dense
-      size="sm"
-      class="on-right"
-      @click="onSchedule" />
+      <span>{{ $t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
+      <q-btn
+        v-if="statusActionIcon"
+        :color="statusActionColor"
+        :icon="statusActionIcon"
+        :title="$t(statusActionLabel)"
+        rounded
+        dense
+        outline
+        size="sm"
+        class="on-right"
+        @click="onStatusAction"
+      />
+      <q-btn
+        v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
+        :color="statusActionColor"
+        icon="cleaning_services"
+        :title="$t('clear')"
+        dense
+        flat
+        size="sm"
+        class="on-right"
+        @click="onClear"
+      />
+      <q-btn
+        v-if="statusActionIcon"
+        :color="statusActionColor"
+        icon="event"
+        :title="$t('schedule')"
+        flat
+        dense
+        size="sm"
+        class="on-right"
+        @click="onSchedule"
+      />
     </div>
-    <q-linear-progress v-if="datasourceStore.tableIndex.progress"  color="white" :value="datasourceStore.tableIndex.progress" class="q-mt-xs" />
+    <q-linear-progress
+      v-if="datasourceStore.tableIndex.progress"
+      color="white"
+      :value="datasourceStore.tableIndex.progress"
+      class="q-mt-xs"
+    />
 
     <table-indexer-dialog v-model="showDialog" />
   </div>
 </template>
-
 
 <script lang="ts">
 export default defineComponent({
@@ -55,7 +62,7 @@ const datasourceStore = useDatasourceStore();
 const showDialog = ref(false);
 
 const statusClass = computed(() => {
-  switch(datasourceStore.tableIndex.status) {
+  switch (datasourceStore.tableIndex.status) {
     case TableIndexationStatus.UPTODATE:
       return 'box-positive';
     case TableIndexationStatus.IN_PROGRESS:
@@ -68,7 +75,7 @@ const statusClass = computed(() => {
 });
 
 const statusActionLabel = computed(() => {
-  switch(datasourceStore.tableIndex.status) {
+  switch (datasourceStore.tableIndex.status) {
     case TableIndexationStatus.UPTODATE:
       return 'refresh';
     case TableIndexationStatus.IN_PROGRESS:
@@ -81,7 +88,7 @@ const statusActionLabel = computed(() => {
 });
 
 const statusActionIcon = computed(() => {
-  switch(datasourceStore.tableIndex.status) {
+  switch (datasourceStore.tableIndex.status) {
     case TableIndexationStatus.UPTODATE:
       return 'refresh';
     case TableIndexationStatus.IN_PROGRESS:
@@ -94,7 +101,7 @@ const statusActionIcon = computed(() => {
 });
 
 const statusActionColor = computed(() => {
-  switch(datasourceStore.tableIndex.status) {
+  switch (datasourceStore.tableIndex.status) {
     case TableIndexationStatus.OUTDATED:
       return 'black';
     default:
@@ -110,7 +117,10 @@ function onStatusAction() {
   } else {
     datasourceStore.updateTableIndex().then(() => {
       setInterval(() => {
-        if (datasourceStore.tableIndex.progress || datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS) {
+        if (
+          datasourceStore.tableIndex.progress ||
+          datasourceStore.tableIndex.status === TableIndexationStatus.IN_PROGRESS
+        ) {
           datasourceStore.loadTableIndex();
         }
       }, 1000); // 1 second

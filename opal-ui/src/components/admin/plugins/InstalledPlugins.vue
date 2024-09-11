@@ -10,7 +10,8 @@
       clearable
       dense
       class="q-mb-md"
-      style="max-width: 200px;"/>
+      style="max-width: 200px"
+    />
     <q-list bordered separator>
       <template v-for="pkg in packages" :key="pkg.name">
         <q-item>
@@ -26,7 +27,9 @@
               {{ pkg.description }}
             </q-item-label>
             <q-item-label lines="1" class="text-body2 text-primary">
-              <span v-if="pkg.website && pkg.website.startsWith('http')"><a :href="pkg.website">{{ pkg.author }}</a></span>
+              <span v-if="pkg.website && pkg.website.startsWith('http')"
+                ><a :href="pkg.website">{{ pkg.author }}</a></span
+              >
               <span v-else>{{ pkg.author }}</span>
               <span class="text-help on-right">{{ pkg.maintainer }}</span>
               <code class="on-right">{{ pkg.license }}</code>
@@ -42,10 +45,24 @@
             <div v-if="!pkg.uninstalled" class="row">
               <q-btn round flat size="sm" icon="refresh" :title="$t('plugin.restart')" @click="onRestart(pkg)" />
               <q-btn round flat size="sm" icon="edit" :title="$t('plugin.configure')" @click="onConfigure(pkg)" />
-              <q-btn round flat size="sm" icon="delete" :title="$t('delete')" @click="pluginsStore.uninstallPlugin(pkg.name)" />
+              <q-btn
+                round
+                flat
+                size="sm"
+                icon="delete"
+                :title="$t('delete')"
+                @click="pluginsStore.uninstallPlugin(pkg.name)"
+              />
             </div>
             <div v-else>
-              <q-btn round flat size="sm" icon="undo" :title="$t('cancel')" @click="pluginsStore.cancelUninstallPlugin(pkg.name)" />
+              <q-btn
+                round
+                flat
+                size="sm"
+                icon="undo"
+                :title="$t('cancel')"
+                @click="pluginsStore.cancelUninstallPlugin(pkg.name)"
+              />
             </div>
           </q-item-section>
         </q-item>
@@ -72,20 +89,19 @@ const selected = ref<PluginPackageDto | undefined>();
 const showConfigurations = ref(false);
 const type = ref<string | undefined>();
 
-const typeOptions = [
-  'opal-analysis-r',
-  'opal-datasource',
-  'vcf-store'
-]
+const typeOptions = ['opal-analysis-r', 'opal-datasource', 'vcf-store'];
 
-const packages = computed(() => pluginsStore.plugins.packages?.filter((pkg) => type.value ? pkg.type === type.value : true))
+const packages = computed(() =>
+  pluginsStore.plugins.packages?.filter((pkg) => (type.value ? pkg.type === type.value : true))
+);
 
 onMounted(() => {
   pluginsStore.loadPlugins();
 });
 
 function onRestart(pkg: PluginPackageDto) {
-  pluginsStore.restartPlugin(pkg.name)
+  pluginsStore
+    .restartPlugin(pkg.name)
     .then(() => notifySuccess(t('plugin.restarted')))
     .catch(() => notifyError(t('plugin.restart_failed')));
 }

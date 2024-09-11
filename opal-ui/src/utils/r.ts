@@ -1,4 +1,3 @@
-
 import { RPackageDto } from 'src/models/OpalR';
 
 export function getPackageKey(pkg: RPackageDto) {

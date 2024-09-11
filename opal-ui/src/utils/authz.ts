@@ -1,11 +1,13 @@
 import { AxiosResponse } from 'axios';
 
 export class Perms {
-
   methods: string[];
 
   constructor(response: AxiosResponse) {
-    this.methods = response && response.headers && response.headers.allow ? response.headers.allow.split(',').map((m: string) => m.trim()) : [];
+    this.methods =
+      response && response.headers && response.headers.allow
+        ? response.headers.allow.split(',').map((m: string) => m.trim())
+        : [];
   }
 
   canCreate() {
@@ -27,5 +29,4 @@ export class Perms {
   none() {
     return this.methods.length === 1 && this.methods.includes('OPTIONS');
   }
-
 }

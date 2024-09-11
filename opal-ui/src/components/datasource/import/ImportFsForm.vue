@@ -7,7 +7,8 @@
       selection="single"
       :extensions="fileExtensions"
       @select="onFileSelect"
-      class="q-mb-md"/>
+      class="q-mb-md"
+    />
   </div>
 </template>
 
@@ -26,7 +27,7 @@ interface ImportFsFormProps {
 }
 
 const props = defineProps<ImportFsFormProps>();
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const filesStore = useFilesStore();
 

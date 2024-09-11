@@ -13,13 +13,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn
-        color="primary"
-        :label="$t('add')"
-        icon="add"
-        size="sm"
-        @click.prevent="onAdd"
-      />
+      <q-btn color="primary" :label="$t('add')" icon="add" size="sm" @click.prevent="onAdd" />
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">

@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "Math";
+export const protobufPackage = 'Math';
 
 export interface SummaryStatisticsDto {
   resource: string;

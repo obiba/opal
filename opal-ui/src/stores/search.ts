@@ -16,7 +16,6 @@ export interface SearchCriteria {
 }
 
 export const useSearchStore = defineStore('search', () => {
-
   const variablesQuery = ref({
     query: '',
     criteria: {
@@ -31,7 +30,7 @@ export const useSearchStore = defineStore('search', () => {
       criteria: {
         project: [],
         table: [],
-      } as SearchCriteria
+      } as SearchCriteria,
     };
   }
 
@@ -40,7 +39,7 @@ export const useSearchStore = defineStore('search', () => {
     Object.keys(variablesQuery.value.criteria).forEach((key) => {
       const terms = variablesQuery.value.criteria[key];
       if (terms.length > 0) {
-        const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`
+        const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`;
         fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
       }
     });
@@ -48,13 +47,14 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   async function search(query: string, limit: number, fields: string[] | undefined) {
-    return api.get('/datasources/variables/_search', {
-      params: { query, limit, field: fields },
-      paramsSerializer: {
-        indexes: null, // no brackets at all
-      }
-    })
-      .then(response => response.data);
+    return api
+      .get('/datasources/variables/_search', {
+        params: { query, limit, field: fields },
+        paramsSerializer: {
+          indexes: null, // no brackets at all
+        },
+      })
+      .then((response) => response.data);
   }
 
   async function clearIndex(type: string) {
@@ -62,13 +62,11 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   async function getEntityTables(type: string, entity: string) {
-    return api.get(`/entity/${entity}/type/${type}/tables`)
-      .then(response => response.data);
+    return api.get(`/entity/${entity}/type/${type}/tables`).then((response) => response.data);
   }
 
   async function getTables() {
-    return api.get('/datasources/tables')
-      .then(response => response.data);
+    return api.get('/datasources/tables').then((response) => response.data);
   }
 
   //
@@ -109,5 +107,4 @@ export const useSearchStore = defineStore('search', () => {
     getLabels,
     getField,
   };
-
 });

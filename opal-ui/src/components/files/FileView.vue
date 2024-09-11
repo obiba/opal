@@ -2,11 +2,7 @@
   <div>
     <q-toolbar>
       <q-breadcrumbs>
-        <q-breadcrumbs-el
-          icon="dns"
-          @click="onFolderSelection('/')"
-          class="cursor-pointer"
-        />
+        <q-breadcrumbs-el icon="dns" @click="onFolderSelection('/')" class="cursor-pointer" />
         <q-breadcrumbs-el
           v-for="crumb in crumbs"
           :key="crumb.to"
@@ -24,7 +20,8 @@
           :title="$t('edit')"
           icon="edit"
           class="q-ml-md"
-          @click="onShowEditName(props.file)" />
+          @click="onShowEditName(props.file)"
+        />
         <q-btn
           v-if="isEditable(props.file)"
           rounded
@@ -90,80 +87,57 @@
             >
             </q-btn>
             <q-btn-group>
-              <q-btn
-                color="secondary"
-                size="sm"
-                icon="file_copy"
-                :disable="readables.length === 0"
-                @click="onCopy"
-              />
-              <q-btn
-                color="secondary"
-                size="sm"
-                icon="content_cut"
-                :disable="writables.length === 0"
-                @click="onCut"
-              />
-              <q-btn
-                color="secondary"
-                size="sm"
-                icon="content_paste"
-                :disable="!canPaste"
-                @click="onPaste"
-              />
+              <q-btn color="secondary" size="sm" icon="file_copy" :disable="readables.length === 0" @click="onCopy" />
+              <q-btn color="secondary" size="sm" icon="content_cut" :disable="writables.length === 0" @click="onCut" />
+              <q-btn color="secondary" size="sm" icon="content_paste" :disable="!canPaste" @click="onPaste" />
             </q-btn-group>
-            <q-btn
-              outline
-              color="red"
-              icon="delete"
-              size="sm"
-              @click="onShowDelete"
-              :disable="writables.length === 0"
-            >
+            <q-btn outline color="red" icon="delete" size="sm" @click="onShowDelete" :disable="writables.length === 0">
             </q-btn>
           </div>
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <q-icon
-                :name="getIconName(props.row)"
-                :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
+              :name="getIconName(props.row)"
+              :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
+              size="sm"
+              class="q-mr-sm"
+            />
+            <span>{{ props.row.name }}</span>
+            <div v-if="isEditable(props.row)" class="float-right">
+              <q-btn
+                rounded
+                dense
+                flat
                 size="sm"
-                class="q-mr-sm"
+                color="secondary"
+                :title="$t('edit')"
+                :icon="toolsVisible[props.row.path] ? 'edit' : 'none'"
+                class="q-ml-xs"
+                @click="onShowEditName(props.row)"
               />
-              <span>{{ props.row.name }}</span>
-              <div v-if="isEditable(props.row)" class="float-right">
-                <q-btn
-                  rounded
-                  dense
-                  flat
-                  size="sm"
-                  color="secondary"
-                  :title="$t('edit')"
-                  :icon="toolsVisible[props.row.path] ? 'edit' : 'none'"
-                  class="q-ml-xs"
-                  @click="onShowEditName(props.row)" />
-                <q-btn
-                  rounded
-                  dense
-                  flat
-                  size="sm"
-                  color="secondary"
-                  :title="$t('delete')"
-                  :icon="toolsVisible[props.row.path] ? 'delete' : 'none'"
-                  class="q-ml-xs"
-                  @click="onShowDeleteSingle(props.row)" />
-              </div>
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="$t('delete')"
+                :icon="toolsVisible[props.row.path] ? 'delete' : 'none'"
+                class="q-ml-xs"
+                @click="onShowDeleteSingle(props.row)"
+              />
+            </div>
           </q-td>
         </template>
         <template v-slot:body-cell-size="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              {{ props.value }}
+            {{ props.value }}
           </q-td>
         </template>
         <template v-slot:body-cell-lastModifiedTime="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-              {{ props.value }}
+            {{ props.value }}
           </q-td>
         </template>
       </q-table>
@@ -182,9 +156,7 @@
             @click="onShowDownload"
             class="q-mb-md"
           />
-          <div class="text-caption">
-            {{ $t('size') }}: {{ getSizeLabel(props.file.size) }}
-          </div>
+          <div class="text-caption">{{ $t('size') }}: {{ getSizeLabel(props.file.size) }}</div>
           <div class="text-caption">
             {{ getDateLabel(props.file.lastModifiedTime) }}
           </div>
@@ -194,7 +166,7 @@
 
     <extract-archive-dialog v-if="selectedSingle" v-model="showExtract" :file="selectedSingle" />
 
-    <add-folder-dialog v-model="showAddFolder" :file="props.file"/>
+    <add-folder-dialog v-model="showAddFolder" :file="props.file" />
 
     <edit-file-name-dialog v-if="selectedSingle" v-model="showEditName" :file="selectedSingle" />
 
@@ -202,7 +174,8 @@
       v-model="showDelete"
       :title="$t('delete')"
       :text="$t('delete_files_confirm', { count: props.file.type === FileDto_FileType.FILE ? 1 : writables.length })"
-      @confirm="onDelete" />
+      @confirm="onDelete"
+    />
 
     <upload-file-dialog v-model="showUpload" :file="props.file" :extensions="[]" />
 
@@ -258,13 +231,7 @@
 
         <q-card-actions align="right" class="bg-grey-3">
           <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn
-            flat
-            :label="$t('download')"
-            color="primary"
-            @click="onDownload"
-            v-close-popup
-          />
+          <q-btn flat :label="$t('download')" color="primary" @click="onDownload" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -316,9 +283,12 @@ const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 
-watch(() => props.file, () => {
-  selected.value = [];
-});
+watch(
+  () => props.file,
+  () => {
+    selected.value = [];
+  }
+);
 
 const columns = computed(() => [
   {
@@ -451,11 +421,7 @@ function onShowDownload() {
 }
 
 function onDownload() {
-  filesStore.downloadFiles(
-    props.file.path,
-    readables.value,
-    encryptContent.value ? encryptPassword.value : undefined
-  );
+  filesStore.downloadFiles(props.file.path, readables.value, encryptContent.value ? encryptPassword.value : undefined);
 }
 
 function onEncryptContentUpdated() {
@@ -464,8 +430,7 @@ function onEncryptContentUpdated() {
 
 function onGenerateDownloadPwd() {
   const length = 12;
-  const charset =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;,:?/()';
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;,:?/()';
   let retVal = '';
   for (var i = 0, n = charset.length; i < length; ++i) {
     retVal += charset.charAt(Math.floor(Math.random() * n));
@@ -483,7 +448,10 @@ function onShowDelete() {
 }
 
 function onDelete() {
-  if (props.file.type !== FileDto_FileType.FOLDER || (selected.value.length === 1 && selected.value[0].path === props.file.path)) {
+  if (
+    props.file.type !== FileDto_FileType.FOLDER ||
+    (selected.value.length === 1 && selected.value[0].path === props.file.path)
+  ) {
     onDeleteFile();
   } else {
     onDeleteSelections();

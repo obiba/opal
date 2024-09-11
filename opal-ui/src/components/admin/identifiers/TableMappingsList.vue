@@ -73,7 +73,6 @@
 
   <confirm-dialog v-model="showConfirm" :title="confirm.title" :text="confirm.text" @confirm="confirm.onCallback" />
 
-
   <add-mapping-dialog
     v-model="showAddMapping"
     :identifier="props.identifierTable"
@@ -204,5 +203,4 @@ function onOverRow(row: VariableDto) {
 function onLeaveRow(row: VariableDto) {
   toolsVisible.value[row.name] = false;
 }
-
 </script>

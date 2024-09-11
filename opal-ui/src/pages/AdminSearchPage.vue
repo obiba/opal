@@ -39,13 +39,15 @@ const searchStore = useSearchStore();
 const { t } = useI18n();
 
 const onVariablesClear = () => {
-  searchStore.clearIndex('variables')
+  searchStore
+    .clearIndex('variables')
     .then(() => notifySuccess(t('variables_index_cleared')))
     .catch(() => notifyError(t('variables_index_clear_error')));
 };
 
 const onValuesClear = () => {
-  searchStore.clearIndex('values')
+  searchStore
+    .clearIndex('values')
     .then(() => notifySuccess(t('values_index_cleared')))
     .catch(() => notifyError(t('values_index_clear_error')));
 };

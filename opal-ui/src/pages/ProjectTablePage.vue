@@ -5,18 +5,10 @@
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="dsName" :to="`/project/${dsName}`" />
-        <q-breadcrumbs-el
-          :label="$t('tables')"
-          :to="`/project/${dsName}/tables`"
-        />
+        <q-breadcrumbs-el :label="$t('tables')" :to="`/project/${dsName}/tables`" />
         <q-breadcrumbs-el :label="tName" />
       </q-breadcrumbs>
-      <q-icon
-        name="circle"
-        :color="tableStatusColor(datasourceStore.table.status)"
-        size="sm"
-        class="on-right"
-      />
+      <q-icon name="circle" :color="tableStatusColor(datasourceStore.table.status)" size="sm" class="on-right" />
       <bookmark-icon :resource="`/datasource/${dsName}/table/${tName}`" />
       <q-space />
       <q-btn
@@ -58,22 +50,44 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn-dropdown v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()" color="secondary" icon="output" size="sm" :label="$t('export')" class="on-right">
-            <q-list>
-              <q-item clickable v-close-popup @click="onShowExportFile">
-                <q-item-section>
-                  <q-item-label>{{ $t('export_file') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click="onShowExportDatabase">
-                <q-item-section>
-                  <q-item-label>{{ $t('export_database') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        <q-btn v-if="!isView && projectsStore.perms.copy?.canCreate()" color="secondary" icon="content_copy" :title="$t('copy')" size="sm" @click="onShowCopyData" class="on-right"></q-btn>
-        <q-btn-dropdown v-if="isView" color="secondary" icon="content_copy" size="sm" :title="$t('copy')" class="on-right">
+        <q-btn-dropdown
+          v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()"
+          color="secondary"
+          icon="output"
+          size="sm"
+          :label="$t('export')"
+          class="on-right"
+        >
+          <q-list>
+            <q-item clickable v-close-popup @click="onShowExportFile">
+              <q-item-section>
+                <q-item-label>{{ $t('export_file') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click="onShowExportDatabase">
+              <q-item-section>
+                <q-item-label>{{ $t('export_database') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn
+          v-if="!isView && projectsStore.perms.copy?.canCreate()"
+          color="secondary"
+          icon="content_copy"
+          :title="$t('copy')"
+          size="sm"
+          @click="onShowCopyData"
+          class="on-right"
+        ></q-btn>
+        <q-btn-dropdown
+          v-if="isView"
+          color="secondary"
+          icon="content_copy"
+          size="sm"
+          :title="$t('copy')"
+          class="on-right"
+        >
           <q-list>
             <q-item clickable v-close-popup @click="onShowCopyData">
               <q-item-section>
@@ -88,9 +102,26 @@
           </q-list>
         </q-btn-dropdown>
 
-        <q-btn v-if="datasourceStore.perms.table?.canUpdate()" outline color="secondary" icon="edit" size="sm" @click="onShowEdit" class="on-right"></q-btn>
-        <q-btn v-if="datasourceStore.perms.table?.canDelete()" outline color="red" icon="delete" size="sm" @click="onShowDelete" class="on-right"></q-btn>
-        <q-btn v-if="isView && datasourceStore.perms.table?.canUpdate()"
+        <q-btn
+          v-if="datasourceStore.perms.table?.canUpdate()"
+          outline
+          color="secondary"
+          icon="edit"
+          size="sm"
+          @click="onShowEdit"
+          class="on-right"
+        ></q-btn>
+        <q-btn
+          v-if="datasourceStore.perms.table?.canDelete()"
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          @click="onShowDelete"
+          class="on-right"
+        ></q-btn>
+        <q-btn
+          v-if="isView && datasourceStore.perms.table?.canUpdate()"
           no-caps
           dense
           flat
@@ -98,20 +129,15 @@
           icon="settings_ethernet"
           size="sm"
           @click="onReconnect"
-          class="on-right" />
+          class="on-right"
+        />
       </div>
       <div class="row q-col-gutter-md q-mt-md q-mb-md">
         <div class="col-12 col-md-6">
-          <fields-list
-            :items="items1"
-            :dbobject="datasourceStore.table"
-          />
+          <fields-list :items="items1" :dbobject="datasourceStore.table" />
         </div>
         <div class="col-12 col-md-6">
-          <fields-list
-            :items="items2"
-            :dbobject="datasourceStore.table"
-          />
+          <fields-list :items="items2" :dbobject="datasourceStore.table" />
         </div>
       </div>
 
@@ -119,20 +145,20 @@
         <q-spinner-dots size="lg" class="q-mt-md" />
       </div>
       <div v-else>
-
-        <q-tabs
-          v-model="tab"
-          dense
-          class="text-grey"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-        >
+        <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="$t('dictionary')" />
           <q-tab name="summary" :label="$t('summary')" />
-          <q-tab name="entity_filter" :label="$t('entity_filter')" v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"/>
-          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()"/>
-          <q-tab name="permissions" :label="$t('permissions')" v-if="datasourceStore.perms.tablePermissions?.canRead()"/>
+          <q-tab
+            name="entity_filter"
+            :label="$t('entity_filter')"
+            v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"
+          />
+          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
+          <q-tab
+            name="permissions"
+            :label="$t('permissions')"
+            v-if="datasourceStore.perms.tablePermissions?.canRead()"
+          />
         </q-tabs>
 
         <q-separator />
@@ -153,9 +179,7 @@
             <div class="row q-gutter-md">
               <q-card flat bordered class="on-left q-mb-md o-card-md">
                 <q-card-section class="text-subtitle2 text-center bg-grey-2">
-                  <div>
-                    <q-icon name="view_column" class="on-left"/>{{ $t('variables') }}
-                  </div>
+                  <div><q-icon name="view_column" class="on-left" />{{ $t('variables') }}</div>
                 </q-card-section>
                 <q-separator />
                 <q-card-section>
@@ -166,9 +190,7 @@
               </q-card>
               <q-card flat bordered class="on-left q-mb-md o-card-md">
                 <q-card-section class="text-subtitle2 text-center bg-grey-2">
-                  <div>
-                    <q-icon name="table_rows" class="on-left"/>{{ $t('entities') }}
-                  </div>
+                  <div><q-icon name="table_rows" class="on-left" />{{ $t('entities') }}</div>
                 </q-card-section>
                 <q-separator />
                 <q-card-section>
@@ -181,7 +203,7 @@
             <div v-if="datasourceStore.perms.tableValueSets?.canRead()">
               <div v-if="datasourceStore.table.valueSetCount === 0">
                 <div class="q-mb-md box-info">
-                  <q-icon name="error" size="1.2rem"/>
+                  <q-icon name="error" size="1.2rem" />
                   <span class="on-right">
                     {{ $t('no_table_values') }}
                   </span>
@@ -196,7 +218,7 @@
           <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
             <div v-if="datasourceStore.table.valueSetCount === 0">
               <div class="q-mb-md box-info">
-                <q-icon name="error" size="1.2rem"/>
+                <q-icon name="error" size="1.2rem" />
                 <span class="on-right">
                   {{ $t('no_table_values') }}
                 </span>
@@ -216,13 +238,28 @@
         </q-tab-panels>
       </div>
 
-      <export-data-dialog v-model="showExport" :type="exportType" :tables="[datasourceStore.table]"/>
-      <copy-tables-dialog v-model="showCopyData" :tables="[datasourceStore.table]"/>
-      <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view"/>
-      <edit-table-dialog v-model="showEdit" :table="datasourceStore.table" :view="datasourceStore.view"
-        @update:table="onTableUpdate" @update:view="onViewUpdate"/>
-      <resource-view-dialog v-if="isResourceView" v-model="showEditResourceView" :view="datasourceStore.view" @update="onViewUpdate"/>
-      <confirm-dialog v-model="showDelete" :title="$t('delete')" :text="$t('delete_tables_confirm', { count: 1 })" @confirm="onDeleteTable" />
+      <export-data-dialog v-model="showExport" :type="exportType" :tables="[datasourceStore.table]" />
+      <copy-tables-dialog v-model="showCopyData" :tables="[datasourceStore.table]" />
+      <copy-view-dialog v-model="showCopyView" :table="datasourceStore.table" :view="datasourceStore.view" />
+      <edit-table-dialog
+        v-model="showEdit"
+        :table="datasourceStore.table"
+        :view="datasourceStore.view"
+        @update:table="onTableUpdate"
+        @update:view="onViewUpdate"
+      />
+      <resource-view-dialog
+        v-if="isResourceView"
+        v-model="showEditResourceView"
+        :view="datasourceStore.view"
+        @update="onViewUpdate"
+      />
+      <confirm-dialog
+        v-model="showDelete"
+        :title="$t('delete')"
+        :text="$t('delete_tables_confirm', { count: 1 })"
+        @confirm="onDeleteTable"
+      />
     </q-page>
   </div>
 </template>
@@ -284,8 +321,7 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     {
       field: 'name',
       label: 'full_name',
-      html: (val) =>
-        val ? `<code>${val.datasourceName}.${val.name}</code>` : '',
+      html: (val) => (val ? `<code>${val.datasourceName}.${val.name}</code>` : ''),
     },
     {
       field: 'entityType',
@@ -294,12 +330,15 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     {
       field: 'from',
       label: isTablesView.value ? 'table_references' : 'resource_ref.label',
-      links: (val) => (val ? datasourceStore.view.from?.map((f) => {
-        return {
-          label: f,
-          to: `/project/${f.split('.')[0]}/${isTablesView.value ? 'table' : 'resource'}/${f.split('.')[1]}`
-        };
-      }) : []),
+      links: (val) =>
+        val
+          ? datasourceStore.view.from?.map((f) => {
+              return {
+                label: f,
+                to: `/project/${f.split('.')[0]}/${isTablesView.value ? 'table' : 'resource'}/${f.split('.')[1]}`,
+              };
+            })
+          : [],
       visible: () => isView.value,
     },
     {
@@ -307,7 +346,7 @@ const items1: FieldItem<TableDto>[] = computed(() => {
       label: 'resource_ref.id_column',
       format: () => datasourceStore.view['Magma.ResourceViewDto.view']?.idColumn || '',
       visible: () => isResourceView.value,
-    }
+    },
   ];
 });
 
@@ -332,7 +371,8 @@ watch([dsName, tName], () => {
 });
 
 function init() {
-  datasourceStore.initDatasourceTable(dsName.value, tName.value)
+  datasourceStore
+    .initDatasourceTable(dsName.value, tName.value)
     .then(() => {
       if (!datasourceStore.perms.tableValueSets?.canRead() && ['entity_filter', 'values'].includes(tab.value)) {
         tab.value = 'dictionary';
@@ -343,8 +383,7 @@ function init() {
     })
     .catch((err) => {
       notifyError(err);
-      if (err.response?.status === 404)
-        router.push(`/project/${dsName.value}/tables`);
+      if (err.response?.status === 404) router.push(`/project/${dsName.value}/tables`);
     });
 }
 
@@ -368,7 +407,7 @@ function onShowEdit() {
   if (isResourceView.value) {
     showEditResourceView.value = true;
   } else {
-    datasourceStore.initDatasourceTables(dsName.value).then(() => showEdit.value = true);
+    datasourceStore.initDatasourceTables(dsName.value).then(() => (showEdit.value = true));
   }
 }
 
@@ -394,10 +433,9 @@ function onViewUpdate(updated: ViewDto) {
 
 function onReconnect() {
   loading.value = true;
-  datasourceStore.reconnectView(dsName.value, tName.value)
-    .finally(() => {
-      datasourceStore.loadTable(tName.value).finally(() => loading.value = false);
-    });
+  datasourceStore.reconnectView(dsName.value, tName.value).finally(() => {
+    datasourceStore.loadTable(tName.value).finally(() => (loading.value = false));
+  });
 }
 
 function onShowExportFile() {
@@ -409,5 +447,4 @@ function onShowExportDatabase() {
   exportType.value = 'database';
   showExport.value = true;
 }
-
 </script>

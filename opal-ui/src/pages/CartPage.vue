@@ -33,12 +33,7 @@
                 size="sm"
                 @click="onShowAddToView"
               />
-              <q-btn-dropdown
-                :label="$t('annotate')"
-                icon="label"
-                color="secondary"
-                no-caps
-                size="sm">
+              <q-btn-dropdown :label="$t('annotate')" icon="label" color="secondary" no-caps size="sm">
                 <q-list>
                   <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
                     <q-item-section>
@@ -52,14 +47,7 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              <q-btn
-                color="secondary"
-                icon="refresh"
-                :title="$t('refresh')"
-                outline
-                size="sm"
-                @click="onRefresh"
-              />
+              <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="onRefresh" />
               <q-btn
                 :disable="selected.length === 0"
                 :title="$t('remove_from_cart')"
@@ -72,13 +60,7 @@
           </div>
         </template>
         <template v-slot:top-right>
-          <q-input
-            dense
-            clearable
-            debounce="400"
-            color="primary"
-            v-model="filter"
-          >
+          <q-input dense clearable debounce="400" color="primary" v-model="filter">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
@@ -86,7 +68,11 @@
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
-            <router-link :to="`${getTableRoute(props.row.parentLink.link)}/variable/${props.value}`" class="text-primary">{{ props.value }}</router-link>
+            <router-link
+              :to="`${getTableRoute(props.row.parentLink.link)}/variable/${props.value}`"
+              class="text-primary"
+              >{{ props.value }}</router-link
+            >
           </q-td>
         </template>
         <template v-slot:body-cell-valueType="props">
@@ -97,27 +83,22 @@
         <template v-slot:body-cell-label="props">
           <q-td :props="props">
             <div v-for="attr in getLabels(props.value)" :key="attr.locale">
-              <q-badge
-                v-if="attr.locale"
-                color="grey-6"
-                :label="attr.locale"
-                class="on-left"
-              />
+              <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
               <span>{{ attr.value }}</span>
             </div>
           </q-td>
         </template>
         <template v-slot:body-cell-table="props">
           <q-td :props="props">
-            <router-link :to="getTableRoute(props.value.link)" class="text-primary">{{ getTableName(props.value.link) }}</router-link>
+            <router-link :to="getTableRoute(props.value.link)" class="text-primary">{{
+              getTableName(props.value.link)
+            }}</router-link>
           </q-td>
         </template>
         <template v-slot:body-cell-annotations="props">
           <q-td :props="props">
-
             <template v-for="annotation in taxonomiesStore.getAnnotations(props.value, true)" :key="annotation.id">
-              <q-chip
-                class="on-left">
+              <q-chip class="on-left">
                 {{ taxonomiesStore.getLabel(annotation.term.title, locale) }}
                 <q-tooltip>
                   <annotation-panel :annotation="annotation" max-width="400px" class="bg-grey-7" />
@@ -128,14 +109,13 @@
         </template>
       </q-table>
       <div v-else class="text-hint">
-          {{ $t('empty_cart') }}
+        {{ $t('empty_cart') }}
       </div>
       <add-to-view-dialog v-model="showAddToView" :variables="selected" />
       <annotate-dialog v-model="showAnnotate" :variables="selected" :operation="annotationOperation" />
     </q-page>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { VariableDto } from 'src/models/Magma';
@@ -210,7 +190,7 @@ const rows = computed(() => {
 
 onMounted(() => {
   loading.value = true;
-  cartStore.refresh().finally(() => loading.value = false);
+  cartStore.refresh().finally(() => (loading.value = false));
 });
 
 function getTableRoute(link: string) {
@@ -251,6 +231,6 @@ function onShowDeleteAnnotation() {
 
 function onRefresh() {
   loading.value = true;
-  cartStore.refresh().finally(() => loading.value = false);
+  cartStore.refresh().finally(() => (loading.value = false));
 }
 </script>

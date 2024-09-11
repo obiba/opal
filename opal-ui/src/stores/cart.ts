@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { VariableDto } from 'src/models/Magma';
 
-export const useCartStore = defineStore('cart',
+export const useCartStore = defineStore(
+  'cart',
   () => {
     const variables = ref([] as VariableDto[]);
 
@@ -13,14 +14,20 @@ export const useCartStore = defineStore('cart',
     async function refresh() {
       if (variables.value.length === 0) return;
       // verify that variables in the cart still exist, are accessible and up to date
-      await Promise.all(variables.value.map((v, i) => api.get(`${v.parentLink?.link}/variable/${v.name}`)
-        .then((response) => {
-          // replace the variable in the cart with the updated version
-          variables.value[i] = response.data;
-        }).catch(() => {
-          // remove the variable from the cart if it no longer exists
-          variables.value[i] = {} as VariableDto;
-        })));
+      await Promise.all(
+        variables.value.map((v, i) =>
+          api
+            .get(`${v.parentLink?.link}/variable/${v.name}`)
+            .then((response) => {
+              // replace the variable in the cart with the updated version
+              variables.value[i] = response.data;
+            })
+            .catch(() => {
+              // remove the variable from the cart if it no longer exists
+              variables.value[i] = {} as VariableDto;
+            })
+        )
+      );
       variables.value = variables.value.filter((v) => v.parentLink !== undefined);
     }
 
@@ -47,5 +54,5 @@ export const useCartStore = defineStore('cart',
       isInCart,
     };
   },
-  { persist: true },
+  { persist: true }
 );

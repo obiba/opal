@@ -18,10 +18,7 @@
       <div class="text-help q-mb-md">{{ $t('r.workspaces_info') }}</div>
       <r-workspaces />
       <div class="text-h5 q-mb-md">{{ $t('permissions') }}</div>
-      <access-control-list
-        resource="/system/permissions/r"
-        :options="['R_USE']"
-      />
+      <access-control-list resource="/system/permissions/r" :options="['R_USE']" />
     </q-page>
   </div>
 </template>

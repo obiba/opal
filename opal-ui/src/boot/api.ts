@@ -9,7 +9,7 @@ declare module '@vue/runtime-core' {
 }
 
 // context path detection
-const locationContextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/',2));
+const locationContextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 2));
 
 const baseUrl = process.env.API.startsWith('/') ? locationContextPath + process.env.API : process.env.API;
 const contextPath = locationContextPath || '/';
@@ -22,8 +22,7 @@ const api = axios.create({
 });
 
 function requiresCode(response: AxiosResponse): boolean {
-  if (response && response.status === 401)
-    return response.headers['www-authenticate'] === 'X-Opal-TOTP';
+  if (response && response.status === 401) return response.headers['www-authenticate'] === 'X-Opal-TOTP';
   return false;
 }
 

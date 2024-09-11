@@ -6,19 +6,18 @@
         size="sm"
         toggle-color="secondary"
         :options="[
-          {label: $t('frequency'), value: 'freq'},
-          {label: $t('density'), value: 'density'},
+          { label: $t('frequency'), value: 'freq' },
+          { label: $t('density'), value: 'density' },
         ]"
       />
-      <q-badge color="positive" :label="`N:  ${data.summary?.n || 0}`"
-        class="on-right"/>
+      <q-badge color="positive" :label="`N:  ${data.summary?.n || 0}`" class="on-right" />
     </div>
     <div class="row q-mt-md">
       <div v-if="hasIntervalFrequencies">
-        <vue-plotly :data="histoChartData" :layout="histoLayout" :config="config"/>
+        <vue-plotly :data="histoChartData" :layout="histoLayout" :config="config" />
       </div>
       <div v-if="hasNormal">
-        <vue-plotly :data="normalChartData" :layout="normalLayout" :config="config"/>
+        <vue-plotly :data="normalChartData" :layout="normalLayout" :config="config" />
       </div>
     </div>
     <div class="row q-col-gutter-md">
@@ -28,14 +27,12 @@
           :nonMissingFreq="nonMissingFreq"
           :missingFreq="missingFreq"
           :totalFreq="totalFreq"
-          :totalPct="totalPct" />
+          :totalPct="totalPct"
+        />
       </div>
       <div class="col-md-6 col-xs-12">
         <div class="text-bold q-mb-md">{{ $t('descriptive_statistics') }}</div>
-        <fields-list
-            :items="items"
-            :dbobject="data.summary"
-          />
+        <fields-list :items="items" :dbobject="data.summary" />
       </div>
     </div>
   </div>
@@ -90,7 +87,9 @@ const intervalFrequencies = computed(() => {
   return freqs;
 });
 
-const hasIntervalFrequencies = computed(() => intervalFrequencies.value.filter((f: IntervalFrequencyDto) => f.freq>0).length > 0);
+const hasIntervalFrequencies = computed(
+  () => intervalFrequencies.value.filter((f: IntervalFrequencyDto) => f.freq > 0).length > 0
+);
 
 const histoLayout = computed(() => {
   if (!props.data) return {};
@@ -109,15 +108,17 @@ const histoLayout = computed(() => {
       r: 80, // right margin
       t: 50, // top margin
       b: 100, // bottom margin
-      pad: 4 // padding around the plot area
-    }
-  }
+      pad: 4, // padding around the plot area
+    },
+  };
 });
 
 const histoChartData = computed(() => {
   if (!props.data) return [];
-  const labels = intervalFrequencies.value.map((f: IntervalFrequencyDto) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`);
-  const values = intervalFrequencies.value.map((f: IntervalFrequencyDto) => isFreq.value ? f.freq : f.density * 100);
+  const labels = intervalFrequencies.value.map(
+    (f: IntervalFrequencyDto) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`
+  );
+  const values = intervalFrequencies.value.map((f: IntervalFrequencyDto) => (isFreq.value ? f.freq : f.density * 100));
 
   return [
     {
@@ -145,9 +146,9 @@ const normalLayout = computed(() => {
       r: 80, // right margin
       t: 50, // top margin
       b: 100, // bottom margin
-      pad: 4 // padding around the plot area
-    }
-  }
+      pad: 4, // padding around the plot area
+    },
+  };
 });
 
 const normalChartData = computed(() => {
@@ -159,7 +160,7 @@ const normalChartData = computed(() => {
       mode: 'lines+markers',
       x: [min, max],
       y: [min, max],
-      name: t('normal')
+      name: t('normal'),
     },
     {
       mode: 'markers',
@@ -167,7 +168,7 @@ const normalChartData = computed(() => {
       y: props.data.distributionPercentiles,
       name: t('sample'),
       marker: {
-        size: 8
+        size: 8,
       },
     },
   ];

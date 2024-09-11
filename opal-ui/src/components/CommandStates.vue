@@ -35,7 +35,7 @@
             <span class="text-primary">{{ props.row.id }}</span>
           </q-td>
           <q-td key="name" :props="props">
-            <q-badge :label="props.row.name"/>
+            <q-badge :label="props.row.name" />
             <div class="float-right">
               <q-btn
                 rounded
@@ -46,7 +46,8 @@
                 :title="$t('messages')"
                 :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
                 @click="onShowMessages(props.row)"
-                class="on-right" />
+                class="on-right"
+              />
               <q-btn
                 v-if="isDeletable(props.row)"
                 rounded
@@ -57,7 +58,8 @@
                 :title="$t('delete')"
                 :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
                 class="q-ml-xs"
-                @click="onClear(props.row)" />
+                @click="onClear(props.row)"
+              />
               <q-btn
                 v-if="isCancelable(props.row)"
                 rounded
@@ -68,14 +70,14 @@
                 :title="$t('cancel')"
                 :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
                 class="q-ml-xs"
-                @click="onCancel(props.row)" />
+                @click="onCancel(props.row)"
+              />
             </div>
           </q-td>
 
           <q-td key="project" :props="props">
-            <router-link
-              v-if="props.row.project"
-              :to="`/project/${props.row.project}`">{{ props.row.project }}
+            <router-link v-if="props.row.project" :to="`/project/${props.row.project}`"
+              >{{ props.row.project }}
             </router-link>
           </q-td>
 
@@ -118,32 +120,25 @@
     <q-dialog v-model="showMessages">
       <q-card flat class="dialog-md">
         <q-card-section align="right" class="q-pb-none">
-          <q-btn
-            flat
-            round
-            dense
-            icon="close"
-            v-close-popup
-          />
+          <q-btn flat round dense icon="close" v-close-popup />
         </q-card-section>
         <q-card-section class="q-pt-none">
           <q-list separator dense>
             <q-item>
-              <q-item-section style="max-width: 200px;">
+              <q-item-section style="max-width: 200px">
                 <q-item-label class="text-bold">{{ $t('date') }}</q-item-label>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-bold">{{  $t('message') }}</q-item-label>
+                <q-item-label class="text-bold">{{ $t('message') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item v-for="message in selected?.messages" :key="message.timestamp">
-              <q-item-section style="max-width: 200px;">
+              <q-item-section style="max-width: 200px">
                 <q-item-label class="text-caption">{{ getDateLabel(message.timestamp) }}</q-item-label>
               </q-item-section>
               <q-item-section>
                 <q-item-label>
-                  <div v-html="message.msg.replace('\n', '<br/>')">
-                  </div>
+                  <div v-html="message.msg.replace('\n', '<br/>')"></div>
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -170,7 +165,7 @@ interface CommandStatesProps {
 }
 
 const props = defineProps<CommandStatesProps>();
-const emit = defineEmits(['refresh', 'clear', 'cancel'])
+const emit = defineEmits(['refresh', 'clear', 'cancel']);
 
 const { t } = useI18n();
 
@@ -243,21 +238,24 @@ const columns = computed(() => {
     });
   }
   cols.push({
-      name: 'status',
-      required: false,
-      label: t('status'),
-      align: 'left',
-      field: 'status',
-      sortable: true,
-    });
+    name: 'status',
+    required: false,
+    label: t('status'),
+    align: 'left',
+    field: 'status',
+    sortable: true,
+  });
   return cols;
 });
 
-const rows = computed(() => props.commands ? props.commands : []);
+const rows = computed(() => (props.commands ? props.commands : []));
 
-watch(() => props.commands, () => {
-  loading.value = false;
-});
+watch(
+  () => props.commands,
+  () => {
+    loading.value = false;
+  }
+);
 
 function isDeletable(row: CommandStateDto) {
   return row.status !== CommandStateDto_Status.IN_PROGRESS && row.status !== CommandStateDto_Status.CANCEL_PENDING;

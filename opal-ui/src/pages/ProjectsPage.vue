@@ -41,15 +41,9 @@
             :label="$t('tags')"
             @update:model-value="onTabChange"
             class="on-left"
-            style="min-width: 200px;"
+            style="min-width: 200px"
           />
-          <q-input
-            dense
-            clearable
-            debounce="400"
-            color="primary"
-            v-model="filter"
-          >
+          <q-input dense clearable debounce="400" color="primary" v-model="filter">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
@@ -111,7 +105,7 @@ const columns = computed(() => [
     sortable: true,
     headerStyle: 'width: 20%; white-space: normal;',
     style: 'width: 20%; white-space: normal;',
-    columnSortOrder: 'ad'
+    columnSortOrder: 'ad',
   },
   {
     name: 'title',
@@ -149,7 +143,6 @@ const columns = computed(() => [
     field: 'datasourceStatus',
     headerStyle: 'width: 5%; white-space: normal;',
     style: 'width: 5%; white-space: normal;',
-
   },
 ]);
 
