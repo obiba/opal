@@ -118,7 +118,7 @@
 
     <!-- maven plugins -->
     <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
-    <github-release-plugin.version>1.2.0</github-release-plugin.version>
+    <github-release-plugin.version>1.6.0</github-release-plugin.version>
     <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
     <maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
     <maven-build-helper-plugin.version>1.8</maven-build-helper-plugin.version>
