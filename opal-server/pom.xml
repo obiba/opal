@@ -237,11 +237,11 @@
                       </sources>
                     </mapping>
                     <mapping>
-                      <directory>${opal.dir}/tools/lib</directory>
+                      <directory>${opal.dir}/tools/hasher/lib</directory>
                       <filemode>755</filemode>
                       <sources>
                         <source>
-                          <location>${dist.location}/tools/lib</location>
+                          <location>${dist.location}/tools/hasher/lib</location>
                         </source>
                       </sources>
                     </mapping>
