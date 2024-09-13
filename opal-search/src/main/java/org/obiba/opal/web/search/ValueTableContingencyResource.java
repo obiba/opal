@@ -10,12 +10,14 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.service.ContingencyService;
-import org.obiba.opal.search.service.SearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,7 @@ public class ValueTableContingencyResource {
 
   @GET
   @Transactional(readOnly = true)
-  public Response getFacets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) throws SearchException {
+  public Response getFacets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) {
     if (Strings.isNullOrEmpty(crossVar0) || Strings.isNullOrEmpty(crossVar1))
       return Response.status(Response.Status.BAD_REQUEST).build();
     log.info("Contingency table: {} x {}", crossVar0, crossVar1);
