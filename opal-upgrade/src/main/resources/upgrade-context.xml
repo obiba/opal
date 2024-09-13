@@ -28,8 +28,6 @@
 
   <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>
 
-  <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>
-
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
   <bean id="orientDbService" class="org.obiba.opal.core.service.OrientDbServiceImpl"/>
@@ -84,16 +82,6 @@
     <property name="installSteps">
       <list>
         <bean class="org.obiba.opal.core.install.SetOpalVersionInstallStep"/>
-        <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
-          <property name="upgradeStep">
-            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-              <property name="description" value="Install Quartz Schema."/>
-              <property name="dataSource" ref="configDataSource"/>
-              <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
-              <property name="scriptBasename" value="tables"/>
-            </bean>
-          </property>
-        </bean>
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
         <bean class="org.obiba.opal.core.install.DefaultPluginsInstallStep"/>
         <bean class="org.obiba.opal.core.install.DefaultPermissionsInstallStep">
