@@ -63,9 +63,6 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private String guessValidationQuery() {
     switch(driverClass) {
-      case "org.hsqldb.jdbcDriver":
-      case "org.hsqldb.jdbc.JDBCDriver":
-        return "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS";
       case "oracle.jdbc.driver.OracleDriver":
         return "select 1 from dual";
       case "com.ibm.db2.jcc.DB2Driver":
