@@ -135,6 +135,7 @@ public class ContingencyService {
       totalFacetBuilder.addAllFrequencies(totalFreq.keySet().stream()
           .map((cat1) -> Search.FacetResultDto.TermFrequencyResultDto.newBuilder().setTerm(cat1).setCount(totalFreq.get(cat1)).build())
           .toList());
+      totalFacetBuilder.addFilters(Search.FacetResultDto.FilterResultDto.newBuilder().setCount(totalHits));
       builder.addFacets(totalFacetBuilder);
       builder.setTotalHits(totalHits);
       return builder.build();
@@ -204,6 +205,7 @@ public class ContingencyService {
             .setVariance(row.getFloat(7))
             .setStdDeviation(row.getFloat(8));
         facetBuilder.setStatistics(statsBuilder);
+        facetBuilder.addFilters(Search.FacetResultDto.FilterResultDto.newBuilder().setCount(count));
         builder.addFacets(facetBuilder);
         totalHits = totalHits + count;
       }
@@ -211,8 +213,8 @@ public class ContingencyService {
       result = readJSONObject(outputTotal);
       rows = result.getJSONArray("rows");
       JSONArray row = rows.getJSONArray(0);
-      Search.FacetResultDto.Builder facetBuilder = Search.FacetResultDto.newBuilder();
-      facetBuilder.setFacet("_total");
+      Search.FacetResultDto.Builder totalFacetBuilder = Search.FacetResultDto.newBuilder();
+      totalFacetBuilder.setFacet("_total");
       Search.FacetResultDto.StatisticalResultDto.Builder statsBuilder = Search.FacetResultDto.StatisticalResultDto.newBuilder();
       statsBuilder
           .setCount(row.getInt(0))
@@ -223,8 +225,9 @@ public class ContingencyService {
           .setSumOfSquares(row.getFloat(5))
           .setVariance(row.getFloat(6))
           .setStdDeviation(row.getFloat(7));
-      facetBuilder.setStatistics(statsBuilder);
-      builder.addFacets(facetBuilder);
+      totalFacetBuilder.setStatistics(statsBuilder);
+      totalFacetBuilder.addFilters(Search.FacetResultDto.FilterResultDto.newBuilder().setCount(totalHits));
+      builder.addFacets(totalFacetBuilder);
 
       builder.setTotalHits(totalHits);
       return builder.build();
