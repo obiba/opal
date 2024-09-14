@@ -18,6 +18,7 @@
     "axios": "^1.7.4",
     "date-fns": "^3.6.0",
     "diff2html": "^3.4.48",
+    "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.0.0",
     "plotly.js-dist": "^2.32.0",

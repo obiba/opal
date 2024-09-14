@@ -41,7 +41,6 @@
           icon="play_arrow"
           :disable="sql.trim().length === 0"
           @click="onExecute"
-          class="q-mb-md"
         />
         <q-btn
           v-if="rows"
@@ -51,13 +50,23 @@
           :title="$t('clear')"
           size="sm"
           @click="onClear"
-          class="on-right q-mb-md"
+          class="on-right"
+        />
+        <q-btn
+          v-if="rows"
+          color="secondary"
+          icon="file_download"
+          :label="$t('download')"
+          size="sm"
+          @click="onDownload"
+          class="on-right"
         />
         <div v-if="loading">
-          <q-spinner-dots size="md" />
+          <q-spinner-dots size="md" class="q-mt-md" />
         </div>
-        <div v-else>
-          <q-table v-if="rows" :rows="rows" row-key="_id" flat>
+        <div v-else class="q-mt-md">
+          <q-table v-if="rows" :rows="rows" row-key="_id" flat
+          table-header-style="background-color: #efefef">
             <template v-slot:header-cell="props">
               <q-th :props="props">
                 {{ props.col.name }}
@@ -105,6 +114,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { SqlCommand, SqlResults } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
+import Papa from 'papaparse';
 const sql = ref('');
 
 const sqlStore = useSqlStore();
@@ -173,5 +183,21 @@ function onExecute() {
 
 function onClear() {
   results.value = null;
+}
+
+function onDownload() {
+  if (results.value) {
+    const csv = Papa.unparse({
+      fields: results.value.columns,
+      data: results.value.rows,
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 }
 </script>
