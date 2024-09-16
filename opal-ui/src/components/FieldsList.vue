@@ -1,5 +1,5 @@
 <template>
-  <q-list v-if="dbobject" separator dense>
+  <q-list v-if="dbobject" separator dense class="fields-list">
     <!-- Makes a re-render when locale changes. For example, getDateLabel does not account for locale change hence this trick -->
     <template v-if="locale"></template>
 

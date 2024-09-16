@@ -17,6 +17,27 @@ p:last-of-type {
   padding: 1em 0 1em 0;
 }
 
+.q-table {
+  th {
+    background-color: $blue-grey-1;
+  }
+  tr:nth-child(even) {
+    background-color: $grey-2;
+  }
+  tr:nth-child(odd) {
+    background-color: white;
+  }
+}
+
+.fields-list {
+  .q-item:nth-child(even) {
+   background-color: $grey-2;
+ }
+ .q-item:nth-child(odd) {
+   background-color: white;
+ }
+}
+
 code {
   color: crimson;
   background-color: #f7f7f9;

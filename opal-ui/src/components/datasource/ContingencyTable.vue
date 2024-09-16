@@ -115,7 +115,7 @@
             </th>
           </tr>
           <tr>
-            <th v-for="cat in variableCatCategories" :key="cat.name" class="bg-grey-2">
+            <th v-for="cat in variableCatCategories" :key="cat.name" class="bg-grey-1">
               <div class="text-bold">{{ cat.name }}</div>
               <div v-for="attr in getLabels(cat.attributes)" :key="attr.locale" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
