@@ -239,6 +239,7 @@ const columns = computed(() => [
     label: t('entity_type'),
     align: 'left',
     field: 'entityType',
+    sortable: true,
   },
   {
     name: 'variableCount',
@@ -246,6 +247,7 @@ const columns = computed(() => [
     label: t('variables'),
     align: 'left',
     field: 'variableCount',
+    sortable: true,
   },
   {
     name: 'valueSetCount',
@@ -253,14 +255,16 @@ const columns = computed(() => [
     label: t('entities'),
     align: 'left',
     field: 'valueSetCount',
+    sortable: true,
   },
   {
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
     align: 'left',
-    field: 'timestamps',
-    format: (val: TimestampsDto) => getDateLabel(val.lastUpdate),
+    sortable: true,
+    field: (row: TableDto) => (row.timestamps || {}).lastUpdate,
+    format: (val: string) => getDateLabel(val),
   },
   {
     name: 'status',
