@@ -91,6 +91,7 @@
 
           <q-td key="endTime" :props="props">
             {{ getDateLabel(props.row.endTime) }}
+            <span class="text-help">({{ getDatesDistanceLabel(props.row.startTime, props.row.endTime, false) }})</span>
           </q-td>
 
           <q-td key="status" :props="props">
@@ -157,7 +158,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
-import { getDateLabel } from 'src/utils/dates';
+import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
 
 interface CommandStatesProps {
   commands: CommandStateDto[];

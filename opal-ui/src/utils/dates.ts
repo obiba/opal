@@ -1,5 +1,5 @@
 import { getCurrentLocale } from 'src/boot/i18n';
-import { parseISO, formatDistanceStrict } from 'date-fns';
+import { parseISO, formatDistanceStrict, differenceInMinutes, add } from 'date-fns';
 
 import { enUS as en } from 'date-fns/locale/en-US';
 import { fr } from 'date-fns/locale/fr';
@@ -21,11 +21,16 @@ export function getDateLabel(date: string | number | undefined) {
 
 export function getDateDistanceLabel(date: string | number | undefined) {
   const now = new Date();
+  return getDatesDistanceLabel(date, now.getTime());
+}
+
+export function getDatesDistanceLabel(date1: string | number | undefined, date2: string | number | undefined, addSuffix = true) {
   const locale = getCurrentLocale();
-  const localeDate = getDate(date);
-  return localeDate
-    ? formatDistanceStrict(localeDate, now, {
-        addSuffix: true,
+  const localeDate1 = getDate(date1);
+  const localeDate2 = getDate(date2) || new Date();
+  return localeDate1
+    ? formatDistanceStrict(localeDate1, localeDate2, {
+        addSuffix,
         locale: locale === 'fr' ? fr : en,
       })
     : '-';
