@@ -1,9 +1,20 @@
 <template>
   <div v-if="rStore.clusters.length">
-    <div class="row q-col-gutter-md">
-      <q-select v-model="tab" :options="clusterNames" :label="$t('r.cluster')" dense outlined class="text-grey" />
-      <div class="q-mt-sm text-help">{{ $t('r.clusters_count', { count: clusterNames.length }) }}</div>
-    </div>
+    <q-toolbar>
+      <q-select v-model="tab" :options="clusterNames" :label="$t('r.cluster')" dense outlined size="sm" class="text-grey" />
+      <div class="text-help on-right">{{ $t('r.clusters_count', { count: clusterNames.length }) }}</div>
+      <q-space />
+      <q-btn
+        outline
+        color="secondary"
+        icon="cleaning_services"
+        :label="$t('cache')"
+        :title="$t('r.clear_cache')"
+        size="sm"
+        class="on-right"
+        @click="onClearCache()"
+      />
+    </q-toolbar>
     <q-tab-panels v-model="tab">
       <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
         <r-cluster :cluster="cluster" />
@@ -36,4 +47,8 @@ watch(
 );
 
 const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
+
+function onClearCache() {
+  rStore.clearRCache();
+}
 </script>

@@ -577,6 +577,7 @@ export default {
     version: 'Version R',
     workspaces_info: "Stockage des espaces de travail R : chaque espace de travail R/DataSHIELD enregistré contient l'image et les fichiers de la session (le cas échéant). Ceux-ci peuvent être restaurés autant de fois que nécessaire à la demande de l'utilisateur.",
     workspaces: 'Espaces de travail R',
+    clear_cache: 'Vider le cache R',
   },
   resource_ref: {
     label: 'Ressource référencée',
@@ -794,6 +795,7 @@ export default {
   bookmarks: 'Favoris',
   built: 'Built',
   busy: 'Occupé',
+  cache: 'Cache',
   cancel_task_confirm: 'Êtes-vous sûr de vouloir annuler cette tâche ?',
   cancel: 'Annuler',
   cart: 'Panier',

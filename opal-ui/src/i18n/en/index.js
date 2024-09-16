@@ -577,6 +577,7 @@ export default {
     version: 'R version',
     workspaces_info: "R workspaces storage: each saved R/DataSHIELD workspace contains the session's image and files (if any). These can be restored any number of times on user demand.",
     workspaces: 'R workspaces',
+    clear_cache: 'Clear R cache',
   },
   resource_ref: {
     label: 'Resource reference',
@@ -794,6 +795,7 @@ export default {
   bookmarks: 'Favorites',
   built: 'Built',
   busy: 'Busy',
+  cache: 'Cache',
   cancel_task_confirm: 'Are you sure you want to cancel this task?',
   cancel: 'Cancel',
   cart: 'Cart',

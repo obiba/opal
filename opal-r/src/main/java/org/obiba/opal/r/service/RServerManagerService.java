@@ -246,7 +246,6 @@ public class RServerManagerService implements Service {
     }
     running = false;
     eventBus.post(new RServiceStoppedEvent(getName()));
-    evictTableCaches();
   }
 
   @Override
@@ -257,6 +256,10 @@ public class RServerManagerService implements Service {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return null;
+  }
+
+  public void evictCache() {
+    evictTableCaches();
   }
 
   //

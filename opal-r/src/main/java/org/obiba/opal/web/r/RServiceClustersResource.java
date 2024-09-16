@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +39,12 @@ public class RServiceClustersResource {
         .map(Dtos::asDto)
         .sorted(Comparator.comparing(OpalR.RServerClusterDto::getName))
         .collect(Collectors.toList());
+  }
+
+  @DELETE
+  @Path("/cache")
+  public Response evictCache() {
+    rServerManagerService.evictCache();
+    return Response.ok().build();
   }
 }

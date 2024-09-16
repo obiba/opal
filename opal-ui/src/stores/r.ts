@@ -17,6 +17,10 @@ export const useRStore = defineStore('r', () => {
     return Promise.all([initClusters(), initSessions(), initWorkspaces()]);
   }
 
+  async function clearRCache() {
+    return api.delete('/service/r/clusters/cache');
+  }
+
   async function initClusters() {
     return api.get('/service/r/clusters').then((response) => {
       if (response.status === 200) {
@@ -118,6 +122,7 @@ export const useRStore = defineStore('r', () => {
     workspaces,
     reset,
     initR,
+    clearRCache,
     getRPackages,
     startRServer,
     stopRServer,
