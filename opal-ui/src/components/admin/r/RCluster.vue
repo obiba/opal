@@ -7,16 +7,6 @@
     <q-separator />
     <q-tab-panels v-model="tab">
       <q-tab-panel name="servers">
-        <div class="row">
-          <q-btn
-            v-if="cluster.servers.length"
-            color="primary"
-            :label="$t('download_logs')"
-            icon="download"
-            size="sm"
-            @click="onClusterLogsDownload"
-          />
-        </div>
         <q-table
           flat
           :rows="cluster.servers"
@@ -25,6 +15,16 @@
           :rows-per-page-options="[0]"
           hide-pagination
         >
+          <template v-slot:top-left>
+            <q-btn
+              v-if="cluster.servers.length"
+              color="primary"
+              :label="$t('download_logs')"
+              icon="download"
+              size="sm"
+              @click="onClusterLogsDownload"
+            />
+          </template>
           <template v-slot:body-cell-name="props">
             <q-td :props="props">
               <span class="text-primary">{{ props.row.app.name }}</span>
