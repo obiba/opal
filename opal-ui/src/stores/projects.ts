@@ -36,6 +36,9 @@ interface ProjectPerms {
   vcfs: Perms | undefined;
   import_vcf: Perms | undefined;
   export_vcf: Perms | undefined;
+
+  analyses: Perms | undefined;
+  anayses_export: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -117,11 +120,23 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.vcfstore = new Perms(response);
           return response;
         }),
+
         api.options(`/project/${project.value.name}`).then((response) => {
           perms.value.project = new Perms(response);
           return response;
         }),
       ]);
+    });
+  }
+
+  async function loadAnalysesPermissions(name: string) {
+    return Promise.all([
+
+      api.options(`/project/${name}/analyses`),
+      api.options(`/project/${name}/analyses_export`),
+    ]).then(([analyses, analyses_export]) => {
+      perms.value.analyses = new Perms(analyses);
+      perms.value.vcfs = new Perms(analyses_export);
     });
   }
 
@@ -368,6 +383,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadAcls,
     loadSubjects,
     loadVcfPermissions,
+    loadAnalysesPermissions,
     deleteSubject,
     getSubjectPermissions,
     deleteSubjectPermission,

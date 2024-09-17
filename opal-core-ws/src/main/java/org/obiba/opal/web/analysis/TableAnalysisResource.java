@@ -11,6 +11,10 @@
 package org.obiba.opal.web.analysis;
 
 import com.google.common.collect.Lists;
+import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.*;
@@ -25,10 +29,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import jakarta.activation.MimetypesFileTypeMap;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 import java.io.BufferedOutputStream;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -54,6 +54,12 @@ public class TableAnalysisResource {
     this.analysisService = analysisService;
     this.analysisResultService = analysisResultService;
     this.analysisExportService = analysisExportService;
+  }
+
+  @OPTIONS
+  @Path("/analyses")
+  public Response getAnalysesOptions() {
+    return Response.ok().build();
   }
 
   @GET

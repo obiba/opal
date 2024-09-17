@@ -288,6 +288,7 @@ const route = useRoute();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
+const pluginsStore = usePluginsStore();
 
 const tab = ref('dictionary');
 const showDelete = ref(false);
