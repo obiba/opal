@@ -154,6 +154,7 @@
             v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"
           />
           <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
+          <q-tab name="analyses" :label="$t('anaylses')" v-if="canAnalyseValidate" />
           <q-tab
             name="permissions"
             :label="$t('permissions')"
@@ -229,6 +230,14 @@
             </div>
           </q-tab-panel>
 
+          <q-tab-panel name="analyses" v-if="canAnalyseValidate">
+            <project-anaylse-validate
+              :project-name="dsName"
+              :table-name="tName"
+              :analysis-packages="pluginsStore.analysisPlugins.packages"
+            />
+          </q-tab-panel>
+
           <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}`"
@@ -279,6 +288,7 @@ import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue'
 import TableIndexer from 'src/components/datasource/TableIndexer.vue';
 import ContingencyTable from 'src/components/datasource/ContingencyTable.vue';
 import ViewWhereScript from 'src/components/datasource/ViewWhereScript.vue';
+import ProjectAnaylseValidate from 'src/components/project/ProjectAnaylseValidate.vue';
 import { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -303,6 +313,7 @@ const exportType = ref<'file' | 'server' | 'database'>('file');
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
 const isResourceView = computed(() => datasourceStore.table.viewType === 'ResourceView');
+const canAnalyseValidate = computed(() => projectsStore.perms.analyses?.canRead());
 
 const previousTable = computed(() => {
   const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);
@@ -450,4 +461,13 @@ function onShowExportDatabase() {
   exportType.value = 'database';
   showExport.value = true;
 }
+
+onMounted(() => {
+  console.log('ProjectTablePage mounted');
+  pluginsStore.initAnalysisPlugins().then(() => {
+    if (!!pluginsStore.analysisPlugins.packages) {
+      projectsStore.loadAnalysesPermissions(dsName.value, tName.value);
+    }
+  });
+});
 </script>

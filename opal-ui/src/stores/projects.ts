@@ -18,6 +18,7 @@ import {
   RestoreCommandOptionsDto,
   ImportVCFCommandOptionsDto,
   ExportVCFCommandOptionsDto,
+  AnalyseCommandOptionsDto,
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 import { VCFSamplesMappingDto } from 'src/models/Plugins';
@@ -129,11 +130,10 @@ export const useProjectsStore = defineStore('projects', () => {
     });
   }
 
-  async function loadAnalysesPermissions(name: string) {
+  async function loadAnalysesPermissions(name: string, tableName: string) {
     return Promise.all([
-
-      api.options(`/project/${name}/analyses`),
-      api.options(`/project/${name}/analyses_export`),
+      api.options(`/project/${name}/table/${tableName}/analyses`),
+      api.options(`/project/${name}/table/${tableName}/analyses_export`),
     ]).then(([analyses, analyses_export]) => {
       perms.value.analyses = new Perms(analyses);
       perms.value.vcfs = new Perms(analyses_export);
@@ -364,6 +364,18 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/keystore/${alias}`);
   }
 
+  async function getAnalyses(name: string, table: string) {
+    return api.get(`/project/${name}/table/${name}/analyses`).then((response) => response.data);
+  }
+
+  async function runAnalysis(name: string, analysis: AnalyseCommandOptionsDto) {
+    return api.post(`/project/${name}/commands/_analyse`, analysis).then((response) => response.data.id);
+  }
+
+  async function removeAnalysis(name: string, table: string, analysisName: string) {
+    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}`);
+  }
+
   return {
     projects,
     project,
@@ -412,5 +424,8 @@ export const useProjectsStore = defineStore('projects', () => {
     getKeyPairs,
     addKeyPair,
     deleteKeyPair,
+    getAnalyses,
+    runAnalysis,
+    removeAnalysis,
   };
 });

@@ -345,6 +345,20 @@ export default {
       description: 'View VCF files and statistics.',
     },
   },
+  analysis_status: {
+    IN_PROGRESS: 'In progress',
+    PASSED: 'Passed',
+    FAILED: 'Failed',
+    ERROR: 'Error',
+    IGNORED: 'Ignored',
+    UNRECOGNIZED: 'Unrecognized',
+  },
+  analyse_validate: {
+    info: 'Analyses can improve data quality by detecting inconsistencies through validation rules and custom reports.',
+    add: 'New Analysis',
+    analyse_command_created: 'Analysis task created with identifier [ {id} ].',
+    delete_analysis_confirm: 'Are sure you want to delete the \'{name}\' analysis and its associated results. This cannot be undone and all data will be lost.',
+  },
   id_mappings: {
     title: 'Identifiers Mappings',
     info: 'Identifiers mappings are defined per entity type. Mapping identifiers consist of associating, for a given entity, its identifier in the system to its identifiers in the data being imported or exported.',
@@ -1156,6 +1170,7 @@ export default {
   role: 'Role',
   rservers_caption: 'Configure R server, grant access to R service',
   rservers: 'R',
+  run: 'Run',
   sample_quantiles: 'Sample quantiles',
   sample: 'Sample',
   samples: 'Samples',

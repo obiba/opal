@@ -103,6 +103,7 @@
     "useAppsStore": true,
     "useSqlStore": true,
     "useSearchStore": true,
-    "useCartStore": true
+    "useCartStore": true,
+    "AnalysisPluginPackages": true
   }
 }
