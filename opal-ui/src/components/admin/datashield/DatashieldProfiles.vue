@@ -1,37 +1,35 @@
 <template>
   <div>
-    <q-btn
-      color="primary"
-      text-color="white"
-      icon="add"
-      :label="$t('add_profile')"
-      size="sm"
-      @click="onAddProfile"
-      class="q-mb-md"
-    />
 
-    <q-card v-if="datashieldStore.profiles?.length" bordered flat>
-      <q-card-section class="q-pa-none">
-        <q-tabs
-          v-model="tab"
-          no-caps
-          dense
-          inline-label
-          class="text-grey"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-        >
-          <q-tab
-            v-for="profile in datashieldStore.profiles"
-            :key="profile.name"
-            :name="profile.name"
-            :label="getProfileLabel(profile)"
-            :alert="profile.enabled ? 'green' : 'red'"
+
+    <div class="row q-gutter-md">
+      <div class="col">
+        <div v-for="profile in datashieldStore.profiles" :key="profile.name">
+          <q-btn
+            flat
+            no-caps
             :icon="getProfileIcon(profile)"
+            :color="profile.enabled ? 'primary' : 'negative'"
+            size="12px"
+            :label="getProfileLabel(profile)"
+            align="left"
+            class="full-width"
+            @click="tab = profile.name"
+          ></q-btn>
+        </div>
+        <div>
+          <q-btn
+            color="primary"
+            text-color="white"
+            icon="add"
+            :label="$t('add_profile')"
+            size="sm"
+            @click="onAddProfile"
+            class="q-mt-md"
           />
-        </q-tabs>
-        <q-separator />
+        </div>
+      </div>
+      <div class="col-10">
         <q-tab-panels v-model="tab" class="q-pl-md q-pr-md">
           <q-tab-panel
             v-for="profile in datashieldStore.profiles"
@@ -39,11 +37,12 @@
             :name="profile.name"
             style="padding-top: 0"
           >
-            <datashield-profile :profile="profile" class="q-mt-md" />
+            <datashield-profile :profile="profile" />
           </q-tab-panel>
         </q-tab-panels>
-      </q-card-section>
-    </q-card>
+      </div>
+    </div>
+
     <add-datashield-profile-dialog v-model="showAdd" />
   </div>
 </template>

@@ -1,12 +1,26 @@
 <template>
   <div>
+    <div class="text-h6 q-mb-md">
+      {{ profile.name }}
+      <q-btn
+        v-if="!builtinProfile"
+        outline
+        color="red"
+        icon="delete"
+        :title="$t('delete')"
+        size="sm"
+        @click="onShowDeleteProfile"
+        class="on-right"
+      />
+    </div>
+    <q-separator class="q-mb-md"/>
     <div v-if="missingCluster" class="box-warning q-mb-md">
       <q-icon name="warning" />
       {{ $t('datashield.profile_missing_cluster') }}
     </div>
     <div class="row q-col-gutter-md q-mb-md">
       <div class="col-md-6 col-xs-12">
-        <div class="text-h6 q-mb-md">{{ $t('status') }}</div>
+        <div class="text-bold q-mb-md" style="font-size: larger;">{{ $t('status') }}</div>
         <div class="q-mb-md">
           <q-toggle
             v-model="enabled"
@@ -16,18 +30,9 @@
           />
         </div>
         <fields-list :items="items" :dbobject="profile" />
-        <q-btn
-          v-if="!builtinProfile"
-          color="red"
-          icon="delete"
-          :label="$t('delete')"
-          size="sm"
-          @click="onShowDeleteProfile"
-          class="q-mt-md"
-        />
       </div>
       <div class="col-md-6 col-xs-12">
-        <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
+        <div class="text-bold q-mb-md" style="font-size: larger;">{{ $t('permissions') }}</div>
         <q-toggle
           v-model="restricted"
           :label="$t('datashield.profile_access_toggle')"
@@ -50,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="text-h6 q-mt-lg">{{ $t('settings') }}</div>
+    <div class="text-bold q-mt-lg" style="font-size: larger;">{{ $t('settings') }}</div>
     <div class="text-help q-mb-md">
       {{ $t('datashield.profile_settings_help') }}
     </div>
