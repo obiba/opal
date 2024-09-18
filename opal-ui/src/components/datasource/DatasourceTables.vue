@@ -183,7 +183,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { TableDto, TimestampsDto } from 'src/models/Magma';
+import { TableDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddViewDialog from 'src/components/datasource/AddViewDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';

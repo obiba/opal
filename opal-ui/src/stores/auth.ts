@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', () => {
   const version = ref('');
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
   const bookmarks = ref<BookmarkDto[]>([]);
+  const isAdministrator = ref(false);
 
   function reset() {
     sid.value = '';
@@ -17,6 +18,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => {
     return profile.value.principal !== undefined;
   });
+
+  async function checkIsAdministrator() {
+    return api.options('/system/subject-credentials')
+      .then((response) => isAdministrator.value = response.headers['allow'].includes('POST'))
+      .catch(() => isAdministrator.value = false);
+  }
 
   async function signin(username: string, password: string, authMethod: string, token: string) {
     const params = new URLSearchParams();
@@ -92,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
     profile,
     isAuthenticated,
     bookmarks,
+    isAdministrator,
     signin,
     signout,
     userProfile,
@@ -100,5 +108,6 @@ export const useAuthStore = defineStore('auth', () => {
     toggleBookmark,
     getProviders,
     reset,
+    checkIsAdministrator,
   };
 });

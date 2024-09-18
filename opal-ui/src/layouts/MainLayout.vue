@@ -61,7 +61,7 @@
               </q-list>
             </q-menu>
           </q-input>
-          <q-btn to="/admin" no-caps>
+          <q-btn v-if="authStore.isAdministrator" to="/admin" no-caps>
             {{ $t('administration') }}
           </q-btn>
           <q-btn no-caps @click="onHelp">
@@ -127,13 +127,11 @@
 <script setup lang="ts">
 import { useCookies } from 'vue3-cookies';
 import { locales } from 'boot/i18n';
-import { ref } from 'vue';
 
 import MainDrawer from 'src/components/MainDrawer.vue';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
-import { computed } from 'vue';
 import { QueryResultDto } from 'src/models/Search';
 import { ItemFieldsResultDto } from 'src/stores/search';
 
@@ -161,12 +159,22 @@ const results = ref<QueryResultDto>();
 const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]) || []);
 
 onMounted(() => {
+  router.beforeEach((to, from, next) => {
+    if (to.path.startsWith('/admin') && !authStore.isAdministrator) {
+      next('/');
+    } else {
+      next();
+    }
+  });
   authStore
     .userProfile()
     .then(() => {
-      systemStore.initGeneralConf();
-      resourcesStore.initResourceProviders();
-      authStore.loadBookmarks();
+      Promise.all([
+        authStore.checkIsAdministrator(),
+        systemStore.initGeneralConf(),
+        resourcesStore.initResourceProviders(),
+        authStore.loadBookmarks(),
+      ]);
     })
     .catch(() => {
       router.push('/signin');

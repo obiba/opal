@@ -12,24 +12,25 @@ package org.obiba.opal.web.system.subject;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.support.ConflictingRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Component
 @Path("/system/subject-credentials")
-public class SubjectCredentialsResource {
+public class SubjectCredentialsResource implements BaseResource {
 
   @Autowired
   private SubjectCredentialsService subjectCredentialsService;

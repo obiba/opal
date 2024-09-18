@@ -1,5 +1,5 @@
 import { getCurrentLocale } from 'src/boot/i18n';
-import { parseISO, formatDistanceStrict, differenceInMinutes, add } from 'date-fns';
+import { parseISO, formatDistanceStrict } from 'date-fns';
 
 import { enUS as en } from 'date-fns/locale/en-US';
 import { fr } from 'date-fns/locale/fr';
