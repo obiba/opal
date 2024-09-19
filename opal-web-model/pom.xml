@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>5.0.0-RC2</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <artifactId>opal-web-model</artifactId>
   <name>opal-web-model</name>
