@@ -55,6 +55,4 @@ watch(
     }
   }
 );
-
-const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
 </script>

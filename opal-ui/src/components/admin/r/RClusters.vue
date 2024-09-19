@@ -65,8 +65,6 @@ watch(
   }
 );
 
-const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
-
 function onClearCache() {
   rStore.clearRCache();
 }
