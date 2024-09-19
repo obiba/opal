@@ -12,6 +12,7 @@
             :label="getProfileLabel(profile)"
             align="left"
             class="full-width"
+            :class="`${ tab === profile.name ? 'bg-grey-2' : '' }`"
             @click="tab = profile.name"
           ></q-btn>
         </div>

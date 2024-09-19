@@ -12,6 +12,7 @@
             :label="cluster.name"
             align="left"
             class="full-width"
+            :class="`${ tab === cluster.name ? 'bg-grey-2' : '' }`"
             @click="tab = cluster.name"
           ></q-btn>
         </div>
