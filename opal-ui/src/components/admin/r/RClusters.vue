@@ -1,25 +1,43 @@
 <template>
   <div v-if="rStore.clusters.length">
-    <q-toolbar>
-      <q-select v-model="tab" :options="clusterNames" :label="$t('r.cluster')" dense outlined size="sm" class="text-grey" />
-      <div class="text-help on-right">{{ $t('r.clusters_count', { count: clusterNames.length }) }}</div>
-      <q-space />
-      <q-btn
-        outline
-        color="secondary"
-        icon="cleaning_services"
-        :label="$t('cache')"
-        :title="$t('r.clear_cache')"
-        size="sm"
-        class="on-right"
-        @click="onClearCache()"
-      />
-    </q-toolbar>
-    <q-tab-panels v-model="tab">
-      <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
-        <r-cluster :cluster="cluster" />
-      </q-tab-panel>
-    </q-tab-panels>
+    <div class="row q-gutter-md">
+      <div class="col" style="max-width: 200px;">
+        <div v-for="cluster in rStore.clusters" :key="cluster.name">
+          <q-btn
+            flat
+            no-caps
+            icon="cloud"
+            color="primary"
+            size="12px"
+            :label="cluster.name"
+            align="left"
+            class="full-width"
+            @click="tab = cluster.name"
+          ></q-btn>
+        </div>
+        <q-btn
+          outline
+          color="secondary"
+          icon="cleaning_services"
+          :label="$t('r.clear_cache')"
+          size="sm"
+          @click="onClearCache()"
+          class="q-mt-md full-width"
+        />
+      </div>
+      <div class="col">
+        <q-tab-panels v-model="tab">
+          <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name"
+            style="padding-top: 0">
+            <div class="text-h6">
+              {{ cluster.name }}
+            </div>
+            <q-separator class="q-mb-sm" />
+            <r-cluster :cluster="cluster" />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
+    </div>
   </div>
 </template>
 

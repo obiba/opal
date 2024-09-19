@@ -1,9 +1,7 @@
 <template>
   <div>
-
-
     <div class="row q-gutter-md">
-      <div class="col">
+      <div class="col" style="max-width: 200px;">
         <div v-for="profile in datashieldStore.profiles" :key="profile.name">
           <q-btn
             flat
@@ -17,19 +15,17 @@
             @click="tab = profile.name"
           ></q-btn>
         </div>
-        <div>
-          <q-btn
-            color="primary"
-            text-color="white"
-            icon="add"
-            :label="$t('add_profile')"
-            size="sm"
-            @click="onAddProfile"
-            class="q-mt-md"
-          />
-        </div>
+        <q-btn
+          color="primary"
+          text-color="white"
+          icon="add"
+          :label="$t('add_profile')"
+          size="sm"
+          @click="onAddProfile"
+          class="q-mt-md full-width"
+        />
       </div>
-      <div class="col-10">
+      <div class="col">
         <q-tab-panels v-model="tab" class="q-pl-md q-pr-md">
           <q-tab-panel
             v-for="profile in datashieldStore.profiles"

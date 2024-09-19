@@ -1,14 +1,34 @@
 <template>
   <div v-if="rStore.clusters.length">
-    <div class="row q-col-gutter-md">
-      <q-select v-model="tab" :options="clusterNames" :label="$t('r.cluster')" dense outlined class="text-grey" />
-      <div class="q-mt-sm text-help">{{ $t('r.clusters_count', { count: clusterNames.length }) }}</div>
+    <div class="row q-gutter-md">
+      <div class="col" style="max-width: 200px;">
+        <div v-for="cluster in rStore.clusters" :key="cluster.name">
+          <q-btn
+            flat
+            no-caps
+            icon="cloud"
+            color="primary"
+            size="12px"
+            :label="cluster.name"
+            align="left"
+            class="full-width"
+            @click="tab = cluster.name"
+          ></q-btn>
+        </div>
+      </div>
+      <div class="col">
+        <q-tab-panels v-model="tab">
+          <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name"
+            style="padding-top: 0">
+            <div class="text-h6">
+              {{ cluster.name }}
+            </div>
+            <q-separator />
+            <datashield-packages :cluster="cluster" />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
     </div>
-    <q-tab-panels v-model="tab">
-      <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name">
-        <datashield-packages :cluster="cluster" />
-      </q-tab-panel>
-    </q-tab-panels>
   </div>
 </template>
 

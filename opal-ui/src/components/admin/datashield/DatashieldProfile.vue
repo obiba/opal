@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h6 q-mb-md">
+    <div class="text-h6 q-mb-sm">
       {{ profile.name }}
       <q-btn
         v-if="!builtinProfile"
@@ -13,7 +13,7 @@
         class="on-right"
       />
     </div>
-    <q-separator class="q-mb-md"/>
+    <q-separator class="q-mb-sm"/>
     <div v-if="missingCluster" class="box-warning q-mb-md">
       <q-icon name="warning" />
       {{ $t('datashield.profile_missing_cluster') }}
