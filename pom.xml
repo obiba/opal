@@ -101,7 +101,6 @@
     <resteasy.version>6.2.8.Final</resteasy.version>
     <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
-    <rql-parser.version>0.3.1</rql-parser.version>
     <shiro.version>1.13.0</shiro.version>
     <shiro-ehcache3.version>1.0.0</shiro-ehcache3.version>
     <shiro-extras.version>1.1.0</shiro-extras.version>
@@ -1274,18 +1273,6 @@
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-xml</artifactId>
         <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.jazdw</groupId>
-        <artifactId>rql-parser</artifactId>
-        <version>${rql-parser.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

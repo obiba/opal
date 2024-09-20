@@ -11,27 +11,19 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import net.jazdw.rql.parser.ASTNode;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.service.ContingencyService;
-import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.service.SearchException;
 import org.obiba.opal.web.model.Identifiers;
-import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.RQLIdentifierCriterionParser;
-import org.obiba.opal.web.search.support.RQLParserFactory;
-import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
-import org.obiba.opal.web.search.support.ValueSetVariableCriterionParser;
-import org.obiba.opal.web.ws.SortDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,36 +88,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
                          @QueryParam("offset") @DefaultValue("0") int offset,
                          @QueryParam("limit") @DefaultValue("10") int limit,
                          @QueryParam("counts") @DefaultValue("false") boolean withCounts) throws SearchException {
-    if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    if (Strings.isNullOrEmpty(query)) return Response.status(Response.Status.BAD_REQUEST).build();
-    this.entityType = entityType;
-
-    final RQLIdentifierCriterionParser idCriterion = Strings.isNullOrEmpty(idQuery) ? null : new RQLIdentifierCriterionParser(idQuery);
-
-    ASTNode queryNode = RQLParserFactory.newParser().parse(query);
-    List<ValueSetVariableCriterionParser> childQueries = extractChildQueries(queryNode);
-    List<Search.EntitiesResultDto> partialResults = Lists.newArrayList();
-    if (withCounts && childQueries.size() > 1) {
-      for (ValueSetVariableCriterionParser childQuery : childQueries) {
-        QuerySettings querySettings = buildHasChildQuerySearch(0, 0);
-        querySettings.childQuery(childQuery.asChildQuery(idCriterion == null ? null : idCriterion.getQuery()));
-        partialResults.add(opalSearchService.executeEntitiesQuery(querySettings, getSearchPath(), entityType, childQuery.getOriginalQuery()).build());
-      }
-    }
-
-    // global query
-
-    QuerySettings querySettings = buildHasChildQuerySearch(offset, limit);
-    querySettings.childQueries(childQueries.stream().map(p -> p.asChildQuery(idCriterion == null ? null : idCriterion.getQuery())).collect(Collectors.toList()));
-    if (childQueries.size() > 1) querySettings.childQueryOperator(queryNode.getName());
-    try {
-      Search.EntitiesResultDto.Builder dtoResponseBuilder = opalSearchService.executeEntitiesQuery(querySettings, getSearchPath(), entityType, query);
-      dtoResponseBuilder.addAllPartialResults(partialResults);
-      return Response.ok().entity(dtoResponseBuilder.build()).build();
-    } catch (Exception e) {
-      // Search engine exception
-      throw new SearchException("Query failed to be executed: " + query, e.getCause() == null ? e : e.getCause());
-    }
+    throw new DeprecatedOperationException("Unsupported operation: since Opal 5 values are not indexed");
   }
 
   @GET
@@ -147,28 +110,6 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Override
   protected String getSearchPath() {
     return opalSearchService.getValuesIndexManager().getName() + "/" + entityType;
-  }
-
-  //
-  // Private methods
-  //
-
-  private List<ValueSetVariableCriterionParser> extractChildQueries(ASTNode queryNode) {
-    // for now the query must look like: and(q1,q2,...) or or(q1,q2...) or (q1,q2...) or q1,q2,...
-    if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName()))
-      return queryNode.getArguments().stream().map(q -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), (ASTNode) q)).collect(Collectors.toList());
-    else // single query
-      return Lists.newArrayList(new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), queryNode));
-  }
-
-  private QuerySettings buildHasChildQuerySearch(int offset, int limit) {
-    QuerySettings querySettings = new QuerySettings();
-    querySettings.from(offset).size(limit).sortField("identifier", SortDir.ASC.name()).noDefaultFields();
-    return querySettings;
-  }
-
-  private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && opalSearchService.getValuesIndexManager().isReady();
   }
 
 }
