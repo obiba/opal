@@ -15,7 +15,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.event.*;
@@ -35,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,8 +45,6 @@ public class RServerManagerService implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(RServerManagerService.class);
 
-  private static final String R_CACHE_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "R" + File.separatorChar + "cache";
-
   public static final String DEFAULT_CLUSTER_NAME = "default";
 
   private static final String ROCK_APP_TYPE = "rock";
@@ -56,6 +52,8 @@ public class RServerManagerService implements Service {
   private final ApplicationContext applicationContext;
 
   private final EventBus eventBus;
+
+  private final RCacheHelper rCacheHelper;
 
   // legacy
   private final RserveService rserveService;
@@ -67,10 +65,11 @@ public class RServerManagerService implements Service {
   private boolean running;
 
   @Autowired
-  public RServerManagerService(ApplicationContext applicationContext, EventBus eventBus, RserveService rserveService) {
+  public RServerManagerService(ApplicationContext applicationContext, EventBus eventBus, RserveService rserveService, RCacheHelper rCacheHelper) {
     this.applicationContext = applicationContext;
     this.eventBus = eventBus;
     this.rserveService = rserveService;
+    this.rCacheHelper = rCacheHelper;
   }
 
   /**
@@ -267,27 +266,12 @@ public class RServerManagerService implements Service {
   //
 
   private void evictTableCaches() {
-    try {
-      File cacheDir = new File(R_CACHE_DIR);
-      FileUtil.delete(cacheDir);
-    } catch (Exception e) {
-      log.warn("Failure when evicting table caches", e);
-    }
+    rCacheHelper.evictAll();
   }
 
   private void evictTableCache(ValueTable table) {
-    try {
-      File cacheDir = new File(R_CACHE_DIR);
-      String tableCachePrefix = String.format("%s-%s-", table.getDatasource().getName(), table.getName());
-      File[] files = cacheDir.listFiles(file -> file.getName().startsWith(tableCachePrefix));
-      if (files != null) {
-        for (File file : files) {
-          file.delete();
-        }
-      }
-    } catch (Exception e) {
-      log.warn("Failure when evicting table cache: {}", table.getName(), e);
-    }
+    String tableCachePrefix = String.format("%s-%s-", table.getDatasource().getName(), table.getName());
+    rCacheHelper.evictCache(tableCachePrefix);
   }
 
   private void notifyInitialized() {

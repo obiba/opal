@@ -28,6 +28,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Collection;
 import java.util.HashSet;
@@ -171,8 +176,39 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     return Hex.encodeToString(key.getEncoded());
   }
 
+  @Override
+  public InputStream newCipherInputStream(InputStream in) {
+    try {
+      return new CipherInputStream(in, getAESCipher(Cipher.DECRYPT_MODE));
+    } catch (GeneralSecurityException e) {
+      log.error("Cipher error", e);
+      return new CipherInputStream(in, new NullCipher());
+    }
+  }
+
+  @Override
+  public OutputStream newCipherOutputStream(OutputStream out) {
+    try {
+      return new CipherOutputStream(out, getAESCipher(Cipher.ENCRYPT_MODE));
+    } catch (GeneralSecurityException e) {
+      log.error("Cipher error", e);
+      return new CipherOutputStream(out, new NullCipher());
+    }
+  }
+
+  //
+  // Private methods
+  //
+
   private byte[] getSecretKey() {
     return Hex.decode(getOpalConfiguration().getSecretKey());
   }
 
+  private Cipher getAESCipher(int mode) throws GeneralSecurityException {
+    byte[] decodedKey = getSecretKey();
+    SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+    Cipher cipher = Cipher.getInstance("AES");
+    cipher.init(mode, secretKey); // Mode: Cipher.DECRYPT_MODE
+    return cipher;
+  }
 }

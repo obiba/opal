@@ -18,6 +18,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
@@ -52,6 +53,9 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
 
   @Autowired
   private DataExportService dataExportService;
+
+  @Autowired
+  private RCacheHelper rCacheHelper;
 
   @Override
   public Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException {
@@ -134,6 +138,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     resource.setRServerSession(getRServerSession());
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
+    resource.setRCacheHelper(rCacheHelper);
     resource.setResourceReferenceService(getResourceReferenceService());
     return resource;
   }

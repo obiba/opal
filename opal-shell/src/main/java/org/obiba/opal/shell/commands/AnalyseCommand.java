@@ -29,6 +29,7 @@ import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.shell.commands.options.AnalyseCommandOptions;
 import org.obiba.opal.spi.analysis.AnalysisService;
@@ -80,6 +81,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Autowired
   private DataExportService dataExportService;
+
+  @Autowired
+  private RCacheHelper rCacheHelper;
 
   @Autowired
   private OpalAnalysisResultService analysisResultService;
@@ -226,7 +230,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String finalSymbol = RUtils.getSymbol(valueTable.getName());
         rSessionHandler
             .getSession()
-            .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, "id"));
+            .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, rCacheHelper, "id"));
       }
     }
 

@@ -67,6 +67,8 @@ public class RSQLService implements Service, SQLService {
 
   protected final DataExportService dataExportService;
 
+  protected final RCacheHelper rCacheHelper;
+
   private boolean running = false;
 
   private boolean ensureSqldfDone;
@@ -74,12 +76,13 @@ public class RSQLService implements Service, SQLService {
   private List<String> userRSessions = Collections.synchronizedList(Lists.newArrayList());
 
   @Autowired
-  public RSQLService(SystemLogService systemLogService, RServerManagerService rServerManagerService, OpalRSessionManager opalRSessionManager, IdentifiersTableService identifiersTableService, DataExportService dataExportService) {
+  public RSQLService(SystemLogService systemLogService, RServerManagerService rServerManagerService, OpalRSessionManager opalRSessionManager, IdentifiersTableService identifiersTableService, DataExportService dataExportService, RCacheHelper rCacheHelper) {
     this.systemLogService = systemLogService;
     this.rServerManagerService = rServerManagerService;
     this.opalRSessionManager = opalRSessionManager;
     this.identifiersTableService = identifiersTableService;
     this.dataExportService = dataExportService;
+    this.rCacheHelper = rCacheHelper;
   }
 
   @Override
@@ -217,7 +220,8 @@ public class RSQLService implements Service, SQLService {
       String tableSymbol = normalizeTableSymbol(fromTable);
       if (!fromTable.equals(tableSymbol))
         queryStr = queryStr.replaceAll(fromTable, tableSymbol);
-      MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, valueTable, dataExportService,
+      MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, valueTable,
+          dataExportService, rCacheHelper,
           Strings.isNullOrEmpty(idName) ? DEFAULT_ID_COLUMN : idName,
           MagmaAssignROperation.RClass.DATA_FRAME_NO_FACTORS);
       rSession.execute(mop);
