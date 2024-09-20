@@ -364,6 +364,10 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/keystore/${alias}`);
   }
 
+  async function getAnalysis(name: string, table: string, analysisName: string) {
+    return api.get(`/project/${name}/table/${name}/analysis/${analysisName}`).then((response) => response.data);
+  }
+
   async function getAnalyses(name: string, table: string) {
     return api.get(`/project/${name}/table/${name}/analyses`).then((response) => response.data);
   }
@@ -424,6 +428,7 @@ export const useProjectsStore = defineStore('projects', () => {
     getKeyPairs,
     addKeyPair,
     deleteKeyPair,
+    getAnalysis,
     getAnalyses,
     runAnalysis,
     removeAnalysis,

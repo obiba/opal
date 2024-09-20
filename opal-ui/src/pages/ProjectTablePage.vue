@@ -234,7 +234,6 @@
             <project-anaylse-validate
               :project-name="dsName"
               :table-name="tName"
-              :analysis-packages="pluginsStore.analysisPlugins.packages"
             />
           </q-tab-panel>
 
@@ -463,7 +462,6 @@ function onShowExportDatabase() {
 }
 
 onMounted(() => {
-  console.log('ProjectTablePage mounted');
   pluginsStore.initAnalysisPlugins().then(() => {
     if (!!pluginsStore.analysisPlugins.packages) {
       projectsStore.loadAnalysesPermissions(dsName.value, tName.value);

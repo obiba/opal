@@ -1,4 +1,3 @@
-import { plugins } from 'app/postcss.config.cjs';
 import { i18n } from 'src/boot/i18n';
 import { PluginPackagesDto, PluginPackageDto } from 'src/models/Plugins';
 
@@ -23,9 +22,10 @@ type TemplateTranslations = {
     }
 }
 
-export function addAnalysesTranslations(packages: PluginPackagesDto) {
+export function mergeAnalysesTranslations(packages: PluginPackagesDto) {
   if (!!packages) {
-    const normalize = (plugin:PluginPackageDto, translations: Translations) => {
+
+    const normalizeFn = (plugin:PluginPackageDto, translations: Translations) => {
       const normalized:PluginTranslations = {plugins: {}} as PluginTranslations;
       normalized.plugins[plugin.name] = translations;
       return normalized;
@@ -37,14 +37,14 @@ export function addAnalysesTranslations(packages: PluginPackagesDto) {
 
       templates.forEach((template: PluginPackageDto) => {
         tplTranslations[template.name] = { title: template.title, description: template.description };
-        i18n.global.mergeLocaleMessage('en', normalize(plugin, tplTranslations));
+        i18n.global.mergeLocaleMessage('en', normalizeFn(plugin, tplTranslations));
 
         if ('i18n' in template) {
           const templateI18n: TemplateTranslations = template.i18n as TemplateTranslations;
           Object.keys(i18n).forEach((key: string) => {
             const i18nTranslations = {} as Translations;
             tplTranslations[template.name] = { title: templateI18n[key].title, description: templateI18n[key].description };
-            i18n.global.mergeLocaleMessage(key, normalize(plugin, i18nTranslations));
+            i18n.global.mergeLocaleMessage(key, normalizeFn(plugin, i18nTranslations));
           });
         }
       });

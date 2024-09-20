@@ -115,7 +115,14 @@
     @confirm="doRemoveAnalysis"
   />
 
-  <add-project-analysis-dialog v-model="showDialog" :project-name="projectName" :table-name="tableName" />
+  <add-project-analysis-dialog
+    v-model="showAnalysisDialog"
+    :project-name="projectName"
+    :table-name="tableName"
+    :analysis-name="selectedAnalysis ? selectedAnalysis.name : undefined"
+    @update:model-value="onAnalysisDialogClosed"
+    @update="onAnalysisUpdated"
+  />
 </template>
 
 <script lang="ts">
@@ -128,7 +135,6 @@ export default defineComponent({
 import AddProjectAnalysisDialog from './AddProjectAnalysisDialog.vue';
 import { OpalAnalysisDto, OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
 import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
-import { PluginPackageDto } from 'src/models/Plugins';
 import { analysisColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError, notifySuccess } from 'src/utils/notify';
@@ -137,7 +143,6 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 interface Props {
   projectName: string;
   tableName: string;
-  analysisPackages: PluginPackageDto[]
 }
 
 interface TableRow extends OpalAnalysisDto {
@@ -148,7 +153,7 @@ const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const props = defineProps<Props>();
 const showRemove = ref(false);
-const showDialog = ref(false);
+const showAnalysisDialog = ref(false);
 const loading = ref(false);
 const selectedAnalysis = ref<OpalAnalysisDto | null>(null);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
@@ -158,10 +163,8 @@ const initialPagination = ref({
   rowsPerPage: 10,
   minRowsForPagination: 10,
 });
-let pluginsTrPrefix = 'plugins.';
 const filter = ref('');
 const analyses = ref<OpalAnalysisDto[]>([]);
-const hasFilter = computed(() => (filter.value || '').length > 0);
 const columns = computed(() => [
   {
     name: 'name',
@@ -177,13 +180,13 @@ const columns = computed(() => [
     label: t('type'),
     align: 'left',
     field: 'templateName',
-    format: (value: string) => t(`${pluginsTrPrefix}.${value}.title`),
+    format: (value: string, row: OpalAnalysisDto) => t(`plugins.${row.pluginName}.${value}.title`),
   },
   {
     name: 'total',
     label: t('total'),
     align: 'left',
-    field: (row: OpalAnalysisDto) => getSuccessCount(row.lastResult || {} as OpalAnalysisResultDto),
+    field: (row: OpalAnalysisDto) => getSuccessCount(row.lastResult || ({} as OpalAnalysisResultDto)),
   },
   {
     name: 'status',
@@ -233,7 +236,7 @@ function onFilter(tableRows: OpalAnalysisDto[], filter: string) {
 }
 
 async function onAddAnalysis() {
-  showDialog.value = true;
+  showAnalysisDialog.value = true;
 }
 
 async function onRunAnalysis(row: OpalAnalysisDto) {
@@ -258,7 +261,16 @@ async function onRunAnalysis(row: OpalAnalysisDto) {
 }
 
 function onViewAnalysis(row: OpalAnalysisDto) {
-  console.log('View analysis', row);
+  selectedAnalysis.value = row;
+  showAnalysisDialog.value = true;
+}
+
+async function onAnalysisDialogClosed() {
+  selectedAnalysis.value = null;
+}
+
+async function onAnalysisUpdated() {
+  return onRefresh();
 }
 
 function onRemoveAnalysis(row: OpalAnalysisDto) {
@@ -268,7 +280,9 @@ function onRemoveAnalysis(row: OpalAnalysisDto) {
 
 async function doRemoveAnalysis() {
   try {
-    await projectsStore.removeAnalysis(props.projectName, props.tableName, selectedAnalysis.value?.name || '');
+    const toDelete = selectedAnalysis.value;
+    selectedAnalysis.value = null;
+    if (!!toDelete) await projectsStore.removeAnalysis(props.projectName, props.tableName, toDelete.name);
     showRemove.value = false;
     return onRefresh();
   } catch (error) {
@@ -292,8 +306,6 @@ async function onRefresh() {
 }
 
 onMounted(() => {
-  // NOTE: assume only one package
-  pluginsTrPrefix = `plugins.${props.analysisPackages[0].name}`;
   onRefresh();
 });
 </script>

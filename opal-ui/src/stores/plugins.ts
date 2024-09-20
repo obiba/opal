@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { PluginPackage } from 'src/components/models';
 import { PluginPackagesDto } from 'src/models/Plugins';
-import { addAnalysesTranslations } from 'src/utils/plugins';
+import { mergeAnalysesTranslations } from 'src/utils/plugins';
 
 export const usePluginsStore = defineStore('plugins', () => {
   const plugins = ref({} as PluginPackagesDto);
@@ -69,7 +69,7 @@ export const usePluginsStore = defineStore('plugins', () => {
     analysisPlugins.value = {} as PluginPackagesDto;
     return api.get('analysis-plugins').then((response) => {
       analysisPlugins.value = response.data;
-      addAnalysesTranslations(response.data);
+      mergeAnalysesTranslations(response.data);
     });
   }
 
