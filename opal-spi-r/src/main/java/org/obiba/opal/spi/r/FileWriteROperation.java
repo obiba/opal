@@ -10,6 +10,7 @@
 package org.obiba.opal.spi.r;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * Write a local file into R.
@@ -20,18 +21,35 @@ public class FileWriteROperation extends AbstractROperation {
 
   private final File source;
 
+  private final InputStream input;
+
   public FileWriteROperation(String fileName, File source) {
     this.fileName = fileName;
     this.source = source;
+    this.input = null;
+  }
+
+  public FileWriteROperation(String fileName, InputStream input) {
+    this.fileName = fileName;
+    this.source = null;
+    this.input = input;
   }
 
   @Override
   public void doWithConnection() {
-    writeFile(fileName, source);
+    if (input != null) {
+      try {
+        writeFile(fileName, input);
+      } catch (RServerException e) {
+        throw new RRuntimeException(e);
+      }
+    } else if (source != null) {
+      writeFile(fileName, source);
+    }
   }
 
   @Override
   public String toString() {
-    return String.format("%s <- %s", fileName, source.getAbsolutePath());
+    return String.format("%s <- %s", fileName, source == null ? "?" : source);
   }
 }

@@ -58,6 +58,6 @@ public class RCacheHelper {
 
   public OutputStream newRDSOutputStream(String cacheKey) throws IOException {
     File cache = new File(cacheDir, cacheKey + ".enc");
-    return cryptoService.newCipherOutputStream(new BufferedOutputStream(new FileOutputStream(cache)));
+    return cryptoService.newCipherOutputStream(new FileOutputStream(cache));
   }
 }

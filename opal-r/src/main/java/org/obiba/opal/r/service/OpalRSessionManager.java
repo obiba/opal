@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
@@ -33,8 +34,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.ForbiddenException;
-import java.io.File;
-import java.io.IOException;
+
+import java.io.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -54,6 +55,8 @@ public class OpalRSessionManager implements DisposableBean {
       + File.separatorChar + "R" + File.separatorChar + "workspaces" + File.separatorChar + "%s";
 
   private static final String R_IMAGE_FILE = ".RData";
+
+  private static final String R_IMAGE_FILE_ENC = ".RData.enc";
 
   @Value("${org.obiba.opal.r.sessionTimeout}")
   private Long rSessionTimeout;
@@ -84,6 +87,9 @@ public class OpalRSessionManager implements DisposableBean {
 
   @Autowired
   private RServerManagerService rServerManagerService;
+
+  @Autowired
+  private CryptoService cryptoService;
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
@@ -417,7 +423,7 @@ public class OpalRSessionManager implements DisposableBean {
   // Nested classes
   //
 
-  private static final class SubjectRSessions implements Iterable<RServerSession> {
+  private final class SubjectRSessions implements Iterable<RServerSession> {
 
     private final List<RServerSession> rSessions = Collections.synchronizedList(new ArrayList<RServerSession>());
 
@@ -489,27 +495,51 @@ public class OpalRSessionManager implements DisposableBean {
       rSessions.removeAll(toRemove);
     }
 
-    private void saveRSessionFiles(RServerSession rSession, String saveId) {
-      rSession.saveRSessionFiles(saveId);
-    }
-
     private void saveRSessionImage(RServerSession rSession, String saveId) {
       // then save the memory image
       String rscript = "base::save.image()";
       RScriptROperation rop = new RScriptROperation(rscript, false);
       rSession.execute(rop);
-      FileReadROperation readop = new FileReadROperation(R_IMAGE_FILE, new File(rSession.getWorkspace(saveId), R_IMAGE_FILE));
-      rSession.execute(readop);
+      // clean legacy
+      File destination = new File(rSession.getWorkspace(saveId), R_IMAGE_FILE);
+      if (destination.exists()) destination.delete();
+      destination = new File(rSession.getWorkspace(saveId), R_IMAGE_FILE_ENC);
+      if (destination.exists()) destination.delete();
+      try {
+        FileReadROperation readop = new FileReadROperation(R_IMAGE_FILE, cryptoService.newCipherOutputStream(new FileOutputStream(destination)));
+        rSession.execute(readop);
+      } catch (FileNotFoundException e) {
+        throw new RRuntimeException(e);
+      }
     }
 
     private void restoreSessionImage(RServerSession rSession, String restoreId) {
-      File source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE);
+      File source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE_ENC);
+      if (!source.exists()) {
+        // legacy
+        source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE);
+      }
       if (!source.exists()) return;
-      FileWriteROperation writeop = new FileWriteROperation(R_IMAGE_FILE, source);
-      rSession.execute(writeop);
-      String rscript = String.format("base::load('%s')", R_IMAGE_FILE);
-      RScriptROperation rop = new RScriptROperation(rscript, false);
-      rSession.execute(rop);
+
+      try {
+        FileWriteROperation writeop = null;
+        if (R_IMAGE_FILE_ENC.equals(source.getName())) {
+          writeop = new FileWriteROperation(R_IMAGE_FILE, cryptoService.newCipherInputStream(new FileInputStream(source)));
+        } else {
+          // legacy
+          writeop = new FileWriteROperation(R_IMAGE_FILE, source);
+        }
+        rSession.execute(writeop);
+        String rscript = String.format("base::load('%s')", R_IMAGE_FILE);
+        RScriptROperation rop = new RScriptROperation(rscript, false);
+        rSession.execute(rop);
+      } catch (FileNotFoundException e) {
+        throw new RRuntimeException(e);
+      }
+    }
+
+    private void saveRSessionFiles(RServerSession rSession, String saveId) {
+      rSession.saveRSessionFiles(saveId);
     }
 
     private void restoreSessionFiles(RServerSession rSession, String restoreId) {
@@ -517,14 +547,16 @@ public class OpalRSessionManager implements DisposableBean {
       FileUtils.listFiles(source, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).forEach(file -> {
         String destination = file.getAbsolutePath().replace(source.getAbsolutePath(), "");
         if (destination.startsWith("/")) destination = destination.substring(1);
-        if (destination.contains("/")) {
-          // make sure destination directory exists
-          String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
-          RScriptROperation rop = new RScriptROperation(rscript, false);
-          rSession.execute(rop);
+        if (!R_IMAGE_FILE_ENC.equals(destination) && !R_IMAGE_FILE.equals(destination)) {
+          if (destination.contains("/")) {
+            // make sure destination directory exists
+            String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
+            RScriptROperation rop = new RScriptROperation(rscript, false);
+            rSession.execute(rop);
+          }
+          FileWriteROperation writeop = new FileWriteROperation(destination, file);
+          rSession.execute(writeop);
         }
-        FileWriteROperation writeop = new FileWriteROperation(destination, file);
-        rSession.execute(writeop);
       });
     }
 

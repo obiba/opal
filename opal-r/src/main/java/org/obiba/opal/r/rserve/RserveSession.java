@@ -14,7 +14,6 @@ import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.r.service.NoSuchRSessionException;
-import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
