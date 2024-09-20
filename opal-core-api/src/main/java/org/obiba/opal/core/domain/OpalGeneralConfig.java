@@ -45,6 +45,8 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   private boolean enforced2FA = false;
 
+  private boolean allowRPackageManagement = false;
+
   @NotNull
   public String getName() {
     return name;
@@ -113,6 +115,14 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public boolean isEnforced2FA() {
     return enforced2FA;
+  }
+
+  public boolean isAllowRPackageManagement() {
+    return allowRPackageManagement;
+  }
+
+  public void setAllowRPackageManagement(boolean allowRPackageManagement) {
+    this.allowRPackageManagement = allowRPackageManagement;
   }
 
   @Override

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.datashield;
 
 import org.obiba.datashield.core.DSMethodType;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
@@ -40,6 +41,9 @@ public class DataShieldPackagesResource {
   @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
 
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
   @GET
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
     return dsPackageMethodeHelper.getInstalledPackagesDtos(getDataShieldProfile(profile));
@@ -48,6 +52,9 @@ public class DataShieldPackagesResource {
   @POST
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager, @QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     DataShieldProfile dsProfile = getDataShieldProfile(profile);
     List<String> originalPkgNames = getPackages(profile).stream()
         .map(OpalR.RPackageDto::getName)
@@ -105,6 +112,9 @@ public class DataShieldPackagesResource {
 
   @DELETE
   public Response deletePackages(@QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       for (OpalR.RPackageDto pkg : getPackages(profile)) {
         dsPackageMethodeHelper.deletePackage(getDataShieldProfile(profile), pkg);

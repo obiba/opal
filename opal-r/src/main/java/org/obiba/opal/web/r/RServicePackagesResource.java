@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
@@ -41,6 +42,9 @@ public class RServicePackagesResource {
   @Autowired
   private RServerManagerService rServerManagerService;
 
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
   @GET
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
     return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile));
@@ -48,6 +52,9 @@ public class RServicePackagesResource {
 
   @PUT
   public Response updateAllPackages(@QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       rPackageHelper.updateAllCRANPackages(rServerManagerService.getRServer(profile));
     } catch (Exception e) {
@@ -60,6 +67,9 @@ public class RServicePackagesResource {
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager,
                                  @QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     rPackageHelper.installPackage(rServerManagerService.getRServer(profile), name, ref, manager);
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(name)).build();

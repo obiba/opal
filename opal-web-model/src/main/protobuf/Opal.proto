@@ -331,6 +331,7 @@ message GeneralConf {
   optional string publicURL = 4;
   optional string logoutURL = 5;
   required bool enforced2FA = 6;
+  required bool allowRPackageManagement = 7;
 }
 
 message AttributeConf {

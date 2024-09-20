@@ -14,6 +14,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
@@ -36,11 +37,17 @@ public class RClusterCommandsUpdateResource extends AbstractCommandsResource {
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsUpdateResource.class);
 
   @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
+  @Autowired
   @Qualifier("web")
   private CommandRegistry commandRegistry;
 
   @POST
   public Response updateAllPackages(@PathParam("cname") String name) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     Commands.RPackagesCommandOptionsDto optionsDto = Commands.RPackagesCommandOptionsDto.newBuilder()
         .setCluster(name).build();
     Command<RPackagesCommandOptions> rCommand = commandRegistry.newCommand("r-packages");

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
@@ -38,6 +39,9 @@ public class DataShieldPackageResource {
 
   @Autowired
   private DataShieldPackageMethodHelper dsPackageMethodeHelper;
+
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
 
   @GET
   public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
@@ -123,6 +127,9 @@ public class DataShieldPackageResource {
    */
   @DELETE
   public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       dsPackageMethodeHelper.deletePackage(getDataShieldProfile(profile), name);
     } catch (Exception e) {

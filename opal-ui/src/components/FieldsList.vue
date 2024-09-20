@@ -4,9 +4,10 @@
     <template v-if="locale"></template>
 
     <q-item v-for="item in visibleItems" :key="item.field">
-      <q-item-section style="max-width: 200px">
-        <q-item-label overline class="text-grey-6">
-          {{ $t(item.label ? item.label : item.field) }}
+      <q-item-section :style="`max-width: ${maxWidth}px`">
+        <q-item-label>
+          <div class="text-overline text-grey-6">{{ $t(item.label ? item.label : item.field) }}</div>
+          <div v-if="item.hint" class="text-hint">{{ $t(item.hint) }}</div>
         </q-item-label>
       </q-item-section>
       <q-item-section>
@@ -60,6 +61,7 @@ export interface FieldLink {
 export interface FieldItem<T> {
   field: string;
   label?: string;
+  hint?: string;
   unit?: string;
   format?: (val: T) => string | undefined;
   html?: (val: T) => string | undefined;
@@ -71,12 +73,14 @@ export interface FieldItem<T> {
 export interface FieldsListProps {
   dbobject: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap;
   items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap>[];
+  maxWidth?: string;
 }
 
 const { locale } = useI18n({ useScope: 'global' });
 const props = withDefaults(defineProps<FieldsListProps>(), {
   dbobject: undefined,
   items: undefined,
+  maxWidth: '200px',
 });
 
 const visibleItems = computed(() => {

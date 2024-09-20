@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class RServicePackageResource {
   @Autowired
   private RServerManagerService rServerManagerService;
 
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
   @GET
   public OpalR.RPackageDto getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile)).stream()
@@ -43,6 +47,9 @@ public class RServicePackageResource {
 
   @DELETE
   public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       rPackageHelper.removePackage(rServerManagerService.getRServer(profile), name);
     } catch (Exception e) {

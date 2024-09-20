@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div v-if="!systemStore.generalConf.allowRPackageManagement" class="box-info q-mt-sm">
+      <q-icon name="info" />
+      {{ $t('r_packages_management_forbidden') }}
+    </div>
     <q-table
       flat
       :rows="packages"
@@ -11,7 +15,7 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left">
+        <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left" :disable="!systemStore.generalConf.allowRPackageManagement">
           <q-list>
             <q-item clickable v-close-popup @click="onShowInstallPackages">
               <q-item-section>
@@ -45,6 +49,7 @@
                 @click="onShowViewPackage(props.row)"
               />
               <q-btn
+                v-if="systemStore.generalConf.allowRPackageManagement"
                 rounded
                 dense
                 flat
@@ -105,6 +110,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const systemStore = useSystemStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 const { t } = useI18n();

@@ -10,9 +10,11 @@
 
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,9 @@ import java.util.List;
 public class RServiceClusterServerResource extends AbstractRServiceResource {
 
   private static final Logger log = LoggerFactory.getLogger(RServiceClusterServerResource.class);
+
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
 
   //
   // R server methods
@@ -63,6 +68,9 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
   @PUT
   @Path("/packages")
   public Response updateAllPackages(@PathParam("cname") String clusterName, @PathParam("sname") String serverName) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       rPackageHelper.updateAllCRANPackages(rServerManagerService.getRServerCluster(clusterName).getRServerService(serverName));
     } catch (Exception e) {
@@ -76,6 +84,9 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
   public Response installPackage(@Context UriInfo uriInfo, @PathParam("cname") String clusterName, @PathParam("sname") String serverName,
                                  @QueryParam("name") String pkgName,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     rPackageHelper.installPackage(rServerManagerService.getRServerCluster(clusterName).getRServerService(serverName), pkgName, ref, manager);
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(RServicePackageResource.class);
     return Response.created(ub.build(pkgName)).build();
@@ -85,6 +96,9 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
   @Path("/packages")
   public Response deletePackages(@PathParam("cname") String clusterName, @PathParam("sname") String serverName,
                                  @QueryParam("name") List<String> pkgNames) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     if (pkgNames != null) {
       pkgNames.forEach(pkgName -> deletePackage(clusterName, serverName, pkgName));
     }
@@ -103,6 +117,9 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
   @DELETE
   @Path("/package/{pname}")
   public Response deletePackage(@PathParam("cname") String clusterName, @PathParam("sname") String serverName, @PathParam("pname") String pkgName) {
+    if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
+      return Response.status(Response.Status.FORBIDDEN).build();
+
     try {
       rPackageHelper.removePackage(rServerManagerService.getRServerCluster(clusterName).getRServerService(serverName), pkgName);
     } catch (Exception e) {

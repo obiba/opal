@@ -359,6 +359,7 @@ export interface GeneralConf {
   publicURL?: string | undefined;
   logoutURL?: string | undefined;
   enforced2FA: boolean;
+  allowRPackageManagement: boolean;
 }
 
 export interface AttributeConf {

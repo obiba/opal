@@ -10,6 +10,7 @@ export const useSystemStore = defineStore('system', () => {
     return api.get('/system/conf/general').then((response) => {
       if (response.status === 200) {
         generalConf.value = response.data;
+        document.title = generalConf.value.name;
       }
       return response;
     });

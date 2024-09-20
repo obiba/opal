@@ -10,6 +10,8 @@ export default {
     languages_hint: 'The languages used to describe the dictionaries.',
     default_charset_hint: 'The default char set used when prompting dictionnaries data.',
     enforced_2fa_hint: 'Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.',
+    allow_r_packages_management: 'Allow R packages management',
+    allow_r_packages_management_hint: 'Allow administrators to install, update and remove R packages on the R servers. Not recommended in a production environment.',
   },
   apps: {
     title: 'Apps',
@@ -1116,6 +1118,7 @@ export default {
   query: 'Query',
   quotation_mark: 'Quotation mark',
   r_func: 'Function',
+  r_packages_management_forbidden: 'R packages management (installation, update, removal) is not allowed: it is recommended to use validated Docker images of R servers, to ensure reproducibility of the R analysis environment. As a R package developer, you may modify the system settings to enable this feature.',
   r_script: 'Script',
   r_service: 'R service',
   range: 'Range',
