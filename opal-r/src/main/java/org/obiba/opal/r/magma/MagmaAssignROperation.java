@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerConnection;
@@ -21,6 +22,7 @@ import org.obiba.opal.spi.r.RServerException;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Assign Magma values (from a table or a variable) to a R symbol.
@@ -57,11 +59,13 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final RClass rClass;
 
-  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, String idColumnName) {
-    this(symbol, valueTable, dataExportService, idColumnName, RClass.TIBBLE);
+  private final RCacheHelper rCacheHelper;
+
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, RCacheHelper rCacheHelper, String idColumnName) {
+    this(symbol, valueTable, dataExportService, rCacheHelper, idColumnName, RClass.TIBBLE);
   }
 
-  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, String idColumnName, RClass rClass) {
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, @NotNull DataExportService dataExportService, RCacheHelper rCacheHelper, String idColumnName, RClass rClass) {
     this.symbol = symbol;
     this.path = "";
     this.valueTable = valueTable;
@@ -72,12 +76,14 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.dataExportService = dataExportService;
     this.idColumnName = idColumnName;
     this.rClass = rClass;
+    this.rCacheHelper = rCacheHelper;
   }
 
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
                                boolean withMissings, String idColumnName, String identifiersMapping, RClass rClass,
                                @NotNull IdentifiersTableService identifiersTableService,
-                               @NotNull DataExportService dataExportService) {
+                               @NotNull DataExportService dataExportService,
+                               @NotNull RCacheHelper rCacheHelper) {
     this.symbol = symbol;
     this.path = path;
     this.valueTable = null;
@@ -88,6 +94,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.identifiersTableService = identifiersTableService;
     this.dataExportService = dataExportService;
     this.rClass = path.contains(":") ? RClass.VECTOR : RClass.VECTOR.equals(rClass) ? RClass.DATA_FRAME : rClass;
+    this.rCacheHelper = rCacheHelper;
   }
 
   @Override
@@ -111,6 +118,10 @@ public class MagmaAssignROperation extends AbstractROperation {
     converter.doAssign(symbol, path);
   }
 
+  public RCacheHelper getRCacheHelper() {
+    return rCacheHelper;
+  }
+
   RServerConnection getRConnection() {
     return getConnection();
   }
@@ -125,6 +136,10 @@ public class MagmaAssignROperation extends AbstractROperation {
     } catch (RServerException e) {
       throw new RRuntimeException(e);
     }
+  }
+
+  void doReadFile(String fileName, OutputStream out) {
+    readFile(fileName, out);
   }
 
   void doWriteFile(String fileName, InputStream in) {

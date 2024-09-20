@@ -10,6 +10,9 @@
 
 package org.obiba.opal.core.service.security;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public interface CryptoService {
 
   String generateSecretKey();
@@ -17,5 +20,9 @@ public interface CryptoService {
   String encrypt(String plain);
 
   String decrypt(String encrypted);
+
+  InputStream newCipherInputStream(InputStream in);
+
+  OutputStream newCipherOutputStream(OutputStream out);
 
 }

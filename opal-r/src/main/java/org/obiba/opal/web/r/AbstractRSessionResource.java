@@ -19,6 +19,7 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
@@ -55,6 +56,9 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Autowired
   private DataExportService dataExportService;
+
+  @Autowired
+  private RCacheHelper rCacheHelper;
 
   @Autowired
   private ResourceReferenceService resourceReferenceService;
@@ -237,6 +241,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     resource.setRServerSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
     resource.setDataExportService(dataExportService);
+    resource.setRCacheHelper(rCacheHelper);
     resource.setResourceReferenceService(resourceReferenceService);
     return resource;
   }

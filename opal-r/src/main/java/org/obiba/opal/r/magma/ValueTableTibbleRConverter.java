@@ -11,7 +11,6 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -20,12 +19,12 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.r.datasource.RAssignDatasourceFactory;
-import org.obiba.opal.spi.r.RRuntimeException;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -41,8 +40,6 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableTibbleRConverter.class);
 
-  private static final String R_CACHE_DIR = System.getenv().get("OPAL_HOME") + File.separatorChar + "work" + File.separatorChar + "R" + File.separatorChar + "cache";
-
   ValueTableTibbleRConverter(MagmaAssignROperation magmaAssignROperation) {
     super(magmaAssignROperation);
   }
@@ -56,17 +53,19 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
 
     Stopwatch stopwatch = Stopwatch.createStarted();
 
-    File tableCache = getTableRCache(table);
+    String cacheKey = getTableRCacheKey(table);
+    String rdsFileName = String.format("%s.rds", cacheKey);
     boolean assigned = false;
-    if (tableCache.exists()) {
-      log.info("Assign table '{}' from R cache: {}", table.getName(), tableCache.getName());
-      try (InputStream is = new FileInputStream(tableCache)) {
-        magmaAssignROperation.doWriteFile(tableCache.getName(), is);
-        magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', readRDS('%s')))", getSymbol(), tableCache.getName()));
-        magmaAssignROperation.doEval(String.format("base::unlink('%s')", tableCache.getName()));
+    RCacheHelper rCacheHelper = magmaAssignROperation.getRCacheHelper();
+    if (rCacheHelper.hasCache(cacheKey)) {
+      log.info("Assign table '{}' from R cache: {}", table.getName(), cacheKey);
+      try (InputStream is = rCacheHelper.newRDSInputStream(cacheKey)) {
+        magmaAssignROperation.doWriteFile(rdsFileName, is);
+        magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', readRDS('%s')))", getSymbol(), rdsFileName));
+        magmaAssignROperation.doEval(String.format("base::unlink('%s')", rdsFileName));
         assigned = true;
       } catch (IOException e) {
-         log.warn("Failed at reinstating table R cache: {}", tableCache.getName(), e);
+         log.warn("Failed at reinstating table R cache: {}", cacheKey, e);
       }
     }
 
@@ -89,27 +88,27 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
         Disposables.silentlyDispose(ds);
       }
 
-      if (!tableCache.exists()) {
+      if (!rCacheHelper.hasCache(cacheKey)) {
         try {
-          magmaAssignROperation.doEval(String.format("saveRDS(`%s`, '%s')", getSymbol(), tableCache.getName()));
-          magmaAssignROperation.doReadFile(tableCache.getName(), tableCache);
-          magmaAssignROperation.doEval(String.format("base::unlink('%s')", tableCache.getName()));
+          magmaAssignROperation.doEval(String.format("saveRDS(`%s`, '%s')", getSymbol(), rdsFileName));
+          magmaAssignROperation.doReadFile(rdsFileName, rCacheHelper.newRDSOutputStream(cacheKey));
+          magmaAssignROperation.doEval(String.format("base::unlink('%s')", rdsFileName));
         } catch (Exception e) {
           log.warn("Table R cache failure", e);
-          tableCache.delete();
+          rCacheHelper.evictCache(cacheKey);
         }
       }
     }
     log.info("R assignment succeed in {}", stopwatch.stop());
   }
 
-  private File getTableRCache(ValueTable table) {
+  private String getTableRCacheKey(ValueTable table) {
     String parametersKey = magmaAssignROperation.getIdColumnName() + "-" +
         magmaAssignROperation.withMissings() +  "-" +
         magmaAssignROperation.getIdentifiersMapping();
     try {
       parametersKey = parametersKey + "-" + (magmaAssignROperation.hasVariableFilter() ?
-            URLEncoder.encode(magmaAssignROperation.getVariableFilter(), StandardCharsets.UTF_8.toString()) : "null");
+            URLEncoder.encode(magmaAssignROperation.getVariableFilter(), StandardCharsets.UTF_8) : "null");
     } catch (Exception e) {
       // ignore
     }
@@ -121,8 +120,7 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
     String cacheKey = table.getDatasource().getName() + "-" + table.getName() + "-" +
         getCRC32Checksum(parametersKey.getBytes()) + "-" +
         ((Date)table.getTimestamps().getLastUpdate().getValue()).getTime();
-    File tableCache = new File(R_CACHE_DIR, cacheKey + ".rds");
-    return tableCache;
+    return cacheKey;
   }
 
   public static long getCRC32Checksum(byte[] bytes) {

@@ -13,6 +13,7 @@ package org.obiba.opal.web.r;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.r.service.RServerSession;
 
 import jakarta.ws.rs.*;
@@ -30,6 +31,8 @@ public interface RSymbolResource {
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
 
   void setDataExportService(DataExportService dataExportService);
+
+  void setRCacheHelper(RCacheHelper rCacheHelper);
 
   void setResourceReferenceService(ResourceReferenceService resourceReferenceService);
 

@@ -15,6 +15,7 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
+import org.obiba.opal.r.service.RCacheHelper;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -43,6 +44,9 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   protected DataExportService dataExportService;
 
   @NotNull
+  protected RCacheHelper rCacheHelper;
+
+  @NotNull
   private ResourceReferenceService resourceReferenceService;
 
   @Override
@@ -67,6 +71,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public void setDataExportService(DataExportService dataExportService) {
     this.dataExportService = dataExportService;
+  }
+
+  @Override
+  public void setRCacheHelper(RCacheHelper rCacheHelper) {
+    this.rCacheHelper = rCacheHelper;
   }
 
   @Override
@@ -150,7 +159,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     MagmaAssignROperation.RClass rClassToApply = getRClassToApply(path, rClass);
     return assignSymbol(uri,
         new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, identifiersMapping,
-            rClassToApply, identifiersTableService, dataExportService), async);
+            rClassToApply, identifiersTableService, dataExportService, rCacheHelper), async);
   }
 
   protected ROperation wrapROperation(ROperation rop) {
