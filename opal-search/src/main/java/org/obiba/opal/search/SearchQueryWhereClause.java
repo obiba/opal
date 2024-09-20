@@ -10,17 +10,15 @@
 
 package org.obiba.opal.search;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.search.service.ValuesIndexManager;
-import org.obiba.opal.web.search.support.RQLParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -48,20 +46,7 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
 
   @Override
   public void initialise() {
-    if (!entities.isEmpty() || allEntities) return; // already initialised
-    try {
-      String esQuery = RQLParserFactory.parse(query, opalSearchService.getValuesIndexManager());
-      if (Strings.isNullOrEmpty(esQuery)) {
-        allEntities = true;
-        return;
-      }
-      String safeQuery = "reference:\"" + valueTable.getTableReference() + "\" AND " + esQuery;
-      opalSearchService.executeAllIdentifiersQuery(
-          buildQuerySearch(safeQuery, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null),
-          getSearchPath()).forEach(id -> entities.add(new VariableEntityBean(valueTable.getEntityType(), id)));
-    } catch(Exception e) {
-      log.error("Failed querying: {}", query, e);
-    }
+    throw new DeprecatedOperationException("Unsupported operation: since Opal 5 values are not indexed");
   }
 
   @Override
