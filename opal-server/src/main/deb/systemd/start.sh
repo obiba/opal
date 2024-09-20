@@ -15,7 +15,9 @@ done
 
 # Append plugins lib
 while IFS= read -r dir; do
-  CLASSPATH="$CLASSPATH:$dir"
+  if ! ls "$dir/../uninstall" > /dev/null 2>&1; then
+    CLASSPATH="$CLASSPATH:$dir"
+  fi
 done < <(find "${OPAL_HOME}/plugins/" -type d -name lib | grep -v ".archive")
 
 APP_OPTS="${JAVA_ARGS} -cp ${CLASSPATH} -DOPAL_HOME=${OPAL_HOME} -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} -Dpolyglot.log.file=${OPAL_LOG}/polyglot.log -Dpolyglot.engine.WarnInterpreterOnly=false"

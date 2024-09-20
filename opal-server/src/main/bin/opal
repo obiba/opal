@@ -49,7 +49,9 @@ done
 
 # Append plugins lib
 while IFS= read -r dir; do
-  CLASSPATH="$CLASSPATH:$dir"
+  if ! ls "$dir/../uninstall" > /dev/null 2>&1; then
+    CLASSPATH="$CLASSPATH:$dir"
+  fi
 done < <(find "${OPAL_HOME}/plugins/" -type d -name lib | grep -v ".archive")
 
 [ -e "$OPAL_HOME/logs" ] || mkdir "$OPAL_HOME/logs"
