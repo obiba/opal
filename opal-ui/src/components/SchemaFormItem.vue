@@ -153,7 +153,7 @@ const dataArray = ref<Array<FormObject>>([]);
 
 //onMounted(init);
 
-watch([() => props.modelValue, () => props.field], init);
+watch([() => props.modelValue, () => props.field], init, { immediate: true });
 
 function init() {
   data.value = props.modelValue;
@@ -188,14 +188,17 @@ function onUpdate() {
   if (isArray()) {
     data.value = dataArray.value;
   }
+  console.log('onUpdate', data.value);
   emit('update:modelValue', data.value);
 }
 
 function onArrayUpdate(index: number) {
+  console.log('onArrayUpdate', index, dataArray.value[index]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onUpdate();
   return (value: any) => {
+    console.log('onArrayUpdate in', index);
     dataArray.value[index] = value;
-    onUpdate();
   };
 }
 

@@ -204,12 +204,13 @@ const columns = computed(() => [
 
 function getSuccessCount(dto: OpalAnalysisResultDto) {
   let successCount = 0;
+  const results = dto.resultItems || [];
 
-  dto.resultItems.forEach((item) => {
+  results.forEach((item) => {
     successCount += item.status === 'PASSED' ? 1 : 0;
   });
 
-  return successCount + ' / ' + dto.resultItems.length;
+  return successCount + ' / ' + results.length;
 }
 
 // Handlers

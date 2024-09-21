@@ -63,7 +63,8 @@ function isValid() {
 }
 
 function onUpdate(key: string) {
-  initDefaults();
+  // NOTE: calling this here removes the array value from the data object
+  // initDefaults();
   if (!isValid()) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);
 }

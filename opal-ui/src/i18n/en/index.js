@@ -360,6 +360,7 @@ export default {
     delete_analysis_confirm: 'Are sure you want to delete the \'{name}\' analysis and its associated results. This cannot be undone and all data will be lost.',
     analysis_dialog: {
       title: 'Add Analysis',
+      type_hint: 'Apply data validation rules. Validating data is all about checking whether a data set meets presumptions or expectations you have about it. Based on the validate R package which is intended to make checking your data easy, maintainable and reproducible.'
     }
   },
   id_mappings: {
