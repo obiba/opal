@@ -50,12 +50,41 @@
             </template>
           </q-select>
 
-          <schema-form
-            v-if="!!sfModel && !!sfSchema"
-            v-model="sfModel"
-            :schema="sfSchema"
+          <q-select
+            ref="variableSelect"
+            v-model="selectedVariables"
+            :options="variableOptions"
+            :label="$t('table')"
+            :hint="$t('vcf_store.mapping_table_hint')"
+            :loading="loadingVariables"
             :disable="editMode"
-          />
+            class="q-mb-md"
+            dense
+            multiple
+            emit-value
+            map-options
+            use-input
+            use-chips
+            hide-selection
+            input-debounce="0"
+            @filter="onFilterFn"
+          >
+            <template v-slot:option="scope">
+              <q-item dense clickable :label="scope.opt.group" @click="onAddVariable(scope.opt.value)">
+                <q-item-section class="q-pa-none">
+                  {{ scope.opt.label.name }}
+                  <span class="text-help">{{ scope.opt.label.vlabel }}</span>
+                </q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:selected-item="scope">
+              <q-chip removable @remove="onRemoveVariable(scope.opt.value)">
+                {{ scope.opt.value }}
+              </q-chip>
+            </template>
+          </q-select>
+
+          <schema-form v-if="!!sfModel && !!sfSchema" v-model="sfModel" :schema="sfSchema" :disable="editMode" />
         </q-form>
       </q-card-section>
 
@@ -82,6 +111,8 @@ import { FormObject, SchemaFormObject } from 'src/components/models';
 import { AnalysisPluginTemplateDto } from 'src/models/Plugins';
 import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { QueryResultDto } from 'src/models/Search';
+import { EntryDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
@@ -92,17 +123,23 @@ interface DialogProps {
 
 type PluginTemplate = { pluginName: string; templateName: string };
 type TemplateOption = { label: string; value?: PluginTemplate };
+type VariableOption = { label: { [key: string]: string }; value: string };
 
 const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const pluginsStore = usePluginsStore();
+const searchStore = useSearchStore();
 
+const variableSelect = ref();
 const emit = defineEmits(['update:modelValue', 'update']);
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
 const dialogTitle = ref('FILL ME');
 const submitCaption = ref('FILL ME');
+const selectedVariables = ref<string[]>([]);
+const loadingVariables = ref(false);
+const variableOptions = ref([] as VariableOption[]);
 const selectedTemplate = ref<PluginTemplate>({} as PluginTemplate);
 const templateOptions = ref([] as TemplateOption[]);
 const analysisOptions = ref({} as AnalyseCommandOptionsDto_AnalyseDto);
@@ -151,24 +188,29 @@ watch(
     if (value) {
       submitCaption.value = 'Add';
       if (!!props.analysisName) {
-        projectsStore.getAnalysis(props.projectName, props.tableName, props.analysisName).then((response: OpalAnalysisDto) => {
-          pluginSchemaFormData[`${response.pluginName}.${response.templateName}`].model = JSON.parse(
-            response.parameters
-          );
-          dialogTitle.value = `${response.name} - ${response.pluginName} / ${response.templateName}`;
-          analysisOptions.value.name = response.name;
-          analysisOptions.value.table = response.table;
-          analysisOptions.value.plugin = response.pluginName;
-          analysisOptions.value.template = response.templateName;
-          analysisOptions.value.params = response.parameters;
-          analysisOptions.value.variables = (response.variables || []).join(',');
+        projectsStore
+          .getAnalysis(props.projectName, props.tableName, props.analysisName)
+          .then((response: OpalAnalysisDto) => {
+            pluginSchemaFormData[`${response.pluginName}.${response.templateName}`].model = JSON.parse(
+              response.parameters
+            );
+            dialogTitle.value = `${response.name} - ${response.pluginName} / ${response.templateName}`;
+            analysisOptions.value.name = response.name;
+            analysisOptions.value.table = response.table;
+            analysisOptions.value.plugin = response.pluginName;
+            analysisOptions.value.template = response.templateName;
+            analysisOptions.value.params = response.parameters;
 
-          selectedTemplate.value = {
-            pluginName: analysisOptions.value.plugin,
-            templateName: analysisOptions.value.template,
-          };
-          updateSchemaForm();
-        });
+            selectedVariables.value = (response.variables || []);
+            variableOptions.value = selectedVariables.value.map((variable) => {
+              return { label: { name: variable, vlabel: variable }, value: variable };
+            });
+            selectedTemplate.value = {
+              pluginName: analysisOptions.value.plugin,
+              templateName: analysisOptions.value.template,
+            };
+            updateSchemaForm();
+          });
       } else {
         dialogTitle.value = t('analyse_validate.analysis_dialog.add_analysis');
         submitCaption.value = t('run');
@@ -182,13 +224,12 @@ watch(
             plugin: '',
             template: '',
             params: '',
-            variables: ''
+            variables: '',
           } as AnalyseCommandOptionsDto_AnalyseDto;
         } else {
           throw new Error('No templates found');
         }
       }
-
     }
     showDialog.value = value;
   }
@@ -199,6 +240,51 @@ function onTemplateSelected(value: PluginTemplate) {
   updateSchemaForm();
 }
 
+function onAddVariable(value: string) {
+  if (!selectedVariables.value) selectedVariables.value = [];
+  if (!selectedVariables.value.includes(value)) selectedVariables.value.push(value);
+  else onRemoveVariable(value);
+  variableSelect.value?.updateInputValue('');
+}
+
+function onRemoveVariable(value: string) {
+  if (!selectedVariables.value) return
+  selectedVariables.value = selectedVariables.value.filter((item) => item !== value);
+}
+
+function getSearchHitFieldMap(fields: EntryDto[], keys: string[]): { [key: string]: string } {
+  const result: EntryDto[] = fields.filter((field) => keys.includes(field.key)) || ([] as EntryDto[]);
+  return result.reduce((acc, f: EntryDto) => {
+    acc[f.key] = f.value ?? '';
+    return acc;
+  }, {} as { [key: string]: string });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function onFilterFn(query: string, update: any) {
+  try {
+    loadingVariables.value = true;
+
+    const fullQuery = `query=${query} AND (project:"${props.projectName}") AND (table:"${props.tableName}")`;
+    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en']);
+    if (result.totalHits > 0) {
+      variableOptions.value = [];
+      result.hits.map((hit) => {
+        const fieldMap = getSearchHitFieldMap(hit['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
+        variableOptions.value.push({
+          label: { name: fieldMap['name'], vlabel: fieldMap['label-en'] },
+          value: fieldMap['name'],
+        });
+      });
+    }
+  } catch (error) {
+    // ignore
+  } finally {
+    loadingVariables.value = false;
+    update();
+  }
+}
+
 function onHide() {
   pluginSchemaFormData[`${selectedTemplate.value?.pluginName}.${selectedTemplate.value?.templateName}`].model = {};
   selectedTemplate.value = {} as PluginTemplate;
@@ -206,6 +292,7 @@ function onHide() {
   sfSchema.value = undefined;
   analysisOptions.value = {} as AnalyseCommandOptionsDto_AnalyseDto;
   showDialog.value = false;
+  selectedVariables.value = [];
   emit('update:modelValue', false);
 }
 
@@ -216,6 +303,11 @@ async function onRunAnalysis() {
       analysisOptions.value.plugin = selectedTemplate.value.pluginName;
       analysisOptions.value.template = selectedTemplate.value.templateName;
       analysisOptions.value.params = JSON.stringify(sfModel.value);
+
+      if (!!selectedVariables.value) {
+        analysisOptions.value.variables = selectedVariables.value.join(',');
+      }
+
       const commandOptions: AnalyseCommandOptionsDto = {
         project: props.projectName,
         analyses: [analysisOptions.value],
