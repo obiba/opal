@@ -359,7 +359,9 @@ export default {
     analyse_command_created: 'Analysis task created with identifier [ {id} ].',
     delete_analysis_confirm: 'Are sure you want to delete the \'{name}\' analysis and its associated results. This cannot be undone and all data will be lost.',
     analysis_dialog: {
+      add_analysis: 'Add Analysis',
       title: 'Add Analysis',
+      variables_hint: 'The variable names (comma separated) to which to the analysis applies. If not specified all the table variables will be analysable.',
       type_hint: 'Apply data validation rules. Validating data is all about checking whether a data set meets presumptions or expectations you have about it. Based on the validate R package which is intended to make checking your data easy, maintainable and reproducible.'
     }
   },
@@ -518,6 +520,7 @@ export default {
     range: 'Value must be between {min} and {max} inclusively',
     identifiers_required: 'Identifiers are required',
     table_name_required: 'Table name is required',
+    missing_required_fields: 'Missing required fields',
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',

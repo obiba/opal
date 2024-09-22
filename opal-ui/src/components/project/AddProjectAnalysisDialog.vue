@@ -54,8 +54,8 @@
             ref="variableSelect"
             v-model="selectedVariables"
             :options="variableOptions"
-            :label="$t('table')"
-            :hint="$t('vcf_store.mapping_table_hint')"
+            :label="$t('variables')"
+            :hint="$t('analyse_validate.analysis_dialog.variables_hint')"
             :loading="loadingVariables"
             :disable="editMode"
             class="q-mb-md"
@@ -84,7 +84,13 @@
             </template>
           </q-select>
 
-          <schema-form v-if="!!sfModel && !!sfSchema" v-model="sfModel" :schema="sfSchema" :disable="editMode" />
+          <schema-form
+            ref="sfForm"
+            v-if="!!sfModel && !!sfSchema"
+            v-model="sfModel"
+            :schema="sfSchema"
+            :disable="editMode"
+          />
         </q-form>
       </q-card-section>
 
@@ -135,6 +141,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
+const sfForm = ref();
 const dialogTitle = ref('FILL ME');
 const submitCaption = ref('FILL ME');
 const selectedVariables = ref<string[]>([]);
@@ -201,7 +208,7 @@ watch(
             analysisOptions.value.template = response.templateName;
             analysisOptions.value.params = response.parameters;
 
-            selectedVariables.value = (response.variables || []);
+            selectedVariables.value = response.variables || [];
             variableOptions.value = selectedVariables.value.map((variable) => {
               return { label: { name: variable, vlabel: variable }, value: variable };
             });
@@ -248,7 +255,7 @@ function onAddVariable(value: string) {
 }
 
 function onRemoveVariable(value: string) {
-  if (!selectedVariables.value) return
+  if (!selectedVariables.value) return;
   selectedVariables.value = selectedVariables.value.filter((item) => item !== value);
 }
 
@@ -286,7 +293,11 @@ async function onFilterFn(query: string, update: any) {
 }
 
 function onHide() {
-  pluginSchemaFormData[`${selectedTemplate.value?.pluginName}.${selectedTemplate.value?.templateName}`].model = {};
+  const key = `${selectedTemplate.value?.pluginName}.${selectedTemplate.value?.templateName}`;
+  if (key in pluginSchemaFormData) {
+    pluginSchemaFormData[key].model = {};
+  }
+
   selectedTemplate.value = {} as PluginTemplate;
   sfModel.value = {};
   sfSchema.value = undefined;
@@ -298,7 +309,8 @@ function onHide() {
 
 async function onRunAnalysis() {
   const valid: boolean = await formRef.value.validate();
-  if (valid) {
+
+  if (valid && sfForm.value.validate()) {
     try {
       analysisOptions.value.plugin = selectedTemplate.value.pluginName;
       analysisOptions.value.template = selectedTemplate.value.templateName;
