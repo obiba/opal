@@ -56,7 +56,7 @@
     <template v-slot:body-cell-name="props">
       <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         {{ props.value }}
-        <div class="float-right">
+        <div class="float-right" v-if="taxonomiesStore.canEdit">
           <q-btn
             rounded
             dense
