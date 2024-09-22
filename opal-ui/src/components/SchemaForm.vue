@@ -1,6 +1,5 @@
 <template>
   <div v-if="schema">
-    <per>{{ isFormValid }}</per>
     <form autocomplete="off" :class="{ 'o-border-negative rounded-borders': !isFormValid }">
       <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
       <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>

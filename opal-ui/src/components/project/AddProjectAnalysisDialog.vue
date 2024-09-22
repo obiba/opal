@@ -8,97 +8,53 @@
       <q-separator />
 
       <q-card-section>
-        <q-form ref="formRef" class="q-gutter-md" persistent>
-          <q-input
-            v-model="analysisOptions.name"
+        <template v-if="editMode">
+          <q-tabs
+            v-model="tab"
             dense
-            type="text"
-            :label="$t('name') + ' *'"
-            class="q-mb-md"
-            lazy-rules
-            :disable="editMode"
-            :rules="[validateRequiredField]"
+            class="text-grey"
+            active-color="primary"
+            indicator-color="primary"
+            align="justify"
           >
-          </q-input>
-          <q-select
-            v-model="selectedTemplate"
-            :options="templateOptions"
-            :label="$t('type')"
-            :hint="$t('analyse_validate.analysis_dialog.type_hint')"
-            :disable="editMode"
-            dense
-            map-options
-            emit-value
-          >
-            <template v-slot:option="scope">
-              <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
-                <q-item-section class="q-pa-none">
-                  {{ scope.opt.label }}
-                </q-item-section>
-              </q-item>
-              <q-item
-                v-show="!!scope.opt.value"
-                dense
-                clickable
-                v-close-popup
-                @click="onTemplateSelected(scope.opt.value)"
-              >
-                <q-item-section class="q-pl-md">
-                  {{ scope.opt.label }}
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-
-          <q-select
-            ref="variableSelect"
-            v-model="selectedVariables"
-            :options="variableOptions"
-            :label="$t('variables')"
-            :hint="$t('analyse_validate.analysis_dialog.variables_hint')"
-            :loading="loadingVariables"
-            :disable="editMode"
-            class="q-mb-md"
-            dense
-            multiple
-            emit-value
-            map-options
-            use-input
-            use-chips
-            hide-selection
-            input-debounce="0"
-            @filter="onFilterFn"
-          >
-            <template v-slot:option="scope">
-              <q-item dense clickable :label="scope.opt.group" @click="onAddVariable(scope.opt.value)">
-                <q-item-section class="q-pa-none">
-                  {{ scope.opt.label.name }}
-                  <span class="text-help">{{ scope.opt.label.vlabel }}</span>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:selected-item="scope">
-              <q-chip removable @remove="onRemoveVariable(scope.opt.value)">
-                {{ scope.opt.value }}
-              </q-chip>
-            </template>
-          </q-select>
-
-          <schema-form
-            ref="sfForm"
-            v-if="!!sfModel && !!sfSchema"
-            v-model="sfModel"
-            :schema="sfSchema"
-            :disable="editMode"
-          />
-        </q-form>
+            <q-tab no-caps name="results" :label="$t('results')" />
+            <q-tab no-caps name="parameters" :label="$t('parameters')" />
+          </q-tabs>
+          <q-tab-panels v-model="tab">
+            <q-tab-panel name="results"> </q-tab-panel>
+            <q-tab-panel name="parameters">
+              <project-analysis-panel
+                ref="analysisPanel"
+                :project-name="projectName"
+                :table-name="tableName"
+                :analysis-name="analysisName"
+                :analysis-names="analysisNames"
+              />
+            </q-tab-panel>
+          </q-tab-panels>
+        </template>
+        <project-analysis-panel
+          v-else
+          ref="analysisPanel"
+          :project-name="projectName"
+          :table-name="tableName"
+          :analysis-name="analysisName"
+          :analysis-names="analysisNames"
+        />
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="$t('close')" color="secondary" v-close-popup />
-        <q-btn flat v-if="!editMode" :label="submitCaption" type="submit" color="primary" @click="onRunAnalysis" />
+        <q-btn
+          flat
+          v-if="!editMode"
+          :label="submitCaption"
+          type="submit"
+          color="primary"
+          @click.prevent="onRunAnalysis"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -112,80 +68,26 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { OpalAnalysisDto } from 'src/models/Projects';
-import SchemaForm from 'src/components/SchemaForm.vue';
-import { FormObject, SchemaFormObject } from 'src/components/models';
-import { AnalysisPluginTemplateDto } from 'src/models/Plugins';
-import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
-import { notifyError, notifySuccess } from 'src/utils/notify';
-import { QueryResultDto } from 'src/models/Search';
-import { EntryDto } from 'src/models/Opal';
+import ProjectAnalysisPanel from 'src/components/project/analyse/ProjectAnalysisPanel.vue';
 
 interface DialogProps {
   modelValue: boolean;
   projectName: string;
   tableName: string;
   analysisName?: string;
+  analysisNames: string[];
 }
-
-type PluginTemplate = { pluginName: string; templateName: string };
-type TemplateOption = { label: string; value?: PluginTemplate };
-type VariableOption = { label: { [key: string]: string }; value: string };
 
 const { t } = useI18n();
 const projectsStore = useProjectsStore();
-const pluginsStore = usePluginsStore();
-const searchStore = useSearchStore();
-
-const variableSelect = ref();
 const emit = defineEmits(['update:modelValue', 'update']);
 const props = defineProps<DialogProps>();
+const analysisPanel = ref();
 const showDialog = ref(props.modelValue);
-const formRef = ref();
-const sfForm = ref();
-const dialogTitle = ref('FILL ME');
-const submitCaption = ref('FILL ME');
-const selectedVariables = ref<string[]>([]);
-const loadingVariables = ref(false);
-const variableOptions = ref([] as VariableOption[]);
-const selectedTemplate = ref<PluginTemplate>({} as PluginTemplate);
-const templateOptions = ref([] as TemplateOption[]);
-const analysisOptions = ref({} as AnalyseCommandOptionsDto_AnalyseDto);
-const pluginSchemaFormData = {} as { [key: string]: { schema: SchemaFormObject; model: FormObject } };
-const sfModel = ref<FormObject>({});
-const sfSchema = ref<SchemaFormObject>();
+const dialogTitle = ref('');
+const submitCaption = ref('');
 const editMode = computed(() => !!props.analysisName);
-
-// Validators
-const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
-
-function initPluginData() {
-  (pluginsStore.analysisPlugins.packages || []).forEach((plugin) => {
-    templateOptions.value.push({ label: t(`plugins.${plugin.name}.title`) });
-
-    (plugin['Plugins.AnalysisPluginPackageDto.analysis'].analysisTemplates || []).forEach(
-      (template: AnalysisPluginTemplateDto) => {
-        const schema = JSON.parse(template.schemaForm);
-        // Exclude title and description from schema so they are not rendered as fields
-        delete schema.title;
-        delete schema.description;
-
-        pluginSchemaFormData[`${plugin.name}.${template.name}`] = { schema: schema, model: {} };
-        templateOptions.value.push({
-          label: t(`plugins.${plugin.name}.${template.name}.title`),
-          value: { pluginName: plugin.name, templateName: template.name },
-        });
-      }
-    );
-  });
-}
-
-function updateSchemaForm() {
-  if (!selectedTemplate.value) return;
-
-  const schemaKey = `${selectedTemplate.value.pluginName}.${selectedTemplate.value.templateName}`;
-  sfModel.value = pluginSchemaFormData[schemaKey].model;
-  sfSchema.value = pluginSchemaFormData[schemaKey].schema;
-}
+const tab = ref('results');
 
 // Handlers
 
@@ -198,146 +100,27 @@ watch(
         projectsStore
           .getAnalysis(props.projectName, props.tableName, props.analysisName)
           .then((response: OpalAnalysisDto) => {
-            pluginSchemaFormData[`${response.pluginName}.${response.templateName}`].model = JSON.parse(
-              response.parameters
-            );
             dialogTitle.value = `${response.name} - ${response.pluginName} / ${response.templateName}`;
-            analysisOptions.value.name = response.name;
-            analysisOptions.value.table = response.table;
-            analysisOptions.value.plugin = response.pluginName;
-            analysisOptions.value.template = response.templateName;
-            analysisOptions.value.params = response.parameters;
-
-            selectedVariables.value = response.variables || [];
-            variableOptions.value = selectedVariables.value.map((variable) => {
-              return { label: { name: variable, vlabel: variable }, value: variable };
-            });
-            selectedTemplate.value = {
-              pluginName: analysisOptions.value.plugin,
-              templateName: analysisOptions.value.template,
-            };
-            updateSchemaForm();
           });
       } else {
         dialogTitle.value = t('analyse_validate.analysis_dialog.add_analysis');
         submitCaption.value = t('run');
-        const found = templateOptions.value.find((opt) => !!opt.value) || null;
-        if (!!found && found.value) {
-          selectedTemplate.value = found.value;
-          updateSchemaForm();
-          analysisOptions.value = {
-            name: '',
-            table: props.tableName,
-            plugin: '',
-            template: '',
-            params: '',
-            variables: '',
-          } as AnalyseCommandOptionsDto_AnalyseDto;
-        } else {
-          throw new Error('No templates found');
-        }
       }
     }
     showDialog.value = value;
   }
 );
 
-function onTemplateSelected(value: PluginTemplate) {
-  selectedTemplate.value = value;
-  updateSchemaForm();
-}
-
-function onAddVariable(value: string) {
-  if (!selectedVariables.value) selectedVariables.value = [];
-  if (!selectedVariables.value.includes(value)) selectedVariables.value.push(value);
-  else onRemoveVariable(value);
-  variableSelect.value?.updateInputValue('');
-}
-
-function onRemoveVariable(value: string) {
-  if (!selectedVariables.value) return;
-  selectedVariables.value = selectedVariables.value.filter((item) => item !== value);
-}
-
-function getSearchHitFieldMap(fields: EntryDto[], keys: string[]): { [key: string]: string } {
-  const result: EntryDto[] = fields.filter((field) => keys.includes(field.key)) || ([] as EntryDto[]);
-  return result.reduce((acc, f: EntryDto) => {
-    acc[f.key] = f.value ?? '';
-    return acc;
-  }, {} as { [key: string]: string });
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function onFilterFn(query: string, update: any) {
-  try {
-    loadingVariables.value = true;
-
-    const fullQuery = `query=${query} AND (project:"${props.projectName}") AND (table:"${props.tableName}")`;
-    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en']);
-    if (result.totalHits > 0) {
-      variableOptions.value = [];
-      result.hits.map((hit) => {
-        const fieldMap = getSearchHitFieldMap(hit['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
-        variableOptions.value.push({
-          label: { name: fieldMap['name'], vlabel: fieldMap['label-en'] },
-          value: fieldMap['name'],
-        });
-      });
-    }
-  } catch (error) {
-    // ignore
-  } finally {
-    loadingVariables.value = false;
-    update();
-  }
-}
-
 function onHide() {
-  const key = `${selectedTemplate.value?.pluginName}.${selectedTemplate.value?.templateName}`;
-  if (key in pluginSchemaFormData) {
-    pluginSchemaFormData[key].model = {};
-  }
-
-  selectedTemplate.value = {} as PluginTemplate;
-  sfModel.value = {};
-  sfSchema.value = undefined;
-  analysisOptions.value = {} as AnalyseCommandOptionsDto_AnalyseDto;
   showDialog.value = false;
-  selectedVariables.value = [];
   emit('update:modelValue', false);
 }
 
 async function onRunAnalysis() {
-  const valid: boolean = await formRef.value.validate();
-
-  if (valid && sfForm.value.validate()) {
-    try {
-      analysisOptions.value.plugin = selectedTemplate.value.pluginName;
-      analysisOptions.value.template = selectedTemplate.value.templateName;
-      analysisOptions.value.params = JSON.stringify(sfModel.value);
-
-      if (!!selectedVariables.value) {
-        analysisOptions.value.variables = selectedVariables.value.join(',');
-      }
-
-      const commandOptions: AnalyseCommandOptionsDto = {
-        project: props.projectName,
-        analyses: [analysisOptions.value],
-      };
-
-      projectsStore.runAnalysis(props.projectName, commandOptions).then((id) => {
-        notifySuccess(t('analyse_validate.analyse_command_created', { id }));
-      });
-
-      emit('update');
-      onHide();
-    } catch (error) {
-      notifyError(error);
-    }
+  const succeeded = await analysisPanel.value.runAnalysis();
+  if (succeeded) {
+    emit('update');
+    onHide();
   }
 }
-
-onMounted(() => {
-  initPluginData();
-});
 </script>

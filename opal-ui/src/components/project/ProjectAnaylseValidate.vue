@@ -120,6 +120,7 @@
     :project-name="projectName"
     :table-name="tableName"
     :analysis-name="selectedAnalysis ? selectedAnalysis.name : undefined"
+    :analysis-names="analysisNames"
     @update:model-value="onAnalysisDialogClosed"
     @update="onAnalysisUpdated"
   />
@@ -165,6 +166,7 @@ const initialPagination = ref({
 });
 const filter = ref('');
 const analyses = ref<OpalAnalysisDto[]>([]);
+const analysisNames = computed(() => analyses.value.map((analysis) => analysis.name));
 const columns = computed(() => [
   {
     name: 'name',

@@ -554,6 +554,9 @@ export default {
       host_required: 'Host is required',
       host_uri_format: 'Host must begin with "https://" or "http://"',
     },
+    analysis: {
+      name_exists: 'Analysis name must be unique',
+    }
   },
   main: {
     brand: 'Opal',
