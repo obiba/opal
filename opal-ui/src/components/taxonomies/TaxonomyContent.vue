@@ -59,7 +59,7 @@
           <router-link :to="`/taxonomies/${taxonomy.name}/${props.value}`">
             {{ props.value }}
           </router-link>
-          <div class="float-right" v-if="!hasFilter">
+          <div class="float-right" v-if="taxonomiesStore.canEdit && !hasFilter">
             <q-btn
               v-show="props.rowIndex > 0"
               rounded
