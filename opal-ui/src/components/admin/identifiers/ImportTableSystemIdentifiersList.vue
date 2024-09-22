@@ -16,6 +16,7 @@
             v-model="tableName"
             dense
             :label="$t('table')"
+            :hint="$t('table_identifiers_import_hint')"
             class="q-mb-md"
             debounce="300"
             lazy-rules
@@ -31,7 +32,7 @@
                   :key="sugg.name"
                   @click="onTableSuggestionSelected(sugg)"
                 >
-                  <q-item-section>{{ sugg.name }}</q-item-section>
+                  <q-item-section>{{ `${sugg.datasourceName}.${sugg.name}` }}</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
@@ -71,7 +72,7 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
 const showSuggestions = ref(false);
-const tableName = ref();
+const tableName = ref<string | null>(null);
 const selectedTable = ref<TableDto | null>(null);
 const initialized = ref(false);
 const filterOptions = ref([] as TableDto[]);
@@ -101,6 +102,7 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
+      tableName.value = null;
       datasourceStore
         .getAllTables(props.identifier.entityType)
         .then((response) => initMappingOptions(response))
@@ -111,11 +113,11 @@ watch(
   }
 );
 
-function onSearchTable(val: string) {
+function onSearchTable(val: string | null) {
   filterOptions.value = [];
   selectedTable.value = null;
 
-  if ((val || '').trim().length < 3) {
+  if (!val || (val || '').trim().length < 3) {
     showSuggestions.value = false;
     return;
   }
@@ -127,7 +129,7 @@ function onSearchTable(val: string) {
 }
 
 function onTableSuggestionSelected(table: TableDto) {
-  tableName.value = table.name;
+  tableName.value = `${table.datasourceName}.${table.name}`;
   selectedTable.value = table;
   showSuggestions.value = false;
 }

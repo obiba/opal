@@ -1198,6 +1198,7 @@ export default {
   table_name: 'Nom de la table',
   table_references: 'Tables référencées',
   table: 'Table',
+  table_identifiers_import_hint: 'La table dont les identifiants seront importés en tant qu\'identifiants système à mapper.',
   tables_views: 'Tables (vues)',
   tables: 'Tables',
   tags: 'Étiquettes',
