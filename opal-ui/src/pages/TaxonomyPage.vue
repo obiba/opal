@@ -3,8 +3,7 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
+        <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
         <q-breadcrumbs-el :label="taxonomyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -15,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import TaxonomyContent from 'src/components/admin/taxonomies/TaxonomyContent.vue';
+import TaxonomyContent from 'src/components/taxonomies/TaxonomyContent.vue';
 import { notifyError } from 'src/utils/notify';
 import { TaxonomyDto } from 'src/models/Opal';
 
@@ -46,7 +45,7 @@ async function onRefresh(newName?: string) {
   try {
     if (!!newName) {
       await taxonomiesStore.refreshSummaries();
-      router.replace(`/admin/taxonomies/${newName}`);
+      router.replace(`/taxonomies/${newName}`);
     } else {
       await taxonomiesStore.getTaxonomy(taxonomyName.value);
     }
@@ -61,7 +60,7 @@ onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getTaxonomy(taxonomyName.value).catch((error) => {
     notifyError(error);
-    router.replace('/admin/taxonomies');
+    router.replace('/taxonomies');
   });
 });
 </script>

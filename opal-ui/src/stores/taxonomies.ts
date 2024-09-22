@@ -17,6 +17,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomy = ref<TaxonomyDto>({} as TaxonomyDto);
   const vocabulary = ref<VocabularyDto>({} as VocabularyDto);
   const summaries = ref<TaxonomiesDto_TaxonomySummaryDto[]>([]);
+  const canEdit = ref(false);
 
   function reset() {
     taxonomies.value = [];
@@ -64,7 +65,9 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   async function getTaxonomy(name: string) {
     taxonomy.value = {} as TaxonomyDto;
     vocabulary.value = {} as VocabularyDto;
+    canEdit.value = false;
     return api.get(`/system/conf/taxonomy/${name}`).then((response) => {
+      canEdit.value = response.headers['allow'].split(',').map((m: string) => m.trim()).includes('DELETE');
       taxonomy.value = response.data;
       return response;
     });
@@ -242,6 +245,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     summaries,
     taxonomy,
     vocabulary,
+    canEdit,
     reset,
     refresh,
     refreshSummaries,

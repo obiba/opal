@@ -45,6 +45,14 @@
           <q-item-label>{{ $t('tasks') }}</q-item-label>
         </q-item-section>
       </q-item>
+      <q-item :to="`/taxonomies`">
+        <q-item-section avatar>
+          <q-icon name="sell" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ $t('taxonomies') }}</q-item-label>
+        </q-item-section>
+      </q-item>
       <q-item v-if="authStore.isAdministrator" to="/admin">
         <q-item-section avatar>
           <q-icon name="admin_panel_settings" />

@@ -2,9 +2,9 @@
   <div v-if="taxonomyName">
     <div class="text-h5">
       <span>{{ taxonomy.name }}</span>
-      <q-btn outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
-      <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
-      <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
+      <q-btn v-if="taxonomiesStore.canEdit" outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
+      <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
+      <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
     </div>
 
     <div class="q-gutter-md q-mt-md q-mb-md">
@@ -32,7 +32,7 @@
         </q-th>
       </template>
       <template v-slot:top-left>
-        <div class="q-gutter-sm">
+        <div v-if="taxonomiesStore.canEdit" class="q-gutter-sm">
           <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
           <template v-if="dirty">
             <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
@@ -56,7 +56,7 @@
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <router-link :to="`/admin/taxonomies/${taxonomy.name}/${props.value}`">
+          <router-link :to="`/taxonomies/${taxonomy.name}/${props.value}`">
             {{ props.value }}
           </router-link>
           <div class="float-right" v-if="!hasFilter">
@@ -118,8 +118,8 @@
       </template>
     </q-table>
 
-    <div class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
-    <taxonomy-git-history :taxonomy-name="taxonomyName" @restore="onGitRestored" />
+    <div v-if="taxonomiesStore.canEdit" class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
+    <taxonomy-git-history v-if="taxonomiesStore.canEdit" :taxonomy-name="taxonomyName" @restore="onGitRestored" />
 
     <!-- Dialogs -->
     <confirm-dialog
@@ -154,11 +154,11 @@ export default defineComponent({
 <script setup lang="ts">
 import { TaxonomyDto, VocabularyDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog.vue';
-import AddVocabularyDialog from 'src/components/admin/taxonomies/AddVocabularyDialog.vue';
+import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
+import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
-import TaxonomyGitHistory from 'src/components/admin/taxonomies/TaxonomyGitHistory.vue';
+import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
+import TaxonomyGitHistory from 'src/components/taxonomies/TaxonomyGitHistory.vue';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
 
@@ -264,7 +264,7 @@ async function doDelete() {
   try {
     await taxonomiesStore.deleteTaxonomy(props.taxonomy);
     await taxonomiesStore.refreshSummaries();
-    router.replace('/admin/taxonomies');
+    router.replace('/taxonomies');
   } catch (error) {
     notifyError(error);
   }

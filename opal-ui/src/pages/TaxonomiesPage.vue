@@ -3,8 +3,7 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
+        <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
         <template v-if="taxonomyName">
           <q-breadcrumbs-el :label="taxonomyName" />
         </template>

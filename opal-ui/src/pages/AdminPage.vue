@@ -112,7 +112,7 @@
             <q-item>
               <q-item-section>
                 <q-item-label
-                  ><router-link to="/admin/taxonomies">{{ $t('taxonomies') }}</router-link></q-item-label
+                  ><router-link to="/taxonomies">{{ $t('taxonomies') }}</router-link></q-item-label
                 >
                 <q-item-label caption lines="2">{{ $t('taxonomies_caption') }}</q-item-label>
               </q-item-section>

@@ -8,7 +8,7 @@
         v-for="summary in summaries"
         :active="taxonomyName === summary.name"
         :key="summary.name"
-        :to="`/admin/taxonomies/${summary.name}`"
+        :to="`/taxonomies/${summary.name}`"
       >
         <q-item-section avatar>
           <q-icon name="sell" />
@@ -17,7 +17,7 @@
           <q-item-label>{{ summary.name }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item class="q-mt-md">
+      <q-item v-if="taxonomiesStore.canEdit" class="q-mt-md">
         <q-btn-dropdown
           no-caps
           color="primary"
@@ -82,10 +82,10 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto, TaxonomyDto } from 'src/models/Opal';
-import AddTaxonomyDialog from 'src/components/admin/taxonomies/AddTaxonomyDialog.vue';
-import ImportMlstrTaxonomiesDialog from 'src/components/admin/taxonomies/ImportMlstrTaxonomiesDialog.vue';
-import ImportGithubTaxonomiesDialog from 'src/components/admin/taxonomies/ImportGithubTaxonomiesDialog.vue';
-import ImportTaxonomyFileDialog from 'src/components/admin/taxonomies/ImportTaxonomyFileDialog.vue';
+import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
+import ImportMlstrTaxonomiesDialog from 'src/components/taxonomies/ImportMlstrTaxonomiesDialog.vue';
+import ImportGithubTaxonomiesDialog from 'src/components/taxonomies/ImportGithubTaxonomiesDialog.vue';
+import ImportTaxonomyFileDialog from 'src/components/taxonomies/ImportTaxonomyFileDialog.vue';
 import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
@@ -134,7 +134,7 @@ async function onAdded(updated: TaxonomyDto) {
   if (updated) {
     taxonomiesStore
       .refreshSummaries()
-      .then(() => router.push(`/admin/taxonomies/${updated.name}`))
+      .then(() => router.push(`/taxonomies/${updated.name}`))
       .catch(notifyError);
   }
 }
@@ -144,7 +144,7 @@ async function onImportedTaxonomies() {
     .refreshSummaries()
     .then(() => {
       // NOTE: trick router to reload the taxonomies, simple push/replace had no effect
-      router.push('/admin').then(() => router.push('/admin/taxonomies'));
+      router.push('/admin').then(() => router.push('/taxonomies'));
     })
     .catch(notifyError);
 }

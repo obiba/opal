@@ -20,18 +20,6 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin/plugins', component: () => import('pages/AdminPluginsPage.vue') },
       { path: '/admin/apps', component: () => import('pages/AdminAppsPage.vue') },
       { path: '/admin/identifiers', component: () => import('pages/AdminIdentifiersPage.vue') },
-      {
-        path: '/admin/taxonomies',
-        component: () => import('pages/AdminTaxonomiesPage.vue'),
-      },
-      {
-        path: '/admin/taxonomies/:name/:vocabulary',
-        component: () => import('pages/AdminTaxonomyVocabularyPage.vue'),
-      },
-      {
-        path: '/admin/taxonomies/:name',
-        component: () => import('pages/AdminTaxonomyPage.vue'),
-      },
       { path: '/profile', component: () => import('pages/ProfilePage.vue') },
       { path: '/projects', component: () => import('pages/ProjectsPage.vue') },
       {
@@ -86,6 +74,19 @@ const routes: RouteRecordRaw[] = [
         path: '/tasks/:path*',
         component: () => import('pages/TasksPage.vue'),
       },
+      {
+        path: '/taxonomies',
+        component: () => import('pages/TaxonomiesPage.vue'),
+      },
+      {
+        path: '/taxonomies/:name/:vocabulary',
+        component: () => import('pages/TaxonomyVocabularyPage.vue'),
+      },
+      {
+        path: '/taxonomies/:name',
+        component: () => import('pages/TaxonomyPage.vue'),
+      },
+
       {
         path: '/cart',
         component: () => import('pages/CartPage.vue'),

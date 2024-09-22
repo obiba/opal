@@ -1202,7 +1202,7 @@ export default {
   tables_views: 'Tables (vues)',
   tables: 'Tables',
   tags: 'Étiquettes',
-  tasks_caption: 'Monitorer et planifier des tâches',
+  tasks_caption: 'Monitorer l\'avancement des tâches',
   tasks: 'Tâches',
   taxonomies_caption: 'Gérer les taxonomies et les vocabulaires contrôlés',
   taxonomies: 'Taxonomies',

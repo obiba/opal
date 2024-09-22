@@ -1,8 +1,11 @@
 <template>
   <div class="text-h5">
+    <router-link :to="`/taxonomies/${taxonomyName}`" :title="taxonomyName" class="q-mr-xs">
+      <q-icon name="arrow_back_ios_new" />
+    </router-link>
     <span>{{ vocabulary.name }}</span>
-    <q-btn outline color="secondary" icon="edit" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
-    <q-btn outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
@@ -28,7 +31,7 @@
       </q-th>
     </template>
     <template v-slot:top-left>
-      <div class="q-gutter-sm">
+      <div v-if="taxonomiesStore.canEdit" class="q-gutter-sm">
         <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddTerm" />
         <template v-if="dirty">
           <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
@@ -182,10 +185,10 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { VocabularyDto, TermDto } from 'src/models/Opal';
-import useTaxonomyEntityContent from 'src/components/admin/taxonomies/TaxonomyEntityContent';
+import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import AddVocabularyDialog from 'src//components/admin/taxonomies/AddVocabularyDialog.vue';
-import AddTermDialog from 'src//components/admin/taxonomies/AddTermDialog.vue';
+import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
+import AddTermDialog from 'src//components/taxonomies/AddTermDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { notifyError } from 'src/utils/notify';
 
@@ -198,6 +201,9 @@ const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
+const route = useRoute();
+
+const taxonomyName = computed(() => route.params.name as string);
 const tableKey = ref(0);
 const showDelete = ref(false);
 const showDeleteTerm = ref(false);
@@ -296,7 +302,7 @@ async function doDelete() {
   showDelete.value = false;
   try {
     await taxonomiesStore.deleteVocabulary(props.taxonomy, props.vocabulary);
-    router.replace(`/admin/taxonomies/${props.taxonomy}`);
+    router.replace(`/taxonomies/${props.taxonomy}`);
   } catch (error) {
     notifyError(error);
   }

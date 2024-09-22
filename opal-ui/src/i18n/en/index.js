@@ -1202,7 +1202,7 @@ export default {
   tables_views: 'Tables (views)',
   tables: 'Tables',
   tags: 'Tags',
-  tasks_caption: 'Monitor and schedule tasks',
+  tasks_caption: 'Monitor tasks progress',
   tasks: 'Tasks',
   taxonomies_caption: 'Manage taxonomies for variable classification with controlled vocabularies',
   taxonomies: 'Taxonomies',

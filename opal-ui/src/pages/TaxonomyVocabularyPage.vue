@@ -3,9 +3,8 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/admin/taxonomies" />
-        <q-breadcrumbs-el :label="taxonomyName" :to="`/admin/taxonomies/${taxonomyName}`" />
+        <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
+        <q-breadcrumbs-el :label="taxonomyName" :to="`/taxonomies/${taxonomyName}`" />
         <q-breadcrumbs-el :label="vocabularyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -21,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import VocabularyContent from 'src/components/admin/taxonomies/VocabularyContent.vue';
+import VocabularyContent from 'src/components/taxonomies/VocabularyContent.vue';
 import { notifyError } from 'src/utils/notify';
 import { VocabularyDto } from 'src/models/Opal';
 
@@ -52,7 +51,7 @@ async function onRefresh(newName?: string) {
   try {
     if (!!newName) {
       await taxonomiesStore.getVocabulary(taxonomyName.value, newName);
-      router.replace(`/admin/taxonomies/${taxonomyName.value}/${newName}`);
+      router.replace(`/taxonomies/${taxonomyName.value}/${newName}`);
     } else {
       await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
     }
@@ -66,7 +65,7 @@ onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
     notifyError(error);
-    router.replace(`/admin/taxonomies/${taxonomyName}`);
+    router.replace(`/taxonomies/${taxonomyName}`);
   });
 });
 </script>
