@@ -53,6 +53,7 @@ public class RCacheHelper {
 
   public InputStream newRDSInputStream(String cacheKey) throws IOException {
     File cache = new File(cacheDir, cacheKey + ".enc");
+    cache.getParentFile().mkdirs();
     return cryptoService.newCipherInputStream(new FileInputStream(cache));
   }
 
