@@ -27,6 +27,7 @@ public class RCacheHelper {
 
   public boolean hasCache(String cacheKey) {
     File cache = new File(cacheDir, cacheKey + ".enc");
+    ensureCacheDir();
     return cache.exists();
   }
 
@@ -40,6 +41,7 @@ public class RCacheHelper {
 
   public void evictCache(String prefix) {
     try {
+      ensureCacheDir();
       File[] files = cacheDir.listFiles(file -> file.getName().startsWith(prefix));
       if (files != null) {
         for (File file : files) {
@@ -53,12 +55,17 @@ public class RCacheHelper {
 
   public InputStream newRDSInputStream(String cacheKey) throws IOException {
     File cache = new File(cacheDir, cacheKey + ".enc");
-    cache.getParentFile().mkdirs();
+    ensureCacheDir();
     return cryptoService.newCipherInputStream(new FileInputStream(cache));
   }
 
   public OutputStream newRDSOutputStream(String cacheKey) throws IOException {
     File cache = new File(cacheDir, cacheKey + ".enc");
+    ensureCacheDir();
     return cryptoService.newCipherOutputStream(new FileOutputStream(cache));
+  }
+
+  private void ensureCacheDir() {
+    cacheDir.mkdirs();
   }
 }
