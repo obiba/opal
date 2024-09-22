@@ -20,6 +20,7 @@
           input-debounce="0"
           @filter="filterFn"
           :label="$t('from_tables')"
+          :hint="$t('from_tables_select_hint')"
           style="min-width: 300px"
           class="q-mb-md"
         />
@@ -37,7 +38,7 @@
 
 <script lang="ts">
 export default defineComponent({
-  name: 'AddTableDialog',
+  name: 'AddViewDialog',
 });
 </script>
 <script setup lang="ts">

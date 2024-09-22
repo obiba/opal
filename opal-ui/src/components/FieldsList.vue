@@ -17,7 +17,9 @@
           <span v-else-if="item.links">
             <div v-for="link in item.links(dbobject)" :key="link.to" class="text-caption">
               <router-link :to="link.to">
-                {{ link.label }}
+                <q-icon v-if="link.icon" :name="link.icon" class="q-mr-xs" />
+                <span>{{ link.label }}</span>
+                <q-icon v-if="link.iconRight" :name="link.iconRight" class="q-ml-xs" />
               </router-link>
             </div>
           </span>
@@ -56,6 +58,8 @@ import { StringMap } from 'src/components/models';
 export interface FieldLink {
   label: string;
   to: string;
+  icon?: string;
+  iconRight?: string;
 }
 
 export interface FieldItem<T> {

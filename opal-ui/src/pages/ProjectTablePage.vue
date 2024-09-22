@@ -321,7 +321,7 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     {
       field: 'name',
       label: 'full_name',
-      html: (val) => (val ? `<code>${val.datasourceName}.${val.name}</code>` : ''),
+      html: (val: TableDto) => (val ? `<code>${val.datasourceName}.${val.name}</code>` : ''),
     },
     {
       field: 'entityType',
@@ -330,12 +330,13 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     {
       field: 'from',
       label: isTablesView.value ? 'table_references' : 'resource_ref.label',
-      links: (val) =>
+      links: (val: string) =>
         val
           ? datasourceStore.view.from?.map((f) => {
               return {
                 label: f,
                 to: `/project/${f.split('.')[0]}/${isTablesView.value ? 'table' : 'resource'}/${f.split('.')[1]}`,
+                icon: datasourceStore.view.innerFrom?.includes(f) ? 'panorama_fish_eye' : 'circle',
               };
             })
           : [],
@@ -426,6 +427,7 @@ function onTableUpdate(updated: TableDto) {
 function onViewUpdate(updated: ViewDto) {
   if (updated.name === tName.value) {
     datasourceStore.view = updated;
+    datasourceStore.loadTable(tName.value);
   } else {
     router.push(`/project/${dsName.value}/table/${updated.name}`);
   }

@@ -12,18 +12,46 @@
         </q-input>
         <div v-if="isView">
           <q-select
-            v-model="from"
+            v-model="fromSelection"
             dense
-            multiple
-            use-chips
             use-input
             :options="fromTables"
             input-debounce="0"
             @filter="filterFn"
             :label="$t('from_tables')"
+            :hint="$t('from_tables_select_hint')"
             style="min-width: 300px"
             class="q-mb-md"
+            @update:model-value="onAdd"
           />
+          <q-list separator bordered>
+            <q-item v-for="tbl in from" :key="tbl">
+              <q-item-section>
+                <q-item-label class="text-caption text-bold">{{ tbl }}</q-item-label>
+                <q-checkbox v-model="innerFrom[tbl]" dense size="sm" :label="$t('inner_join')" class="q-mt-sm text-caption" />
+              </q-item-section>
+              <q-item-section side>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <q-btn flat dense round icon="arrow_upward" @click="onUp(tbl)" size="sm" />
+                      </td>
+                      <td>
+                        <q-btn flat dense round icon="arrow_downward" @click="onDown(tbl)" size="sm" />
+                      </td>
+                      <td>
+                        <q-btn flat dense round icon="delete" @click="onRemove(tbl)" size="sm" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </q-item-section>
+            </q-item>
+          </q-list>
+          <div class="text-hint q-mt-sm">
+            {{ $t('from_tables_hint') }}
+          </div>
         </div>
       </q-card-section>
 
@@ -66,8 +94,10 @@ const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);
 const name = ref(props.table.name);
-const from = ref(props.view?.from);
-const fromTables = ref<string[]>([]);
+const from = ref<string[]>(props.view?.from || []);
+const innerFrom = ref<{[key: string]: boolean}>({});
+const fromSelection = ref<string>();
+const fromAllTables = ref<string[]>([]);
 const allTables = ref<string[]>([]);
 
 watch(
@@ -75,7 +105,10 @@ watch(
   (value) => {
     if (value) {
       name.value = props.table.name;
-      from.value = props.view?.from;
+      innerFrom.value = {};
+      from.value = props.view?.from || [];
+      props.view?.from?.forEach((tbl) => (innerFrom.value[tbl] = false));
+      props.view?.innerFrom?.forEach((tbl) => (innerFrom.value[tbl] = true));
       if (props.view) {
         datasourceStore
           .getAllTables(props.table.entityType)
@@ -85,12 +118,14 @@ watch(
                 .map((table) => `${table.datasourceName}.${table.name}`)
                 .filter((tbl) => tbl !== `${props.table.datasourceName}.${props.table.name}`))
           )
-          .then(() => (fromTables.value = allTables.value));
+          .then(() => (fromAllTables.value = allTables.value));
       }
     }
     showDialog.value = value;
   }
 );
+
+const fromTables = computed(() => fromAllTables.value.filter((tbl) => !from.value.includes(tbl)));
 
 function onHide() {
   emit('update:modelValue', false);
@@ -106,20 +141,21 @@ const isView = computed(() => props.view && props.view.name);
 function filterFn(val: string, update: any) {
   if (val === '') {
     update(() => {
-      fromTables.value = allTables.value;
+      fromAllTables.value = allTables.value;
     });
     return;
   }
 
   update(() => {
     const needle = val.toLowerCase();
-    fromTables.value = allTables.value.filter((v) => v.toLowerCase().indexOf(needle) > -1);
+    fromAllTables.value = allTables.value.filter((v) => v.toLowerCase().indexOf(needle) > -1);
   });
 }
 
 function onSaveTable() {
   if (props.view && isView.value) {
-    const updatedView = { ...props.view, name: name.value, from: from.value as string[] };
+    const newInner = Object.entries(innerFrom.value).filter(([, value]) => value).map(([key]) => key);
+    const updatedView = { ...props.view, name: name.value, from: from.value as string[], innerFrom: newInner };
     datasourceStore
       .updateView(
         datasourceStore.datasource.name,
@@ -139,6 +175,35 @@ function onSaveTable() {
       .catch((err) => {
         notifyError(err);
       });
+  }
+}
+
+function onAdd() {
+  if (fromSelection.value && !from.value.includes(fromSelection.value)) {
+    from.value.push(fromSelection.value);
+    innerFrom.value[fromSelection.value] = false;
+  }
+  fromSelection.value = undefined;
+}
+
+function onRemove(tbl: string) {
+  from.value = from.value.filter((t) => t !== tbl);
+  innerFrom.value = Object.fromEntries(Object.entries(innerFrom.value).filter(([key]) => key !== tbl));
+}
+
+function onUp(tbl: string) {
+  const index = from.value.indexOf(tbl);
+  if (index > 0) {
+    from.value.splice(index, 1);
+    from.value.splice(index - 1, 0, tbl);
+  }
+}
+
+function onDown(tbl: string) {
+  const index = from.value.indexOf(tbl);
+  if (index < from.value.length - 1) {
+    from.value.splice(index, 1);
+    from.value.splice(index + 1, 0, tbl);
   }
 }
 </script>
