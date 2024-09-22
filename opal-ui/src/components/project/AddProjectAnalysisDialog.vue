@@ -40,6 +40,7 @@
           :table-name="tableName"
           :analysis-name="analysisName"
           :analysis-names="analysisNames"
+          :clone="clone"
         />
       </q-card-section>
 
@@ -74,8 +75,9 @@ interface DialogProps {
   modelValue: boolean;
   projectName: string;
   tableName: string;
-  analysisName?: string;
   analysisNames: string[];
+  analysisName?: string;
+  clone?: OpalAnalysisDto
 }
 
 const { t } = useI18n();

@@ -88,12 +88,14 @@ import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 's
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { QueryResultDto } from 'src/models/Search';
 import { EntryDto } from 'src/models/Opal';
+import { isEmpty } from 'src/utils/validations';
 
-interface DialogProps {
+interface Props {
   projectName: string;
   tableName: string;
-  analysisName?: string;
   analysisNames: string[];
+  analysisName?: string;
+  clone?: OpalAnalysisDto;
 }
 
 type PluginTemplate = { pluginName: string; templateName: string };
@@ -107,7 +109,7 @@ const searchStore = useSearchStore();
 
 const variableSelect = ref();
 const emit = defineEmits(['update:modelValue', 'update']);
-const props = defineProps<DialogProps>();
+const props = defineProps<Props>();
 const formRef = ref();
 const sfForm = ref();
 const selectedVariables = ref<string[]>([]);
@@ -123,7 +125,8 @@ const editMode = computed(() => !!props.analysisName);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
-const validateUniqueField = (val: string) => !val || !props.analysisNames.includes(val) || t('validation.analysis.name_exists');
+const validateUniqueField = (val: string) =>
+  !val || !props.analysisNames.includes(val) || t('validation.analysis.name_exists');
 
 function initPluginData() {
   (pluginsStore.analysisPlugins.packages || []).forEach((plugin) => {
@@ -154,35 +157,44 @@ function updateSchemaForm() {
   sfSchema.value = pluginSchemaFormData[schemaKey].schema;
 }
 
+function initFromDto(dto: OpalAnalysisDto) {
+  pluginSchemaFormData[`${dto.pluginName}.${dto.templateName}`].model = JSON.parse(dto.parameters);
+
+  analysisOptions.value.name = dto.name;
+  analysisOptions.value.table = dto.table;
+  analysisOptions.value.plugin = dto.pluginName;
+  analysisOptions.value.template = dto.templateName;
+  analysisOptions.value.params = dto.parameters;
+  if (!!dto.variables) {
+    analysisOptions.value.variables = dto.variables.join(',');
+    selectedVariables.value = dto.variables;
+  } else {
+    selectedVariables.value = [];
+  }
+
+  variableOptions.value = selectedVariables.value.map((variable) => {
+    return { label: { name: variable, vlabel: variable }, value: variable };
+  });
+  selectedTemplate.value = {
+    pluginName: analysisOptions.value.plugin,
+    templateName: analysisOptions.value.template,
+  };
+}
+
 function init() {
   initPluginData();
 
-  if (!!props.analysisName) {
+  if (!isEmpty(props.analysisName)) {
     projectsStore
       .getAnalysis(props.projectName, props.tableName, props.analysisName)
       .then((response: OpalAnalysisDto) => {
-        pluginSchemaFormData[`${response.pluginName}.${response.templateName}`].model = JSON.parse(response.parameters);
-        analysisOptions.value.name = response.name;
-        analysisOptions.value.table = response.table;
-        analysisOptions.value.plugin = response.pluginName;
-        analysisOptions.value.template = response.templateName;
-        analysisOptions.value.params = response.parameters;
-
-        selectedVariables.value = response.variables || [];
-        variableOptions.value = selectedVariables.value.map((variable) => {
-          return { label: { name: variable, vlabel: variable }, value: variable };
-        });
-        selectedTemplate.value = {
-          pluginName: analysisOptions.value.plugin,
-          templateName: analysisOptions.value.template,
-        };
+        initFromDto(response);
         updateSchemaForm();
       });
   } else {
     const found = templateOptions.value.find((opt) => !!opt.value) || null;
     if (!!found && found.value) {
       selectedTemplate.value = found.value;
-      updateSchemaForm();
       analysisOptions.value = {
         name: '',
         table: props.tableName,
@@ -191,6 +203,12 @@ function init() {
         params: '',
         variables: '',
       } as AnalyseCommandOptionsDto_AnalyseDto;
+
+      if (!!props.clone) {
+        initFromDto(props.clone);
+      }
+
+      updateSchemaForm();
     } else {
       throw new Error('No templates found');
     }
@@ -303,5 +321,4 @@ onMounted(() => {
 defineExpose({
   runAnalysis,
 });
-
 </script>

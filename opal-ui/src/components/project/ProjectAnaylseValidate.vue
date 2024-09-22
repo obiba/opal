@@ -66,6 +66,7 @@
             :title="$t('duplicate')"
             :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
             class="q-ml-xs"
+            @click="onDuplicateAnalysis(props.row)"
           />
           <q-btn
             rounded
@@ -121,6 +122,7 @@
     :table-name="tableName"
     :analysis-name="selectedAnalysis ? selectedAnalysis.name : undefined"
     :analysis-names="analysisNames"
+    :clone="selectedAnalysis || undefined"
     @update:model-value="onAnalysisDialogClosed"
     @update="onAnalysisUpdated"
   />
@@ -265,6 +267,12 @@ async function onRunAnalysis(row: OpalAnalysisDto) {
 
 function onViewAnalysis(row: OpalAnalysisDto) {
   selectedAnalysis.value = row;
+  showAnalysisDialog.value = true;
+}
+
+function onDuplicateAnalysis(row: OpalAnalysisDto) {
+  selectedAnalysis.value = JSON.parse(JSON.stringify(row));
+  (selectedAnalysis.value ?? {} as OpalAnalysisDto).name = '';
   showAnalysisDialog.value = true;
 }
 
