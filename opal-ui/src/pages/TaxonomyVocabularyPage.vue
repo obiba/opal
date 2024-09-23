@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
-        <q-breadcrumbs-el :label="taxonomyName" :to="`/taxonomies/${taxonomyName}`" />
+        <q-breadcrumbs-el :label="taxonomyName" :to="`/taxonomy/${taxonomyName}`" />
         <q-breadcrumbs-el :label="vocabularyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -51,7 +51,7 @@ async function onRefresh(newName?: string) {
   try {
     if (!!newName) {
       await taxonomiesStore.getVocabulary(taxonomyName.value, newName);
-      router.replace(`/taxonomies/${taxonomyName.value}/${newName}`);
+      router.replace(`/taxonomy/${taxonomyName.value}/vocabulary/${newName}`);
     } else {
       await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
     }
@@ -65,7 +65,7 @@ onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
     notifyError(error);
-    router.replace(`/taxonomies/${taxonomyName}`);
+    router.replace(`/taxonomy/${taxonomyName}`);
   });
 });
 </script>

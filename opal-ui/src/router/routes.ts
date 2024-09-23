@@ -79,14 +79,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/TaxonomiesPage.vue'),
       },
       {
-        path: '/taxonomies/:name/:vocabulary',
-        component: () => import('pages/TaxonomyVocabularyPage.vue'),
-      },
-      {
-        path: '/taxonomies/:name',
+        path: '/taxonomy/:name',
         component: () => import('pages/TaxonomyPage.vue'),
       },
-
+      {
+        path: '/taxonomy/:name/vocabulary/:vocabulary',
+        component: () => import('pages/TaxonomyVocabularyPage.vue'),
+      },
       {
         path: '/cart',
         component: () => import('pages/CartPage.vue'),

@@ -8,7 +8,7 @@
         v-for="summary in summaries"
         :active="taxonomyName === summary.name"
         :key="summary.name"
-        :to="`/taxonomies/${summary.name}`"
+        :to="`/taxonomy/${summary.name}`"
       >
         <q-item-section avatar>
           <q-icon name="sell" />
@@ -134,7 +134,7 @@ async function onAdded(updated: TaxonomyDto) {
   if (updated) {
     taxonomiesStore
       .refreshSummaries()
-      .then(() => router.push(`/taxonomies/${updated.name}`))
+      .then(() => router.push(`/taxonomy/${updated.name}`))
       .catch(notifyError);
   }
 }

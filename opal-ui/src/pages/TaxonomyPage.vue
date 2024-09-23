@@ -45,7 +45,7 @@ async function onRefresh(newName?: string) {
   try {
     if (!!newName) {
       await taxonomiesStore.refreshSummaries();
-      router.replace(`/taxonomies/${newName}`);
+      router.replace(`/taxonomy/${newName}`);
     } else {
       await taxonomiesStore.getTaxonomy(taxonomyName.value);
     }

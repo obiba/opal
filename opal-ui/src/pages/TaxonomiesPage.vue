@@ -3,40 +3,57 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
-        <template v-if="taxonomyName">
-          <q-breadcrumbs-el :label="taxonomyName" />
-        </template>
+        <q-breadcrumbs-el :label="$t('taxonomies')" />
       </q-breadcrumbs>
     </q-toolbar>
+    <q-page class="q-pa-md">
+      <div class="text-h5 q-mb-md">
+        {{ $t('taxonomies') }}
+      </div>
+      <div class="text-help q-mb-md">
+        {{ $t('taxonomies_info') }}
+      </div>
+      <div class="row">
+        <template v-for="summary in summaries" :key="summary.name">
+          <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
+            <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4">
+              <router-link :to="`/taxonomy/${summary.name}`">{{ summary.name }}</router-link>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="text-hint">
+              {{ getTitle(summary) }}
+              <q-btn flat rounded dense icon="arrow_forward" size="xs" color="primary" :to="`/taxonomy/${summary.name}`" />
+            </q-card-section>
+          </q-card>
+        </template>
+      </div>
+    </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
+import { TaxonomiesDto_TaxonomySummaryDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
-const route = useRoute();
-const router = useRouter();
+const { locale } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
-const taxonomyName = computed(() => route.params.name as string);
 const summaries = computed(() => taxonomiesStore.summaries || []);
-
-watch(taxonomyName, (name) => {
-  if (name) {
-    const path = `${route.path.replace(/\/$/, '')}/${summaries.value[0].name}`;
-    router.replace(path);
-  }
-});
 
 onMounted(() => {
   taxonomiesStore
     .initSummaries()
-    .then(() => {
-      if (!taxonomyName.value && summaries.value.length > 0) {
-        const path = `${route.path.replace(/\/$/, '')}/${summaries.value[0].name}`;
-        router.replace(path);
-      }
-    })
     .catch(notifyError);
 });
+
+function getTitle(summary: TaxonomiesDto_TaxonomySummaryDto) {
+  if (!summary.title) return '';
+  let title = summary.title.find((att) => att.locale === locale.value)?.text;
+  if (!title) {
+    title = summary.title.find((att) => att.locale === 'en')?.text;
+  }
+  if (!title) {
+    title = '';
+  }
+  return title;
+}
 </script>

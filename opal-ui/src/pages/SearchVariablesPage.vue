@@ -136,6 +136,9 @@
           <q-btn no-caps icon="add_circle" :label="$t('more_results')" color="primary" size="sm" @click="addLimit" />
         </div>
       </div>
+      <div v-else class="text-hint">
+        {{ $t('no_results') }}
+      </div>
     </q-page>
   </div>
 </template>

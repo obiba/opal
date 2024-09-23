@@ -56,7 +56,7 @@
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <router-link :to="`/taxonomies/${taxonomy.name}/${props.value}`">
+          <router-link :to="`/taxonomy/${taxonomy.name}/vocabulary/${props.value}`">
             {{ props.value }}
           </router-link>
           <div class="float-right" v-if="taxonomiesStore.canEdit && !hasFilter">

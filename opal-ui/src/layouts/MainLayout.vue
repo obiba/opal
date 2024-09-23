@@ -186,7 +186,7 @@ const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
 const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
 const taxonomiesPage = computed(() => {
-  return router.currentRoute.value.path.startsWith('/taxonomies');
+  return router.currentRoute.value.path.startsWith('/taxo');
 });
 
 const projectPage = computed(() => {

@@ -78,6 +78,9 @@
           </template>
         </q-table>
       </div>
+      <div v-else class="text-hint">
+        {{ $t('no_results') }}
+      </div>
     </q-page>
   </div>
 </template>

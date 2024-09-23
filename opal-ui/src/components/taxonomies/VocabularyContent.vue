@@ -1,11 +1,12 @@
 <template>
   <div class="text-h5">
-    <router-link :to="`/taxonomies/${taxonomyName}`" :title="taxonomyName" class="q-mr-xs">
+    <router-link :to="`/taxonomy/${taxonomyName}`" :title="taxonomyName" class="q-mr-xs">
       <q-icon name="arrow_back_ios_new" />
     </router-link>
     <span>{{ vocabulary.name }}</span>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" :title="$t('edit')" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onDelete" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="search" :title="$t('search')" size="sm" @click="onSearchVocabulary" class="on-right"></q-btn>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
@@ -56,8 +57,21 @@
     <template v-slot:body-cell-name="props">
       <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         {{ props.value }}
-        <div class="float-right" v-if="taxonomiesStore.canEdit">
+        <div class="float-right">
           <q-btn
+            v-if="taxonomiesStore.canEdit"
+            rounded
+            dense
+            flat
+            size="sm"
+            color="secondary"
+            :title="$t('search')"
+            :icon="toolsVisible[props.row.name] ? 'search' : 'none'"
+            class="q-ml-xs"
+            @click="onSearchTerm(props.row)"
+          />
+          <q-btn
+            v-if="taxonomiesStore.canEdit"
             rounded
             dense
             flat
@@ -69,7 +83,7 @@
             @click="onAddTerm(props.row)"
           />
           <q-btn
-            v-show="!hasFilter && props.rowIndex > 0"
+            v-show="taxonomiesStore.canEdit && !hasFilter && props.rowIndex > 0"
             rounded
             dense
             flat
@@ -81,7 +95,7 @@
             @click="onMoveUp(props.value)"
           />
           <q-btn
-            v-show="!hasFilter && props.rowIndex < rows.length - 1"
+            v-show="taxonomiesStore.canEdit && !hasFilter && props.rowIndex < rows.length - 1"
             rounded
             dense
             flat
@@ -93,6 +107,7 @@
             @click="onMoveDown(props.value)"
           />
           <q-btn
+            v-if="taxonomiesStore.canEdit"
             rounded
             dense
             flat
@@ -188,7 +203,7 @@ import { VocabularyDto, TermDto } from 'src/models/Opal';
 import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
-import AddTermDialog from 'src//components/taxonomies/AddTermDialog.vue';
+import AddTermDialog from 'src/components/taxonomies/AddTermDialog.vue';
 import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
 import { notifyError } from 'src/utils/notify';
 
@@ -200,6 +215,7 @@ interface Props {
 const emit = defineEmits(['update', 'refresh']);
 const props = defineProps<Props>();
 const { t } = useI18n({ useScope: 'global' });
+const searchStore = useSearchStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -302,7 +318,7 @@ async function doDelete() {
   showDelete.value = false;
   try {
     await taxonomiesStore.deleteVocabulary(props.taxonomy, props.vocabulary);
-    router.replace(`/taxonomies/${props.taxonomy}`);
+    router.replace(`/taxonomy/${props.taxonomy}`);
   } catch (error) {
     notifyError(error);
   }
@@ -327,6 +343,18 @@ async function doDeleteTerm() {
 
 function onEditVocabulary() {
   showEditVocabulary.value = true;
+}
+
+function onSearchVocabulary() {
+  searchStore.reset();
+  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] = props.vocabulary.terms?.map((term) => term.name) || [];
+  router.push('/search/variables');
+}
+
+function onSearchTerm(term: TermDto) {
+  searchStore.reset();
+  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] = [ term.name ];
+  router.push('/search/variables');
 }
 
 function onClose() {
