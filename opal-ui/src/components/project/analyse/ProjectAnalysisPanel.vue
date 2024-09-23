@@ -4,8 +4,8 @@
       v-model="analysisOptions.name"
       dense
       type="text"
+      class="q-pb-none"
       :label="$t('name') + ' *'"
-      class="q-mb-md"
       lazy-rules
       :disable="editMode"
       :rules="[validateRequiredField, validateUniqueField]"
@@ -34,7 +34,6 @@
         </q-item>
       </template>
     </q-select>
-
     <q-select
       ref="variableSelect"
       v-model="selectedVariables"
@@ -43,7 +42,7 @@
       :hint="$t('analyse_validate.analysis_dialog.variables_hint')"
       :loading="loadingVariables"
       :disable="editMode"
-      class="q-mb-md"
+      class="q-py-md"
       dense
       multiple
       emit-value
@@ -55,7 +54,7 @@
       @filter="onFilterFn"
     >
       <template v-slot:option="scope">
-        <q-item dense clickable :label="scope.opt.group" @click="onAddVariable(scope.opt.value)">
+        <q-item dense clickable :label="scope.opt.group" v-close-popup @click="onAddVariable(scope.opt.value)">
           <q-item-section class="q-pa-none">
             {{ scope.opt.label.name }}
             <span class="text-help">{{ scope.opt.label.vlabel }}</span>
@@ -69,7 +68,7 @@
       </template>
     </q-select>
 
-    <schema-form ref="sfForm" v-if="!!sfModel && !!sfSchema" v-model="sfModel" :schema="sfSchema" :disable="editMode" />
+    <schema-form class="q-pt-md" ref="sfForm" v-if="!!sfModel && !!sfSchema" v-model="sfModel" :schema="sfSchema" :disable="editMode" />
   </q-form>
 </template>
 
@@ -88,13 +87,12 @@ import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 's
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { QueryResultDto } from 'src/models/Search';
 import { EntryDto } from 'src/models/Opal';
-import { isEmpty } from 'src/utils/validations';
 
 interface Props {
   projectName: string;
   tableName: string;
   analysisNames: string[];
-  analysisName?: string;
+  analysis: OpalAnalysisDto | null;
   clone?: OpalAnalysisDto;
 }
 
@@ -121,7 +119,7 @@ const analysisOptions = ref({} as AnalyseCommandOptionsDto_AnalyseDto);
 const pluginSchemaFormData = {} as { [key: string]: { schema: SchemaFormObject; model: FormObject } };
 const sfModel = ref<FormObject>({});
 const sfSchema = ref<SchemaFormObject>();
-const editMode = computed(() => !!props.analysisName);
+const editMode = computed(() => !!props.analysis && !!props.analysis.name);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -181,16 +179,12 @@ function initFromDto(dto: OpalAnalysisDto) {
   };
 }
 
-function init() {
+watchEffect(() => {
   initPluginData();
 
-  if (!isEmpty(props.analysisName)) {
-    projectsStore
-      .getAnalysis(props.projectName, props.tableName, props.analysisName)
-      .then((response: OpalAnalysisDto) => {
-        initFromDto(response);
-        updateSchemaForm();
-      });
+  if (!!props.analysis && !!props.analysis.name) {
+    initFromDto(props.analysis);
+    updateSchemaForm();
   } else {
     const found = templateOptions.value.find((opt) => !!opt.value) || null;
     if (!!found && found.value) {
@@ -213,7 +207,7 @@ function init() {
       throw new Error('No templates found');
     }
   }
-}
+});
 
 // Handlers
 
@@ -226,7 +220,7 @@ function onAddVariable(value: string) {
   if (!selectedVariables.value) selectedVariables.value = [];
   if (!selectedVariables.value.includes(value)) selectedVariables.value.push(value);
   else onRemoveVariable(value);
-  variableSelect.value?.updateInputValue('');
+  setTimeout(() => variableSelect.value?.updateInputValue(''), 50);
 }
 
 function onRemoveVariable(value: string) {
@@ -262,8 +256,8 @@ async function onFilterFn(query: string, update: any) {
   } catch (error) {
     // ignore
   } finally {
-    loadingVariables.value = false;
     update();
+    loadingVariables.value = false;
   }
 }
 
@@ -312,10 +306,6 @@ async function runAnalysis() {
 
 onUnmounted(() => {
   onHide();
-});
-
-onMounted(() => {
-  init();
 });
 
 defineExpose({

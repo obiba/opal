@@ -7,42 +7,62 @@
 
       <q-separator />
 
-      <q-card-section>
-        <template v-if="editMode">
-          <q-tabs
-            v-model="tab"
-            dense
-            class="text-grey"
-            active-color="primary"
-            indicator-color="primary"
-            align="justify"
-          >
-            <q-tab no-caps name="results" :label="$t('results')" />
-            <q-tab no-caps name="parameters" :label="$t('parameters')" />
-          </q-tabs>
-          <q-tab-panels v-model="tab">
-            <q-tab-panel name="results"> </q-tab-panel>
-            <q-tab-panel name="parameters">
-              <project-analysis-panel
-                ref="analysisPanel"
-                :project-name="projectName"
-                :table-name="tableName"
-                :analysis-name="analysisName"
-                :analysis-names="analysisNames"
-              />
-            </q-tab-panel>
-          </q-tab-panels>
-        </template>
-        <project-analysis-panel
-          v-else
-          ref="analysisPanel"
-          :project-name="projectName"
-          :table-name="tableName"
-          :analysis-name="analysisName"
-          :analysis-names="analysisNames"
-          :clone="clone"
-        />
-      </q-card-section>
+      <q-card flat style="max-height: 75vh" class="scroll">
+        <q-card-section>
+          <template v-if="editMode">
+            <template v-if="!!analysis?.analysisResults">
+              <q-tabs
+                v-model="tab"
+                dense
+                class="text-grey"
+                active-color="primary"
+                indicator-color="primary"
+                align="justify"
+              >
+                <q-tab no-caps name="results" :label="$t('results')" />
+                <q-tab no-caps name="parameters" :label="$t('parameters')" />
+              </q-tabs>
+              <q-tab-panels v-model="tab">
+                <q-tab-panel name="results">
+                  <project-results-panel
+                    :project-name="projectName"
+                    :table-name="tableName"
+                    :analysis-name="analysis.name"
+                    :results="analysis.analysisResults"
+                  />
+                </q-tab-panel>
+
+                <q-tab-panel name="parameters">
+                  <project-analysis-panel
+                    ref="analysisPanel"
+                    :project-name="projectName"
+                    :table-name="tableName"
+                    :analysis-names="analysisNames"
+                    :analysis="analysis"
+                  />
+                </q-tab-panel>
+              </q-tab-panels>
+            </template>
+            <project-analysis-panel
+              v-else
+              ref="analysisPanel"
+              :project-name="projectName"
+              :table-name="tableName"
+              :analysis-names="analysisNames"
+              :analysis="analysis"
+            />
+          </template>
+          <project-analysis-panel
+            v-else
+            ref="analysisPanel"
+            :project-name="projectName"
+            :table-name="tableName"
+            :analysis-names="analysisNames"
+            :analysis="analysis"
+            :clone="clone"
+          />
+        </q-card-section>
+      </q-card>
 
       <q-separator />
 
@@ -70,6 +90,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { OpalAnalysisDto } from 'src/models/Projects';
 import ProjectAnalysisPanel from 'src/components/project/analyse/ProjectAnalysisPanel.vue';
+import ProjectResultsPanel from 'src/components/project/analyse/ProjectResultsPanel.vue';
 
 interface DialogProps {
   modelValue: boolean;
@@ -77,7 +98,7 @@ interface DialogProps {
   tableName: string;
   analysisNames: string[];
   analysisName?: string;
-  clone?: OpalAnalysisDto
+  clone?: OpalAnalysisDto;
 }
 
 const { t } = useI18n();
@@ -86,6 +107,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 const props = defineProps<DialogProps>();
 const analysisPanel = ref();
 const showDialog = ref(props.modelValue);
+const analysis = ref<OpalAnalysisDto | null>(null);
 const dialogTitle = ref('');
 const submitCaption = ref('');
 const editMode = computed(() => !!props.analysisName);
@@ -102,6 +124,7 @@ watch(
         projectsStore
           .getAnalysis(props.projectName, props.tableName, props.analysisName)
           .then((response: OpalAnalysisDto) => {
+            analysis.value = response;
             dialogTitle.value = `${response.name} - ${response.pluginName} / ${response.templateName}`;
           });
       } else {
@@ -115,6 +138,8 @@ watch(
 
 function onHide() {
   showDialog.value = false;
+  analysis.value = null;
+  tab.value = 'results';
   emit('update:modelValue', false);
 }
 

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, baseUrl } from 'src/boot/api';
 import {
   ProjectDto,
   ProjectSummaryDto,
@@ -380,6 +380,14 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}`);
   }
 
+  function getAnalysisReportUrl(name: string, table: string, analysisName: string, resultId: string) {
+    return `${baseUrl}/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}/_report`;
+  }
+
+  async function removeAnalysisResult(name: string, table: string, analysisName: string, resultId: string) {
+    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}`);
+  }
+
   return {
     projects,
     project,
@@ -432,5 +440,7 @@ export const useProjectsStore = defineStore('projects', () => {
     getAnalyses,
     runAnalysis,
     removeAnalysis,
+    getAnalysisReportUrl,
+    removeAnalysisResult,
   };
 });

@@ -196,12 +196,14 @@ const columns = computed(() => [
     name: 'status',
     label: t('status'),
     align: 'left',
+    sortable: true,
     field: (row: OpalAnalysisDto) => (row.lastResult || {}).status || AnalysisStatusDto.ERROR,
   },
   {
     name: 'date',
     label: t('date'),
     align: 'left',
+    sortable: true,
     field: (row: OpalAnalysisDto) => getDateLabel(row.lastResult ? row.lastResult.startDate : row.updated),
   },
 ]);
