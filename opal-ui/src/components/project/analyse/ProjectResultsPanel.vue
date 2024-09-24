@@ -9,7 +9,7 @@
             dense
             switch-toggle-side
             header-class="text-primary text-caption q-pl-none"
-            :default-opened="details.length < 4"
+            :default-opened="details.length < 6"
             :label="$t('details')"
           >
             <q-table
@@ -48,7 +48,7 @@
             dense
             switch-toggle-side
             header-class="text-primary text-caption q-pl-none"
-            :default-opened="history.length < 4"
+            :default-opened="history.length < 6"
             :label="$t('history')"
           >
             <q-table
@@ -135,14 +135,14 @@ const history = ref(props.results.slice(1));
 const initialDetailsPagination = ref({
   descending: false,
   page: 1,
-  rowsPerPage: 4,
-  minRowsForPagination: 4,
+  rowsPerPage: 5,
+  minRowsForPagination: 5,
 });
 const initialHistoryPagination = ref({
   descending: false,
   page: 1,
-  rowsPerPage: 4,
-  minRowsForPagination: 4,
+  rowsPerPage: 5,
+  minRowsForPagination: 5,
 });
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 

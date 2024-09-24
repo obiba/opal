@@ -34,6 +34,7 @@
         </q-item>
       </template>
     </q-select>
+
     <q-select
       ref="variableSelect"
       v-model="selectedVariables"
@@ -68,7 +69,14 @@
       </template>
     </q-select>
 
-    <schema-form class="q-pt-md" ref="sfForm" v-if="!!sfModel && !!sfSchema" v-model="sfModel" :schema="sfSchema" :disable="editMode" />
+    <schema-form
+      class="q-pt-md"
+      ref="sfForm"
+      v-if="!!sfModel && !!sfSchema"
+      v-model="sfModel"
+      :schema="sfSchema"
+      :disable="editMode"
+    />
   </q-form>
 </template>
 
@@ -179,36 +187,6 @@ function initFromDto(dto: OpalAnalysisDto) {
   };
 }
 
-watchEffect(() => {
-  initPluginData();
-
-  if (!!props.analysis && !!props.analysis.name) {
-    initFromDto(props.analysis);
-    updateSchemaForm();
-  } else {
-    const found = templateOptions.value.find((opt) => !!opt.value) || null;
-    if (!!found && found.value) {
-      selectedTemplate.value = found.value;
-      analysisOptions.value = {
-        name: '',
-        table: props.tableName,
-        plugin: '',
-        template: '',
-        params: '',
-        variables: '',
-      } as AnalyseCommandOptionsDto_AnalyseDto;
-
-      if (!!props.clone) {
-        initFromDto(props.clone);
-      }
-
-      updateSchemaForm();
-    } else {
-      throw new Error('No templates found');
-    }
-  }
-});
-
 // Handlers
 
 function onTemplateSelected(value: PluginTemplate) {
@@ -220,6 +198,8 @@ function onAddVariable(value: string) {
   if (!selectedVariables.value) selectedVariables.value = [];
   if (!selectedVariables.value.includes(value)) selectedVariables.value.push(value);
   else onRemoveVariable(value);
+
+  // To remove the text after selecting a variable
   setTimeout(() => variableSelect.value?.updateInputValue(''), 50);
 }
 
@@ -306,6 +286,42 @@ async function runAnalysis() {
 
 onUnmounted(() => {
   onHide();
+});
+
+onMounted(() => {
+  watch(
+    () => [props.projectName, props.tableName, props.analysisNames, props.analysis, props.clone],
+    () => {
+      initPluginData();
+
+      if (!!props.analysis && !!props.analysis.name) {
+        initFromDto(props.analysis);
+        updateSchemaForm();
+      } else {
+        const found = templateOptions.value.find((opt) => !!opt.value) || null;
+        if (!!found && found.value) {
+          selectedTemplate.value = found.value;
+          analysisOptions.value = {
+            name: '',
+            table: props.tableName,
+            plugin: '',
+            template: '',
+            params: '',
+            variables: '',
+          } as AnalyseCommandOptionsDto_AnalyseDto;
+
+          if (!!props.clone) {
+            initFromDto(props.clone);
+          }
+
+          updateSchemaForm();
+        } else {
+          throw new Error('No templates found');
+        }
+      }
+    },
+    { immediate: true }
+  );
 });
 
 defineExpose({
