@@ -155,7 +155,7 @@
         </q-tab-panel>
 
         <q-tab-panel name="permissions">
-          <div class="text-h6">{{ $t('permissions') }}</div>
+          <div class="text-h6 q-mb-md">{{ $t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${name}/permissions/vcf-store`"
             :options="['VCF_STORE_VIEW', 'VCF_STORE_VALUES', 'VCF_STORE_ALL']"

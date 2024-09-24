@@ -82,7 +82,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <span class="text-h6">{{ $t('permissions') }}</span>
+            <span class="text-h6 q-mb-md">{{ $t('permissions') }}</span>
             <access-control-list
               :resource="`/project/${name}/permissions/project`"
               :options="[AclAction.PROJECT_ALL]"
