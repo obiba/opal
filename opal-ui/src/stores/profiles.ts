@@ -61,6 +61,12 @@ export const useProfilesStore = defineStore('profiles', () => {
     return api.delete('/system/subject-profile/_current/otp');
   }
 
+  async function getProfile(principal: string): Promise<SubjectProfileDto> {
+    return api.get(`/system/subject-profile/${principal}`).then((response) => {
+      return response.data;
+    });
+  }
+
   return {
     profiles,
     profile,
@@ -72,5 +78,6 @@ export const useProfilesStore = defineStore('profiles', () => {
     disableOtp,
     enableCurrentOtp,
     disableCurrentOtp,
+    getProfile,
   };
 });

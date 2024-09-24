@@ -223,7 +223,6 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

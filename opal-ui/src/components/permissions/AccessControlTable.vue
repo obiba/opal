@@ -1,46 +1,53 @@
 <template>
-  <q-table
-    flat
-    :rows="rows"
-    :columns="columns"
-    row-key="resource"
-    :sort-method="sortRows"
-    binary-state-sort
-    :pagination="initialPagination"
-    :hide-pagination="rows.length <= initialPagination.rowsPerPage"
-    :loading="loading"
-    selection="multiple"
-    v-model:selected="selectedAcls"
-  >
-    <template v-slot:top v-if="!hideDelete">
-      <q-btn
-        outline
-        color="red"
-        icon="delete"
-        size="sm"
-        :disable="selectedAcls.length === 0"
-        @click="onDeleteAcls"
-      ></q-btn>
-    </template>
-    <template v-slot:body-cell-resource="props">
-      <q-td :props="props">
-        <q-item-section>
-          <q-item-label
-            ><router-link :to="props.row.url">{{ props.row.title }}</router-link></q-item-label
-          >
-          <q-item-label caption lines="2">{{ props.row.caption }}</q-item-label>
-        </q-item-section>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-permissions="props">
-      <q-td :props="props">
-        <span class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index">
-          {{ props.col.format(permission) }}
-          <q-tooltip>{{ props.col.tooltip(permission) }}</q-tooltip>
-        </span>
-      </q-td>
-    </template>
-  </q-table>
+  <div>
+    <div v-if="rows.length === 0">
+      <div class="text-hint q-mt-md">{{ $t('no_permissions') }}</div>
+    </div>
+    <q-table
+      v-else
+      flat
+      :rows="rows"
+      :columns="columns"
+      row-key="resource"
+      :sort-method="sortRows"
+      binary-state-sort
+      :pagination="initialPagination"
+      :hide-pagination="rows.length <= initialPagination.rowsPerPage"
+      :loading="loading"
+      selection="multiple"
+      v-model:selected="selectedAcls"
+    >
+      <template v-slot:top v-if="!hideDelete">
+        <q-btn
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          :disable="selectedAcls.length === 0"
+          @click="onDeleteAcls"
+        ></q-btn>
+      </template>
+      <template v-slot:body-cell-resource="props">
+        <q-td :props="props">
+          <q-item-section>
+            <q-item-label
+              ><router-link :to="props.row.url">{{ props.row.title }}</router-link></q-item-label
+            >
+            <q-item-label caption lines="2">{{ props.row.caption }}</q-item-label>
+          </q-item-section>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-permissions="props">
+        <q-td :props="props">
+          <span class="q-ml-none" v-for="(permission, index) in props.row.actions" :key="index">
+            {{ props.col.format(permission) }}
+            <q-tooltip>{{ props.col.tooltip(permission) }}</q-tooltip>
+          </span>
+        </q-td>
+      </template>
+    </q-table>
+  </div>
+  
 </template>
 
 <script lang="ts">
@@ -50,12 +57,13 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { Acl } from 'src/models/Opal';
+import { Acl, Subject_SubjectType } from 'src/models/Opal';
 
 interface Props {
   modelValue: Acl[];
   acls: Acl[];
   principal?: string;
+  type: Subject_SubjectType;
   loading: boolean;
   hideDelete?: boolean;
   onDeleteAcls: () => void;

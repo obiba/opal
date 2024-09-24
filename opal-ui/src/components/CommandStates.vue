@@ -160,12 +160,12 @@ import { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
 
-interface CommandStatesProps {
+interface Props {
   commands: CommandStateDto[];
   project?: string | undefined;
 }
 
-const props = defineProps<CommandStatesProps>();
+const props = defineProps<Props>();
 const emit = defineEmits(['refresh', 'clear', 'cancel']);
 
 const { t } = useI18n();

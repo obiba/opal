@@ -90,6 +90,9 @@
           </q-item>
         </q-list>
       </q-btn-dropdown>
+      <div class="text-hint q-mt-md">
+        {{ $t('no_permissions') }}
+      </div>
     </div>
 
     <confirm-dialog

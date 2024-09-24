@@ -124,7 +124,6 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { notifyError } from 'src/utils/notify';
 import { IDProviderDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

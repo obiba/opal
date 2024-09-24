@@ -52,7 +52,6 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { GroupDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError } from 'src/utils/notify';

@@ -73,7 +73,6 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { SubjectProfileDto } from 'src/models/Opal';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
