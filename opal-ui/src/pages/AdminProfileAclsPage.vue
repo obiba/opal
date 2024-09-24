@@ -2,8 +2,9 @@
   <div>
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
+        <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('profiles')" to="/admin/profiles" />
+        <q-breadcrumbs-el :label="$t('user_profiles')" to="/admin/profiles" />
         <q-breadcrumbs-el :label="`${$route.params.principal}`" />
       </q-breadcrumbs>
     </q-toolbar>

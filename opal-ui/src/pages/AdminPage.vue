@@ -25,9 +25,9 @@
             <q-item>
               <q-item-section>
                 <q-item-label
-                  ><router-link to="/admin/profiles">{{ $t('profiles') }}</router-link></q-item-label
+                  ><router-link to="/admin/profiles">{{ $t('user_profiles') }}</router-link></q-item-label
                 >
-                <q-item-label caption lines="2">{{ $t('profiles_caption') }}</q-item-label>
+                <q-item-label caption lines="2">{{ $t('user_profiles_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>

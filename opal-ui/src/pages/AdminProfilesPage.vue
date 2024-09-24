@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('profiles')" />
+        <q-breadcrumbs-el :label="$t('user_profiles')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
