@@ -369,7 +369,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function getAnalyses(name: string, table: string) {
-    return api.get(`/project/${name}/table/${name}/analyses`).then((response) => response.data);
+    return api.get(`/project/${name}/table/${table}/analyses`).then((response) => response.data);
   }
 
   async function runAnalysis(name: string, analysis: AnalyseCommandOptionsDto) {
