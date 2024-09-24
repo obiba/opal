@@ -19,18 +19,34 @@
       </div>
       <div class="text-help q-mb-md">{{ $t('profile_groups_acls_info') }}</div>
       <div v-if="profile && profile.groups?.length>0">
-        <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-          <template v-for="grp in groups" :key="grp">
-            <q-tab :name="grp" :label="grp" />
-          </template>
-        </q-tabs>
-        <q-separator />
-        <q-tab-panels v-model="tab">
-          <q-tab-panel v-for="grp in groups" :key="grp" :name="grp"
-            style="padding-top: 0">
-            <profile-acls-list :principal="grp" :type="Subject_SubjectType.GROUP"/>
-          </q-tab-panel>
-        </q-tab-panels>
+        <div class="row q-gutter-md">
+          <div class="col" style="max-width: 200px;">
+            <div v-for="grp in groups" :key="grp">
+              <q-btn
+                flat
+                no-caps
+                icon="group"
+                color="primary"
+                size="12px"
+                :label="grp"
+                align="left"
+                class="full-width"
+                :class="`${ tab === grp ? 'bg-grey-2' : '' }`"
+                @click="tab = grp"
+              ></q-btn>
+            </div>
+          </div>
+          <div class="col">
+            <q-tab-panels v-model="tab">
+              <q-tab-panel v-for="grp in groups" :key="grp" :name="grp"
+                style="padding-top: 0">
+                <div class="text-h6 q-mb-sm">{{ grp }}</div>
+                <q-separator />
+                <profile-acls-list :principal="grp" :type="Subject_SubjectType.GROUP"/>
+              </q-tab-panel>
+            </q-tab-panels>
+          </div>
+        </div>
       </div>
     </q-page>
   </div>

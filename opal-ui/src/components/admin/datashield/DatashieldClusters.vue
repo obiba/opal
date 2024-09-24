@@ -21,7 +21,7 @@
         <q-tab-panels v-model="tab">
           <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name"
             style="padding-top: 0">
-            <div class="text-h6">
+            <div class="text-h6 q-mb-sm">
               {{ cluster.name }}
             </div>
             <q-separator />
