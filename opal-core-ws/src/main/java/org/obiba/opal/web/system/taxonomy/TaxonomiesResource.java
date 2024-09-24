@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.TaxonomyDto;
 import org.obiba.opal.web.taxonomy.Dtos;
@@ -37,7 +38,7 @@ import com.google.common.base.Strings;
 
 @Component
 @Path("/system/conf/taxonomies")
-public class TaxonomiesResource {
+public class TaxonomiesResource implements BaseResource {
 
   @Autowired
   private TaxonomyService taxonomyService;

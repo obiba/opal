@@ -1058,6 +1058,7 @@ export default {
   no_results: 'Aucun résultat',
   no_sql_history: 'Aucun historique SQL',
   no_table_values: 'Aucune valeur dans la table',
+  no_taxonomies: 'Aucune taxonomie',
   no: 'Non',
   non_missings: 'Non manquantes',
   none_value: '(Aucun)',

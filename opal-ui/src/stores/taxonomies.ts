@@ -17,6 +17,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   const taxonomy = ref<TaxonomyDto>({} as TaxonomyDto);
   const vocabulary = ref<VocabularyDto>({} as VocabularyDto);
   const summaries = ref<TaxonomiesDto_TaxonomySummaryDto[]>([]);
+  const canAdd = ref(false);
   const canEdit = ref(false);
 
   function reset() {
@@ -42,10 +43,18 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   async function initSummaries() {
+    loadTaxonomiesPermissions();
     if (summaries.value.length === 0) {
       return loadSummaries();
     }
     return Promise.resolve();
+  }
+
+  async function loadTaxonomiesPermissions() {
+    return api.options('/system/conf/taxonomies').then((response) => {
+      canAdd.value = response.headers['allow'].split(',').map((m: string) => m.trim()).includes('POST');
+      return response;
+    });
   }
 
   async function loadTaxonomies() {
@@ -245,6 +254,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     summaries,
     taxonomy,
     vocabulary,
+    canAdd,
     canEdit,
     reset,
     refresh,

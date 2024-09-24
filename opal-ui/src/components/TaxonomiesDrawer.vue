@@ -17,7 +17,7 @@
           <q-item-label>{{ summary.name }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item v-if="taxonomiesStore.canEdit" class="q-mt-md">
+      <q-item v-if="taxonomiesStore.canAdd" class="q-mt-md">
         <q-btn-dropdown
           no-caps
           color="primary"

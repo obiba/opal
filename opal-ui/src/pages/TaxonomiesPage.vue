@@ -13,7 +13,7 @@
       <div class="text-help q-mb-md">
         {{ $t('taxonomies_info') }}
       </div>
-      <div class="row">
+      <div class="row" v-if="summaries.length">
         <template v-for="summary in summaries" :key="summary.name">
           <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
             <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4">
@@ -26,6 +26,9 @@
             </q-card-section>
           </q-card>
         </template>
+      </div>
+      <div v-else class="text-hint">
+        {{ $t('no_taxonomies') }}
       </div>
     </q-page>
   </div>
