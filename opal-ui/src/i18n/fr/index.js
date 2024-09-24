@@ -345,6 +345,26 @@ export default {
       description: 'VCF_STORE_VIEW',
     },
   },
+  analysis_status: {
+    IN_PROGRESS: 'En cours',
+    PASSED: 'Réussi',
+    FAILED: 'Échoué',
+    ERROR: 'Erreur',
+    IGNORED: 'Ignoré',
+    UNRECOGNIZED: 'Non reconnu',
+  },
+  analyse_validate: {
+    info: 'Les analyses peuvent améliorer la qualité des données en détectant les incohérences grâce à des règles de validation et des rapports personnalisés.',
+    add: 'Nouvelle analyse',
+    analyse_command_created: 'La tâche d\'analyse créée avec l\'identifiant [ {id} ].',
+    delete_analysis_confirm: 'Êtes-vous sûr de vouloir supprimer l\'analyse \'{name}\' et ses résultats associés. Cette action est irréversible et toutes les données seront perdues.',
+    analysis_dialog: {
+      add_analysis: 'Ajouter une analyse',
+      title: 'Ajouter une analyse',
+      variables_hint: 'Les noms de variables (séparés par des virgules) auxquels l\'analyse s\'applique. S\'ils ne sont pas spécifiés, toutes les variables de la table pourront être analysées.',
+      type_hint: 'Appliquer des règles de validation des données. La validation des données consiste à vérifier si un ensemble de données répond aux présomptions ou aux attentes que vous avez à son sujet. Basé sur le package R validate qui vise à rendre la vérification de vos données facile, maintenable et reproductible.'
+    }
+  },
   id_mappings: {
     title: "Correspondances d'Identifiants",
     info: "Les correspondances d'identifiants sont définies par type d'entité. Les correspondances d'identifiants consistent à associer, pour une entité donnée, son identifiant dans le système à ses identifiants dans les données importées ou exportées.",
@@ -500,6 +520,7 @@ export default {
     range: 'La valeur doit être comprise entre {min} et {max} inclusivement',
     identifiers_required: 'Les identifiants sont requis',
     table_name_required: 'Le nom de la table est requis',
+    missing_required_fields: 'Champs obligatoires manquants',
     user: {
       password_required: 'Le mot de passe est requis et doit comporter au moins 8 caractères',
       certificate_required: 'Le certificat est requis',
@@ -533,6 +554,9 @@ export default {
       host_required: "L'hôte est requis",
       host_uri_format: 'L\'hôte doit commencer par "https://" ou "http://"',
     },
+  },
+  analysis : {
+    name_exists : 'Le nom de l\'analyse doit être unique',
   },
   main: {
     brand: 'Opal',
@@ -773,6 +797,7 @@ export default {
   advanced_search: 'Recherche avancée',
   all_categories: 'Toutes',
   all_projects: 'Tous',
+  analyses: 'Analyses',
   annotate_info: '- | Une variable sera annotée. | {count} variables seront annotées.',
   annotate: 'Annoter',
   annotation_texts_hint: 'Annotez avec du texte libre. Pour une lisibilité humaine, vous pouvez fournir un texte différent dans chaque langue. Pour un traitement automatique ou un texte sans localisation, choisissez la langue "default". Le texte vide sera ignoré. Le format de texte Markdown est pris en charge.',
@@ -888,6 +913,7 @@ export default {
   description: 'Description',
   descriptive_statistics: 'Statistiques descriptives',
   destination_folder: 'Dossier de destination',
+  details: 'Détails',
   dictionary: 'Dictionnaire',
   disable: 'Désactiver',
   discovery: 'Découverte',
@@ -914,6 +940,7 @@ export default {
   encrypt_file_content: 'Encrypter le contenu du fichier',
   encrypt_password_hint: 'Le mot de passe doit avoir au moins 8 caractères.',
   encrypt_password: 'Mot de passe',
+  end: 'Fin',
   end_time: 'Fin',
   enforced_2fa: 'Authentification à deux facteurs obligatoire',
   entities: 'Entités',
@@ -1140,6 +1167,7 @@ export default {
   reload: 'Recharger',
   remove_from_cart: 'Retirer du panier',
   remove: 'Supprimer',
+  report: 'Rapport',
   repeatable_hint: 'Quand une entitié peut avoir plusieurs valeurs pour cette variable.',
   repeatable: 'Répétable',
   reset: 'Réinitialiser',
@@ -1156,6 +1184,7 @@ export default {
   role: 'Rôle',
   rservers_caption: "Configurer les serveurs R, accorder l'accès au service R",
   rservers: 'R',
+  run: 'Exécuter',
   sample_quantiles: "Quantiles d'échantillon",
   sample: 'Échantillon',
   samples: 'Échantillons',
@@ -1277,7 +1306,7 @@ export default {
   version: 'Version',
   view_destination_hint: "La vue de destination sera créée si elle n'existe pas, sinon elle sera mise à jour en fusionnant les variables dérivées.",
   view_name: 'Nom de la vue',
-  view: 'Vue',
+  view: 'Voir',
   vocabularies: 'Vocabulaires',
   vocabulary: 'Vocabulaire',
   waiting: 'En attente',

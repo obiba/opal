@@ -14,6 +14,7 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,11 @@ public class ProjectAnalysisResource {
   @PathParam("name")
   private String name;
 
+  @OPTIONS
+  @Path("/analyses")
+  public Response getAnalysesOptions() {
+    return Response.ok().build();
+  }
 
   @GET
   @Path("/analyses")

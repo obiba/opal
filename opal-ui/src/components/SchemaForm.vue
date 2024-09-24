@@ -1,5 +1,5 @@
 <template>
-  <div v-if="schema">
+  <div v-if="schema" :class="{ 'o-border-negative rounded-borders': !isFormValid }">
     <form autocomplete="off">
       <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
       <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>
@@ -13,6 +13,7 @@
       </div>
     </form>
   </div>
+  <span v-if="!isFormValid" class="text-negative text-caption">{{ $t('validation.missing_required_fields') }}</span>
 </template>
 
 <script lang="ts">
@@ -23,6 +24,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { FormObject, SchemaFormObject } from 'src/components/models';
 import SchemaFormItem from 'src/components/SchemaFormItem.vue';
+import { isEmpty } from 'src/utils/validations';
 
 interface Props {
   modelValue: FormObject | undefined;
@@ -32,8 +34,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);
-
 const data = ref(props.modelValue || {});
+const isFormValid = ref(true);
 
 watch([() => props.modelValue, () => props.schema], () => {
   data.value = props.modelValue || {};
@@ -53,18 +55,34 @@ function initDefaults() {
   });
 }
 
-function isValid() {
-  if (!data.value) return false;
+
+// TODO needs a better validation handling, this is just a basic one
+function validate() {
+  isFormValid.value = !!data.value;
   if (props.schema.required) {
-    const missings = props.schema.required.filter((key) => data.value[key] === undefined);
-    return missings.length === 0;
+    const missings = props.schema.required.filter((key) => isEmpty(data.value[key]));
+    isFormValid.value = missings.length === 0;
   }
-  return true;
+
+  return isFormValid.value;
 }
 
 function onUpdate(key: string) {
-  initDefaults();
-  if (!isValid()) emit('update:modelValue', undefined);
+  validate();
+  if (!isFormValid.value) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);
 }
+
+defineExpose({
+  validate,
+});
 </script>
+
+<style lang="scss" scoped>
+.o-border-negative {
+  color: $negative !important;
+  outline: 1px solid $negative !important;
+  min-height: 90%;
+  padding: 0.3rem !important;
+}
+</style>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, baseUrl } from 'src/boot/api';
 import {
   ProjectDto,
   ProjectSummaryDto,
@@ -18,6 +18,7 @@ import {
   RestoreCommandOptionsDto,
   ImportVCFCommandOptionsDto,
   ExportVCFCommandOptionsDto,
+  AnalyseCommandOptionsDto,
 } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
 import { VCFSamplesMappingDto } from 'src/models/Plugins';
@@ -36,6 +37,9 @@ interface ProjectPerms {
   vcfs: Perms | undefined;
   import_vcf: Perms | undefined;
   export_vcf: Perms | undefined;
+
+  analyses: Perms | undefined;
+  anayses_export: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -117,11 +121,22 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.vcfstore = new Perms(response);
           return response;
         }),
+
         api.options(`/project/${project.value.name}`).then((response) => {
           perms.value.project = new Perms(response);
           return response;
         }),
       ]);
+    });
+  }
+
+  async function loadAnalysesPermissions(name: string, tableName: string) {
+    return Promise.all([
+      api.options(`/project/${name}/table/${tableName}/analyses`),
+      api.options(`/project/${name}/table/${tableName}/analyses_export`),
+    ]).then(([analyses, analyses_export]) => {
+      perms.value.analyses = new Perms(analyses);
+      perms.value.vcfs = new Perms(analyses_export);
     });
   }
 
@@ -349,6 +364,30 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.delete(`/project/${name}/keystore/${alias}`);
   }
 
+  async function getAnalysis(name: string, table: string, analysisName: string) {
+    return api.get(`/project/${name}/table/${name}/analysis/${analysisName}`).then((response) => response.data);
+  }
+
+  async function getAnalyses(name: string, table: string) {
+    return api.get(`/project/${name}/table/${name}/analyses`).then((response) => response.data);
+  }
+
+  async function runAnalysis(name: string, analysis: AnalyseCommandOptionsDto) {
+    return api.post(`/project/${name}/commands/_analyse`, analysis).then((response) => response.data.id);
+  }
+
+  async function removeAnalysis(name: string, table: string, analysisName: string) {
+    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}`);
+  }
+
+  function getAnalysisReportUrl(name: string, table: string, analysisName: string, resultId: string) {
+    return `${baseUrl}/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}/_report`;
+  }
+
+  async function removeAnalysisResult(name: string, table: string, analysisName: string, resultId: string) {
+    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}`);
+  }
+
   return {
     projects,
     project,
@@ -368,6 +407,7 @@ export const useProjectsStore = defineStore('projects', () => {
     loadAcls,
     loadSubjects,
     loadVcfPermissions,
+    loadAnalysesPermissions,
     deleteSubject,
     getSubjectPermissions,
     deleteSubjectPermission,
@@ -396,5 +436,11 @@ export const useProjectsStore = defineStore('projects', () => {
     getKeyPairs,
     addKeyPair,
     deleteKeyPair,
+    getAnalysis,
+    getAnalyses,
+    runAnalysis,
+    removeAnalysis,
+    getAnalysisReportUrl,
+    removeAnalysisResult,
   };
 });

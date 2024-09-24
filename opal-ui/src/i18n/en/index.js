@@ -345,6 +345,26 @@ export default {
       description: 'View VCF files and statistics.',
     },
   },
+  analysis_status: {
+    IN_PROGRESS: 'In progress',
+    PASSED: 'Passed!!!',
+    FAILED: 'Failed',
+    ERROR: 'Error',
+    IGNORED: 'Ignored',
+    UNRECOGNIZED: 'Unrecognized',
+  },
+  analyse_validate: {
+    info: 'Analyses can improve data quality by detecting inconsistencies through validation rules and custom reports.',
+    add: 'New Analysis',
+    analyse_command_created: 'Analysis task created with identifier [ {id} ].',
+    delete_analysis_confirm: 'Are sure you want to delete the \'{name}\' analysis and its associated results. This cannot be undone and all data will be lost.',
+    analysis_dialog: {
+      add_analysis: 'Add Analysis',
+      title: 'Add Analysis',
+      variables_hint: 'The variable names (comma separated) to which to the analysis applies. If not specified all the table variables will be analysable.',
+      type_hint: 'Apply data validation rules. Validating data is all about checking whether a data set meets presumptions or expectations you have about it. Based on the validate R package which is intended to make checking your data easy, maintainable and reproducible.'
+    }
+  },
   id_mappings: {
     title: 'Identifiers Mappings',
     info: 'Identifiers mappings are defined per entity type. Mapping identifiers consist of associating, for a given entity, its identifier in the system to its identifiers in the data being imported or exported.',
@@ -500,6 +520,7 @@ export default {
     range: 'Value must be between {min} and {max} inclusively',
     identifiers_required: 'Identifiers are required',
     table_name_required: 'Table name is required',
+    missing_required_fields: 'Missing required fields',
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',
@@ -533,6 +554,9 @@ export default {
       host_required: 'Host is required',
       host_uri_format: 'Host must begin with "https://" or "http://"',
     },
+    analysis: {
+      name_exists: 'Analysis name must be unique',
+    }
   },
   main: {
     brand: 'Opal',
@@ -773,6 +797,7 @@ export default {
   advanced_search: 'Advanced search',
   all_categories: 'All',
   all_projects: 'All',
+  anaylses: 'Analyses',
   annotate_info: '- | One variable will be annotated. | {count} variables will be annotated.',
   annotate: 'Annotate',
   annotation_texts_hint: 'Annotate with free text. For human readibility, you can provide a different text for each language. For machine processing or not localized text, choose "default" language. Empty text will be ignored. Markdown text format is supported.',
@@ -888,6 +913,7 @@ export default {
   description: 'Description',
   descriptive_statistics: 'Descriptive statistics',
   destination_folder: 'Destination folder',
+  details: 'Details',
   dictionary: 'Dictionary',
   disable: 'Disable',
   discovery: 'Discovery',
@@ -914,6 +940,7 @@ export default {
   encrypt_file_content: 'Encrypt file content',
   encrypt_password_hint: 'The password must have at least 8 characters.',
   encrypt_password: 'Password',
+  end: 'End',
   end_time: 'End time',
   enforced_2fa: 'Enforced 2FA',
   entities: 'Entities',
@@ -1140,6 +1167,7 @@ export default {
   reload: 'Reload',
   remove_from_cart: 'Remove from cart',
   remove: 'Remove',
+  report: 'Report',
   repeatable_hint: 'When an entity can have multiple values for this variable.',
   repeatable: 'Repeatable',
   reset: 'Reset',
@@ -1156,6 +1184,7 @@ export default {
   role: 'Role',
   rservers_caption: 'Configure R server, grant access to R service',
   rservers: 'R',
+  run: 'Run',
   sample_quantiles: 'Sample quantiles',
   sample: 'Sample',
   samples: 'Samples',

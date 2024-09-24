@@ -1,6 +1,6 @@
 import { CommandStateDto_Status } from 'src/models/Commands';
 import { TableStatusDto } from 'src/models/Magma';
-import { ProjectDatasourceStatusDto } from 'src/models/Projects';
+import { ProjectDatasourceStatusDto, AnalysisStatusDto } from 'src/models/Projects';
 
 export function projectStatusColor(status: string | ProjectDatasourceStatusDto) {
   const statusEnum = typeof status === 'string' ? ProjectDatasourceStatusDto[status] : status;
@@ -54,4 +54,15 @@ export function commandStatusColor(status: string | CommandStateDto_Status) {
     default:
       return 'white';
   }
+}
+
+export function analysisColor(status: string | AnalysisStatusDto) {
+    const statusEnum = typeof status === 'string' ? AnalysisStatusDto[status] : status;
+    switch (statusEnum) {
+      case AnalysisStatusDto.PASSED:
+        return 'positive';
+      default:
+        return 'negative';
+
+    }
 }

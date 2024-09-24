@@ -2,15 +2,18 @@ import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
 import { PluginPackage } from 'src/components/models';
 import { PluginPackagesDto } from 'src/models/Plugins';
+import { mergeAnalysesTranslations } from 'src/utils/plugins';
 
 export const usePluginsStore = defineStore('plugins', () => {
   const plugins = ref({} as PluginPackagesDto);
+  const analysisPlugins = ref({} as PluginPackagesDto);
   const datasourceImportPlugins = ref([] as PluginPackage[]);
   const datasourceExportPlugins = ref([] as PluginPackage[]);
   const vcfStorePlugins = ref([] as PluginPackage[]);
 
   function reset() {
     plugins.value = {} as PluginPackagesDto;
+    analysisPlugins.value = {} as PluginPackagesDto;
     datasourceImportPlugins.value = [];
     datasourceExportPlugins.value = [];
   }
@@ -55,6 +58,19 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   async function loadPlugins() {
     return api.get('plugins').then((response) => (plugins.value = response.data));
+  }
+
+  async function initAnalysisPlugins() {
+    if (!!analysisPlugins.value.site) return Promise.resolve();
+    return loadAnalysisPlugins();
+  }
+
+  async function loadAnalysisPlugins() {
+    analysisPlugins.value = {} as PluginPackagesDto;
+    return api.get('analysis-plugins').then((response) => {
+      analysisPlugins.value = response.data;
+      mergeAnalysesTranslations(response.data);
+    });
   }
 
   async function getPlugins(type: string) {
@@ -106,11 +122,13 @@ export const usePluginsStore = defineStore('plugins', () => {
 
   return {
     plugins,
+    analysisPlugins,
     datasourceImportPlugins,
     datasourceExportPlugins,
     vcfStorePlugins,
     reset,
     loadPlugins,
+    initAnalysisPlugins,
     initDatasourcePlugins,
     getDatasourcePluginForm,
     initVcfStorePlugins,

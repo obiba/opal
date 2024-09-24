@@ -153,7 +153,7 @@ const dataArray = ref<Array<FormObject>>([]);
 
 //onMounted(init);
 
-watch([() => props.modelValue, () => props.field], init);
+watch([() => props.modelValue, () => props.field], init, { immediate: true });
 
 function init() {
   data.value = props.modelValue;
@@ -192,10 +192,10 @@ function onUpdate() {
 }
 
 function onArrayUpdate(index: number) {
+  onUpdate();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (value: any) => {
     dataArray.value[index] = value;
-    onUpdate();
   };
 }
 
