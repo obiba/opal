@@ -1,5 +1,5 @@
 <template>
-  <q-form ref="formRef" class="q-gutter-md" persistent>
+  <q-form ref="formRef" class="q-gutter-lg" persistent>
     <q-input
       v-model="analysisOptions.name"
       dense

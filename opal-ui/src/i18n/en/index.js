@@ -347,7 +347,7 @@ export default {
   },
   analysis_status: {
     IN_PROGRESS: 'In progress',
-    PASSED: 'Passed',
+    PASSED: 'Passed!!!',
     FAILED: 'Failed',
     ERROR: 'Error',
     IGNORED: 'Ignored',
