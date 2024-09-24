@@ -1,6 +1,6 @@
 <template>
-  <div v-if="schema">
-    <form autocomplete="off" :class="{ 'o-border-negative rounded-borders': !isFormValid }">
+  <div v-if="schema" :class="{ 'o-border-negative rounded-borders': !isFormValid }">
+    <form autocomplete="off">
       <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
       <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>
       <div v-for="item in schema.items" :key="item.key">
@@ -12,8 +12,8 @@
         />
       </div>
     </form>
-    <span v-if="!isFormValid" class="text-negative text-caption">{{ $t('validation.missing_required_fields') }}</span>
   </div>
+  <span v-if="!isFormValid" class="text-negative text-caption">{{ $t('validation.missing_required_fields') }}</span>
 </template>
 
 <script lang="ts">
@@ -55,6 +55,8 @@ function initDefaults() {
   });
 }
 
+
+// TODO needs a better validation handling, this is just a basic one
 function validate() {
   isFormValid.value = !!data.value;
   if (props.schema.required) {
@@ -66,8 +68,6 @@ function validate() {
 }
 
 function onUpdate(key: string) {
-  // NOTE: calling this here removes the array value from the data object
-  // initDefaults();
   validate();
   if (!isFormValid.value) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);
@@ -81,7 +81,8 @@ defineExpose({
 <style lang="scss" scoped>
 .o-border-negative {
   color: $negative !important;
-  border: 1px solid $negative !important;
-  padding: 0.5rem !important;
+  outline: 1px solid $negative !important;
+  min-height: 90%;
+  padding: 0.3rem !important;
 }
 </style>

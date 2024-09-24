@@ -89,11 +89,11 @@
           <div class="row q-col-gutter-md">
             <div class="col-6">
               <div class="text-bold q-mb-sm">{{ $t('parameters') }}</div>
-              <schema-form v-model="refParameters" :schema="parametersSchemaForm" />
+              <schema-form ref="sfParameters" v-model="refParameters" :schema="parametersSchemaForm" />
             </div>
             <div class="col-6">
               <div class="text-bold q-mb-sm">{{ $t('credentials') }}</div>
-              <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" />
+              <schema-form ref="sfCredentials"  v-model="refCredentials" :schema="credentialsSchemaForm" />
             </div>
           </div>
         </div>
@@ -139,6 +139,8 @@ const category = ref();
 const factory = ref();
 const refParameters = ref();
 const refCredentials = ref();
+const sfParameters = ref();
+const sfCredentials = ref();
 
 const categories = computed(() =>
   props.provider?.categories
@@ -224,7 +226,7 @@ function compareTitles(a: { title: string }, b: { title: string }) {
 }
 
 function onSave() {
-  if (!props.provider) {
+  if (!props.provider || !sfParameters.value.validate() || !sfCredentials.value.validate()) {
     return;
   }
   const resourceRef: ResourceReferenceDto = {
