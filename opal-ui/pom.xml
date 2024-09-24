@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0.0-RC3</version>
   </parent>
   <artifactId>opal-ui</artifactId>
   <name>opal-ui</name>
