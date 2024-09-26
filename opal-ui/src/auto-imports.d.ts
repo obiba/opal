@@ -80,6 +80,7 @@ declare global {
   const useLink: typeof import('vue-router')['useLink']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
   const useProfileAclsStore: typeof import('./stores/profile-acls')['useProfileAclsStore']
+  const useProfileActivityStore: typeof import('./stores/profile-activity')['useProfileActivityStore']
   const useProfilesStore: typeof import('./stores/profiles')['useProfilesStore']
   const useProjectsStore: typeof import('./stores/projects')['useProjectsStore']
   const useRStore: typeof import('./stores/r')['useRStore']
@@ -187,6 +188,7 @@ declare module 'vue' {
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
     readonly useProfileAclsStore: UnwrapRef<typeof import('./stores/profile-acls')['useProfileAclsStore']>
+    readonly useProfileActivityStore: UnwrapRef<typeof import('./stores/profile-activity')['useProfileActivityStore']>
     readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
     readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>

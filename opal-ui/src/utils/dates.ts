@@ -35,3 +35,10 @@ export function getDatesDistanceLabel(date1: string | number | undefined, date2:
       })
     : '-';
 }
+
+export function getMillisLabel(millis: number) {
+  if (millis < 1000)
+    return `${millis} ms`;
+  else 
+    return `${millis/1000} s`;
+}

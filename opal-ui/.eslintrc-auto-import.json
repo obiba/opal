@@ -104,6 +104,7 @@
     "useSqlStore": true,
     "useSearchStore": true,
     "useCartStore": true,
-    "AnalysisPluginPackages": true
+    "AnalysisPluginPackages": true,
+    "useProfileActivityStore": true
   }
 }

@@ -124,6 +124,8 @@ const groupsStore = useGroupsStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 const profilesStore = useProfilesStore();
+const profileAclsStore = useProfileAclsStore();
+const profileActivityStore = useProfileActivityStore();
 const identityProvidersStore = useIdentityProvidersStore();
 const tokensStore = useTokensStore();
 const identifiersStore = useIdentifiersStore();
@@ -172,6 +174,8 @@ onMounted(() => {
   rStore.reset();
   datashieldStore.reset();
   profilesStore.reset();
+  profileAclsStore.reset();
+  profileActivityStore.reset();
   identityProvidersStore.reset();
   tokensStore.reset();
   authStore.getProviders().then((providers) => {
