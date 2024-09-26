@@ -30,7 +30,7 @@
       </template>
       <template v-slot:body-cell-principal="props">
         <q-td :props="props">
-          <router-link :to="`/admin/profile/${props.value}/permissions`" class="text-primary">{{
+          <router-link :to="`/admin/profile/${props.value}`" class="text-primary">{{
             props.value
           }}</router-link>
         </q-td>
