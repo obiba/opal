@@ -5,6 +5,12 @@ CLASSPATH="${OPAL_HOME}/conf:${OPAL_DIST}/lib/*"
 PLUGINS_DIR="${OPAL_HOME}/plugins/"
 [ -e "${PLUGINS_DIR}/.archive" ] || mkdir -p "${PLUGINS_DIR}/.archive"
 
+# Iterate over deprecated plugins
+find "$PLUGINS_DIR" -type d -name "opal-search-*" | grep -v ".archive" | while IFS= read -r deprecated; do
+    # Move the deprecated folder to archive folder
+    mv "$deprecated" "${PLUGINS_DIR}/.archive"
+done
+
 # Iterate over plugins zip files
 find "$PLUGINS_DIR" -type f -name "*-dist.zip" | grep -v ".archive" | while IFS= read -r zip_file; do
     # Unzip each zip file
