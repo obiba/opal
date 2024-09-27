@@ -306,8 +306,8 @@ export default {
       description: "Ajouter et accéder à des fichiers sans avoir l'autorisation de les supprimer.",
     },
     FILES_ALL: {
-      label: 'Administrer les dossiers',
-      description: 'Accès complet aux dossiers.',
+      label: 'Administrer lesfichiers',
+      description: 'Accès complet aux fichiers.',
     },
     // resource permissions
     RESOURCE_ALL: {
@@ -926,6 +926,7 @@ export default {
   download_views_backup: 'Sauvegarder les vues',
   download: 'Télécharger',
   duplicate: 'Dupliquer',
+  duration: 'Durée',
   edit_category: 'Éditer la catégorie',
   edit_permission: 'Éditer la permission',
   edit_project: 'Éditer le projet',
@@ -970,6 +971,7 @@ export default {
   filter: 'Filtre',
   filters: 'Filtres',
   folder: 'Dossier',
+  folder_file: 'Dossier ou fichier',
   format: 'Format',
   frequencies: 'Fréquences',
   frequency: 'Fréquence',
@@ -1160,6 +1162,7 @@ export default {
   r_packages_management_forbidden: 'La gestion des paquets R (installation, mise à jour, suppression) n\'est pas autorisée : il est recommandé d\'utiliser des images Docker validées des serveurs R, pour garantir la reproductibilité de l\'environnement d\'analyse R. En tant que développeur de paquets R, vous pouvez modifier les paramètres système pour activer cette fonctionnalité.',
   r_script: 'Script',
   r_service: 'Service R',
+  r_sessions_activity: 'Activité des sessions R',
   r_sessions_count: 'Nombre de sessions R',
   range: 'Plage',
   realm: 'Domaine',
@@ -1256,6 +1259,8 @@ export default {
   title: 'Titre',
   to: 'À',
   token: 'Jeton',
+  total_duration: 'Durée totale',
+  total_execution_time: 'Temps d\'execution total',
   total: 'Total',
   type: 'Type',
   unique_name_hint: 'Le nom doit être unique.',
@@ -1318,8 +1323,4 @@ export default {
   vocabulary: 'Vocabulaire',
   waiting: 'En attente',
   yes: 'Oui',
-  duration: 'Durée',
-  total_duration: 'Durée totale',
-  total_execution_time: 'Temps d\'execution total',
-  r_sessions_activity: 'Activité des sessions R',
 };

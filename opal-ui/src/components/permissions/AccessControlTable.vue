@@ -113,7 +113,7 @@ const columns = computed(() => [
 ]);
 
 const cases = [
-  { regex: /\/files\/(.*)$/, type: 'folder' },
+  { regex: /\/files\/(.*)$/, type: 'folder_file' },
   { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
   { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
   { regex: /\/datasource\/([^\/]+)\/view\/(.*)$/, type: 'view' },
@@ -148,7 +148,7 @@ const rows = computed(() => {
         result.caption = t(item.type);
         switch (item.type) {
           case 'home_folder':
-          case 'folder':
+          case 'folder_file':
             result.title = result.url.replace(/^\/files\//, '/');
             break;
           case 'project':

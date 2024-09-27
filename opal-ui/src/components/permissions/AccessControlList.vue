@@ -7,7 +7,6 @@
       :row-key="getRowKey"
       :columns="columns"
       :pagination="initialPagination"
-      :hide-pagination="authzStore.acls.length <= initialPagination.rowsPerPage"
       :filter="filter"
       :filter-method="onFilter"
     >
