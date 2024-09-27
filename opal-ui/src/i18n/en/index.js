@@ -1318,4 +1318,8 @@ export default {
   vocabulary: 'Vocabulary',
   waiting: 'Waiting',
   yes: 'Yes',
+  duration: 'Duration',
+  total_duration: 'Total duration',
+  total_execution_time: 'Total execution time',
+  r_sessions_activity: 'R sessions activity',
 };

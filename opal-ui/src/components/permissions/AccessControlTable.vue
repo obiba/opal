@@ -77,8 +77,8 @@ const initialPagination = ref({
   sortBy: 'resource',
   descending: false,
   page: 1,
-  rowsPerPage: 10,
-  minRowsForPagination: 10,
+  rowsPerPage: 5,
+  minRowsForPagination: 5,
 });
 
 interface Row {
