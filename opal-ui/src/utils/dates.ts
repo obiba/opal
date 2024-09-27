@@ -1,10 +1,10 @@
 import { getCurrentLocale } from 'src/boot/i18n';
-import { parseISO, formatDistanceStrict } from 'date-fns';
+import { parseISO, formatDistanceStrict, formatDuration, millisecondsToHours, millisecondsToMinutes, millisecondsToSeconds } from 'date-fns';
 
 import { enUS as en } from 'date-fns/locale/en-US';
 import { fr } from 'date-fns/locale/fr';
 
-function getDate(date: string | number | undefined) {
+export function getDate(date: string | number | undefined) {
   if (typeof date === 'string') {
     return parseISO(date);
   } else if (date === undefined || isNaN(date)) {
@@ -34,4 +34,31 @@ export function getDatesDistanceLabel(date1: string | number | undefined, date2:
         locale: locale === 'fr' ? fr : en,
       })
     : '-';
+}
+
+export function getMillisLabel(millis: number, compact = true) {
+  let value = millis;
+  const hours = millisecondsToHours(value);
+  value = value - hours * 3600000;
+  const minutes = millisecondsToMinutes(value);
+  value = value - minutes * 60000;
+  const seconds = millisecondsToSeconds(value);
+  const milliseconds = value - seconds * 1000;
+
+  if (compact) {
+    const labels = [];
+    if (hours > 0) labels.push(`${hours} h`);
+    if (minutes>0) labels.push(`${minutes} min`);
+    if (seconds>0) labels.push(`${seconds} s`);
+    if (milliseconds>0) labels.push(`${milliseconds} ms`);
+    return labels.join(', ');
+  }
+
+  const locale = getCurrentLocale();
+  const label = formatDuration({
+    hours,
+    minutes,
+    seconds
+  }, {locale: locale === 'fr' ? fr : en,});
+  return `${label}${milliseconds>0 ? ' ' + milliseconds + ' ms' : ''}`;
 }
