@@ -165,7 +165,14 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public void updateProfileSecret(String principal, boolean enable) {
     SubjectProfile profile = getProfile(principal);
-    profile.setSecret(enable ? totpService.generateSecret() : null);
+    profile.setSecret(enable ? (profile.hasTmpSecret() ? profile.getTmpSecret() : totpService.generateSecret()) : null);
+    orientDbService.save(profile, profile);
+  }
+
+  @Override
+  public void updateProfileTmpSecret(String principal, boolean enable) {
+    SubjectProfile profile = getProfile(principal);
+    profile.setTmpSecret(enable ? totpService.generateSecret() : null);
     orientDbService.save(profile, profile);
   }
 

@@ -38,6 +38,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   private String secret;
 
+  private String tmpSecret;
+
   public SubjectProfile() {
   }
 
@@ -136,6 +138,20 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   public void setSecret(String secret) {
     this.secret = secret;
+    this.tmpSecret = null;
+  }
+
+  public boolean hasTmpSecret() {
+    return !Strings.isNullOrEmpty(tmpSecret);
+  }
+
+  public String getTmpSecret() {
+    return tmpSecret;
+  }
+
+  public void setTmpSecret(String tmpSecret) {
+    this.tmpSecret = tmpSecret;
+    this.secret = null;
   }
 
   @Override

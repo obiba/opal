@@ -85,7 +85,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
       OpalGeneralConfig config = configService.getConfig();
       if (config.hasOtpStrategy()) {
         String otpHeader = request.getHeader("X-Opal-" + config.getOtpStrategy());
-        validateOtp(config.getOtpStrategy(), otpHeader, token);
+        validateOtp(config.getOtpStrategy(), otpHeader, token, config.isEnforced2FA());
       }
     }
     super.processRequest(request, token);
@@ -111,20 +111,38 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
     }
   }
 
-  private void validateOtp(String strategy, String code, AuthenticationToken token) {
+  private void validateOtp(String strategy, String code, AuthenticationToken token, boolean enforced2FA) {
     String username = token.getPrincipal().toString();
     try {
       SubjectProfile profile = subjectProfileService.getProfile(username);
       boolean otpRealm = StreamSupport.stream(profile.getRealms().spliterator(), false)
           .anyMatch(realm -> realm.equals("opal-user-realm") || realm.equals("opal-ini-realm"));
-      if (profile.hasSecret() && "TOTP".equals(strategy) && otpRealm) {
-        if (Strings.isNullOrEmpty(code)) {
-          throw new NoSuchOtpException("X-Opal-" + strategy);
+      if ("TOTP".equals(strategy) && otpRealm) {
+        if (profile.hasSecret()) {
+          if (Strings.isNullOrEmpty(code)) {
+            throw new NoSuchOtpException("X-Opal-" + strategy);
+          }
+          if (!totpService.validateCode(code, profile.getSecret())) {
+            throw new AuthenticationException("Wrong TOTP");
+          }
+        } else if (profile.hasTmpSecret()) {
+          if (Strings.isNullOrEmpty(code)) {
+            throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()));
+          }
+          if (!totpService.validateCode(code, profile.getTmpSecret())) {
+            throw new AuthenticationException("Wrong TOTP");
+          }
+          // this will make the temporary secret permanent
+          subjectProfileService.updateProfileSecret(profile.getPrincipal(), true);
+        } else if (enforced2FA) {
+          // make a temporary secret
+          subjectProfileService.updateProfileTmpSecret(profile.getPrincipal(), true);
+          profile = subjectProfileService.getProfile(username);
+          throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()));
         }
-        if (!totpService.validateCode(code, profile.getSecret())) {
-           throw new AuthenticationException("Wrong TOTP");
-        }
-      } // else 2FA not activated
+        // else 2FA not activated
+      }
+
     } catch (NoSuchSubjectProfileException e) {
       // first login or wrong username
     }
