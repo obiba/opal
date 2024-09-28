@@ -561,6 +561,8 @@ export default {
   main: {
     brand: 'Opal',
     powered_by: 'Propulsé par',
+    two_fa_info: 'Vous devriez améliorer la sécurité de votre compte avec l\'authentification à deux facteurs.',
+    two_fa_link: 'Activer la 2FA',
     python_api: 'Apprenez comment utiliser la librairie Python et ses outils de commande en ligne.\n\n[Python user guide (en)](https://opaldoc.obiba.org/en/latest/python-user-guide/index.html)',
     r_api: 'Apprenez comment utiliser la librairie R pour gérer les données et faire des opérations DataSHIELD.\n\n[R/DataSHIELD user guide (en)](https://opaldoc.obiba.org/en/latest/r-user-guide/index.html)',
     javascript_api: 'Apprenez comment utiliser la librairie Javascript pour dériver des variables.\n\n[Javascript user guide (en)](https://opaldoc.obiba.org/en/latest/magma-user-guide/index.html)',

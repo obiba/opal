@@ -392,7 +392,11 @@ async function doDeleteToken() {
 }
 
 async function fetchData() {
-  return Promise.all([profilesStore.initProfile(), tokensStore.initTokens()]).catch(notifyError);
+  return Promise.all([profilesStore.initProfile(), tokensStore.initTokens()])
+    .then(() => {
+      authStore.profile = profile.value;
+    })
+    .catch(notifyError);
 }
 
 // Hook and event handlers
