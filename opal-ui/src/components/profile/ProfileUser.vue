@@ -36,7 +36,7 @@
       <!-- !Account -->
 
       <!-- 2FA -->
-      <div v-if="isAnOpalRealm" class="q-gutter-sm">
+      <div v-if="isAnOpalRealm">
         <div class="text-h6 q-mt-lg">{{ $t('2fa.title') }}</div>
         <div
           class="text-help q-mb-md"
@@ -69,34 +69,34 @@
       <!--!2FA -->
 
       <!-- PERSONAL ACCESS TOKENS-->
-      <div class="q-gutter-sm">
-        <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
-        <div class="text-help q-mb-md">{{ $t('user_profile.tokens_info') }}</div>
-        <q-btn-dropdown no-caps color="primary" :title="$t('user_profile.add_token')" icon="add" size="sm">
-          <q-list>
-            <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
-              <q-item-section>
-                <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click.prevent="onAddRToken">
-              <q-item-section>
-                <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
-              <q-item-section>
-                <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
-              <q-item-section>
-                <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+      <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
+      <div class="text-help q-mb-md">{{ $t('user_profile.tokens_info') }}</div>
+      <q-btn-dropdown no-caps color="primary" :title="$t('user_profile.add_token')" icon="add" size="sm">
+        <q-list>
+          <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddRToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
+            <q-item-section>
+              <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
 
+      <div v-if="tokens.length" class="q-mt-md q-mb-md">
         <q-table
           flat
           :rows="tokens"
@@ -185,6 +185,7 @@
           </template>
         </q-table>
       </div>
+      <div v-else class="text-hint q-mt-md q-mb-md">{{ $t('user_profile.no_tokens') }}</div>
       <!-- !PERSONAL ACCESS TOKENS-->
 
       <!-- Dialogs -->
@@ -197,13 +198,6 @@
       />
 
       <update-password-dialog v-model="showUpdatePassword" :name="authStore.profile.principal || ''" />
-
-      <bookmarks-list>
-        <template #title>
-          <div class="text-h6 q-mt-lg">{{ $t('bookmarks') }}</div>
-          <div class="text-help q-mb-md">{{ $t('user_profile.bookmarks_hint') }}</div>
-        </template>
-      </bookmarks-list>
 
       <add-token-dialog
         v-model="showAddToken"
@@ -252,9 +246,7 @@ import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
-import BookmarksList from 'src/components/BookmarksList.vue';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
-import { on } from 'events';
 
 const loading = ref(false);
 const authStore = useAuthStore();
@@ -315,18 +307,18 @@ const columns = computed(() => [
     style: 'width: 40%; white-space: normal;',
   },
   {
-    name: 'services',
-    label: t('services'),
-    align: 'left  ',
-    field: (row: SubjectTokenDto) => getServicesField(row),
-    format: (values: string[]) => values.map((val) => t(`token_services.${val}`)).sort(),
-  },
-  {
     name: 'administration',
     label: t('administration'),
     align: 'left  ',
     field: (row: SubjectTokenDto) => getAdministrationField(row),
     format: (values: string[]) => values.map((val) => t(`token_administration.${val}`)).sort(),
+  },
+  {
+    name: 'services',
+    label: t('services'),
+    align: 'left  ',
+    field: (row: SubjectTokenDto) => getServicesField(row),
+    format: (values: string[]) => values.map((val) => t(`token_services.${val}`)).sort(),
   },
   {
     name: 'inactive',

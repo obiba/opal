@@ -9,6 +9,7 @@
       <q-card-section style="max-height: 75vh" class="scroll">
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
+            dense
             type="text"
             :label="$t('name') + ' *'"
             :hint="$t('user_profile.token_dialog.name_hint')"
@@ -19,6 +20,7 @@
           >
           </q-input>
           <q-input
+            dense
             type="text"
             readonly
             :label="$t('token') + ' *'"
@@ -40,6 +42,7 @@
           </q-input>
 
           <q-select
+            dense
             v-model="token.projects"
             v-if="projectsFilterOptions.length > 0"
             use-input

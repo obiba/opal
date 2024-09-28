@@ -6,10 +6,11 @@
       </q-card-section>
 
       <q-separator />
-      <q-card-section style="max-height: 75vh" class="scroll">
-        <p>{{ $t('user_profile.password_dialog.info') }}</p>
+      <q-card-section>
+        <div class="q-mb-lg text-help">{{ $t('user_profile.password_dialog.info') }}</div>
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
+            dense
             autocomplete="off"
             type="password"
             :label="$t('user_profile.password_dialog.old_password') + ' *'"
@@ -19,11 +20,12 @@
             :rules="[validateRequiredOldPassword]"
           >
             <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="xs" />
+              <q-icon name="fas fa-lock" size="12px" />
             </template>
           </q-input>
 
           <q-input
+            dense
             autocomplete="off"
             type="password"
             :label="$t('user_profile.password_dialog.new_password') + ' *'"
@@ -33,14 +35,14 @@
             :rules="[validateRequiredNewPassword]"
           >
             <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="xs" />
+              <q-icon name="fas fa-lock" size="12px" />
             </template>
           </q-input>
 
           <q-input
+            dense
             autocomplete="off"
             v-model="confirmPassword"
-            dense
             type="password"
             :label="$t('password_confirm') + '*'"
             class="q-mb-md"
@@ -48,7 +50,7 @@
             :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
           >
             <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="xs" />
+              <q-icon name="fas fa-lock" size="12px" />
             </template>
           </q-input>
         </q-form>

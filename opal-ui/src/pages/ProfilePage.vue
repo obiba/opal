@@ -10,9 +10,9 @@
       <div class="text-h5 q-mb-md">
         {{ $t('user_profile.title') }}
       </div>
-      <profile-user></profile-user>
+      <profile-user />
 
-      <div class="text-h6 q-mt-md q-mb-md">
+      <div class="text-h6 q-mt-lg q-mb-md">
         {{ $t('r_activity') }}
       </div>
       <div class="text-help q-mb-md">

@@ -468,7 +468,7 @@ export default {
     add_r_token: 'Ajouter un jeton R',
     add_sql_token: 'Ajouter un jeton SQL',
     add_custom_token: 'Ajouter un jeton personnalisé',
-    bookmarks_hint: 'Accédez rapidement à vos articles préférés en cliquant dessus.',
+    no_tokens: 'Aucun jeton d\'accès personnel.',
     password_dialog: {
       old_password: 'Ancien mot de passe',
       new_password: 'Nouveau mot de passe',

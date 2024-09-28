@@ -468,7 +468,7 @@ export default {
     add_r_token: 'Add R Token',
     add_sql_token: 'Add SQL Token',
     add_custom_token: 'Add Custom Token',
-    bookmarks_hint: 'Quickly access your favorite items by clicking on them.',
+    no_tokens: 'No personal access tokens.',
     password_dialog: {
       old_password: 'Old Password',
       new_password: 'New Password',
