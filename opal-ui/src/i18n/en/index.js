@@ -480,6 +480,7 @@ export default {
       add_sql_token: 'Add SQL Token',
       add_custom_token: 'Add Custom Token',
       name_hint: 'The name or short description of this API access token so that you can remember its usage.',
+      projects_hint: 'Access can be limited to some projects. Leave empty to apply no restrictions.',
       project_access: 'Project Data Access',
       project_access_hint: 'Data access can be limited to read operations. Limiting data access affects which project tasks can be performed and which services can be used.',
       project_tasks: 'Project Tasks',

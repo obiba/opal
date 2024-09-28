@@ -1,12 +1,11 @@
 <template>
   <div class="row q-mt-lg">
     <div>
-      <span class="text-subtitle1" :class="{ 'text-primary': group.length > 0, 'text-secondary': group.length < 1 }">{{
+      <div class="text-subtitle1" :class="{ 'text-primary': group.length > 0, 'text-secondary': group.length < 1 }">{{
         $t(title)
-      }}</span>
-
-      <q-option-group dense :options="groupOptions" type="checkbox" v-model="group" />
-      <span class="text-caption text-secondary">{{ $t(hint) }}</span>
+      }}</div>
+      <div class="text-hint">{{ $t(hint) }}</div>
+      <q-option-group size="sm" :options="groupOptions" type="checkbox" v-model="group" />
     </div>
   </div>
 </template>

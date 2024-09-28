@@ -480,6 +480,7 @@ export default {
       add_sql_token: 'Ajouter un jeton SQL',
       add_custom_token: 'Ajouter un jeton personnalisé',
       name_hint: "Le nom ou une courte description de ce jeton d'accès à l'API afin que vous puissiez vous souvenir de son utilisation.",
+      projects_hint: 'L\'accès peut être limité à certain projets. Par défaut, aucune restriction n\'est appliquée.',
       project_access: 'Accès aux données du projet',
       project_access_hint: "L'accès aux données peut être limité aux opérations de lecture. La limitation de l'accès aux données affecte les tâches du projet qui peuvent être exécutées et les services qui peuvent être utilisés.",
       project_tasks: 'Tâches du projet',

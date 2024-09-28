@@ -209,8 +209,31 @@
         v-model="showAddToken"
         :type="tokenType"
         :names="tokenNames"
-        @update:modelValue="onTokenAdded"
+        @added="onTokenAdded"
       ></add-token-dialog>
+
+      <q-dialog v-if="tokenAdded" v-model="showTokenAdded" position="bottom" @hide="onTokenAddedHide">
+        <q-card>
+          <q-card-section class="row items-center no-wrap bg-positive">
+            <div>
+              <div class="text-white">{{ tokenAdded?.token }}</div>
+              <div class="text-grey-6">{{ tokenAdded?.name }}</div>
+            </div>
+            <q-space />
+            <q-btn
+              flat
+              dense
+              size="sm"
+              icon="content_copy"
+              color="white"
+              :title="$t('clipboard.copy')"
+              @click="onCopyToClipboard"
+              aria-label="Copy to clipboard"
+              class="q-ml-sm"
+            />
+          </q-card-section>
+        </q-card>
+      </q-dialog>
       <!-- !Dialogs -->
     </div>
   </div>
@@ -223,6 +246,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
+import { copyToClipboard } from 'quasar';
 import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -230,6 +254,7 @@ import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vu
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
 import BookmarksList from 'src/components/BookmarksList.vue';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
+import { on } from 'events';
 
 const loading = ref(false);
 const authStore = useAuthStore();
@@ -244,7 +269,9 @@ const selectedToken = ref<SubjectTokenDto | null>(null);
 const showDelete = ref(false);
 const showUpdatePassword = ref(false);
 const showAddToken = ref(false);
+const showTokenAdded = ref(false);
 const tokenType = ref(TOKEN_TYPES.DATASHIELD);
+const tokenAdded = ref<SubjectTokenDto | null>(null);
 const initialPagination = ref({
   sortBy: 'name',
   descending: false,
@@ -437,9 +464,16 @@ function onAddCustomToken() {
   showAddToken.value = true;
 }
 
-function onTokenAdded() {
-  tokenType.value = TOKEN_TYPES.DATASHIELD;
-  showAddToken.value = false;
+function onTokenAdded(token: SubjectTokenDto) {
+  if (token.token) {
+    tokenAdded.value = token;
+    showTokenAdded.value = true;
+  //   showTokenAddedId.value = setInterval(() => {
+  //     showTokenAdded.value = false;
+  //     tokenAdded.value = null;
+  //     showTokenAddedId.value = undefined;
+  //   }, 10000);
+  }
   fetchData();
 }
 
@@ -453,4 +487,17 @@ onMounted(() => {
 function onAccountLink() {
   window.open(profile.value?.accountUrl, '_blank');
 }
+
+function onCopyToClipboard() {
+  if (tokenAdded.value && tokenAdded.value.token) {
+    copyToClipboard(tokenAdded.value.token);
+    onTokenAddedHide();
+  }
+}
+
+function onTokenAddedHide() {
+  showTokenAdded.value = false;
+  tokenAdded.value = null;
+}
+
 </script>

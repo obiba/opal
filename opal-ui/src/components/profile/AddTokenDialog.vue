@@ -30,6 +30,7 @@
             <template v-slot:append>
               <q-btn
                 flat
+                size="sm"
                 icon="content_copy"
                 :title="$t('clipboard.copy')"
                 @click="onCopyToClipboard"
@@ -46,6 +47,7 @@
             multiple
             input-debounce="0"
             :label="$t('projects')"
+            :hint="$t('user_profile.token_dialog.projects_hint')"
             :options="projectFilters"
             @new-value="addProject"
             @filter="filterProjects"
@@ -88,7 +90,7 @@
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('update')" type="submit" color="primary" @click="onAddToken" />
+        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onAddToken" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -117,9 +119,10 @@ interface DialogProps {
 }
 
 const props = defineProps<DialogProps>();
+
 const showDialog = ref(props.modelValue);
 const formRef = ref();
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'added']);
 const tokensStore = useTokensStore();
 const projectsStore = useProjectsStore();
 let projectsFilterOptions = Array<string>();
@@ -283,7 +286,7 @@ async function onAddToken() {
     try {
       await tokensStore.addToken(token.value);
       showDialog.value = false;
-      emit('update:modelValue', false);
+      emit('added', token.value);
     } catch (error) {
       notifyError(error);
     }
