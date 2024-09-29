@@ -92,7 +92,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
       ResourceProvidersService.ResourceFactory factory = resourceProvidersService.getResourceFactory(resourceReference.getProvider(), resourceReference.getFactory());
       return factory.createResource(resourceReference.getName(), resourceReference.getParameters(), resourceReference.getCredentials());
     } catch (Exception e) {
-      logger.error("Cannot make resource object of resource reference {}", resourceReference.getProject() + "." + resourceReference.getName(), e);
+      logger.warn("Cannot make resource object of resource reference {}", resourceReference.getProject() + "." + resourceReference.getName(), e);
     }
     return null;
   }
