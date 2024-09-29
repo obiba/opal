@@ -13,6 +13,7 @@ package org.obiba.opal.web.system;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import jakarta.ws.rs.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.oidc.OIDCConfiguration;
@@ -41,10 +42,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import java.lang.management.*;
@@ -254,6 +251,28 @@ public class SystemResource {
 
     opalGeneralConfigService.save(conf);
 
+    return Response.ok().build();
+  }
+
+  @PUT
+  @Path("/conf/general/_rPackage")
+  public Response enableAllowRPackageManagement() {
+    OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
+    if (!conf.isAllowRPackageManagement()) {
+      conf.setAllowRPackageManagement(true);
+      opalGeneralConfigService.save(conf);
+      }
+    return Response.ok().build();
+  }
+
+  @DELETE
+  @Path("/conf/general/_rPackage")
+  public Response disableAllowRPackageManagement() {
+    OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
+    if (conf.isAllowRPackageManagement()) {
+      conf.setAllowRPackageManagement(false);
+      opalGeneralConfigService.save(conf);
+    }
     return Response.ok().build();
   }
 
