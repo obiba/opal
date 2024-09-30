@@ -27,12 +27,16 @@ export const useTokensStore = defineStore('tokens', () => {
     });
   }
 
-  function addToken(token: SubjectTokenDto): Promise<void> {
+  async function addToken(token: SubjectTokenDto): Promise<void> {
     return api.post('/system/subject-token/_current/tokens', token);
   }
 
-  function deleteToken(name: string): Promise<void> {
+  async function deleteToken(name: string): Promise<void> {
     return api.delete(`/system/subject-token/_current/token/${name}`);
+  }
+
+  async function renewToken(name: string): Promise<void> {
+    return api.put(`/system/subject-token/_current/token/${name}/_renew`);
   }
 
   return {
@@ -41,5 +45,6 @@ export const useTokensStore = defineStore('tokens', () => {
     initTokens,
     deleteToken,
     addToken,
+    renewToken,
   };
 });

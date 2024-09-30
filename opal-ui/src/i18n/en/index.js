@@ -1179,6 +1179,7 @@ export default {
   reload: 'Reload',
   remove_from_cart: 'Remove from cart',
   remove: 'Remove',
+  renew: 'Renew',
   repeatable_hint: 'When an entity can have multiple values for this variable.',
   repeatable: 'Repeatable',
   report: 'Report',

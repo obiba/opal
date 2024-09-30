@@ -1179,6 +1179,7 @@ export default {
   reload: 'Recharger',
   remove_from_cart: 'Retirer du panier',
   remove: 'Supprimer',
+  renew: 'Renouveler',
   repeatable_hint: 'Quand une entitié peut avoir plusieurs valeurs pour cette variable.',
   repeatable: 'Répétable',
   report: 'Rapport',

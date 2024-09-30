@@ -129,6 +129,17 @@
                   flat
                   size="sm"
                   color="secondary"
+                  :title="$t('renew')"
+                  :icon="toolsVisible[props.row.name] ? 'restore' : 'none'"
+                  class="q-ml-xs"
+                  @click="onRenewToken(props.row)"
+                />
+                <q-btn
+                  rounded
+                  dense
+                  flat
+                  size="sm"
+                  color="secondary"
                   :title="$t('delete')"
                   :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
                   class="q-ml-xs"
@@ -404,6 +415,15 @@ async function doDeleteToken() {
 
   try {
     await tokensStore.deleteToken(toDelete.name);
+    await fetchData();
+  } catch (err) {
+    notifyError(err);
+  }
+}
+
+async function onRenewToken(token: SubjectTokenDto) {
+  try {
+    await tokensStore.renewToken(token.name);
     await fetchData();
   } catch (err) {
     notifyError(err);
