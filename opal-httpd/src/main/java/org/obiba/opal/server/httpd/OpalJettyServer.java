@@ -82,6 +82,8 @@ public class OpalJettyServer {
 
   private String contextPath = "/";
 
+  private boolean productionMode = true;
+
   public void start() throws Exception {
     init();
     log.info("Starting Opal HTTP/s Server on ports {}/{}", httpPort, httpsPort);
@@ -100,6 +102,7 @@ public class OpalJettyServer {
     jettyServer.setStopAtShutdown(false);
 
     Properties properties = loadProperties();
+    productionMode = Boolean.valueOf(properties.getProperty("productionMode", "true"));
     httpPort = properties.getProperty("org.obiba.opal.http.port");
     httpsPort = properties.getProperty("org.obiba.opal.https.port");
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
@@ -172,6 +175,11 @@ public class OpalJettyServer {
     httpConfig.setSendServerVersion(false);
     httpConfig.setRequestHeaderSize(REQUEST_HEADER_SIZE);
     httpConfig.setIdleTimeout(maxIdleTime);
+    if (!productionMode) {
+      SecureRequestCustomizer customizer = new SecureRequestCustomizer();
+      customizer.setSniHostCheck(false);
+      httpConfig.addCustomizer(customizer);
+    }
     return httpConfig;
   }
 

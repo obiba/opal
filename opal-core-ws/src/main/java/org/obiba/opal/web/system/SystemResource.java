@@ -261,7 +261,7 @@ public class SystemResource {
     if (!conf.isAllowRPackageManagement()) {
       conf.setAllowRPackageManagement(true);
       opalGeneralConfigService.save(conf);
-      }
+    }
     return Response.ok().build();
   }
 
