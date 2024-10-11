@@ -70,9 +70,9 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
 
       // Build results
       Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder().setTotalHits((int) results.totalHits.value);
-      StoredFields storedFields = reader. storedFields();
+      StoredFields storedFields = reader.storedFields();
       for (ScoreDoc hit : hits) {
-        Document doc = storedFields. document(hit. doc);
+        Document doc = storedFields.document(hit. doc);
         log.debug("Document hit: {}", doc);
         String identifier = doc.get("id");
         Search.ItemResultDto.Builder resHit = Search.ItemResultDto.newBuilder().setIdentifier(identifier);
