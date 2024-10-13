@@ -41,7 +41,7 @@
     <commons-daemon.version>1.0.15</commons-daemon.version>
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
-    <commons-io.version>2.15.1</commons-io.version>
+    <commons-io.version>2.16.1</commons-io.version>
     <commons-lang.version>3.14.0</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
@@ -80,7 +80,7 @@
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.0.2</magma.version>
+    <magma.version>5.0.3</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
