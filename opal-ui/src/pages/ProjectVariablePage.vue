@@ -90,8 +90,8 @@
         <q-spinner-dots />
       </div>
       <div v-else>
-        <attributes-bundle-panel :bundle="labelBundle" />
-        <attributes-bundle-panel :bundle="descriptionBundle" />
+        <attributes-bundle-panel :bundle="labelBundle" class="q-mb-md" />
+        <attributes-bundle-panel :bundle="descriptionBundle" class="q-mb-md text-help" />
 
         <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="$t('dictionary')" />

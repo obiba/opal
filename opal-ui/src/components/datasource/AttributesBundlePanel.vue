@@ -14,7 +14,7 @@
       </q-tabs>
       <q-tab-panels v-model="tab">
         <template v-for="loc in locales" :key="loc">
-          <q-tab-panel :name="loc" style="padding-top: 0">
+          <q-tab-panel :name="loc" style="padding-top: 0px; padding-bottom: 0px;">
             <q-card bordered flat>
               <q-card-section>
                 <q-markdown :src="getValue(loc)" no-heading-anchor-links />
