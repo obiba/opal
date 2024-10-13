@@ -308,7 +308,7 @@ public class FilesResource {
     }
 
     List<InputPart> uploadedFiles = getUploadedFiles(input);
-    if (uploadedFiles.isEmpty()) {
+    if (uploadedFiles == null || uploadedFiles.isEmpty()) {
       return Response.status(Status.BAD_REQUEST)
           .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
           .build();
