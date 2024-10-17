@@ -33,7 +33,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item v-show="hasVcfStorePermission" :to="`/project/${projectsStore.project.name}/genotypes`">
+      <q-item v-show="hasVcfPlugins && hasVcfStorePermission" :to="`/project/${projectsStore.project.name}/genotypes`">
         <q-item-section avatar>
           <q-icon name="science" />
         </q-item-section>
@@ -103,7 +103,7 @@ watchEffect(() => {
     false;
 
   hasVcfStorePermission.value =
-    hasVcfPlugins && projectsStore.perms.vcfstore?.canRead() && !!projectsStore.project.vcfStoreService ? true : false;
+    projectsStore.perms.vcfstore?.canRead() && !!projectsStore.project.vcfStoreService ? true : false;
 });
 
 onMounted(() => {

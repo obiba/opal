@@ -42,6 +42,7 @@
             map-options
           />
           <q-select
+            v-if="hasVcfStores"
             v-model="newProject.vcfStoreService"
             :options="vcfStores"
             dense
