@@ -21,6 +21,9 @@
         <property name="properties">
           <props>
             <prop key="mail.smtp.auth">${org.obiba.opal.smtp.auth}</prop>
+            <prop key="mail.smtp.starttls.enable">${org.obiba.opal.smtp.starttls}</prop>
+            <prop key="mail.smtp.ssl.enable">${org.obiba.opal.smtp.ssl}</prop>
+            <prop key="mail.smtp.ssl.protocols">${org.obiba.opal.smtp.ssl.protocols}</prop>
           </props>
         </property>
         <property name="location" value="file:${OPAL_HOME}/conf/smtp.properties"/>
