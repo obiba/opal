@@ -62,7 +62,7 @@
     <javax-el.version>2.2.5</javax-el.version>
     <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
     <jettison.version>1.5.4</jettison.version>
-    <jetty.version>12.0.10</jetty.version>
+    <jetty.version>12.0.12</jetty.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>6.7.0.202309050840-r</jgit.version>
     <jline.version>0.9.94</jline.version>
