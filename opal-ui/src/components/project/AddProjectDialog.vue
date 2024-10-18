@@ -15,6 +15,7 @@
             type="text"
             :label="$t('name')"
             :hint="$t('unique_name_hint')"
+            :disable="editMode"
             style="min-width: 300px"
             class="q-mb-md"
             lazy-rules
