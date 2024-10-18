@@ -510,7 +510,7 @@ export default {
   datetime: 'DateTime',
   point: 'Point',
   linestring: 'LineString',
-  polygon: 'Polygin',
+  polygon: 'Polygon',
   binary: 'Binary',
   boolean: 'Boolean',
   locale: 'Locale',
