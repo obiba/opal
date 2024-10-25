@@ -9,15 +9,30 @@
  */
 package org.obiba.opal.shell.commands;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nullable;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.json.JSONObject;
 import org.obiba.core.util.FileUtil;
-import org.obiba.magma.*;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceCopierProgressListener;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.RenameValueTable;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.support.CsvUtil;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
@@ -31,6 +46,7 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
@@ -38,6 +54,7 @@ import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -61,10 +78,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -115,6 +133,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private EventBus eventBus;
+
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
 
   private Map<String, String> entityIdMap;
 
@@ -517,6 +538,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   /**
+   * Returns the decoded local file
+   * NOTE: newer VFS versions encode the file path, decode path to remove escape characters.
+   * @param path
+   * @return new File instance
+   * @throws UnsupportedEncodingException
+   */
+  private File getDecodedFile(String path) throws UnsupportedEncodingException {
+    // Remove the possible escape characters that will cause errors when creating folders
+    OpalGeneralConfig config = opalGeneralConfigService.getConfig();
+    return new File(URLDecoder.decode(path, config.getDefaultCharacterSet()));
+  }
+
+  /**
    * Get the output file to which the metadata will be exported to.
    *
    * @return The output file.
@@ -645,7 +679,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
       if (outputFile.getType() == FileType.FOLDER) {
-        return getMultipleFileCsvDatasource(getLocalFile(outputFile));
+        return getMultipleFileCsvDatasource(getDecodedFile(getLocalFile(outputFile).getPath()));
       }
       return null;
     }
@@ -764,7 +798,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           }
         };
         List<File> outFiles = Lists.newArrayList();
-        File outFile = getLocalFile(outputFile);
+        File outFile = getDecodedFile(getLocalFile(outputFile).getPath());
         FileUtil.delete(outFile);
         if (getValueTables().size() == 1) {
           outFiles.add(outFile);
