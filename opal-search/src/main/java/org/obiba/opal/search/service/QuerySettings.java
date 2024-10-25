@@ -61,6 +61,8 @@ public class QuerySettings {
 
   private boolean withDefaultQueryFields = true;
 
+  private String lastDoc;
+
   //
   // Public methods
   //
@@ -80,6 +82,15 @@ public class QuerySettings {
 
   public QuerySettings from(int value) {
     from = value;
+    return this;
+  }
+
+  public String getLastDoc() {
+    return lastDoc;
+  }
+
+  public QuerySettings lastDoc(String value) {
+    lastDoc = value;
     return this;
   }
 

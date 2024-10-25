@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 
 @Component
@@ -39,20 +40,19 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
-                         @QueryParam("limit") @DefaultValue("10") int limit,
-                         @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
-                         @QueryParam("facet") List<String> facets, @QueryParam("sortField") String sortField,
-                         @QueryParam("sortDir") String sortDir) {
+  public Response search(@QueryParam("query") String query, @QueryParam("limit") @DefaultValue("10") int limit,
+                         @QueryParam("lastDoc") String lastDoc, @QueryParam("variable") @DefaultValue("false") boolean addVariableDto,
+                         @QueryParam("field") List<String> fields, @QueryParam("facet") List<String> facets,
+                         @QueryParam("sortField") String sortField, @QueryParam("sortDir") String sortDir) {
 
     try {
       if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if (!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable()))
         return Response.status(Response.Status.NOT_FOUND).build();
       String esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + query;
-      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(esQuery, offset, limit, fields, facets, sortField, sortDir),
-          getSearchPath(),
-          addVariableDto ? new ItemResultDtoStrategy(getValueTable()) : null);
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(esQuery, lastDoc, limit, fields, facets, sortField, sortDir),
+        getSearchPath(),
+        addVariableDto ? new ItemResultDtoStrategy(getValueTable()) : null);
       return Response.ok().entity(dtoResponse).build();
     } catch (NoSuchValueSetException | NoSuchDatasourceException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -69,7 +69,7 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   private boolean canQueryEsIndex() {
     return searchServiceAvailable() && opalSearchService.getVariablesIndexManager().isReady() &&
-        opalSearchService.getVariablesIndexManager().isIndexUpToDate(getValueTable());
+      opalSearchService.getVariablesIndexManager().isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {

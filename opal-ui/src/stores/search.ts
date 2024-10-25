@@ -34,7 +34,7 @@ export const useSearchStore = defineStore('search', () => {
     };
   }
 
-  async function searchVariables(limit: number) {
+  async function searchVariables(limit: number, lastDoc: string | undefined) {
     let fullQuery = variablesQuery.value.query?.trim() || '';
     Object.keys(variablesQuery.value.criteria).forEach((key) => {
       const terms = variablesQuery.value.criteria[key];
@@ -43,13 +43,13 @@ export const useSearchStore = defineStore('search', () => {
         fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
       }
     });
-    return search(fullQuery, limit, ['label', 'label-en']);
+    return search(fullQuery, limit, ['label', 'label-en'], lastDoc);
   }
 
-  async function search(query: string, limit: number, fields: string[] | undefined) {
+  async function search(query: string, limit: number, fields: string[] | undefined, lastDoc: string | undefined) {
     return api
       .get('/datasources/variables/_search', {
-        params: { query, limit, field: fields },
+        params: { query, lastDoc: lastDoc , limit, field: fields },
         paramsSerializer: {
           indexes: null, // no brackets at all
         },
