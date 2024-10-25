@@ -188,50 +188,54 @@
         <q-separator />
 
         <q-card-section>
-          <div>
-            <q-checkbox
-              v-model="encryptContent"
-              :label="$t('encrypt_file_content')"
-              @update:model-value="onEncryptContentUpdated"
-            />
-          </div>
-          <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
-            <div class="row q-gutter-md">
-              <div class="col-8">
-                <q-input
-                  v-model="encryptPassword"
-                  dense
-                  :disable="encryptContent === false"
-                  :type="showPwd ? 'text' : 'password'"
-                  :label="$t('encrypt_password')"
-                  :hint="$t('encrypt_password_hint')"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      :name="showPwd ? 'visibility_off' : 'visibility'"
-                      class="cursor-pointer"
-                      @click="showPwd = !showPwd"
-                    />
-                  </template>
-                </q-input>
-              </div>
-              <div class="col-2">
-                <q-btn
-                  flat
-                  :label="$t('generate')"
-                  :disable="encryptContent === false"
-                  @click="onGenerateDownloadPwd"
-                ></q-btn>
+          <q-form ref="formRef">
+            <div>
+              <q-checkbox
+                v-model="encryptContent"
+                :label="$t('encrypt_file_content')"
+                @update:model-value="onEncryptContentUpdated"
+              />
+            </div>
+            <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
+              <div class="row q-gutter-md">
+                <div class="col-8">
+                  <q-input
+                    v-model="encryptPassword"
+                    dense
+                    :disable="encryptContent === false"
+                    :type="showPwd ? 'text' : 'password'"
+                    :label="$t('encrypt_password')"
+                    :hint="$t('encrypt_password_hint')"
+                    lazy-rules
+                    :rules="[validatePassword]"
+                  >
+                    <template v-slot:append>
+                      <q-icon
+                        :name="showPwd ? 'visibility_off' : 'visibility'"
+                        class="cursor-pointer"
+                        @click="showPwd = !showPwd"
+                      />
+                    </template>
+                  </q-input>
+                </div>
+                <div class="col-2">
+                  <q-btn
+                    flat
+                    :label="$t('generate')"
+                    :disable="encryptContent === false"
+                    @click="onGenerateDownloadPwd"
+                  ></q-btn>
+                </div>
               </div>
             </div>
-          </div>
+          </q-form>
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right" class="bg-grey-3">
           <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn flat :label="$t('download')" color="primary" @click="onDownload" v-close-popup />
+          <q-btn flat :label="$t('download')" color="primary" @click="onDownload" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -260,6 +264,7 @@ interface Props {
   file: FileDto;
 }
 
+const MIN_PASSWORD_LENGTH = 8;
 const props = defineProps<Props>();
 
 const tableRef = ref();
@@ -270,6 +275,7 @@ const initialPagination = ref({
   rowsPerPage: 50,
 });
 
+const formRef = ref();
 const selected = ref<FileDto[]>([]);
 const selectedSingle = ref<FileDto>();
 const showDownload = ref(false);
@@ -282,6 +288,11 @@ const showUpload = ref(false);
 const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+
+// Validators
+const validatePassword = (val: string) =>
+  (encryptContent && val.trim().length >= MIN_PASSWORD_LENGTH) ||
+  t('validation.password_min_length', { min: MIN_PASSWORD_LENGTH });
 
 watch(
   () => props.file,
@@ -420,12 +431,17 @@ function onShowDownload() {
   showDownload.value = true;
 }
 
-function onDownload() {
-  filesStore.downloadFiles(props.file.path, readables.value, encryptContent.value ? encryptPassword.value : undefined);
+async function onDownload() {
+  const valid = await formRef.value.validate();
+  if (valid) {
+    filesStore.downloadFiles(props.file.path, readables.value, encryptContent.value ? encryptPassword.value : undefined);
+    showDownload.value = false;
+  }
 }
 
 function onEncryptContentUpdated() {
   encryptPassword.value = '';
+  if (!encryptContent.value) formRef.value.resetValidation();
 }
 
 function onGenerateDownloadPwd() {

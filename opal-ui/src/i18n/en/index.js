@@ -522,6 +522,7 @@ export default {
     identifiers_required: 'Identifiers are required',
     table_name_required: 'Table name is required',
     missing_required_fields: 'Missing required fields',
+    password_min_length: 'Password must be at least {min} characters long',
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',

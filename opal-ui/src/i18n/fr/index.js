@@ -522,6 +522,7 @@ export default {
     identifiers_required: 'Les identifiants sont requis',
     table_name_required: 'Le nom de la table est requis',
     missing_required_fields: 'Champs obligatoires manquants',
+    password_min_length: 'Le mot de passe doit comporter au moins {min} caractères',
     user: {
       password_required: 'Le mot de passe est requis et doit comporter au moins 8 caractères',
       certificate_required: 'Le certificat est requis',
