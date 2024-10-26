@@ -31,22 +31,28 @@ public abstract class AbstractSearchUtility {
 
   abstract protected String getSearchPath();
 
-  protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+  protected QuerySettings buildQuerySearch(String query, String lastDoc, int limit, Collection<String> fields,
                                            Collection<String> facets, String sortField, String sortDir) {
     String sortBy = Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField;
     String sortOrder = Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir;
-    return buildQuerySearch(query, offset, limit, fields, facets, Lists.newArrayList(sortBy + ":" + sortOrder));
+    return buildQuerySearch(query, lastDoc, limit, fields, facets, Lists.newArrayList(sortBy + ":" + sortOrder));
   }
 
-  protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+  protected QuerySettings buildQuerySearch(String query, String lastDoc, int limit, Collection<String> fields,
                                            Collection<String> facets, List<String> sortWithOrder) {
 
     List<String> safeFields = Lists.newArrayList();
     if (fields != null)
       safeFields.addAll(fields);
-    return QuerySettings.newSettings(query)
-        .fields(safeFields).facets(facets).from(offset).size(limit) //
-        .sortWithOrder(sortWithOrder);
+    QuerySettings querySettings = QuerySettings.newSettings(query)
+      .fields(safeFields).facets(facets).size(limit) //
+      .sortWithOrder(sortWithOrder);
+
+    if (!Strings.isNullOrEmpty(lastDoc)) {
+      querySettings.lastDoc(lastDoc);
+    }
+
+    return querySettings;
   }
 
   protected boolean searchServiceAvailable() {

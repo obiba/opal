@@ -86,6 +86,7 @@ message QueryResultDto {
   repeated FacetResultDto facets = 1;
   required int32 totalHits = 2;
   repeated ItemResultDto hits = 3;
+  optional string lastDoc = 4;
 }
 
 message FacetResultDto {

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.search.service.impl;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -27,6 +28,7 @@ import org.apache.lucene.store.Directory;
 import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.service.SearchException;
 import org.obiba.opal.search.service.SearchQueryExecutor;
+import org.obiba.opal.search.service.support.ScoreDocSerializer;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
@@ -63,13 +65,17 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
 
       // Parse a query (search for books with "Lucene" in the title)
       Query query = parser.parse(querySettings.getQuery());
+      String lastDoc = querySettings.getLastDoc();
+      ScoreDoc lastScoreDoc = Strings.isNullOrEmpty(lastDoc) ? null : ScoreDocSerializer.deserialize(lastDoc);
 
       // Search for the top results
-      TopDocs results = searcher.search(query, querySettings.getSize());
+      TopDocs results = searcher.searchAfter(lastScoreDoc, query, querySettings.getSize());
       ScoreDoc[] hits = results.scoreDocs;
 
       // Build results
       Search.QueryResultDto.Builder builder = Search.QueryResultDto.newBuilder().setTotalHits((int) results.totalHits.value);
+      if (hits.length > 0) builder.setLastDoc(ScoreDocSerializer.serialize(hits[hits.length - 1]));
+
       StoredFields storedFields = reader.storedFields();
       for (ScoreDoc hit : hits) {
         Document doc = storedFields.document(hit. doc);

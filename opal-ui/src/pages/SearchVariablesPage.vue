@@ -20,31 +20,31 @@
               :label="$t('query')"
               flat
               dense
-              size="sm"
               style="min-width: 400px"
-              @update:model-value="onClear"
-              @keyup.enter="onSubmit"
+              @keyup.enter="onClearAndSubmit"
             />
-            <q-btn
-              :label="$t('search')"
-              icon="search"
-              color="primary"
-              size="sm"
-              @click="onSubmit"
-              :disable="loading || !isValid"
-              class="q-mt-lg"
-              style="height: 2.5em"
-            />
-            <q-btn
-              outline
-              color="secondary"
-              icon="cleaning_services"
-              :label="$t('clear')"
-              size="sm"
-              style="height: 2.5em"
-              @click="onClearAndReset"
-              class="q-mt-lg"
-            />
+            <div class="q-gutter-x-md q-mt-lg">
+              <q-btn
+                :label="$t('search')"
+                icon="search"
+                color="primary"
+                size="sm"
+                @click="onClearAndSubmit"
+                :disable="loading || !isValid"
+                class=""
+                style="height: 2.5em"
+              />
+              <q-btn
+                outline
+                color="secondary"
+                icon="search_off"
+                :label="$t('clear')"
+                size="sm"
+                style="height: 2.5em"
+                @click="onClearAndReset"
+                class=""
+              />
+            </div>
           </div>
         </q-card-section>
         <q-card-section class="q-pt-none">
@@ -158,6 +158,7 @@ const { t, locale } = useI18n({ useScope: 'global' });
 const loading = ref<boolean>(false);
 const showResults = ref(false);
 const results = ref<QueryResultDto>();
+const lastDoc = ref();
 const limit = ref<number>(10);
 const tables = ref<TableDto[]>([]);
 
@@ -224,6 +225,7 @@ onMounted(() => {
 function onClear() {
   showResults.value = false;
   results.value = undefined;
+  lastDoc.value = undefined;
   limit.value = 10;
 }
 
@@ -231,10 +233,18 @@ function onSubmit() {
   if (isValid.value) {
     loading.value = true;
     searchStore
-      .searchVariables(limit.value)
+      .searchVariables(limit.value, lastDoc.value)
       .then((res) => {
-        showResults.value = res.totalHits > 0;
-        results.value = res;
+        const totalHits = res.totalHits;
+        showResults.value = totalHits > 0;
+        lastDoc.value = res.lastDoc;
+
+        if (totalHits > 0 && !!results.value && !!lastDoc.value) {
+          results.value.totalHits = totalHits;
+          results.value.hits.push(...res.hits);
+        } else {
+          results.value = res;
+        }
       })
       .finally(() => (loading.value = false));
   } else {
@@ -272,7 +282,6 @@ function goToVariable(item: ItemFieldsResultDto) {
 }
 
 function addLimit() {
-  limit.value += 10;
   onSubmit();
 }
 
