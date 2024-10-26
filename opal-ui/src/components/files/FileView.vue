@@ -38,6 +38,7 @@
     <div v-if="props.file.type === 'FOLDER'">
       <q-table
         ref="tableRef"
+        v-model:selected="selected"
         flat
         :rows="rows"
         :columns="columns"
@@ -46,9 +47,9 @@
         :loading="loading"
         @row-dblclick="onRowDblClick"
         selection="multiple"
-        v-model:selected="selected"
+        :filter="filter"
       >
-        <template v-slot:top>
+        <template v-slot:top-left>
           <div class="row q-gutter-sm">
             <q-btn
               color="primary"
@@ -94,6 +95,20 @@
             <q-btn outline color="red" icon="delete" size="sm" @click="onShowDelete" :disable="writables.length === 0">
             </q-btn>
           </div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            dense
+            clearable
+            debounce="400"
+            color="primary"
+            v-model="filter"
+            :placeholder="$t('file_folder_search')"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -174,6 +189,7 @@
       v-model="showDelete"
       :title="$t('delete')"
       :text="$t('delete_files_confirm', { count: props.file.type === FileDto_FileType.FILE ? 1 : writables.length })"
+      @cancel="onConfirmCancelled"
       @confirm="onDelete"
     />
 
@@ -256,6 +272,7 @@ import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue'
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
+import { includesToken } from 'src/utils/strings';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
@@ -268,6 +285,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const props = defineProps<Props>();
 
 const tableRef = ref();
+const filter = ref('');
 const loading = ref(false);
 const initialPagination = ref({
   descending: false,
@@ -349,31 +367,20 @@ const crumbs = computed(() => {
 });
 
 const rows = computed(() => {
-  const result =
-    props.file.path === '/'
-      ? []
-      : [
-          {
-            name: '..',
-            type: FileDto_FileType.FOLDER,
-            path: filesStore.getParentFolder(props.file.path),
-            readable: true,
-            writable: false,
-            children: [],
-          },
-        ];
+  const result:FileDto[] = [];
+
   if (props.file.children === undefined) {
     return result;
   }
   props.file.children
-    .filter((file) => file.type === FileDto_FileType.FOLDER)
+    .filter((file) => file.type === FileDto_FileType.FOLDER && includesToken(file.name, filter.value))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
     });
 
   props.file.children
-    .filter((file) => file.type === FileDto_FileType.FILE)
+    .filter((file) => file.type === FileDto_FileType.FILE && includesToken(file.name, filter.value))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
@@ -434,7 +441,11 @@ function onShowDownload() {
 async function onDownload() {
   const valid = await formRef.value.validate();
   if (valid) {
-    filesStore.downloadFiles(props.file.path, readables.value, encryptContent.value ? encryptPassword.value : undefined);
+    filesStore.downloadFiles(
+      props.file.path,
+      readables.value,
+      encryptContent.value ? encryptPassword.value : undefined
+    );
     showDownload.value = false;
   }
 }
@@ -461,6 +472,10 @@ function onShowDeleteSingle(file: FileDto) {
 
 function onShowDelete() {
   showDelete.value = true;
+}
+
+function onConfirmCancelled() {
+  selected.value = [];
 }
 
 function onDelete() {
