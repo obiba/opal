@@ -132,7 +132,7 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <div v-if="limit <= itemResults.length" class="q-mt-md">
+        <div v-if="!!results && itemResults.length < results.totalHits" class="q-mt-md">
           <q-btn no-caps icon="add_circle" :label="$t('more_results')" color="primary" size="sm" @click="addLimit" />
         </div>
       </div>
