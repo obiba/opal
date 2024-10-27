@@ -141,7 +141,7 @@ const initialPagination = ref({
   rowsPerPage: 20,
 });
 const selected = ref<CategoryDto[]>([]);
-const selectedSingle = ref<CategoryDto>();
+const selectedSingle = ref<CategoryDto>({ name: '', attributes: [], isMissing: false });
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showDelete = ref(false);
 const showEdit = ref(false);
@@ -153,7 +153,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: 'left' as const,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -162,14 +162,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: 'left' as const,
     field: 'attributes',
   },
   {
     name: 'missing',
     required: true,
     label: t('is_missing'),
-    align: 'left',
+    align: 'left' as const,
     field: 'isMissing',
     sortable: true,
   },

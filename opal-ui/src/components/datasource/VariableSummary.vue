@@ -96,13 +96,15 @@ watch([dsName, tName, () => props.variable], () => {
 });
 
 function init() {
+  const fullIfCached = !limit.value || limit.value >= props.total;
+
   summary.value = {};
   if (!props.variable || !props.variable.name) {
     return;
   }
   loading.value = true;
   datasourceStore
-    .loadVariableSummary(props.variable, true, limit.value > props.total ? props.total : limit.value)
+    .loadVariableSummary(props.variable, fullIfCached, limit.value > props.total ? props.total : limit.value)
     .then((data) => {
       summary.value = data;
     })
