@@ -107,7 +107,7 @@
               </div>
             </th>
             <th :colspan="(variableCatCategories.length || 0) + 1">
-              <div class="text-bold">{{ variableAlt?.name }}</div>
+              <div class="text-bold">{{ variableCat?.name }}</div>
               <div v-for="attr in getLabels(variableCat?.attributes)" :key="attr.locale" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
