@@ -32,3 +32,8 @@ export function flattenObjectToString(object: any, icase = true): string {
   result = result.trim();
   return icase ? result.toLowerCase() : result;
 }
+
+export const includesToken = (source: string, token: string, ignoreCase = true) => {
+  if (!source || !token) return true
+  return ignoreCase ? source.toLowerCase().includes(token.toLowerCase()) : source.includes(token);
+};

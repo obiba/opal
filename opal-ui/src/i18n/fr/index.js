@@ -970,6 +970,7 @@ export default {
   export: 'Exporter',
   extract_archive_password_hint: "Le mot de passe pour extraire le contenu de l'archive, si applicable.",
   extract: 'Extraire',
+  file_folder_search: 'Rechercher des fichiers et dossiers',
   field_separator: 'Séparateur de champ',
   file_already_exists: 'Ce fichier existe déjà',
   file_selection: 'Sélection de fichier',

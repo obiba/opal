@@ -125,7 +125,22 @@
                     :selection="props.selection ? props.selection : 'single'"
                     v-model:selected="selected"
                     @update:selected="onFileSelection"
+                    :filter="filter"
                   >
+                    <template v-slot:top-right>
+                      <q-input
+                        dense
+                        clearable
+                        debounce="400"
+                        color="primary"
+                        v-model="filter"
+                        :placeholder="$t('file_folder_search')"
+                      >
+                        <template v-slot:append>
+                          <q-icon name="search" />
+                        </template>
+                      </q-input>
+                    </template>
                     <template v-slot:body-cell-name="props">
                       <q-td :props="props">
                         <q-icon
@@ -198,6 +213,7 @@ import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
+import { includesToken } from 'src/utils/strings';
 
 interface DialogProps {
   modelValue: FileDto | FileDto[] | undefined;
@@ -216,7 +232,7 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const filesStore = useFilesStore();
 const projectsStore = useProjectsStore();
-
+const filter = ref('');
 const tableRef = ref();
 const selected = ref<FileDto[]>(
   props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]) : []
@@ -278,31 +294,20 @@ watch(
 );
 
 const rows = computed(() => {
-  const result: FileDto[] =
-    props.folder.path === '/'
-      ? []
-      : [
-          {
-            name: '..',
-            type: FileDto_FileType.FOLDER,
-            path: filesStore.getParentFolder(props.folder.path),
-            readable: true,
-            writable: false,
-            children: [],
-          },
-        ];
+  const result: FileDto[] = [];
+
   if (props.folder.children === undefined) {
     return result;
   }
   props.folder.children
-    .filter((file) => file.type === FileDto_FileType.FOLDER)
+    .filter((file) => file.type === FileDto_FileType.FOLDER && includesToken(file.name, filter.value))
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
       result.push(file);
     });
 
   props.folder.children
-    .filter((file) => (props.type !== 'folder' || hasExtensions.value) && file.type === FileDto_FileType.FILE)
+    .filter((file) => (props.type !== 'folder' || hasExtensions.value) && file.type === FileDto_FileType.FILE && includesToken(file.name, filter.value))
     .filter(
       (file) =>
         props.extensions === undefined ||
