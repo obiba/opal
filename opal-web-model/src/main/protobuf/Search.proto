@@ -89,6 +89,10 @@ message QueryResultDto {
   optional string lastDoc = 4;
 }
 
+message QueryCountDto {
+  required int32 totalHits = 1 [default = 0];
+}
+
 message FacetResultDto {
   message FilterResultDto {
     required int32 count = 1;

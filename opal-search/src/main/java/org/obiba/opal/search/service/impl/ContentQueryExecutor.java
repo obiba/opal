@@ -24,6 +24,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
 import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.service.SearchException;
@@ -78,7 +79,7 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
 
       StoredFields storedFields = reader.storedFields();
       for (ScoreDoc hit : hits) {
-        Document doc = storedFields.document(hit. doc);
+        Document doc = storedFields.document(hit.doc);
         log.debug("Document hit: {}", doc);
         String identifier = doc.get("id");
         Search.ItemResultDto.Builder resHit = Search.ItemResultDto.newBuilder().setIdentifier(identifier);
@@ -100,6 +101,31 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
       else
         log.warn("Wrong search query syntax: {}", e.getMessage());
       return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
+    }
+  }
+
+  @Override
+  public Search.QueryCountDto count(String rawQuery) throws SearchException {
+    // Create an IndexReader to access the index
+    try (IndexReader reader = DirectoryReader.open(directory);) {
+      // Create an IndexSearcher to perform the search
+      IndexSearcher searcher = new IndexSearcher(reader);
+
+      // Build a QueryParser
+      QueryParser parser = new QueryParser("content", analyzer);
+
+      // Parse a query (search for books with "Lucene" in the title)
+      Query parsedQuery = parser.parse(rawQuery);
+      Search.QueryCountDto.Builder builder = Search.QueryCountDto.newBuilder().setTotalHits(searcher.count(parsedQuery));
+      return builder.build();
+    } catch (IOException e) {
+      throw new SearchException("Tables index access failure", e);
+    } catch (ParseException e) {
+      if (log.isTraceEnabled())
+        log.warn("Wrong search query syntax", e);
+      else
+        log.warn("Wrong search query syntax: {}", e.getMessage());
+      return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
     }
   }
 }

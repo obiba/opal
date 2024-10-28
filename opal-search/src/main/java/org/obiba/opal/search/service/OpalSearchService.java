@@ -18,7 +18,6 @@ import org.obiba.opal.core.event.*;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
-import org.obiba.opal.search.event.SynchronizeIndexEvent;
 import org.obiba.opal.search.service.impl.TablesIndexManagerImpl;
 import org.obiba.opal.search.service.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
@@ -151,6 +150,17 @@ public class OpalSearchService implements Service {
     }
     // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
     return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
+  }
+
+  public Search.QueryCountDto executeCount(String query, String searchPath) throws SearchException {
+    if (!isRunning()) return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
+    if (variablesIndexManager.getName().equals(searchPath)) {
+      return variablesIndexManager.createQueryExecutor().count(query);
+    } else if (tablesIndexManager.getName().equals(searchPath)) {
+      return tablesIndexManager.createQueryExecutor().count(query);
+    }
+    // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
+    return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
   }
 
   //

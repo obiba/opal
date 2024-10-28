@@ -104,7 +104,7 @@
         <q-spinner-dots size="lg" />
       </div>
       <div v-else-if="itemResults.length">
-        <div class="text-bold q-mb-md">{{ $t('results') }} ({{ itemResults.length }}/{{ results?.totalHits }})</div>
+        <div class="text-bold q-mb-md">{{ $t('results') }} ({{ itemResults.length }}/{{ totalHits }})</div>
         <q-list separator>
           <q-item
             clickable
@@ -161,6 +161,7 @@ const results = ref<QueryResultDto>();
 const lastDoc = ref();
 const limit = ref<number>(10);
 const tables = ref<TableDto[]>([]);
+const totalHits = ref<number>(0);
 
 const queryParam = computed(() => (route.query.q as string) || '');
 const isValid = computed(
@@ -226,21 +227,27 @@ function onClear() {
   showResults.value = false;
   results.value = undefined;
   lastDoc.value = undefined;
+  totalHits.value = 0;
   limit.value = 10;
 }
 
 function onSubmit() {
   if (isValid.value) {
     loading.value = true;
-    searchStore
-      .searchVariables(limit.value, lastDoc.value)
-      .then((res) => {
-        const totalHits = res.totalHits;
-        showResults.value = totalHits > 0;
+    const queries = [searchStore.searchVariables(limit.value, lastDoc.value)];
+    if (!lastDoc.value) {
+      queries.push(searchStore.countVariables());
+    }
+
+    Promise.all(queries)
+      .then((responses) => {
+        const res = responses[0];
+        totalHits.value = responses.length > 1 ? responses[1].totalHits : res.totalHits;
+        showResults.value = totalHits.value > 0;
         lastDoc.value = res.lastDoc;
 
-        if (totalHits > 0 && !!results.value && !!lastDoc.value) {
-          results.value.totalHits = totalHits;
+        if (totalHits.value > 0 && !!results.value && !!lastDoc.value) {
+          results.value.totalHits = totalHits.value;
           results.value.hits.push(...res.hits);
         } else {
           results.value = res;
