@@ -46,10 +46,33 @@ export const useSearchStore = defineStore('search', () => {
     return search(fullQuery, limit, ['label', 'label-en'], lastDoc);
   }
 
+  async function countVariables() {
+    let fullQuery = variablesQuery.value.query?.trim() || '';
+    Object.keys(variablesQuery.value.criteria).forEach((key) => {
+      const terms = variablesQuery.value.criteria[key];
+      if (terms.length > 0) {
+        const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`;
+        fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
+      }
+    });
+    return count(fullQuery);
+  }
+
   async function search(query: string, limit: number, fields: string[] | undefined, lastDoc: string | undefined) {
     return api
       .get('/datasources/variables/_search', {
         params: { query, lastDoc: lastDoc , limit, field: fields },
+        paramsSerializer: {
+          indexes: null, // no brackets at all
+        },
+      })
+      .then((response) => response.data);
+  }
+
+  async function count(query: string) {
+    return api
+      .get('/datasources/variables/_count', {
+        params: { query },
         paramsSerializer: {
           indexes: null, // no brackets at all
         },
@@ -99,7 +122,9 @@ export const useSearchStore = defineStore('search', () => {
   return {
     variablesQuery,
     reset,
+    count ,
     search,
+    countVariables,
     searchVariables,
     clearIndex,
     getEntityTables,

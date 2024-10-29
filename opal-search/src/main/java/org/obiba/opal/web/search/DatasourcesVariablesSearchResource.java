@@ -72,6 +72,21 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
     }
   }
 
+  @GET
+  @Path("_count")
+  @Transactional(readOnly = true)
+  public Response count(@QueryParam("query") String query) {
+
+    try {
+      if (!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      Search.QueryCountDto queryCountDto = opalSearchService.executeCount(query, getSearchPath());
+      return Response.ok().entity(queryCountDto).build();
+    } catch (Exception e) {
+      log.error("Unable to perform variables search", e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+  }
+
   @Override
   protected String getSearchPath() {
     return opalSearchService.getVariablesIndexManager().getName();

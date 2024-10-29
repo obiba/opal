@@ -23,4 +23,13 @@ public interface SearchQueryExecutor {
    */
   Search.QueryResultDto execute(QuerySettings querySettings) throws SearchException;
 
+  /**
+   * Performs a count on the query.
+   *
+   * @param query
+   * @return
+   * @throws SearchException
+   */
+  Search.QueryCountDto count(String query) throws SearchException;
+
 }
