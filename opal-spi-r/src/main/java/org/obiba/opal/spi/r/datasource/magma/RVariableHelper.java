@@ -80,7 +80,7 @@ public class RVariableHelper {
     String indexStr = extractProperty("opal.index");
     if (!Strings.isNullOrEmpty(indexStr)) {
       try {
-        index = new Double(indexStr).intValue();
+        index = Double.valueOf(indexStr).intValue();
       } catch (NumberFormatException e) {
         // ignore
       }

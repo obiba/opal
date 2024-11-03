@@ -62,13 +62,29 @@ public abstract class AbstractRVariableValueSource extends AbstractVariableValue
   private Value getDateValue(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
     try {
-      if (objValue instanceof Double) {
-        Double dbl = (Double) objValue;
-        if (dbl.isNaN()) return getValueType().nullValue();
-        Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
-        return getValueType().valueOf(value);
-      } else
-        return getValueType().valueOf(objValue);
+      switch (objValue) {
+        case Float flt -> {
+          if (flt.isNaN()) return getValueType().nullValue();
+          Date value = new Date(flt.longValue() * 24 * 3600 * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Double dbl -> {
+          if (dbl.isNaN()) return getValueType().nullValue();
+          Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Integer ii -> {
+          Date value = new Date(ii.longValue() * 24 * 3600 * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Long lng -> {
+          Date value = new Date(lng * 1000);
+          return getValueType().valueOf(value);
+        }
+        default -> {
+          return getValueType().valueOf(objValue);
+        }
+      }
     } catch (Exception e) {
       return getValueType().nullValue();
     }
@@ -76,15 +92,30 @@ public abstract class AbstractRVariableValueSource extends AbstractVariableValue
 
   private Value getDateTimeValue(Object objValue) {
     if (objValue == null || "NaN".equals(objValue)) return getValueType().nullValue();
-
     try {
-      if (objValue instanceof Double) {
-        Double dbl = (Double) objValue;
-        if (dbl.isNaN()) return getValueType().nullValue();
-        Date value = new Date(dbl.longValue() * 1000);
-        return getValueType().valueOf(value);
-      } else
-        return getValueType().valueOf(objValue);
+      switch (objValue) {
+        case Float flt -> {
+          if (flt.isNaN()) return getValueType().nullValue();
+          Date value = new Date(flt.longValue() * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Double dbl -> {
+          if (dbl.isNaN()) return getValueType().nullValue();
+          Date value = new Date(dbl.longValue() * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Integer ii -> {
+          Date value = new Date(ii.longValue() * 1000);
+          return getValueType().valueOf(value);
+        }
+        case Long lng -> {
+          Date value = new Date(lng * 1000);
+          return getValueType().valueOf(value);
+        }
+        default -> {
+          return getValueType().valueOf(objValue);
+        }
+      }
     } catch (Exception e) {
       return getValueType().nullValue();
     }
