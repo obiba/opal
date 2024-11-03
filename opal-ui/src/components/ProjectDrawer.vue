@@ -1,7 +1,15 @@
 <template>
   <div v-if="projectsStore.project">
     <h6 class="q-mt-none q-mb-none q-pa-md">
-      {{ projectsStore.project.name }}
+      <q-btn
+        flat
+        round
+        dense
+        icon="arrow_back"
+        to="/projects" />
+      <span class="q-ml-md">
+        {{ projectsStore.project.name }}
+      </span>
     </h6>
     <q-list>
       <q-item :to="`/project/${projectsStore.project.name}`">

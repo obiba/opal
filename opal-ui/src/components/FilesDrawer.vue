@@ -1,7 +1,15 @@
 <template>
   <div>
     <h6 class="q-mt-none q-mb-none q-pa-md">
-      {{ $t('files') }}
+      <q-btn
+        flat
+        round
+        dense
+        icon="arrow_back"
+        to="/" />
+      <span class="q-ml-md">
+        {{ $t('files') }}
+      </span>
     </h6>
     <q-list>
       <q-item :to="`/files/home/${username}`">
