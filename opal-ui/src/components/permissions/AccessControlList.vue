@@ -118,7 +118,7 @@
             debounce="300"
             @update:model-value="onSearchSubject"
           >
-            <q-menu v-model="showSuggestions" no-parent-event auto-close>
+            <q-menu v-model="showSuggestions" no-parent-event no-focus auto-close>
               <q-list style="min-width: 100px">
                 <q-item
                   clickable
