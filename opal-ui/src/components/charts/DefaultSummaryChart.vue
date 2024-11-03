@@ -61,7 +61,6 @@ import { VariableDto } from 'src/models/Magma';
 import { DefaultSummaryDto, FrequencyDto } from 'src/models/Math';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
-import { getLabelsString } from 'src/utils/attributes';
 
 const { t } = useI18n();
 

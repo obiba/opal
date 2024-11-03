@@ -224,17 +224,20 @@ public class RAssignDatasource extends CsvDatasource {
      * Read the CSV file in the R workspace with the appropriate data types.
      */
     private void doReadCSVFile() {
-      log.debug("Reading the CSV file into a tibble");
-      ensurePackage("readr");
-      ensurePackage("labelled");
-      eval(String.format("base::source('%s')", COLS_FILE_NAME));
-      eval(String.format("base::is.null(base::assign('%s', readr::read_csv('%s', col_types = .cols)))", getSymbol(tableName), DATA_FILE_NAME));
-      eval("base::rm(.cols)");
-      eval(String.format("base::source('%s')", ATTR_FILE_NAME));
-      eval(String.format("base::unlink('%s')", DATA_FILE_NAME));
-      eval(String.format("base::unlink('%s')", COLS_FILE_NAME));
-      eval(String.format("base::unlink('%s')", ATTR_FILE_NAME));
-      log.debug("Symbol {} assigned", getSymbol(tableName));
+      try {
+        log.debug("Reading the CSV file into a tibble");
+        ensurePackage("readr");
+        ensurePackage("labelled");
+        eval(String.format("base::source('%s')", COLS_FILE_NAME));
+        eval(String.format("base::is.null(base::assign('%s', readr::read_csv('%s', col_types = .cols)))", getSymbol(tableName), DATA_FILE_NAME));
+        eval("base::rm(.cols)");
+        eval(String.format("base::source('%s')", ATTR_FILE_NAME));
+        log.debug("Symbol {} assigned", getSymbol(tableName));
+      } finally {
+        eval(String.format("base::unlink('%s')", DATA_FILE_NAME));
+        eval(String.format("base::unlink('%s')", COLS_FILE_NAME));
+        eval(String.format("base::unlink('%s')", ATTR_FILE_NAME));
+      }
     }
 
   }
@@ -309,9 +312,9 @@ public class RAssignDatasource extends CsvDatasource {
         type = "double";
       else if (variable.getValueType().equals(BooleanType.get()))
         type = "logical";
-      else if (variable.getValueType().equals(DateType.get()))
+      else if (variable.getValueType().equals(DateType.get()) && !variable.hasCategories())
         type = "date";
-      else if (variable.getValueType().equals(DateTimeType.get()))
+      else if (variable.getValueType().equals(DateTimeType.get()) && !variable.hasCategories())
         type = "datetime";
       else
         type = "character";
@@ -361,7 +364,7 @@ public class RAssignDatasource extends CsvDatasource {
           }
           // obiba/opal#3829 enforce haven to read spss missings properly
           attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
-              getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
+            getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
         }
         labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
       }
