@@ -16,8 +16,13 @@
           :label="$t('select_files_to_upload')"
           style="width: 300px"
           :accept="accept"
+          @update:model-value="onLocalFilesChange"
+          class="q-mb-md"
         >
         </q-file>
+        <div v-if="existingFiles.length">
+          <q-checkbox dense v-model="overwrite" :label="$t('select_files_overwrite')" />
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -28,7 +33,7 @@
           flat
           :label="$t('add')"
           color="primary"
-          :disable="newFiles.length === 0"
+          :disable="newFiles.length === 0 || (existingFiles.length > 0 && !overwrite)"
           @click="onUpload"
           v-close-popup
         />
@@ -59,8 +64,16 @@ const filesStore = useFilesStore();
 
 const showDialog = ref(props.modelValue);
 const newFiles = ref<FileObject[]>([]);
+const overwrite = ref(false);
 
 const accept = props.extensions ? props.extensions.join(',') : undefined;
+
+const existingFiles = computed(() => {
+  if (newFiles.value.length === 0 || !props.file.children || props.file.children.length === 0) {
+    return [];
+  }
+  return props.file.children.filter((f) => newFiles.value.some((nf) => nf.name === f.name));
+});
 
 watch(
   () => props.modelValue,
@@ -80,5 +93,12 @@ function onUpload() {
   filesStore
     .uploadFiles(props.file.path, newFiles.value as FileObject[])
     .then(() => filesStore.loadFiles(props.file.path));
+}
+
+function onLocalFilesChange() {
+  if (newFiles.value.length > 0) {
+    // check files do not already exist
+    
+  }
 }
 </script>
