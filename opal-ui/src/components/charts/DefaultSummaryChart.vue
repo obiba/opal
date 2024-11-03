@@ -53,12 +53,12 @@
 <script lang="ts">
 export default defineComponent({
   components: { VuePlotly },
-  name: 'CategoricalSummaryChart',
+  name: 'DefaultSummaryChart',
 });
 </script>
 <script setup lang="ts">
 import { VariableDto } from 'src/models/Magma';
-import { CategoricalSummaryDto, FrequencyDto } from 'src/models/Math';
+import { DefaultSummaryDto, FrequencyDto } from 'src/models/Math';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
 import { getLabelsString } from 'src/utils/attributes';
@@ -67,7 +67,7 @@ const { t } = useI18n();
 
 interface Props {
   variable: VariableDto;
-  data: CategoricalSummaryDto;
+  data: DefaultSummaryDto;
 }
 
 const props = defineProps<Props>();
@@ -132,15 +132,6 @@ const frequencies = computed(() => {
       (!nonMissingsSelection.value && f.missing) ||
       (nonMissingsSelection.value && !f.missing)
   );
-
-  if (props.data.otherFrequency && props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {
-    freqs.push({
-      value: t('other'),
-      freq: props.data.otherFrequency,
-      pct: props.data.otherFrequency / props.data.n,
-      missing: false,
-    });
-  }
 
   return freqs;
 });

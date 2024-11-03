@@ -13,7 +13,10 @@
           <td colspan="3">{{ $t('non_missings') }}</td>
         </tr>
         <tr v-for="f in nonMissingFreq" :key="f.value">
-          <td>{{ getLabel(f.value) }}</td>
+          <td>
+            <div>{{ getLabel(f.value) }}</div>
+            <div class="text-hint">{{ getLabels(f.value) }}</div>
+          </td>
           <td>{{ f.freq }}</td>
           <td class="text-grey-6">
             {{ (f.pct * 100).toFixed(2) }}%
@@ -32,7 +35,10 @@
           <td colspan="3">{{ $t('missings') }}</td>
         </tr>
         <tr v-for="f in missingFreq" :key="f.value">
-          <td>{{ getLabel(f.value) }}</td>
+          <td>
+            <div>{{ getLabel(f.value) }}</div>
+            <div class="text-hint">{{ getLabels(f.value) }}</div>
+          </td>
           <td>{{ f.freq }}</td>
           <td class="text-grey-6">
             {{ (f.pct * 100).toFixed(2) }}%
@@ -61,11 +67,14 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
+import { VariableDto } from 'src/models/Magma';
 import { FrequencyDto } from 'src/models/Math';
+import { getLabelsString } from 'src/utils/attributes';
 
 const { t } = useI18n();
 
 interface FrequenciesTableProps {
+  variable: VariableDto;
   nonMissingFreq: FrequencyDto[];
   missingFreq: FrequencyDto[];
   totalFreq: number;
@@ -73,16 +82,28 @@ interface FrequenciesTableProps {
 }
 
 const props = withDefaults(defineProps<FrequenciesTableProps>(), {
-  nonMissingFreq: [] as FrequencyDto[],
-  missingFreq: [] as FrequencyDto[],
   totalFreq: 0,
   totalPct: 0,
 });
 
+const categorical = computed(() => props.variable.categories && props.variable.categories.length > 0);
 const nonMissingTotalFreq = computed(() => props.nonMissingFreq.reduce((acc, f) => acc + f.freq, 0));
 const nonMissingTotalPct = computed(() => props.nonMissingFreq.reduce((acc, f) => acc + f.pct, 0));
 const missingTotalFreq = computed(() => props.missingFreq.reduce((acc, f) => acc + f.freq, 0));
 const missingTotalPct = computed(() => props.missingFreq.reduce((acc, f) => acc + f.pct, 0));
+
+function getLabels(value: string): string | undefined {
+  if (categorical.value) {
+    const cat = props.variable.categories.find((c) => c.name === value);
+    if (cat && cat.attributes) {
+      const labels = getLabelsString(cat.attributes);
+      if (labels) {
+        return labels;
+      }
+    }
+  }
+  return undefined;
+}
 
 function getLabel(value: string): string {
   return value === 'NOT_NULL' ? t('not_empty') : value;

@@ -45,13 +45,16 @@
     <q-spinner-dots size="lg" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.CategoricalSummaryDto.categorical']">
-    <categorical-summary-chart :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md" />
+    <categorical-summary-chart :variable="variable" :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.TextSummaryDto.textSummary']">
-    <categorical-summary-chart :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md" />
+    <categorical-summary-chart :variable="variable" :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md" />
   </div>
   <div v-else-if="summary['Math.ContinuousSummaryDto.continuous']">
-    <continuous-summary-chart :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md" />
+    <continuous-summary-chart :variable="variable" :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md" />
+  </div>
+  <div v-else-if="summary['Math.DefaultSummaryDto.defaultSummary']">
+    <default-summary-chart :variable="variable" :data="summary['Math.DefaultSummaryDto.defaultSummary']" class="q-mt-md" />
   </div>
   <div v-else-if="total > 0">
     <pre>{{ summary }}</pre>
@@ -65,6 +68,7 @@ export default defineComponent({
 </script>
 <script setup lang="ts">
 import { VariableDto } from 'src/models/Magma';
+import DefaultSummaryChart from 'src/components/charts/DefaultSummaryChart.vue';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
 import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
 

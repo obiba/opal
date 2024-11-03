@@ -24,6 +24,7 @@
       <div class="col-md-6 col-xs-12">
         <div class="text-bold q-mb-md">{{ $t('frequencies') }}</div>
         <frequencies-table
+          :variable="variable"
           :nonMissingFreq="nonMissingFreq"
           :missingFreq="missingFreq"
           :totalFreq="totalFreq"
@@ -45,6 +46,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
+import { VariableDto } from 'src/models/Magma';
 import { ContinuousSummaryDto, IntervalFrequencyDto } from 'src/models/Math';
 import FieldsList from 'src/components/FieldsList.vue';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
@@ -53,6 +55,7 @@ import VuePlotly from 'src/components/charts/VuePlotly.vue';
 const { t } = useI18n();
 
 interface ContinuousSummaryChartProps {
+  variable: VariableDto;
   data: ContinuousSummaryDto;
 }
 
