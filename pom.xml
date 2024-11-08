@@ -111,7 +111,7 @@
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
     <xmlunit.version>1.6</xmlunit.version>
-    <xstream.version>1.4.20</xstream.version>
+    <xstream.version>1.4.21</xstream.version>
 
     <!-- maven plugins -->
     <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
