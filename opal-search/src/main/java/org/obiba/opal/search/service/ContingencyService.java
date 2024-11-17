@@ -147,6 +147,17 @@ public class ContingencyService {
   }
 
   private Search.QueryResultDto getFacetStatistics(ValueTable table0, Variable var0, List<String> categories, Variable var1) {
+    String var1Filter = String.format("`%s` IS NOT NULL", var1.getName());
+    if (var1.hasCategories()) {
+      // exclude missing values described by categories
+      String missings = var1.getCategories().stream()
+          .filter(Category::isMissing)
+          .map(Category::getName)
+          .map(name -> name.replace("'", "''")) // escape single quotes
+          .collect(Collectors.joining("','"));
+      var1Filter = String.format("%s AND `%s` NOT IN ('%s')", var1Filter, var1.getName(), missings);
+    }
+    String avgStatement = String.format("`%s` - (SELECT avg(`%s`) FROM `%s` WHERE %s)", var1.getName(), var1.getName(), table0.getName(), var1Filter);
     String statsStatement = String.format(
         """
             count(*) AS _count,
@@ -155,19 +166,19 @@ public class ContingencyService {
             max(`%s`) AS _max,
             avg(`%s`) AS _mean,
             sum(`%s` * `%s`) AS _sum_of_squares,
-            avg((`%s` - (SELECT avg(`%s`) FROM `%s`)) * (`%s` - (SELECT avg(`%s`) FROM `%s`))) AS _variance,
-            sqrt(avg((`%s` - (SELECT avg(`%s`) FROM `%s`)) * (`%s` - (SELECT avg(`%s`) FROM `%s`)))) AS _stdev
+            avg((%s) * (%s)) AS _variance,
+            sqrt(avg((%s) * (%s))) AS _stdev
             FROM `%s`
-            WHERE `%s` IS NOT NULL AND `%s` IS NOT NULL""",
+            WHERE `%s` IS NOT NULL AND %s""",
         var1.getName(), // total
         var1.getName(), // min
         var1.getName(), // max
         var1.getName(), // mean
         var1.getName(), var1.getName(), // sum of squares
-        var1.getName(), var1.getName(), table0.getName(), var1.getName(), var1.getName(), table0.getName(), // variance
-        var1.getName(), var1.getName(), table0.getName(), var1.getName(), var1.getName(), table0.getName(), // stdev
+        avgStatement, avgStatement, // variance
+        avgStatement, avgStatement, // stdev
         table0.getName(), // select
-        var0.getName(), var1.getName() // where
+        var0.getName(), var1Filter // where
     );
     String query = String.format("""
             SELECT `%s`,
