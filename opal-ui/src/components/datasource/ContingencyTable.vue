@@ -175,7 +175,7 @@ export default defineComponent({
 });
 </script>
 <script setup lang="ts">
-import { ValueTypesMap } from 'src/utils/magma';
+import { getVariableNature, VariableNatures } from 'src/utils/magma';
 import { getLabels } from 'src/utils/attributes';
 import { VariableDto } from 'src/models/Magma';
 import { QueryResultDto } from 'src/models/Search';
@@ -208,13 +208,13 @@ const tName = computed(() => route.params.tid as string);
 
 const allVarCatOptions = computed(() =>
   datasourceStore.variables
-    .filter((v) => v.categories?.length > 0 || v.valueType === 'boolean')
+    .filter((v) => getVariableNature(v) === VariableNatures.CATEGORICAL)
     .map((v) => ({ label: v.name, value: v.name, variable: v }))
 );
 const allVarAltOptions = computed(() =>
   datasourceStore.variables
     .filter(
-      (v) => v.categories?.length > 0 || v.valueType === 'boolean' || ValueTypesMap.numerical.includes(v.valueType)
+      (v) => getVariableNature(v) === VariableNatures.CATEGORICAL || getVariableNature(v) === VariableNatures.CONTINUOUS
     )
     .map((v) => ({ label: v.name, value: v.name, variable: v }))
 );

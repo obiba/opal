@@ -1,3 +1,5 @@
+import { VariableDto } from 'src/models/Magma';
+
 export const ValueTypes = [
   'text',
   'integer',
@@ -28,3 +30,31 @@ export const VariableNatures = {
   BINARY: 'BINARY',
   UNDETERMINED: 'UNDETERMINED',
 };
+
+export const getVariableNature = (variable: VariableDto) => {
+  if (variable.categories && variable.categories.length > 0 && variable.categories.find((c) => !c.isMissing)) {
+    return VariableNatures.CATEGORICAL;
+  }
+
+  if (variable.valueType === 'boolean') {
+    return VariableNatures.CATEGORICAL;
+  }
+
+  if (variable.valueType === 'integer' || variable.valueType === 'decimal') {
+    return VariableNatures.CONTINUOUS;
+  }
+
+  if (variable.valueType === 'date' || variable.valueType === 'datetime') {
+    return VariableNatures.TEMPORAL;
+  }
+
+  if (variable.valueType === 'point' || variable.valueType === 'linestring' || variable.valueType === 'polygon') {
+    return VariableNatures.GEO;
+  }
+
+  if (variable.valueType === 'binary') {
+    return VariableNatures.BINARY;
+  }
+
+  return VariableNatures.UNDETERMINED;
+}
