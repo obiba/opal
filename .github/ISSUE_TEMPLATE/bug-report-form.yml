@@ -3,16 +3,8 @@ description: File a bug report for Opal
 labels: ["bug", "issue"]
 assignees:
   - ymarcon
-  - meek0
   - kazoompa
 body:
-  - type: checkboxes
-    id: unique
-    attributes:
-      label: This issue is unique
-      options:
-        - label: I have used the [search tool](https://github.com/obiba/Opal/issues?q=) and did not find an issue describing my bug. 
-          required: true
   - type: input
     id: version
     attributes:
@@ -43,17 +35,6 @@ body:
         3. Export the project in Opal Archive format\n
         6. Observe that the exported file is not in the project's export folder"
   - type: dropdown
-    id: operating-system
-    attributes:
-      label: Operating System (OS)
-      description: If you know this bug occurs on multiple operating systems, select all you have tested.
-      multiple: true
-      options:
-        - Windows
-        - Mac OS
-        - Linux
-      default: 0
-  - type: dropdown
     id: browser
     attributes:
       label: Browser
@@ -67,12 +48,3 @@ body:
         - Brave
         - Opera
       default: 0      
-  - type: textarea
-    id: contact-onfo
-    attributes:
-      label: Contact info
-      description: OBiBa always appreciates knowing about its software users. Please provide the below information if you are a new user Of Opal or you are evaluating the software. 
-      placeholder: "
-        - Name of your organisation \n
-        - What does your organisation do\n
-        - Your organisation's website"
