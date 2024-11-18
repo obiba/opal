@@ -98,7 +98,7 @@ public class ContingencyService {
         JSONArray row = rows.getJSONArray(i);
         String cat0 = row.get(0).toString();
         String cat1 = row.get(1).toString();
-        int count = row.getInt(2);
+        int count = row.isNull(2) ? 0 : row.getInt(2);
         if (!facets.containsKey(cat0)) facets.put(cat0, Maps.newHashMap());
         facets.get(cat0).put(cat1, count);
       }
@@ -202,19 +202,18 @@ public class ContingencyService {
       for (int i = 0; i < rows.length(); i++) {
         JSONArray row = rows.getJSONArray(i);
         String cat0 = row.get(0).toString();
-        int count = row.getInt(1);
         Search.FacetResultDto.Builder facetBuilder = Search.FacetResultDto.newBuilder();
         facetBuilder.setFacet(cat0);
         Search.FacetResultDto.StatisticalResultDto.Builder statsBuilder = Search.FacetResultDto.StatisticalResultDto.newBuilder();
-        statsBuilder
-            .setCount(count)
-            .setTotal(row.getFloat(2))
-            .setMin(row.getFloat(3))
-            .setMax(row.getFloat(4))
-            .setMean(row.getFloat(5))
-            .setSumOfSquares(row.getFloat(6))
-            .setVariance(row.getFloat(7))
-            .setStdDeviation(row.getFloat(8));
+        int count = row.isNull(1) ? 0 : row.getInt(1);
+        statsBuilder.setCount(count);
+        if (!row.isNull(2)) statsBuilder.setTotal(row.getFloat(2));
+        if (!row.isNull(3)) statsBuilder.setMin(row.getFloat(3));
+        if (!row.isNull(4)) statsBuilder.setMax(row.getFloat(4));
+        if (!row.isNull(5)) statsBuilder.setMean(row.getFloat(5));
+        if (!row.isNull(6)) statsBuilder.setSumOfSquares(row.getFloat(6));
+        if (!row.isNull(7)) statsBuilder.setVariance(row.getFloat(7));
+        if (!row.isNull(8)) statsBuilder.setStdDeviation(row.getFloat(8));
         facetBuilder.setStatistics(statsBuilder);
         facetBuilder.addFilters(Search.FacetResultDto.FilterResultDto.newBuilder().setCount(count));
         builder.addFacets(facetBuilder);
@@ -227,7 +226,7 @@ public class ContingencyService {
       Search.FacetResultDto.Builder totalFacetBuilder = Search.FacetResultDto.newBuilder();
       totalFacetBuilder.setFacet("_total");
       Search.FacetResultDto.StatisticalResultDto.Builder statsBuilder = Search.FacetResultDto.StatisticalResultDto.newBuilder();
-      if (!row.isNull(0)) statsBuilder.setCount(row.getInt(0));
+      statsBuilder.setCount(row.isNull(0) ? 0 : row.getInt(0));
       if (!row.isNull(1)) statsBuilder.setTotal(row.getFloat(1));
       if (!row.isNull(2)) statsBuilder.setMin(row.getFloat(2));
       if (!row.isNull(3)) statsBuilder.setMax(row.getFloat(3));
