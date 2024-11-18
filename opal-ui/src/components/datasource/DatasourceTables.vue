@@ -22,12 +22,11 @@
             size="sm"
           >
             <q-list>
-              <q-item clickable v-close-popup @click="onShowAddTable">
+              <q-item v-if="projectsStore.isReady" clickable v-close-popup @click="onShowAddTable">
                 <q-item-section>
                   <q-item-label>{{ $t('add_table') }}</q-item-label>
                 </q-item-section>
               </q-item>
-
               <q-item clickable v-close-popup @click="onShowAddTables">
                 <q-item-section>
                   <q-item-label>{{ $t('add_tables') }}</q-item-label>
@@ -61,7 +60,7 @@
             </q-list>
           </q-btn-dropdown>
           <q-btn-dropdown
-            v-if="projectsStore.perms.import?.canCreate()"
+            v-if="projectsStore.isReady && projectsStore.perms.import?.canCreate()"
             color="secondary"
             icon="input"
             size="sm"

@@ -51,6 +51,8 @@ export const useProjectsStore = defineStore('projects', () => {
   const subjects = ref([] as Subject[]);
   const acls = ref([] as Acl[]);
 
+  const isReady = computed(() => summary.value?.datasourceStatus === ProjectDatasourceStatusDto.READY);
+
   function reset() {
     projects.value = [];
     project.value = {} as ProjectDto;
@@ -396,6 +398,7 @@ export const useProjectsStore = defineStore('projects', () => {
     perms,
     subjects,
     acls,
+    isReady,
     initProjects,
     initProject,
     refreshProject,
