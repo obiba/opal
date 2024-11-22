@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require('quasar/wrappers');
+const { mergeConfig } = require('vite');
 //const path = require('path');
 
 module.exports = configure(function (ctx) {
@@ -76,6 +77,17 @@ module.exports = configure(function (ctx) {
       // https://github.com/quasarframework/quasar/issues/8513#issuecomment-1127654470
       extendViteConf(viteConf, { isServer, isClient }) {
         viteConf.base = '';
+        viteConf.css = mergeConfig(viteConf.css, {
+          preprocessorOptions: {
+            // silence deprecation warnings from quasar-ui-qmarkdown
+            sass: {
+              silenceDeprecations: ['color-functions']
+            },
+            scss: {
+              silenceDeprecations: ['color-functions']
+            }
+          }
+        });
       },
       // viteVuePluginOptions: {},
 
