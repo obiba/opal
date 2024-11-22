@@ -227,7 +227,7 @@ const variableAlt = computed(() => varAlt.value?.variable);
 const variableAltCategories = computed(
   () => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || []
 );
-const withFrequencies = computed(() => contingency.value?.facets.some((f) => f.frequencies !== undefined));
+const withFrequencies = computed(() => varAlt.value ? getVariableNature(varAlt.value.variable) === VariableNatures.CATEGORICAL : contingency.value?.facets.some((f) => f.frequencies !== undefined));
 const withStatistics = computed(() => contingency.value?.facets.some((f) => f.statistics !== undefined));
 
 watch([dsName, tName], () => {
@@ -299,8 +299,8 @@ function getFrequency(cat: string, catAlt: string | undefined) {
   if (!contingency.value) return 0;
   const facet = getFacet(cat);
   if (!facet) return 0;
-  if (catAlt === undefined) return facet.frequencies.reduce((acc, f) => acc + f.count, 0);
-  return facet.frequencies.find((f) => f.term === catAlt)?.count || 0;
+  if (catAlt === undefined) return facet.frequencies?.reduce((acc, f) => acc + f.count, 0) || 0;
+  return facet.frequencies?.find((f) => f.term === catAlt)?.count || 0;
 }
 
 function getStatistic(cat: string, measure: string) {
