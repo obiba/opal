@@ -70,15 +70,22 @@ const showDialog = ref(props.modelValue);
 const destinationFolder = ref<FileDto>();
 const password = ref();
 
+onMounted(init);
+
 watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      destinationFolder.value = filesStore.current;
+      init();
     }
     showDialog.value = value;
   }
 );
+
+function init() {
+  destinationFolder.value = filesStore.current;
+  password.value = '';
+}
 
 function onHide() {
   emit('update:modelValue', false);
