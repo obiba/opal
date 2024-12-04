@@ -151,8 +151,8 @@ public class FilesResource {
       return Response.status(Status.BAD_REQUEST).entity("Source file is missing").build();
 
     // filter actions: copy, move
-    if ("move".equals(action.toLowerCase())) return moveTo(destinationFile, sourcesPath);
-    if ("copy".equals(action.toLowerCase())) return copyFrom(destinationFile, sourcesPath);
+    if ("move".equalsIgnoreCase(action)) return moveTo(destinationFile, sourcesPath);
+    if ("copy".equalsIgnoreCase(action)) return copyFrom(destinationFile, sourcesPath);
 
     return Response.status(Status.BAD_REQUEST).entity("Unexpected file action: " + action).build();
   }

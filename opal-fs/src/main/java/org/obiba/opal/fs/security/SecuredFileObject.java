@@ -9,11 +9,8 @@
  */
 package org.obiba.opal.fs.security;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
@@ -23,9 +20,7 @@ import org.obiba.magma.security.Authorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.util.List;
 
 class SecuredFileObject extends DecoratedFileObject {
 
@@ -46,7 +41,9 @@ class SecuredFileObject extends DecoratedFileObject {
 
     List<FileObject> securedSelected = Lists.newArrayList();
     for (FileObject file : selected) {
-     securedSelected.add(new SecuredFileObject(authorizer,file));
+      SecuredFileObject secured = new SecuredFileObject(authorizer, file);
+      if (secured.getParent() == null || secured.getParent().isReadable())
+        securedSelected.add(secured);
     }
     selected.clear();
     selected.addAll(securedSelected);
@@ -61,7 +58,7 @@ class SecuredFileObject extends DecoratedFileObject {
   @Override
   public FileObject getChild(String name) throws FileSystemException {
     FileObject child = super.getChild(name);
-    if(child == null) return null;
+    if (child == null) return null;
     return new SecuredFileObject(authorizer, child);
   }
 
@@ -98,7 +95,7 @@ class SecuredFileObject extends DecoratedFileObject {
 
   @Override
   public boolean delete() throws FileSystemException {
-    if(isPermitted(getDecoratedFileObject(), "DELETE")) {
+    if (isPermitted(getDecoratedFileObject(), "DELETE")) {
       return super.delete();
     }
     throw new FileSystemException("vfs.provider.local/delete-file.error", getName());
@@ -108,8 +105,8 @@ class SecuredFileObject extends DecoratedFileObject {
   public void moveTo(FileObject destFile) throws FileSystemException {
     FileObject sourceFile = getDecoratedFileObject();
 
-    if(isPermitted(sourceFile, "DELETE")) {
-      if(!(destFile instanceof SecuredFileObject)) {
+    if (isPermitted(sourceFile, "DELETE")) {
+      if (!(destFile instanceof SecuredFileObject)) {
         super.moveTo(destFile);
         return;
       }
@@ -122,10 +119,10 @@ class SecuredFileObject extends DecoratedFileObject {
 
   @Nullable
   private FileObject[] toSecuredFileObjects(FileObject... children) {
-    if(children == null) return null;
+    if (children == null) return null;
 
     FileObject[] secured = new FileObject[children.length];
-    for (int i=0; i<children.length;i++) {
+    for (int i = 0; i < children.length; i++) {
       secured[i] = new SecuredFileObject(authorizer, children[i]);
     }
 
