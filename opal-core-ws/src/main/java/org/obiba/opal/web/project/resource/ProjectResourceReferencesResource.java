@@ -45,10 +45,10 @@ public class ProjectResourceReferencesResource implements BaseResource {
   }
 
   @GET
-  public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name) {
-    return StreamSupport.stream(resourceReferenceService.getResourceReferences(name).spliterator(), false)
+  public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name, @QueryParam("safe") @DefaultValue("true") Boolean safe) {
+    return resourceReferenceService.getResourceReferences(name).stream()
         .sorted(Comparator.comparing(ResourceReference::getName))
-        .map(ref -> Dtos.asDto(ref, resourceReferenceService.createResource(ref), isEditable(name, ref.getName())))
+        .map(ref -> Dtos.asDto(ref, resourceReferenceService.createResource(ref), !safe && isEditable(name, ref.getName())))
         .collect(Collectors.toList());
   }
 
