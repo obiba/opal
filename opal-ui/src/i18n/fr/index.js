@@ -561,8 +561,8 @@ export default {
       host_uri_format: 'L\'hôte doit commencer par "https://" ou "http://"',
     },
   },
-  analysis : {
-    name_exists : 'Le nom de l\'analyse doit être unique',
+  analysis: {
+    name_exists: 'Le nom de l\'analyse doit être unique',
   },
   main: {
     brand: 'Opal',

@@ -44,6 +44,7 @@ import java.io.*;
 import java.net.FileNameMap;
 import java.net.URI;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -324,12 +325,13 @@ public class FilesResource {
       String fileName = uploadedFile.getFileName();
       // #3275 make sure file name is valid
       if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
-        return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
+        throw new IllegalArgumentException("Not a valid file name.");
+      if (!checkFileName(fileName)) throw new IllegalArgumentException("Not a valid file name.");
 
       // #3275 make sure parent folder of the written file is the provided destination folder
       FileObject file = folder.resolveFile(fileName);
       if (!file.getParent().getURL().equals(folder.getURL()))
-        return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
+        throw new IllegalArgumentException("Not a valid file name.");
 
       boolean overwrite = file.exists();
       writeUploadedFileToFileSystem(uploadedFile, file);
@@ -361,6 +363,10 @@ public class FilesResource {
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo)
       throws IOException {
     if (folderName == null || folderName.trim().isEmpty()) return Response.status(Status.BAD_REQUEST).build();
+    String[] parts = folderName.split("/");
+    for (String part : parts) {
+      if (!checkFileName(part)) throw new IllegalArgumentException("Not a valid file name.");
+    }
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
@@ -464,6 +470,16 @@ public class FilesResource {
     } catch (JSONException e) {
       return Response.ok().build();
     }
+  }
+
+  private boolean checkFileName(String fileName) {
+    try {
+      String safeFileName = URLEncoder.encode(fileName, "UTF-8");
+      if (!safeFileName.equals(fileName)) return false;
+    } catch (UnsupportedEncodingException e) {
+      return false;
+    }
+    return true;
   }
 
   private Response unzipArchive(String archivePath, String destinationPath, String archiveKey, UriInfo uriInfo) throws IOException {
