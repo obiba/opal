@@ -19,27 +19,6 @@
             :rules="[validateRequiredName]"
           >
           </q-input>
-          <q-input
-            dense
-            type="text"
-            readonly
-            :label="$t('token') + ' *'"
-            :hint="$t('user_profile.token_dialog.name_hint')"
-            v-model="token.token"
-            color="grey-10"
-            lazy-rules
-          >
-            <template v-slot:append>
-              <q-btn
-                flat
-                size="sm"
-                icon="content_copy"
-                :title="$t('clipboard.copy')"
-                @click="onCopyToClipboard"
-                aria-label="Copy to clipboard"
-              />
-            </template>
-          </q-input>
 
           <q-select
             dense
@@ -106,10 +85,8 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { copyToClipboard } from 'quasar';
 import { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
-import { notifyError, notifySuccess } from 'src/utils/notify';
-import { generateToken } from 'src/utils/tokens';
+import { notifyError } from 'src/utils/notify';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
 import AddTokenDialogAccessSection from './AddTokenDialogAccessSection.vue';
@@ -153,7 +130,7 @@ watch(
         projectFilters.value = [...projectsFilterOptions];
       });
 
-      token.value.token = generateToken();
+      token.value.token = undefined;
       token.value.name = generateName(props.type, props.names);
       updateTokenType();
       showDialog.value = value;
@@ -246,16 +223,6 @@ function onTokenServicesUpdate() {
   token.value.sysAdmin = tokenServices.value.includes('sysAdmin');
 }
 
-function onCopyToClipboard() {
-  copyToClipboard(token.value.token || '')
-    .then(() => {
-      notifySuccess(t('clipboard.copied'));
-    })
-    .catch(() => {
-      notifyError(t('clipboard.failed'));
-    });
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addProject(val: string, done: any) {
   if (val.trim().length > 0) {
@@ -287,9 +254,9 @@ async function onAddToken() {
   const valid = await formRef.value.validate();
   if (valid) {
     try {
-      await tokensStore.addToken(token.value);
+      const created = await tokensStore.addToken(token.value);
       showDialog.value = false;
-      emit('added', token.value);
+      emit('added', created);
     } catch (error) {
       notifyError(error);
     }

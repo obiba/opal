@@ -10,6 +10,8 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.obiba.opal.core.service.SubjectTokenService;
@@ -49,13 +51,17 @@ public class SubjectTokensCurrentResource {
   @NoAuthorization
   public Response create(Opal.SubjectTokenDto token) {
     checkSubjectNotToken();
-    if (!token.hasToken() || Strings.isNullOrEmpty(token.getName()))
+    if (Strings.isNullOrEmpty(token.getName()))
       return Response.status(Response.Status.BAD_REQUEST).build();
     SubjectToken tokenObj = Dtos.fromDto(token);
     tokenObj.setPrincipal(getPrincipal());
+    if (!tokenObj.hasToken()) {
+      tokenObj.setToken(subjectTokenService.generateToken());
+    }
+    String secret = tokenObj.getToken();
     subjectTokenService.saveToken(tokenObj);
     URI tokenUri = UriBuilder.fromPath("/").path(SubjectTokenResource.class).build(getPrincipal(), token.getName());
-    return Response.created(tokenUri).build();
+    return Response.created(tokenUri).entity(token.toBuilder().setToken(secret).build()).build();
   }
 
   @DELETE

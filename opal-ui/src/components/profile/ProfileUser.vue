@@ -219,13 +219,11 @@
 
       <q-dialog v-if="tokenAdded" v-model="showTokenAdded" position="bottom" @hide="onTokenAddedHide">
         <q-card>
-          <q-card-section class="row items-center no-wrap bg-positive">
-            <div>
-              <div class="text-white">{{ tokenAdded?.token }}</div>
-              <div class="text-grey-6">{{ tokenAdded?.name }}</div>
-            </div>
-            <q-space />
-            <q-btn
+          <q-card-section class="bg-positive">
+            <div class="text-grey-4 q-mb-sm">{{ $t('added_token') }}</div>
+            <div class="row">
+              <div class="text-white text-bold">{{ tokenAdded?.token }}</div>
+              <q-btn
               flat
               dense
               size="sm"
@@ -236,6 +234,8 @@
               aria-label="Copy to clipboard"
               class="q-ml-sm"
             />
+            </div>
+            
           </q-card-section>
         </q-card>
       </q-dialog>
@@ -480,11 +480,6 @@ function onTokenAdded(token: SubjectTokenDto) {
   if (token.token) {
     tokenAdded.value = token;
     showTokenAdded.value = true;
-  //   showTokenAddedId.value = setInterval(() => {
-  //     showTokenAdded.value = false;
-  //     tokenAdded.value = null;
-  //     showTokenAddedId.value = undefined;
-  //   }, 10000);
   }
   fetchData();
 }

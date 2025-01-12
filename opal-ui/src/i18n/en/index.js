@@ -799,6 +799,7 @@ export default {
   add_variable: 'Add variable',
   add_view: 'Add view',
   add: 'Add',
+  added_token: 'Copy this token and keep it in a safe place. You will not be able to see it again.',
   administration: 'Administration',
   administrator: 'Administrator',
   advanced_options: 'Advanced options',
