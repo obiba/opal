@@ -12,11 +12,15 @@ package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.shiro.crypto.CryptoException;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +28,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class SubjectTokenServiceImpl implements SubjectTokenService {
@@ -36,6 +43,10 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   private static final Logger log = LoggerFactory.getLogger(SubjectTokenServiceImpl.class);
 
   private static final String LEGACY_DATE = "2022-05-01";
+
+  private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  private static final int TOKEN_LENGTH = 32;
+
 
   /**
    * Number of times the user password is hashed for attack resiliency
@@ -177,6 +188,14 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   public List<SubjectToken> getTokens(String principal) {
     return Lists.newArrayList(orientDbService.list(SubjectToken.class,
         String.format("select from %s where principal = ?", SubjectToken.class.getSimpleName()), principal));
+  }
+
+  @Override
+  public String generateToken() {
+    SecureRandom random = new SecureRandom();
+    return IntStream.range(0, TOKEN_LENGTH)
+        .mapToObj(i -> String.valueOf(CHARACTERS.charAt(random.nextInt(CHARACTERS.length()))))
+        .collect(Collectors.joining());
   }
 
   @Subscribe

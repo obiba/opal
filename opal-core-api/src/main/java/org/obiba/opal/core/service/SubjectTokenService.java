@@ -114,6 +114,13 @@ public interface SubjectTokenService extends SystemService {
    */
   List<SubjectToken> getTokens(String principal);
 
+  /**
+   * Generate the token value.
+   *
+   * @return
+   */
+  String generateToken();
+
   class SubjectTokenTimestamps {
     private final Date expiresAt;
     private final Date inactiveAt;

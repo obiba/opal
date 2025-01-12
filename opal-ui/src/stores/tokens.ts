@@ -27,8 +27,8 @@ export const useTokensStore = defineStore('tokens', () => {
     });
   }
 
-  async function addToken(token: SubjectTokenDto): Promise<void> {
-    return api.post('/system/subject-token/_current/tokens', token);
+  async function addToken(token: SubjectTokenDto): Promise<SubjectTokenDto> {
+    return api.post('/system/subject-token/_current/tokens', token).then((response) => response.data);
   }
 
   async function deleteToken(name: string): Promise<void> {

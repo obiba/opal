@@ -799,6 +799,7 @@ export default {
   add_variable: 'Ajouter une variable',
   add_view: 'Ajouter une vue',
   add: 'Ajouter',
+  added_token: 'Copier ce jeton et gardez-le en sécurité. Vous ne pourrez pas le voir à nouveau.',
   administration: 'Administration',
   administrator: 'Administrateur',
   advanced_options: 'Options avancées',
