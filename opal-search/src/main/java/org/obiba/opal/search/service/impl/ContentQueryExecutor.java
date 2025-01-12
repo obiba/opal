@@ -14,17 +14,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.service.SearchException;
@@ -64,8 +57,21 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
       // Build a QueryParser
       QueryParser parser = new QueryParser("content", analyzer);
 
-      // Parse a query (search for books with "Lucene" in the title)
+      // Parse a query
       Query query = parser.parse(querySettings.getQuery());
+      if (querySettings.hasFilterReferences()) {
+        // at least one table-ref must match
+        BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+        for (String tableRef : querySettings.getFilterReferences()) {
+          queryBuilder.add(new TermQuery(new Term("table-ref", tableRef)), BooleanClause.Occur.SHOULD);
+        }
+        Query termsQuery = queryBuilder.build();
+        
+        queryBuilder = new BooleanQuery.Builder();
+        queryBuilder.add(new BooleanClause(query, BooleanClause.Occur.MUST));
+        queryBuilder.add(new BooleanClause(termsQuery, BooleanClause.Occur.MUST));
+        query = queryBuilder.build();
+      }
       String lastDoc = querySettings.getLastDoc();
       ScoreDoc lastScoreDoc = Strings.isNullOrEmpty(lastDoc) ? null : ScoreDocSerializer.deserialize(lastDoc);
 
