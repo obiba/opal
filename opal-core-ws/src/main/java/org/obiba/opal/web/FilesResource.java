@@ -9,9 +9,12 @@
  */
 package org.obiba.opal.web;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.*;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -34,6 +37,7 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.*;
@@ -64,6 +68,12 @@ public class FilesResource {
   private final FileNameMap mimeTypes = URLConnection.getFileNameMap();;
 
   private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
+  @Value("${files.extensions.allowed}")
+  private String allowedFileExtensions;
+
+  @Value("${files.extensions.denied}")
+  private String deniedFileExtensions;
 
   @Autowired
   public void setOpalFileSystemService(OpalFileSystemService opalFileSystemService) {
@@ -224,6 +234,9 @@ public class FilesResource {
     if (!destinationFile.getParent().isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
     }
+    if (!destinationFile.exists() && !checkFileExtension(destinationPath)) {
+      throw new IllegalArgumentException("The file extension is not allowed");
+    }
 
     // cannot rename to itself
     if (!destinationPath.equals(sourcePath)) sourceFile.moveTo(destinationFile);
@@ -327,6 +340,7 @@ public class FilesResource {
       if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
         throw new IllegalArgumentException("Not a valid file name.");
       if (!checkFileName(fileName)) throw new IllegalArgumentException("Not a valid file name.");
+      if (!checkFileExtension(fileName)) throw new IllegalArgumentException("Not a valid file extension.");
 
       // #3275 make sure parent folder of the written file is the provided destination folder
       FileObject file = folder.resolveFile(fileName);
@@ -479,6 +493,26 @@ public class FilesResource {
     } catch (UnsupportedEncodingException e) {
       return false;
     }
+    return true;
+  }
+
+  private boolean checkFileExtension(String fileName) {
+    String ext = FilenameUtils.getExtension(fileName).toLowerCase();
+    if (Strings.isNullOrEmpty(ext)) return true;
+
+    List<String> allowed = Strings.isNullOrEmpty(allowedFileExtensions) ? Lists.newArrayList() : Splitter.on(",").splitToList(allowedFileExtensions.trim());
+    List<String> denied = Strings.isNullOrEmpty(deniedFileExtensions) ? Lists.newArrayList() : Splitter.on(",").splitToList(deniedFileExtensions.trim());
+
+    if (!allowed.isEmpty() && !allowed.contains("*") && !allowed.contains(ext)) {
+      // extension is not part of the allowed ones
+      return false;
+    }
+
+    if (!denied.isEmpty() && denied.contains(ext)) {
+      // extension is explicitly denied
+      return false;
+    }
+
     return true;
   }
 
