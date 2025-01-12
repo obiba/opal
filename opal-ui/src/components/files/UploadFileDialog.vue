@@ -50,6 +50,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { FileObject } from 'src/components/models';
 import { FileDto } from 'src/models/Opal';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -92,7 +93,8 @@ function onHide() {
 function onUpload() {
   filesStore
     .uploadFiles(props.file.path, newFiles.value as FileObject[])
-    .then(() => filesStore.loadFiles(props.file.path));
+    .then(() => filesStore.loadFiles(props.file.path))
+    .catch(notifyError);
 }
 
 function onLocalFilesChange() {
