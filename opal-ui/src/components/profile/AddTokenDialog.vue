@@ -86,7 +86,7 @@ export default defineComponent({
 
 <script setup lang="ts">
 import { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
-import { notifyError, notifySuccess } from 'src/utils/notify';
+import { notifyError } from 'src/utils/notify';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
 import AddTokenDialogAccessSection from './AddTokenDialogAccessSection.vue';
