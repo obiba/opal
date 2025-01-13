@@ -152,12 +152,12 @@ public class OpalSearchService implements Service {
     return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
   }
 
-  public Search.QueryCountDto executeCount(String query, String searchPath) throws SearchException {
+  public Search.QueryCountDto executeCount(QuerySettings querySettings, String searchPath) throws SearchException {
     if (!isRunning()) return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
     if (variablesIndexManager.getName().equals(searchPath)) {
-      return variablesIndexManager.createQueryExecutor().count(query);
+      return variablesIndexManager.createQueryExecutor().count(querySettings);
     } else if (tablesIndexManager.getName().equals(searchPath)) {
-      return tablesIndexManager.createQueryExecutor().count(query);
+      return tablesIndexManager.createQueryExecutor().count(querySettings);
     }
     // return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
     return Search.QueryCountDto.newBuilder().setTotalHits(0).build();

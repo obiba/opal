@@ -54,24 +54,13 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
       // Create an IndexSearcher to perform the search
       IndexSearcher searcher = new IndexSearcher(reader);
 
-      // Build a QueryParser
-      QueryParser parser = new QueryParser("content", analyzer);
-
-      // Parse a query
-      Query query = parser.parse(querySettings.getQuery());
-      if (querySettings.hasFilterReferences()) {
-        // at least one table-ref must match
-        BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
-        for (String tableRef : querySettings.getFilterReferences()) {
-          queryBuilder.add(new TermQuery(new Term("table-ref", tableRef)), BooleanClause.Occur.SHOULD);
-        }
-        Query termsQuery = queryBuilder.build();
-        
-        queryBuilder = new BooleanQuery.Builder();
-        queryBuilder.add(new BooleanClause(query, BooleanClause.Occur.MUST));
-        queryBuilder.add(new BooleanClause(termsQuery, BooleanClause.Occur.MUST));
-        query = queryBuilder.build();
+      // Case no tables
+      if (!querySettings.hasFilterReferences()) {
+        return Search.QueryResultDto.newBuilder().setTotalHits(0).build();
       }
+
+      // Make query
+      Query query = makeQuery(querySettings);
       String lastDoc = querySettings.getLastDoc();
       ScoreDoc lastScoreDoc = Strings.isNullOrEmpty(lastDoc) ? null : ScoreDocSerializer.deserialize(lastDoc);
 
@@ -111,18 +100,20 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
   }
 
   @Override
-  public Search.QueryCountDto count(String rawQuery) throws SearchException {
+  public Search.QueryCountDto count(QuerySettings querySettings) throws SearchException {
     // Create an IndexReader to access the index
     try (IndexReader reader = DirectoryReader.open(directory);) {
       // Create an IndexSearcher to perform the search
       IndexSearcher searcher = new IndexSearcher(reader);
 
-      // Build a QueryParser
-      QueryParser parser = new QueryParser("content", analyzer);
+      // Case no tables
+      if (!querySettings.hasFilterReferences()) {
+        return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
+      }
 
-      // Parse a query (search for books with "Lucene" in the title)
-      Query parsedQuery = parser.parse(rawQuery);
-      Search.QueryCountDto.Builder builder = Search.QueryCountDto.newBuilder().setTotalHits(searcher.count(parsedQuery));
+      // Make query
+      Query query = makeQuery(querySettings);
+      Search.QueryCountDto.Builder builder = Search.QueryCountDto.newBuilder().setTotalHits(searcher.count(query));
       return builder.build();
     } catch (IOException e) {
       throw new SearchException("Tables index access failure", e);
@@ -133,5 +124,27 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
         log.warn("Wrong search query syntax: {}", e.getMessage());
       return Search.QueryCountDto.newBuilder().setTotalHits(0).build();
     }
+  }
+
+  private Query makeQuery(QuerySettings querySettings) throws ParseException {
+    // Build a QueryParser
+    QueryParser parser = new QueryParser("content", analyzer);
+
+    // Parse a query
+    Query query = parser.parse(querySettings.getQuery());
+    if (querySettings.hasFilterReferences()) {
+      // at least one table-ref must match
+      BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+      for (String tableRef : querySettings.getFilterReferences()) {
+        queryBuilder.add(new TermQuery(new Term("table-ref", tableRef)), BooleanClause.Occur.SHOULD);
+      }
+      Query termsQuery = queryBuilder.build();
+
+      queryBuilder = new BooleanQuery.Builder();
+      queryBuilder.add(new BooleanClause(query, BooleanClause.Occur.MUST));
+      queryBuilder.add(new BooleanClause(termsQuery, BooleanClause.Occur.MUST));
+      query = queryBuilder.build();
+    }
+    return query;
   }
 }
