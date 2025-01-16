@@ -17,7 +17,7 @@
           flat
           size="sm"
           color="secondary"
-          :title="$t('edit')"
+          :title="t('edit')"
           icon="edit"
           class="q-ml-md"
           @click="onShowEditName(props.file)"
@@ -28,7 +28,7 @@
           dense
           flat
           color="negative"
-          :title="$t('delete')"
+          :title="t('delete')"
           icon="delete"
           size="sm"
           @click="onShowDeleteSingle(props.file)"
@@ -54,7 +54,7 @@
             <q-btn
               color="primary"
               icon="add"
-              :label="$t('add_folder')"
+              :label="t('add_folder')"
               :disable="!props.file.writable"
               size="sm"
               @click="onShowAddFolder"
@@ -63,7 +63,7 @@
             <q-btn
               color="secondary"
               icon="file_upload"
-              :label="$t('upload')"
+              :label="t('upload')"
               :disable="!props.file.writable"
               size="sm"
               @click="onShowUpload"
@@ -72,7 +72,7 @@
             <q-btn
               color="secondary"
               icon="file_download"
-              :label="$t('download')"
+              :label="t('download')"
               :disable="!isReadableSelected"
               size="sm"
               @click="onShowDownload"
@@ -81,7 +81,7 @@
             <q-btn
               color="secondary"
               icon="unarchive"
-              :label="$t('extract')"
+              :label="t('extract')"
               :disable="!isArchiveSelected"
               size="sm"
               @click="onShowExtract"
@@ -103,7 +103,7 @@
             debounce="400"
             color="primary"
             v-model="filter"
-            :placeholder="$t('file_folder_search')"
+            :placeholder="t('file_folder_search')"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -126,7 +126,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('edit')"
+                :title="t('edit')"
                 :icon="toolsVisible[props.row.path] ? 'edit' : 'none'"
                 class="q-ml-xs"
                 @click="onShowEditName(props.row)"
@@ -137,7 +137,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[props.row.path] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onShowDeleteSingle(props.row)"
@@ -167,11 +167,11 @@
           <q-btn
             color="secondary"
             icon="file_download"
-            :label="$t('download')"
+            :label="t('download')"
             @click="onShowDownload"
             class="q-mb-md"
           />
-          <div class="text-caption">{{ $t('size') }}: {{ getSizeLabel(props.file.size) }}</div>
+          <div class="text-caption">{{ t('size') }}: {{ getSizeLabel(props.file.size) }}</div>
           <div class="text-caption">
             {{ getDateLabel(props.file.lastModifiedTime) }}
           </div>
@@ -187,8 +187,8 @@
 
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_files_confirm', { count: props.file.type === FileDto_FileType.FILE ? 1 : writables.length })"
+      :title="t('delete')"
+      :text="t('delete_files_confirm', { count: props.file.type === FileDto_FileType.FILE ? 1 : writables.length })"
       @cancel="onConfirmCancelled"
       @confirm="onDelete"
     />
@@ -198,7 +198,7 @@
     <q-dialog v-model="showDownload">
       <q-card>
         <q-card-section>
-          <div class="text-h6">{{ $t('download') }}</div>
+          <div class="text-h6">{{ t('download') }}</div>
         </q-card-section>
 
         <q-separator />
@@ -208,7 +208,7 @@
             <div>
               <q-checkbox
                 v-model="encryptContent"
-                :label="$t('encrypt_file_content')"
+                :label="t('encrypt_file_content')"
                 @update:model-value="onEncryptContentUpdated"
               />
             </div>
@@ -220,8 +220,8 @@
                     dense
                     :disable="encryptContent === false"
                     :type="showPwd ? 'text' : 'password'"
-                    :label="$t('encrypt_password')"
-                    :hint="$t('encrypt_password_hint')"
+                    :label="t('encrypt_password')"
+                    :hint="t('encrypt_password_hint')"
                     lazy-rules
                     :rules="[validatePassword]"
                   >
@@ -237,7 +237,7 @@
                 <div class="col-2">
                   <q-btn
                     flat
-                    :label="$t('generate')"
+                    :label="t('generate')"
                     :disable="encryptContent === false"
                     @click="onGenerateDownloadPwd"
                   ></q-btn>
@@ -250,26 +250,21 @@
         <q-separator />
 
         <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-          <q-btn flat :label="$t('download')" color="primary" @click="onDownload" />
+          <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+          <q-btn flat :label="t('download')" color="primary" @click="onDownload" />
         </q-card-actions>
       </q-card>
     </q-dialog>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FileView',
-});
-</script>
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import EditFileNameDialog from 'src/components/files/EditFileNameDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue';
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
@@ -396,7 +391,7 @@ const isReadableSelected = computed(() => {
 const isArchiveSelected = computed(() => {
   return (
     selected.value.length === 1 &&
-    selected.value[0].type === FileDto_FileType.FILE &&
+    selected.value[0]?.type === FileDto_FileType.FILE &&
     selected.value[0].name.endsWith('.zip')
   );
 });
@@ -459,7 +454,7 @@ function onGenerateDownloadPwd() {
   const length = 12;
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;,:?/()';
   let retVal = '';
-  for (var i = 0, n = charset.length; i < length; ++i) {
+  for (let i = 0, n = charset.length; i < length; ++i) {
     retVal += charset.charAt(Math.floor(Math.random() * n));
   }
   encryptPassword.value = retVal;
@@ -481,7 +476,7 @@ function onConfirmCancelled() {
 function onDelete() {
   if (
     props.file.type !== FileDto_FileType.FOLDER ||
-    (selected.value.length === 1 && selected.value[0].path === props.file.path)
+    (selected.value.length === 1 && selected.value[0]?.path === props.file.path)
   ) {
     onDeleteFile();
   } else {

@@ -2,19 +2,19 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('add_table') }}</div>
+        <div class="text-h6">{{ t('add_table') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="newTable.name" dense type="text" :label="$t('name')" style="min-width: 300px" class="q-mb-md">
+        <q-input v-model="newTable.name" dense type="text" :label="t('name')" style="min-width: 300px" class="q-mb-md">
         </q-input>
         <q-input
           v-model="newTable.entityType"
           dense
           type="text"
-          :label="$t('entity_type')"
+          :label="t('entity_type')"
           style="min-width: 300px"
           class="q-mb-md"
         >
@@ -24,10 +24,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('add')"
+          :label="t('add')"
           color="primary"
           :disable="!isTableNameValid || !isEntityTypeValid"
           @click="onAddTable"
@@ -38,14 +38,11 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTableDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import type { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
+
+const { t } = useI18n();
 
 interface DialogProps {
   modelValue: boolean;

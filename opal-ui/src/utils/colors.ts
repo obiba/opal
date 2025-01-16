@@ -57,12 +57,12 @@ export function commandStatusColor(status: string | CommandStateDto_Status) {
 }
 
 export function analysisColor(status: string | AnalysisStatusDto) {
-    const statusEnum = typeof status === 'string' ? AnalysisStatusDto[status] : status;
-    switch (statusEnum) {
-      case AnalysisStatusDto.PASSED:
-        return 'positive';
-      default:
-        return 'negative';
+  const statusEnum = typeof status === 'string' ? AnalysisStatusDto[status] : status;
+  switch (statusEnum) {
+    case AnalysisStatusDto.PASSED:
+      return 'positive';
+    default:
+      return 'negative';
 
-    }
+  }
 }

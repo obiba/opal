@@ -34,15 +34,10 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ValueCell',
-});
-</script>
 <script setup lang="ts">
 import { baseUrl } from 'src/boot/api';
 import { getSizeLabel } from 'src/utils/files';
-import { ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
+import type { ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 
 interface ValueCellProps {
   value: ValueSetsDto_ValueDto | undefined;

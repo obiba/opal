@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div class="text-h6 q-mb-md">{{ $t('contingency_table') }}</div>
-    <div class="text-help q-mb-md">{{ $t('contingency_table_info') }}</div>
+    <div class="text-h6 q-mb-md">{{ t('contingency_table') }}</div>
+    <div class="text-help q-mb-md">{{ t('contingency_table_info') }}</div>
 
     <div class="row">
       <q-select
         filled
         dense
-        :label="$t('categorical_variable')"
-        :hint="$t('categorical_variable_hint')"
+        :label="t('categorical_variable')"
+        :hint="t('categorical_variable_hint')"
         v-model="varCat"
         use-input
         hide-selected
@@ -32,7 +32,7 @@
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey">
-              {{ $t('no_options') }}
+              {{ t('no_options') }}
             </q-item-section>
           </q-item>
         </template>
@@ -41,8 +41,8 @@
       <q-select
         filled
         dense
-        :label="$t('other_variable')"
-        :hint="$t('other_variable_hint')"
+        :label="t('other_variable')"
+        :hint="t('other_variable_hint')"
         v-model="varAlt"
         use-input
         hide-selected
@@ -66,14 +66,14 @@
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey">
-              {{ $t('no_options') }}
+              {{ t('no_options') }}
             </q-item-section>
           </q-item>
         </template>
       </q-select>
       <q-btn
         color="primary"
-        :label="$t('submit')"
+        :label="t('submit')"
         size="sm"
         style="height: 2.5em"
         @click="onSubmit"
@@ -84,7 +84,7 @@
         outline
         color="secondary"
         icon="cleaning_services"
-        :label="$t('clear')"
+        :label="t('clear')"
         size="sm"
         style="height: 2.5em"
         @click="onClear"
@@ -101,14 +101,14 @@
           <tr class="bg-grey-3">
             <th rowspan="2">
               <div class="text-bold">{{ variableAlt?.name }}</div>
-              <div v-for="attr in getLabels(variableAlt?.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(variableAlt?.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </th>
             <th :colspan="(variableCatCategories.length || 0) + 1">
               <div class="text-bold">{{ variableCat?.name }}</div>
-              <div v-for="attr in getLabels(variableCat?.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(variableCat?.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
@@ -117,19 +117,19 @@
           <tr>
             <th v-for="cat in variableCatCategories" :key="cat.name" class="bg-grey-1">
               <div class="text-bold">{{ cat.name }}</div>
-              <div v-for="attr in getLabels(cat.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(cat.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
             </th>
-            <th>{{ $t('total') }}</th>
+            <th>{{ t('total') }}</th>
           </tr>
         </thead>
         <tbody v-if="withFrequencies">
           <tr v-for="catAlt in variableAltCategories" :key="catAlt.name">
             <td class="bg-grey-2">
               <div class="text-bold">{{ catAlt.name }}</div>
-              <div v-for="attr in getLabels(catAlt.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(catAlt.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
@@ -142,7 +142,7 @@
             </td>
           </tr>
           <tr>
-            <td class="text-bold">{{ $t('total') }}</td>
+            <td class="text-bold">{{ t('total') }}</td>
             <td v-for="cat in variableCatCategories" :key="cat.name" class="text-caption">
               {{ getFrequency(cat.name, undefined) }}
             </td>
@@ -154,7 +154,7 @@
         <tbody v-if="withStatistics">
           <tr v-for="measure in measures" :key="measure">
             <td class="bg-grey-2">
-              <div class="text-bold">{{ $t(`stats.${measure}`) }}</div>
+              <div class="text-bold">{{ t(`stats.${measure}`) }}</div>
             </td>
             <td v-for="cat in variableCatCategories" :key="cat.name" class="text-caption">
               {{ getStatistic(cat.name, measure) }}
@@ -169,18 +169,14 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ContingencyTable',
-});
-</script>
 <script setup lang="ts">
 import { getVariableNature, VariableNatures } from 'src/utils/magma';
 import { getLabels } from 'src/utils/attributes';
-import { VariableDto } from 'src/models/Magma';
-import { QueryResultDto } from 'src/models/Search';
+import type { VariableDto } from 'src/models/Magma';
+import type { QueryResultDto } from 'src/models/Search';
 import { notifyError } from 'src/utils/notify';
 
+const { t } = useI18n();
 const route = useRoute();
 const datasourceStore = useDatasourceStore();
 
@@ -245,7 +241,7 @@ watch([dsName, tName], () => {
     });
 });
 
-function onFilterVarCat(val: string, update, abort) {
+function onFilterVarCat(val: string, update) {
   update(() => {
     const needle = val.toLowerCase().trim();
     varCatOptions.value =
@@ -255,7 +251,7 @@ function onFilterVarCat(val: string, update, abort) {
   });
 }
 
-function onFilterVarAlt(val: string, update, abort) {
+function onFilterVarAlt(val: string, update) {
   update(() => {
     const needle = val.toLowerCase().trim();
     varAltOptions.value =
@@ -266,6 +262,7 @@ function onFilterVarAlt(val: string, update, abort) {
 }
 
 function onSubmit() {
+  if (!varCat.value?.value || !varAlt.value?.value) return;
   loading.value = true;
   datasourceStore
     .getContingencyTable(varCat.value?.value, varAlt.value?.value)

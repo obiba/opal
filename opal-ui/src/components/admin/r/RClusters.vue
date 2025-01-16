@@ -20,7 +20,7 @@
           outline
           color="secondary"
           icon="cleaning_services"
-          :label="$t('r.clear_cache')"
+          :label="t('r.clear_cache')"
           size="sm"
           @click="onClearCache()"
           class="q-mt-md full-width"
@@ -42,15 +42,11 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RClusters',
-});
-</script>
 <script setup lang="ts">
-import { RServerClusterDto } from 'src/models/OpalR';
+import type { RServerClusterDto } from 'src/models/OpalR';
 import RCluster from 'src/components/admin/r/RCluster.vue';
 
+const { t } = useI18n();
 const rStore = useRStore();
 
 const tab = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');

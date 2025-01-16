@@ -347,7 +347,7 @@ export default {
   },
   analysis_status: {
     IN_PROGRESS: 'In progress',
-    PASSED: 'Passed!!!',
+    PASSED: 'Passed',
     FAILED: 'Failed',
     ERROR: 'Error',
     IGNORED: 'Ignored',
@@ -671,7 +671,7 @@ export default {
       edit: 'Edit Term',
       keywords_hint: 'Optional list of keywords of the term. Can be useful when building variable search requests.',
     },
-    import_mlstr: {
+    import_mr: {
       label: 'Maelstrom Research Taxonomies',
       title: 'Import Maelstrom Research Taxonomies',
       info: 'The {mlstr_url} variable classification taxonomies allow annotating study and harmonized variables to facilitate metadata browsing and enhance data discoverability on the {mica_url} data web portal.',
@@ -680,7 +680,7 @@ export default {
       versions_hint_url: 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License.',
       license_agreement: 'I have read and accepted the license terms.',
     },
-    import_github: {
+    import_gh: {
       label: 'From GitHub Repository',
       title: 'Import GitHub Repository',
       org_hint: 'Example: maelstrom-research',
@@ -690,7 +690,7 @@ export default {
       file_hint: 'Taxonomy YAML file name (e.g. taxonomy.yml or scales/taxonomy.yml). Leave this field empty to import all taxonomy files.',
       override: 'Override existing taxonomies',
     },
-    import_file: {
+    import: {
       label: 'From YAML File',
       title: 'Import YAML File',
     },
@@ -811,7 +811,6 @@ export default {
   annotate: 'Annotate',
   annotation_texts_hint: 'Annotate with free text. For human readibility, you can provide a different text for each language. For machine processing or not localized text, choose "default" language. Empty text will be ignored. Markdown text format is supported.',
   annotations: 'Annotations',
-  annotations: 'Annotations',
   apply_annotation: 'Apply annotation',
   apply: 'Apply',
   at: 'At',
@@ -918,7 +917,6 @@ export default {
   derivation_script: 'Derivation script',
   derived_variables_hint: 'The derived variable name and value type can be different from the one of original variable.',
   derived_variables: 'Derived variables',
-  description: 'Description',
   description: 'Description',
   descriptive_statistics: 'Descriptive statistics',
   destination_folder: 'Destination folder',

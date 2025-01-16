@@ -23,7 +23,7 @@
             options-dense
             size="sm"
             display-value=""
-            :label="$t('select_columns')"
+            :label="t('select_columns')"
             emit-value
             map-options
             :options="selectableColumns"
@@ -74,16 +74,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ValuesList',
-});
-</script>
 <script setup lang="ts">
-import { QTableColumn } from 'quasar';
-import { TableDto, ValueSetsDto, VariableDto } from 'src/models/Magma';
+import type { QTableColumn } from 'quasar';
+import type { TableDto, ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
-import { t } from 'src/boot/i18n';
+
+const { t } = useI18n();
 
 interface ValuesListProps {
   table: TableDto;
@@ -143,7 +139,7 @@ function init() {
   tableRef.value.requestServerInteraction();
 }
 
-function onFilter(val: string, update, abort) {
+function onFilter(val: string, update) {
   update(() => {
     varFilter.value = val.toLowerCase();
   });

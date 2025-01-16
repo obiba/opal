@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
-import { FileObject } from 'src/components/models';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
+import type { FileObject } from 'src/components/models';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);

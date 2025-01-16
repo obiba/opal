@@ -2,9 +2,9 @@
   <div v-show="!loading">
     <div>
       <!-- Account -->
-      <div class="text-h6">{{ $t('account') }}</div>
+      <div class="text-h6">{{ t('account') }}</div>
       <div>
-        <span>{{ $t('user_profile.groups', { count: (profile?.groups || []).length }) }}</span>
+        <span>{{ t('user_profile.groups', { count: (profile?.groups || []).length }) }}</span>
         <q-chip v-for="group in profile?.groups" :key="group">
           {{ group }}
         </q-chip>
@@ -15,7 +15,7 @@
           v-if="isOpalUserRealm"
           color="primary"
           size="sm"
-          :label="$t('user_profile.update_password')"
+          :label="t('user_profile.update_password')"
           @click="onUpdatePassword"
         />
         <div v-else-if="profile?.accountUrl">
@@ -24,24 +24,24 @@
             color="primary"
             size="sm"
             icon-right="open_in_new"
-            :label="$t('user_profile.external_account')"
+            :label="t('user_profile.external_account')"
             @click="onAccountLink"
           />
         </div>
         <div v-else square class="box-info q-mt-md" text-color="white" icon="warning">
           <q-icon name="info" size="1.2rem" />
-          <span class="on-right">{{ $t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
+          <span class="on-right">{{ t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
         </div>
       </div>
       <!-- !Account -->
 
       <!-- 2FA -->
       <div v-if="isAnOpalRealm">
-        <div class="text-h6 q-mt-lg">{{ $t('2fa.title') }}</div>
+        <div class="text-h6 q-mt-lg">{{ t('2fa.title') }}</div>
         <div
           class="text-help q-mb-md"
           v-html="
-            $t('user_profile.2fa_info', {
+            t('user_profile.2fa_info', {
               androidOtp: androidOtpUrl,
               androidOnlyOtp: androidOnlyOtpUrl,
               iosOtp: iosOtpUrl,
@@ -53,13 +53,13 @@
           :icon="otpIcon"
           color="primary"
           size="sm"
-          :label="profile?.otpEnabled ? $t('user_profile.disable_2fa') : $t('user_profile.enable_2fa')"
+          :label="profile?.otpEnabled ? t('user_profile.disable_2fa') : t('user_profile.enable_2fa')"
           @click="onToggleOtp"
         />
 
         <q-card v-if="profile?.otpEnabled && otpQrCode" bordered flat class="bg-grey-3">
           <q-card-section>
-            <div class="text-help">{{ $t('user_profile.otp_qr_core_info') }}</div>
+            <div class="text-help">{{ t('user_profile.otp_qr_core_info') }}</div>
           </q-card-section>
           <q-card-section>
             <div class="text-center"><img :src="otpQrCode" alt="QR Code" /></div>
@@ -69,28 +69,28 @@
       <!--!2FA -->
 
       <!-- PERSONAL ACCESS TOKENS-->
-      <div class="text-h6 q-mt-lg">{{ $t('user_profile.personal_access_tokens') }}</div>
-      <div class="text-help q-mb-md">{{ $t('user_profile.tokens_info') }}</div>
-      <q-btn-dropdown no-caps color="primary" :title="$t('user_profile.add_token')" icon="add" size="sm">
+      <div class="text-h6 q-mt-lg">{{ t('user_profile.personal_access_tokens') }}</div>
+      <div class="text-help q-mb-md">{{ t('user_profile.tokens_info') }}</div>
+      <q-btn-dropdown no-caps color="primary" :title="t('user_profile.add_token')" icon="add" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click.prevent="onAddDataShieldToken">
             <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_datashield_token') }}</q-item-label>
+              <q-item-label>{{ t('user_profile.add_datashield_token') }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item clickable v-close-popup @click.prevent="onAddRToken">
             <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_r_token') }}</q-item-label>
+              <q-item-label>{{ t('user_profile.add_r_token') }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item clickable v-close-popup @click.prevent="onAddSqlToken">
             <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_sql_token') }}</q-item-label>
+              <q-item-label>{{ t('user_profile.add_sql_token') }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item clickable v-close-popup @click.prevent="onAddCustomToken">
             <q-item-section>
-              <q-item-label>{{ $t('user_profile.add_custom_token') }}</q-item-label>
+              <q-item-label>{{ t('user_profile.add_custom_token') }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -129,7 +129,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('renew')"
+                  :title="t('renew')"
                   :icon="toolsVisible[props.row.name] ? 'restore' : 'none'"
                   class="q-ml-xs"
                   @click="onRenewToken(props.row)"
@@ -140,7 +140,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('delete')"
+                  :title="t('delete')"
                   :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
                   class="q-ml-xs"
                   @click="onDeleteToken(props.row)"
@@ -196,15 +196,15 @@
           </template>
         </q-table>
       </div>
-      <div v-else class="text-hint q-mt-md q-mb-md">{{ $t('user_profile.no_tokens') }}</div>
+      <div v-else class="text-hint q-mt-md q-mb-md">{{ t('user_profile.no_tokens') }}</div>
       <!-- !PERSONAL ACCESS TOKENS-->
 
       <!-- Dialogs -->
       <confirm-dialog
         v-if="selectedToken"
         v-model="showDelete"
-        :title="$t('delete')"
-        :text="$t('delete_token_confirm', { token: selectedToken.name })"
+        :title="t('delete')"
+        :text="t('delete_token_confirm', { token: selectedToken.name })"
         @confirm="doDeleteToken"
       />
 
@@ -220,7 +220,7 @@
       <q-dialog v-if="tokenAdded" v-model="showTokenAdded" position="bottom" @hide="onTokenAddedHide">
         <q-card>
           <q-card-section class="bg-positive">
-            <div class="text-grey-4 q-mb-sm">{{ $t('added_token') }}</div>
+            <div class="text-grey-4 q-mb-sm">{{ t('added_token') }}</div>
             <div class="row">
               <div class="text-white text-bold">{{ tokenAdded?.token }}</div>
               <q-btn
@@ -229,7 +229,7 @@
               size="sm"
               icon="content_copy"
               color="white"
-              :title="$t('clipboard.copy')"
+              :title="t('clipboard.copy')"
               @click="onCopyToClipboard"
               aria-label="Copy to clipboard"
               class="q-ml-sm"
@@ -244,15 +244,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProfileUser',
-});
-</script>
-
 <script setup lang="ts">
 import { copyToClipboard } from 'quasar';
-import { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
+import type { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';

@@ -10,21 +10,18 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('close')" color="primary" v-close-popup />
+        <q-btn flat :label="t('close')" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ViewRPackageDialog',
-});
-</script>
 <script setup lang="ts">
-import { RPackageDto } from 'src/models/OpalR';
-import { StringMap } from 'src/components/models';
+import type { RPackageDto } from 'src/models/OpalR';
+import type { StringMap } from 'src/components/models';
 import FieldsList from 'src/components/FieldsList.vue';
+
+const { t } = useI18n();
 
 interface DialogProps {
   modelValue: boolean;

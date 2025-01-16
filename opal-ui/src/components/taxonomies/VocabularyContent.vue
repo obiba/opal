@@ -4,15 +4,15 @@
       <q-icon name="arrow_back_ios_new" />
     </router-link>
     <span>{{ vocabulary.name }}</span>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" :title="$t('edit')" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" :title="$t('delete')" size="sm" @click="onDelete" class="on-right"></q-btn>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="search" :title="$t('search')" size="sm" @click="onSearchVocabulary" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" :title="t('edit')" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" :title="t('delete')" size="sm" @click="onDelete" class="on-right"></q-btn>
+    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="search" :title="t('search')" size="sm" @click="onSearchVocabulary" class="on-right"></q-btn>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
   </div>
 
-  <div class="text-h6 q-mb-none q-mt-lg">{{ $t('terms') }}</div>
+  <div class="text-h6 q-mb-none q-mt-lg">{{ t('terms') }}</div>
   <q-table
     flat
     :key="tableKey"
@@ -33,10 +33,10 @@
     </template>
     <template v-slot:top-left>
       <div v-if="taxonomiesStore.canEdit" class="q-gutter-sm">
-        <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddTerm" />
+        <q-btn no-caps color="primary " icon="add" size="sm" :label="t('add')" @click="onAddTerm" />
         <template v-if="dirty">
-          <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
-          <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+          <q-btn no-caps color="primary" icon="check" size="sm" :label="t('apply')" @click="onApply" />
+          <q-btn no-caps color="secondary" icon="close" size="sm" :label="t('reset')" @click="onResetSort" />
         </template>
       </div>
     </template>
@@ -47,7 +47,7 @@
         debounce="400"
         color="primary"
         v-model="filter"
-        :placeholder="$t('taxonomy.vocabulary.filter_terms')"
+        :placeholder="t('taxonomy.vocabulary.filter_terms')"
       >
         <template v-slot:append>
           <q-icon name="search" />
@@ -65,7 +65,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('search')"
+            :title="t('search')"
             :icon="toolsVisible[props.row.name] ? 'search' : 'none'"
             class="q-ml-xs"
             @click="onSearchTerm(props.row)"
@@ -77,7 +77,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('edit')"
+            :title="t('edit')"
             :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
             class="q-ml-xs"
             @click="onAddTerm(props.row)"
@@ -89,7 +89,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('move_up')"
+            :title="t('move_up')"
             :icon="toolsVisible[props.row.name] ? 'arrow_upward' : 'none'"
             class="q-ml-xs"
             @click="onMoveUp(props.value)"
@@ -101,7 +101,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('move_down')"
+            :title="t('move_down')"
             :icon="toolsVisible[props.value] ? 'arrow_downward' : 'none'"
             class="q-ml-xs"
             @click="onMoveDown(props.value)"
@@ -113,7 +113,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.value] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDeleteTerm(props.row)"
@@ -163,15 +163,15 @@
 
   <confirm-dialog
     v-model="showDelete"
-    :title="$t('delete')"
-    :text="$t('delete_vocabulary_confirm', { taxonomy: taxonomy, vocabulary: vocabulary.name })"
+    :title="t('delete')"
+    :text="t('delete_vocabulary_confirm', { taxonomy: taxonomy, vocabulary: vocabulary.name })"
     @confirm="doDelete"
   />
 
   <confirm-dialog
     v-model="showDeleteTerm"
-    :title="$t('delete')"
-    :text="$t('delete_term_confirm', { vocabulary: vocabulary.name, term: newTerm?.name })"
+    :title="t('delete')"
+    :text="t('delete_term_confirm', { vocabulary: vocabulary.name, term: newTerm?.name })"
     @confirm="doDeleteTerm"
   />
 
@@ -192,19 +192,13 @@
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VocabularyContent',
-});
-</script>
-
 <script setup lang="ts">
-import { VocabularyDto, TermDto } from 'src/models/Opal';
+import type { VocabularyDto, TermDto } from 'src/models/Opal';
 import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
 import AddTermDialog from 'src/components/taxonomies/AddTermDialog.vue';
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import { notifyError } from 'src/utils/notify';
 
 interface Props {
@@ -326,7 +320,7 @@ async function doDelete() {
 
 async function doDeleteTerm() {
   showDelete.value = false;
-  if (!!newTerm.value) {
+  if (newTerm.value) {
     const toDelete: TermDto = newTerm.value;
     newTerm.value = null;
 
@@ -388,7 +382,7 @@ async function onDelete() {
 watch(
   () => props.vocabulary,
   (newValue) => {
-    if (!!newValue.name) {
+    if (newValue.name) {
       tableKey.value += 1;
       sortedName.value = [];
       canSort.value = true;

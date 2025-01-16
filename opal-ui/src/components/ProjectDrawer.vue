@@ -17,18 +17,18 @@
           <q-icon name="dashboard" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('dashboard') }}</q-item-label>
+          <q-item-label>{{ t('dashboard') }}</q-item-label>
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{ $t('content') }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ t('content') }}</q-item-label>
 
       <q-item :to="`/project/${projectsStore.project.name}/tables`">
         <q-item-section avatar>
           <q-icon name="table_chart" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('tables') }}</q-item-label>
+          <q-item-label>{{ t('tables') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -37,7 +37,7 @@
           <q-icon name="link" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('resources') }}</q-item-label>
+          <q-item-label>{{ t('resources') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -46,7 +46,7 @@
           <q-icon name="science" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('genotypes') }}</q-item-label>
+          <q-item-label>{{ t('genotypes') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -55,18 +55,18 @@
           <q-icon name="folder" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('files') }}</q-item-label>
+          <q-item-label>{{ t('files') }}</q-item-label>
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{ $t('administration') }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ t('administration') }}</q-item-label>
 
       <q-item :to="`/project/${projectsStore.project.name}/tasks`">
         <q-item-section avatar>
           <q-icon name="splitscreen" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('tasks') }}</q-item-label>
+          <q-item-label>{{ t('tasks') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -75,7 +75,7 @@
           <q-icon name="lock" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('permissions') }}</q-item-label>
+          <q-item-label>{{ t('permissions') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -84,19 +84,15 @@
           <q-icon name="admin_panel_settings" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('administration') }}</q-item-label>
+          <q-item-label>{{ t('administration') }}</q-item-label>
         </q-item-section>
       </q-item>
     </q-list>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProjectDrawer',
-});
-</script>
 <script setup lang="ts">
+const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const pluginsStore = usePluginsStore();
 const hasAdminPermission = ref(false);
@@ -111,7 +107,7 @@ watchEffect(() => {
     false;
 
   hasVcfStorePermission.value =
-    projectsStore.perms.vcfstore?.canRead() && !!projectsStore.project.vcfStoreService ? true : false;
+    projectsStore.perms.vcfstore?.canRead() && projectsStore.project.vcfStoreService ? true : false;
 });
 
 onMounted(() => {

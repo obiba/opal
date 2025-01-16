@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { IDProviderDto } from 'src/models/Opal';
+import type { IDProviderDto } from 'src/models/Opal';
 
 export const useIdentityProvidersStore = defineStore('identityProviders', () => {
   const providers = ref([] as IDProviderDto[]);

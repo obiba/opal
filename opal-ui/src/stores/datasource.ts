@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
+import type { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
-import { AttributesBundle } from 'src/components/models';
-import { QueryResultDto } from 'src/models/Search';
-import { ScheduleDto, TableIndexStatusDto } from 'src/models/Opal';
+import type { AttributesBundle } from 'src/components/models';
+import type { QueryResultDto } from 'src/models/Search';
+import type { ScheduleDto, TableIndexStatusDto } from 'src/models/Opal';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -40,7 +40,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
           attributes: [attr],
         } as AttributesBundle);
       } else {
-        acc[index].attributes.push(attr);
+        acc[index]?.attributes.push(attr);
       }
       return acc;
     }, []);
@@ -106,7 +106,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   // Loaders
   async function loadDatasource(name: string) {
     datasource.value = {} as DatasourceDto;
-    delete perms.value.datasource;
+    perms.value.datasource = undefined;
     return api.get(`/datasource/${name}`).then((response) => {
       perms.value.datasource = new Perms(response);
       datasource.value = response.data;
@@ -124,7 +124,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     // tableIndex.value = {} as TableIndexStatusDto;
     // variables.value = [];
     // variable.value = {} as VariableDto;
-    delete perms.value.tables;
+    perms.value.tables = undefined;
     return api.get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } }).then((response) => {
       perms.value.tables = new Perms(response);
       tables.value = response.data;
@@ -136,10 +136,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     table.value = {} as TableDto;
     view.value = {} as ViewDto;
     tableIndex.value = {} as TableIndexStatusDto;
-    delete perms.value.table;
-    delete perms.value.tableValueSets;
+    perms.value.table = undefined;
+    perms.value.tableValueSets = undefined;
     variables.value = [];
-    delete perms.value.variables;
+    perms.value.variables = undefined;
     return api
       .get(`/datasource/${datasource.value.name}/table/${name}`, { params: { counts: true } })
       .then((response) => {
@@ -170,7 +170,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTableVariables() {
     variables.value = [];
-    delete perms.value.variables;
+    perms.value.variables = undefined;
     return api.get(`/datasource/${datasource.value.name}/table/${table.value.name}/variables`).then((response) => {
       perms.value.variables = new Perms(response);
       variables.value = response.data;
@@ -186,7 +186,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTableVariable(name: string) {
     variable.value = {} as VariableDto;
-    delete perms.value.variable;
+    perms.value.variable = undefined;
     return api
       .get(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`)
       .then((response) => {
@@ -290,7 +290,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
-    const params = { offset, limit };
+    const params: { offset: number, limit: number, select: string | undefined } = { offset, limit, select: undefined };
     if (select && select.length > 0) {
       params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }
@@ -306,7 +306,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     const link = localVar
       ? `${localVar.parentLink?.link}/variable/${localVar.name}`
       : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
-    const params = { fullIfCached };
+    const params: { fullIfCached: boolean, limit: number | undefined, resetCache: boolean | undefined } = { fullIfCached, limit, resetCache: undefined };
     if (limit) {
       params.limit = limit;
     } else {
@@ -383,7 +383,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
     return Promise.all(
       Object.keys(grouped).map((tableLink) => {
-        grouped[tableLink].forEach((v) => {
+        grouped[tableLink]?.forEach((v) => {
           if (v.attributes === undefined) {
             v.attributes = [];
           }
@@ -411,7 +411,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
     return Promise.all(
       Object.keys(grouped).map((tableLink) => {
-        grouped[tableLink].forEach((v) => {
+        grouped[tableLink]?.forEach((v) => {
           if (v.attributes !== undefined) {
             v.attributes = v.attributes.filter((a) => a.namespace !== taxonomy || a.name !== vocabulary);
           }

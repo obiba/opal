@@ -2,7 +2,7 @@
   <div>
     <file-select
       v-model="dataFile"
-      :label="$t('data_file')"
+      :label="t('data_file')"
       :folder="filesStore.current"
       selection="single"
       :extensions="fileExtensions"
@@ -11,7 +11,7 @@
     />
     <q-input
       v-model="name"
-      :label="$t('table_name')"
+      :label="t('table_name')"
       :disable="dataFile === undefined"
       dense
       class="q-mb-md"
@@ -22,7 +22,7 @@
       <div class="col">
         <q-input
           v-model="entityType"
-          :label="$t('entity_type')"
+          :label="t('entity_type')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -30,7 +30,7 @@
         />
         <q-input
           v-model="locale"
-          :label="$t('locale')"
+          :label="t('locale')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -40,8 +40,8 @@
       <div class="col">
         <q-input
           v-model="idColumn"
-          :label="$t('id_column')"
-          :hint="$t('id_column_hint')"
+          :label="t('id_column')"
+          :hint="t('id_column_hint')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -52,14 +52,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportHavenForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
-import { FileDto } from 'src/models/Opal';
+import type { DatasourceFactory } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ImportHavenFormProps {
@@ -70,6 +65,7 @@ interface ImportHavenFormProps {
 const props = defineProps<ImportHavenFormProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 
 const fileExtensions = computed(() => fileImporterExtensions[props.type]);

@@ -1,5 +1,5 @@
 <template>
-  <div class="text-help">{{ $t('analyse_validate.info') }}</div>
+  <div class="text-help">{{ t('analyse_validate.info') }}</div>
   <q-table
     flat
     :filter="filter"
@@ -18,10 +18,10 @@
           color="primary"
           icon="add"
           size="sm"
-          :label="$t('analyse_validate.add')"
+          :label="t('analyse_validate.add')"
           @click="onAddAnalysis"
         />
-        <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="$t('refresh')" @click="onRefresh" />
+        <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="t('refresh')" @click="onRefresh" />
       </div>
     </template>
     <template v-slot:top-right>
@@ -41,7 +41,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('run')"
+            :title="t('run')"
             :icon="toolsVisible[props.row.name] ? 'play_arrow' : 'none'"
             class="q-ml-xs"
             @click="onRunAnalysis(props.row)"
@@ -52,7 +52,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('view')"
+            :title="t('view')"
             :icon="toolsVisible[props.row.name] ? 'visibility' : 'none'"
             class="q-ml-xs"
             @click="onViewAnalysis(props.row)"
@@ -63,7 +63,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('duplicate')"
+            :title="t('duplicate')"
             :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
             class="q-ml-xs"
             @click="onDuplicateAnalysis(props.row)"
@@ -74,7 +74,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onRemoveAnalysis(props.row)"
@@ -98,7 +98,7 @@
           name="circle"
           size="sm"
           :color="analysisColor(props.value)"
-          :title="$t(`analysis_status.${props.value}`)"
+          :title="t(`analysis_status.${props.value}`)"
         />
       </q-td>
     </template>
@@ -111,8 +111,8 @@
 
   <confirm-dialog
     v-model="showRemove"
-    :title="$t('remove')"
-    :text="$t('analyse_validate.delete_analysis_confirm', { name: selectedAnalysis?.name })"
+    :title="t('remove')"
+    :text="t('analyse_validate.delete_analysis_confirm', { name: selectedAnalysis?.name })"
     @confirm="doRemoveAnalysis"
   />
 
@@ -128,16 +128,10 @@
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProjectAnaylseValidate',
-});
-</script>
-
 <script setup lang="ts">
 import AddProjectAnalysisDialog from './AddProjectAnalysisDialog.vue';
-import { OpalAnalysisDto, OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
-import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
+import type { OpalAnalysisDto, OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
+import type { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
 import { analysisColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError, notifySuccess } from 'src/utils/notify';
@@ -233,7 +227,7 @@ function onFilter(tableRows: OpalAnalysisDto[], filter: string) {
   if (filter.length === 0) {
     return tableRows;
   }
-  const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
+  const query = filter?.length > 0 ? filter.toLowerCase() : '';
   const result = tableRows.filter((row) => {
     const rowString = `${row.name.toLowerCase()}`;
     return rowString.includes(query);
@@ -295,7 +289,7 @@ async function doRemoveAnalysis() {
   try {
     const toDelete = selectedAnalysis.value;
     selectedAnalysis.value = null;
-    if (!!toDelete) await projectsStore.removeAnalysis(props.projectName, props.tableName, toDelete.name);
+    if (toDelete) await projectsStore.removeAnalysis(props.projectName, props.tableName, toDelete.name);
     showRemove.value = false;
     return onRefresh();
   } catch (error) {

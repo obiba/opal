@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: Magma.proto
 
-/* eslint-disable */
 import { type IdentifiersMappingConfigDto } from './Identifiers';
 
 export const protobufPackage = 'Magma';
@@ -139,10 +138,6 @@ export interface SpssDatasourceFactoryDto {
   locale?: string | undefined;
   idVariable?: string | undefined;
 }
-
-export interface HCDatasourceFactoryDto {}
-
-export interface GNPostalCodesDatasourceFactoryDto {}
 
 export interface MongoDBDatasourceFactoryDto {
   database?: string | undefined;

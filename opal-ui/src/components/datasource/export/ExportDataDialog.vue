@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('export_data') }}</div>
+        <div class="text-h6">{{ t('export_data') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -16,7 +16,7 @@
         </div>
 
         <div v-if="isFile">
-          <q-select v-model="fileExporter" :options="fileExporters" :label="$t('data_format')" dense class="q-mb-md" />
+          <q-select v-model="fileExporter" :options="fileExporters" :label="t('data_format')" dense class="q-mb-md" />
           <div class="text-hint q-mb-md">
             {{ fileExporterHint }}
           </div>
@@ -38,12 +38,12 @@
               switch-toggle-side
               dense
               header-class="text-primary text-caption"
-              :label="$t('advanced_options')"
+              :label="t('advanced_options')"
             >
               <q-input
                 v-model="entityIdNames"
-                :label="$t('id_column_name')"
-                :hint="$t('id_column_name_hint')"
+                :label="t('id_column_name')"
+                :hint="t('id_column_name_hint')"
                 dense
                 class="q-mb-md"
                 :debounce="500"
@@ -55,7 +55,7 @@
           <q-select
             v-model="databaseExporter"
             :options="databaseExporters"
-            :label="$t('database')"
+            :label="t('database')"
             dense
             emit-value
             map-options
@@ -67,10 +67,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('export')"
+          :label="t('export')"
           color="primary"
           @click="onExportData"
           :disable="isFile ? out === undefined : databaseExporter === undefined"
@@ -81,22 +81,17 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExportDataDialog',
-});
-</script>
 <script setup lang="ts">
-import { ExportCommandOptionsDto } from 'src/models/Commands';
-import { TableDto } from 'src/models/Magma';
+import type { ExportCommandOptionsDto } from 'src/models/Commands';
+import type { TableDto } from 'src/models/Magma';
 import ExportCsvForm from 'src/components/datasource/export/ExportCsvForm.vue';
 import ExportFsForm from 'src/components/datasource/export/ExportFsForm.vue';
 import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vue';
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
 import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
-import { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
+import type { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import type { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -207,7 +202,7 @@ function onExportData() {
     return;
   }
 
-  if (idConfig.value && !!idConfig.value.name) {
+  if (idConfig.value && idConfig.value.name) {
     options.idConfig = idConfig.value;
   }
 

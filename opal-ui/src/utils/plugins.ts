@@ -1,5 +1,5 @@
 import { i18n } from 'src/boot/i18n';
-import { PluginPackagesDto, PluginPackageDto } from 'src/models/Plugins';
+import type { PluginPackagesDto, PluginPackageDto } from 'src/models/Plugins';
 
 type Translation = {
   [key: string]: string;
@@ -16,14 +16,14 @@ type PluginTranslations = {
 };
 
 export function mergeAnalysesTranslations(packages: PluginPackagesDto) {
-  if (!!packages) {
+  if (packages) {
     const normalizeFn = (plugin: PluginPackageDto, translations: Translations) => {
       const normalized: PluginTranslations = { plugins: {} } as PluginTranslations;
       normalized.plugins[plugin.name] = translations;
       return normalized;
     };
 
-    ((packages || {}).packages || []).forEach((plugin) => {
+    packages.packages?.forEach((plugin) => {
       const pluginTranslations: Translations = {};
       pluginTranslations[plugin.name] = { title: plugin.title, description: plugin.description };
       i18n.global.mergeLocaleMessage('en', { plugins: pluginTranslations });

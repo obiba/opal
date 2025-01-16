@@ -3,21 +3,21 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('plugins')" />
+        <q-breadcrumbs-el :label="t('administration')" to="/admin" />
+        <q-breadcrumbs-el :label="t('plugins')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('plugins') }}
+        {{ t('plugins') }}
       </div>
       <div class="text-help q-mb-md">
-        {{ $t('plugins_info') }}
+        {{ t('plugins_info') }}
       </div>
       <div v-if="pluginsStore.plugins.restart" class="q-mb-md box-warning">
         <q-icon name="error" size="1.2rem" />
         <span class="on-right">
-          {{ $t('plugin.system_restart_required') }}
+          {{ t('plugin.system_restart_required') }}
         </span>
       </div>
       <q-tabs
@@ -28,10 +28,10 @@
         indicator-color="primary"
         align="justify"
       >
-        <q-tab name="installed" :label="$t('plugin.installed')" />
-        <q-tab name="updates" :label="$t('plugin.updates')" />
-        <q-tab name="available" :label="$t('plugin.available')" />
-        <q-tab name="advanced" :label="$t('plugin.advanced')" />
+        <q-tab name="installed" :label="t('plugin.installed')" />
+        <q-tab name="updates" :label="t('plugin.updates')" />
+        <q-tab name="available" :label="t('plugin.available')" />
+        <q-tab name="advanced" :label="t('plugin.advanced')" />
       </q-tabs>
       <q-separator />
       <q-tab-panels v-model="tab">
@@ -58,6 +58,7 @@ import UpdatesPlugins from 'src/components/admin/plugins/UpdatesPlugins.vue';
 import AvailablePlugins from 'src/components/admin/plugins/AvailablePlugins.vue';
 import AdvancedPlugins from 'src/components/admin/plugins/AdvancedPlugins.vue';
 
+const { t } = useI18n();
 const pluginsStore = usePluginsStore();
 
 const tab = ref('installed');

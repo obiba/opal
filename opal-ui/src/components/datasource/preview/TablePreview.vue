@@ -1,10 +1,10 @@
 <template>
   <div v-if="props.table">
     <q-tabs v-model="tableTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-      <q-tab name="variables" :label="$t('dictionary')">
+      <q-tab name="variables" :label="t('dictionary')">
         <q-badge v-if="props.table.variableCount !== undefined" color="red">{{ props.table.variableCount }}</q-badge>
       </q-tab>
-      <q-tab name="values" :label="$t('values')">
+      <q-tab name="values" :label="t('values')">
         <q-badge v-if="props.table.valueSetCount !== undefined" color="red">{{ props.table.valueSetCount }}</q-badge>
       </q-tab>
     </q-tabs>
@@ -20,15 +20,10 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TablePreviewList',
-});
-</script>
 <script setup lang="ts">
 import VariablesList from 'src/components/datasource/preview/VariablesList.vue';
 import ValuesList from 'src/components/datasource/preview/ValuesList.vue';
-import { TableDto, VariableDto } from 'src/models/Magma';
+import type { TableDto, VariableDto } from 'src/models/Magma';
 
 interface TablePreviewProps {
   table: TableDto | undefined;
@@ -37,6 +32,8 @@ interface TablePreviewProps {
 }
 
 const props = defineProps<TablePreviewProps>();
+
+const { t } = useI18n();
 
 const tableTab = ref('variables');
 

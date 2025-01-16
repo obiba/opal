@@ -15,7 +15,7 @@
       <q-btn
         :disable="!canAddMappings"
         color="primary"
-        :label="$t('add')"
+        :label="t('add')"
         icon="add"
         size="sm"
         @click.prevent="onAdd"
@@ -31,7 +31,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.entityType + props.row.mapping] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
@@ -49,15 +49,9 @@
   <add-project-id-mappings-dialog v-model="showAddDialog" :project="project" @update="$emit('update')" />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'IdMappingsList',
-});
-</script>
-
 <script setup lang="ts">
-import { t } from 'src/boot/i18n';
-import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+const { t } = useI18n();
+import type { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
 import AddProjectIdMappingsDialog from 'src/components/project/AddProjectIdMappingsDialog.vue';
 
@@ -99,7 +93,7 @@ const columns = computed(() => [
   },
 ]);
 const canAddMappings = computed(
-  () => (identifiersStore.identifiers || []).filter((id) => !!id.variableCount && id.variableCount > 0).length > 0
+  () => (identifiersStore.identifiers || []).filter((id) => id.variableCount && id.variableCount > 0).length > 0
 );
 
 // Handlers

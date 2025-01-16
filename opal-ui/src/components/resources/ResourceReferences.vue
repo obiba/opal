@@ -16,7 +16,7 @@
         <q-btn-dropdown
           v-if="resourcesStore.perms.resources?.canCreate()"
           color="primary"
-          :label="$t('add')"
+          :label="t('add')"
           icon="add"
           size="sm"
           :disable="!hasProviders"
@@ -38,7 +38,7 @@
           outline
           color="red"
           icon="delete"
-          :title="$t('delete')"
+          :title="t('delete')"
           size="sm"
           @click="onShowDelete"
           class="on-right"
@@ -80,21 +80,16 @@
     />
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_resources_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('delete_resources_confirm', { count: selected.length })"
       @confirm="onDeleteResources"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ResourceReferences',
-});
-</script>
 <script setup lang="ts">
-import { ResourceReferenceDto } from 'src/models/Projects';
-import { ResourceProviderDto } from 'src/models/Resources';
+import type { ResourceReferenceDto } from 'src/models/Projects';
+import type { ResourceProviderDto } from 'src/models/Resources';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';

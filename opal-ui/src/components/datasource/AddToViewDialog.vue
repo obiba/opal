@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('add_to_view') }}</div>
+        <div class="text-h6">{{ t('add_to_view') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,14 +11,14 @@
         <div class="q-mb-md box-info">
           <q-icon name="info" size="1.2rem" />
           <span class="on-right">
-            {{ $t('add_to_view_info', { count: props.variables.length }) }}
+            {{ t('add_to_view_info', { count: props.variables.length }) }}
           </span>
         </div>
 
         <q-select
           v-model="projectDestination"
           :options="projectNames"
-          :label="$t('project_destination')"
+          :label="t('project_destination')"
           dense
           style="min-width: 300px"
           class="q-mb-md"
@@ -27,18 +27,18 @@
           v-model="newTableName"
           dense
           type="text"
-          :label="$t('view_name')"
-          :hint="$t('view_destination_hint')"
+          :label="t('view_name')"
+          :hint="t('view_destination_hint')"
           style="min-width: 300px"
           class="q-mb-md"
         >
         </q-input>
 
         <div class="q-mt-lg">
-          {{ $t('derived_variables') }}
+          {{ t('derived_variables') }}
         </div>
         <div class="text-hint">
-          {{ $t('derived_variables_hint') }}
+          {{ t('derived_variables_hint') }}
         </div>
         <q-table
           :rows="derivedVariables"
@@ -60,10 +60,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('save')"
+          :label="t('save')"
           color="primary"
           @click="onSaveView"
           :disable="!projectDestination || !newTableName || !validDerivedVariables.length"
@@ -74,13 +74,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddToViewDialog',
-});
-</script>
 <script setup lang="ts">
-import { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
+import type { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
 import { ValueTypes } from 'src/utils/magma';
 
 interface DialogProps {
@@ -163,7 +158,7 @@ function onSaveView() {
         .updateView(projectDestination.value, newTableName.value, view, `Added variables from ${from} to view`)
         .then(() => router.push(newViewPage));
     })
-    .catch((err) => {
+    .catch(() => {
       datasourceStore
         .addVariablesView(projectDestination.value, newTableName.value, from, validDerivedVariables.value)
         .then(() => router.push(newViewPage));
@@ -172,7 +167,7 @@ function onSaveView() {
 
 function getFromTables() {
   const tables = props.variables.map((v) => v.parentLink?.link.replace('/datasource/', '').replace('/table/', '.'));
-  return tables.filter((table, idx) => table && tables.indexOf(table) === idx);
+  return tables.filter((table, idx) => table && tables.indexOf(table) === idx).filter((table) => table !== undefined);
 }
 
 function makeDerivedVariables() {

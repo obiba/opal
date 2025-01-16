@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 
 export const useCommandsStore = defineStore('commands', () => {
   const commandStates = ref([] as CommandStateDto[]);

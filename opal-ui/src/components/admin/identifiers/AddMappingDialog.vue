@@ -13,7 +13,7 @@
             v-model="newMapping.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
+            :label="t('name') + '*'"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredName]"
@@ -24,7 +24,7 @@
             v-model="newMapping.attributes[0].value"
             dense
             type="text"
-            :label="$t('description')"
+            :label="t('description')"
             class="q-mb-md"
             lazy-rules
           >
@@ -35,20 +35,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddMapping" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddMappingDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, VariableDto, AttributeDto } from 'src/models/Magma';
+import type { TableDto, VariableDto, AttributeDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -64,7 +59,7 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
 const newMapping = ref<VariableDto>({} as VariableDto);
-const editMode = computed(() => !!props.mapping && !!props.mapping.name);
+const editMode = computed(() => props.mapping && props.mapping.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('id_mappings.add_mapping') : t('id_mappings.edit_mapping')));
 

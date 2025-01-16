@@ -10,7 +10,7 @@
       <q-card flat style="max-height: 75vh" class="scroll">
         <q-card-section>
           <template v-if="editMode">
-            <template v-if="!!analysis?.analysisResults">
+            <template v-if="analysis?.analysisResults">
               <q-tabs
                 v-model="tab"
                 dense
@@ -19,8 +19,8 @@
                 indicator-color="primary"
                 align="justify"
               >
-                <q-tab no-caps name="results" :label="$t('results')" />
-                <q-tab no-caps name="parameters" :label="$t('parameters')" />
+                <q-tab no-caps name="results" :label="t('results')" />
+                <q-tab no-caps name="parameters" :label="t('parameters')" />
               </q-tabs>
               <q-tab-panels v-model="tab">
                 <q-tab-panel name="results">
@@ -67,7 +67,7 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('close')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('close')" color="secondary" v-close-popup />
         <q-btn
           flat
           v-if="!editMode"
@@ -81,14 +81,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddProjectAnalysisDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { OpalAnalysisDto } from 'src/models/Projects';
+import type { OpalAnalysisDto } from 'src/models/Projects';
 import ProjectAnalysisPanel from 'src/components/project/analyse/ProjectAnalysisPanel.vue';
 import ProjectResultsPanel from 'src/components/project/analyse/ProjectResultsPanel.vue';
 
@@ -110,7 +104,7 @@ const showDialog = ref(props.modelValue);
 const analysis = ref<OpalAnalysisDto | null>(null);
 const dialogTitle = ref('');
 const submitCaption = ref('');
-const editMode = computed(() => !!props.analysisName);
+const editMode = computed(() => props.analysisName);
 const tab = ref('results');
 
 // Handlers
@@ -120,7 +114,7 @@ watch(
   (value) => {
     if (value) {
       submitCaption.value = 'Add';
-      if (!!props.analysisName) {
+      if (props.analysisName) {
         projectsStore
           .getAnalysis(props.projectName, props.tableName, props.analysisName)
           .then((response: OpalAnalysisDto) => {

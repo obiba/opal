@@ -2,12 +2,6 @@
   <div v-html="htmlText" @click="onClick"></div>
 </template>
 
-<script lang="ts">
-defineComponent({
-  name: 'HtmlAnchorHint',
-});
-</script>
-
 <script setup lang="ts">
 interface Props {
   trKey: string;

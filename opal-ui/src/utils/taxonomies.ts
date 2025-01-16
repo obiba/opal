@@ -1,4 +1,4 @@
-import { TaxonomyDto } from 'src/models/Opal';
+import type { TaxonomyDto } from 'src/models/Opal';
 
 export function getCreativeCommonsLicenseUrl() {
   return 'http://creativecommons.org/choose/';

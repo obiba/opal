@@ -19,12 +19,12 @@
               v-if="datasourceStore.perms.variables?.canCreate()"
               color="primary"
               icon="add"
-              :title="$t('add_variable')"
+              :title="t('add_variable')"
               size="sm"
               @click="onShowAddVariable"
             />
-            <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="onRefresh" />
-            <q-btn color="secondary" icon="search" :title="$t('search')" outline size="sm" @click="onSearch" />
+            <q-btn color="secondary" icon="refresh" :title="t('refresh')" outline size="sm" @click="onRefresh" />
+            <q-btn color="secondary" icon="search" :title="t('search')" outline size="sm" @click="onSearch" />
             <q-btn
               v-if="datasourceStore.perms.table?.canUpdate()"
               outline
@@ -35,11 +35,11 @@
             />
             <div v-if="selected.length === 0" class="text-hint q-pt-xs">
               <q-icon name="info" />
-              <span class="q-ml-xs">{{ $t('variables_hint') }}</span>
+              <span class="q-ml-xs">{{ t('variables_hint') }}</span>
             </div>
             <q-btn
               v-if="selected.length > 0"
-              :label="$t('add_to_view')"
+              :label="t('add_to_view')"
               icon="add_circle"
               no-caps
               dense
@@ -51,7 +51,7 @@
             <q-btn-dropdown
               v-if="datasourceStore.perms.table?.canUpdate()"
               v-show="selected.length > 0"
-              :label="$t('annotate')"
+              :label="t('annotate')"
               icon="label"
               no-caps
               dense
@@ -61,19 +61,19 @@
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
                   <q-item-section>
-                    <q-item-label>{{ $t('apply_annotation') }}</q-item-label>
+                    <q-item-label>{{ t('apply_annotation') }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 <q-item clickable v-close-popup @click.prevent="onShowDeleteAnnotation">
                   <q-item-section>
-                    <q-item-label>{{ $t('delete_annotation') }}</q-item-label>
+                    <q-item-label>{{ t('delete_annotation') }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
             </q-btn-dropdown>
             <q-btn
               v-if="selected.length > 0"
-              :label="$t('add_to_cart')"
+              :label="t('add_to_cart')"
               icon="add_shopping_cart"
               no-caps
               dense
@@ -138,20 +138,15 @@
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog
       v-model="showDeleteVariables"
-      :title="$t('delete')"
-      :text="$t('delete_variables_confirm', { count: selected.length || rows.length })"
+      :title="t('delete')"
+      :text="t('delete_variables_confirm', { count: selected.length || rows.length })"
       @confirm="onDeleteVariables"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableVariables',
-});
-</script>
 <script setup lang="ts">
-import { CategoryDto, VariableDto } from 'src/models/Magma';
+import type { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';

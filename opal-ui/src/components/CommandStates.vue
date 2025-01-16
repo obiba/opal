@@ -13,7 +13,7 @@
         <q-btn
           color="secondary"
           icon="refresh"
-          :title="$t('refresh')"
+          :title="t('refresh')"
           outline
           size="sm"
           @click="onRefresh"
@@ -23,7 +23,7 @@
           outline
           color="secondary"
           icon="cleaning_services"
-          :title="$t('clear')"
+          :title="t('clear')"
           size="sm"
           @click="onClear(undefined)"
           class="on-right q-mb-sm"
@@ -43,7 +43,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('messages')"
+                :title="t('messages')"
                 :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
                 @click="onShowMessages(props.row)"
                 class="on-right"
@@ -55,7 +55,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onClear(props.row)"
@@ -67,7 +67,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('cancel')"
+                :title="t('cancel')"
                 :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
                 class="q-ml-xs"
                 @click="onCancel(props.row)"
@@ -127,10 +127,10 @@
           <q-list separator dense>
             <q-item>
               <q-item-section style="max-width: 200px">
-                <q-item-label class="text-bold">{{ $t('date') }}</q-item-label>
+                <q-item-label class="text-bold">{{ t('date') }}</q-item-label>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-bold">{{ $t('message') }}</q-item-label>
+                <q-item-label class="text-bold">{{ t('message') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item v-for="message in selected?.messages" :key="message.timestamp">
@@ -150,13 +150,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CommandStates',
-});
-</script>
 <script setup lang="ts">
-import { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import type { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
 

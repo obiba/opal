@@ -2,20 +2,20 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('r_sessions_activity') }}</div>
+        <div class="text-h6">{{ t('r_sessions_activity') }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
         <div class="q-mb-sm">
-          <span class="text-help">{{ $t('profile') }}:</span>
+          <span class="text-help">{{ t('profile') }}:</span>
           <span class="text-caption q-ml-xs">{{ props.profile }}</span>
-          <span class="text-help on-right">{{ $t('context') }}:</span>
+          <span class="text-help on-right">{{ t('context') }}:</span>
           <span class="text-caption q-ml-xs">{{ props.context }}</span>
         </div>
         <div class="q-mb-md">
-          <span class="text-hint">{{ $t('total_duration') }}:</span>
+          <span class="text-hint">{{ t('total_duration') }}:</span>
           <span class="text-caption q-ml-xs">{{ getMillisLabel(totalDuration) }}</span>
-          <span class="text-hint on-right">{{ $t('total_execution_time') }}:</span>
+          <span class="text-hint on-right">{{ t('total_execution_time') }}:</span>
           <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
         </div>
         <q-table
@@ -27,19 +27,14 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('close')" color="primary" v-close-popup />
+        <q-btn flat :label="t('close')" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RSessionActivitiesDialog',
-});
-</script>
 <script setup lang="ts">
-import { RSessionActivityDto } from 'src/models/OpalR';
+import type { RSessionActivityDto } from 'src/models/OpalR';
 import { getDate, getDateLabel, getMillisLabel } from 'src/utils/dates';
 
 interface DialogProps {

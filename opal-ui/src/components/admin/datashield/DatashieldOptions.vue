@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-help">
-      {{ $t('datashield.options_info') }}
+      {{ t('datashield.options_info') }}
     </div>
     <q-table
       flat
@@ -20,7 +20,7 @@
           color="primary"
           text-color="white"
           icon="add"
-          :title="$t('add_option')"
+          :title="t('add_option')"
           size="sm"
           @click="onShowEdit(null)"
         />
@@ -28,7 +28,7 @@
           outline
           color="secondary"
           icon="refresh"
-          :title="$t('refresh')"
+          :title="t('refresh')"
           size="sm"
           class="on-right"
           @click="updateOptions"
@@ -70,7 +70,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onShowDeleteSingle(props.row)"
@@ -86,21 +86,16 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('datashield.delete_options_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('datashield.delete_options_confirm', { count: selected.length })"
       @confirm="onDeleteOptions"
     />
     <edit-datashield-option-dialog v-model="showEdit" :option="opt" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldOptions',
-});
-</script>
 <script setup lang="ts">
-import { DataShieldROptionDto } from 'src/models/DataShield';
+import type { DataShieldROptionDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldOptionDialog from 'src/components/admin/datashield/EditDatashieldOptionDialog.vue';
 
@@ -123,7 +118,7 @@ function onFilter() {
   if (filter.value.length === 0) {
     return datashieldStore.options;
   }
-  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const query = filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
   return datashieldStore.options.filter((o) => {
     return o.name.includes(query);
   });

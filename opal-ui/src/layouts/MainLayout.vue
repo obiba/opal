@@ -7,43 +7,29 @@
           {{ appName }}
         </q-btn>
         <q-btn flat to="/projects" no-caps>
-          {{ $t('projects') }}
+          {{ t('projects') }}
         </q-btn>
         <q-btn flat to="/search" no-caps>
-          {{ $t('search') }}
+          {{ t('search') }}
         </q-btn>
         <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn icon="shopping_cart" size="sm" to="/cart" class="q-mr-sm">
             <q-badge v-if="cartStore.variables?.length" color="orange" floating>{{
               cartStore.variables.length
-            }}</q-badge>
+              }}</q-badge>
           </q-btn>
-          <q-input
-            v-model="query"
-            dense
-            filled
-            :placeholder="$t('search') + '...'"
-            bg-color="grey-2"
-            debounce="300"
-            @update:model-value="onSearch"
-            style="width: 200px"
-          >
+          <q-input v-model="query" dense filled :placeholder="t('search') + '...'" bg-color="grey-2" debounce="300"
+            @update:model-value="onSearch" style="width: 200px">
             <q-menu v-model="showResults" no-parent-event no-focus auto-close>
               <q-list style="min-width: 100px">
-                <q-item
-                  clickable
-                  v-close-popup
-                  v-for="item in itemResults"
-                  :key="item.identifier"
-                  @click="goToVariable(item)"
-                >
+                <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier"
+                  @click="goToVariable(item)">
                   <q-item-section class="text-caption">
                     <span>{{ searchStore.getField(item, 'name') }}</span>
                     <div>
-                      <span class="text-hint text-primary"
-                        >{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span
-                      >
+                      <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{
+                        searchStore.getField(item, 'table') }}</span>
                     </div>
                     <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
                       <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
@@ -54,7 +40,7 @@
                 <q-item v-if="itemResults.length > 0" clickable class="bg-grey-2">
                   <q-item-section>
                     <router-link :to="`/search/variables?q=${query}`" class="text-primary">
-                      <q-icon name="arrow_circle_right" size="sm" class="on-left" />{{ $t('advanced_search') }}
+                      <q-icon name="arrow_circle_right" size="sm" class="on-left" />{{ t('advanced_search') }}
                     </router-link>
                   </q-item-section>
                 </q-item>
@@ -62,20 +48,15 @@
             </q-menu>
           </q-input>
           <q-btn v-if="authStore.isAdministrator" to="/admin" no-caps>
-            {{ $t('administration') }}
+            {{ t('administration') }}
           </q-btn>
           <q-btn no-caps @click="onHelp">
-            {{ $t('help') }}
+            {{ t('help') }}
           </q-btn>
           <q-btn-dropdown flat :label="locale">
             <q-list>
-              <q-item
-                clickable
-                v-close-popup
-                @click="onLocaleSelection(localeOpt)"
-                v-for="localeOpt in localeOptions"
-                :key="localeOpt.value"
-              >
+              <q-item clickable v-close-popup @click="onLocaleSelection(localeOpt)" v-for="localeOpt in localeOptions"
+                :key="localeOpt.value">
                 <q-item-section>
                   <q-item-label>{{ localeOpt.label }}</q-item-label>
                 </q-item-section>
@@ -89,12 +70,12 @@
             <q-list>
               <q-item clickable v-close-popup to="/profile" v-if="authStore.isAuthenticated">
                 <q-item-section>
-                  <q-item-label>{{ $t('my_profile') }}</q-item-label>
+                  <q-item-label>{{ t('my_profile') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onSignout" v-if="authStore.isAuthenticated">
                 <q-item-section>
-                  <q-item-label>{{ $t('auth.signout') }}</q-item-label>
+                  <q-item-label>{{ t('auth.signout') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -125,15 +106,15 @@
 </template>
 
 <script setup lang="ts">
-import { useCookies } from 'vue3-cookies';
+import { Cookies } from 'quasar';
 import { locales } from 'boot/i18n';
 
 import MainDrawer from 'src/components/MainDrawer.vue';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
-import { QueryResultDto } from 'src/models/Search';
-import { ItemFieldsResultDto } from 'src/stores/search';
+import type { QueryResultDto } from 'src/models/Search';
+import type { ItemFieldsResultDto } from 'src/stores/search';
 
 const router = useRouter();
 const systemStore = useSystemStore();
@@ -142,7 +123,6 @@ const authStore = useAuthStore();
 const searchStore = useSearchStore();
 const cartStore = useCartStore();
 
-const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
 const localeOptions = computed(() => {
   return locales.map((key) => ({
@@ -203,7 +183,7 @@ function toggleLeftDrawer() {
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
   locale.value = localeOpt.value;
-  cookies.set('locale', localeOpt.value);
+  Cookies.set('locale', localeOpt.value);
 }
 
 function onSignout() {

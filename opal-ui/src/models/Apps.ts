@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Apps.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Apps';
 
 export interface AppDto {

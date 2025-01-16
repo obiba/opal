@@ -11,7 +11,7 @@
       v-model:selected="selected"
     >
       <template v-slot:top-left>
-        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRWorkspaces" />
+        <q-btn outline color="secondary" icon="refresh" :title="t('refresh')" size="sm" @click="updateRWorkspaces" />
         <q-btn
           outline
           color="red"
@@ -35,21 +35,16 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_r_workspaces_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('delete_r_workspaces_confirm', { count: selected.length })"
       @confirm="onDeleteWorkspaces"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RWorkspaces',
-});
-</script>
 <script setup lang="ts">
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { RWorkspaceDto } from 'src/models/OpalR';
+import type { RWorkspaceDto } from 'src/models/OpalR';
 import { getDateLabel } from 'src/utils/dates';
 import { getSizeLabel } from 'src/utils/files';
 

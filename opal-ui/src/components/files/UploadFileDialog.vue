@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('upload') }}</div>
+        <div class="text-h6">{{ t('upload') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -13,7 +13,7 @@
           dense
           multiple
           append
-          :label="$t('select_files_to_upload')"
+          :label="t('select_files_to_upload')"
           style="width: 300px"
           :accept="accept"
           @update:model-value="onLocalFilesChange"
@@ -21,17 +21,17 @@
         >
         </q-file>
         <div v-if="existingFiles.length">
-          <q-checkbox dense v-model="overwrite" :label="$t('select_files_overwrite')" />
+          <q-checkbox dense v-model="overwrite" :label="t('select_files_overwrite')" />
         </div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('add')"
+          :label="t('add')"
           color="primary"
           :disable="newFiles.length === 0 || (existingFiles.length > 0 && !overwrite)"
           @click="onUpload"
@@ -42,14 +42,9 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UploadFileDialog',
-});
-</script>
 <script setup lang="ts">
-import { FileObject } from 'src/components/models';
-import { FileDto } from 'src/models/Opal';
+import type { FileObject } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -61,6 +56,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 
 const showDialog = ref(props.modelValue);

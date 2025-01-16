@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SubjectTokenDto } from 'src/models/Opal';
+import type { SubjectTokenDto } from 'src/models/Opal';
 
 export enum TOKEN_TYPES {
   DATASHIELD = 'datashield',

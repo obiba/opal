@@ -12,7 +12,7 @@
         color="primary"
         size="sm"
         no-caps
-        :label="$t(showDetails ? 'less' : 'more')"
+        :label="t(showDetails ? 'less' : 'more')"
         @click="showDetails = !showDetails"
       />
     </q-card-section>
@@ -48,17 +48,12 @@
   </q-card>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AnnotationPanel',
-});
-</script>
 <script setup lang="ts">
-import { Annotation } from 'src/components/models';
+import type { Annotation } from 'src/components/models';
 import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
 
 const taxonomiesStore = useTaxonomiesStore();
-const { locale } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
 
 interface Props {
   annotation: Annotation;

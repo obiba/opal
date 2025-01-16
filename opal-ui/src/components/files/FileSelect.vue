@@ -9,7 +9,7 @@
         outline
         no-caps
         icon="more_horiz"
-        :label="$t('select')"
+        :label="t('select')"
         color="primary"
         size="12px"
         @click="onShowDialog"
@@ -48,7 +48,7 @@
                       icon="person"
                       color="primary"
                       size="12px"
-                      :label="$t('user')"
+                      :label="t('user')"
                       align="left"
                       class="full-width"
                       @click="onFolderSelection(`/home/${username}`)"
@@ -61,7 +61,7 @@
                       icon="table_chart"
                       color="primary"
                       size="12px"
-                      :label="$t('project')"
+                      :label="t('project')"
                       align="left"
                       class="full-width"
                       @click="onFolderSelection(`/projects/${projectName}`)"
@@ -75,7 +75,7 @@
                       icon="group"
                       color="primary"
                       size="12px"
-                      :label="$t('users')"
+                      :label="t('users')"
                       align="left"
                       class="full-width"
                       @click="onFolderSelection('/home')"
@@ -88,7 +88,7 @@
                       icon="table_chart"
                       color="primary"
                       size="12px"
-                      :label="$t('projects')"
+                      :label="t('projects')"
                       align="left"
                       class="full-width"
                       @click="onFolderSelection('/projects')"
@@ -101,7 +101,7 @@
                       icon="dns"
                       color="primary"
                       size="12px"
-                      :label="$t('file_system')"
+                      :label="t('file_system')"
                       align="left"
                       class="full-width"
                       @click="onFolderSelection('/')"
@@ -134,7 +134,7 @@
                         debounce="400"
                         color="primary"
                         v-model="filter"
-                        :placeholder="$t('file_folder_search')"
+                        :placeholder="t('file_folder_search')"
                       >
                         <template v-slot:append>
                           <q-icon name="search" />
@@ -163,16 +163,16 @@
 
         <q-card-actions class="bg-grey-3">
           <div>
-            <q-btn-dropdown outline icon="add" :label="$t('add')" size="sm">
+            <q-btn-dropdown outline icon="add" :label="t('add')" size="sm">
               <q-list>
                 <q-item clickable v-close-popup @click="onShowAddFolder">
                   <q-item-section>
-                    <q-item-label>{{ $t('add_folder') }}</q-item-label>
+                    <q-item-label>{{ t('add_folder') }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 <q-item v-if="type !== 'folder' || hasExtensions" clickable v-close-popup @click="onShowUpload">
                   <q-item-section>
-                    <q-item-label>{{ $t('upload') }}</q-item-label>
+                    <q-item-label>{{ t('upload') }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -183,10 +183,10 @@
           </div>
           <q-space />
           <div>
-            <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+            <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
             <q-btn
               flat
-              :label="$t('select')"
+              :label="t('select')"
               color="primary"
               :disable="selected.length === 0"
               @click="onSubmitSelection"
@@ -202,15 +202,10 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FileSelect',
-});
-</script>
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
+import type { FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';

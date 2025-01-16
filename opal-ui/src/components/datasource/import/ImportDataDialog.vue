@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('import_data') }}</div>
+        <div class="text-h6">{{ t('import_data') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -17,12 +17,12 @@
           class="q-pt-none q-pb-none"
           @update:model-value="onStepChange"
         >
-          <q-step :name="1" :title="$t('select_import_source')" icon="settings" :done="step > 1">
+          <q-step :name="1" :title="t('select_import_source')" icon="settings" :done="step > 1">
             <div v-if="isFile">
               <q-select
                 v-model="fileImporter"
                 :options="fileImporters"
-                :label="$t('data_format')"
+                :label="t('data_format')"
                 dense
                 @update:model-value="onImporterSelection"
                 class="q-mb-md"
@@ -35,7 +35,7 @@
               <q-select
                 v-model="serverImporter"
                 :options="serverImporters"
-                :label="$t('data_server')"
+                :label="t('data_server')"
                 dense
                 @update:model-value="onImporterSelection"
                 class="q-mb-md"
@@ -48,7 +48,7 @@
               <q-select
                 v-model="databaseImporter"
                 :options="databaseImporters"
-                :label="$t('database')"
+                :label="t('database')"
                 dense
                 @update:model-value="onImporterSelection"
                 emit-value
@@ -60,7 +60,7 @@
             </div>
           </q-step>
 
-          <q-step :name="2" :title="$t('configure_import_source')" icon="table_chart" :done="step > 2">
+          <q-step :name="2" :title="t('configure_import_source')" icon="table_chart" :done="step > 2">
             <div v-if="isFile">
               <div v-if="fileImporter.value === 'csv'">
                 <import-csv-form v-model="factory" />
@@ -90,41 +90,41 @@
 
           <q-step
             :name="3"
-            :title="$t('select_import_options')"
-            :caption="$t('optional')"
+            :title="t('select_import_options')"
+            :caption="t('optional')"
             icon="assignment"
             :done="step > 3"
           >
             <div>
-              <q-checkbox v-model="merge" :label="$t('merge_dictionaries')" />
+              <q-checkbox v-model="merge" :label="t('merge_dictionaries')" />
               <div class="text-hint q-mb-md">
-                {{ $t('merge_dictionaries_hint') }}
+                {{ t('merge_dictionaries_hint') }}
               </div>
               <q-input
                 v-model="limit"
-                :label="$t('limit')"
+                :label="t('limit')"
                 dense
                 type="number"
                 min="0"
                 step="1000"
                 class="q-mb-md"
-                :hint="$t('import_limit_hint')"
+                :hint="t('import_limit_hint')"
               />
-              <q-checkbox v-model="incremental" :label="$t('incremental_import')" />
+              <q-checkbox v-model="incremental" :label="t('incremental_import')" />
               <div class="text-hint q-mb-md">
-                {{ $t('incremental_import_hint') }}
+                {{ t('incremental_import_hint') }}
               </div>
               <identifiers-mapping-select v-model="idConfig" :for-import="true" />
             </div>
           </q-step>
 
-          <q-step :name="4" :title="$t('preview_import_source')" icon="table_chart">
+          <q-step :name="4" :title="t('preview_import_source')" icon="table_chart">
             <div v-if="transientDatasourceStore.datasource.table">
               <q-select
                 v-show="transientDatasourceStore.datasource?.table?.length > 1"
                 v-model="selectedTable"
                 :options="transientDatasourceStore.datasource.table"
-                :label="$t('tables')"
+                :label="t('tables')"
                 dense
                 @update:model-value="onTableSelection"
                 class="q-mb-md"
@@ -152,7 +152,7 @@
           icon="navigate_before"
           color="primary"
           @click="$refs.stepper.previous()"
-          :label="$t('back')"
+          :label="t('back')"
         />
         <q-btn
           v-if="step < 4"
@@ -160,26 +160,21 @@
           icon-right="navigate_next"
           @click="$refs.stepper.next()"
           color="primary"
-          :label="$t('continue')"
+          :label="t('continue')"
           :disable="!canNext"
           class="on-right"
         >
         </q-btn>
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup @click="onCancel" />
-        <q-btn :disable="step < 4" flat :label="$t('import')" color="primary" @click="onImportData" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup @click="onCancel" />
+        <q-btn :disable="step < 4" flat :label="t('import')" color="primary" @click="onImportData" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportDataDialog',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
-import { ImportCommandOptionsDto } from 'src/models/Commands';
+import type { DatasourceFactory } from 'src/components/models';
+import type { ImportCommandOptionsDto } from 'src/models/Commands';
 import ImportCsvForm from 'src/components/datasource/import/ImportCsvForm.vue';
 import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';
@@ -188,9 +183,9 @@ import ImportPluginForm from 'src/components/datasource/import/ImportPluginForm.
 import ImportDatabaseForm from 'src/components/datasource/import/ImportDatabaseForm.vue';
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
-import { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
+import type { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -304,7 +299,7 @@ function onShow() {
       .getDatabases(DatabaseDto_Usage.IMPORT)
       .then((response) => {
         databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
-        if (databaseImporters.value.length > 0) databaseImporter.value = databaseImporters.value[0].value;
+        if (databaseImporters.value.length > 0) databaseImporter.value = databaseImporters.value[0]?.value;
       })
       .catch((err) => {
         notifyError(err);
@@ -331,7 +326,7 @@ function onImportData() {
     tables: transientDatasourceStore.datasource.table.map((tbl) => `${dsName}.${tbl}`),
   } as ImportCommandOptionsDto;
 
-  if (idConfig.value && !!idConfig.value.name) {
+  if (idConfig.value && idConfig.value.name) {
     options.idConfig = idConfig.value;
   }
 
@@ -397,7 +392,7 @@ function onTableSelection() {
     });
 }
 
-function onImporterSelection(value: string) {
+function onImporterSelection() {
   factory.value = undefined;
 }
 </script>

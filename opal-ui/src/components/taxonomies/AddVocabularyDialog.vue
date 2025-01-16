@@ -13,29 +13,29 @@
             v-model="newVocabulary.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
-            :hint="$t('taxonomy.vocabulary.name_hint')"
+            :label="t('name') + '*'"
+            :hint="t('taxonomy.vocabulary.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('required_field')]"
           >
           </q-input>
 
-          <localized-field-large v-model="newVocabulary.title" :title="$t('title')" :hint="$t('title_hint')" />
+          <localized-field-large v-model="newVocabulary.title" :title="t('title')" :hint="t('title_hint')" />
 
           <localized-field-large
             v-model="newVocabulary.description"
-            :title="$t('description')"
-            :hint="$t('taxonomy.vocabulary.description_hint')"
+            :title="t('description')"
+            :hint="t('taxonomy.vocabulary.description_hint')"
           />
 
           <q-checkbox
             v-model="newVocabulary.repeatable"
             class="q-ml-sm"
-            :label="$t('taxonomy.vocabulary.repeatable')"
+            :label="t('taxonomy.vocabulary.repeatable')"
           />
           <div class="text-hint q-mb-md q-mt-none">
-            {{ $t('taxonomy.vocabulary.repeatable_hint') }}
+            {{ t('taxonomy.vocabulary.repeatable_hint') }}
           </div>
         </q-form>
       </q-card-section>
@@ -43,20 +43,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddVocabulary" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddVocabularyDialog',
-});
-</script>
 <script setup lang="ts">
-import { VocabularyDto } from 'src/models/Opal';
+import type { VocabularyDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
 
@@ -84,7 +79,7 @@ const emptyVocabulary = {
 } as VocabularyDto;
 
 const newVocabulary = ref<VocabularyDto>({ ...emptyVocabulary });
-const editMode = computed(() => !!props.vocabulary);
+const editMode = computed(() => props.vocabulary !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update_action') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.vocabulary.edit') : t('taxonomy.vocabulary.add')));
 

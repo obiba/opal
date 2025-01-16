@@ -11,7 +11,7 @@
       v-model:selected="selected"
     >
       <template v-slot:top-left>
-        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRSessions" />
+        <q-btn outline color="secondary" icon="refresh" :title="t('refresh')" size="sm" @click="updateRSessions" />
         <q-btn
           outline
           color="red"
@@ -43,7 +43,7 @@
           <q-icon
             name="circle"
             size="sm"
-            :title="$t(props.value.toLowerCase())"
+            :title="t(props.value.toLowerCase())"
             :color="getSessionColor(props.value)"
           />
         </q-td>
@@ -51,21 +51,16 @@
     </q-table>
     <confirm-dialog
       v-model="showTerminate"
-      :title="$t('terminate')"
-      :text="$t('terminate_r_sessions_confirm', { count: selected.length })"
+      :title="t('terminate')"
+      :text="t('terminate_r_sessions_confirm', { count: selected.length })"
       @confirm="onTerminateSessions"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RSessions',
-});
-</script>
 <script setup lang="ts">
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { RSessionDto } from 'src/models/OpalR';
+import type { RSessionDto } from 'src/models/OpalR';
 import { getDateLabel } from 'src/utils/dates';
 
 const rStore = useRStore();

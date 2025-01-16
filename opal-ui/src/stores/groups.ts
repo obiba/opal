@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { GroupDto } from 'src/models/Opal';
+import type { GroupDto } from 'src/models/Opal';
 
 export const useGroupsStore = defineStore('groups', () => {
   const groups = ref([] as GroupDto[]);

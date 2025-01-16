@@ -6,8 +6,8 @@
         size="sm"
         toggle-color="secondary"
         :options="[
-          { label: $t('frequency'), value: 'freq' },
-          { label: $t('density'), value: 'density' },
+          { label: t('frequency'), value: 'freq' },
+          { label: t('density'), value: 'density' },
         ]"
       />
       <q-badge color="positive" :label="`N:  ${data.summary?.n || 0}`" class="on-right" />
@@ -22,7 +22,7 @@
     </div>
     <div class="row q-col-gutter-md">
       <div class="col-md-6 col-xs-12">
-        <div class="text-bold q-mb-md">{{ $t('frequencies') }}</div>
+        <div class="text-bold q-mb-md">{{ t('frequencies') }}</div>
         <frequencies-table
           :variable="variable"
           :nonMissingFreq="nonMissingFreq"
@@ -32,22 +32,16 @@
         />
       </div>
       <div class="col-md-6 col-xs-12">
-        <div class="text-bold q-mb-md">{{ $t('descriptive_statistics') }}</div>
+        <div class="text-bold q-mb-md">{{ t('descriptive_statistics') }}</div>
         <fields-list :items="items" :dbobject="data.summary" />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  components: { VuePlotly },
-  name: 'ContinuousSummaryChart',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
-import { ContinuousSummaryDto, IntervalFrequencyDto } from 'src/models/Math';
+import type { VariableDto } from 'src/models/Magma';
+import type { ContinuousSummaryDto, IntervalFrequencyDto } from 'src/models/Math';
 import FieldsList from 'src/components/FieldsList.vue';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';

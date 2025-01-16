@@ -1,4 +1,4 @@
-import { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
+import type { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
 import { locales } from 'boot/i18n';
 import { flattenObjectToString } from 'src/utils/strings';
 /**
@@ -89,7 +89,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     if (filter.length === 0) {
       return tableRows;
     }
-    const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
+    const query = filter && filter.length > 0 ? filter.toLowerCase() : '';
     const result = tableRows.filter((row) => {
       const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
         row.description || {}

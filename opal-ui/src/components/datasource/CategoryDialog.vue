@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ category.name === '' ? $t('add_category') : $t('edit_category') }}</div>
+        <div class="text-h6">{{ category.name === '' ? t('add_category') : t('edit_category') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -12,14 +12,14 @@
           v-model="newCategory.name"
           dense
           type="text"
-          :label="$t('name')"
-          :hint="$t('unique_name_hint')"
+          :label="t('name')"
+          :hint="t('unique_name_hint')"
           style="min-width: 300px"
           class="q-mb-md"
         >
         </q-input>
         <div class="text-grey-6 q-mb-sm">
-          {{ $t('labels') }}
+          {{ t('labels') }}
         </div>
         <q-card flat class="q-mb-md bg-grey-2">
           <q-card-section>
@@ -28,11 +28,11 @@
                 v-model="label.locale"
                 dense
                 type="text"
-                :label="$t('locale')"
+                :label="t('locale')"
                 :debounce="500"
                 style="width: 80px"
               />
-              <q-input v-model="label.value" dense type="text" :label="$t('value')" style="min-width: 290px" />
+              <q-input v-model="label.value" dense type="text" :label="t('value')" style="min-width: 290px" />
               <span class="q-mt-md">
                 <q-btn
                   flat
@@ -48,34 +48,29 @@
               size="sm"
               color="primary"
               icon="add"
-              :label="labels.length ? '' : $t('add')"
+              :label="labels.length ? '' : t('add')"
               @click="labels = labels.concat({ locale: '', value: '' })"
             />
           </q-card-section>
         </q-card>
-        <q-checkbox v-model="newCategory.isMissing" :label="$t('is_missing')" dense />
+        <q-checkbox v-model="newCategory.isMissing" :label="t('is_missing')" dense />
         <div class="text-hint q-mt-xs">
-          {{ $t('is_missing_hint') }}
+          {{ t('is_missing_hint') }}
         </div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('save')" color="primary" :disable="!isValid" @click="onSave" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" :disable="!isValid" @click="onSave" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CategoryDialog',
-});
-</script>
 <script setup lang="ts">
-import { CategoryDto, VariableDto } from 'src/models/Magma';
+import type { CategoryDto, VariableDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;
@@ -91,6 +86,7 @@ interface Label {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'saved']);
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);

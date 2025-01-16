@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Math.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Math';
 
 export interface SummaryStatisticsDto {
