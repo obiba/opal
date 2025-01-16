@@ -20,7 +20,7 @@
           color="primary"
           text-color="white"
           icon="add"
-          :label="$t('add_profile')"
+          :label="t('add_profile')"
           size="sm"
           @click="onAddProfile"
           class="q-mt-md full-width"
@@ -44,15 +44,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldProfiles',
-});
-</script>
 <script setup lang="ts">
-import { DataShieldProfileDto } from 'src/models/DataShield';
+import type { DataShieldProfileDto } from 'src/models/DataShield';
 import DatashieldProfile from 'src/components/admin/datashield/DatashieldProfile.vue';
 import AddDatashieldProfileDialog from 'src/components/admin/datashield/AddDatashieldProfileDialog.vue';
+
+const { t } = useI18n();
 
 const datashieldStore = useDatashieldStore();
 

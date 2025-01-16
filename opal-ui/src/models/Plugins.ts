@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Plugins.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Plugins';
 
 export interface PluginPackageDto {

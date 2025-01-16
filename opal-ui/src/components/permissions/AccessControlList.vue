@@ -11,17 +11,17 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :title="$t('add')" icon="add" size="sm">
+        <q-btn-dropdown color="primary" :title="t('add')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onShowAddUser">
               <q-item-section>
-                <q-item-label>{{ $t('add_user_permission') }}</q-item-label>
+                <q-item-label>{{ t('add_user_permission') }}</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click.prevent="onShowAddGroup">
               <q-item-section>
-                <q-item-label>{{ $t('add_group_permission') }}</q-item-label>
+                <q-item-label>{{ t('add_group_permission') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -55,7 +55,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[getRowKey(props.row)] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onShowDelete(props.row)"
@@ -63,56 +63,56 @@
             </div>
           </q-td>
           <q-td key="type" :props="props" class="text-caption">
-            {{ $t(props.row.subject.type.toLowerCase()) }}
+            {{ t(props.row.subject.type.toLowerCase()) }}
           </q-td>
           <q-td key="permissions" :props="props" class="text-help">
             <div v-for="action in props.row.actions" :key="action">
-              <span :title="$t(`acls.${action}.description`)">{{ $t(`acls.${action}.label`) }}</span>
+              <span :title="t(`acls.${action}.description`)">{{ t(`acls.${action}.label`) }}</span>
             </div>
           </q-td>
         </q-tr>
       </template>
     </q-table>
     <div v-else class="q-mt-sm">
-      <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm">
+      <q-btn-dropdown color="primary" :label="t('add')" icon="add" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click.prevent="onShowAddUser">
             <q-item-section>
-              <q-item-label>{{ $t('add_user_permission') }}</q-item-label>
+              <q-item-label>{{ t('add_user_permission') }}</q-item-label>
             </q-item-section>
           </q-item>
 
           <q-item clickable v-close-popup @click.prevent="onShowAddGroup">
             <q-item-section>
-              <q-item-label>{{ $t('add_group_permission') }}</q-item-label>
+              <q-item-label>{{ t('add_group_permission') }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </q-btn-dropdown>
       <div class="text-hint q-mt-md">
-        {{ $t('no_permissions') }}
+        {{ t('no_permissions') }}
       </div>
     </div>
 
     <confirm-dialog
       v-if="selected && selected.subject"
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_permission_confirm', { principal: selected.subject.principal })"
+      :title="t('delete')"
+      :text="t('delete_permission_confirm', { principal: selected.subject.principal })"
       @confirm="deletePermission"
     />
 
     <q-dialog v-model="showEdit">
       <q-card class="dialog-sm">
         <q-card-section>
-          <div class="text-h6">{{ $t(editMode ? 'edit_permission' : 'add_permission') }}</div>
+          <div class="text-h6">{{ t(editMode ? 'edit_permission' : 'add_permission') }}</div>
         </q-card-section>
         <q-separator />
         <q-card-section>
           <q-input
             v-model="selected.subject.principal"
             dense
-            :label="$t(selected.subject.type.toLowerCase())"
+            :label="t(selected.subject.type.toLowerCase())"
             :disable="editMode"
             class="q-mb-md"
             debounce="300"
@@ -133,19 +133,19 @@
             </q-menu>
           </q-input>
           <div>
-            {{ $t('permission') }}
+            {{ t('permission') }}
           </div>
           <div v-for="option in props.options" :key="option">
-            <q-radio v-model="action" :label="$t(`acls.${option}.label`)" :val="option" />
-            <div class="text-hint q-ml-sm">{{ $t(`acls.${option}.description`) }}</div>
+            <q-radio v-model="action" :label="t(`acls.${option}.label`)" :val="option" />
+            <div class="text-hint q-ml-sm">{{ t(`acls.${option}.description`) }}</div>
           </div>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right" class="bg-grey-3"
-          ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
           <q-btn
             flat
-            :label="$t('submit')"
+            :label="t('submit')"
             color="primary"
             :disable="selected.subject.principal"
             @click="onSubmitPermission"
@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { Acl } from 'src/models/Opal';
+import type { Acl } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 
 interface Props {

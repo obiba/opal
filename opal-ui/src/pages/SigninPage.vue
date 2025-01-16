@@ -12,42 +12,36 @@
           <div class="col">
             <q-card class="bg-white text-dark">
               <q-card-section class="q-pb-none">
-                <div class="text-help text-center q-pt-xs q-pb-xs">{{ $t('auth.title') }}</div>
+                <div class="text-help text-center q-pt-xs q-pb-xs">{{ t('auth.title') }}</div>
                 <q-card-section v-show="!withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
-                    <q-input autofocus color="grey-10" v-model="username" :label="$t('auth.username')" lazy-rules>
+                    <q-input autofocus color="grey-10" v-model="username" :label="t('auth.username')" lazy-rules>
                       <template v-slot:prepend>
                         <q-icon name="fas fa-user" size="xs" />
                       </template>
                     </q-input>
 
-                    <q-input type="password" color="grey-10" v-model="password" :label="$t('auth.password')" lazy-rules>
+                    <q-input type="password" color="grey-10" v-model="password" :label="t('auth.password')" lazy-rules>
                       <template v-slot:prepend>
                         <q-icon name="fas fa-lock" size="xs" />
                       </template>
                     </q-input>
 
                     <div>
-                      <q-btn :label="$t('auth.signin')" type="submit" color="primary" :disable="disableSubmit" />
+                      <q-btn :label="t('auth.signin')" type="submit" color="primary" :disable="disableSubmit" />
                     </div>
                     <div v-if="authProviders.length > 0">
                       <q-separator class="q-mb-md" />
                       <div v-for="provider in authProviders" :key="provider.name">
-                        <q-btn
-                          no-caps
-                          :label="$t('signin_with', { provider: provider.name })"
-                          @click="onSigninProvider(provider)"
-                          color="primary"
-                          class="full-width"
-                          stretch
-                        />
+                        <q-btn no-caps :label="t('signin_with', { provider: provider.name })"
+                          @click="onSigninProvider(provider)" color="primary" class="full-width" stretch />
                       </div>
                     </div>
                   </q-form>
                 </q-card-section>
                 <q-card-section v-show="qr" class="q-pb-none">
                   <div class="col text-subtitle">
-                    {{ $t('auth.totp_help') }}
+                    {{ t('auth.totp_help') }}
                   </div>
                   <div class="text-center q-mt-md">
                     <img :src="qr" />
@@ -55,35 +49,24 @@
                 </q-card-section>
                 <q-card-section v-if="withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
-                    <q-input
-                      autofocus
-                      type="number"
-                      color="grey-10"
-                      v-model="token"
-                      :label="$t('auth.code')"
-                      :hint="$t('auth.code_hint')"
-                    >
+                    <q-input autofocus type="number" color="grey-10" v-model="token" :label="t('auth.code')"
+                      :hint="t('auth.code_hint')">
                       <template v-slot:prepend>
                         <q-icon name="fas fa-mobile" size="xs" />
                       </template>
                     </q-input>
                     <div>
-                      <q-btn :label="$t('auth.validate')" type="submit" color="primary" :disable="token.length !== 6" />
-                      <q-btn :label="$t('cancel')" @click="onCancelToken" flat stretch class="text-bold q-ml-md" />
+                      <q-btn :label="t('auth.validate')" type="submit" color="primary" :disable="token.length !== 6" />
+                      <q-btn :label="t('cancel')" @click="onCancelToken" flat stretch class="text-bold q-ml-md" />
                     </div>
                   </q-form>
                 </q-card-section>
               </q-card-section>
               <q-card-section class="q-pt-none">
-                <q-btn-dropdown flat :label="$t(locale)">
+                <q-btn-dropdown flat :label="t(locale)">
                   <q-list>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="onLocaleSelection(localeOpt)"
-                      v-for="localeOpt in localeOptions"
-                      :key="localeOpt.value"
-                    >
+                    <q-item clickable v-close-popup @click="onLocaleSelection(localeOpt)"
+                      v-for="localeOpt in localeOptions" :key="localeOpt.value">
                       <q-item-section>
                         <q-item-label>{{ localeOpt.label }}</q-item-label>
                       </q-item-section>
@@ -103,9 +86,9 @@
 </template>
 
 <script setup lang="ts">
-import { useCookies } from 'vue3-cookies';
+import { Cookies } from 'quasar';
 import { locales } from 'src/boot/i18n';
-import { AuthProviderDto } from 'src/models/Opal';
+import type { AuthProviderDto } from 'src/models/Opal';
 import { baseUrl } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
@@ -133,7 +116,6 @@ const appsStore = useAppsStore();
 const searchStore = useSearchStore();
 const cartStore = useCartStore();
 
-const { cookies } = useCookies();
 const { locale, t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 const localeOptions = computed(() => {
@@ -189,7 +171,7 @@ onMounted(() => {
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
   locale.value = localeOpt.value;
-  cookies.set('locale', localeOpt.value);
+  Cookies.set('locale', localeOpt.value);
 }
 
 async function onSubmit() {

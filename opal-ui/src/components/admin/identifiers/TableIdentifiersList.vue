@@ -13,15 +13,9 @@
   ></q-table>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableIdentifiersList',
-});
-</script>
-
 <script setup lang="ts">
-import { QTableColumn } from 'quasar';
-import { TableDto, ValueSetsDto } from 'src/models/Magma';
+import type { QTableColumn } from 'quasar';
+import type { TableDto, ValueSetsDto } from 'src/models/Magma';
 
 interface Props {
   identifierTable: TableDto;

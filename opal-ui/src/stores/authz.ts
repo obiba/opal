@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { Acl, SuggestionsDto } from 'src/models/Opal';
+import type { Acl, SuggestionsDto } from 'src/models/Opal';
 
 export const useAuthzStore = defineStore('authz', () => {
   const acls = ref<{ [key: string]: Acl[] }>({}); // the list of ACLs for the current resource

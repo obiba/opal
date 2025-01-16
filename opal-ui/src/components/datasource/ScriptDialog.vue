@@ -3,7 +3,7 @@
     <q-card :class="maximizedToggle ? '' : 'dialog-lg'">
       <q-card-section>
         <div class="row">
-          <div class="text-h6">{{ $t('edit_script') }}</div>
+          <div class="text-h6">{{ t('edit_script') }}</div>
           <q-space />
           <q-btn dense flat icon="close_fullscreen" @click="maximizedToggle = false" v-if="maximizedToggle" />
           <q-btn dense flat icon="open_in_full" @click="maximizedToggle = true" v-if="!maximizedToggle" />
@@ -25,28 +25,23 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-input v-model="comment" :label="$t('comment')" dense />
+        <q-input v-model="comment" :label="t('comment')" dense />
         <q-space />
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <!-- <q-btn
             flat
-            :label="$t('test')"
+            :label="t('test')"
             color="positive"
             @click="onTest"
           /> -->
-        <q-btn flat :label="$t('save')" color="primary" @click="onSave" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" @click="onSave" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ScriptDialog',
-});
-</script>
 <script setup lang="ts">
-import { VAceEditor } from 'vue3-ace-editor';
+import type { VAceEditor } from 'vue3-ace-editor';
 
 interface DialogProps {
   modelValue: boolean;
@@ -55,6 +50,8 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'save']);
+
+const { t } = useI18n();
 
 const scriptEdit = ref();
 const comment = ref();

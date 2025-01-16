@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Identifiers.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Identifiers';
 
 export interface IdentifiersMappingDto {

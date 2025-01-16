@@ -3,15 +3,15 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" />
+        <q-breadcrumbs-el :label="t('projects')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('projects') }}
+        {{ t('projects') }}
       </div>
       <div class="text-help">
-        {{ $t('projects_info') }}
+        {{ t('projects_info') }}
       </div>
       <q-table
         ref="tableRef"
@@ -38,7 +38,7 @@
             use-chips
             v-model="tagsFilter"
             :options="tags"
-            :label="$t('tags')"
+            :label="t('tags')"
             @update:model-value="onTabChange"
             class="on-left"
             style="min-width: 200px"
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
@@ -196,7 +196,7 @@ function onFilter(tableRows: ProjectDto[], filter: string) {
   if (filter.length === 0) {
     return tableRows;
   }
-  const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
+  const query = filter && filter.length > 0 ? filter.toLowerCase() : '';
   const result = tableRows.filter((row) => {
     const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
       row.description || {}

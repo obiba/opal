@@ -36,13 +36,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariablesList',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto, CategoryDto } from 'src/models/Magma';
+import type { VariableDto, CategoryDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
 
 interface VariablesListProps {

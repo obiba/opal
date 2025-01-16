@@ -13,7 +13,7 @@
             v-model="newUser.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
+            :label="t('name') + '*'"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredName]"
@@ -25,10 +25,10 @@
             <q-input
               autocomplete="off"
               type="password"
-              :label="$t('password') + '*'"
+              :label="t('password') + '*'"
               v-model="newUser.password"
               color="grey-10"
-              :hint="$t('password_hint')"
+              :hint="t('password_hint')"
               lazy-rules
               :rules="[validateRequiredPassword]"
             >
@@ -42,7 +42,7 @@
               v-model="confirmPassword"
               dense
               type="password"
-              :label="$t('password_confirm') + '*'"
+              :label="t('password_confirm') + '*'"
               class="q-mb-md"
               lazy-rules
               :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
@@ -55,8 +55,8 @@
               dense
               rows="10"
               type="textarea"
-              :label="$t('certificate') + '*'"
-              :placeholder="$t('certificate_placeholder')"
+              :label="t('certificate') + '*'"
+              :placeholder="t('certificate_placeholder')"
               class="q-mb-md"
               lazy-rules
               :rules="[validateRequiredCertificate]"
@@ -69,7 +69,7 @@
             use-chips
             multiple
             input-debounce="0"
-            :hint="$t('groups_hint')"
+            :hint="t('groups_hint')"
             @new-value="addGroup"
             :options="groupFilters"
             @filter="filterGroups"
@@ -80,20 +80,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddUser" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddUserDialog',
-});
-</script>
 <script setup lang="ts">
-import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
+import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -128,13 +123,13 @@ const userCertificate = computed({
   },
   set(value) {
     certificate.value = value;
-    // NOTE: need to send string and not bytes (Uint8Array)
-    newUser.value.certificate = value;
+    // need to send string and not bytes (Uint8Array)
+    newUser.value.certificate = new TextEncoder().encode(value);
   },
 });
 
 const authPassword = computed(() => props.authenticationType === SubjectCredentialsDto_AuthenticationType.PASSWORD);
-const editMode = computed(() => !!props.user && !!props.user.name);
+const editMode = computed(() => props.user && props.user.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('user_edit') : t('user_add')));
 

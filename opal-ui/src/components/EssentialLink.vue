@@ -11,11 +11,6 @@
   </q-item>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'EssentialLink',
-});
-</script>
 <script setup lang="ts">
 export interface EssentialLinkProps {
   title: string;

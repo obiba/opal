@@ -13,8 +13,8 @@
             v-model="newRockAppConfig.host"
             dense
             type="text"
-            :label="$t('host') + ' *'"
-            :hint="$t('apps.host_hint')"
+            :label="t('host') + ' *'"
+            :hint="t('apps.host_hint')"
             :disable="editMode"
             style="min-width: 300px"
             class="q-mb-md"
@@ -27,7 +27,7 @@
             v-model="credentialType"
             :options="credentialOptions"
             dense
-            :label="$t('credentials')"
+            :label="t('credentials')"
             :hint="credentialTypeHint"
             class="q-mb-lg q-pt-md"
             emit-value
@@ -37,17 +37,17 @@
 
           <q-card flat v-if="adminCredentials">
             <q-card-section class="q-px-none">
-              <div class="text-bold">{{ $t('administrator') }}</div>
+              <div class="text-bold">{{ t('administrator') }}</div>
               <app-credentials-form type="administrator" v-model="newRockAppConfig.administratorCredentials" />
             </q-card-section>
           </q-card>
           <q-card flat v-else-if="managerCredentials">
             <q-card-section class="q-px-none">
-              <div class="text-bold">{{ $t('manager') }}</div>
+              <div class="text-bold">{{ t('manager') }}</div>
               <app-credentials-form type="manager" v-model="newRockAppConfig.managerCredentials" />
             </q-card-section>
             <q-card-section class="q-px-none">
-              <div class="text-bold">{{ $t('user') }}</div>
+              <div class="text-bold">{{ t('user') }}</div>
               <app-credentials-form type="user" v-model="newRockAppConfig.userCredentials" />
             </q-card-section>
           </q-card>
@@ -57,21 +57,16 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddConfig" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddRServerDialog',
-});
-</script>
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import { RockAppConfigDto, AppsConfigDto, AppCredentialsDto } from 'src/models/Apps';
+import type { RockAppConfigDto, AppsConfigDto, AppCredentialsDto } from 'src/models/Apps';
 import AppCredentialsForm from 'src/components/admin/apps/AppCredentialsForm.vue';
 
 interface DialogProps {
@@ -108,13 +103,13 @@ const credentialOptions = [
     value: 'manager_user',
   },
 ];
-const credentialType = ref(credentialOptions[0].value);
+const credentialType = ref(credentialOptions[0]?.value);
 const credentialTypeHint = computed(() =>
-  !!credentialType.value ? t(`apps.credential_hints.${credentialType.value}`) : t('apps.credential_hints.default')
+  credentialType.value ? t(`apps.credential_hints.${credentialType.value}`) : t('apps.credential_hints.default')
 );
 const adminCredentials = computed(() => credentialType.value === 'administrator');
 const managerCredentials = computed(() => credentialType.value === 'manager_user');
-const editMode = computed(() => !!props.rockAppConfig && !!props.rockAppConfig.host);
+const editMode = computed(() => props.rockAppConfig && props.rockAppConfig.host);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('apps.edit_service') : t('apps.add_service')));
 
@@ -131,7 +126,7 @@ const validateUri = (val: string) => {
 
 function onHide() {
   newRockAppConfig.value = { ...emptyRockAppConfig };
-  credentialType.value = credentialOptions[0].value;
+  credentialType.value = credentialOptions[0]?.value;
   showDialog.value = false;
   emit('update:modelValue', false);
 }
@@ -151,7 +146,7 @@ watch(
         }
       } else {
         newRockAppConfig.value = { ...emptyRockAppConfig };
-        credentialType.value = credentialOptions[0].value;
+        credentialType.value = credentialOptions[0]?.value;
       }
 
       showDialog.value = value;

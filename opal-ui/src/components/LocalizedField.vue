@@ -2,7 +2,7 @@
   <div>
     <slot name="header"></slot>
     <span
-      v-if="!$slots.header && !!title"
+      v-if="!$slots.header && title"
       class="text-subtitle1"
       :class="{ 'text-primary': dirty, 'text-secondary': !dirty }"
       >{{ title }}</span
@@ -11,12 +11,12 @@
     <q-card flat class="bg-grey-2">
       <q-card-section>
         <div v-for="label in labels" :key="label.locale" class="row q-col-gutter-md q-mb-md">
-          <q-input v-model="label.locale" dense type="text" :label="$t('locale')" :debounce="500" style="width: 80px" />
+          <q-input v-model="label.locale" dense type="text" :label="t('locale')" :debounce="500" style="width: 80px" />
           <q-input
             v-model="label.text"
             dense
             type="text"
-            :label="$t('value')"
+            :label="t('value')"
             style="min-width: 290px"
             lazy-rules
             :rules="[validateRequiredField]"
@@ -30,24 +30,20 @@
           size="sm"
           color="primary"
           icon="add"
-          :label="labels.length ? '' : $t('add')"
+          :label="labels.length ? '' : t('add')"
           @click="onAddLocale"
         />
       </q-card-section>
     </q-card>
-    <span v-if="!!hint" class="text-caption text-secondary q-pa-none">{{ hint }}</span>
+    <span v-if="hint" class="text-caption text-secondary q-pa-none">{{ hint }}</span>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'LocalizedField',
-});
-</script>
-
 <script setup lang="ts">
-import { LocaleTextDto } from 'src/models/Opal';
-import { t, locales } from 'boot/i18n';
+import type { LocaleTextDto } from 'src/models/Opal';
+import { locales } from 'boot/i18n';
+
+const { t } = useI18n();
 
 interface Props {
   modelValue: LocaleTextDto[] | undefined;

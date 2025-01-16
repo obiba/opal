@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { RActivitySummaryDto } from 'src/models/OpalR';
+import type { RActivitySummaryDto } from 'src/models/OpalR';
 
 export const useProfileActivityStore = defineStore('profileActivity', () => {
-  
+
   const rSummaries = ref<RActivitySummaryDto[]>([]);
   const datashieldSummaries = ref<RActivitySummaryDto[]>([]);
   const sqlSummaries = ref<RActivitySummaryDto[]>([]);
-  
+
   const summaries = computed(() => [...rSummaries.value, ...datashieldSummaries.value, ...sqlSummaries.value].sort((a, b) => a.profile.localeCompare(b.profile)))
 
   function reset() {

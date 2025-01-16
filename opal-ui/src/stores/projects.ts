@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import {
+import type {
   ProjectDto,
   ProjectSummaryDto,
-  ProjectDatasourceStatusDto,
   ProjectDto_IdentifiersMappingDto,
 } from 'src/models/Projects';
-import { Acl } from 'src/models/Opal';
-import { Subject, KeyForm } from 'src/models/Opal';
-import {
+import { ProjectDatasourceStatusDto } from 'src/models/Projects';
+import type { Acl } from 'src/models/Opal';
+import type { Subject, KeyForm } from 'src/models/Opal';
+import type {
   CommandStateDto,
-  CommandStateDto_Status,
   ImportCommandOptionsDto,
   ExportCommandOptionsDto,
   CopyCommandOptionsDto,
@@ -20,8 +19,9 @@ import {
   ExportVCFCommandOptionsDto,
   AnalyseCommandOptionsDto,
 } from 'src/models/Commands';
+import { CommandStateDto_Status } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
-import { VCFSamplesMappingDto } from 'src/models/Plugins';
+import type { VCFSamplesMappingDto } from 'src/models/Plugins';
 
 interface ProjectPerms {
   export: Perms | undefined;
@@ -268,7 +268,7 @@ export const useProjectsStore = defineStore('projects', () => {
     const resource = acl.resource
       .replace(/^\//, '')
       .replace(/^project.*/, 'project')
-      .replace(/^datasource\/[^\/]+$/, 'datasource')
+      .replace(/^datasource\/[^/]+$/, 'datasource')
       .replace(/.*(table|view)/, 'table');
 
     const params = { principal: subject.principal, type: subject.type };

@@ -4,13 +4,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportPluginForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory, FormObject, SchemaFormObject } from 'src/components/models';
+import type { DatasourceFactory, FormObject, SchemaFormObject } from 'src/components/models';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface ImportPluginFormProps {

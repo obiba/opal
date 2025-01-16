@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t(`user_profile.token_dialog.add_${type}_token`) }}</div>
+        <div class="text-h6">{{ t(`user_profile.token_dialog.add_${type}_token`) }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,8 +11,8 @@
           <q-input
             dense
             type="text"
-            :label="$t('name') + ' *'"
-            :hint="$t('user_profile.token_dialog.name_hint')"
+            :label="t('name') + ' *'"
+            :hint="t('user_profile.token_dialog.name_hint')"
             v-model="token.name"
             color="grey-10"
             lazy-rules
@@ -28,8 +28,8 @@
             use-chips
             multiple
             input-debounce="0"
-            :label="$t('projects')"
-            :hint="$t('user_profile.token_dialog.projects_hint')"
+            :label="t('projects')"
+            :hint="t('user_profile.token_dialog.projects_hint')"
             :options="projectFilters"
             @new-value="addProject"
             @filter="filterProjects"
@@ -71,21 +71,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onAddToken" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onAddToken" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTokenDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
+import type { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';

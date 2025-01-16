@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('copy_view') }}</div>
+        <div class="text-h6">{{ t('copy_view') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,7 +11,7 @@
         <q-select
           v-model="projectDestination"
           :options="projectNames"
-          :label="$t('project_destination')"
+          :label="t('project_destination')"
           dense
           style="min-width: 300px"
           class="q-mb-md"
@@ -20,7 +20,7 @@
           v-model="newTableName"
           dense
           type="text"
-          :label="$t('new_name')"
+          :label="t('new_name')"
           style="min-width: 300px"
           class="q-mb-md"
         >
@@ -30,20 +30,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('copy')" color="primary" @click="onCopyView" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('copy')" color="primary" @click="onCopyView" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CopyViewDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, ViewDto } from 'src/models/Magma';
+import type { TableDto, ViewDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -55,6 +50,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();

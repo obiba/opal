@@ -2,20 +2,13 @@
   <div class="row q-mt-lg">
     <div>
       <div class="text-subtitle1" :class="{ 'text-primary': group.length > 0, 'text-secondary': group.length < 1 }">{{
-        $t(title)
+        t(title)
       }}</div>
-      <div class="text-hint">{{ $t(hint) }}</div>
+      <div class="text-hint">{{ t(hint) }}</div>
       <q-option-group size="sm" :options="groupOptions" type="checkbox" v-model="group" />
     </div>
   </div>
 </template>
-access
-
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTokenDialogOptionGroups.vue',
-});
-</script>
 
 <script setup lang="ts">
 interface GroupProps {
@@ -25,6 +18,8 @@ interface GroupProps {
   title: string;
   hint: string;
 }
+
+const { t } = useI18n();
 
 const props = defineProps<GroupProps>();
 const emit = defineEmits(['update:modelValue']);

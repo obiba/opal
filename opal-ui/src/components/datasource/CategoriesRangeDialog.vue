@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('add_categories_range') }}</div>
+        <div class="text-h6">{{ t('add_categories_range') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -12,8 +12,8 @@
           v-model="rangeStr"
           dense
           type="text"
-          :label="$t('range')"
-          :hint="$t('categories_range_hint')"
+          :label="t('range')"
+          :hint="t('categories_range_hint')"
           placeholder="ex: 1-5, 99"
           style="min-width: 300px"
           class="q-mb-xl"
@@ -24,20 +24,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('save')" color="primary" :disable="!isValid" @click="onSave" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" :disable="!isValid" @click="onSave" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CategoriesRangeDialog',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;
@@ -47,6 +42,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'saved']);
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);

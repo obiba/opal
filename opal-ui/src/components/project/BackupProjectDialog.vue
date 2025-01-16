@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('project_admin.backup_project') }}</div>
+        <div class="text-h6">{{ t('project_admin.backup_project') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,7 +10,7 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <file-select
             v-model="backupFolder"
-            :label="$t('project_admin.backup_folder')"
+            :label="t('project_admin.backup_folder')"
             :folder="filesStore.current"
             selection="single"
             @select="onUpdateFolder"
@@ -21,31 +21,25 @@
             </template>
           </file-select>
 
-          <q-checkbox v-model="backupOptions.viewsAsTables" :label="$t('project_admin.views_as_table')" />
+          <q-checkbox v-model="backupOptions.viewsAsTables" :label="t('project_admin.views_as_table')" />
         </q-form>
       </q-card-section>
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('backup')" type="submit" color="primary" @click="onBackup" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('backup')" type="submit" color="primary" @click="onBackup" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UpdatePasswordDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
-import { BackupCommandOptionsDto } from 'src/models/Commands';
+import type { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
+import type { BackupCommandOptionsDto } from 'src/models/Commands';
 
 interface DialogProps {
   modelValue: boolean;
@@ -55,6 +49,8 @@ interface DialogProps {
 const projectsStore = useProjectsStore();
 const profilesStore = useProfilesStore();
 const filesStore = useFilesStore();
+const { t } = useI18n();
+
 const emptyFileDto = {
   name: '/',
   path: '/home',
@@ -65,7 +61,6 @@ const emptyFileDto = {
 } as FileDto;
 
 const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
-const { t } = useI18n();
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();

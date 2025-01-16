@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings.title') }}</div>
+        <div class="text-h6">{{ t('id_mappings.title') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -13,8 +13,8 @@
             v-model="selectedId"
             dense
             :options="idOptions"
-            :label="$t('entity_type')"
-            :hint="$t('project_admin.entity_type_hint')"
+            :label="t('entity_type')"
+            :hint="t('project_admin.entity_type_hint')"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
@@ -24,8 +24,8 @@
             v-model="selectedMappings"
             dense
             :options="mappingOptions"
-            :label="$t('id_mappings.title')"
-            :hint="$t('project_admin.id_mappings_hint')"
+            :label="t('id_mappings.title')"
+            :hint="t('project_admin.id_mappings_hint')"
             emit-value
             map-options
           ></q-select>
@@ -35,21 +35,16 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onAddMapping" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onAddMapping" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddProjectIdMappingsDialog',
-});
-</script>
 <script setup lang="ts">
-import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
-import { TableDto, VariableDto } from 'src/models/Magma';
+import type { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+import type { TableDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -61,6 +56,8 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const projectsStore = useProjectsStore();
 const identifiersStore = useIdentifiersStore();
+const { t } = useI18n();
+
 const showDialog = ref(props.modelValue);
 const mappingOptions = ref([] as { label: string; value: VariableDto }[]);
 const idOptions = ref([] as { label: string; value: TableDto }[]);

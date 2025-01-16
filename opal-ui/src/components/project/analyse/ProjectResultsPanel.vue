@@ -10,7 +10,7 @@
             switch-toggle-side
             header-class="text-primary text-caption q-pl-none"
             :default-opened="details.length < 6"
-            :label="$t('details')"
+            :label="t('details')"
           >
             <q-table
               flat
@@ -33,7 +33,7 @@
                     name="circle"
                     size="sm"
                     :color="analysisColor(props.value)"
-                    :title="$t(`analysis_status.${props.value}`)"
+                    :title="t(`analysis_status.${props.value}`)"
                   />
                 </q-td>
               </template>
@@ -49,7 +49,7 @@
             switch-toggle-side
             header-class="text-primary text-caption q-pl-none"
             :default-opened="history.length < 6"
-            :label="$t('history')"
+            :label="t('history')"
           >
             <q-table
               flat
@@ -65,7 +65,7 @@
                     name="circle"
                     size="sm"
                     :color="analysisColor(props.value)"
-                    :title="$t(`analysis_status.${props.value}`)"
+                    :title="t(`analysis_status.${props.value}`)"
                   />
                   <div class="float-right">
                     <q-btn
@@ -74,7 +74,7 @@
                       flat
                       size="sm"
                       color="secondary"
-                      :title="$t('report')"
+                      :title="t('report')"
                       :icon="toolsVisible[props.row.status] ? 'insert_chart' : 'none'"
                       class="q-ml-xs"
                       @click="onViewReport(props.row)"
@@ -85,7 +85,7 @@
                       flat
                       size="sm"
                       color="secondary"
-                      :title="$t('remove')"
+                      :title="t('remove')"
                       :icon="toolsVisible[props.row.status] ? 'delete' : 'none'"
                       class="q-ml-xs"
                       @click="onRemoveHistory(props.row)"
@@ -106,15 +106,9 @@
   </q-card>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProjectResultsPanel',
-});
-</script>
-
 <script setup lang="ts">
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import { OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import type { OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { analysisColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
@@ -129,6 +123,7 @@ interface Props {
 const props = defineProps<Props>();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
+
 const firstResult = props.results[0];
 const details = firstResult.resultItems || [];
 const history = ref(props.results.slice(1));

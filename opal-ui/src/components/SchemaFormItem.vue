@@ -104,7 +104,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               icon="delete"
               @click="dataArray.splice(index, 1)"
             />
@@ -115,7 +115,7 @@
         v-if="!disable"
         color="primary"
         icon="add"
-        :label="$t('add')"
+        :label="t('add')"
         @click="dataArray.push({})"
         size="sm"
         class="q-mt-sm"
@@ -127,14 +127,11 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'SchemaFormItem',
-});
-</script>
 <script setup lang="ts">
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileObject, FormObject, SchemaFormField } from 'src/components/models';
+import type { FileObject, FormObject, SchemaFormField } from 'src/components/models';
+
+const { t } = useI18n();
 
 interface Props {
   modelValue: string | number | boolean | FileObject | FormObject | Array<FormObject> | undefined;
@@ -150,8 +147,6 @@ const filesStore = useFilesStore();
 const data = ref(props.modelValue);
 const dataFile = ref<FileObject>();
 const dataArray = ref<Array<FormObject>>([]);
-
-//onMounted(init);
 
 watch([() => props.modelValue, () => props.field], init, { immediate: true });
 

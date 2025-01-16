@@ -22,8 +22,8 @@
         size="sm"
         toggle-color="secondary"
         :options="[
-          { label: $t('frequency'), value: 'freq' },
-          { label: $t('percentage'), value: 'pct' },
+          { label: t('frequency'), value: 'freq' },
+          { label: t('percentage'), value: 'pct' },
         ]"
         class="on-right"
       />
@@ -50,15 +50,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  components: { VuePlotly },
-  name: 'DefaultSummaryChart',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
-import { DefaultSummaryDto, FrequencyDto } from 'src/models/Math';
+import type { VariableDto } from 'src/models/Magma';
+import type { DefaultSummaryDto, FrequencyDto } from 'src/models/Math';
 import FrequenciesTable from 'src/components/datasource/FrequenciesTable.vue';
 import VuePlotly from 'src/components/charts/VuePlotly.vue';
 

@@ -3,35 +3,35 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
+        <q-breadcrumbs-el :label="t('administration')" to="/admin" />
         <q-breadcrumbs-el label="DataSHIELD" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h5 q-mb-md">{{ $t('packages') }}</div>
-      <div class="text-help q-mb-md">{{ $t('datashield.packages_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ t('packages') }}</div>
+      <div class="text-help q-mb-md">{{ t('datashield.packages_info') }}</div>
       <datashield-clusters />
       <div class="row q-col-gutter-md q-mb-lg">
         <div class="col-12 col-md-6">
-          <div class="text-h5 q-mb-md">{{ $t('permissions') }}</div>
+          <div class="text-h5 q-mb-md">{{ t('permissions') }}</div>
           <access-control-list
             resource="/system/permissions/datashield"
             :options="['DATASHIELD_USE', 'DATASHIELD_ALL']"
           />
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-h5 q-mb-md">{{ $t('datashield.audit') }}</div>
-          <div class="text-help q-mb-md">{{ $t('datashield.audit_info') }}</div>
-          <q-btn-dropdown :label="$t('download')" icon="download" size="sm" color="primary">
+          <div class="text-h5 q-mb-md">{{ t('datashield.audit') }}</div>
+          <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
+          <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
             <q-list>
               <q-item clickable v-close-popup @click="onDownloadLogs(true)">
                 <q-item-section>
-                  <q-item-label>{{ $t('datashield.download_all_logs') }}</q-item-label>
+                  <q-item-label>{{ t('datashield.download_all_logs') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onDownloadLogs(false)">
                 <q-item-section>
-                  <q-item-label>{{ $t('datashield.download_latest_logs') }}</q-item-label>
+                  <q-item-label>{{ t('datashield.download_latest_logs') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -39,8 +39,8 @@
         </div>
       </div>
 
-      <div class="text-h5 q-mb-md">{{ $t('profiles') }}</div>
-      <div class="text-help q-mb-md">{{ $t('datashield.profiles_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ t('profiles') }}</div>
+      <div class="text-help q-mb-md">{{ t('datashield.profiles_info') }}</div>
       <datashield-profiles />
     </q-page>
   </div>
@@ -52,6 +52,7 @@ import DatashieldClusters from 'src/components/admin/datashield/DatashieldCluste
 import DatashieldProfiles from 'src/components/admin/datashield/DatashieldProfiles.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
+const { t } = useI18n();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 

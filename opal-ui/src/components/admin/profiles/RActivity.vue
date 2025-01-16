@@ -2,7 +2,7 @@
   <div>
     <div v-if="profileActivityStore.summaries.length">
       <div class="q-mb-md">
-        <span class="text-hint">{{ $t('total_execution_time') }}:</span>
+        <span class="text-hint">{{ t('total_execution_time') }}:</span>
         <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
       </div>
       <q-table
@@ -36,7 +36,7 @@
       </q-table>
     </div>
     <div v-else class="text-hint">
-      {{ $t('no_r_activity') }}
+      {{ t('no_r_activity') }}
     </div>
 
     <r-session-activities-dialog
@@ -48,16 +48,9 @@
   </div>
 </template>
 
-
-<script lang="ts">
-export default defineComponent({
-  name: 'RActivity',
-});
-</script>
-
 <script setup lang="ts">
 import RSessionActivitiesDialog from 'src/components/admin/profiles/RSessionActivitiesDialog.vue';
-import { RActivitySummaryDto } from 'src/models/OpalR';
+import type { RActivitySummaryDto } from 'src/models/OpalR';
 import { getDateLabel, getMillisLabel } from 'src/utils/dates';
 
 interface Props {

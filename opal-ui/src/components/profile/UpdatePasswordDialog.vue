@@ -2,18 +2,18 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('user_profile.update_password') }}</div>
+        <div class="text-h6">{{ t('user_profile.update_password') }}</div>
       </q-card-section>
 
       <q-separator />
       <q-card-section>
-        <div class="q-mb-lg text-help">{{ $t('user_profile.password_dialog.info') }}</div>
+        <div class="q-mb-lg text-help">{{ t('user_profile.password_dialog.info') }}</div>
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
             dense
             autocomplete="off"
             type="password"
-            :label="$t('user_profile.password_dialog.old_password') + ' *'"
+            :label="t('user_profile.password_dialog.old_password') + ' *'"
             v-model="password.oldPassword"
             color="grey-10"
             lazy-rules
@@ -28,7 +28,7 @@
             dense
             autocomplete="off"
             type="password"
-            :label="$t('user_profile.password_dialog.new_password') + ' *'"
+            :label="t('user_profile.password_dialog.new_password') + ' *'"
             v-model="password.newPassword"
             color="grey-10"
             lazy-rules
@@ -44,7 +44,7 @@
             autocomplete="off"
             v-model="confirmPassword"
             type="password"
-            :label="$t('password_confirm') + '*'"
+            :label="t('password_confirm') + '*'"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
@@ -58,21 +58,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('update')" type="submit" color="primary" @click="onUpdatePassword" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('update')" type="submit" color="primary" @click="onUpdatePassword" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UpdatePasswordDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { PasswordDto } from 'src/models/Opal';
+import type { PasswordDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -93,7 +87,7 @@ const password = ref<PasswordDto>({
   oldPassword: '',
 });
 
-const validateRequiredOldPassword = (val: string) => !!val || t('validation.update_password.old_password');
+const validateRequiredOldPassword = (val: string) => val || t('validation.update_password.old_password');
 const validateRequiredNewPassword = (val: string) =>
   (val && val.length >= 8) || t('validation.update_password.new_password');
 const validateMatchingPasswords = () =>

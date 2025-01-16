@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: Search.proto
 
-/* eslint-disable */
 import { type ValueSetsDto, type VariableDto } from './Magma';
 import { type EntryDto } from './Opal';
 

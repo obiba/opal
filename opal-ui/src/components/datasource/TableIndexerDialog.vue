@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card flat class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('schedule') }}</div>
+        <div class="text-h6">{{ t('schedule') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,7 +11,7 @@
         <q-select
           v-model="schedule.type"
           :options="typeOptions"
-          :label="$t('type')"
+          :label="t('type')"
           dense
           emit-value
           map-options
@@ -19,12 +19,12 @@
         />
         <div v-if="schedule.type === ScheduleType.HOURLY">
           <div class="row q-gutter-md">
-            <div class="col-1 text-help q-pt-sm">{{ $t('at') }}</div>
+            <div class="col-1 text-help q-pt-sm">{{ t('at') }}</div>
             <div class="col">
               <q-select
                 v-model="schedule.minutes"
                 :options="minutesOptions"
-                :label="$t('minutes')"
+                :label="t('minutes')"
                 dense
                 emit-value
                 map-options
@@ -34,20 +34,20 @@
         </div>
         <div v-if="schedule.type === ScheduleType.WEEKLY">
           <div class="row q-gutter-md q-mb-md">
-            <div class="col-1 text-help q-pt-sm">{{ $t('on') }}</div>
+            <div class="col-1 text-help q-pt-sm">{{ t('on') }}</div>
             <div class="col">
-              <q-select v-model="schedule.day" :options="dayOptions" :label="$t('day')" dense emit-value map-options />
+              <q-select v-model="schedule.day" :options="dayOptions" :label="t('day')" dense emit-value map-options />
             </div>
           </div>
         </div>
         <div v-if="schedule.type === ScheduleType.DAILY || schedule.type === ScheduleType.WEEKLY">
           <div class="row q-gutter-md">
-            <div class="col-1 text-help q-pt-sm">{{ $t('at') }}</div>
+            <div class="col-1 text-help q-pt-sm">{{ t('at') }}</div>
             <div class="col">
               <q-select
                 v-model="schedule.hours"
                 :options="hoursOptions"
-                :label="$t('hour')"
+                :label="t('hour')"
                 dense
                 emit-value
                 map-options
@@ -57,7 +57,7 @@
               <q-select
                 v-model="schedule.minutes"
                 :options="minutesOptions"
-                :label="$t('minutes')"
+                :label="t('minutes')"
                 dense
                 emit-value
                 map-options
@@ -70,20 +70,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('save')" color="primary" @click="onSchedule" v-close-popup :disable="!isValid" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" @click="onSchedule" v-close-popup :disable="!isValid" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableIndexerDialog',
-});
-</script>
 <script setup lang="ts">
-import { ScheduleDto, ScheduleType, Day } from 'src/models/Opal';
+import { type ScheduleDto, ScheduleType, Day } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;

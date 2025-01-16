@@ -4,14 +4,14 @@
       v-model="idConfig.name"
       dense
       :options="mappingNames"
-      :label="$t('id_mappings.title')"
-      :hint="$t('importer.id_mappings.hint')"
+      :label="t('id_mappings.title')"
+      :hint="t('importer.id_mappings.hint')"
       class="q-mb-md q-pt-md"
       emit-value
       map-options
       @update:model-value="onMappingConfigUpdated"
     />
-    <div class="q-ml-none" v-show="forImport && !!idConfig.name">
+    <div class="q-ml-none" v-show="forImport && idConfig.name">
       <q-option-group
         dense
         :options="mappingOptions"
@@ -21,8 +21,8 @@
       >
         <template v-slot:label="opt">
           <div class="row q-pt-md">
-            <span>{{ $t(opt.label) }}</span>
-            <span class="text-caption text-secondary">{{ $t(opt.hint) }}</span>
+            <span>{{ t(opt.label) }}</span>
+            <span class="text-caption text-secondary">{{ t(opt.hint) }}</span>
           </div>
         </template>
       </q-option-group>
@@ -30,15 +30,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'IdentifiersMappingSelect',
-});
-</script>
-
 <script setup lang="ts">
-import { IdentifiersMappingDto, IdentifiersMappingConfigDto } from 'src/models/Identifiers';
-import { ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+import type { IdentifiersMappingDto, IdentifiersMappingConfigDto } from 'src/models/Identifiers';
+import type { ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
 
 interface Props {
@@ -48,9 +42,11 @@ interface Props {
 
 defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);
+
 const identifiersStore = useIdentifiersStore();
 const { t } = useI18n();
 const projectsStore = useProjectsStore();
+
 const mappingNames = ref<{ label: string; value: string }[]>([]);
 const mappingOption = computed({
   get: () =>

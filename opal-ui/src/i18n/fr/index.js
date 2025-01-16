@@ -671,7 +671,7 @@ export default {
       edit: 'Modifier le terme',
       keywords_hint: 'Liste facultative de mots-clés du terme. Peut être utile lors de la création de requêtes de recherche de variables.',
     },
-    import_mlstr: {
+    import_mr: {
       label: 'Taxonomies de Maelstrom Research',
       title: 'Importer les taxonomies de Maelstrom Research',
       info: "Les taxonomies de classification des variables {mlstr_url} permettent d'annoter des études et des variables harmonisées pour faciliter la navigation dans les métadonnées et améliorer la découverte des données sur le portail Web de données {mica_url}.",
@@ -680,7 +680,7 @@ export default {
       versions_hint_url: 'Licence publique internationale Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.',
       licence_agreement: "J'ai lu et accepté les termes de la licence.",
     },
-    import_github: {
+    import_gh: {
       label: 'À partir de GitHub',
       title: 'Importer le référentiel GitHub',
       org_hint: 'Exemple : maelstrom-research',
@@ -690,7 +690,7 @@ export default {
       file_hint: 'Nom du fichier YAML de taxonomie (par exemple taxonomy.yml ou scales/taxonomy.yml). Laissez ce champ vide pour importer tous les fichiers de taxonomie.',
       override: 'Remplacer les taxonomies existantes',
     },
-    import_file: {
+    import: {
       label: 'À partir du fichier YAML',
       title: 'Importer un fichier YAML',
     },
@@ -811,7 +811,6 @@ export default {
   annotate: 'Annoter',
   annotation_texts_hint: 'Annotez avec du texte libre. Pour une lisibilité humaine, vous pouvez fournir un texte différent dans chaque langue. Pour un traitement automatique ou un texte sans localisation, choisissez la langue "default". Le texte vide sera ignoré. Le format de texte Markdown est pris en charge.',
   annotations: 'Annotations',
-  annotations: 'Annotations',
   apply_annotation: 'Appliquer une annotation',
   apply: 'Appliquer',
   at: 'à',
@@ -883,7 +882,6 @@ export default {
   databases: 'Base de données',
   datashield_profile: 'Profil DataSHIELD',
   datashield_service: 'Service DataSHIELD',
-  date: 'Date',
   day: 'Jour',
   default_charset: 'Jeu de caractères par défaut',
   default_storage: 'Stockage par défaut',
@@ -918,7 +916,6 @@ export default {
   derivation_script: 'Script de dérivation',
   derived_variables_hint: "Le nom et le type de la variable dérivée peuvent être différents de celui de la variable d'origine.",
   derived_variables: 'Variables dérivées',
-  description: 'Description',
   description: 'Description',
   descriptive_statistics: 'Statistiques descriptives',
   destination_folder: 'Dossier de destination',
@@ -1139,7 +1136,7 @@ export default {
   plugins: 'Plugins',
   preview_import_source: 'Prévisualiser les données',
   preview: 'Prévisualiser',
-  profile_groups_acls_info: "Liste des permissions accordées à l'utilisateur par l'intermédiaire de groupes auxquels il appartient. Notez que supprimer une permission d\'un groupe affecte les permissions accordées aux membres de ce groupe.",
+  profile_groups_acls_info: "Liste des permissions accordées à l'utilisateur par l'intermédiaire de groupes auxquels il appartient. Notez que supprimer une permission d'un groupe affecte les permissions accordées aux membres de ce groupe.",
   profile_groups_acls: 'Permissions de ses groupes',
   profile_otp_disable: "Désactiver l'authentification à deux facteurs pour l'utilisateur '{user}'",
   profile_otp_disabled: "L'authentification à deux facteurs peut être activée par l'utilisateur '{user}'",

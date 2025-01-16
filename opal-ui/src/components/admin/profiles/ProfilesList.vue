@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="text-h5 q-mb-md">
-      {{ $t('user_profiles') }}
+      {{ t('user_profiles') }}
     </div>
-    <div class="text-help q-mb-md">{{ $t('profiles_info') }}</div>
+    <div class="text-help q-mb-md">{{ t('profiles_info') }}</div>
     <q-table
       flat
       :rows="profiles"
@@ -17,7 +17,7 @@
     >
       <template v-slot:top>
         <div class="row items-center q-gutter-sm">
-          <span :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ $t('delete_profiles_selected') }}</span>
+          <span :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ t('delete_profiles_selected') }}</span>
           <q-btn
             outline
             color="red"
@@ -51,7 +51,7 @@
         <q-td :props="props">
           <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)" />
           <q-tooltip>{{
-            $t(props.value ? 'profile_otp_disable' : 'profile_otp_disabled', { user: props.row.principal })
+            t(props.value ? 'profile_otp_disable' : 'profile_otp_disabled', { user: props.row.principal })
           }}</q-tooltip>
         </q-td>
       </template>
@@ -59,21 +59,15 @@
 
     <confirm-dialog
       v-model="showDeletes"
-      :title="$t('delete')"
-      :text="$t('delete_profiles_confirm', { count: selectedProfiles.length, profile: principalsToDelete })"
+      :title="t('delete')"
+      :text="t('delete_profiles_confirm', { count: selectedProfiles.length, profile: principalsToDelete })"
       @confirm="doDeleteProfiles"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProfilesList',
-});
-</script>
-
 <script setup lang="ts">
-import { SubjectProfileDto } from 'src/models/Opal';
+import type { SubjectProfileDto } from 'src/models/Opal';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

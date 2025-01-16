@@ -3,22 +3,22 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('search')" to="/search" />
-        <q-breadcrumbs-el :label="$t('entity')" />
+        <q-breadcrumbs-el :label="t('search')" to="/search" />
+        <q-breadcrumbs-el :label="t('entity')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h6">{{ $t('entity_search') }}</div>
+      <div class="text-h6">{{ t('entity_search') }}</div>
       <div class="text-help q-mb-md">
-        <q-markdown :src="$t('entity_search_info')" no-heading-anchor-links />
+        <q-markdown :src="t('entity_search_info')" no-heading-anchor-links />
       </div>
       <q-card flat class="bg-grey-2 q-mb-md">
         <q-card-section>
           <div class="row q-gutter-md">
-            <q-input v-model="type" :label="$t('entity_type')" flat dense size="sm" @update:model-value="onClear" />
+            <q-input v-model="type" :label="t('entity_type')" flat dense size="sm" @update:model-value="onClear" />
             <q-input
               v-model="identifier"
-              :label="$t('id')"
+              :label="t('id')"
               flat
               dense
               size="sm"
@@ -26,7 +26,7 @@
               @keyup.enter="onSubmit"
             />
             <q-btn
-              :label="$t('search')"
+              :label="t('search')"
               color="primary"
               size="sm"
               @click="onSubmit"
@@ -46,7 +46,7 @@
         <q-select
           v-model="tableId"
           :options="tableOptions"
-          :label="$t('table')"
+          :label="t('table')"
           flat
           dense
           emit-value
@@ -79,7 +79,7 @@
         </q-table>
       </div>
       <div v-else class="text-hint">
-        {{ $t('no_results') }}
+        {{ t('no_results') }}
       </div>
     </q-page>
   </div>
@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import ValueCell from 'src/components/datasource/ValueCell.vue';
-import { TableDto, ValueSetsDto, ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
+import type { TableDto, ValueSetsDto, ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 const route = useRoute();
@@ -107,7 +107,7 @@ const variables = ref<VariableDto[]>();
 const idParam = computed(() => route.query.id as string);
 const typeParam = computed(() => route.query.type as string);
 
-const isValid = computed(() => !!type.value && !!identifier.value);
+const isValid = computed(() => type.value && identifier.value);
 const tableOptions = computed(
   () => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || []
 );

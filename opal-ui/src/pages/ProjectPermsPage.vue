@@ -3,17 +3,17 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
-        <q-breadcrumbs-el :label="$t('permissions')" />
+        <q-breadcrumbs-el :label="t('permissions')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('permissions') }}
+        {{ t('permissions') }}
       </div>
       <div class="text-help q-mb-md">
-        {{ $t('project_permissions_info') }}
+        {{ t('project_permissions_info') }}
       </div>
       <div v-if="hasSubjects" class="row q-gutter-md">
         <div class="col">
@@ -22,7 +22,7 @@
               <q-list dense padding>
                 <q-item-label header class="text-weight-bolder">
                   <q-icon :name="ICONS[type]" size="sm" class="on-left" />
-                  <span>{{ $t(CAPTIONS[type]) }}</span>
+                  <span>{{ t(CAPTIONS[type]) }}</span>
                 </q-item-label>
                 <q-item
                   clickable
@@ -49,12 +49,12 @@
           />
         </div>
       </div>
-      <div v-else class="text-help">{{ $t('project_acls_empty') }}</div>
+      <div v-else class="text-help">{{ t('project_acls_empty') }}</div>
 
       <confirm-dialog
         v-model="showDeletes"
-        :title="$t('delete')"
-        :text="$t('delete_profile_acl_confirm', { count: selectedAcls.length })"
+        :title="t('delete')"
+        :text="t('delete_profile_acl_confirm', { count: selectedAcls.length })"
         @confirm="doDeleteAcls"
       />
     </q-page>
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { Subject, Acl, Subject_SubjectType } from 'src/models/Opal';
+import { type Subject, type Acl, Subject_SubjectType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -76,8 +76,10 @@ const CAPTIONS: Record<string, string> = {
   GROUP: 'groups',
 };
 
+const { t } = useI18n();
 const route = useRoute();
 const projectsStore = useProjectsStore();
+
 const acls = ref([] as Acl[]);
 const selectedSubject = ref({} as Subject);
 const selectedAcls = ref<Acl[]>([]);
@@ -125,7 +127,7 @@ async function loadSubjects() {
   projectsStore.loadSubjects().then(() => {
     initializeSubjectTypes();
     const candidate = findCandidateSubject();
-    if (!!candidate) {
+    if (candidate) {
       onSubject(candidate);
     }
   });

@@ -6,8 +6,8 @@
     <q-item v-for="item in visibleItems" :key="item.field">
       <q-item-section :style="`max-width: ${maxWidth}px`">
         <q-item-label>
-          <div class="text-overline text-grey-6">{{ $t(item.label ? item.label : item.field) }}</div>
-          <div v-if="item.hint" class="text-hint">{{ $t(item.hint) }}</div>
+          <div class="text-overline text-grey-6">{{ t(item.label ? item.label : item.field) }}</div>
+          <div v-if="item.hint" class="text-hint">{{ t(item.hint) }}</div>
         </q-item-label>
       </q-item-section>
       <q-item-section>
@@ -43,17 +43,12 @@
   </q-list>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FieldsList',
-});
-</script>
 <script setup lang="ts">
 import { toMaxDecimals } from 'src/utils/numbers';
-import { TableDto, VariableDto } from 'src/models/Magma';
-import { DescriptiveStatsDto } from 'src/models/Math';
-import { DataShieldProfileDto } from 'src/models/DataShield';
-import { StringMap } from 'src/components/models';
+import type { TableDto, VariableDto } from 'src/models/Magma';
+import type { DescriptiveStatsDto } from 'src/models/Math';
+import type { DataShieldProfileDto } from 'src/models/DataShield';
+import type { StringMap } from 'src/components/models';
 
 export interface FieldLink {
   label: string;
@@ -80,7 +75,7 @@ export interface FieldsListProps {
   maxWidth?: string;
 }
 
-const { locale } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
 const props = withDefaults(defineProps<FieldsListProps>(), {
   dbobject: undefined,
   items: undefined,

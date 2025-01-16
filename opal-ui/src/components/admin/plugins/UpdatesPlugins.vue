@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-help q-mb-md">
-      {{ $t('plugin.updates_plugins_info') }}
+      {{ t('plugin.updates_plugins_info') }}
     </div>
     <div v-if="packages">
       <q-list bordered separator>
@@ -34,7 +34,7 @@
             </q-item-section>
             <q-item-section side>
               <div class="row">
-                <q-btn round flat size="sm" icon="download" :title="$t('install')" @click="onUpdate(pkg)" />
+                <q-btn round flat size="sm" icon="download" :title="t('install')" @click="onUpdate(pkg)" />
               </div>
             </q-item-section>
           </q-item>
@@ -46,19 +46,14 @@
     </div>
     <div v-else>
       <div class="text-hint">
-        {{ $t('plugin.no_updates') }}
+        {{ t('plugin.no_updates') }}
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UpdatesPlugins',
-});
-</script>
 <script setup lang="ts">
-import { PluginPackageDto } from 'src/models/Plugins';
+import type { PluginPackageDto } from 'src/models/Plugins';
 import { notifySuccess, notifyError } from 'src/utils/notify';
 
 const pluginsStore = usePluginsStore();

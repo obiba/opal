@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { TableDto, VariableDto, ValueSetsDto } from 'src/models/Magma';
+import type { TableDto, VariableDto, ValueSetsDto } from 'src/models/Magma';
 
 export interface GenerateIdentifiersOptions {
   prefix: string | '';

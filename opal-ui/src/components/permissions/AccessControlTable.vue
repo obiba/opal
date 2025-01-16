@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="rows.length === 0">
-      <div class="text-hint q-mt-md">{{ $t('no_permissions') }}</div>
+      <div class="text-hint q-mt-md">{{ t('no_permissions') }}</div>
     </div>
     <q-table
       v-else
@@ -50,14 +50,8 @@
   
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AccessControlTable',
-});
-</script>
-
 <script setup lang="ts">
-import { Acl, Subject_SubjectType } from 'src/models/Opal';
+import type { Acl, Subject_SubjectType } from 'src/models/Opal';
 
 interface Props {
   modelValue: Acl[];
@@ -114,9 +108,9 @@ const columns = computed(() => [
 
 const cases = [
   { regex: /\/files\/(.*)$/, type: 'folder_file' },
-  { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
-  { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
-  { regex: /\/datasource\/([^\/]+)\/view\/(.*)$/, type: 'view' },
+  { regex: /\/datasource\/([^/]+)\/table\/([^/]+)\/variable\/(.*)$/, type: 'variable' },
+  { regex: /\/datasource\/([^/]+)\/table\/(.*)$/, type: 'table' },
+  { regex: /\/datasource\/([^/]+)\/view\/(.*)$/, type: 'view' },
   { regex: /\/datasource\/(.*)$/, type: 'project' },
   { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
   { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
@@ -187,9 +181,13 @@ const rows = computed(() => {
             break;
           case 'project|system':
             result.url = item.url || '';
-            const isSystem = acl.actions.includes('SYSTEM_ALL');
-            result.title = isSystem ? t('system_settings') : t('project_settings');
-            result.caption = isSystem ? t('system') : t('project');
+            if (acl.actions.includes('SYSTEM_ALL')) {
+              result.title = t('system_settings');
+              result.caption = t('system');
+            } else {
+              result.title = t('project_settings');
+              result.caption = t('project');
+            }
             break;
         }
         return true;

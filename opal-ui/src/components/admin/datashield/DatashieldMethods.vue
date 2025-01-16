@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-help">
-      {{ $t(`datashield.${env}_methods_info`) }}
+      {{ t(`datashield.${env}_methods_info`) }}
     </div>
     <q-table
       flat
@@ -20,7 +20,7 @@
           color="primary"
           text-color="white"
           icon="add"
-          :title="$t('add_method')"
+          :title="t('add_method')"
           size="sm"
           @click="onShowEdit(null)"
         />
@@ -28,7 +28,7 @@
           outline
           color="secondary"
           icon="refresh"
-          :title="$t('refresh')"
+          :title="t('refresh')"
           size="sm"
           class="on-right"
           @click="updateMethods"
@@ -71,7 +71,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onShowDeleteSingle(props.row)"
@@ -81,7 +81,7 @@
       </template>
       <template v-slot:body-cell-type="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-caption">{{ $t(getType(props.row)) }}</span>
+          <span class="text-caption">{{ t(getType(props.row)) }}</span>
         </q-td>
       </template>
       <template v-slot:body-cell-code="props">
@@ -102,21 +102,16 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('datashield.delete_methods_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('datashield.delete_methods_confirm', { count: selected.length })"
       @confirm="onDeleteMethods"
     />
     <edit-datashield-method-dialog v-model="showEdit" :env="env" :method="method" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldMethods',
-});
-</script>
 <script setup lang="ts">
-import { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
+import type { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldMethodDialog from 'src/components/admin/datashield/EditDatashieldMethodDialog.vue';
 
@@ -149,8 +144,8 @@ function onFilter() {
   if (filter.value.length === 0) {
     return methods.value;
   }
-  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
-  return methods.value.filter((m) => {
+  const query = filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  return methods.value?.filter((m) => {
     const desc = `${m.name} ${getCode(m)} ${getPackageName(m)}`.toLowerCase();
     return desc.includes(query);
   });

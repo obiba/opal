@@ -34,13 +34,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AttributesBundlePanel',
-});
-</script>
 <script setup lang="ts">
-import { AttributesBundle } from 'src/components/models';
+import type { AttributesBundle } from 'src/components/models';
 
 interface Props {
   bundle?: AttributesBundle;

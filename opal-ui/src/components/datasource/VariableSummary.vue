@@ -5,7 +5,7 @@
       flat
       dense
       size="sm"
-      :label="$t('limit')"
+      :label="t('limit')"
       type="number"
       min="0"
       :max="total"
@@ -21,7 +21,7 @@
     <q-btn
       color="secondary"
       icon="refresh"
-      :title="$t('refresh')"
+      :title="t('refresh')"
       outline
       size="sm"
       @click="init"
@@ -32,7 +32,7 @@
     <q-btn
       color="primary"
       icon="analytics"
-      :label="$t('full_summary')"
+      :label="t('full_summary')"
       size="sm"
       @click="onFullSummary"
       class="q-mt-lg"
@@ -61,17 +61,13 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableSummary',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 import DefaultSummaryChart from 'src/components/charts/DefaultSummaryChart.vue';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
 import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const datasourceStore = useDatasourceStore();
 

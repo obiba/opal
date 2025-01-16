@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Opal.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Opal';
 
 export enum KeyType {

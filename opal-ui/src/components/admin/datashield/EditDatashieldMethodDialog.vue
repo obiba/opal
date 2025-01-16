@@ -2,24 +2,24 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t(isCreation ? 'add_method' : 'update_method') }}</div>
+        <div class="text-h6">{{ t(isCreation ? 'add_method' : 'update_method') }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
         <q-input
           v-model="name"
-          :label="$t('name')"
-          :hint="$t('datashield.method_name_hint')"
+          :label="t('name')"
+          :hint="t('datashield.method_name_hint')"
           :disable="!isCreation"
           dense
           class="q-mb-md"
         />
-        <q-select v-model="type" :label="$t('type')" :options="typeOptions" dense class="q-mb-md" />
+        <q-select v-model="type" :label="t('type')" :options="typeOptions" dense class="q-mb-md" />
         <q-input
           v-if="type.value === 'r_func'"
           v-model="func"
-          :label="$t('function')"
-          :hint="$t('datashield.method_func_hint')"
+          :label="t('function')"
+          :hint="t('datashield.method_func_hint')"
           placeholder="package::function"
           dense
           class="q-mb-md"
@@ -27,8 +27,8 @@
         <q-input
           v-if="type.value === 'r_script'"
           v-model="script"
-          :label="$t('script')"
-          :hint="$t('datashield.method_script_hint')"
+          :label="t('script')"
+          :hint="t('datashield.method_script_hint')"
           placeholder="function(x) { return(x) }"
           dense
           type="textarea"
@@ -37,10 +37,10 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t(isCreation ? 'add' : 'update_action')"
+          :label="t(isCreation ? 'add' : 'update_action')"
           :disable="
             name.length === 0 ||
             (type.value === 'r_func' && func.length === 0) ||
@@ -55,13 +55,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'EditDatashieldethodDialog',
-});
-</script>
 <script setup lang="ts">
-import { DataShieldMethodDto, RScriptDataShieldMethodDto, RFunctionDataShieldMethodDto } from 'src/models/DataShield';
+import type { DataShieldMethodDto, RScriptDataShieldMethodDto, RFunctionDataShieldMethodDto } from 'src/models/DataShield';
 
 interface DialogProps {
   modelValue: boolean;

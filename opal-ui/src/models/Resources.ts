@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Resources.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Resources';
 
 export interface ResourceProvidersStatusDto {

@@ -1,17 +1,17 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { Acl, Subject_SubjectType, SubjectProfileDto } from 'src/models/Opal';
+import { type Acl, Subject_SubjectType, type SubjectProfileDto } from 'src/models/Opal';
 
 export const useProfileAclsStore = defineStore('profileAcls', () => {
   const acls = ref([] as Acl[]);
-  const groupAcls = ref<{[key: string]: SubjectProfileDto}>({});
+  const groupAcls = ref<{ [key: string]: SubjectProfileDto }>({});
 
   function reset() {
     acls.value = [];
     groupAcls.value = {};
   }
 
-  async function initSubjectAcls(profile: SubjectProfileDto) { 
+  async function initSubjectAcls(profile: SubjectProfileDto) {
     reset();
     initAcls(profile.principal, Subject_SubjectType.USER);
     if (profile.groups) {

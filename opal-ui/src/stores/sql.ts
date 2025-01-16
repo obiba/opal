@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SqlCommand, SqlResults } from 'src/components/models';
+import type { SqlCommand, SqlResults } from 'src/components/models';
 
 const datasourceStore = useDatasourceStore();
 

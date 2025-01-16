@@ -12,16 +12,16 @@
       v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :title="$t('add')" size="sm">
+        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :title="t('add')" size="sm">
           <q-list>
             <q-item clickable @click="onShowAddSingle">
               <q-item-section>
-                <q-item-label>{{ $t('add_category') }}</q-item-label>
+                <q-item-label>{{ t('add_category') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable @click="onShowAddRange">
               <q-item-section>
-                <q-item-label>{{ $t('add_categories_range') }}</q-item-label>
+                <q-item-label>{{ t('add_categories_range') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -31,7 +31,7 @@
           color="secondary"
           icon="arrow_upward"
           size="sm"
-          :title="$t('move_up')"
+          :title="t('move_up')"
           @click="onUp"
           :disable="selected.length === 0 || !moveEnabled"
           class="on-right"
@@ -41,7 +41,7 @@
           color="secondary"
           icon="arrow_downward"
           size="sm"
-          :title="$t('move_down')"
+          :title="t('move_down')"
           @click="onDown"
           :disable="selected.length === 0 || !moveEnabled"
           class="on-right"
@@ -67,7 +67,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('edit')"
+              :title="t('edit')"
               :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
               class="q-ml-xs"
               @click="onShowEdit(props.row)"
@@ -78,7 +78,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onShowDeleteSingle(props.row)"
@@ -103,8 +103,8 @@
 
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_categories_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('delete_categories_confirm', { count: selected.length })"
       @confirm="onDelete"
     />
 
@@ -119,17 +119,13 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableCategories',
-});
-</script>
 <script setup lang="ts">
 import { getLabels } from 'src/utils/attributes';
-import { CategoryDto } from 'src/models/Magma';
+import type { CategoryDto } from 'src/models/Magma';
 import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
 import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 

@@ -3,7 +3,7 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="name" />
       </q-breadcrumbs>
       <q-icon
@@ -31,7 +31,7 @@
           <q-separator />
           <q-card-section>
             <div class="text-subtitle2">
-              {{ $t('tables_views') }}
+              {{ t('tables_views') }}
               <q-btn
                 flat
                 rounded
@@ -52,7 +52,7 @@
           <q-separator />
           <q-card-section>
             <div class="text-subtitle2">
-              {{ $t('resources') }}
+              {{ t('resources') }}
               <q-btn
                 flat
                 rounded
@@ -74,6 +74,7 @@ import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import { projectStatusColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const projectsStore = useProjectsStore();

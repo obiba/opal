@@ -33,13 +33,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldClusters',
-});
-</script>
 <script setup lang="ts">
-import { RServerClusterDto } from 'src/models/OpalR';
+import type { RServerClusterDto } from 'src/models/OpalR';
 import DatashieldPackages from 'src/components/admin/datashield/DatashieldPackages.vue';
 
 const rStore = useRStore();

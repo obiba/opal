@@ -13,8 +13,8 @@
             v-model="newTerm.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
-            :hint="$t('taxonomy.vocabulary.name_hint')"
+            :label="t('name') + '*'"
+            :hint="t('taxonomy.vocabulary.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('required_field')]"
@@ -23,20 +23,20 @@
 
           <localized-field-large
             v-model="newTerm.title"
-            :title="$t('title')"
-            :hint="$t('title_hint')"
+            :title="t('title')"
+            :hint="t('title_hint')"
           ></localized-field-large>
 
           <localized-field-large
             v-model="newTerm.description"
-            :title="$t('description')"
-            :hint="$t('taxonomy.term.description_hint')"
+            :title="t('description')"
+            :hint="t('taxonomy.term.description_hint')"
           />
 
           <localized-field-large
             v-model="newTerm.keywords"
-            :title="$t('keywords')"
-            :hint="$t('taxonomy.term.keywords_hint')"
+            :title="t('keywords')"
+            :hint="t('taxonomy.term.keywords_hint')"
           />
         </q-form>
       </q-card-section>
@@ -44,20 +44,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddTerm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTermDialog',
-});
-</script>
 <script setup lang="ts">
-import { TermDto } from 'src/models/Opal';
+import type { TermDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
 
@@ -85,7 +80,7 @@ const emptyTerm = {
 } as TermDto;
 
 const newTerm = ref<TermDto>({ ...emptyTerm });
-const editMode = computed(() => !!props.term && !!props.term.name);
+const editMode = computed(() => props.term && props.term.name);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.term.edit') : t('taxonomy.term.add')));
 

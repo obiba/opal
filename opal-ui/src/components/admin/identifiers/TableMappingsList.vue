@@ -10,7 +10,7 @@
   >
     <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddMapping" />
+        <q-btn no-caps color="primary" icon="add" size="sm" :label="t('add')" @click="onAddMapping" />
       </div>
     </template>
     <template v-slot:body-cell-name="props">
@@ -23,7 +23,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('edit')"
+            :title="t('edit')"
             :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
             class="q-ml-xs"
             @click="onEditMapping(props.row)"
@@ -34,7 +34,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDeleteMapping(props.row)"
@@ -45,7 +45,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('id_mappings.generate_identifiers')"
+            :title="t('id_mappings.generate_identifiers')"
             :icon="toolsVisible[props.row.name] ? 'autorenew' : 'none'"
             class="q-ml-xs"
             @click="onGenerateIdentifiers(props.row)"
@@ -56,7 +56,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('id_mappings.download_identifiers')"
+            :title="t('id_mappings.download_identifiers')"
             :icon="toolsVisible[props.row.name] ? 'download' : 'none'"
             class="q-ml-xs"
             @click="onExportMappingIdentifiers(props.row.name)"
@@ -90,14 +90,8 @@
   />
 </template>
 
-<script lang="ts">
-defineComponent({
-  name: 'TableMappingsList',
-});
-</script>
-
 <script setup lang="ts">
-import { TableDto, VariableDto } from 'src/models/Magma';
+import type { TableDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.vue';
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
@@ -142,7 +136,7 @@ const columns = computed(() => [
     align: 'left',
     field: (mapping: VariableDto) => {
       const description = (mapping.attributes || []).find((a) => a.name === 'description');
-      return !!description ? description.value : '';
+      return description ? description.value : '';
     },
   },
 ]);

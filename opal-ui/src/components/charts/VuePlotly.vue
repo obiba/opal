@@ -2,11 +2,6 @@
   <div ref="plotlyId" name="plotly"></div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VuePlotly',
-});
-</script>
 <script setup lang="ts">
 import { ref, onMounted, watchEffect } from 'vue';
 import type { Ref } from 'vue';

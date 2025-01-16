@@ -3,9 +3,9 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="dsName" :to="`/project/${dsName}`" />
-        <q-breadcrumbs-el :label="$t('tables')" :to="`/project/${dsName}/tables`" />
+        <q-breadcrumbs-el :label="t('tables')" :to="`/project/${dsName}/tables`" />
         <q-breadcrumbs-el :label="tName" :to="`/project/${dsName}/table/${tName}`" />
         <q-breadcrumbs-el :label="vName" />
       </q-breadcrumbs>
@@ -53,7 +53,7 @@
           class="on-right"
         />
         <q-btn
-          :label="$t('add_to_view')"
+          :label="t('add_to_view')"
           icon="add_circle"
           no-caps
           dense
@@ -64,7 +64,7 @@
         />
         <q-btn
           v-if="!cartStore.isInCart(datasourceStore.variable)"
-          :label="$t('add_to_cart')"
+          :label="t('add_to_cart')"
           icon="add_shopping_cart"
           no-caps
           dense
@@ -75,7 +75,7 @@
         />
         <q-btn
           v-if="cartStore.isInCart(datasourceStore.variable)"
-          :label="$t('remove_from_cart')"
+          :label="t('remove_from_cart')"
           icon="remove_shopping_cart"
           no-caps
           dense
@@ -94,13 +94,13 @@
         <attributes-bundle-panel :bundle="descriptionBundle" class="q-mb-md text-help" />
 
         <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-          <q-tab name="dictionary" :label="$t('dictionary')" />
-          <q-tab name="script" :label="$t('script')" v-if="withScript" />
-          <q-tab name="summary" :label="$t('summary')" />
-          <q-tab name="values" :label="$t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
+          <q-tab name="dictionary" :label="t('dictionary')" />
+          <q-tab name="script" :label="t('script')" v-if="withScript" />
+          <q-tab name="summary" :label="t('summary')" />
+          <q-tab name="values" :label="t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
           <q-tab
             name="permissions"
-            :label="$t('permissions')"
+            :label="t('permissions')"
             v-if="datasourceStore.perms.variablePermissions?.canRead()"
           />
         </q-tabs>
@@ -109,7 +109,7 @@
 
         <q-tab-panels v-model="tab">
           <q-tab-panel name="dictionary">
-            <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
+            <div class="text-h6 q-mb-md">{{ t('properties') }}</div>
             <div class="row q-col-gutter-md q-mb-md">
               <div class="col-12 col-md-6">
                 <fields-list :items="items1" :dbobject="datasourceStore.variable" class="" />
@@ -120,11 +120,11 @@
             </div>
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <div class="text-h6">{{ $t('categories') }}</div>
+                <div class="text-h6">{{ t('categories') }}</div>
                 <variable-categories />
               </div>
               <div class="col-12 col-md-6">
-                <div class="text-h6">{{ $t('attributes') }}</div>
+                <div class="text-h6">{{ t('attributes') }}</div>
                 <variable-attribues />
               </div>
             </div>
@@ -158,8 +158,8 @@
       />
       <confirm-dialog
         v-model="showDelete"
-        :title="$t('delete')"
-        :text="$t('delete_variables_confirm', { count: 1 })"
+        :title="t('delete')"
+        :text="t('delete_variables_confirm', { count: 1 })"
         @confirm="onDeleteVariable"
       />
     </q-page>
@@ -167,7 +167,7 @@
 </template>
 
 <script setup lang="ts">
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import VariableCategories from 'src/components/datasource/VariableCategories.vue';
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
@@ -178,9 +178,10 @@ import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();

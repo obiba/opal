@@ -2,44 +2,39 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('install') }}</div>
+        <div class="text-h6">{{ t('install') }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section class="bg-warning">
         <q-icon name="warning" />
-        {{ $t('r.packages_warn') }}
+        {{ t('r.packages_warn') }}
       </q-card-section>
       <q-card-section>
-        <q-select v-model="manager" :options="managersOptions" dense :label="$t('package_manager')" class="q-mb-md" />
-        <q-input v-model="name" dense :label="$t(manager.value === 'gh' ? 'gh_repo' : 'name')" />
-        <div v-if="manager.value === 'gh'" class="text-hint">{{ $t('gh_repo_hint') }}</div>
+        <q-select v-model="manager" :options="managersOptions" dense :label="t('package_manager')" class="q-mb-md" />
+        <q-input v-model="name" dense :label="t(manager.value === 'gh' ? 'gh_repo' : 'name')" />
+        <div v-if="manager.value === 'gh'" class="text-hint">{{ t('gh_repo_hint') }}</div>
         <div v-if="manager.value === 'gh'" class="q-mt-xs row q-col-gutter-md">
           <div class="col">
-            <q-input v-model="organization" dense :label="$t('gh_org')" />
-            <div class="text-hint">{{ $t('gh_org_hint') }}</div>
+            <q-input v-model="organization" dense :label="t('gh_org')" />
+            <div class="text-hint">{{ t('gh_org_hint') }}</div>
           </div>
           <div class="col">
-            <q-input v-model="reference" dense :label="$t('gh_ref')" />
-            <div class="text-hint">{{ $t('gh_ref_hint') }}</div>
+            <q-input v-model="reference" dense :label="t('gh_ref')" />
+            <div class="text-hint">{{ t('gh_ref_hint') }}</div>
           </div>
         </div>
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('install_action')" color="primary" @click="onUpdate" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('install_action')" color="primary" @click="onUpdate" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'InstallRPackageDialog',
-});
-</script>
 <script setup lang="ts">
-import { RServerClusterDto } from 'src/models/OpalR';
+import type { RServerClusterDto } from 'src/models/OpalR';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 interface DialogProps {

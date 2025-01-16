@@ -13,7 +13,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn color="primary" :label="$t('add')" icon="add" size="sm" @click.prevent="onAdd" />
+      <q-btn color="primary" :label="t('add')" icon="add" size="sm" @click.prevent="onAdd" />
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -25,7 +25,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.alias] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
@@ -43,16 +43,10 @@
   <add-key-pair-dialog v-model="showAddDialog" :project="project" @update="$emit('update')" />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'KeyPairsList',
-});
-</script>
-
 <script setup lang="ts">
-import { t } from 'src/boot/i18n';
-import { ProjectDto } from 'src/models/Projects';
-import { KeyForm, KeyType } from 'src/models/Opal';
+const { t } = useI18n();
+import type { ProjectDto } from 'src/models/Projects';
+import type { KeyForm, KeyType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import AddKeyPairDialog from 'src/components/project/AddKeyPairDialog.vue';
 
