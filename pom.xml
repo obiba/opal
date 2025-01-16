@@ -1632,7 +1632,7 @@
     <connection>scm:git:https://github.com/obiba/opal.git</connection>
     <developerConnection>scm:git:https://github.com/obiba/opal.git</developerConnection>
     <url>https://github.com/obiba/opal</url>
-    <tag>HEAD</tag>
+    <tag>opal-5.0.x</tag>
   </scm>
 
   <issueManagement>
