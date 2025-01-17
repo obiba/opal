@@ -215,7 +215,7 @@ function onSearch() {
     showResults.value = false;
     return;
   }
-  searchStore.search(query.value, 10, ['label', 'label-en']).then((res) => {
+  searchStore.search(query.value, 10, ['label', 'label-en'], undefined).then((res) => {
     showResults.value = res.totalHits > 0;
     results.value = res;
   });

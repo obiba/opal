@@ -111,6 +111,7 @@
         <q-card-section>
           <q-input
             v-model="selected.subject.principal"
+            type="text"
             dense
             :label="t(selected.subject.type.toLowerCase())"
             :disable="editMode"
@@ -187,7 +188,7 @@ const suggestions = ref<string[]>([]);
 
 const showSuggestions = ref(false);
 
-const rows = computed(() => authzStore.acls[props.resource]);
+const rows = computed(() => authzStore.acls[props.resource] || []);
 
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: 'left', field: 'subject', style: 'width: 30%' },
@@ -225,7 +226,7 @@ function onLeaveRow(row: Acl) {
 function onShowEdit(row: Acl) {
   selected.value = row;
   editMode.value = true;
-  action.value = row.actions[0];
+  action.value = row.actions[0] || '';
   showEdit.value = true;
 }
 
@@ -238,7 +239,7 @@ function onFilter() {
   if (!filter.value) {
     return authzStore.acls[props.resource];
   }
-  return authzStore.acls[props.resource].filter((row) => {
+  return authzStore.acls[props.resource]?.filter((row) => {
     return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
   });
 }
@@ -246,7 +247,7 @@ function onFilter() {
 function onShowAddUser() {
   selected.value = { subject: { principal: '', type: 'USER' }, actions: [], resource: props.resource, domain: 'opal' };
   editMode.value = false;
-  action.value = props.options[0];
+  action.value = props.options[0] || '';
   suggestions.value = [];
   showEdit.value = true;
 }
@@ -254,7 +255,7 @@ function onShowAddUser() {
 function onShowAddGroup() {
   selected.value = { subject: { principal: '', type: 'GROUP' }, actions: [], resource: props.resource, domain: 'opal' };
   editMode.value = false;
-  action.value = props.options[0];
+  action.value = props.options[0] || '';
   suggestions.value = [];
   showEdit.value = true;
 }
@@ -268,8 +269,8 @@ function deletePermission() {
   authzStore.deleteAcl(props.resource, selected.value);
 }
 
-function onSearchSubject(value: string) {
-  if (value.length < 3) {
+function onSearchSubject(value: string | number | null) {
+  if (!value || typeof value !== 'string' || value.length < 3) {
     suggestions.value = [];
     showSuggestions.value = false;
     return;

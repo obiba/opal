@@ -90,8 +90,8 @@
         <q-spinner-dots />
       </div>
       <div v-else>
-        <attributes-bundle-panel :bundle="labelBundle" class="q-mb-md" />
-        <attributes-bundle-panel :bundle="descriptionBundle" class="q-mb-md text-help" />
+        <attributes-bundle-panel v-if="labelBundle" :bundle="labelBundle" class="q-mb-md" />
+        <attributes-bundle-panel v-if="descriptionBundle" :bundle="descriptionBundle" class="q-mb-md text-help" />
 
         <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="t('dictionary')" />
@@ -135,7 +135,7 @@
           </q-tab-panel>
 
           <q-tab-panel name="summary">
-            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount" />
+            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount || 0" />
           </q-tab-panel>
 
           <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
