@@ -205,7 +205,7 @@
 <script setup lang="ts">
 import AddFolderDialog from 'src/components/files/AddFolderDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
-import type { FileDto, FileDto_FileType } from 'src/models/Opal';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';

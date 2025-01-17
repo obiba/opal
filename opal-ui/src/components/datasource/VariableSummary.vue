@@ -44,17 +44,17 @@
   <div v-if="loading">
     <q-spinner-dots size="lg" class="q-mt-md" />
   </div>
-  <div v-else-if="summary['Math.CategoricalSummaryDto.categorical']">
-    <categorical-summary-chart :variable="variable" :data="summary['Math.CategoricalSummaryDto.categorical']" class="q-mt-md" />
+  <div v-else-if="categoricalData">
+    <categorical-summary-chart :variable="variable" :data="categoricalData" class="q-mt-md" />
   </div>
-  <div v-else-if="summary['Math.TextSummaryDto.textSummary']">
-    <categorical-summary-chart :variable="variable" :data="summary['Math.TextSummaryDto.textSummary']" class="q-mt-md" />
+  <div v-else-if="textData">
+    <categorical-summary-chart :variable="variable" :data="textData" class="q-mt-md" />
   </div>
-  <div v-else-if="summary['Math.ContinuousSummaryDto.continuous']">
-    <continuous-summary-chart :variable="variable" :data="summary['Math.ContinuousSummaryDto.continuous']" class="q-mt-md" />
+  <div v-else-if="continuousData">
+    <continuous-summary-chart :variable="variable" :data="continuousData" class="q-mt-md" />
   </div>
-  <div v-else-if="summary['Math.DefaultSummaryDto.defaultSummary']">
-    <default-summary-chart :variable="variable" :data="summary['Math.DefaultSummaryDto.defaultSummary']" class="q-mt-md" />
+  <div v-else-if="defaultData">
+    <default-summary-chart :variable="variable" :data="defaultData" class="q-mt-md" />
   </div>
   <div v-else-if="total > 0">
     <pre>{{ summary }}</pre>
@@ -71,6 +71,15 @@ const { t } = useI18n();
 const route = useRoute();
 const datasourceStore = useDatasourceStore();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const categoricalData = computed(() => (summary as any)['Math.CategoricalSummaryDto.categorical'])
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const textData = computed(() => (summary as any)['Math.TextSummaryDto.textSummary'])
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const continuousData = computed(() => (summary as any)['Math.ContinuousSummaryDto.continuous'])
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defaultData = computed(() => (summary as any)['Math.DefaultSummaryDto.defaultSummary'])
+
 interface VariableSummaryProps {
   variable: VariableDto;
   total: number;
@@ -81,7 +90,7 @@ const props = defineProps<VariableSummaryProps>();
 const STEP_COUNT = 1000;
 
 const summary = ref({});
-const limit = ref(STEP_COUNT);
+const limit = ref<number | undefined>(STEP_COUNT);
 const loading = ref(false);
 
 const dsName = computed(() => route.params.id as string);
@@ -104,7 +113,7 @@ function init() {
   }
   loading.value = true;
   datasourceStore
-    .loadVariableSummary(props.variable, fullIfCached, limit.value > props.total ? props.total : limit.value)
+    .loadVariableSummary(props.variable, fullIfCached, (limit.value && limit.value > props.total) ? props.total : limit.value)
     .then((data) => {
       summary.value = data;
     })

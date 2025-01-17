@@ -5,7 +5,7 @@
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('administration')" to="/admin" />
         <q-breadcrumbs-el :label="t('user_profiles')" to="/admin/profiles" />
-        <q-breadcrumbs-el :label="`${$route.params.principal}`" />
+        <q-breadcrumbs-el :label="`${route.params.principal}`" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
