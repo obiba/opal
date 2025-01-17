@@ -1,5 +1,5 @@
-import { i18n } from 'src/boot/i18n';
 import type { PluginPackagesDto, PluginPackageDto } from 'src/models/Plugins';
+const { mergeLocaleMessage } = useI18n({ useScope: 'global' });
 
 type Translation = {
   [key: string]: string;
@@ -26,13 +26,14 @@ export function mergeAnalysesTranslations(packages: PluginPackagesDto) {
     packages.packages?.forEach((plugin) => {
       const pluginTranslations: Translations = {};
       pluginTranslations[plugin.name] = { title: plugin.title, description: plugin.description };
-      i18n.global.mergeLocaleMessage('en', { plugins: pluginTranslations });
+      mergeLocaleMessage('en', { plugins: pluginTranslations });
 
-      const templates = (plugin['Plugins.AnalysisPluginPackageDto.analysis'] || {}).analysisTemplates || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const templates = ((plugin as any)['Plugins.AnalysisPluginPackageDto.analysis'] || {}).analysisTemplates || [];
       const tplTranslations: Translations = {};
       templates.forEach((template: PluginPackageDto) => {
         tplTranslations[template.name] = { title: template.title, description: template.description };
-        i18n.global.mergeLocaleMessage('en', normalizeFn(plugin, tplTranslations));
+        mergeLocaleMessage('en', normalizeFn(plugin, tplTranslations));
       });
     });
   }

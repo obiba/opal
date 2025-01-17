@@ -277,7 +277,7 @@ import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
-import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList from 'src/components/FieldsList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ExportDataDialog from 'src/components/datasource/export/ExportDataDialog.vue';
 import CopyTablesDialog from 'src/components/datasource/CopyTablesDialog.vue';
@@ -325,7 +325,7 @@ const nextTable = computed(() => {
   return idx === datasourceStore.tables.length - 1 ? null : datasourceStore.tables[idx + 1];
 });
 
-const items1: FieldItem<TableDto>[] = computed(() => {
+const items1 = computed(() => {
   return [
     {
       field: 'name',
@@ -357,22 +357,23 @@ const items1: FieldItem<TableDto>[] = computed(() => {
     {
       field: 'idColumn',
       label: 'resource_ref.id_column',
-      format: () => datasourceStore.view['Magma.ResourceViewDto.view']?.idColumn || '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      format: () => (datasourceStore.view as any)['Magma.ResourceViewDto.view']?.idColumn || '',
       visible: () => isResourceView.value,
     },
   ];
 });
 
-const items2: FieldItem<TableDto>[] = [
+const items2 = [
   {
     field: 'timestamps',
     label: 'created',
-    format: (val) => (val ? getDateLabel(val.timestamps?.created) : ''),
+    format: (val: TableDto) => (val ? getDateLabel(val.timestamps?.created) : ''),
   },
   {
     field: 'timestamps',
     label: 'last_update',
-    format: (val) => (val ? getDateLabel(val.timestamps?.lastUpdate) : ''),
+    format: (val: TableDto) => (val ? getDateLabel(val.timestamps?.lastUpdate) : ''),
   },
 ];
 

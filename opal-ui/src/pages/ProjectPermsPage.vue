@@ -22,7 +22,7 @@
               <q-list dense padding>
                 <q-item-label header class="text-weight-bolder">
                   <q-icon :name="ICONS[type]" size="sm" class="on-left" />
-                  <span>{{ t(CAPTIONS[type]) }}</span>
+                  <span>{{ CAPTIONS[type] ? t(CAPTIONS[type]) : type }}</span>
                 </q-item-label>
                 <q-item
                   clickable
@@ -111,8 +111,8 @@ async function doDeleteAcls() {
 function initializeSubjectTypes() {
   subjectTypes.value = projectsStore.subjects.reduce((acc: Record<string, Subject[]>, subject: Subject) => {
     acc[subject.type] = acc[subject.type] || [];
-    acc[subject.type].push(subject);
-    acc[subject.type].sort((a, b) => a.principal.localeCompare(b.principal));
+    acc[subject.type]?.push(subject);
+    acc[subject.type]?.sort((a, b) => a.principal.localeCompare(b.principal));
     return acc;
   }, {} as Record<string, Subject[]>);
 }
