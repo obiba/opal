@@ -125,11 +125,11 @@ const rows = computed(() => {
   if (!variables || !valueSets.value?.valueSets) {
     return [];
   }
-  const values = valueSets.value?.valueSets[0].values;
+  const values = valueSets.value?.valueSets[0]?.values;
   const result: { variable: string; value?: ValueSetsDto_ValueDto }[] = [];
-  values.forEach((value, idx: number) => {
+  values?.forEach((value, idx: number) => {
     result.push({
-      variable: variables[idx],
+      variable: variables[idx] || '',
       value: value,
     });
   });
@@ -232,6 +232,6 @@ function getEntityValueSets(table: TableDto, identifier: string) {
 }
 
 function getVariable(name: string) {
-  return variables.value?.find((v) => v.name === name);
+  return variables.value?.find((v) => v.name === name) || { name: name } as VariableDto;
 }
 </script>

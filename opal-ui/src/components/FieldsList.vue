@@ -28,10 +28,10 @@
           </span>
           <span v-else>
             {{
-              dbobject[item.field] !== undefined
-                ? typeof dbobject[item.field] === 'number'
-                  ? toMaxDecimals(dbobject[item.field], 3)
-                  : dbobject[item.field]
+              (dbobject as any)[item.field] !== undefined
+                ? typeof (dbobject as any)[item.field] === 'number'
+                  ? toMaxDecimals((dbobject as any)[item.field], 3)
+                  : (dbobject as any)[item.field]
                 : '-'
             }}
           </span>
@@ -48,6 +48,7 @@ import { toMaxDecimals } from 'src/utils/numbers';
 import type { TableDto, VariableDto } from 'src/models/Magma';
 import type { DescriptiveStatsDto } from 'src/models/Math';
 import type { DataShieldProfileDto } from 'src/models/DataShield';
+import type { ResourceFactoryDto } from 'src/models/Resources';
 import type { StringMap } from 'src/components/models';
 
 export interface FieldLink {
@@ -70,21 +71,19 @@ export interface FieldItem<T> {
 }
 
 export interface FieldsListProps {
-  dbobject: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap;
-  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap>[];
-  maxWidth?: string;
+  dbobject?: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap | ResourceFactoryDto;
+  items?: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap | ResourceFactoryDto>[];
+  maxWidth: string;
 }
 
 const { t, locale } = useI18n({ useScope: 'global' });
 const props = withDefaults(defineProps<FieldsListProps>(), {
-  dbobject: undefined,
-  items: undefined,
   maxWidth: '200px',
 });
 
 const visibleItems = computed(() => {
-  return props.items.filter((item) => {
-    if (item.visible) {
+  return props.items?.filter((item) => {
+    if (item.visible && props.dbobject) {
       return item.visible(props.dbobject);
     }
     return true;

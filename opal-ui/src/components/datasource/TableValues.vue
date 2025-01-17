@@ -83,12 +83,10 @@ import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { notifyError } from 'src/utils/notify';
 
 interface TableValuesProps {
-  variable: VariableDto | undefined;
+  variable?: VariableDto;
 }
 
-const props = withDefaults(defineProps<TableValuesProps>(), {
-  variable: undefined,
-});
+const props = defineProps<TableValuesProps>();
 
 const { t } = useI18n();
 const route = useRoute();

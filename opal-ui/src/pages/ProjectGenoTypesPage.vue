@@ -178,7 +178,7 @@
         v-model="showExport"
         :project="project"
         :vcfs="selectedVcfs"
-        :show-mapping="samplesMapping.projectName"
+        :show-mapping="samplesMapping.projectName !== undefined"
         @update:modelValue="onExportedVcfs"
       />
     </q-page>
@@ -431,7 +431,7 @@ function onDeleteMapping() {
 function onDeleteVcf() {
   confirmText.value = t('delete_vcf_confirm', {
     count: selectedVcfs.value.length,
-    profile: selectedVcfs.value[0].name,
+    profile: selectedVcfs.value[0]?.name,
   });
   onConfirmed.value = async () => await _onDeleteVcf();
   showDelete.value = true;

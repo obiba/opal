@@ -40,15 +40,12 @@ import { getSizeLabel } from 'src/utils/files';
 import type { ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 
 interface ValueCellProps {
-  value: ValueSetsDto_ValueDto | undefined;
+  value?: ValueSetsDto_ValueDto;
   variable: VariableDto;
-  occurrence: number | undefined;
+  occurrence?: number;
 }
 
-const props = withDefaults(defineProps<ValueCellProps>(), {
-  value: undefined,
-  occurrence: undefined,
-});
+const props = defineProps<ValueCellProps>();
 
 function onDownload() {
   if (props.value?.link) {

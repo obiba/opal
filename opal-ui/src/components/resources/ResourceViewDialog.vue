@@ -126,8 +126,9 @@ watch(
       }
       if (props.view) {
         name.value = props.view.name || '';
-        resourceFullName.value = props.view.from[0];
-        const resView = props.view['Magma.ResourceViewDto.view'] as ResourceViewDto;
+        resourceFullName.value = props.view.from[0] || '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resView = (props.view as any)['Magma.ResourceViewDto.view'] as ResourceViewDto;
         id.value = resView.idColumn || '';
         entityType.value = resView.entityType || 'Participant';
         allColumns.value = resView.allColumns || true;
@@ -165,10 +166,11 @@ function onSaveView() {
 
   if (editMode.value) {
     // update existing
-    const currentView = { ...props.view };
+    const currentView = { ...props.view } as ViewDto;
     currentView.name = name.value;
     currentView.from = [resourceFullName.value];
-    currentView['Magma.ResourceViewDto.view'] = resView;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (currentView as any)['Magma.ResourceViewDto.view'] = resView;
     datasourceStore
       .updateView(projectDestination.value, props.view?.name || name.value, currentView, 'Updated from resource view')
       .then(() => {
@@ -184,7 +186,8 @@ function onSaveView() {
       .getView(projectDestination.value, name.value)
       .then((view: ViewDto) => {
         view.from = [resourceFullName.value];
-        view['Magma.ResourceViewDto.view'] = resView;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (view as any)['Magma.ResourceViewDto.view'] = resView;
         datasourceStore
           .updateView(projectDestination.value, name.value, view, 'Updated from resource')
           .then(() => {

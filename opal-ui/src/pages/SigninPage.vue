@@ -86,12 +86,19 @@
 </template>
 
 <script setup lang="ts">
-import { Cookies } from 'quasar';
+import type { AxiosError } from 'axios';
+import { Cookies, useQuasar } from 'quasar';
 import { locales } from 'src/boot/i18n';
 import type { AuthProviderDto } from 'src/models/Opal';
 import { baseUrl } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
+interface AuthResponse {
+  image?: string;
+  status?: string;
+}
+
+const $q = useQuasar();
 const systemStore = useSystemStore();
 const authStore = useAuthStore();
 const authzStore = useAuthzStore();
@@ -181,13 +188,15 @@ async function onSubmit() {
       router.push('/');
     }
   } catch (err) {
-    authMethod.value = err.response?.headers['www-authenticate'];
+    const error = err as AxiosError;
+    authMethod.value = error.response?.headers['www-authenticate'];
+    const data = error.response?.data as AuthResponse;
     if (authMethod.value) {
       withToken.value = true;
-      if (err.response?.data?.image) {
-        qr.value = err.response.data.image;
+      if (data?.image) {
+        qr.value = data.image;
       }
-    } else if (err.response?.status === 403 && err.response.data?.status === undefined) {
+    } else if (error.response?.status === 403 && data?.status === undefined) {
       notifyError('error.InvalidCredentials');
     } else {
       notifyError(err);

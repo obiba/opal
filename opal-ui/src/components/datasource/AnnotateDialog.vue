@@ -157,11 +157,10 @@ const emit = defineEmits(['update:modelValue']);
 
 const NO_LOCALE = 'default';
 
-const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
 const datasourceStore = useDatasourceStore();
 const systemStore = useSystemStore();
-const { locale } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const taxonomyName = ref<string>('');
 const vocabularyName = ref<string>('');

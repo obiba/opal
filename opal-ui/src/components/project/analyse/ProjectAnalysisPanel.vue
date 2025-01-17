@@ -132,7 +132,8 @@ function initPluginData() {
   (pluginsStore.analysisPlugins.packages || []).forEach((plugin) => {
     templateOptions.value.push({ label: t(`plugins.${plugin.name}.title`) });
 
-    (plugin['Plugins.AnalysisPluginPackageDto.analysis'].analysisTemplates || []).forEach(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((plugin as any)['Plugins.AnalysisPluginPackageDto.analysis'].analysisTemplates || []).forEach(
       (template: AnalysisPluginTemplateDto) => {
         const schema = JSON.parse(template.schemaForm);
         // Exclude title and description from schema so they are not rendered as fields
@@ -158,7 +159,8 @@ function updateSchemaForm() {
 }
 
 function initFromDto(dto: OpalAnalysisDto) {
-  pluginSchemaFormData[`${dto.pluginName}.${dto.templateName}`].model = JSON.parse(dto.parameters);
+  const sf = pluginSchemaFormData[`${dto.pluginName}.${dto.templateName}`];
+  if (sf) sf.model = JSON.parse(dto.parameters);
 
   analysisOptions.value.name = dto.name;
   analysisOptions.value.table = dto.table;
@@ -216,14 +218,15 @@ async function onFilterFn(query: string, update: any) {
     loadingVariables.value = true;
 
     const fullQuery = `query=${query} AND (project:"${props.projectName}") AND (table:"${props.tableName}")`;
-    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en']);
+    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en'], undefined);
     if (result.totalHits > 0) {
       variableOptions.value = [];
       result.hits.map((hit) => {
-        const fieldMap = getSearchHitFieldMap(hit['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fieldMap = getSearchHitFieldMap((hit as any)['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
         variableOptions.value.push({
-          label: { name: fieldMap['name'], vlabel: fieldMap['label-en'] },
-          value: fieldMap['name'],
+          label: { name: fieldMap['name'] || '', vlabel: fieldMap['label-en'] || '' },
+          value: fieldMap['name'] || '',
         });
       });
     }

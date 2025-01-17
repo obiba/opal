@@ -53,7 +53,6 @@ export const useResourcesStore = defineStore('resources', () => {
         return response;
       }),
     ]);
-    return;
   }
 
   function getResourceReference(name: string) {
