@@ -188,6 +188,7 @@ import RestoreViewsDialog from 'src/components/datasource/RestoreViewsDialog.vue
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -223,7 +224,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -231,7 +232,7 @@ const columns = computed(() => [
     name: 'entityType',
     required: true,
     label: t('entity_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'entityType',
     sortable: true,
   },
@@ -239,7 +240,7 @@ const columns = computed(() => [
     name: 'variableCount',
     required: true,
     label: t('variables'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'variableCount',
     sortable: true,
   },
@@ -247,7 +248,7 @@ const columns = computed(() => [
     name: 'valueSetCount',
     required: true,
     label: t('entities'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueSetCount',
     sortable: true,
   },
@@ -255,7 +256,7 @@ const columns = computed(() => [
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: TableDto) => (row.timestamps || {}).lastUpdate,
     format: (val: string) => getDateLabel(val),
@@ -264,7 +265,7 @@ const columns = computed(() => [
     name: 'status',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'status',
   },
 ]);

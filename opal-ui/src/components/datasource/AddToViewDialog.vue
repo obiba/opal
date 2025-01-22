@@ -77,6 +77,7 @@
 <script setup lang="ts">
 import type { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
 import { ValueTypes } from 'src/utils/magma';
+import { DefaultAlignment } from 'src/components/models';
 
 interface DialogProps {
   modelValue: boolean;
@@ -102,8 +103,8 @@ const derivedVariables = ref<VariableDto[]>([]);
 const validDerivedVariables = computed(() => derivedVariables.value.filter((v) => v.name));
 
 const columns = computed(() => [
-  { name: 'name', align: 'left', label: t('name'), field: 'name' },
-  { name: 'valueType', align: 'left', label: t('value_type'), field: 'valueType' },
+  { name: 'name', align: DefaultAlignment, label: t('name'), field: 'name' },
+  { name: 'valueType', align: DefaultAlignment, label: t('value_type'), field: 'valueType' },
 ]);
 
 watch(

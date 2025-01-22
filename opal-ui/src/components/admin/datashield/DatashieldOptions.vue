@@ -98,6 +98,7 @@
 import type { DataShieldROptionDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldOptionDialog from 'src/components/admin/datashield/EditDatashieldOptionDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const datashieldStore = useDatashieldStore();
 const { t } = useI18n();
@@ -129,7 +130,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -137,7 +138,7 @@ const columns = computed(() => [
     name: 'value',
     required: true,
     label: t('value'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'value',
     sortable: true,
   },

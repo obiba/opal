@@ -136,6 +136,7 @@ import { analysisColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   projectName: string;
@@ -168,7 +169,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
     style: 'width: 25%',
@@ -176,27 +177,27 @@ const columns = computed(() => [
   {
     name: 'type',
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'templateName',
     format: (value: string, row: OpalAnalysisDto) => t(`plugins.${row.pluginName}.${value}.title`),
   },
   {
     name: 'total',
     label: t('total'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: OpalAnalysisDto) => getSuccessCount(row.lastResult || ({} as OpalAnalysisResultDto)),
   },
   {
     name: 'status',
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: OpalAnalysisDto) => (row.lastResult || {}).status || AnalysisStatusDto.ERROR,
   },
   {
     name: 'date',
     label: t('date'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: OpalAnalysisDto) => getDateLabel(row.lastResult ? row.lastResult.startDate : row.updated),
   },

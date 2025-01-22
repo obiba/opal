@@ -97,6 +97,7 @@ import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
 import { notifyError } from 'src/utils/notify';
 import { baseUrl } from 'src/boot/api';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   identifierTable: TableDto;
@@ -125,7 +126,7 @@ const columns = computed(() => [
   {
     name: 'name',
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     headerStyle: 'width: 35%; white-space: normal;',
     style: 'width: 35%; white-space: normal;',
@@ -133,7 +134,7 @@ const columns = computed(() => [
   {
     name: 'description',
     label: t('description'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (mapping: VariableDto) => {
       const description = (mapping.attributes || []).find((a) => a.name === 'description');
       return description ? description.value : '';

@@ -52,6 +52,7 @@
 import RSessionActivitiesDialog from 'src/components/admin/profiles/RSessionActivitiesDialog.vue';
 import type { RActivitySummaryDto } from 'src/models/OpalR';
 import { getDateLabel, getMillisLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   principal: string | undefined;
@@ -75,7 +76,7 @@ const columns = computed(() => {
       name: 'profile',
       required: true,
       label: t('profile'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'profile',
       sortable: true,
     },
@@ -83,7 +84,7 @@ const columns = computed(() => {
       name: 'context',
       required: true,
       label: t('context'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'context',
       sortable: true,
     },
@@ -91,7 +92,7 @@ const columns = computed(() => {
       name: 'startDate',
       required: true,
       label: t('from'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'startDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -100,7 +101,7 @@ const columns = computed(() => {
       name: 'endDate',
       required: true,
       label: t('to'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'endDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -109,7 +110,7 @@ const columns = computed(() => {
       name: 'sessionsCount',
       required: true,
       label: t('r_sessions_count'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'sessionsCount',
       sortable: true,
     },
@@ -117,7 +118,7 @@ const columns = computed(() => {
       name: 'executionTimeMillis',
       required: true,
       label: t('r_execution_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'executionTimeMillis',
       format: (val: number) => getMillisLabel(val),
       sortable: true,

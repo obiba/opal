@@ -93,6 +93,7 @@ import type { ResourceProviderDto } from 'src/models/Resources';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -119,15 +120,15 @@ const rows = computed(() => {
 });
 const pName = computed(() => route.params.id as string);
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'name' },
-  { name: 'type', label: t('type'), align: 'left', field: 'provider' },
-  { name: 'description', label: t('description'), align: 'left', field: 'description' },
-  { name: 'url', label: 'URL', align: 'left', field: (row: ResourceReferenceDto) => row.resource?.url },
+  { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },
+  { name: 'type', label: t('type'), align: DefaultAlignment, field: 'provider' },
+  { name: 'description', label: t('description'), align: DefaultAlignment, field: 'description' },
+  { name: 'url', label: 'URL', align: DefaultAlignment, field: (row: ResourceReferenceDto) => row.resource?.url },
   {
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'updated',
     format: (val: string) => getDateLabel(val),
   },

@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import type { VariableDto, CategoryDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
+import { DefaultAlignment } from 'src/components/models';
 
 interface VariablesListProps {
   variables: VariableDto[];
@@ -65,7 +66,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -74,14 +75,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'valueType',
     required: true,
     label: t('value_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueType',
     format: (val: string) => t(val),
     sortable: true,
@@ -90,7 +91,7 @@ const columns = computed(() => [
     name: 'categories',
     required: true,
     label: t('categories'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'categories',
   },
 ]);

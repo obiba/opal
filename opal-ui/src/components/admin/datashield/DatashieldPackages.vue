@@ -98,6 +98,7 @@ import InstallRPackageDialog from 'src/components/admin/r/InstallRPackageDialog.
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ViewRPackageDialog from 'src/components/admin/r/ViewRPackageDialog.vue';
 import { getDescriptionValue, getPackageKey } from 'src/utils/r';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   cluster: RServerClusterDto;
@@ -128,7 +129,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -136,14 +137,14 @@ const columns = computed(() => [
     name: 'title',
     required: true,
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
   },
   {
     name: 'version',
     required: true,
     label: t('version'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
     sortable: true,
   },
@@ -151,7 +152,7 @@ const columns = computed(() => [
     name: 'built',
     required: true,
     label: t('built'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
     sortable: true,
   },
@@ -159,7 +160,7 @@ const columns = computed(() => [
     name: 'libpath',
     required: true,
     label: t('libpath'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
     sortable: true,
   },
@@ -167,7 +168,7 @@ const columns = computed(() => [
     name: 'rserver',
     required: true,
     label: t('server'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'rserver',
     sortable: true,
   },

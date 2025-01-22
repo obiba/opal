@@ -97,6 +97,7 @@ import type { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const systemStore = useSystemStore();
 const { t } = useI18n();
@@ -113,10 +114,10 @@ const showDelete = ref(false);
 const selected = ref();
 
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'name' },
-  { name: 'hasDatasource', label: t('db.in_use'), align: 'left' },
-  { name: 'url', label: 'URL', align: 'left' },
-  { name: 'usage', label: t('usage'), align: 'left', field: 'usage' },
+  { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },
+  { name: 'hasDatasource', label: t('db.in_use'), align: DefaultAlignment },
+  { name: 'url', label: 'URL', align: DefaultAlignment },
+  { name: 'usage', label: t('usage'), align: DefaultAlignment, field: 'usage' },
 ]);
 
 onMounted(() => {

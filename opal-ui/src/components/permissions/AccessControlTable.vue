@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import type { Acl, Subject_SubjectType } from 'src/models/Opal';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   modelValue: Acl[];
@@ -91,7 +92,7 @@ const columns = computed(() => [
     name: 'resource',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'resource',
     sortable: true,
     style: 'width: 25%',
@@ -99,7 +100,7 @@ const columns = computed(() => [
   {
     name: 'permissions',
     label: t('permissions'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'action',
     format: (val: string) => t(`acls.${val}.label`),
     tooltip: (val: string) => t(`acls.${val}.description`),

@@ -49,6 +49,7 @@ import type { ProjectDto } from 'src/models/Projects';
 import type { KeyForm, KeyType } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import AddKeyPairDialog from 'src/components/project/AddKeyPairDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   project: ProjectDto;
@@ -74,7 +75,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'alias',
     headerStyle: 'width: 30%; white-space: normal;',
     style: 'width: 30%; white-space: normal;',
@@ -82,7 +83,7 @@ const columns = computed(() => [
   {
     name: 'type',
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'keyType',
     format: (val: KeyType) => t(`key_type.${val}`),
   },

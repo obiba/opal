@@ -161,6 +161,7 @@
 <script setup lang="ts">
 import type { Acl } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   resource: string;
@@ -191,9 +192,9 @@ const showSuggestions = ref(false);
 const rows = computed(() => authzStore.acls[props.resource] || []);
 
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'subject', style: 'width: 30%' },
-  { name: 'type', label: t('type'), align: 'left', field: 'subject' },
-  { name: 'permissions', label: t('permissions'), align: 'left', field: 'actions' },
+  { name: 'name', label: t('name'), align: DefaultAlignment, field: 'subject', style: 'width: 30%' },
+  { name: 'type', label: t('type'), align: DefaultAlignment, field: 'subject' },
+  { name: 'permissions', label: t('permissions'), align: DefaultAlignment, field: 'actions' },
 ]);
 
 onMounted(async () => {

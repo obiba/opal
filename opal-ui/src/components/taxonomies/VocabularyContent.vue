@@ -200,6 +200,7 @@ import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.v
 import AddTermDialog from 'src/components/taxonomies/AddTermDialog.vue';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   taxonomy: string;
@@ -267,7 +268,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -277,7 +278,7 @@ const columns = computed(() => [
   {
     name: 'title',
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'title',
     headerStyle: 'width: 20%; white-space: normal;',
     style: 'width: 20%; white-space: normal;',
@@ -285,7 +286,7 @@ const columns = computed(() => [
   {
     name: 'description',
     label: t('description'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'description',
     headerStyle: 'width: 50%; white-space: normal;',
     style: 'width: 50%; white-space: normal;',
@@ -293,7 +294,7 @@ const columns = computed(() => [
   {
     name: 'keywords',
     label: t('keywords'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'keywords',
   },
 ]);

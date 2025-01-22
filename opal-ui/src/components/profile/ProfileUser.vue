@@ -252,6 +252,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 const loading = ref(false);
 const authStore = useAuthStore();
@@ -281,7 +282,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
     headerStyle: 'width: 25%;',
@@ -289,7 +290,7 @@ const columns = computed(() => [
   {
     name: 'projects',
     label: t('projects'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'projects',
     format: (values: string[]) => ((values || []).length > 0 ? values : [t('user_profile.all_projects')]),
     headerStyle: 'width: 40%; white-space: normal;',
@@ -298,7 +299,7 @@ const columns = computed(() => [
   {
     name: 'access',
     label: t('data_access'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'access',
     format: (val: string) => t(`access.${val}`),
   },

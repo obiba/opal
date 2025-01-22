@@ -116,6 +116,7 @@ import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } 
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddUserDialog from 'src/components/admin/users/AddUserDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
@@ -133,7 +134,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -142,14 +143,14 @@ const columns = computed(() => [
   {
     name: 'groups',
     label: t('groups'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'groups',
     format: (val: string[]) => (val || []).filter((val) => val && val.length > 0),
   },
   {
     name: 'authentication',
     label: t('authentication'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'authenticationType',
     format: (val: string) => t(`auth_types.${val}`),
   },

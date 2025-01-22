@@ -81,6 +81,7 @@ import type { QTableColumn } from 'quasar';
 import type { ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface TableValuesProps {
   variable?: VariableDto;
@@ -134,7 +135,7 @@ function init() {
       columns.value = datasourceStore.variables.map((v) => ({
         name: v.name,
         label: v.name,
-        align: 'left',
+        align: DefaultAlignment,
         field: v.name,
         required: false,
         variable: v,
@@ -147,7 +148,7 @@ function init() {
         name: '_id',
         required: true,
         label: t('id'),
-        align: 'left',
+        align: DefaultAlignment,
         field: '_id',
         format: (val: string) => val,
         sortable: false,

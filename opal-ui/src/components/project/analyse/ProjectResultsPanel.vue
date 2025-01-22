@@ -112,6 +112,7 @@ import type { OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projec
 import { getDateLabel } from 'src/utils/dates';
 import { analysisColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   projectName: string;
@@ -183,13 +184,13 @@ const detailsColumns = computed(() => [
   {
     name: 'status',
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'status',
   },
   {
     field: 'message',
     label: t('message'),
-    align: 'left',
+    align: DefaultAlignment,
   },
 ]);
 
@@ -197,14 +198,14 @@ const historyColumns = computed(() => [
   {
     name: 'status',
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: OpalAnalysisResultDto) => row.status || AnalysisStatusDto.ERROR,
   },
   {
     name: 'date',
     label: t('date'),
     field: 'startDate',
-    align: 'left',
+    align: DefaultAlignment,
     format: (val: string) => getDateLabel(val),
     headerStyle: 'width: 65%; white-space: normal;',
     style: 'width: 65%; white-space: normal;',

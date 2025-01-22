@@ -110,6 +110,7 @@
 import type { SqlCommand, SqlResults } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
 import Papa from 'papaparse';
+import { DefaultAlignment } from 'src/components/models';
 
 const sql = ref('');
 
@@ -145,8 +146,8 @@ const historyRows = computed(() => {
 });
 
 const historyColumns = [
-  { name: 'query', label: t('query'), align: 'left', field: 'query', sortable: true },
-  { name: 'delay', label: t('delay'), align: 'left', field: 'delay', sortable: true },
+  { name: 'query', label: t('query'), align: DefaultAlignment, field: 'query', sortable: true },
+  { name: 'delay', label: t('delay'), align: DefaultAlignment, field: 'delay', sortable: true },
 ];
 
 function onHistoryClick(evt: unknown, row: SqlCommand) {

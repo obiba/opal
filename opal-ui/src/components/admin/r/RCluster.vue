@@ -97,6 +97,7 @@ import { baseUrl } from 'src/boot/api';
 import type { RServerClusterDto, RServerDto } from 'src/models/OpalR';
 import { getSizeLabel } from 'src/utils/files';
 import RPackages from 'src/components/admin/r/RPackages.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   cluster: RServerClusterDto;
@@ -114,14 +115,14 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
   },
   {
     name: 'version',
     required: true,
     label: t('r.version'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'version',
     classes: 'text-caption',
   },
@@ -129,28 +130,28 @@ const columns = computed(() => [
     name: 'sessionCount',
     required: true,
     label: t('r.sessions'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: RServerDto) => t('r.sessions_counts', { count: row.sessionCount, active: row.busySessionCount }),
   },
   {
     name: 'system',
     required: true,
     label: t('system'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: RServerDto) => t('r.system', { cores: row.cores, memory: getSizeLabel(row.freeMemory * 1000) }),
   },
   {
     name: 'url',
     required: true,
     label: 'URL',
-    align: 'left',
+    align: DefaultAlignment,
     field: 'app',
   },
   {
     name: 'running',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'running',
   },
 ]);

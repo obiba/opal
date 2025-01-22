@@ -125,6 +125,7 @@ import type { CategoryDto } from 'src/models/Magma';
 import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
 import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
@@ -149,7 +150,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -158,14 +159,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'missing',
     required: true,
     label: t('is_missing'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'isMissing',
     sortable: true,
   },

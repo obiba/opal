@@ -71,6 +71,7 @@ import type { SubjectProfileDto } from 'src/models/Opal';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 
@@ -84,7 +85,7 @@ const columns = computed(() => [
     name: 'principal',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'principal',
     format: (val: string) => val,
     sortable: true,
@@ -93,14 +94,14 @@ const columns = computed(() => [
   {
     name: 'realm',
     label: t('realm'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'realm',
     format: (val: string) => val,
   },
   {
     name: 'groups',
     label: t('groups'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'groups',
     format: (val: string) => val,
   },
@@ -115,7 +116,7 @@ const columns = computed(() => [
     name: 'created',
     required: true,
     label: t('created'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'created',
     format: (val: string) => getDateLabel(val),
   },
@@ -123,7 +124,7 @@ const columns = computed(() => [
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'lastUpdate',
     format: (val: string) => getDateLabel(val),
   },

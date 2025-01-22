@@ -151,9 +151,10 @@
 </template>
 
 <script setup lang="ts">
-import type { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   commands: CommandStateDto[];
@@ -182,7 +183,7 @@ const columns = computed(() => {
       name: 'id',
       required: true,
       label: t('id'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'id',
       format: (val: string) => val,
       sortable: true,
@@ -191,7 +192,7 @@ const columns = computed(() => {
       name: 'name',
       required: true,
       label: t('name'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'name',
       sortable: true,
     },
@@ -199,7 +200,7 @@ const columns = computed(() => {
       name: 'owner',
       required: true,
       label: t('user'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'owner',
       sortable: true,
     },
@@ -207,7 +208,7 @@ const columns = computed(() => {
       name: 'startTime',
       required: true,
       label: t('start_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'startTime',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -216,7 +217,7 @@ const columns = computed(() => {
       name: 'endTime',
       required: true,
       label: t('end_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'endTime',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -227,7 +228,7 @@ const columns = computed(() => {
       name: 'project',
       required: false,
       label: t('project'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'project',
       format: (val: string) => val,
       sortable: true,
@@ -237,7 +238,7 @@ const columns = computed(() => {
     name: 'status',
     required: false,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'status',
     sortable: true,
   });
