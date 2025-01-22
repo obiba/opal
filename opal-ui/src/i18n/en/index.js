@@ -806,7 +806,7 @@ export default {
   advanced_search: 'Advanced search',
   all_categories: 'All',
   all_projects: 'All',
-  anaylses: 'Analyses',
+  analyses: 'Analyses',
   annotate_info: '- | One variable will be annotated. | {count} variables will be annotated.',
   annotate: 'Annotate',
   annotation_texts_hint: 'Annotate with free text. For human readibility, you can provide a different text for each language. For machine processing or not localized text, choose "default" language. Empty text will be ignored. Markdown text format is supported.',
