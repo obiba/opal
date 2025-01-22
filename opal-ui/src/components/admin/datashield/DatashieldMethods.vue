@@ -114,6 +114,7 @@
 import type { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldMethodDialog from 'src/components/admin/datashield/EditDatashieldMethodDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   env: string;
@@ -156,7 +157,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -164,25 +165,25 @@ const columns = computed(() => [
     name: 'type',
     required: true,
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
   },
   {
     name: 'code',
     required: true,
     label: t('code'),
-    align: 'left',
+    align: DefaultAlignment,
   },
   {
     name: 'package',
     required: true,
     label: t('package'),
-    align: 'left',
+    align: DefaultAlignment,
   },
   {
     name: 'version',
     required: true,
     label: t('version'),
-    align: 'left',
+    align: DefaultAlignment,
   },
 ]);
 

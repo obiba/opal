@@ -222,6 +222,7 @@ import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
 import AttributeDialog from 'src/components/datasource/AttributeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import type { AttributeDto } from 'src/models/Magma';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -251,7 +252,7 @@ const columns = computed(() => [
   {
     name: 'namespace',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('namespace'),
     field: (row: AttributesBundle) => row.attributes[0].namespace,
     sortable: true,
@@ -259,7 +260,7 @@ const columns = computed(() => [
   {
     name: 'name',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('name'),
     field: (row: AttributesBundle) => row.attributes[0].name,
     sortable: true,
@@ -267,7 +268,7 @@ const columns = computed(() => [
   {
     name: 'values',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('values'),
     field: (row: AttributesBundle) => row.attributes,
   },

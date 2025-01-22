@@ -123,6 +123,7 @@ import { getLabels } from 'src/utils/attributes';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
 import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const cartStore = useCartStore();
 const taxonomiesStore = useTaxonomiesStore();
@@ -146,7 +147,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -155,14 +156,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'valueType',
     required: true,
     label: t('value_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueType',
     format: (val: string) => t(val),
     sortable: true,
@@ -171,14 +172,14 @@ const columns = computed(() => [
     name: 'table',
     required: true,
     label: t('table'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'parentLink',
   },
   {
     name: 'annotations',
     required: true,
     label: t('annotations'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
 ]);

@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookmarkDto, BookmarkDto_ResourceType } from 'src/models/Opal';
+import { type BookmarkDto, BookmarkDto_ResourceType } from 'src/models/Opal';
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 
 const { t } = useI18n();
@@ -41,10 +41,13 @@ const items = computed(() =>
 );
 
 function getTitle(bookmark: BookmarkDto) {
-  const title = bookmark.links.find((link) => link.rel === bookmark.resource).link;
-  if (bookmark.type === BookmarkDto_ResourceType.TABLE) {
-    const dsName = bookmark.links.find((link) => link.rel !== bookmark.resource).link;
-    return `${dsName}.${title}`;
+  let linkObj = bookmark.links.find((link) => link.rel === bookmark.resource);
+  const title = linkObj?.link;
+  if (title && bookmark.type === BookmarkDto_ResourceType.TABLE) {
+    linkObj = bookmark.links.find((link) => link.rel !== bookmark.resource);
+    const dsName = linkObj?.link;
+    if (dsName)
+      return `${dsName}.${title}`;
   }
   return title;
 }

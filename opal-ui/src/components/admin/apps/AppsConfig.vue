@@ -105,6 +105,7 @@ import AddAppTokenDialog from 'src/components/admin/apps/AddAppTokenDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { copyToClipboard } from 'quasar';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const appsStore = useAppsStore();
@@ -129,7 +130,7 @@ const columns = computed(() => [
     name: 'host',
     required: true,
     label: t('host'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'host',
     sortable: true,
     style: 'width: 25%',

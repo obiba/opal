@@ -77,6 +77,7 @@ import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 import { flattenObjectToString } from 'src/utils/strings';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -99,7 +100,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -110,7 +111,7 @@ const columns = computed(() => [
   {
     name: 'title',
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'title',
     format: (val: string) => val,
     headerStyle: 'width: 20%; white-space: normal;',
@@ -119,7 +120,7 @@ const columns = computed(() => [
   {
     name: 'tags',
     label: t('tags'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'tags',
     headerStyle: 'width: 20%; white-space: normal;',
     style: 'width: 20%; white-space: normal;',
@@ -128,7 +129,7 @@ const columns = computed(() => [
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: ProjectDto) => (row.timestamps || {}).lastUpdate,
     format: (val: string) => getDateLabel(val),
     sortable: true,
@@ -139,7 +140,7 @@ const columns = computed(() => [
     name: 'status',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'datasourceStatus',
     headerStyle: 'width: 5%; white-space: normal;',
     style: 'width: 5%; white-space: normal;',

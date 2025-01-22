@@ -155,6 +155,7 @@ import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityCo
 import TaxonomyGitHistory from 'src/components/taxonomies/TaxonomyGitHistory.vue';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   taxonomy: TaxonomyDto;
@@ -221,7 +222,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -230,7 +231,7 @@ const columns = computed(() => [
   {
     name: 'title',
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'title',
     headerStyle: 'width: 30%; white-space: normal;',
     style: 'width: 30%; white-space: normal;',
@@ -238,7 +239,7 @@ const columns = computed(() => [
   {
     name: 'description',
     label: t('description'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'description',
     headerStyle: 'width: 50%; white-space: normal;',
     style: 'width: 50%; white-space: normal;',
@@ -246,7 +247,7 @@ const columns = computed(() => [
   {
     name: 'terms',
     label: t('terms'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: VocabularyDto) => (row.terms || []).length,
   },
 ]);

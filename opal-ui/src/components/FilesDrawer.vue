@@ -64,7 +64,7 @@ const username = computed(() => (authStore.profile.principal ? authStore.profile
 watch(
   () => route.params.path,
   () => {
-    const path = [...route.params.path].join('/');
+    const path = Array.isArray(route.params.path) ? route.params.path.join('/') : route.params.path;
     filesStore.loadFiles(`/${path}`);
   }
 );

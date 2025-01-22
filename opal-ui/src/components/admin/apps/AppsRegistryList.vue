@@ -68,6 +68,7 @@
 import type { AppDto } from 'src/models/Apps';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const appsStore = useAppsStore();
@@ -89,7 +90,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
     style: 'width: 30%',
@@ -97,19 +98,19 @@ const columns = computed(() => [
   {
     name: 'type',
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'type',
   },
   {
     name: 'cluster',
     label: t('cluster'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'cluster',
   },
   {
     name: 'host',
     label: t('host'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'server',
   },
   {

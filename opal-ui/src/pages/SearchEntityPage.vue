@@ -89,6 +89,7 @@
 import ValueCell from 'src/components/datasource/ValueCell.vue';
 import type { TableDto, ValueSetsDto, ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const route = useRoute();
 const searchStore = useSearchStore();
@@ -115,8 +116,8 @@ const table = computed(() => tables.value?.find((t) => asTableId(t) === tableId.
 
 const columns = computed(() => {
   return [
-    { name: 'variable', label: t('variable'), field: 'variable', align: 'left', sortable: true },
-    { name: 'value', label: t('value'), field: 'value', align: 'left', sortable: true },
+    { name: 'variable', label: t('variable'), field: 'variable', align: DefaultAlignment, sortable: true },
+    { name: 'value', label: t('value'), field: 'value', align: DefaultAlignment, sortable: true },
   ];
 });
 

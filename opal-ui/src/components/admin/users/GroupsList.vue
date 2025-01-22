@@ -50,6 +50,7 @@
 import type { GroupDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 
@@ -65,7 +66,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -74,7 +75,7 @@ const columns = computed(() => [
   {
     name: 'users',
     label: t('users'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'subjectCredentials',
     format: (val: string[]) => (val || []).filter((val) => val && val.length > 0),
   },

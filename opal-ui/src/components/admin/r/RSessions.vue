@@ -62,6 +62,7 @@
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import type { RSessionDto } from 'src/models/OpalR';
 import { getDateLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 const rStore = useRStore();
 const { t } = useI18n();
@@ -75,16 +76,16 @@ const initialPagination = ref({
 });
 
 const columns = computed(() => [
-  { name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
-  { name: 'profile', label: t('profile'), align: 'left', field: 'profile', sortable: true, classes: 'text-caption' },
-  { name: 'cluster', label: t('r.cluster'), align: 'left', field: 'cluster', sortable: true, classes: 'text-caption' },
-  { name: 'server', label: t('server'), align: 'left', field: 'server', sortable: true },
-  { name: 'context', label: t('context'), align: 'left', field: 'context', sortable: true, classes: 'text-caption' },
-  { name: 'user', label: t('user'), align: 'left', field: 'user', sortable: true },
+  { name: 'id', label: 'ID', align: DefaultAlignment, field: 'id', sortable: true },
+  { name: 'profile', label: t('profile'), align: DefaultAlignment, field: 'profile', sortable: true, classes: 'text-caption' },
+  { name: 'cluster', label: t('r.cluster'), align: DefaultAlignment, field: 'cluster', sortable: true, classes: 'text-caption' },
+  { name: 'server', label: t('server'), align: DefaultAlignment, field: 'server', sortable: true },
+  { name: 'context', label: t('context'), align: DefaultAlignment, field: 'context', sortable: true, classes: 'text-caption' },
+  { name: 'user', label: t('user'), align: DefaultAlignment, field: 'user', sortable: true },
   {
     name: 'creationDate',
     label: t('started'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'creationDate',
     sortable: true,
     format: getDateLabel,
@@ -92,12 +93,12 @@ const columns = computed(() => [
   {
     name: 'lastAccessDate',
     label: t('last_access'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'lastAccessDate',
     sortable: true,
     format: getDateLabel,
   },
-  { name: 'status', label: 'Status', align: 'left', field: 'status', sortable: true },
+  { name: 'status', label: 'Status', align: DefaultAlignment, field: 'status', sortable: true },
 ]);
 
 function getSessionColor(status: string) {

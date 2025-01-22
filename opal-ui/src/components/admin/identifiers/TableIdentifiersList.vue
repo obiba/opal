@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import type { QTableColumn } from 'quasar';
 import type { TableDto, ValueSetsDto } from 'src/models/Magma';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   identifierTable: TableDto;
@@ -42,7 +43,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
   idColumns.value.push({
     name: 'id',
     label: 'ID',
-    align: 'left',
+    align: DefaultAlignment,
     field: 'id',
   } as QTableColumn);
 
@@ -50,7 +51,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
     idColumns.value.push({
       name: vItem,
       label: vItem,
-      align: 'left',
+      align: DefaultAlignment,
       field: vItem,
     } as QTableColumn);
   });

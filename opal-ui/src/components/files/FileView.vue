@@ -268,6 +268,7 @@ import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
@@ -319,7 +320,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -328,7 +329,7 @@ const columns = computed(() => [
     name: 'size',
     required: true,
     label: t('size'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'size',
     format: (val: number) => getSizeLabel(val),
     sortable: true,
@@ -337,7 +338,7 @@ const columns = computed(() => [
     name: 'lastModifiedTime',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'lastModifiedTime',
     format: (val: number) => getDateLabel(val),
     sortable: true,

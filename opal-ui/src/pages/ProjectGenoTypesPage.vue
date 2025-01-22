@@ -196,6 +196,7 @@ import ImportVcfFileDialog from 'src/components/project/ImportVcfFileDialog.vue'
 import ExportVcfFileDialog from 'src/components/project/ExportVcfFileDialog.vue';
 import { getSizeLabel } from 'src/utils/files';
 import { baseUrl } from 'src/boot/api';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -265,7 +266,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string, row: VCFSummaryDto) => `${val}.${row.format.toLowerCase()}.gz`,
     sortable: true,
@@ -274,32 +275,32 @@ const columns = computed(() => [
   {
     name: 'samples',
     label: t('samples'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'totalSamplesCount',
   },
   {
     name: 'participants',
     label: t('participants'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'participantsCount',
     required: false,
   },
   {
     name: 'identified',
     label: t('vcf_store.identified_samples'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'identifiedSamplesCount',
   },
   {
     name: 'controls',
     label: t('vcf_store.controls'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'controlSamplesCount',
   },
   {
     name: 'vcf_store.variants',
     label: t('vcf_store.variants'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'variantsCount',
   },
   {

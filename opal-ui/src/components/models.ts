@@ -1,3 +1,5 @@
+export const DefaultAlignment: 'left' | 'right' | 'center' = 'left';
+
 import type { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
 import type {
   ViewDto,

@@ -54,6 +54,7 @@ const { t } = useI18n();
 import type { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
 import AddProjectIdMappingsDialog from 'src/components/project/AddProjectIdMappingsDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   project: ProjectDto;
@@ -80,7 +81,7 @@ const columns = computed(() => [
     name: 'type',
     required: true,
     label: t('entity_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'entityType',
     headerStyle: 'width: 30%; white-space: normal;',
     style: 'width: 30%; white-space: normal;',
@@ -88,7 +89,7 @@ const columns = computed(() => [
   {
     name: 'mapping',
     label: t('project_admin.id_mapping'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'mapping',
   },
 ]);

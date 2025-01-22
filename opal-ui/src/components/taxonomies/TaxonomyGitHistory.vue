@@ -82,6 +82,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
 import type { VcsCommitInfoDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   taxonomyName: string;
@@ -106,7 +107,7 @@ const columns = computed(() => [
     name: 'id',
     required: true,
     label: t('id'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'commitId',
     format: (val: string) => val.slice(0, 7),
     headerStyle: 'width: 20%; white-space: normal;',
@@ -115,14 +116,14 @@ const columns = computed(() => [
   {
     name: 'date',
     label: t('date'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'date',
     format: (val: string) => getDateLabel(val),
   },
   {
     name: 'author',
     label: t('author'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'author',
   },
 ]);

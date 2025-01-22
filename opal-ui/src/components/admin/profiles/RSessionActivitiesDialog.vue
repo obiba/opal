@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import type { RSessionActivityDto } from 'src/models/OpalR';
 import { getDate, getDateLabel, getMillisLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 interface DialogProps {
   modelValue: boolean;
@@ -62,7 +63,7 @@ const columns = computed(() => {
       name: 'createdDate',
       required: true,
       label: t('start_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'createdDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -71,7 +72,7 @@ const columns = computed(() => {
       name: 'updatedDate',
       required: true,
       label: t('end_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'updatedDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -80,7 +81,7 @@ const columns = computed(() => {
       name: 'duration',
       required: true,
       label: t('duration'),
-      align: 'left',
+      align: DefaultAlignment,
       field: (row: RSessionActivityDto) => getMillisLabel(Math.ceil(Math.max(getDuration(row), row.executionTimeMillis)/1000)*1000),
       sortable: true,
     },
@@ -88,7 +89,7 @@ const columns = computed(() => {
       name: 'executionTimeMillis',
       required: true,
       label: t('r_execution_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'executionTimeMillis',
       format: (val: number) => getMillisLabel(val),
       sortable: true,

@@ -122,6 +122,7 @@ import { notifyError } from 'src/utils/notify';
 import type { IDProviderDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddIdentityProviderDialog from './AddIdentityProviderDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const identityProvidersStore = useIdentityProvidersStore();
 const { t } = useI18n();
@@ -144,7 +145,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -153,35 +154,35 @@ const columns = computed(() => [
   {
     name: 'label',
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'label',
     format: (val: string) => val,
   },
   {
     name: 'groups',
     label: t('groups'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'groups',
     format: (val: string) => ((val) => (val || '').split(/\s+/))(val).filter((group) => group),
   },
   {
     name: 'providerUrl',
     label: t('identity_provider_account_login'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'providerUrl',
     format: (val: string) => val,
   },
   {
     name: 'parameters',
     label: t('parameters'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'discoveryURI',
     format: (val: string) => val,
   },
   {
     name: 'enabled',
     label: t('enabled'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'enabled',
     format: (val: string) => val,
   },
