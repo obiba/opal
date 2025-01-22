@@ -154,7 +154,7 @@
             v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"
           />
           <q-tab name="values" :label="t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
-          <q-tab name="analyses" :label="t('anaylses')" v-if="canAnalyseValidate" />
+          <q-tab name="analyses" :label="t('analyses')" v-if="canAnalyseValidate" />
           <q-tab
             name="permissions"
             :label="t('permissions')"

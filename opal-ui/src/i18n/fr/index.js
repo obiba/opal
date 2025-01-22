@@ -402,7 +402,7 @@ export default {
   },
   git: {
     diff_viewer: {
-      titre: 'Détails de la validation',
+      title: 'Détails de la validation',
     },
   },
   key_type: {
@@ -560,9 +560,9 @@ export default {
       host_required: "L'hôte est requis",
       host_uri_format: 'L\'hôte doit commencer par "https://" ou "http://"',
     },
-  },
-  analysis: {
-    name_exists: 'Le nom de l\'analyse doit être unique',
+    analysis: {
+      name_exists: 'Le nom de l\'analyse doit être unique',
+    }
   },
   main: {
     brand: 'Opal',
@@ -601,7 +601,7 @@ export default {
   r: {
     cluster: 'Cluster',
     clusters_count: 'Aucun cluster de serveurs R | 1 cluster de serveurs R | {count} clusters de serveurs R',
-    paquets_warn: "Cette opération peut paraître pratique mais elle n'est pas recommandée dans un environnement de production. Il est préférable de déployer le serveur R à partir d'une image Docker validée pour garantir la reproductibilité de l'environnement d'analyse R.",
+    packages_warn: "Cette opération peut paraître pratique mais elle n'est pas recommandée dans un environnement de production. Il est préférable de déployer le serveur R à partir d'une image Docker validée pour garantir la reproductibilité de l'environnement d'analyse R.",
     servers_info: "Les serveurs R sont regroupés par clusters. Dans chaque cluster, tous les serveurs R sont considérés comme interchangeables, c'est-à-dire que la charge d'activité sera répartie sur l'un ou l'autre serveur lors de la création d'une session R.",
     servers: 'Serveurs R',
     sessions_counts: '{count} ({active} active)',
@@ -640,7 +640,7 @@ export default {
     title: 'Taxonomie',
     name_hint: 'Une taxonomie doit avoir un nom unique.',
     author_hint: "L'auteur de la taxonomie peut être spécifié (pour le droit d'auteur).",
-    licence_hint: "Type de licence qui s'applique à cette taxonomie. Voir l'{url} suggérée.",
+    license_hint: "Type de licence qui s'applique à cette taxonomie. Voir l'{url} suggérée.",
     creative_commons_licenses: 'Licences Creative Commons',
     description_hint: 'Description facultative de la taxonomie.',
     add: 'Ajouter une taxonomie',
@@ -678,7 +678,7 @@ export default {
       versions: 'Versions publiées',
       versions_hint: "Ces taxonomies sont disponibles sous l'{url}",
       versions_hint_url: 'Licence publique internationale Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.',
-      licence_agreement: "J'ai lu et accepté les termes de la licence.",
+      license_agreement: "J'ai lu et accepté les termes de la licence.",
     },
     import_gh: {
       label: 'À partir de GitHub',
@@ -886,10 +886,11 @@ export default {
   default_charset: 'Jeu de caractères par défaut',
   default_storage: 'Stockage par défaut',
   default_value_type: 'Type de valeur par défaut',
+  default: 'Défaut',
   delay: 'Délai',
   delete_annotation_confirm: 'Êtes-vous sûr de vouloir supprimer cette annotation ?',
   delete_annotation: 'Supprimer une annotation',
-  delete_attributs_confirm: 'Êtes-vous sûr de vouloir supprimer cet attribut (toutes langues) ?',
+  delete_attributes_confirm: 'Êtes-vous sûr de vouloir supprimer cet attribut (toutes langues) ?',
   delete_categories_confirm: '- | Êtes-vous sûr de vouloir supprimer cette catégorie ? | Êtes-vous sûr de vouloir supprimer ces {count} catégories ?',
   delete_files_confirm: '- | Êtes-vous sûr de vouloir supprimer ce fichier ? | Êtes-vous sûr de vouloir supprimer ces {count} fichiers ?',
   delete_group_confirm: "Êtes-vous sûr de vouloir supprimer le groupe '{groupe}'?",
