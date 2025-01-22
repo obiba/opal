@@ -14,7 +14,7 @@ interface Props {
 }
 
 defineProps<Props>();
-const properties: FieldItem<VcsCommitInfoDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'commitId',
     label: 'id',

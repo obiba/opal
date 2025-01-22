@@ -241,7 +241,7 @@ const {
   onFilter,
 } = useTaxonomyEntityContent<TermDto>(() => props.vocabulary, 'terms');
 
-const properties: FieldItem<VocabularyDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'name',
   },

@@ -73,11 +73,10 @@
 
 <script setup lang="ts">
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
-import type { StringMap } from 'src/components/models';
 
 const { t } = useI18n();
 
-const items: FieldItem<StringMap>[] = [
+const items: FieldItem[] = [
   { field: 'name',
     label: 'name',
     hint: 'app_configuration.name_hint'

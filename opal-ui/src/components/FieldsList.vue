@@ -45,11 +45,6 @@
 
 <script setup lang="ts">
 import { toMaxDecimals } from 'src/utils/numbers';
-import type { TableDto, VariableDto } from 'src/models/Magma';
-import type { DescriptiveStatsDto } from 'src/models/Math';
-import type { DataShieldProfileDto } from 'src/models/DataShield';
-import type { ResourceFactoryDto } from 'src/models/Resources';
-import type { StringMap } from 'src/components/models';
 
 export interface FieldLink {
   label: string;
@@ -58,22 +53,28 @@ export interface FieldLink {
   iconRight?: string;
 }
 
-export interface FieldItem<T> {
+export interface FieldItem {
   field: string;
   label?: string;
   hint?: string;
   unit?: string;
-  format?: (val: T) => string | undefined;
-  html?: (val: T) => string | undefined;
-  visible?: (val: T) => boolean;
-  links?: (val: T) => FieldLink[];
-  icon?: (val: T) => string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  format?: (val: any) => string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  html?: (val: any) => string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visible?: (val: any) => boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  links?: (val: any) => FieldLink[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: (val: any) => string;
 }
 
 export interface FieldsListProps {
-  dbobject?: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap | ResourceFactoryDto;
-  items?: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap | ResourceFactoryDto>[];
-  maxWidth: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dbobject?: any;
+  items?: FieldItem[];
+  maxWidth?: string;
 }
 
 const { t, locale } = useI18n({ useScope: 'global' });

@@ -55,9 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ResourceReferenceDto } from 'src/models/Projects';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
-import type { ResourceFactoryDto } from 'src/models/Resources';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 const route = useRoute();
@@ -90,7 +88,7 @@ function init() {
   });
 }
 
-const itemsReference: FieldItem<ResourceReferenceDto>[] = [
+const itemsReference: FieldItem[] = [
   { field: 'name' },
   { field: 'description' },
   {
@@ -108,7 +106,7 @@ const itemsReference: FieldItem<ResourceReferenceDto>[] = [
   },
 ];
 
-const itemsFactory: FieldItem<ResourceFactoryDto>[] = [{ field: 'title', label: 'type' }];
+const itemsFactory: FieldItem[] = [{ field: 'title', label: 'type' }];
 
 function onParametersUpdate() {
   console.log('onParametersUpdate');

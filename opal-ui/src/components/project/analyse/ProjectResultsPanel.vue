@@ -141,7 +141,7 @@ const initialHistoryPagination = ref({
 });
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 
-const properties = computed<FieldItem<OpalAnalysisResultDto>[]>(() => [
+const properties = computed<FieldItem[]>(() => [
   {
     field: 'status',
     label: 'status',
