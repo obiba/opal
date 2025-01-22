@@ -210,7 +210,7 @@ const nextVariable = computed(() => {
   return idx === datasourceStore.variables.length - 1 ? null : datasourceStore.variables[idx + 1];
 });
 
-const items1: FieldItem<VariableDto>[] = [
+const items1: FieldItem[] = [
   {
     field: 'name',
   },
@@ -233,7 +233,7 @@ const items1: FieldItem<VariableDto>[] = [
   },
 ];
 
-const items2: FieldItem<VariableDto>[] = [
+const items2: FieldItem[] = [
   {
     field: 'isRepeatable',
     label: 'repeatable',

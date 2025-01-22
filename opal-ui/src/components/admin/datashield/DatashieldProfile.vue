@@ -137,7 +137,7 @@ const missingCluster = computed(
 );
 const builtinProfile = computed(() => props.profile?.name === props.profile?.cluster);
 
-const items: FieldItem<DataShieldProfileDto>[] = [
+const items: FieldItem[] = [
   {
     field: 'name',
   },

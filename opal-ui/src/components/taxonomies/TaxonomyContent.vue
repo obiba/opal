@@ -190,7 +190,7 @@ const {
   onFilter,
 } = useTaxonomyEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
 
-const properties: FieldItem<TaxonomyDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'name',
   },

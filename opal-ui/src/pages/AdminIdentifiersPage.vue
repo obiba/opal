@@ -145,7 +145,7 @@
 <script setup lang="ts">
 import type { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
-import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList from 'src/components/FieldsList.vue';
 import { getDateLabel } from 'src/utils/dates';
 import AddIdentifierTableDialog from 'src/components/admin/identifiers/AddIdentifierTableDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -173,7 +173,7 @@ const showImportMapped = ref(false);
 const identifiersTables = ref([] as TableDto[]);
 const hasIdentifiersTables = computed(() => identifiersTables.value.length > 0);
 const mappings = computed(() => identifiersStore.mappings || []);
-const properties: FieldItem<TableDto>[] = computed(() => {
+const properties = computed(() => {
   return [
     {
       field: 'timestamps',

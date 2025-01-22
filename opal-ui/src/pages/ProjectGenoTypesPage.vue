@@ -221,7 +221,7 @@ const initialPagination = ref({
   minRowsForPagination: 10,
 });
 const toolsVisible = ref<{ [key: string]: boolean }>({});
-const summaryProperties: FieldItem<VCFStoreDto>[] = [
+const summaryProperties: FieldItem[] = [
   {
     field: 'totalSamplesCount',
     label: 'samples',
@@ -239,7 +239,7 @@ const summaryProperties: FieldItem<VCFStoreDto>[] = [
     label: 'vcf_store.controls',
   },
 ];
-const sampleMappingProperties: FieldItem<VCFSamplesMappingDto>[] = [
+const sampleMappingProperties: FieldItem[] = [
   {
     field: 'tableReference',
     label: 'table',

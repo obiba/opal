@@ -190,7 +190,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjectDto } from 'src/models/Projects';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -229,7 +228,7 @@ const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCr
 const hasDatabase = computed(() => project.value.database !== undefined);
 const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
-const properties: FieldItem<ProjectDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'name',
   },
@@ -252,7 +251,7 @@ const properties: FieldItem<ProjectDto>[] = [
   },
 ];
 
-const dsProperties: FieldItem<ProjectDto>[] = [
+const dsProperties: FieldItem[] = [
   {
     field: 'database',
     label: 'database',
@@ -267,7 +266,7 @@ const dsProperties: FieldItem<ProjectDto>[] = [
   },
 ];
 
-const vcfProperties: FieldItem<ProjectDto>[] = [
+const vcfProperties: FieldItem[] = [
   {
     field: 'vcfStoreService',
     label: 'vcf_store.label',
