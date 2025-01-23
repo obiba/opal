@@ -157,7 +157,7 @@ const columns = computed(() => [
   {
     name: 'enabled',
     label: t('enabled'),
-    align: 'center  ',
+    align: DefaultAlignment,
     field: 'enabled',
   },
 ]);

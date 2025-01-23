@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
@@ -115,8 +115,8 @@ const selected = ref();
 
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },
-  { name: 'hasDatasource', label: t('db.in_use'), align: DefaultAlignment },
-  { name: 'url', label: 'URL', align: DefaultAlignment },
+  { name: 'hasDatasource', label: t('db.in_use'), align: DefaultAlignment, field: 'hasDatasource' },
+  { name: 'url', label: 'URL', align: DefaultAlignment, field: 'url' },
   { name: 'usage', label: t('usage'), align: DefaultAlignment, field: 'usage' },
 ]);
 

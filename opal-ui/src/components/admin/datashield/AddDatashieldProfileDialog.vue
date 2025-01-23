@@ -37,7 +37,7 @@ const datashieldStore = useDatashieldStore();
 const rStore = useRStore();
 
 const name = ref<string>('');
-const cluster = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
+const cluster = ref<string>(rStore.clusters.length && rStore.clusters[0] ? rStore.clusters[0].name : '');
 
 const clusterNames = computed(() => rStore.clusters.map((cluster: RServerClusterDto) => cluster.name));
 
@@ -47,7 +47,7 @@ watch(
     showDialog.value = value;
     if (value) {
       name.value = '';
-      cluster.value = rStore.clusters.length ? rStore.clusters[0].name : '';
+      cluster.value = rStore.clusters.length && rStore.clusters[0] ? rStore.clusters[0].name : '';
     }
   }
 );

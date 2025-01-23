@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import type { RPackageDto } from 'src/models/OpalR';
 import type { StringMap } from 'src/components/models';
-import FieldsList from 'src/components/FieldsList.vue';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 
 const { t } = useI18n();
 
@@ -47,7 +47,7 @@ const fields = computed(() => {
     field: d.key,
     label: d.key,
     format: (obj: StringMap) => obj[d.key],
-  }));
+  } as FieldItem));
 });
 
 watch(

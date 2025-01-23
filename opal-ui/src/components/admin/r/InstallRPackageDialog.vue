@@ -11,9 +11,9 @@
       </q-card-section>
       <q-card-section>
         <q-select v-model="manager" :options="managersOptions" dense :label="t('package_manager')" class="q-mb-md" />
-        <q-input v-model="name" dense :label="t(manager.value === 'gh' ? 'gh_repo' : 'name')" />
-        <div v-if="manager.value === 'gh'" class="text-hint">{{ t('gh_repo_hint') }}</div>
-        <div v-if="manager.value === 'gh'" class="q-mt-xs row q-col-gutter-md">
+        <q-input v-model="name" dense :label="t(manager?.value === 'gh' ? 'gh_repo' : 'name')" />
+        <div v-if="manager?.value === 'gh'" class="text-hint">{{ t('gh_repo_hint') }}</div>
+        <div v-if="manager?.value === 'gh'" class="q-mt-xs row q-col-gutter-md">
           <div class="col">
             <q-input v-model="organization" dense :label="t('gh_org')" />
             <div class="text-hint">{{ t('gh_org_hint') }}</div>
@@ -40,12 +40,10 @@ import { notifyError, notifySuccess } from 'src/utils/notify';
 interface DialogProps {
   modelValue: boolean;
   cluster: RServerClusterDto;
-  managers: string[] | undefined;
+  managers?: string[];
 }
 
-const props = withDefaults(defineProps<DialogProps>(), {
-  managers: undefined,
-});
+const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue']);
 
@@ -80,11 +78,11 @@ function onHide() {
 }
 
 function onUpdate() {
-  const isgh = manager.value.value === 'gh';
+  const isgh = manager.value?.value === 'gh';
   const pname = isgh ? `${organization.value}/${name.value}` : name.value;
   const pref = isgh && reference.value ? reference.value : undefined;
   rStore
-    .installRPackage(props.cluster.name, manager.value.value, pname, pref)
+    .installRPackage(props.cluster.name, manager.value?.value || 'cran', pname, pref)
     .then((response) => {
       notifySuccess(t('install_r_package_task_created', { id: response.data.id }));
     })

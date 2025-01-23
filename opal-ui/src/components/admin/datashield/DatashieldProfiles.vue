@@ -53,7 +53,7 @@ const { t } = useI18n();
 
 const datashieldStore = useDatashieldStore();
 
-const tab = ref<string>(datashieldStore.profiles.length ? datashieldStore.profiles[0].name : '');
+const tab = ref<string>(datashieldStore.profiles.length && datashieldStore.profiles[0] ? datashieldStore.profiles[0].name : '');
 const showAdd = ref(false);
 
 watch(
@@ -61,7 +61,7 @@ watch(
   () => {
     if (datashieldStore.profiles.length) {
       if (tab.value === '' || !datashieldStore.profiles.find((profile) => profile.name === tab.value))
-        tab.value = datashieldStore.profiles[0].name;
+        tab.value = datashieldStore.profiles[0]?.name || '';
     }
   }
 );

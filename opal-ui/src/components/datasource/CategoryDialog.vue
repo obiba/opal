@@ -103,7 +103,7 @@ watch(
         labels.value = props.category.attributes
           ? props.category.attributes
               .filter((a) => a.name === 'label')
-              .map((a) => ({ locale: a.locale, value: a.value }))
+              .map((a) => ({ locale: a.locale || '', value: a.value }))
           : [];
       } else {
         newCategory.value = { name: '', attributes: [], isMissing: false } as CategoryDto;

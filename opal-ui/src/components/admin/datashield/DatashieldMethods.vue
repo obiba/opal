@@ -138,7 +138,7 @@ const showEdit = ref(false);
 const method = ref<DataShieldMethodDto | null>(null);
 
 const methods = computed(() => {
-  return datashieldStore.methods[props.env];
+  return datashieldStore.methods[props.env] || [];
 });
 
 function onFilter() {
@@ -165,24 +165,28 @@ const columns = computed(() => [
     name: 'type',
     required: true,
     label: t('type'),
+    field: 'type',
     align: DefaultAlignment,
   },
   {
     name: 'code',
     required: true,
     label: t('code'),
+    field: 'code',
     align: DefaultAlignment,
   },
   {
     name: 'package',
     required: true,
     label: t('package'),
+    field: 'package',
     align: DefaultAlignment,
   },
   {
     name: 'version',
     required: true,
     label: t('version'),
+    field: 'version',
     align: DefaultAlignment,
   },
 ]);

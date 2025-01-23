@@ -129,7 +129,7 @@ const userCertificate = computed({
 });
 
 const authPassword = computed(() => props.authenticationType === SubjectCredentialsDto_AuthenticationType.PASSWORD);
-const editMode = computed(() => props.user && props.user.name);
+const editMode = computed(() => props.user?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('user_edit') : t('user_add')));
 

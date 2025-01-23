@@ -39,14 +39,14 @@ import DatashieldPackages from 'src/components/admin/datashield/DatashieldPackag
 
 const rStore = useRStore();
 
-const tab = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
+const tab = ref<string>(rStore.clusters.length && rStore.clusters[0] ? rStore.clusters[0].name : '');
 
 watch(
   () => rStore.clusters,
   () => {
     if (rStore.clusters.length) {
       if (tab.value === '' || !rStore.clusters.find((cluster: RServerClusterDto) => cluster.name === tab.value))
-        tab.value = rStore.clusters[0].name;
+        tab.value = rStore.clusters[0]?.name || '';
     }
   }
 );

@@ -107,7 +107,7 @@ async function onAddTable(tName: string) {
   const variables = [...transientDatasourceStore.variables];
 
   if (!datasourceStore.tables.map((tbl) => tbl.name).includes(tName)) {
-    const entityType = variables[0].entityType;
+    const entityType = variables[0]?.entityType || 'Participant';
     await datasourceStore.addTable(tName, entityType);
   }
   await datasourceStore.addOrUpdateVariables(tName, variables);

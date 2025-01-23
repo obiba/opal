@@ -260,7 +260,7 @@ const groupsMappingOptions = [
 ];
 const groupsMapping: Ref<string | null> = ref(null);
 const newProvider = ref<IDProviderDto>({ ...emptyProvider });
-const editMode = computed(() => props.provider && props.provider.name);
+const editMode = computed(() => props.provider?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('identity_provider_edit') : t('identity_provider_add')));
 const groupsJavascriptPlaceholder = computed(() => {

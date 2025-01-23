@@ -88,7 +88,7 @@
       @confirm="onDeletePackage"
     />
     <install-r-package-dialog v-model="showInstall" :cluster="cluster" :managers="['cran', 'gh']" />
-    <view-r-package-dialog v-model="showView" :pkg="pkg" />
+    <view-r-package-dialog v-if="pkg" v-model="showView" :pkg="pkg" />
   </div>
 </template>
 
@@ -138,6 +138,7 @@ const columns = computed(() => [
     required: true,
     label: t('title'),
     align: DefaultAlignment,
+    field: 'title',
     sortable: true,
   },
   {
@@ -146,6 +147,7 @@ const columns = computed(() => [
     label: t('version'),
     align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'version',
     sortable: true,
   },
   {
@@ -154,6 +156,7 @@ const columns = computed(() => [
     label: t('built'),
     align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'built',
     sortable: true,
   },
   {
@@ -162,6 +165,7 @@ const columns = computed(() => [
     label: t('libpath'),
     align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'libpath',
     sortable: true,
   },
   {

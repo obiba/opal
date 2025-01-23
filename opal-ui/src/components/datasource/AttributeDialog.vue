@@ -142,8 +142,8 @@ watch(
   (value) => {
     if (value) {
       if (props.bundle && props.bundle.attributes.length > 0) {
-        namespace.value = props.bundle.attributes[0].namespace || '';
-        name.value = props.bundle.attributes[0].name;
+        namespace.value = props.bundle.attributes[0]?.namespace || '';
+        name.value = props.bundle.attributes[0]?.name || '';
         texts.value = {};
         previews.value = {};
         props.bundle.attributes.forEach((attr) => {
@@ -166,11 +166,11 @@ function onHide() {
 }
 
 async function onApply() {
-  if (props.bundle && props.bundle.attributes.length > 0) {
+  if (props.bundle && props.bundle.attributes.length > 0 && props.bundle.attributes[0]?.name) {
     // provided are to be modified
     await datasourceStore.deleteAttributes(
       props.variable,
-      props.bundle.attributes[0].namespace,
+      props.bundle.attributes[0]?.namespace,
       props.bundle.attributes[0].name
     );
   }

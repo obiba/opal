@@ -94,13 +94,13 @@ watch(
   (value) => {
     if (value) {
       projectDestination.value =
-        props.tables.length === 1 ? props.tables[0].datasourceName : projectsStore.projects[0].name;
+        (props.tables.length === 1 ? props.tables[0]?.datasourceName : projectsStore.projects[0]?.name) || '';
       newTableName.value = '';
       if (props.tables.length === 1) {
         const tableNames = datasourceStore.tables.map((t) => t.name);
         let idx = 1;
         while (newTableName.value === '') {
-          const name = `${props.tables[0].name}_${idx}`;
+          const name = `${props.tables[0]?.name}_${idx}`;
           if (!tableNames.includes(name)) {
             newTableName.value = name;
           }

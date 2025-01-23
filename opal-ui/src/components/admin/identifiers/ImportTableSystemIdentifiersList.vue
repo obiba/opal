@@ -108,16 +108,16 @@ watch(
   }
 );
 
-function onSearchTable(val: string | null) {
+function onSearchTable(val: string | number | null) {
   filterOptions.value = [];
   selectedTable.value = null;
 
-  if (!val || (val || '').trim().length < 3) {
+  if (!val || (val + '').trim().length < 3) {
     showSuggestions.value = false;
     return;
   }
 
-  const needle = val.toLowerCase();
+  const needle = (val + '').toLowerCase();
   filterOptions.value = [...identifiersOptions.filter((v) => v.name.toLowerCase().indexOf(needle) > -1)];
 
   showSuggestions.value = filterOptions.value.length > 0;

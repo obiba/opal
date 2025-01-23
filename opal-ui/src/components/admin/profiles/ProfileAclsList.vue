@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import type { Acl, Subject_SubjectType } from 'src/models/Opal';
+import { type Acl, Subject_SubjectType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
 

@@ -21,7 +21,7 @@
           >
           </q-input>
           <q-input
-            v-model="newMapping.attributes[0].value"
+            v-model="description"
             dense
             type="text"
             :label="t('description')"
@@ -59,7 +59,8 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const showDialog = ref(props.modelValue);
 const newMapping = ref<VariableDto>({} as VariableDto);
-const editMode = computed(() => props.mapping && props.mapping.name);
+const description = ref('');
+const editMode = computed(() => props.mapping?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('id_mappings.add_mapping') : t('id_mappings.edit_mapping')));
 
@@ -85,6 +86,8 @@ watch(
         newMapping.value = emptyMapping;
       }
 
+      description.value = newMapping.value.attributes?.find((a) => a.name === 'description')?.value || '';
+
       showDialog.value = value;
     }
   }
@@ -99,6 +102,7 @@ function onHide() {
 async function onAddMapping() {
   const valid = await formRef.value.validate();
   if (valid) {
+    newMapping.value.attributes = [{ name: 'description', value: description.value }];
     (editMode.value
       ? identifiersStore.updateMapping(props.identifier.name, newMapping.value)
       : identifiersStore.addMapping(props.identifier.name, newMapping.value)

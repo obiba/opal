@@ -77,12 +77,12 @@ function onSave() {
     if (interval.length === 1) {
       const n = interval[0];
       if (!newVariable.categories.find((c) => c.name === n)) {
-        newVariable.categories.push({ name: n, attributes: [], isMissing: false });
+        newVariable.categories.push({ name: n || '', attributes: [], isMissing: false });
       }
     } else if (interval.length === 2) {
       try {
-        const from = parseInt(interval[0].trim());
-        const to = parseInt(interval[1].trim());
+        const from = interval[0] ? parseInt(interval[0].trim()) : 0;
+        const to = interval[1] ? parseInt(interval[1].trim()) : 0;
         for (let i = from; i <= to; i++) {
           const n = i.toString();
           if (!newVariable.categories.find((c) => c.name === n)) {
