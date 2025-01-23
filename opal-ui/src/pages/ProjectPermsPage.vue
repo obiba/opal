@@ -40,7 +40,6 @@
         </div>
         <div class="col-10">
           <access-control-table
-            class=""
             v-model="selectedAcls"
             :acls="acls"
             :on-delete-acls="onDeleteAcls"

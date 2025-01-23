@@ -31,7 +31,7 @@
           placeholder="SELECT * FROM ..."
           autogrow
           @keydown="onKeydown"
-          type="text-area"
+          type="textarea"
           class="q-mb-md"
         />
         <q-btn
@@ -132,7 +132,8 @@ const rows = computed(() => {
     const columns = results.value?.columns;
     return columns
       ? row.reduce((acc, val, i) => {
-          acc[columns[i]] = val;
+          if (columns[i])  
+            acc[columns[i]] = val;
           return acc;
         }, rowObj)
       : rowObj;

@@ -193,12 +193,12 @@ function onRowClick(evt: unknown, row: { name: string }) {
   });
 }
 
-function onFilter(tableRows: ProjectDto[], filter: string) {
-  if (filter.length === 0) {
-    return tableRows;
+function onFilter() {
+  if (filter.value.length === 0) {
+    return projects.value;
   }
-  const query = filter && filter.length > 0 ? filter.toLowerCase() : '';
-  const result = tableRows.filter((row) => {
+  const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const result = projects.value.filter((row) => {
     const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
       row.description || {}
     )}`;

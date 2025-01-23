@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
 import AddProjectAnalysisDialog from './AddProjectAnalysisDialog.vue';
-import type { OpalAnalysisDto, OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
+import { type OpalAnalysisDto, type OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
 import type { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
 import { analysisColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
@@ -224,15 +224,15 @@ function onLeaveRow(row: TableRow) {
   toolsVisible.value[row.name] = false;
 }
 
-function onFilter(tableRows: OpalAnalysisDto[], filter: string) {
-  if (filter.length === 0) {
-    return tableRows;
+function onFilter() {
+  if (filter.value.length === 0) {
+    return analyses.value;
   }
-  const query = filter?.length > 0 ? filter.toLowerCase() : '';
-  const result = tableRows.filter((row) => {
+  const query = filter.value?.length > 0 ? filter.value.toLowerCase() : '';
+  const result = analyses.value.filter((row) => {
     const rowString = `${row.name.toLowerCase()}`;
     return rowString.includes(query);
-  });
+  }) || [];
 
   return result;
 }

@@ -71,7 +71,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     if (datasource.value?.name !== dsName || !tables.value) {
       return initDatasourceTables(dsName).then(() => {
         if (table.value?.name !== tName) {
-          return loadTable(tName);
+          loadTable(tName);
         } else {
           return Promise.resolve();
         }

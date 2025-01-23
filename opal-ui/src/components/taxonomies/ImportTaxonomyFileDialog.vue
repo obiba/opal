@@ -44,7 +44,7 @@
 import { notifyError } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import type { FileDto } from 'src/models/Opal';
-import type { FileDto_FileType } from 'src/models/Opal';
+import { FileDto_FileType } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;

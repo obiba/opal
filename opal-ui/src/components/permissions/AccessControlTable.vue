@@ -58,7 +58,7 @@ interface Props {
   modelValue: Acl[];
   acls: Acl[];
   principal?: string;
-  type: Subject_SubjectType;
+  type?: Subject_SubjectType;
   loading: boolean;
   hideDelete?: boolean;
   onDeleteAcls: () => void;

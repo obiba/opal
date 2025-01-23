@@ -91,8 +91,8 @@ interface DialogProps {
   projectName: string;
   tableName: string;
   analysisNames: string[];
-  analysisName?: string;
-  clone?: OpalAnalysisDto;
+  analysisName?: string | undefined;
+  clone?: OpalAnalysisDto | undefined;
 }
 
 const { t } = useI18n();
@@ -101,7 +101,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 const props = defineProps<DialogProps>();
 const analysisPanel = ref();
 const showDialog = ref(props.modelValue);
-const analysis = ref<OpalAnalysisDto | null>(null);
+const analysis = ref<OpalAnalysisDto>();
 const dialogTitle = ref('');
 const submitCaption = ref('');
 const editMode = computed(() => props.analysisName);
@@ -132,7 +132,7 @@ watch(
 
 function onHide() {
   showDialog.value = false;
-  analysis.value = null;
+  analysis.value = undefined;
   tab.value = 'results';
   emit('update:modelValue', false);
 }

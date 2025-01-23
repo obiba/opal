@@ -148,7 +148,7 @@ interface DialogProps {
   modelValue: boolean;
   table?: TableDto;
   variables: VariableDto[];
-  annotation?: Annotation;
+  annotation?: Annotation | undefined;
   operation?: string;
 }
 

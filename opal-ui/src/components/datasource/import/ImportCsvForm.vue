@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import type { DatasourceFactory } from 'src/components/models';
 import type { FileDto } from 'src/models/Opal';
-import type { ValueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface Props {
@@ -120,16 +120,17 @@ onMounted(() => {
   if (props.modelValue) {
     const params = props.modelValue['Magma.CsvDatasourceFactoryDto.params'];
     if (params) {
-      name.value = params.tables[0].name;
-      entityType.value = params.tables[0].entityType || 'Participant';
+      name.value = params.tables[0]?.name || '';
+      entityType.value = params.tables[0]?.entityType || 'Participant';
       defaultValueType.value = params.defaultValueType || 'text';
       fieldSeparator.value = params.separator || ',';
       quotationMark.value = params.quote || '"';
       fromRow.value = params.firstRow || 1;
       charSet.value = params.characterSet || 'ISO-8859-1';
-      filesStore.getFile(params.tables[0].data).then((file) => {
-        dataFile.value = file;
-      });
+      if (params.tables[0]?.data)
+        filesStore.getFile(params.tables[0].data).then((file) => {
+          dataFile.value = file;
+        });
     }
   }
 });

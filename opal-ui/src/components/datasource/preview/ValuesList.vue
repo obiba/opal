@@ -102,7 +102,8 @@ const pagination = ref({
 });
 const COLUMNS_COUNT = 20;
 
-const rows = ref([]);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rows = ref<{ [key: string]: any }[]>([]);
 const columns = ref<QTableColumn[]>([]);
 const visibleColumns = ref<string[]>([]);
 const varFilter = ref<string>('');
@@ -140,13 +141,15 @@ function init() {
   tableRef.value.requestServerInteraction();
 }
 
-function onFilter(val: string, update) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onFilter(val: string, update: any) {
   update(() => {
     varFilter.value = val.toLowerCase();
   });
 }
 
-function onRequest(props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onRequest(props: any) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   const offset = (page - 1) * rowsPerPage;
@@ -158,7 +161,9 @@ function onRequest(props) {
       rows.value = res.valueSets.map((vs) => {
         const row = { _id: vs.identifier };
         vs.values.forEach((val, idx: number) => {
-          row[res.variables[idx]] = val;
+          if (res.variables[idx])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (row as any)[res.variables[idx]] = val;
         });
         return row;
       });
@@ -179,6 +184,6 @@ function onVariableSelection() {
 }
 
 function getVariable(name: string) {
-  return props.variables.find((v) => v.name === name);
+  return props.variables.find((v) => v.name === name) || {name} as VariableDto;
 }
 </script>

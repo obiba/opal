@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import type { VAceEditor } from 'vue3-ace-editor';
-import type { ValueTypes } from 'src/utils/magma';
+import { ValueTypes } from 'src/utils/magma';
 import type { VariableDto, AttributeDto } from 'src/models/Magma';
 
 interface DialogProps {

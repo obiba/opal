@@ -151,14 +151,14 @@
           flat
           icon="navigate_before"
           color="primary"
-          @click="$refs.stepper.previous()"
+          @click="stepper.previous()"
           :label="t('back')"
         />
         <q-btn
           v-if="step < 4"
           flat
           icon-right="navigate_next"
-          @click="$refs.stepper.next()"
+          @click="stepper.next()"
           color="primary"
           :label="t('continue')"
           :disable="!canNext"
@@ -201,6 +201,7 @@ const transientDatasourceStore = useTransientDatasourceStore();
 const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
+const stepper = ref();
 const showDialog = ref(props.modelValue);
 const step = ref(1);
 const factory = ref<DatasourceFactory>();

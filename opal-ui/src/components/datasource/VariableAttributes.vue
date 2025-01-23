@@ -254,7 +254,7 @@ const columns = computed(() => [
     required: true,
     align: DefaultAlignment,
     label: t('namespace'),
-    field: (row: AttributesBundle) => row.attributes[0].namespace,
+    field: (row: AttributesBundle) => row.attributes[0]?.namespace,
     sortable: true,
   },
   {
@@ -262,7 +262,7 @@ const columns = computed(() => [
     required: true,
     align: DefaultAlignment,
     label: t('name'),
-    field: (row: AttributesBundle) => row.attributes[0].name,
+    field: (row: AttributesBundle) => row.attributes[0]?.name,
     sortable: true,
   },
   {
@@ -346,8 +346,8 @@ function onConfirmDeleteAttributes() {
     datasourceStore
       .deleteAttributes(
         datasourceStore.variable,
-        bundleSelected.value.attributes[0].namespace,
-        bundleSelected.value.attributes[0].name
+        bundleSelected.value.attributes[0]?.namespace,
+        bundleSelected.value.attributes[0]?.name || ''
       )
       .then(() => {
         datasourceStore.loadTableVariables();

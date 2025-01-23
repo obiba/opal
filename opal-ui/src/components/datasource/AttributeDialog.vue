@@ -105,7 +105,7 @@ interface DialogProps {
   modelValue: boolean;
   table: TableDto;
   variable: VariableDto;
-  bundle?: AttributesBundle;
+  bundle?: AttributesBundle | undefined;
 }
 
 const props = defineProps<DialogProps>();

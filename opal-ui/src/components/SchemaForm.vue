@@ -26,7 +26,7 @@ const { t } = useI18n();
 interface Props {
   modelValue: FormObject | undefined;
   schema: SchemaFormObject;
-  disable: boolean;
+  disable?: boolean | undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {

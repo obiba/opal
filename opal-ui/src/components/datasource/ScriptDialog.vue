@@ -45,7 +45,7 @@ import type { VAceEditor } from 'vue3-ace-editor';
 
 interface DialogProps {
   modelValue: boolean;
-  script?: string;
+  script?: string | undefined;
 }
 
 const props = defineProps<DialogProps>();

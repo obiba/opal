@@ -119,11 +119,11 @@ function onHide() {
   emit('update:modelValue', false);
 }
 
-const isView = computed(() => datasourceStore.table.viewType);
+const isView = computed(() => datasourceStore.table.viewType !== undefined);
 
 const hasValues = computed(
   () =>
-    !datasourceStore.table.viewLink && datasourceStore.table.valueSetCount && datasourceStore.table.valueSetCount > 0
+    datasourceStore.table.viewLink !== undefined && datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0 && datasourceStore.table.valueSetCount > 0
 );
 
 const isValid = computed(

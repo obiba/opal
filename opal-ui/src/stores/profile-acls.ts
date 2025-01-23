@@ -4,7 +4,7 @@ import { type Acl, Subject_SubjectType, type SubjectProfileDto } from 'src/model
 
 export const useProfileAclsStore = defineStore('profileAcls', () => {
   const acls = ref([] as Acl[]);
-  const groupAcls = ref<{ [key: string]: SubjectProfileDto }>({});
+  const groupAcls = ref<{ [key: string]: Acl[] }>({});
 
   function reset() {
     acls.value = [];

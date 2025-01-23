@@ -29,7 +29,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
 
   // Functions
 
-  function customSort(rows: TYPE[], sortBy: string, descending: string) {
+  function customSort(rows: TYPE[], sortBy: string, descending: boolean) {
     if (!canSort.value || !sortBy) return rows;
 
     const data = rows;
@@ -85,12 +85,12 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     canSort.value = true;
   }
 
-  function onFilter(tableRows: TYPE[], filter: string) {
-    if (filter.length === 0) {
-      return tableRows;
+  function onFilter() {
+    if (filter.value.length === 0) {
+      return rows.value;
     }
-    const query = filter && filter.length > 0 ? filter.toLowerCase() : '';
-    const result = tableRows.filter((row) => {
+    const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+    const result = rows.value.filter((row) => {
       const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
         row.description || {}
       )}`;

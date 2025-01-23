@@ -13,7 +13,6 @@
           :label="t('destination_folder')"
           :folder="filesStore.current"
           selection="single"
-          @select="onUpdate"
           type="folder"
           class="q-mb-md"
         />

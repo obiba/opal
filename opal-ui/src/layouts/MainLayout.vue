@@ -31,7 +31,7 @@
                       <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{
                         searchStore.getField(item, 'table') }}</span>
                     </div>
-                    <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
+                    <div v-for="(attr, idx) in searchStore.getLabels(item)" :key="idx" class="text-hint">
                       <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                       <span>{{ attr.value }}</span>
                     </div>

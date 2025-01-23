@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import * as Plotly from 'plotly.js-dist';
+import * as Plotly from 'plotly.js';
 
 const props = defineProps({
   data: {

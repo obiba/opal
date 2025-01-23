@@ -151,7 +151,7 @@ const { t } = useI18n();
 interface Props {
   modelValue: string | number | boolean | FileObject | FormObject | Array<FormObject> | undefined;
   field: SchemaFormField;
-  disable: boolean;
+  disable?: boolean | undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
