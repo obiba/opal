@@ -75,7 +75,7 @@ function onAddLocale() {
   const missingLocales = getMissingLocales();
 
   if (missingLocales.length > 0) {
-    labels.value = labels.value.concat({ locale: missingLocales[0], text: '' });
+    labels.value = labels.value.concat({ locale: missingLocales[0] || 'en', text: '' });
   }
 
   canAddLocale.value = missingLocales.length === 0;

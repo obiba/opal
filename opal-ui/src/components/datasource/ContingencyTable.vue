@@ -22,7 +22,7 @@
           <q-item v-bind="scope.itemProps">
             <q-item-section class="text-caption">
               <span>{{ scope.opt.label }}</span>
-              <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(scope.opt.variable.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
@@ -56,7 +56,7 @@
           <q-item v-bind="scope.itemProps">
             <q-item-section class="text-caption">
               <span>{{ scope.opt.label }}</span>
-              <div v-for="attr in getLabels(scope.opt.variable.attributes)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in getLabels(scope.opt.variable.attributes)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
@@ -241,7 +241,8 @@ watch([dsName, tName], () => {
     });
 });
 
-function onFilterVarCat(val: string, update) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onFilterVarCat(val: string, update: any) {
   update(() => {
     const needle = val.toLowerCase().trim();
     varCatOptions.value =
@@ -251,7 +252,8 @@ function onFilterVarCat(val: string, update) {
   });
 }
 
-function onFilterVarAlt(val: string, update) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onFilterVarAlt(val: string, update: any) {
   update(() => {
     const needle = val.toLowerCase().trim();
     varAltOptions.value =
@@ -304,6 +306,7 @@ function getStatistic(cat: string, measure: string) {
   if (!contingency.value) return '-';
   const facet = getFacet(cat);
   if (!facet || !facet.statistics) return '-';
-  return facet.statistics[measure] === undefined ? '-' : facet.statistics[measure];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (facet.statistics as any)[measure] === undefined ? '-' : (facet.statistics as any)[measure];
 }
 </script>

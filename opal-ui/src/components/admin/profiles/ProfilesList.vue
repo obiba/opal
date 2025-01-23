@@ -108,7 +108,7 @@ const columns = computed(() => [
   {
     name: 'otpEnabled',
     label: t('2fa.name'),
-    align: 'center',
+    align: DefaultAlignment,
     field: 'otpEnabled',
     format: (val: string) => val,
   },

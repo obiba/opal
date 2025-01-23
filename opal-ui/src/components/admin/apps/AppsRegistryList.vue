@@ -116,7 +116,7 @@ const columns = computed(() => [
   {
     name: 'tags',
     label: t('tags'),
-    align: 'left  ',
+    align: DefaultAlignment,
     field: 'tags',
   },
 ]);

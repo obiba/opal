@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isFileItem()">
+    <div v-if="isFile()">
       <file-select
         v-model="dataFile"
         :label="field.title"
@@ -8,15 +8,15 @@
         :folder="filesStore.current"
         selection="single"
         :disable="disable"
-        :type="field.format"
+        :type="field.format === 'folder' ? 'folder' : 'file'"
         :extensions="field.fileFormats"
         @select="onFileSelect()"
         class="q-mb-md"
       />
     </div>
-    <div v-else-if="isPasswordItem()">
+    <div v-else-if="isPassword()">
       <q-input
-        v-model="data"
+        v-model="dataString"
         :label="field.title"
         :hint="field.description"
         type="password"
@@ -28,10 +28,10 @@
         @update:model-value="onUpdate"
       />
     </div>
-    <div v-else-if="field.type === 'string'">
+    <div v-else-if="isString()">
       <q-select
         v-if="field.enum"
-        v-model="data"
+        v-model="dataString"
         :label="field.title"
         :hint="field.description"
         dense
@@ -44,7 +44,7 @@
       />
       <q-input
         v-else
-        v-model="data"
+        v-model="dataString"
         :label="field.title"
         :hint="field.description"
         autocomplete="off"
@@ -55,9 +55,9 @@
         @update:model-value="onUpdate"
       />
     </div>
-    <div v-else-if="field.type === 'integer'">
+    <div v-else-if="isNumber()">
       <q-input
-        v-model.number="data"
+        v-model.number="dataNumber"
         :label="field.title"
         :hint="field.description"
         type="number"
@@ -68,9 +68,22 @@
         @update:model-value="onUpdate"
       />
     </div>
-    <div v-else-if="field.type === 'boolean'">
+    <div v-else-if="isInteger()">
+      <q-input
+        v-model.number="dataInteger"
+        :label="field.title"
+        :hint="field.description"
+        type="number"
+        dense
+        :disable="disable"
+        class="q-mb-md"
+        :debounce="500"
+        @update:model-value="onUpdate"
+      />
+    </div>
+    <div v-else-if="isBoolean()">
       <q-toggle
-        v-model="data"
+        v-model="dataBoolean"
         :label="field.title"
         :hint="field.description"
         dense
@@ -82,7 +95,7 @@
         {{ field.description }}
       </div>
     </div>
-    <div v-else-if="field.type === 'array'">
+    <div v-else-if="isArray()">
       <div class="text-help">{{ field.title }}</div>
       <div class="text-hint q-mb-sm">{{ field.description }}</div>
       <q-list separator bordered>
@@ -90,6 +103,7 @@
           <q-item-section>
             <div v-for="item in field.items" :key="item.key">
               <schema-form-item
+                v-if="dataArray[index]"
                 v-model="dataArray[index][item.key]"
                 :field="item"
                 :disable="disable"
@@ -130,22 +144,29 @@
 <script setup lang="ts">
 import FileSelect from 'src/components/files/FileSelect.vue';
 import type { FileObject, FormObject, SchemaFormField } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 
 const { t } = useI18n();
 
 interface Props {
   modelValue: string | number | boolean | FileObject | FormObject | Array<FormObject> | undefined;
   field: SchemaFormField;
-  disable?: boolean;
+  disable: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  disable: false,
+});
 const emit = defineEmits(['update:modelValue']);
 
 const filesStore = useFilesStore();
 
 const data = ref(props.modelValue);
-const dataFile = ref<FileObject>();
+const dataFile = ref<FileDto>();
+const dataString = ref('');
+const dataNumber = ref<number>();
+const dataInteger = ref<number>();
+const dataBoolean = ref<boolean>();
 const dataArray = ref<Array<FormObject>>([]);
 
 watch([() => props.modelValue, () => props.field], init, { immediate: true });
@@ -154,7 +175,15 @@ function init() {
   data.value = props.modelValue;
   if (isArray()) {
     dataArray.value = data.value ? (data.value as Array<FormObject>) : [];
-  } else if (isFileItem()) {
+  } else if (isString()) {
+    dataString.value = data.value as string;
+  } else if (isNumber()) {
+    dataNumber.value = data.value as number;
+  } else if (isInteger()) {
+    dataInteger.value = data.value as number;
+  } else if (isBoolean()) {
+    dataBoolean.value = data.value === true || data.value === 'true';
+  } else if (isFile()) {
     if (props.modelValue && typeof props.modelValue === 'string') {
       filesStore.getFile(props.modelValue).then((file) => {
         dataFile.value = file;
@@ -162,16 +191,33 @@ function init() {
     }
   }
 }
-function isFileItem() {
-  return props.field.type === 'string' && (props.field.format === 'file' || props.field.format === 'folder');
+
+function isString() {
+  return props.field.type === 'string';
 }
 
-function isPasswordItem() {
-  return props.field.type === 'string' && props.field.format === 'password';
+function isPassword() {
+  return isString() && props.field.format === 'password';
 }
 
 function isArray() {
   return props.field.type === 'array';
+}
+
+function isNumber() {
+  return props.field.type === 'number';
+}
+
+function isInteger() {
+  return props.field.type === 'integer';
+}
+
+function isBoolean() {
+  return props.field.type === 'boolean';
+}
+
+function isFile() {
+  return props.field.type === 'string' && (props.field.format === 'file' || props.field.format === 'folder');
 }
 
 function onFileSelect() {
@@ -182,6 +228,19 @@ function onFileSelect() {
 function onUpdate() {
   if (isArray()) {
     data.value = dataArray.value;
+  } else if (isString()) {
+    data.value = dataString.value;
+  } else if (isNumber()) {
+    data.value = dataNumber.value;
+  } else if (isInteger()) {
+    if (dataInteger.value) {
+      // Remove decimal part
+      data.value = dataInteger.value = Math.floor(dataInteger.value);
+    } else {
+      data.value = undefined;
+    }
+  } else if (isBoolean()) {
+    data.value = dataBoolean.value;
   }
   emit('update:modelValue', data.value);
 }

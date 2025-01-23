@@ -35,6 +35,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0,
+  sortBy: 'id',
 });
 
 function formatIdentifiersForTable(identifiers: ValueSetsDto) {
@@ -60,7 +61,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
   (identifiers.valueSets || []).forEach((item) => {
     const d = { id: item.identifier } as { [key: string]: string };
     variables.forEach((vItem, index) => {
-      d[vItem] = item.values[index].value || '';
+      d[vItem] = item.values[index]?.value || '';
     });
     idRows.value.push(d);
   });
@@ -82,7 +83,8 @@ async function getIdentifiers(offset = 0, limit = 10, identifiers?: ValueSetsDto
 
 // Handlers
 
-function onRequest(props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onRequest(props: any) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
   const offset = (page - 1) * rowsPerPage;
   const limit = rowsPerPage;

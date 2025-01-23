@@ -231,7 +231,7 @@ const termsOptions = computed(() => {
     return [];
   }
   return vocabulary.value.terms
-    ? vocabulary.value.terms.map((item: VocabularyDto) => {
+    ? vocabulary.value.terms.map((item: TermDto) => {
         return {
           label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
           value: item.name,
@@ -273,7 +273,7 @@ watch(
             });
           }
         } else {
-          taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0].name : '';
+          taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0]?.name || '' : '';
           onTaxonomyChange();
         }
         tab.value = NO_LOCALE;
@@ -285,7 +285,7 @@ watch(
 
 function onTaxonomyChange() {
   if (taxonomy.value) {
-    vocabularyName.value = taxonomy.value.vocabularies ? taxonomy.value.vocabularies[0].name : '';
+    vocabularyName.value = taxonomy.value.vocabularies ? taxonomy.value.vocabularies[0]?.name || '' : '';
   } else {
     vocabularyName.value = '';
   }
@@ -294,7 +294,7 @@ function onTaxonomyChange() {
 
 function onVocabularyChange() {
   if (vocabulary.value) {
-    termName.value = vocabulary.value.terms ? vocabulary.value.terms[0].name : '';
+    termName.value = vocabulary.value.terms ? vocabulary.value.terms[0]?.name || '' : '';
   } else {
     termName.value = '';
   }

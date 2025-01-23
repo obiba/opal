@@ -27,7 +27,7 @@
     <div v-else>
       <q-card bordered flat>
         <q-card-section>
-          <q-markdown :src="bundle?.attributes[0].value" no-heading-anchor-links />
+          <q-markdown :src="bundle?.attributes[0]?.value" no-heading-anchor-links />
         </q-card-section>
       </q-card>
     </div>

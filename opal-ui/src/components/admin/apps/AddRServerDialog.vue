@@ -109,7 +109,7 @@ const credentialTypeHint = computed(() =>
 );
 const adminCredentials = computed(() => credentialType.value === 'administrator');
 const managerCredentials = computed(() => credentialType.value === 'manager_user');
-const editMode = computed(() => props.rockAppConfig && props.rockAppConfig.host);
+const editMode = computed(() => props.rockAppConfig !== undefined && props.rockAppConfig.host !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('apps.edit_service') : t('apps.add_service')));
 

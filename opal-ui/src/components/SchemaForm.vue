@@ -26,10 +26,12 @@ const { t } = useI18n();
 interface Props {
   modelValue: FormObject | undefined;
   schema: SchemaFormObject;
-  disable?: boolean;
+  disable: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  disable: false,
+});
 const emit = defineEmits(['update:modelValue']);
 const data = ref(props.modelValue || {});
 const isFormValid = ref(true);

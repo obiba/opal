@@ -92,10 +92,13 @@ export const useRStore = defineStore('r', () => {
 
   async function installRPackage(
     clusterId: string,
-    manager: 'cran' | 'gh' | 'bioc',
+    manager: string,
     packageName: string,
     ref?: string
   ) {
+    if (!['cran', 'gh', 'bioc'].includes(manager)) {
+      throw new Error(`Invalid package manager: ${manager}`);
+    }
     return api.post(
       `/service/r/cluster/${clusterId}/commands/_install`,
       {

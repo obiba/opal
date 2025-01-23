@@ -42,7 +42,7 @@ const showDialog = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue', 'beforeInit', 'afterInit']);
 
 const selected = ref<string[]>([]);
-const options = ref<{ label: string; value: string }[]>();
+const options = ref<{ label: string; value: string }[]>([]);
 const loading = ref(false);
 
 const datashieldStore = useDatashieldStore();

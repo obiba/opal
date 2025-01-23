@@ -49,14 +49,14 @@ import RCluster from 'src/components/admin/r/RCluster.vue';
 const { t } = useI18n();
 const rStore = useRStore();
 
-const tab = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
+const tab = ref<string>(rStore.clusters.length ? rStore.clusters[0]?.name || '' : '');
 
 watch(
   () => rStore.clusters,
   () => {
     if (rStore.clusters.length) {
       if (tab.value === '' || !rStore.clusters.find((cluster: RServerClusterDto) => cluster.name === tab.value))
-        tab.value = rStore.clusters[0].name;
+        tab.value = rStore.clusters[0]?.name || '';
     }
   }
 );

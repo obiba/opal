@@ -44,7 +44,7 @@
                     @click="tab = grp"
                   >
                   <q-badge color="info" class="on-right">
-                    {{ profileAclsStore.groupAcls[grp] ? profileAclsStore.groupAcls[grp].length : 0 }}
+                    {{ profileAclsStore.groupAcls[grp] ? 1 : 0 }}
                   </q-badge>
                 </q-btn>
                 </div>
@@ -67,13 +67,13 @@
 </template>
 
 <script setup lang="ts">
-import type { SubjectProfileDto, Subject_SubjectType } from 'src/models/Opal';
+import { type SubjectProfileDto, Subject_SubjectType } from 'src/models/Opal';
 import ProfileAclsList from 'src/components/admin/profiles/ProfileAclsList.vue';
 
 const { t } = useI18n();
 
 interface Props {
-  principal: string | undefined;
+  principal: string;
 }
 
 const props = defineProps<Props>();
@@ -87,7 +87,7 @@ const profile = ref<SubjectProfileDto>();
 
 const groups = computed(() => profile.value?.groups || []);
 const aclsCount = computed(() => profileAclsStore.acls ? profileAclsStore.acls.length : 0);
-const groupAclsCount = computed(() => profileAclsStore.groupAcls ? Object.keys(profileAclsStore.groupAcls).map(grp => profileAclsStore.groupAcls[grp]?.length).reduce((a, b) => a + b, 0) : 0);
+const groupAclsCount = computed(() => profileAclsStore.groupAcls ? Object.keys(profileAclsStore.groupAcls).map(grp => profileAclsStore.groupAcls[grp] ? 1 : 0).reduce((a: number, b: number) => a + b, 0) : 0);
 
 onMounted(() => {
   if (props.principal) {

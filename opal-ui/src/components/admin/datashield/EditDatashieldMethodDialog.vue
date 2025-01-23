@@ -76,10 +76,18 @@ interface MethodTypeOption {
   value: string;
 }
 
-const typeOptions: MethodTypeOption[] = ['r_func', 'r_script'].map((value) => ({ label: t(value), value }));
+const RFuncOption: MethodTypeOption = {
+  label: t('r_func'),
+  value: 'r_func'
+}
+const RScriptOption: MethodTypeOption = {
+  label: t('r_script'),
+  value: 'r_script'
+}
+const typeOptions: MethodTypeOption[] = [RFuncOption, RScriptOption];
 
 const name = ref('');
-const type = ref<MethodTypeOption>(typeOptions[0]);
+const type = ref<MethodTypeOption>(RFuncOption);
 const func = ref('');
 const script = ref('');
 
@@ -91,7 +99,7 @@ watch(
     showDialog.value = value;
     if (value) {
       name.value = props.method ? props.method.name : '';
-      type.value = props.method ? getType(props.method) : typeOptions[0];
+      type.value = props.method ? getType(props.method) : RFuncOption;
       func.value = props.method && type.value.value === 'r_func' ? getCode(props.method) : '';
       script.value = props.method && type.value.value === 'r_script' ? getCode(props.method) : '';
     }
@@ -105,7 +113,7 @@ function onHide() {
 function getType(method: DataShieldMethodDto): MethodTypeOption {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const val = (method as any)['DataShield.RFunctionDataShieldMethodDto.method'] ? 'r_func' : 'r_script';
-  return typeOptions.find((o) => o.value === val) || typeOptions[0];
+  return typeOptions.find((o) => o.value === val) || RFuncOption;
 }
 
 function getCode(method: DataShieldMethodDto): string {
@@ -126,12 +134,14 @@ function onSubmit() {
   const payload = {
     name: name.value,
   };
-  if (type.value.value === 'r_func') {
-    payload['DataShield.RFunctionDataShieldMethodDto.method'] = {
+  if (type.value.value === 'r_func') {  
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (payload as any)['DataShield.RFunctionDataShieldMethodDto.method'] = {
       func: func.value,
     } as RFunctionDataShieldMethodDto;
   } else {
-    payload['DataShield.RScriptDataShieldMethodDto.method'] = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (payload as any)['DataShield.RScriptDataShieldMethodDto.method'] = {
       script: script.value,
     } as RScriptDataShieldMethodDto;
   }
