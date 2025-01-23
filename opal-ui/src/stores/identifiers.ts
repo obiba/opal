@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import type { TableDto, VariableDto, ValueSetsDto } from 'src/models/Magma';
+import type { TableDto, VariableDto } from 'src/models/Magma';
+import type { IdentifiersMappingDto } from 'src/models/Identifiers';
 
 export interface GenerateIdentifiersOptions {
   prefix: string | '';
@@ -107,7 +108,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     });
   }
 
-  async function getMappings(type = 'Participant'): Promise<ValueSetsDto> {
+  async function getMappings(type = 'Participant'): Promise<IdentifiersMappingDto[]> {
     return api.get('/identifiers/mappings', { params: { type } }).then((response) => response.data);
   }
 

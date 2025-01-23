@@ -98,13 +98,13 @@ onMounted(() => {
     name.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].symbol;
   }
   if (params.entityType) {
-    entityType.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].entityType;
+    entityType.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].entityType || 'Participant';
   }
   if (params.idColumn) {
-    idColumn.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].idColumn;
+    idColumn.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].idColumn || '';
   }
   if (params.locale) {
-    locale.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].locale;
+    locale.value = props.modelValue['Magma.RHavenDatasourceFactoryDto.params'].locale || '';
   }
 });
 

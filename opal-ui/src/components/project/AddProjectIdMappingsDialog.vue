@@ -70,7 +70,7 @@ async function initMapping(identifier: string) {
       label: mapping.name,
       value: mapping,
     }));
-    selectedMappings.value = mappingOptions.value[0].value;
+    selectedMappings.value = mappingOptions.value[0]?.value || null;
   });
 }
 
@@ -90,8 +90,9 @@ watch(
   (value) => {
     if (value) {
       idOptions.value = identifiersStore.identifiers.map((id) => ({ label: id.entityType, value: id }));
-      selectedId.value = idOptions.value[0].value;
-      initMapping(selectedId.value.name);
+      selectedId.value = idOptions.value[0]?.value || null;
+      if (selectedId.value)
+        initMapping(selectedId.value.name);
       showDialog.value = value;
     }
   }

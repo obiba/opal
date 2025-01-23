@@ -116,7 +116,7 @@ import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface DialogProps {
   modelValue: boolean;
-  provider?: ResourceProviderDto;
+  provider?: ResourceProviderDto | undefined;
   resource?: ResourceReferenceDto;
 }
 

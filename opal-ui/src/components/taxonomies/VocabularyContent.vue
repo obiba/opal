@@ -33,7 +33,7 @@
     </template>
     <template v-slot:top-left>
       <div v-if="taxonomiesStore.canEdit" class="q-gutter-sm">
-        <q-btn no-caps color="primary " icon="add" size="sm" :label="t('add')" @click="onAddTerm" />
+        <q-btn no-caps color="primary " icon="add" size="sm" :label="t('add')" @click="onAddTerm()" />
         <template v-if="dirty">
           <q-btn no-caps color="primary" icon="check" size="sm" :label="t('apply')" @click="onApply" />
           <q-btn no-caps color="secondary" icon="close" size="sm" :label="t('reset')" @click="onResetSort" />
@@ -360,9 +360,16 @@ function onVocabularyUpdated(updated: VocabularyDto, oldName?: string) {
   emit('refresh', updated.name !== oldName ? updated.name : null);
 }
 
-function onAddTerm(term: TermDto) {
+function onAddTerm(term: TermDto | undefined = undefined) {
   showAddTerm.value = true;
-  newTerm.value = term;
+  newTerm.value = term || {
+    name: '',
+    title: [],
+    description: [],
+    keywords: [],
+    terms: [],
+    attributes: [],
+  };
 }
 
 function onTermUpdated() {

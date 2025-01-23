@@ -93,7 +93,7 @@
       </template>
       <template v-slot:body-cell-label="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+          <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
             <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
@@ -227,12 +227,13 @@ function onUp() {
   const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort();
   for (let i = 0; i < indices.length; i++) {
     const idx = indices[i];
-    if (idx === 0) {
+    if (idx === 0 || idx === undefined) {
       continue;
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    categories.splice(idx - 1, 0, c);
+    if (c)
+      categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore
@@ -248,12 +249,13 @@ function onDown() {
   const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort((a, b) => b - a);
   for (let i = 0; i < indices.length; i++) {
     const idx = indices[i];
-    if (idx === categories.length - 1) {
+    if (idx === categories.length - 1 || idx === undefined) {
       continue;
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    categories.splice(idx + 1, 0, c);
+    if (c)
+      categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore

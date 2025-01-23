@@ -38,7 +38,7 @@
 import type { AttributesBundle } from 'src/components/models';
 
 interface Props {
-  bundle?: AttributesBundle;
+  bundle?: AttributesBundle | undefined;
 }
 const props = defineProps<Props>();
 

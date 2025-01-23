@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
-import type { OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
+import { type OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { analysisColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
@@ -126,7 +126,7 @@ const projectsStore = useProjectsStore();
 const { t } = useI18n();
 
 const firstResult = props.results[0];
-const details = firstResult.resultItems || [];
+const details = firstResult?.resultItems || [];
 const history = ref(props.results.slice(1));
 const initialDetailsPagination = ref({
   descending: false,
@@ -188,9 +188,10 @@ const detailsColumns = computed(() => [
     field: 'status',
   },
   {
-    field: 'message',
+    name: 'message',
     label: t('message'),
     align: DefaultAlignment,
+    field: 'message',
   },
 ]);
 

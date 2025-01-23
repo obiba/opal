@@ -1,6 +1,6 @@
 <template>
   <div>
-    <schema-form v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
+    <schema-form v-if="schema" v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
   </div>
 </template>
 

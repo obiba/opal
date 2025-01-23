@@ -94,8 +94,8 @@ interface Props {
   projectName: string;
   tableName: string;
   analysisNames: string[];
-  analysis: OpalAnalysisDto | null;
-  clone?: OpalAnalysisDto;
+  analysis?: OpalAnalysisDto | undefined;
+  clone?: OpalAnalysisDto | undefined;
 }
 
 type PluginTemplate = { pluginName: string; templateName: string };

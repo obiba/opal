@@ -238,11 +238,11 @@ function onShowDelete(row: Acl) {
 
 function onFilter() {
   if (!filter.value) {
-    return authzStore.acls[props.resource];
+    return authzStore.acls[props.resource] || [];
   }
   return authzStore.acls[props.resource]?.filter((row) => {
     return row.subject?.principal.toLowerCase().includes(filter.value.toLowerCase());
-  });
+  }) || [];
 }
 
 function onShowAddUser() {

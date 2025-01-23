@@ -90,7 +90,7 @@ import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vu
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
 import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import type { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import type { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
@@ -178,7 +178,7 @@ function onShow() {
       .getDatabases(DatabaseDto_Usage.EXPORT)
       .then((response) => {
         databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
-        if (databaseExporters.value.length > 0) databaseExporter.value = databaseExporters.value[0].value;
+        if (databaseExporters.value.length > 0) databaseExporter.value = databaseExporters.value[0]?.value;
       })
       .catch((err) => {
         notifyError(err);

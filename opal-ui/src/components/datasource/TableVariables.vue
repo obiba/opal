@@ -103,7 +103,7 @@
       </template>
       <template v-slot:body-cell-label="props">
         <q-td :props="props">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+          <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
             <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>

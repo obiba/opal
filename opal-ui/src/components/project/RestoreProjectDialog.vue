@@ -48,7 +48,7 @@
 import type { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import type { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
+import { type FileDto, type SubjectProfileDto, FileDto_FileType } from 'src/models/Opal';
 import type { RestoreCommandOptionsDto } from 'src/models/Commands';
 
 interface DialogProps {

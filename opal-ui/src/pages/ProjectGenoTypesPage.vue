@@ -306,14 +306,14 @@ const columns = computed(() => [
   {
     name: 'genotypes',
     label: t('vcf_store.genotypes'),
-    align: 'center  ',
+    align: DefaultAlignment,
     field: 'genotypesCount',
     format: (val: number) => `${getSizeLabel(val)}`,
   },
   {
     name: 'size',
     label: t('size'),
-    align: 'center  ',
+    align: DefaultAlignment,
     field: 'size',
     format: (val: number) => `${getSizeLabel(val)}`,
   },
