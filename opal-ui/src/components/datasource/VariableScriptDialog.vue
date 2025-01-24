@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import type { VAceEditor } from 'vue3-ace-editor';
+import { VAceEditor } from 'vue3-ace-editor';
 import { ValueTypes } from 'src/utils/magma';
 import type { VariableDto, AttributeDto } from 'src/models/Magma';
 
