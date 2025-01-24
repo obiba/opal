@@ -44,7 +44,7 @@ async function onUpdate(updated: TaxonomyDto) {
 
 async function onRefresh(newName?: string) {
   try {
-    if (!newName) {
+    if (newName) {
       await taxonomiesStore.refreshSummaries();
       router.replace(`/taxonomy/${newName}`);
     } else {

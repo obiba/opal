@@ -105,7 +105,7 @@ const emptyTaxonomy = {
 
 const newTaxonomy = ref<TaxonomyDto>({ ...emptyTaxonomy });
 const oldName = computed(() => props.taxonomy?.name);
-const editMode = computed(() => props.taxonomy !== undefined);
+const editMode = computed(() => props.taxonomy?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.edit') : t('taxonomy.add')));
 

@@ -80,7 +80,7 @@ const emptyTerm = {
 } as TermDto;
 
 const newTerm = ref<TermDto>({ ...emptyTerm });
-const editMode = computed(() => props.term && props.term.name);
+const editMode = computed(() => props.term?.name !== undefined && props.term?.name !== '');
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.term.edit') : t('taxonomy.term.add')));
 
