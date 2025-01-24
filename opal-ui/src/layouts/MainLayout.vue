@@ -6,12 +6,6 @@
         <q-btn flat to="/" no-caps size="lg">
           {{ appName }}
         </q-btn>
-        <q-btn flat to="/projects" no-caps>
-          {{ t('projects') }}
-        </q-btn>
-        <q-btn flat to="/search" no-caps>
-          {{ t('search') }}
-        </q-btn>
         <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn icon="shopping_cart" size="sm" to="/cart" class="q-mr-sm">
@@ -47,12 +41,6 @@
               </q-list>
             </q-menu>
           </q-input>
-          <q-btn v-if="authStore.isAdministrator" to="/admin" no-caps>
-            {{ t('administration') }}
-          </q-btn>
-          <q-btn no-caps @click="onHelp">
-            {{ t('help') }}
-          </q-btn>
           <q-btn-dropdown flat :label="locale">
             <q-list>
               <q-item clickable v-close-popup @click="onLocaleSelection(localeOpt)" v-for="localeOpt in localeOptions"
@@ -204,10 +192,6 @@ function onSignout() {
       }
       router.push('/signin');
     });
-}
-
-function onHelp() {
-  window.open('https://opaldoc.obiba.org', '_blank');
 }
 
 function onSearch() {
