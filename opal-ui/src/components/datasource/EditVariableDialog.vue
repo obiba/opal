@@ -21,8 +21,8 @@
           :options="ValueTypes"
           :label="t('value_type')"
           :hint="t('value_type_hint')"
-          :disable="editMode && hasValues"
-          dens
+          :disable="!canEditTypeFields"
+          dense
           class="q-mb-sm"
         />
         <div class="row q-mb-md">
@@ -30,7 +30,7 @@
             <q-checkbox
               v-model="selected.isRepeatable"
               :label="t('repeatable')"
-              :disable="editMode && hasValues"
+              :disable="!canEditTypeFields"
               dense
               class="q-mt-md q-mb-sm"
             />
@@ -120,12 +120,8 @@ function onHide() {
 }
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
-
-const hasValues = computed(
-  () =>
-    datasourceStore.table.viewLink !== undefined && datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0 && datasourceStore.table.valueSetCount > 0
-);
-
+const hasValues = computed(() => datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0);
+const canEditTypeFields = computed(() => isView.value || !editMode.value || !hasValues.value);
 const isValid = computed(
   () =>
     selected.value.name &&
