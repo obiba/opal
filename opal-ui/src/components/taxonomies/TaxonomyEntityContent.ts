@@ -29,10 +29,10 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
 
   // Functions
 
-  function customSort(rows: TYPE[], sortBy: string, descending: boolean) {
+  function customSort(rows: readonly TYPE[], sortBy: string, descending: boolean) {
     if (!canSort.value || !sortBy) return rows;
 
-    const data = rows;
+    const data = [...rows];
     dirty.value = true;
 
     data.sort((a: TYPE, b: TYPE): number => (descending ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)));

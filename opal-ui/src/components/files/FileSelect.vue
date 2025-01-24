@@ -5,15 +5,7 @@
     </div>
     <div class="row q-gutter-sm">
       <span v-if="selectedPaths" class="text-caption q-pt-xs">{{ selectedPaths }}</span>
-      <q-btn
-        outline
-        no-caps
-        icon="more_horiz"
-        :label="t('select')"
-        color="primary"
-        size="12px"
-        @click="onShowDialog"
-      />
+      <q-btn outline no-caps icon="more_horiz" :label="t('select')" color="primary" size="12px" @click="onShowDialog" />
     </div>
     <slot name="error"></slot>
     <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
@@ -38,124 +30,126 @@
 
         <q-card-section>
           <table class="full-width">
-            <tr>
-              <td style="width: 150px; vertical-align: top">
-                <div class="text-grey-8">
-                  <div>
-                    <q-btn
-                      flat
-                      no-caps
-                      icon="person"
-                      color="primary"
-                      size="12px"
-                      :label="t('user')"
-                      align="left"
-                      class="full-width"
-                      @click="onFolderSelection(`/home/${username}`)"
-                    ></q-btn>
-                  </div>
-                  <div v-if="projectName">
-                    <q-btn
-                      flat
-                      no-caps
-                      icon="table_chart"
-                      color="primary"
-                      size="12px"
-                      :label="t('project')"
-                      align="left"
-                      class="full-width"
-                      @click="onFolderSelection(`/projects/${projectName}`)"
-                    ></q-btn>
-                  </div>
-                  <q-separator class="q-mt-md q-mb-md" />
-                  <div>
-                    <q-btn
-                      flat
-                      no-caps
-                      icon="group"
-                      color="primary"
-                      size="12px"
-                      :label="t('users')"
-                      align="left"
-                      class="full-width"
-                      @click="onFolderSelection('/home')"
-                    ></q-btn>
-                  </div>
-                  <div>
-                    <q-btn
-                      flat
-                      no-caps
-                      icon="table_chart"
-                      color="primary"
-                      size="12px"
-                      :label="t('projects')"
-                      align="left"
-                      class="full-width"
-                      @click="onFolderSelection('/projects')"
-                    ></q-btn>
-                  </div>
-                  <div>
-                    <q-btn
-                      flat
-                      no-caps
-                      icon="dns"
-                      color="primary"
-                      size="12px"
-                      :label="t('file_system')"
-                      align="left"
-                      class="full-width"
-                      @click="onFolderSelection('/')"
-                    ></q-btn>
-                  </div>
-                </div>
-              </td>
-              <td style="vertical-align: top">
-                <div>
-                  <q-table
-                    ref="tableRef"
-                    flat
-                    dense
-                    :rows="rows"
-                    :columns="columns"
-                    row-key="name"
-                    :pagination="initialPagination"
-                    :loading="loading"
-                    @row-dblclick="onRowDblClick"
-                    @row-click="onRowClick"
-                    :selection="props.selection ? props.selection : 'single'"
-                    v-model:selected="selected"
-                    @update:selected="onFileSelection"
-                    :filter="filter"
-                  >
-                    <template v-slot:top-right>
-                      <q-input
-                        dense
-                        clearable
-                        debounce="400"
+            <tbody>
+              <tr>
+                <td style="width: 150px; vertical-align: top">
+                  <div class="text-grey-8">
+                    <div>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="person"
                         color="primary"
-                        v-model="filter"
-                        :placeholder="t('file_folder_search')"
-                      >
-                        <template v-slot:append>
-                          <q-icon name="search" />
-                        </template>
-                      </q-input>
-                    </template>
-                    <template v-slot:body-cell-name="props">
-                      <q-td :props="props">
-                        <q-icon
-                          :name="getIconName(props.row)"
-                          :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
-                          size="sm"
-                          class="q-mr-sm"
-                        />
-                        <span>{{ props.value }}</span>
-                      </q-td>
-                    </template>
-                  </q-table>
-                </div>
-              </td>
-            </tr>
+                        size="12px"
+                        :label="t('user')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection(`/home/${username}`)"
+                      ></q-btn>
+                    </div>
+                    <div v-if="projectName">
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="table_chart"
+                        color="primary"
+                        size="12px"
+                        :label="t('project')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection(`/projects/${projectName}`)"
+                      ></q-btn>
+                    </div>
+                    <q-separator class="q-mt-md q-mb-md" />
+                    <div>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="group"
+                        color="primary"
+                        size="12px"
+                        :label="t('users')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/home')"
+                      ></q-btn>
+                    </div>
+                    <div>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="table_chart"
+                        color="primary"
+                        size="12px"
+                        :label="t('projects')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/projects')"
+                      ></q-btn>
+                    </div>
+                    <div>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="dns"
+                        color="primary"
+                        size="12px"
+                        :label="t('file_system')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/')"
+                      ></q-btn>
+                    </div>
+                  </div>
+                </td>
+                <td style="vertical-align: top">
+                  <div>
+                    <q-table
+                      ref="tableRef"
+                      flat
+                      dense
+                      :rows="rows"
+                      :columns="columns"
+                      row-key="name"
+                      :pagination="initialPagination"
+                      :loading="loading"
+                      @row-dblclick="onRowDblClick"
+                      @row-click="onRowClick"
+                      :selection="props.selection ? props.selection : 'single'"
+                      v-model:selected="selected"
+                      @update:selected="onFileSelection"
+                      :filter="filter"
+                    >
+                      <template v-slot:top-right>
+                        <q-input
+                          dense
+                          clearable
+                          debounce="400"
+                          color="primary"
+                          v-model="filter"
+                          :placeholder="t('file_folder_search')"
+                        >
+                          <template v-slot:append>
+                            <q-icon name="search" />
+                          </template>
+                        </q-input>
+                      </template>
+                      <template v-slot:body-cell-name="props">
+                        <q-td :props="props">
+                          <q-icon
+                            :name="getIconName(props.row)"
+                            :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
+                            size="sm"
+                            class="q-mr-sm"
+                          />
+                          <span>{{ props.value }}</span>
+                        </q-td>
+                      </template>
+                    </q-table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </q-card-section>
 
@@ -231,7 +225,7 @@ const projectsStore = useProjectsStore();
 const filter = ref('');
 const tableRef = ref();
 const selected = ref<FileDto[]>(
-  props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]) : []
+  props.modelValue ? (Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]) : [],
 );
 const initialPagination = { descending: false, page: 1, rowsPerPage: 10 };
 const loading = ref(false);
@@ -286,7 +280,7 @@ watch(
   () => props.modelValue,
   (value) => {
     selected.value = value ? (Array.isArray(value) ? value : [value]) : [];
-  }
+  },
 );
 
 const rows = computed(() => {
@@ -303,12 +297,17 @@ const rows = computed(() => {
     });
 
   props.folder.children
-    .filter((file) => (props.type !== 'folder' || hasExtensions.value) && file.type === FileDto_FileType.FILE && includesToken(file.name, filter.value))
+    .filter(
+      (file) =>
+        (props.type !== 'folder' || hasExtensions.value) &&
+        file.type === FileDto_FileType.FILE &&
+        includesToken(file.name, filter.value),
+    )
     .filter(
       (file) =>
         props.extensions === undefined ||
         props.extensions.length === 0 ||
-        props.extensions.some((ext) => file.name.endsWith(ext))
+        props.extensions.some((ext) => file.name.endsWith(ext)),
     )
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((file) => {
