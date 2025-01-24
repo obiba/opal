@@ -90,7 +90,7 @@
           </q-td>
 
           <q-td key="endTime" :props="props">
-            {{ getDateLabel(props.row.endTime) }}
+            {{ props.row.endTime ? getDateLabel(props.row.endTime) : '' }}
             <span class="text-help">({{ getDatesDistanceLabel(props.row.startTime, props.row.endTime, false) }})</span>
           </q-td>
 
