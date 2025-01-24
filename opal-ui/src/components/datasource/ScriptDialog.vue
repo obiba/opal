@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import type { VAceEditor } from 'vue3-ace-editor';
+import { VAceEditor } from 'vue3-ace-editor';
 
 interface DialogProps {
   modelValue: boolean;
@@ -62,7 +62,7 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      scriptEdit.value = props.script;
+      scriptEdit.value = props.script || '';
     }
     showDialog.value = value;
   }

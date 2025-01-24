@@ -21,7 +21,6 @@
             flat
             dense
             options-dense
-            size="sm"
             display-value=""
             :label="t('select_columns')"
             emit-value

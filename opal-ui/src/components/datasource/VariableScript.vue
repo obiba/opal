@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import type { VariableDto } from 'src/models/Magma';
-import type { VAceEditor } from 'vue3-ace-editor';
+import { VAceEditor } from 'vue3-ace-editor';
 import VariableScriptDialog from 'src/components/datasource/VariableScriptDialog.vue';
 
 interface VariableScriptProps {

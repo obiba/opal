@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { VAceEditor } from 'vue3-ace-editor';
+import { VAceEditor } from 'vue3-ace-editor';
 import ScriptDialog from 'src/components/datasource/ScriptDialog.vue';
 import type { ViewDto } from 'src/models/Magma';
 
