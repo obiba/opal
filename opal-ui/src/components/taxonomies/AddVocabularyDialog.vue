@@ -79,7 +79,7 @@ const emptyVocabulary = {
 } as VocabularyDto;
 
 const newVocabulary = ref<VocabularyDto>({ ...emptyVocabulary });
-const editMode = computed(() => props.vocabulary !== undefined);
+const editMode = computed(() => props.vocabulary?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update_action') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.vocabulary.edit') : t('taxonomy.vocabulary.add')));
 
