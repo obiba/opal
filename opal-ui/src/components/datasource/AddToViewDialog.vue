@@ -78,6 +78,7 @@
 import type { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
 import { ValueTypes } from 'src/utils/magma';
 import { DefaultAlignment } from 'src/components/models';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -157,12 +158,14 @@ function onSaveView() {
       );
       datasourceStore
         .updateView(projectDestination.value, newTableName.value, view, `Added variables from ${from} to view`)
-        .then(() => router.push(newViewPage));
+        .then(() => router.push(newViewPage))
+        .catch(notifyError);
     })
     .catch(() => {
       datasourceStore
         .addVariablesView(projectDestination.value, newTableName.value, from, validDerivedVariables.value)
-        .then(() => router.push(newViewPage));
+        .then(() => router.push(newViewPage))
+        .catch(notifyError);
     });
 }
 
