@@ -28,45 +28,47 @@
             </q-item-section>
             <q-item-section v-if="canUpdate" side>
               <table>
-                <tr>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="t('search')"
-                      icon="search"
-                      @click="onSearch(annotation)"
-                    />
-                  </td>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="t('edit')"
-                      icon="edit"
-                      @click="onShowAnnotate(annotation)"
-                    />
-                  </td>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="t('delete')"
-                      icon="delete"
-                      class="q-ml-xs"
-                      @click="onShowDelete(annotation)"
-                    />
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('search')"
+                        icon="search"
+                        @click="onSearch(annotation)"
+                      />
+                    </td>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('edit')"
+                        icon="edit"
+                        @click="onShowAnnotate(annotation)"
+                      />
+                    </td>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('delete')"
+                        icon="delete"
+                        class="q-ml-xs"
+                        @click="onShowDelete(annotation)"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </q-item-section>
           </q-item>
@@ -102,7 +104,7 @@
             size="sm"
             @click="
               onShowAttribute(
-                descriptionBundle || { id: 'description', attributes: [{ name: 'description' } as AttributeDto] }
+                descriptionBundle || { id: 'description', attributes: [{ name: 'description' } as AttributeDto] },
               )
             "
           />
@@ -309,7 +311,7 @@ function onConfirmDeleteAnnotation() {
       .deleteAnnotation(
         [datasourceStore.variable],
         annotationSelected.value.taxonomy.name,
-        annotationSelected.value.vocabulary.name
+        annotationSelected.value.vocabulary.name,
       )
       .then(() => {
         datasourceStore.loadTableVariables();
@@ -347,7 +349,7 @@ function onConfirmDeleteAttributes() {
       .deleteAttributes(
         datasourceStore.variable,
         bundleSelected.value.attributes[0]?.namespace,
-        bundleSelected.value.attributes[0]?.name || ''
+        bundleSelected.value.attributes[0]?.name || '',
       )
       .then(() => {
         datasourceStore.loadTableVariables();

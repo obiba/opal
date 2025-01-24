@@ -1,5 +1,7 @@
 import type { PluginPackagesDto, PluginPackageDto } from 'src/models/Plugins';
-const { mergeLocaleMessage } = useI18n({ useScope: 'global' });
+import { i18n } from 'src/boot/i18n';
+
+const mergeLocaleMessage = i18n.global.mergeLocaleMessage;
 
 type Translation = {
   [key: string]: string;
