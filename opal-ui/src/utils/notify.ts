@@ -4,8 +4,6 @@ import { i18n } from 'src/boot/i18n';
 const { t } = i18n.global;
 
 export function notifySuccess(message: string) {
-  const { t } = useI18n();
-
   Notify.create({
     type: 'positive',
     message: t(message),
