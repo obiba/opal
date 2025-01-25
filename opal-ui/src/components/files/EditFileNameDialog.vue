@@ -2,33 +2,28 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('edit') }}</div>
+        <div class="text-h6">{{ t('edit') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="newName" dense autofocus type="text" :label="$t('name')" style="width: 300px" class="q-mb-md">
+        <q-input v-model="newName" dense autofocus type="text" :label="t('name')" style="width: 300px" class="q-mb-md">
         </q-input>
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('save')" color="primary" :disable="newName === ''" @click="onSave" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" :disable="newName === ''" @click="onSave" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'EditFileNameDialog',
-});
-</script>
 <script setup lang="ts">
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -39,6 +34,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 
 const showDialog = ref(props.modelValue);

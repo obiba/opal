@@ -3,7 +3,7 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" to="/taxonomies" />
+        <q-breadcrumbs-el :label="t('taxonomies')" to="/taxonomies" />
         <q-breadcrumbs-el :label="taxonomyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -16,8 +16,9 @@
 <script setup lang="ts">
 import TaxonomyContent from 'src/components/taxonomies/TaxonomyContent.vue';
 import { notifyError } from 'src/utils/notify';
-import { TaxonomyDto } from 'src/models/Opal';
+import type { TaxonomyDto } from 'src/models/Opal';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();
@@ -43,7 +44,7 @@ async function onUpdate(updated: TaxonomyDto) {
 
 async function onRefresh(newName?: string) {
   try {
-    if (!!newName) {
+    if (newName) {
       await taxonomiesStore.refreshSummaries();
       router.replace(`/taxonomy/${newName}`);
     } else {

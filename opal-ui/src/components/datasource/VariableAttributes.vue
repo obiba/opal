@@ -1,21 +1,21 @@
 <template>
   <div>
     <div class="text-help q-mb-md">
-      {{ $t('attributes_info') }}
+      {{ t('attributes_info') }}
     </div>
     <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-      <q-tab name="annotations" :label="$t('annotations')" />
-      <q-tab name="label_description" :label="$t('label_description')" />
-      <q-tab name="records" :label="$t('records')" />
+      <q-tab name="annotations" :label="t('annotations')" />
+      <q-tab name="label_description" :label="t('label_description')" />
+      <q-tab name="records" :label="t('records')" />
     </q-tabs>
     <q-separator />
     <q-tab-panels v-model="tab">
       <q-tab-panel name="annotations">
         <div class="text-help q-mb-md">
-          {{ $t('attributes_annotations_info') }}
+          {{ t('attributes_annotations_info') }}
         </div>
         <div v-if="canUpdate" class="q-mb-sm">
-          <q-btn color="primary" icon="edit" :title="$t('add')" size="sm" @click="onShowAnnotate(undefined)" />
+          <q-btn color="primary" icon="edit" :title="t('add')" size="sm" @click="onShowAnnotate(undefined)" />
         </div>
         <q-list separator>
           <q-item
@@ -28,57 +28,59 @@
             </q-item-section>
             <q-item-section v-if="canUpdate" side>
               <table>
-                <tr>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="$t('search')"
-                      icon="search"
-                      @click="onSearch(annotation)"
-                    />
-                  </td>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="$t('edit')"
-                      icon="edit"
-                      @click="onShowAnnotate(annotation)"
-                    />
-                  </td>
-                  <td>
-                    <q-btn
-                      rounded
-                      dense
-                      flat
-                      size="sm"
-                      color="secondary"
-                      :title="$t('delete')"
-                      icon="delete"
-                      class="q-ml-xs"
-                      @click="onShowDelete(annotation)"
-                    />
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('search')"
+                        icon="search"
+                        @click="onSearch(annotation)"
+                      />
+                    </td>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('edit')"
+                        icon="edit"
+                        @click="onShowAnnotate(annotation)"
+                      />
+                    </td>
+                    <td>
+                      <q-btn
+                        rounded
+                        dense
+                        flat
+                        size="sm"
+                        color="secondary"
+                        :title="t('delete')"
+                        icon="delete"
+                        class="q-ml-xs"
+                        @click="onShowDelete(annotation)"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </q-item-section>
           </q-item>
         </q-list>
       </q-tab-panel>
       <q-tab-panel name="label_description">
-        <div class="text-bold q-mb-sm">{{ $t('label') }}</div>
+        <div class="text-bold q-mb-sm">{{ t('label') }}</div>
         <div v-if="canUpdate" class="q-mb-sm">
           <q-btn
             color="primary"
             icon="edit"
-            :title="$t('add')"
+            :title="t('add')"
             size="sm"
             @click="onShowAttribute(labelBundle || { id: 'label', attributes: [{ name: 'label' } as AttributeDto] })"
           />
@@ -93,16 +95,16 @@
           />
         </div>
         <attributes-bundle-panel :bundle="labelBundle" class="q-mb-md" />
-        <div class="text-bold q-mb-sm">{{ $t('description') }}</div>
+        <div class="text-bold q-mb-sm">{{ t('description') }}</div>
         <div v-if="canUpdate" class="q-mb-sm">
           <q-btn
             color="primary"
             icon="edit"
-            :title="$t('add')"
+            :title="t('add')"
             size="sm"
             @click="
               onShowAttribute(
-                descriptionBundle || { id: 'description', attributes: [{ name: 'description' } as AttributeDto] }
+                descriptionBundle || { id: 'description', attributes: [{ name: 'description' } as AttributeDto] },
               )
             "
           />
@@ -120,7 +122,7 @@
       </q-tab-panel>
       <q-tab-panel name="records">
         <div class="text-help q-mb-md">
-          {{ $t('attributes_records_info') }}
+          {{ t('attributes_records_info') }}
         </div>
         <q-table
           ref="tableRef"
@@ -136,7 +138,7 @@
               v-if="canUpdate"
               color="primary"
               icon="edit"
-              :title="$t('add')"
+              :title="t('add')"
               size="sm"
               @click="onShowAttribute(undefined)"
             />
@@ -156,7 +158,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('edit')"
+                  :title="t('edit')"
                   :icon="toolsVisible[props.row.id] ? 'edit' : 'none'"
                   class="q-ml-xs"
                   @click="onShowEditBundle(props.row)"
@@ -167,7 +169,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('delete')"
+                  :title="t('delete')"
                   :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
                   class="q-ml-xs"
                   @click="onShowDeleteBundle(props.row)"
@@ -189,8 +191,8 @@
 
     <confirm-dialog
       v-model="showDeleteAnnotation"
-      :title="$t('delete')"
-      :text="$t('delete_annotation_confirm')"
+      :title="t('delete')"
+      :text="t('delete_annotation_confirm')"
       @confirm="onConfirmDeleteAnnotation"
     />
     <annotate-dialog
@@ -201,8 +203,8 @@
     />
     <confirm-dialog
       v-model="showDeleteAttributes"
-      :title="$t('delete')"
-      :text="$t('delete_attributes_confirm')"
+      :title="t('delete')"
+      :text="t('delete_attributes_confirm')"
       @confirm="onConfirmDeleteAttributes"
     />
     <attribute-dialog
@@ -214,19 +216,15 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableAttributes',
-});
-</script>
 <script setup lang="ts">
-import { Annotation, AttributesBundle } from 'src/components/models';
+import type { Annotation, AttributesBundle } from 'src/components/models';
 import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
 import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
 import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
 import AttributeDialog from 'src/components/datasource/AttributeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { AttributeDto } from 'src/models/Magma';
+import type { AttributeDto } from 'src/models/Magma';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -256,23 +254,23 @@ const columns = computed(() => [
   {
     name: 'namespace',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('namespace'),
-    field: (row: AttributesBundle) => row.attributes[0].namespace,
+    field: (row: AttributesBundle) => row.attributes[0]?.namespace,
     sortable: true,
   },
   {
     name: 'name',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('name'),
-    field: (row: AttributesBundle) => row.attributes[0].name,
+    field: (row: AttributesBundle) => row.attributes[0]?.name,
     sortable: true,
   },
   {
     name: 'values',
     required: true,
-    align: 'left',
+    align: DefaultAlignment,
     label: t('values'),
     field: (row: AttributesBundle) => row.attributes,
   },
@@ -313,7 +311,7 @@ function onConfirmDeleteAnnotation() {
       .deleteAnnotation(
         [datasourceStore.variable],
         annotationSelected.value.taxonomy.name,
-        annotationSelected.value.vocabulary.name
+        annotationSelected.value.vocabulary.name,
       )
       .then(() => {
         datasourceStore.loadTableVariables();
@@ -350,8 +348,8 @@ function onConfirmDeleteAttributes() {
     datasourceStore
       .deleteAttributes(
         datasourceStore.variable,
-        bundleSelected.value.attributes[0].namespace,
-        bundleSelected.value.attributes[0].name
+        bundleSelected.value.attributes[0]?.namespace,
+        bundleSelected.value.attributes[0]?.name || '',
       )
       .then(() => {
         datasourceStore.loadTableVariables();

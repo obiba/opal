@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: DataShield.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'DataShield';
 
 export interface DataShieldProfileDto {

@@ -3,15 +3,15 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" />
+        <q-breadcrumbs-el :label="t('projects')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('projects') }}
+        {{ t('projects') }}
       </div>
       <div class="text-help">
-        {{ $t('projects_info') }}
+        {{ t('projects_info') }}
       </div>
       <q-table
         ref="tableRef"
@@ -38,7 +38,7 @@
             use-chips
             v-model="tagsFilter"
             :options="tags"
-            :label="$t('tags')"
+            :label="t('tags')"
             @update:model-value="onTabChange"
             class="on-left"
             style="min-width: 200px"
@@ -72,11 +72,12 @@
 </template>
 
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 import { flattenObjectToString } from 'src/utils/strings';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -99,7 +100,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -110,7 +111,7 @@ const columns = computed(() => [
   {
     name: 'title',
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'title',
     format: (val: string) => val,
     headerStyle: 'width: 20%; white-space: normal;',
@@ -119,7 +120,7 @@ const columns = computed(() => [
   {
     name: 'tags',
     label: t('tags'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'tags',
     headerStyle: 'width: 20%; white-space: normal;',
     style: 'width: 20%; white-space: normal;',
@@ -128,7 +129,7 @@ const columns = computed(() => [
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: ProjectDto) => (row.timestamps || {}).lastUpdate,
     format: (val: string) => getDateLabel(val),
     sortable: true,
@@ -139,7 +140,7 @@ const columns = computed(() => [
     name: 'status',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'datasourceStatus',
     headerStyle: 'width: 5%; white-space: normal;',
     style: 'width: 5%; white-space: normal;',
@@ -192,12 +193,12 @@ function onRowClick(evt: unknown, row: { name: string }) {
   });
 }
 
-function onFilter(tableRows: ProjectDto[], filter: string) {
-  if (filter.length === 0) {
-    return tableRows;
+function onFilter() {
+  if (filter.value.length === 0) {
+    return projects.value;
   }
-  const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
-  const result = tableRows.filter((row) => {
+  const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const result = projects.value.filter((row) => {
     const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
       row.description || {}
     )}`;

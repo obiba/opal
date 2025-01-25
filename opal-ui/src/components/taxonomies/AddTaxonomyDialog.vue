@@ -13,8 +13,8 @@
             v-model="newTaxonomy.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
-            :hint="$t('taxonomy.name_hint')"
+            :label="t('name') + '*'"
+            :hint="t('taxonomy.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('required_field')]"
@@ -25,8 +25,8 @@
             v-model="newTaxonomy.author"
             dense
             type="text"
-            :label="$t('author')"
-            :hint="$t('taxonomy.author_hint')"
+            :label="t('author')"
+            :hint="t('taxonomy.author_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -36,7 +36,7 @@
             v-model="newTaxonomy.license"
             dense
             type="text"
-            :label="$t('license')"
+            :label="t('license')"
             class="q-mb-md"
             lazy-rules
             :rules="[() => true]"
@@ -44,7 +44,7 @@
             <template v-slot:hint>
               <html-anchor-hint
                 :tr-key="'taxonomy.license_hint'"
-                :text="$t('taxonomy.creative_commons_licenses')"
+                :text="t('taxonomy.creative_commons_licenses')"
                 :url="getCreativeCommonsLicenseUrl()"
               />
             </template>
@@ -52,14 +52,14 @@
 
           <localized-field-large
             v-model="newTaxonomy.title"
-            :title="$t('title')"
-            :hint="$t('title_hint')"
+            :title="t('title')"
+            :hint="t('title_hint')"
           ></localized-field-large>
 
           <localized-field-large
             v-model="newTaxonomy.description"
-            :title="$t('description')"
-            :hint="$t('taxonomy.description_hint')"
+            :title="t('description')"
+            :hint="t('taxonomy.description_hint')"
           />
         </q-form>
       </q-card-section>
@@ -67,20 +67,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddTaxonomy" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTaxonomyDialog',
-});
-</script>
 <script setup lang="ts">
-import { TaxonomyDto } from 'src/models/Opal';
+import type { TaxonomyDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import LocalizedFieldLarge from 'src/components/LocalizedFieldLarge.vue';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
@@ -93,9 +88,11 @@ interface DialogProps {
 
 const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
+
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'updated']);
+
 const showDialog = ref(props.modelValue);
 const emptyTaxonomy = {
   name: '',
@@ -108,7 +105,7 @@ const emptyTaxonomy = {
 
 const newTaxonomy = ref<TaxonomyDto>({ ...emptyTaxonomy });
 const oldName = computed(() => props.taxonomy?.name);
-const editMode = computed(() => !!props.taxonomy);
+const editMode = computed(() => props.taxonomy?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('taxonomy.edit') : t('taxonomy.add')));
 
@@ -147,7 +144,7 @@ async function onAddTaxonomy() {
       .then(() => {
         emit('updated', newTaxonomy.value, oldName.value);
         showDialog.value = false;
-        if (!!oldName.value) onHide(); // due to reroute in the page
+        if (oldName.value) onHide(); // due to reroute in the page
       })
       .catch(notifyError);
   }

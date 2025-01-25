@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { ItemFieldsDto, ItemResultDto } from 'src/models/Search';
+import type { ItemFieldsDto, ItemResultDto } from 'src/models/Search';
 
 export interface ItemFieldsResultDto extends ItemResultDto {
   'Search.ItemFieldsDto.item': ItemFieldsDto;
@@ -38,7 +38,7 @@ export const useSearchStore = defineStore('search', () => {
     let fullQuery = variablesQuery.value.query?.trim() || '';
     Object.keys(variablesQuery.value.criteria).forEach((key) => {
       const terms = variablesQuery.value.criteria[key];
-      if (terms.length > 0) {
+      if (terms && terms.length > 0) {
         const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`;
         fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
       }
@@ -50,7 +50,7 @@ export const useSearchStore = defineStore('search', () => {
     let fullQuery = variablesQuery.value.query?.trim() || '';
     Object.keys(variablesQuery.value.criteria).forEach((key) => {
       const terms = variablesQuery.value.criteria[key];
-      if (terms.length > 0) {
+      if (terms && terms.length > 0) {
         const statement = `(${terms.map((t) => `${key}:"${t}"`).join(' OR ')})`;
         fullQuery = fullQuery.length === 0 ? statement : `${fullQuery} AND ${statement}`;
       }
@@ -61,7 +61,7 @@ export const useSearchStore = defineStore('search', () => {
   async function search(query: string, limit: number, fields: string[] | undefined, lastDoc: string | undefined) {
     return api
       .get('/datasources/variables/_search', {
-        params: { query, lastDoc: lastDoc , limit, field: fields },
+        params: { query, lastDoc: lastDoc, limit, field: fields },
         paramsSerializer: {
           indexes: null, // no brackets at all
         },
@@ -122,7 +122,7 @@ export const useSearchStore = defineStore('search', () => {
   return {
     variablesQuery,
     reset,
-    count ,
+    count,
     search,
     countVariables,
     searchVariables,

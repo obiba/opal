@@ -1,5 +1,7 @@
 import { Notify } from 'quasar';
-import { t } from 'src/boot/i18n';
+import { i18n } from 'src/boot/i18n';
+
+const { t } = i18n.global;
 
 export function notifySuccess(message: string) {
   Notify.create({
@@ -22,7 +24,8 @@ export function notifyWarning(message: string) {
   });
 }
 
-export function notifyError(error) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function notifyError(error: any) {
   let message = t('unknown_error');
   if (typeof error === 'string') {
     message = t(error);

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { DatabaseDto, DatabasesStatusDto } from 'src/models/Database';
-import { GeneralConf } from 'src/models/Opal';
+import type { DatabaseDto, DatabasesStatusDto } from 'src/models/Database';
+import type { GeneralConf } from 'src/models/Opal';
 
 export const useSystemStore = defineStore('system', () => {
   const generalConf = ref<GeneralConf>({} as GeneralConf);

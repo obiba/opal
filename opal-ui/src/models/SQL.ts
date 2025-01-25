@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: SQL.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'SQL';
 
 export interface SQLExecutionDto {

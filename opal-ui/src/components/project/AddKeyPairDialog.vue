@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('project_admin.import_key') }}</div>
+        <div class="text-h6">{{ t('project_admin.import_key') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -13,7 +13,7 @@
             v-model="keyPair.alias"
             dense
             type="text"
-            :label="$t('name')"
+            :label="t('name')"
             lazy-rules
             :rules="[validateRequiredField('validation.name_required')]"
           >
@@ -23,7 +23,7 @@
             dense
             type="textarea"
             rows="10"
-            :label="$t('project_admin.private_key')"
+            :label="t('project_admin.private_key')"
             lazy-rules
             :rules="[validateRequiredField('validation.project_admin.private_key_required')]"
           >
@@ -33,34 +33,28 @@
             dense
             type="textarea"
             rows="10"
-            :label="$t('project_admin.public_key')"
+            :label="t('project_admin.public_key')"
             lazy-rules
             :rules="[validateRequiredField('validation.project_admin.public_key_required')]"
           >
           </q-input>
-          <div class="text-help">{{ $t('project_admin.import_key_info') }}</div>
+          <div class="text-help">{{ t('project_admin.import_key_info') }}</div>
         </q-form>
       </q-card-section>
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onAdd" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onAdd" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddKeyPairDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
-import { KeyForm, KeyType } from 'src/models/Opal';
+import { type KeyForm, KeyType } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;

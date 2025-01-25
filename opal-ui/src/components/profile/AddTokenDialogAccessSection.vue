@@ -4,24 +4,17 @@
       v-model="accessMapping"
       :options="accessMappingOptions"
       dense
-      :label="$t('user_profile.token_dialog.project_access')"
-      :hint="$t('user_profile.token_dialog.project_access_hint')"
+      :label="t('user_profile.token_dialog.project_access')"
+      :hint="t('user_profile.token_dialog.project_access_hint')"
       class="q-mb-md q-pt-md"
       emit-value
       map-options
     />
   </div>
 </template>
-access
-
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTokenDialogAccessSection.vue',
-});
-</script>
 
 <script setup lang="ts">
-import { t } from 'src/boot/i18n';
+const { t } = useI18n();
 
 interface AccessProps {
   modelValue: string | undefined;

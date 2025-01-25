@@ -13,15 +13,10 @@
   ></q-table>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableIdentifiersList',
-});
-</script>
-
 <script setup lang="ts">
-import { QTableColumn } from 'quasar';
-import { TableDto, ValueSetsDto } from 'src/models/Magma';
+import type { QTableColumn } from 'quasar';
+import type { TableDto, ValueSetsDto } from 'src/models/Magma';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   identifierTable: TableDto;
@@ -40,6 +35,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0,
+  sortBy: 'id',
 });
 
 function formatIdentifiersForTable(identifiers: ValueSetsDto) {
@@ -48,7 +44,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
   idColumns.value.push({
     name: 'id',
     label: 'ID',
-    align: 'left',
+    align: DefaultAlignment,
     field: 'id',
   } as QTableColumn);
 
@@ -56,7 +52,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
     idColumns.value.push({
       name: vItem,
       label: vItem,
-      align: 'left',
+      align: DefaultAlignment,
       field: vItem,
     } as QTableColumn);
   });
@@ -65,7 +61,7 @@ function formatIdentifiersForTable(identifiers: ValueSetsDto) {
   (identifiers.valueSets || []).forEach((item) => {
     const d = { id: item.identifier } as { [key: string]: string };
     variables.forEach((vItem, index) => {
-      d[vItem] = item.values[index].value || '';
+      d[vItem] = item.values[index]?.value || '';
     });
     idRows.value.push(d);
   });
@@ -87,7 +83,8 @@ async function getIdentifiers(offset = 0, limit = 10, identifiers?: ValueSetsDto
 
 // Handlers
 
-function onRequest(props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onRequest(props: any) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
   const offset = (page - 1) * rowsPerPage;
   const limit = rowsPerPage;

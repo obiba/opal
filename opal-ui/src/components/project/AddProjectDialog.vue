@@ -13,8 +13,8 @@
             v-model="newProject.name"
             dense
             type="text"
-            :label="$t('name')"
-            :hint="$t('unique_name_hint')"
+            :label="t('name')"
+            :hint="t('unique_name_hint')"
             :disable="editMode"
             style="min-width: 300px"
             class="q-mb-md"
@@ -26,8 +26,8 @@
             v-model="newProject.title"
             dense
             type="text"
-            :label="$t('title')"
-            :hint="$t('title_hint')"
+            :label="t('title')"
+            :hint="t('title_hint')"
             style="min-width: 300px"
             class="q-mb-md"
           >
@@ -36,7 +36,7 @@
             v-model="newProject.database"
             :options="databases"
             dense
-            :label="$t('database')"
+            :label="t('database')"
             :disable="hasTables"
             class="q-mb-md q-pt-md"
             emit-value
@@ -47,7 +47,7 @@
             v-model="newProject.vcfStoreService"
             :options="vcfStores"
             dense
-            :label="$t('vcf_store.label')"
+            :label="t('vcf_store.label')"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
@@ -55,15 +55,15 @@
           <q-input
             v-model="newProject.description"
             ref="input"
-            :label="$t('description')"
-            :hint="$t('project_description_hint')"
+            :label="t('description')"
+            :hint="t('project_description_hint')"
             dense
             type="textarea"
             lazy-rules
           />
           <file-select
             v-model="exportFolder"
-            :label="$t('export_folder')"
+            :label="t('export_folder')"
             :folder="filesStore.current"
             selection="single"
             @select="onUpdateFolder"
@@ -75,8 +75,8 @@
             use-chips
             multiple
             input-debounce="0"
-            :label="$t('tags')"
-            :hint="$t('project_tag_hint')"
+            :label="t('tags')"
+            :hint="t('project_tag_hint')"
             @new-value="addTag"
             :options="tagsFilters"
             @filter="onFilterTags"
@@ -87,25 +87,20 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddProject" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddProjectDialog',
-});
-</script>
 <script setup lang="ts">
-import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+import type { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { notifyError } from 'src/utils/notify';
-import { DatabaseDto_Usage, DatabaseDto } from 'src/models/Database';
-import { FileDto } from 'src/models/Opal';
-import { PluginPackageDto } from 'src/models/Plugins';
+import { DatabaseDto_Usage, type DatabaseDto } from 'src/models/Database';
+import type { FileDto } from 'src/models/Opal';
+import type { PluginPackageDto } from 'src/models/Plugins';
 
 interface Project extends Omit<ProjectDto, 'idMappings'> {
   idMappings?: ProjectDto_IdentifiersMappingDto[];
@@ -142,7 +137,7 @@ let tagsFilterOptions = Array<string>();
 const tagsFilters = ref(Array<string>());
 
 const exportFolder = ref<FileDto>();
-const editMode = computed(() => !!props.project && !!props.project.name);
+const editMode = computed(() => props.project && props.project.name !== undefined && props.project.name !== '');
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('edit_project') : t('add_project')));
 const hasTables = computed(() => (newProject.value?.datasource?.table ?? []).length > 0);
@@ -224,10 +219,11 @@ async function onAddProject() {
         newProject.value.title = newProject.value.name;
       }
 
-      editMode.value
-        ? await projectsStore.updateProject(newProject.value as ProjectDto)
-        : await projectsStore.addProject(newProject.value as ProjectDto),
-        emit('update', newProject.value);
+      if (editMode.value)
+        await projectsStore.updateProject(newProject.value as ProjectDto);
+      else
+        await projectsStore.addProject(newProject.value as ProjectDto);
+      emit('update', newProject.value);
       onHide();
     } catch (err) {
       notifyError(err);

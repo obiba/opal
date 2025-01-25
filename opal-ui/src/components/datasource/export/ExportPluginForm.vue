@@ -1,17 +1,12 @@
 <template>
   <div>
-    <schema-form v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
+    <schema-form v-if="schema !== undefined" v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExportPluginForm',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
-import { FormObject, SchemaFormObject } from 'src/components/models';
+import type { TableDto } from 'src/models/Magma';
+import type { FormObject, SchemaFormObject } from 'src/components/models';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface ExportPluginFormProps {

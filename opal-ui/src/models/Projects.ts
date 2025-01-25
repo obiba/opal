@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: Projects.proto
 
-/* eslint-disable */
 import { type DatasourceDto, type TimestampsDto } from './Magma';
 
 export const protobufPackage = 'Projects';

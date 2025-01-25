@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
-import { DatasourceFactory } from 'src/components/models';
-import { FileDto } from 'src/models/Opal';
+import type { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
+import type { DatasourceFactory } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 
 const projectsStore = useProjectsStore();
 
@@ -82,7 +82,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   }
 
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
-    const params = { offset, limit };
+    const params: { offset: number, limit: number, select: string | undefined } = { offset, limit, select: undefined };
     if (select && select.length > 0) {
       params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }

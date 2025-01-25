@@ -1,5 +1,5 @@
 <template>
-  <div class="text-help">{{ $t('analyse_validate.info') }}</div>
+  <div class="text-help">{{ t('analyse_validate.info') }}</div>
   <q-table
     flat
     :filter="filter"
@@ -18,10 +18,10 @@
           color="primary"
           icon="add"
           size="sm"
-          :label="$t('analyse_validate.add')"
+          :label="t('analyse_validate.add')"
           @click="onAddAnalysis"
         />
-        <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="$t('refresh')" @click="onRefresh" />
+        <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="t('refresh')" @click="onRefresh" />
       </div>
     </template>
     <template v-slot:top-right>
@@ -41,7 +41,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('run')"
+            :title="t('run')"
             :icon="toolsVisible[props.row.name] ? 'play_arrow' : 'none'"
             class="q-ml-xs"
             @click="onRunAnalysis(props.row)"
@@ -52,7 +52,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('view')"
+            :title="t('view')"
             :icon="toolsVisible[props.row.name] ? 'visibility' : 'none'"
             class="q-ml-xs"
             @click="onViewAnalysis(props.row)"
@@ -63,7 +63,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('duplicate')"
+            :title="t('duplicate')"
             :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
             class="q-ml-xs"
             @click="onDuplicateAnalysis(props.row)"
@@ -74,7 +74,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onRemoveAnalysis(props.row)"
@@ -98,7 +98,7 @@
           name="circle"
           size="sm"
           :color="analysisColor(props.value)"
-          :title="$t(`analysis_status.${props.value}`)"
+          :title="t(`analysis_status.${props.value}`)"
         />
       </q-td>
     </template>
@@ -111,8 +111,8 @@
 
   <confirm-dialog
     v-model="showRemove"
-    :title="$t('remove')"
-    :text="$t('analyse_validate.delete_analysis_confirm', { name: selectedAnalysis?.name })"
+    :title="t('remove')"
+    :text="t('analyse_validate.delete_analysis_confirm', { name: selectedAnalysis?.name })"
     @confirm="doRemoveAnalysis"
   />
 
@@ -128,20 +128,15 @@
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProjectAnaylseValidate',
-});
-</script>
-
 <script setup lang="ts">
 import AddProjectAnalysisDialog from './AddProjectAnalysisDialog.vue';
-import { OpalAnalysisDto, OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
-import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
+import { type OpalAnalysisDto, type OpalAnalysisResultDto, AnalysisStatusDto } from 'src/models/Projects';
+import type { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
 import { analysisColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   projectName: string;
@@ -174,7 +169,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
     style: 'width: 25%',
@@ -182,27 +177,27 @@ const columns = computed(() => [
   {
     name: 'type',
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'templateName',
     format: (value: string, row: OpalAnalysisDto) => t(`plugins.${row.pluginName}.${value}.title`),
   },
   {
     name: 'total',
     label: t('total'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: OpalAnalysisDto) => getSuccessCount(row.lastResult || ({} as OpalAnalysisResultDto)),
   },
   {
     name: 'status',
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: OpalAnalysisDto) => (row.lastResult || {}).status || AnalysisStatusDto.ERROR,
   },
   {
     name: 'date',
     label: t('date'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: OpalAnalysisDto) => getDateLabel(row.lastResult ? row.lastResult.startDate : row.updated),
   },
@@ -229,15 +224,15 @@ function onLeaveRow(row: TableRow) {
   toolsVisible.value[row.name] = false;
 }
 
-function onFilter(tableRows: OpalAnalysisDto[], filter: string) {
-  if (filter.length === 0) {
-    return tableRows;
+function onFilter() {
+  if (filter.value.length === 0) {
+    return analyses.value;
   }
-  const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
-  const result = tableRows.filter((row) => {
+  const query = filter.value?.length > 0 ? filter.value.toLowerCase() : '';
+  const result = analyses.value.filter((row) => {
     const rowString = `${row.name.toLowerCase()}`;
     return rowString.includes(query);
-  });
+  }) || [];
 
   return result;
 }
@@ -295,7 +290,7 @@ async function doRemoveAnalysis() {
   try {
     const toDelete = selectedAnalysis.value;
     selectedAnalysis.value = null;
-    if (!!toDelete) await projectsStore.removeAnalysis(props.projectName, props.tableName, toDelete.name);
+    if (toDelete) await projectsStore.removeAnalysis(props.projectName, props.tableName, toDelete.name);
     showRemove.value = false;
     return onRefresh();
   } catch (error) {

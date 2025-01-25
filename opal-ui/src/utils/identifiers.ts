@@ -7,7 +7,7 @@ export function generateIdentifier(count: number, allowZeros: boolean, withCheck
     sample = '' + '9'.repeat(count - 1) + generateLuhnCheckDigit(parseInt(sample));
   }
 
-  if (!!prefix) {
+  if (prefix) {
     sample = `${prefix}${sample}`;
   }
 
@@ -22,8 +22,7 @@ export function generateLuhnCheckDigit(input: number): number {
   }
 
   for (let i = ints.length - 2; i >= 0; i = i - 2) {
-    let j: number = ints[i];
-    j = j * 2;
+    let j: number = ints[i] as number * 2;
     if (j > 9) {
       j = (j % 10) + 1;
     }
@@ -31,7 +30,7 @@ export function generateLuhnCheckDigit(input: number): number {
   }
   let sum = 0;
   for (let i = 0; i < ints.length; i++) {
-    sum += ints[i];
+    sum += ints[i] as number;
   }
   if (sum % 10 == 0) {
     return 0;

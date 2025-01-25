@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
+import type { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
   const sid = ref('');
@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     params.append('password', password);
     sid.value = '';
     version.value = '';
-    const headers = {};
+    const headers: Record<string, string> = {};
     if (authMethod && token) {
       headers[authMethod] = token;
     }

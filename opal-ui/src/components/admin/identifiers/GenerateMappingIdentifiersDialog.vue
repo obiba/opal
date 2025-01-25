@@ -2,27 +2,27 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings.generate_identifiers') }}</div>
+        <div class="text-h6">{{ t('id_mappings.generate_identifiers') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section class="q-gutter-y-md">
         <q-banner v-if="!hasSystemIdentifiers" rounded class="bg-warning">
-          {{ $t('id_mappings.generate_identifiers_warning') }}
+          {{ t('id_mappings.generate_identifiers_warning') }}
         </q-banner>
         <div v-else class="text-help">
-          {{ $t('id_mappings.generate_identifiers_info', { count: mappingIdentifiersCount }) }}
+          {{ t('id_mappings.generate_identifiers_info', { count: mappingIdentifiersCount }) }}
         </div>
         <q-form ref="formRef" class="q-gutter-md" persistent>
-          <div>{{ $t('id_mappings.sample_identifier', { sample: sampleIdentifier }) }}</div>
+          <div>{{ t('id_mappings.sample_identifier', { sample: sampleIdentifier }) }}</div>
           <q-input
             v-model.number="options.size"
             dense
             type="text"
-            :label="$t('id_mappings.identifier_size')"
+            :label="t('id_mappings.identifier_size')"
             :hint="
-              $t('id_mappings.identifier_size_hint', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE }) + ' *'
+              t('id_mappings.identifier_size_hint', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE }) + ' *'
             "
             :disable="!hasSystemIdentifiers"
             class="q-mb-md"
@@ -34,18 +34,18 @@
           <q-checkbox
             :disable="!hasSystemIdentifiers"
             v-model="useChecksum"
-            :label="$t('id_mappings.with_checksum')"
+            :label="t('id_mappings.with_checksum')"
             dense
           />
           <div class="text-hint q-mb-md q-mt-none">
-            {{ $t('id_mappings.with_checksum_hint') }}
+            {{ t('id_mappings.with_checksum_hint') }}
           </div>
 
           <q-input
             v-model.number="options.prefix"
             dense
             type="text"
-            :label="$t('id_mappings.identifier_prefix')"
+            :label="t('id_mappings.identifier_prefix')"
             :disable="!hasSystemIdentifiers"
             class="q-mb-md"
             lazy-rules
@@ -55,7 +55,7 @@
           <q-checkbox
             :disable="!hasSystemIdentifiers"
             v-model="useLeadingZeros"
-            :label="$t('id_mappings.leading_zero')"
+            :label="t('id_mappings.leading_zero')"
             dense
           />
         </q-form>
@@ -64,23 +64,18 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onAddMapping" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onAddMapping" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'GenerateMappingIdentifiersDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, VariableDto } from 'src/models/Magma';
+import type { TableDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 import { generateIdentifier } from 'src/utils/identifiers';
-import { GenerateIdentifiersOptions } from 'src/stores/identifiers';
+import type { GenerateIdentifiersOptions } from 'src/stores/identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -121,7 +116,7 @@ const useChecksum = computed({
 // Validation rules
 // const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.entity_type_required');
 const validateRange = (val: number) =>
-  !!!val ||
+  !val ||
   (val >= MIN_IDENTIFIER_SIZE && val <= MAX_IDENTIFIER_SIZE) ||
   t('validation.range', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE });
 

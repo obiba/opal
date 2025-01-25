@@ -5,7 +5,7 @@
       dense
       type="text"
       class="q-pb-none"
-      :label="$t('name') + ' *'"
+      :label="t('name') + ' *'"
       lazy-rules
       :disable="editMode"
       :rules="[validateRequiredField, validateUniqueField]"
@@ -14,20 +14,20 @@
     <q-select
       v-model="selectedTemplate"
       :options="templateOptions"
-      :label="$t('type')"
-      :hint="$t('analyse_validate.analysis_dialog.type_hint')"
+      :label="t('type')"
+      :hint="t('analyse_validate.analysis_dialog.type_hint')"
       :disable="editMode"
       dense
       map-options
       emit-value
     >
       <template v-slot:option="scope">
-        <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
+        <q-item v-show="!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
           <q-item-section class="q-pa-none">
             {{ scope.opt.label }}
           </q-item-section>
         </q-item>
-        <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="onTemplateSelected(scope.opt.value)">
+        <q-item v-show="scope.opt.value" dense clickable v-close-popup @click="onTemplateSelected(scope.opt.value)">
           <q-item-section class="q-pl-md">
             {{ scope.opt.label }}
           </q-item-section>
@@ -39,8 +39,8 @@
       ref="variableSelect"
       v-model="selectedVariables"
       :options="variableOptions"
-      :label="$t('variables')"
-      :hint="$t('analyse_validate.analysis_dialog.variables_hint')"
+      :label="t('variables')"
+      :hint="t('analyse_validate.analysis_dialog.variables_hint')"
       :loading="loadingVariables"
       :disable="editMode"
       class="q-py-md"
@@ -72,7 +72,7 @@
     <schema-form
       class="q-pt-md"
       ref="sfForm"
-      v-if="!!sfModel && !!sfSchema"
+      v-if="sfModel && sfSchema"
       v-model="sfModel"
       :schema="sfSchema"
       :disable="editMode"
@@ -80,28 +80,22 @@
   </q-form>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProjectAnalysisPanel',
-});
-</script>
-
 <script setup lang="ts">
-import { OpalAnalysisDto } from 'src/models/Projects';
+import type { OpalAnalysisDto } from 'src/models/Projects';
 import SchemaForm from 'src/components/SchemaForm.vue';
-import { FormObject, SchemaFormObject } from 'src/components/models';
-import { AnalysisPluginTemplateDto } from 'src/models/Plugins';
-import { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
+import type { FormObject, SchemaFormObject } from 'src/components/models';
+import type { AnalysisPluginTemplateDto } from 'src/models/Plugins';
+import type { AnalyseCommandOptionsDto, AnalyseCommandOptionsDto_AnalyseDto } from 'src/models/Commands';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import { QueryResultDto } from 'src/models/Search';
-import { EntryDto } from 'src/models/Opal';
+import type { QueryResultDto } from 'src/models/Search';
+import type { EntryDto } from 'src/models/Opal';
 
 interface Props {
   projectName: string;
   tableName: string;
   analysisNames: string[];
-  analysis: OpalAnalysisDto | null;
-  clone?: OpalAnalysisDto;
+  analysis?: OpalAnalysisDto | undefined;
+  clone?: OpalAnalysisDto | undefined;
 }
 
 type PluginTemplate = { pluginName: string; templateName: string };
@@ -127,7 +121,7 @@ const analysisOptions = ref({} as AnalyseCommandOptionsDto_AnalyseDto);
 const pluginSchemaFormData = {} as { [key: string]: { schema: SchemaFormObject; model: FormObject } };
 const sfModel = ref<FormObject>({});
 const sfSchema = ref<SchemaFormObject>();
-const editMode = computed(() => !!props.analysis && !!props.analysis.name);
+const editMode = computed(() => props.analysis && props.analysis.name !== undefined && props.analysis.name !== '' && props.analysis.name !== null || false);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -138,7 +132,8 @@ function initPluginData() {
   (pluginsStore.analysisPlugins.packages || []).forEach((plugin) => {
     templateOptions.value.push({ label: t(`plugins.${plugin.name}.title`) });
 
-    (plugin['Plugins.AnalysisPluginPackageDto.analysis'].analysisTemplates || []).forEach(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((plugin as any)['Plugins.AnalysisPluginPackageDto.analysis'].analysisTemplates || []).forEach(
       (template: AnalysisPluginTemplateDto) => {
         const schema = JSON.parse(template.schemaForm);
         // Exclude title and description from schema so they are not rendered as fields
@@ -159,19 +154,20 @@ function updateSchemaForm() {
   if (!selectedTemplate.value) return;
 
   const schemaKey = `${selectedTemplate.value.pluginName}.${selectedTemplate.value.templateName}`;
-  sfModel.value = pluginSchemaFormData[schemaKey].model;
-  sfSchema.value = pluginSchemaFormData[schemaKey].schema;
+  sfModel.value = pluginSchemaFormData[schemaKey]?.model || {};
+  sfSchema.value = pluginSchemaFormData[schemaKey]?.schema;
 }
 
 function initFromDto(dto: OpalAnalysisDto) {
-  pluginSchemaFormData[`${dto.pluginName}.${dto.templateName}`].model = JSON.parse(dto.parameters);
+  const sf = pluginSchemaFormData[`${dto.pluginName}.${dto.templateName}`];
+  if (sf) sf.model = JSON.parse(dto.parameters);
 
   analysisOptions.value.name = dto.name;
   analysisOptions.value.table = dto.table;
   analysisOptions.value.plugin = dto.pluginName;
   analysisOptions.value.template = dto.templateName;
   analysisOptions.value.params = dto.parameters;
-  if (!!dto.variables) {
+  if (dto.variables) {
     analysisOptions.value.variables = dto.variables.join(',');
     selectedVariables.value = dto.variables;
   } else {
@@ -222,18 +218,20 @@ async function onFilterFn(query: string, update: any) {
     loadingVariables.value = true;
 
     const fullQuery = `query=${query} AND (project:"${props.projectName}") AND (table:"${props.tableName}")`;
-    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en']);
+    const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en'], undefined);
     if (result.totalHits > 0) {
       variableOptions.value = [];
       result.hits.map((hit) => {
-        const fieldMap = getSearchHitFieldMap(hit['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fieldMap = getSearchHitFieldMap((hit as any)['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
         variableOptions.value.push({
-          label: { name: fieldMap['name'], vlabel: fieldMap['label-en'] },
-          value: fieldMap['name'],
+          label: { name: fieldMap['name'] || '', vlabel: fieldMap['label-en'] || '' },
+          value: fieldMap['name'] || '',
         });
       });
     }
-  } catch (error) {
+  } catch (e) {
+    console.error(e);
     // ignore
   } finally {
     update();
@@ -243,7 +241,7 @@ async function onFilterFn(query: string, update: any) {
 
 function onHide() {
   const key = `${selectedTemplate.value?.pluginName}.${selectedTemplate.value?.templateName}`;
-  if (key in pluginSchemaFormData) {
+  if (key in pluginSchemaFormData && pluginSchemaFormData[key]) {
     pluginSchemaFormData[key].model = {};
   }
 
@@ -264,7 +262,7 @@ async function runAnalysis() {
       analysisOptions.value.template = selectedTemplate.value.templateName;
       analysisOptions.value.params = JSON.stringify(sfModel.value);
 
-      if (!!selectedVariables.value) {
+      if (selectedVariables.value) {
         analysisOptions.value.variables = selectedVariables.value.join(',');
       }
 
@@ -294,12 +292,12 @@ onMounted(() => {
     () => {
       initPluginData();
 
-      if (!!props.analysis && !!props.analysis.name) {
+      if (props.analysis && props.analysis.name) {
         initFromDto(props.analysis);
         updateSchemaForm();
       } else {
-        const found = templateOptions.value.find((opt) => !!opt.value) || null;
-        if (!!found && found.value) {
+        const found = templateOptions.value.find((opt) => opt.value) || null;
+        if (found && found.value) {
           selectedTemplate.value = found.value;
           analysisOptions.value = {
             name: '',
@@ -310,7 +308,7 @@ onMounted(() => {
             variables: '',
           } as AnalyseCommandOptionsDto_AnalyseDto;
 
-          if (!!props.clone) {
+          if (props.clone) {
             initFromDto(props.clone);
           }
 

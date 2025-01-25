@@ -2,14 +2,14 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('apps.edit_token') }}</div>
+        <div class="text-h6">{{ t('apps.edit_token') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section class="row items-center q-gutter-sm">
         <div class="col-8">
-          <q-input clearable v-model="model" dense type="text" :label="$t('token')" class="q-mb-md" lazy-rules>
+          <q-input clearable v-model="model" dense type="text" :label="t('token')" class="q-mb-md" lazy-rules>
           </q-input>
         </div>
         <div class="col-auto">
@@ -18,7 +18,7 @@
             size="sm"
             icon="cached"
             color="primary"
-            :label="$t('generate')"
+            :label="t('generate')"
             @click="onGenerateToken"
           ></q-btn>
         </div>
@@ -27,20 +27,17 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('edit')" type="submit" color="primary" @click="onEdit" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('edit')" type="submit" color="primary" @click="onEdit" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddAppTokenDialog',
-});
-</script>
 <script setup lang="ts">
 import { generateToken } from 'src/utils/tokens';
+
+const { t } = useI18n();
 
 interface DialogProps {
   modelValue: boolean;
@@ -64,7 +61,7 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      if (!!props.token) {
+      if (props.token) {
         model.value = props.token;
       }
 

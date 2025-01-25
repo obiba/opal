@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('restore_views') }}</div>
+        <div class="text-h6">{{ t('restore_views') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -13,22 +13,22 @@
           dense
           multiple
           append
-          :label="$t('restore_views_files')"
-          :hint="$t('restore_views_files_hint')"
+          :label="t('restore_views_files')"
+          :hint="t('restore_views_files_hint')"
           class="q-mb-md"
           accept="json"
         />
-        <q-checkbox v-model="override" class="q-ml-none" :label="$t('restore_views_override')" />
+        <q-checkbox v-model="override" class="q-ml-none" :label="t('restore_views_override')" />
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-spinner-dots v-if="processing" class="on-left" />
-        <q-btn flat :label="$t('cancel')" color="secondary" :disable="processing" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" :disable="processing" v-close-popup />
         <q-btn
           flat
-          :label="$t('restore')"
+          :label="t('restore')"
           color="primary"
           @click="onRestore"
           :disable="newFiles.length === 0 || processing"
@@ -38,13 +38,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RestoreViewsDialog',
-});
-</script>
 <script setup lang="ts">
-import { FileObject } from 'src/components/models';
+import type { FileObject } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {

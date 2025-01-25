@@ -1,4 +1,4 @@
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 
 export function getSizeLabel(size: number | undefined) {
   if (size === undefined || isNaN(size)) {

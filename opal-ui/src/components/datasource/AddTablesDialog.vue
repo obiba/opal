@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('add_tables') }}</div>
+        <div class="text-h6">{{ t('add_tables') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -16,10 +16,10 @@
           class="q-mb-md"
         />
         <div class="text-help q-mb-md">
-          {{ $t('select_dictionary_file') }}
+          {{ t('select_dictionary_file') }}
         </div>
         <div class="text-help q-mb-md">
-          <span class="on-left">{{ $t('select_dictionary_file_template') }}</span>
+          <span class="on-left">{{ t('select_dictionary_file_template') }}</span>
           <a :href="`${baseUrl}/templates/OpalVariableTemplate.xlsx`" class="text-primary">OpalVariableTemplate.xlsx</a>
         </div>
       </q-card-section>
@@ -27,23 +27,20 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" color="primary" @click="onAddTables" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" color="primary" @click="onAddTables" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddTablesDialog',
-});
-</script>
 <script setup lang="ts">
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 import { baseUrl } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
+
+const { t } = useI18n();
 
 interface DialogProps {
   modelValue: boolean;
@@ -110,7 +107,7 @@ async function onAddTable(tName: string) {
   const variables = [...transientDatasourceStore.variables];
 
   if (!datasourceStore.tables.map((tbl) => tbl.name).includes(tName)) {
-    const entityType = variables[0].entityType;
+    const entityType = variables[0]?.entityType || 'Participant';
     await datasourceStore.addTable(tName, entityType);
   }
   await datasourceStore.addOrUpdateVariables(tName, variables);

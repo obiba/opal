@@ -21,7 +21,7 @@
       </template>
       <template v-slot:body-cell-label="props">
         <q-td :props="props">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+          <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
             <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
@@ -36,14 +36,10 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariablesList',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto, CategoryDto } from 'src/models/Magma';
+import type { VariableDto, CategoryDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
+import { DefaultAlignment } from 'src/components/models';
 
 interface VariablesListProps {
   variables: VariableDto[];
@@ -70,7 +66,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -79,14 +75,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'valueType',
     required: true,
     label: t('value_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueType',
     format: (val: string) => t(val),
     sortable: true,
@@ -95,7 +91,7 @@ const columns = computed(() => [
     name: 'categories',
     required: true,
     label: t('categories'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'categories',
   },
 ]);

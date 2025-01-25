@@ -2,13 +2,13 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t(isView ? 'edit_view' : 'edit_table') }}</div>
+        <div class="text-h6">{{ t(isView ? 'edit_view' : 'edit_table') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="name" dense type="text" :label="$t('name')" style="min-width: 300px" class="q-mb-md">
+        <q-input v-model="name" dense type="text" :label="t('name')" style="min-width: 300px" class="q-mb-md">
         </q-input>
         <div v-if="isView">
           <q-select
@@ -18,8 +18,8 @@
             :options="fromTables"
             input-debounce="0"
             @filter="filterFn"
-            :label="$t('from_tables')"
-            :hint="$t('from_tables_select_hint')"
+            :label="t('from_tables')"
+            :hint="t('from_tables_select_hint')"
             style="min-width: 300px"
             class="q-mb-md"
             @update:model-value="onAdd"
@@ -28,7 +28,7 @@
             <q-item v-for="tbl in from" :key="tbl">
               <q-item-section>
                 <q-item-label class="text-caption text-bold">{{ tbl }}</q-item-label>
-                <q-checkbox v-model="innerFrom[tbl]" dense size="sm" :label="$t('inner_join')" class="q-mt-sm text-caption" />
+                <q-checkbox v-model="innerFrom[tbl]" dense size="sm" :label="t('inner_join')" class="q-mt-sm text-caption" />
               </q-item-section>
               <q-item-section side>
                 <table>
@@ -50,7 +50,7 @@
             </q-item>
           </q-list>
           <div class="text-hint q-mt-sm">
-            {{ $t('from_tables_hint') }}
+            {{ t('from_tables_hint') }}
           </div>
         </div>
       </q-card-section>
@@ -58,10 +58,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('save')"
+          :label="t('save')"
           color="primary"
           :disable="!isTableNameValid"
           @click="onSaveTable"
@@ -72,13 +72,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'EditTableDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, ViewDto } from 'src/models/Magma';
+import type { TableDto, ViewDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -90,6 +85,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update:table', 'update:view']);
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);

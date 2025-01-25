@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings.add_identifier') }}</div>
+        <div class="text-h6">{{ t('id_mappings.add_identifier') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -14,7 +14,7 @@
             dense
             rows="10"
             type="textarea"
-            :label="$t('identifiers') + ' *'"
+            :label="t('identifiers') + ' *'"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField]"
@@ -26,20 +26,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onImport" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onImport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportSystemIdentifiersList',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import type { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {

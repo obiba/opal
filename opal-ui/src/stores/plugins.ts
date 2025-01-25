@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { PluginPackage } from 'src/components/models';
-import { PluginPackagesDto } from 'src/models/Plugins';
+import type { PluginPackage } from 'src/components/models';
+import type { PluginPackagesDto } from 'src/models/Plugins';
 import { mergeAnalysesTranslations } from 'src/utils/plugins';
 
 export const usePluginsStore = defineStore('plugins', () => {
@@ -61,7 +61,7 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function initAnalysisPlugins() {
-    if (!!analysisPlugins.value.site) return Promise.resolve();
+    if (analysisPlugins.value.site) return Promise.resolve();
     return loadAnalysisPlugins();
   }
 

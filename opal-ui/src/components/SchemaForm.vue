@@ -8,31 +8,30 @@
           v-model="data[item.key]"
           :field="item"
           :disable="disable"
-          @update:model-value="onUpdate(item.key)"
+          @update:model-value="onUpdate"
         />
       </div>
     </form>
   </div>
-  <span v-if="!isFormValid" class="text-negative text-caption">{{ $t('validation.missing_required_fields') }}</span>
+  <span v-if="!isFormValid" class="text-negative text-caption">{{ t('validation.missing_required_fields') }}</span>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'SchemaForm',
-});
-</script>
 <script setup lang="ts">
-import { FormObject, SchemaFormObject } from 'src/components/models';
+import type { FormObject, SchemaFormObject } from 'src/components/models';
 import SchemaFormItem from 'src/components/SchemaFormItem.vue';
 import { isEmpty } from 'src/utils/validations';
+
+const { t } = useI18n();
 
 interface Props {
   modelValue: FormObject | undefined;
   schema: SchemaFormObject;
-  disable?: boolean;
+  disable?: boolean | undefined;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  disable: false,
+});
 const emit = defineEmits(['update:modelValue']);
 const data = ref(props.modelValue || {});
 const isFormValid = ref(true);
@@ -58,7 +57,7 @@ function initDefaults() {
 
 // TODO needs a better validation handling, this is just a basic one
 function validate() {
-  isFormValid.value = !!data.value;
+  isFormValid.value = data.value !== undefined;
   if (props.schema.required) {
     const missings = props.schema.required.filter((key) => isEmpty(data.value[key]));
     isFormValid.value = missings.length === 0;
@@ -67,7 +66,7 @@ function validate() {
   return isFormValid.value;
 }
 
-function onUpdate(key: string) {
+function onUpdate() {
   validate();
   if (!isFormValid.value) emit('update:modelValue', undefined);
   else emit('update:modelValue', data.value);

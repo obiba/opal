@@ -6,8 +6,8 @@
     <q-item v-for="item in visibleItems" :key="item.field">
       <q-item-section :style="`max-width: ${maxWidth}px`">
         <q-item-label>
-          <div class="text-overline text-grey-6">{{ $t(item.label ? item.label : item.field) }}</div>
-          <div v-if="item.hint" class="text-hint">{{ $t(item.hint) }}</div>
+          <div class="text-overline text-grey-6">{{ t(item.label ? item.label : item.field) }}</div>
+          <div v-if="item.hint" class="text-hint">{{ t(item.hint) }}</div>
         </q-item-label>
       </q-item-section>
       <q-item-section>
@@ -28,10 +28,10 @@
           </span>
           <span v-else>
             {{
-              dbobject[item.field] !== undefined
-                ? typeof dbobject[item.field] === 'number'
-                  ? toMaxDecimals(dbobject[item.field], 3)
-                  : dbobject[item.field]
+              (dbobject as any)[item.field] !== undefined
+                ? typeof (dbobject as any)[item.field] === 'number'
+                  ? toMaxDecimals((dbobject as any)[item.field], 3)
+                  : (dbobject as any)[item.field]
                 : '-'
             }}
           </span>
@@ -43,17 +43,8 @@
   </q-list>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FieldsList',
-});
-</script>
 <script setup lang="ts">
 import { toMaxDecimals } from 'src/utils/numbers';
-import { TableDto, VariableDto } from 'src/models/Magma';
-import { DescriptiveStatsDto } from 'src/models/Math';
-import { DataShieldProfileDto } from 'src/models/DataShield';
-import { StringMap } from 'src/components/models';
 
 export interface FieldLink {
   label: string;
@@ -62,34 +53,38 @@ export interface FieldLink {
   iconRight?: string;
 }
 
-export interface FieldItem<T> {
+export interface FieldItem {
   field: string;
   label?: string;
   hint?: string;
   unit?: string;
-  format?: (val: T) => string | undefined;
-  html?: (val: T) => string | undefined;
-  visible?: (val: T) => boolean;
-  links?: (val: T) => FieldLink[];
-  icon?: (val: T) => string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  format?: (val: any) => string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  html?: (val: any) => string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visible?: (val: any) => boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  links?: (val: any) => FieldLink[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: (val: any) => string;
 }
 
 export interface FieldsListProps {
-  dbobject: TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap;
-  items: FieldItem<TableDto | VariableDto | DescriptiveStatsDto | DataShieldProfileDto | StringMap>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dbobject?: any;
+  items?: FieldItem[];
   maxWidth?: string;
 }
 
-const { locale } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
 const props = withDefaults(defineProps<FieldsListProps>(), {
-  dbobject: undefined,
-  items: undefined,
   maxWidth: '200px',
 });
 
 const visibleItems = computed(() => {
-  return props.items.filter((item) => {
-    if (item.visible) {
+  return props.items?.filter((item) => {
+    if (item.visible && props.dbobject) {
       return item.visible(props.dbobject);
     }
     return true;

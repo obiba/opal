@@ -3,9 +3,9 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="pName" :to="`/project/${pName}`" />
-        <q-breadcrumbs-el :label="$t('resources')" :to="`/project/${pName}/resources`" />
+        <q-breadcrumbs-el :label="t('resources')" :to="`/project/${pName}/resources`" />
         <q-breadcrumbs-el :label="rName" />
       </q-breadcrumbs>
       <q-space />
@@ -48,7 +48,7 @@
           size="sm"
           outline
           icon="terminal"
-          :label="$t('test')"
+          :label="t('test')"
           @click="onTest"
           class="on-right"
         />
@@ -56,7 +56,7 @@
           color="secondary"
           size="sm"
           icon="content_copy"
-          :title="$t('duplicate')"
+          :title="t('duplicate')"
           @click="onShowDuplicate"
           :disable="!resourceProvider"
           class="on-right"
@@ -71,7 +71,7 @@
           class="on-right"
         />
         <q-btn
-          :label="$t('add_view')"
+          :label="t('add_view')"
           icon="add_circle"
           no-caps
           dense
@@ -89,10 +89,10 @@
         indicator-color="primary"
         align="justify"
       >
-        <q-tab name="reference" :label="$t('reference')" />
+        <q-tab name="reference" :label="t('reference')" />
         <q-tab
           name="permissions"
-          :label="$t('permissions')"
+          :label="t('permissions')"
           v-if="resourcesStore.perms.resourcePermissions?.canRead()"
         />
       </q-tabs>
@@ -121,8 +121,8 @@
       />
       <confirm-dialog
         v-model="showDelete"
-        :title="$t('delete')"
-        :text="$t('delete_resources_confirm', { count: 1 })"
+        :title="t('delete')"
+        :text="t('delete_resources_confirm', { count: 1 })"
         @confirm="onDeleteResource"
       />
     </q-page>
@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ResourceReferenceDto } from 'src/models/Projects';
+import type { ResourceReferenceDto } from 'src/models/Projects';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';

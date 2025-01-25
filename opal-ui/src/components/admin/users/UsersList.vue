@@ -12,17 +12,17 @@
       :loading="loading"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :label="$t('add')" icon="add" size="sm">
+        <q-btn-dropdown color="primary" :label="t('add')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onAddWithPassword">
               <q-item-section>
-                <q-item-label>{{ $t('user_add_with_pwd') }}</q-item-label>
+                <q-item-label>{{ t('user_add_with_pwd') }}</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click.prevent="onAddWithCertificate">
               <q-item-section>
-                <q-item-label>{{ $t('user_add_with_crt') }}</q-item-label>
+                <q-item-label>{{ t('user_add_with_crt') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -45,7 +45,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('edit')"
+              :title="t('edit')"
               :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
               class="q-ml-xs"
               @click="onEditUser(props.row)"
@@ -56,7 +56,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onDeleteUser(props.row)"
@@ -67,7 +67,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="props.row.enabled ? $t('disable') : $t('enable')"
+              :title="props.row.enabled ? t('disable') : t('enable')"
               :icon="toolsVisible[props.row.name] ? (props.row.enabled ? 'block' : 'check_circle') : 'none'"
               class="q-ml-xs"
               @click="onEnableUser(props.row)"
@@ -97,8 +97,8 @@
     <confirm-dialog
       v-if="selectedUser"
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_user_confirm', { user: selectedUser.name })"
+      :title="t('delete')"
+      :text="t('delete_user_confirm', { user: selectedUser.name })"
       @confirm="doDeleteUser"
     />
 
@@ -111,16 +111,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UsersList',
-});
-</script>
 <script setup lang="ts">
-import { SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
+import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddUserDialog from 'src/components/admin/users/AddUserDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
@@ -138,7 +134,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -147,21 +143,21 @@ const columns = computed(() => [
   {
     name: 'groups',
     label: t('groups'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'groups',
-    format: (val: string[]) => (val || []).filter((val) => !!val && val.length > 0),
+    format: (val: string[]) => (val || []).filter((val) => val && val.length > 0),
   },
   {
     name: 'authentication',
     label: t('authentication'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'authenticationType',
     format: (val: string) => t(`auth_types.${val}`),
   },
   {
     name: 'enabled',
     label: t('enabled'),
-    align: 'center  ',
+    align: DefaultAlignment,
     field: 'enabled',
   },
 ]);
@@ -180,7 +176,7 @@ function onFilter() {
   if (filter.value.length === 0) {
     return users.value;
   }
-  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const query = filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
   const result = users.value.filter((row) => {
     return Object.values(row).some((val) => {
       return String(val).toLowerCase().includes(query);

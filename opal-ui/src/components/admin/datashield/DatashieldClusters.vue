@@ -33,25 +33,20 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldClusters',
-});
-</script>
 <script setup lang="ts">
-import { RServerClusterDto } from 'src/models/OpalR';
+import type { RServerClusterDto } from 'src/models/OpalR';
 import DatashieldPackages from 'src/components/admin/datashield/DatashieldPackages.vue';
 
 const rStore = useRStore();
 
-const tab = ref<string>(rStore.clusters.length ? rStore.clusters[0].name : '');
+const tab = ref<string>(rStore.clusters.length && rStore.clusters[0] ? rStore.clusters[0].name : '');
 
 watch(
   () => rStore.clusters,
   () => {
     if (rStore.clusters.length) {
       if (tab.value === '' || !rStore.clusters.find((cluster: RServerClusterDto) => cluster.name === tab.value))
-        tab.value = rStore.clusters[0].name;
+        tab.value = rStore.clusters[0]?.name || '';
     }
   }
 );

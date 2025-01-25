@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="row items-center">
           <div class="col">
-            <div class="text-h6">{{ $t('git.diff_viewer.title') }}</div>
+            <div class="text-h6">{{ t('git.diff_viewer.title') }}</div>
           </div>
           <div class="col-auto">
             <q-btn
@@ -31,22 +31,16 @@
       </q-card-section>
 
       <q-card-actions align="right" class="bg-grey-3" :class="{ 'action-section': fullscreen }">
-        <q-btn flat :label="$t('close')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('close')" color="secondary" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'GitDiffViewerDialog',
-});
-</script>
-
 <script setup lang="ts">
 import GitDiffHeader from 'src/components/git/GitDiffHeader.vue';
 import GitDiffViewer from 'src/components/git/GitDiffViewer.vue';
-import { VcsCommitInfoDto } from 'src/models/Opal';
+import type { VcsCommitInfoDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
@@ -55,6 +49,9 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
+
+const { t } = useI18n();
+
 const showDialog = ref(props.modelValue);
 const fullscreen = ref(false);
 

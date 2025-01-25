@@ -13,7 +13,7 @@
         <q-btn
           color="secondary"
           icon="refresh"
-          :title="$t('refresh')"
+          :title="t('refresh')"
           outline
           size="sm"
           @click="onRefresh"
@@ -23,7 +23,7 @@
           outline
           color="secondary"
           icon="cleaning_services"
-          :title="$t('clear')"
+          :title="t('clear')"
           size="sm"
           @click="onClear(undefined)"
           class="on-right q-mb-sm"
@@ -43,7 +43,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('messages')"
+                :title="t('messages')"
                 :icon="toolsVisible[props.row.id] ? 'visibility' : 'none'"
                 @click="onShowMessages(props.row)"
                 class="on-right"
@@ -55,7 +55,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onClear(props.row)"
@@ -67,7 +67,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('cancel')"
+                :title="t('cancel')"
                 :icon="toolsVisible[props.row.id] ? 'cancel' : 'none'"
                 class="q-ml-xs"
                 @click="onCancel(props.row)"
@@ -90,7 +90,7 @@
           </q-td>
 
           <q-td key="endTime" :props="props">
-            {{ getDateLabel(props.row.endTime) }}
+            {{ props.row.endTime ? getDateLabel(props.row.endTime) : '' }}
             <span class="text-help">({{ getDatesDistanceLabel(props.row.startTime, props.row.endTime, false) }})</span>
           </q-td>
 
@@ -127,10 +127,10 @@
           <q-list separator dense>
             <q-item>
               <q-item-section style="max-width: 200px">
-                <q-item-label class="text-bold">{{ $t('date') }}</q-item-label>
+                <q-item-label class="text-bold">{{ t('date') }}</q-item-label>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-bold">{{ $t('message') }}</q-item-label>
+                <q-item-label class="text-bold">{{ t('message') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item v-for="message in selected?.messages" :key="message.timestamp">
@@ -150,15 +150,11 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CommandStates',
-});
-</script>
 <script setup lang="ts">
-import { CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   commands: CommandStateDto[];
@@ -187,7 +183,7 @@ const columns = computed(() => {
       name: 'id',
       required: true,
       label: t('id'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'id',
       format: (val: string) => val,
       sortable: true,
@@ -196,7 +192,7 @@ const columns = computed(() => {
       name: 'name',
       required: true,
       label: t('name'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'name',
       sortable: true,
     },
@@ -204,7 +200,7 @@ const columns = computed(() => {
       name: 'owner',
       required: true,
       label: t('user'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'owner',
       sortable: true,
     },
@@ -212,7 +208,7 @@ const columns = computed(() => {
       name: 'startTime',
       required: true,
       label: t('start_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'startTime',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -221,7 +217,7 @@ const columns = computed(() => {
       name: 'endTime',
       required: true,
       label: t('end_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'endTime',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -232,7 +228,7 @@ const columns = computed(() => {
       name: 'project',
       required: false,
       label: t('project'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'project',
       format: (val: string) => val,
       sortable: true,
@@ -242,7 +238,7 @@ const columns = computed(() => {
     name: 'status',
     required: false,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'status',
     sortable: true,
   });

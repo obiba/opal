@@ -1,20 +1,15 @@
 <template>
   <div>
     <div v-if="datasourceStore.perms.variable?.canUpdate()" class="row q-gutter-sm q-mb-md">
-      <q-btn size="sm" color="primary" icon="edit" :title="$t('edit')" @click="onShowEdit" />
+      <q-btn size="sm" color="primary" icon="edit" :title="t('edit')" @click="onShowEdit" />
     </div>
     <v-ace-editor v-model:value="script" @init="onEditorInit" lang="javascript" theme="monokai" style="height: 300px" />
     <variable-script-dialog v-model="showEdit" :variable="variable" @save="onSave" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableScript',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 import { VAceEditor } from 'vue3-ace-editor';
 import VariableScriptDialog from 'src/components/datasource/VariableScriptDialog.vue';
 
@@ -24,6 +19,7 @@ interface VariableScriptProps {
 
 const props = defineProps<VariableScriptProps>();
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showEdit = ref(false);

@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="text-h5 q-mb-md">
-      {{ $t('identity_providers') }}
+      {{ t('identity_providers') }}
     </div>
     <div
       class="text-help q-mb-md"
-      v-html="$t('identity_providers_info', { idProvider: idProviderDefinition, openId: openIdDefinition })"
+      v-html="t('identity_providers_info', { idProvider: idProviderDefinition, openId: openIdDefinition })"
     ></div>
     <q-table
       flat
@@ -18,7 +18,7 @@
       :loading="loading"
     >
       <template v-slot:top-left>
-        <q-btn no-caps color="primary" icon="add" size="sm" :label="$t('add')" @click="onAddProfile" />
+        <q-btn no-caps color="primary" icon="add" size="sm" :label="t('add')" @click="onAddProfile" />
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -30,7 +30,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('edit')"
+              :title="t('edit')"
               :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
               class="q-ml-xs"
               @click="onEditProvider(props.row)"
@@ -41,7 +41,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('duplicate')"
+              :title="t('duplicate')"
               :icon="toolsVisible[props.row.name] ? 'content_copy' : 'none'"
               class="q-ml-xs"
               @click="onDuplicateProvider(props.row)"
@@ -52,7 +52,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="props.row.enabled ? $t('disable') : $t('enable')"
+              :title="props.row.enabled ? t('disable') : t('enable')"
               :icon="toolsVisible[props.row.name] ? (props.row.enabled ? 'close' : 'check') : 'none'"
               class="q-ml-xs"
               @click="onEnableProvider(props.row)"
@@ -63,7 +63,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onDeleteProvider(props.row)"
@@ -81,14 +81,14 @@
       <template v-slot:body-cell-providerUrl="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <a :href="props.value" target="_blank">
-            {{ $t('identity_provider_url') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
+            {{ t('identity_provider_url') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
           </a>
         </q-td>
       </template>
       <template v-slot:body-cell-parameters="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <a :href="props.value" target="_blank">
-            {{ $t('identity_provider_discovery_uri') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
+            {{ t('identity_provider_discovery_uri') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
           </a>
         </q-td>
       </template>
@@ -104,8 +104,8 @@
     <confirm-dialog
       v-if="selectedProvider"
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_identity_provider_confirm', { provider: selectedProvider.name })"
+      :title="t('delete')"
+      :text="t('delete_identity_provider_confirm', { provider: selectedProvider.name })"
       @confirm="doDeleteProvider"
     />
 
@@ -117,17 +117,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'IdentityProvidersList',
-});
-</script>
-
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import { IDProviderDto } from 'src/models/Opal';
+import type { IDProviderDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddIdentityProviderDialog from './AddIdentityProviderDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const identityProvidersStore = useIdentityProvidersStore();
 const { t } = useI18n();
@@ -150,7 +145,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -159,35 +154,35 @@ const columns = computed(() => [
   {
     name: 'label',
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'label',
     format: (val: string) => val,
   },
   {
     name: 'groups',
     label: t('groups'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'groups',
     format: (val: string) => ((val) => (val || '').split(/\s+/))(val).filter((group) => group),
   },
   {
     name: 'providerUrl',
     label: t('identity_provider_account_login'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'providerUrl',
     format: (val: string) => val,
   },
   {
     name: 'parameters',
     label: t('parameters'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'discoveryURI',
     format: (val: string) => val,
   },
   {
     name: 'enabled',
     label: t('enabled'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'enabled',
     format: (val: string) => val,
   },

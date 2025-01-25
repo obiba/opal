@@ -1,4 +1,4 @@
-import { RPackageDto } from 'src/models/OpalR';
+import type { RPackageDto } from 'src/models/OpalR';
 
 export function getPackageKey(pkg: RPackageDto) {
   return `${pkg.name}-${getDescriptionValue(pkg, 'LibPath')}`;

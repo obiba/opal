@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('vcf_store.import_vcf_file') }}</div>
+        <div class="text-h6">{{ t('vcf_store.import_vcf_file') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,8 +10,8 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <file-select
             v-model="importData"
-            :label="$t('vcf_store.import_vcf_file_label')"
-            :hint="$t('vcf_store.import_vcf_file_hint')"
+            :label="t('vcf_store.import_vcf_file_label')"
+            :hint="t('vcf_store.import_vcf_file_hint')"
             :folder="filesStore.current"
             selection="multiple"
             type="folder"
@@ -27,10 +27,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('import')"
+          :label="t('import')"
           type="submit"
           color="primary"
           :disable="importFiles.length == 0"
@@ -41,18 +41,12 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportVcfFileDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto, SubjectProfileDto } from 'src/models/Opal';
-import { ImportVCFCommandOptionsDto } from 'src/models/Commands';
+import type { FileDto, SubjectProfileDto } from 'src/models/Opal';
+import type { ImportVCFCommandOptionsDto } from 'src/models/Commands';
 
 interface DialogProps {
   modelValue: boolean;
