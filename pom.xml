@@ -85,7 +85,7 @@
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
-    <mongodb-driver.version>5.1.3</mongodb-driver.version>
+    <mongodb-driver.version>5.3.1</mongodb-driver.version>
     <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
@@ -106,7 +106,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
-    <spring.version>6.2.1</spring.version>
+    <spring.version>6.2.2</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
