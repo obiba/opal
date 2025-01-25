@@ -71,8 +71,12 @@ export const useFilesStore = defineStore('files', () => {
     } else {
       let uri = `${baseUrl}/files${path}`;
       if (files && files.length > 0) {
-        uri += '?';
-        files.forEach((f) => (uri += `&file=${f.name}`));
+        if (files.length > 1) {
+          uri += '?';
+          files.forEach((f) => (uri += `&file=${f.name}`));
+        } else if (files[0]) {
+          uri += `/${files[0].name}`;
+        }
       }
       window.open(uri, '_self');
     }
