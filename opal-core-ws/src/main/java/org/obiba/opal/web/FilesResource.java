@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
@@ -605,7 +606,7 @@ public class FilesResource {
       }
       Files.copy(output.toPath(), os);
       if (!Strings.isNullOrEmpty(key)) {
-        output.getParentFile().delete();
+        FileUtils.deleteQuietly(output.getParentFile());
       }
     };
 
@@ -638,7 +639,7 @@ public class FilesResource {
         return true;
       }, new File(tmpDir, fileName), key);
       Files.copy(output.toPath(), os);
-      tmpDir.delete();
+      FileUtils.deleteQuietly(tmpDir);
     };
 
     return Response.ok(stream, mimeType)
