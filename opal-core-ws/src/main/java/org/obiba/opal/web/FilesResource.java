@@ -97,7 +97,7 @@ public class FilesResource {
   @NoAuthorization
   public Response getFileDetails(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
-    if (!file.getParent().isReadable() || !file.exists()) {
+    if (file.getParent() != null && !file.getParent().isReadable() || !file.exists()) {
       return getPathNotExistResponse("/" + path);
     }
     if (file.getType() == FileType.FILE) {
