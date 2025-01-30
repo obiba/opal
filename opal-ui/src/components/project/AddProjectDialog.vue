@@ -192,6 +192,11 @@ watch(
     if (value) {
       if (props.project) {
         newProject.value = { ...props.project };
+        if (props.project.exportFolder) {
+          filesStore.getFile(props.project.exportFolder).then((file) => {
+            exportFolder.value = file;
+          });
+        }
       } else {
         newProject.value = { ...emptyProject };
         const defaultDb = databases.value.find((db) => db.defaultStorage);
@@ -232,11 +237,11 @@ async function onAddProject() {
 }
 
 onMounted(() => {
-  if (!filesStore.current?.path) {
-    filesStore.loadFiles('/');
-  }
-
   profilesStore.initProfile().then(() => {
+    if (!filesStore.current?.path) {
+      filesStore.loadFiles(`/home/${profilesStore.profile.principal}`);
+    }
+
     systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
       databases.value = (dbs || []).map((db) => {
         return {
