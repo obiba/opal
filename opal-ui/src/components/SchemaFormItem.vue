@@ -175,6 +175,12 @@ function init() {
   data.value = props.modelValue;
   if (isArray()) {
     dataArray.value = data.value ? (data.value as Array<FormObject>) : [];
+  } else if (isFile()) {
+    if (props.modelValue && typeof props.modelValue === 'string') {
+      filesStore.getFile(props.modelValue).then((file) => {
+        dataFile.value = file;
+      });
+    }
   } else if (isString()) {
     dataString.value = data.value as string;
   } else if (isNumber()) {
@@ -183,12 +189,6 @@ function init() {
     dataInteger.value = data.value as number;
   } else if (isBoolean()) {
     dataBoolean.value = data.value === true || data.value === 'true';
-  } else if (isFile()) {
-    if (props.modelValue && typeof props.modelValue === 'string') {
-      filesStore.getFile(props.modelValue).then((file) => {
-        dataFile.value = file;
-      });
-    }
   }
 }
 
@@ -221,13 +221,14 @@ function isFile() {
 }
 
 function onFileSelect() {
-  data.value = dataFile.value?.path;
   onUpdate();
 }
 
 function onUpdate() {
   if (isArray()) {
     data.value = dataArray.value;
+  } else if (isFile()) {
+    data.value = dataFile.value?.path;
   } else if (isString()) {
     data.value = dataString.value;
   } else if (isNumber()) {
