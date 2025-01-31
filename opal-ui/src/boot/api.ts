@@ -22,7 +22,7 @@ const api = axios.create({
 });
 
 function requiresCode(response: AxiosResponse): boolean {
-  if (response && response.status === 401) return response.headers['www-authenticate'] === 'X-Opal-TOTP';
+  if (response && response.status === 401) return ['X-Opal-TOTP', 'X-Obiba-TOTP'].includes(response.headers['www-authenticate']);
   return false;
 }
 
