@@ -2,13 +2,13 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('add_view') }}</div>
+        <div class="text-h6">{{ t('add_view') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="name" dense type="text" :label="$t('name')" style="min-width: 300px" class="q-mb-md">
+        <q-input v-model="name" dense type="text" :label="t('name')" style="min-width: 300px" class="q-mb-md">
         </q-input>
         <q-select
           v-model="from"
@@ -19,8 +19,8 @@
           :options="fromTables"
           input-debounce="0"
           @filter="filterFn"
-          :label="$t('from_tables')"
-          :hint="$t('from_tables_select_hint')"
+          :label="t('from_tables')"
+          :hint="t('from_tables_select_hint')"
           style="min-width: 300px"
           class="q-mb-md"
         />
@@ -29,18 +29,13 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" color="primary" :disable="!isTableNameValid" @click="onAddTable" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" color="primary" :disable="!isTableNameValid" @click="onAddTable" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddViewDialog',
-});
-</script>
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
 
@@ -51,6 +46,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(props.modelValue);

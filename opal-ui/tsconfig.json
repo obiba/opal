@@ -1,7 +1,3 @@
 {
-  "extends": "@quasar/app-vite/tsconfig-preset",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "target": "ES2015"
-  }
+  "extends": "./.quasar/tsconfig.json"
 }

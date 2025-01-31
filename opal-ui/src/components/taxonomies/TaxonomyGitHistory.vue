@@ -11,7 +11,7 @@
       <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         {{ props.value }}
         <template v-if="props.rowIndex === 0"
-          ><q-badge color="grey-6 q-ml-xs">{{ $t('current') }}</q-badge></template
+          ><q-badge color="grey-6 q-ml-xs">{{ t('current') }}</q-badge></template
         >
         <div class="float-right">
           <q-btn
@@ -20,7 +20,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('compare')"
+            :title="t('compare')"
             :icon="toolsVisible[props.row.commitId] ? 'compare_arrows' : 'none'"
             class="q-ml-xs"
             @click="onCompare(props.row)"
@@ -32,7 +32,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('taxonomy.compare_current')"
+            :title="t('taxonomy.compare_current')"
             :icon="toolsVisible[props.row.commitId] ? 'keyboard_tab' : 'none'"
             class="q-ml-xs"
             @click="onCompareWith(props.row)"
@@ -44,7 +44,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('restore')"
+            :title="t('restore')"
             :icon="toolsVisible[props.row.commitId] ? 'replay' : 'none'"
             class="q-ml-xs"
             @click="onRestore(props.row)"
@@ -68,26 +68,21 @@
 
   <confirm-dialog
     v-model="showRestore"
-    :title="$t('restore')"
-    :text="$t('taxonomy.restore_confirm', { date: getDateLabel(commitInfo.date) })"
+    :title="t('restore')"
+    :text="t('taxonomy.restore_confirm', { date: getDateLabel(commitInfo.date) })"
     @confirm="doRestore"
   />
 
   <git-diff-viewer-dialog v-model="showDiff" :commit-info="commitInfo" @update:modelValue="onCloseDiffViewer" />
 </template>
 
-<script lang="ts">
-defineComponent({
-  name: 'TaxonomyGitHistory',
-});
-</script>
-
 <script setup lang="ts">
 import GitDiffViewerDialog from 'src/components/git/GitDiffViewerDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
-import { VcsCommitInfoDto } from 'src/models/Opal';
+import type { VcsCommitInfoDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   taxonomyName: string;
@@ -112,7 +107,7 @@ const columns = computed(() => [
     name: 'id',
     required: true,
     label: t('id'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'commitId',
     format: (val: string) => val.slice(0, 7),
     headerStyle: 'width: 20%; white-space: normal;',
@@ -121,14 +116,14 @@ const columns = computed(() => [
   {
     name: 'date',
     label: t('date'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'date',
     format: (val: string) => getDateLabel(val),
   },
   {
     name: 'author',
     label: t('author'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'author',
   },
 ]);
@@ -196,14 +191,14 @@ async function getCommits() {
 watch(
   () => props.taxonomyName,
   async (newValue) => {
-    if (!!newValue) {
+    if (newValue) {
       getCommits();
     }
   }
 );
 
 onMounted(() => {
-  if (!!props.taxonomyName) {
+  if (props.taxonomyName) {
     getCommits();
   }
 });

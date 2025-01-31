@@ -3,12 +3,12 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('cart')" />
+        <q-breadcrumbs-el :label="t('cart')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('variables') }}
+        {{ t('variables') }}
       </div>
       <q-table
         v-if="cartStore.variables?.length"
@@ -26,31 +26,31 @@
           <div class="column">
             <div class="row q-gutter-sm">
               <q-btn
-                :label="$t('add_to_view')"
+                :label="t('add_to_view')"
                 icon="add_circle"
                 color="primary"
                 no-caps
                 size="sm"
                 @click="onShowAddToView"
               />
-              <q-btn-dropdown :label="$t('annotate')" icon="label" color="secondary" no-caps size="sm">
+              <q-btn-dropdown :label="t('annotate')" icon="label" color="secondary" no-caps size="sm">
                 <q-list>
                   <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
                     <q-item-section>
-                      <q-item-label>{{ $t('apply_annotation') }}</q-item-label>
+                      <q-item-label>{{ t('apply_annotation') }}</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup @click.prevent="onShowDeleteAnnotation">
                     <q-item-section>
-                      <q-item-label>{{ $t('delete_annotation') }}</q-item-label>
+                      <q-item-label>{{ t('delete_annotation') }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="onRefresh" />
+              <q-btn color="secondary" icon="refresh" :title="t('refresh')" outline size="sm" @click="onRefresh" />
               <q-btn
                 :disable="selected.length === 0"
-                :title="$t('remove_from_cart')"
+                :title="t('remove_from_cart')"
                 icon="cleaning_services"
                 size="sm"
                 outline
@@ -82,7 +82,7 @@
         </template>
         <template v-slot:body-cell-label="props">
           <q-td :props="props">
-            <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+            <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
               <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
               <span>{{ attr.value }}</span>
             </div>
@@ -109,7 +109,7 @@
         </template>
       </q-table>
       <div v-else class="text-hint">
-        {{ $t('empty_cart') }}
+        {{ t('empty_cart') }}
       </div>
       <add-to-view-dialog v-model="showAddToView" :variables="selected" />
       <annotate-dialog v-model="showAnnotate" :variables="selected" :operation="annotationOperation" />
@@ -118,11 +118,12 @@
 </template>
 
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 import { getLabels } from 'src/utils/attributes';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
 import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 const cartStore = useCartStore();
 const taxonomiesStore = useTaxonomiesStore();
@@ -146,7 +147,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -155,14 +156,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'valueType',
     required: true,
     label: t('value_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueType',
     format: (val: string) => t(val),
     sortable: true,
@@ -171,14 +172,14 @@ const columns = computed(() => [
     name: 'table',
     required: true,
     label: t('table'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'parentLink',
   },
   {
     name: 'annotations',
     required: true,
     label: t('annotations'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
 ]);

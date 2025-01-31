@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: Database.proto
 
-/* eslint-disable */
 import { type JdbcDatasourceSettingsDto } from './Magma';
 
 export const protobufPackage = 'Database';

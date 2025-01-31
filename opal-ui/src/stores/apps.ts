@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { AppDto, AppsConfigDto } from 'src/models/Apps';
+import type { AppDto, AppsConfigDto } from 'src/models/Apps';
 
 export const useAppsStore = defineStore('apps', () => {
   const apps = ref<AppDto[]>([]);

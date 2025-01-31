@@ -1,15 +1,15 @@
 <template>
-  <div class="text-h6">{{ $t('apps.self_register') }}</div>
+  <div class="text-h6">{{ t('apps.self_register') }}</div>
   <html-anchor-hint
     class="text-help"
     trKey="apps.self_register_info"
-    :text="$t('apps.apps_admin')"
+    :text="t('apps.apps_admin')"
     url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
   />
 
   <div class="q-mt-sm q-gutter-sm row items-center">
-    <q-btn size="sm" icon="edit" color="primary" :title="$t('edit')" @click="onEditToken"></q-btn>
-    <q-btn size="sm" icon="delete" color="negative" outline :title="$t('delete')" @click="onClearToken"></q-btn>
+    <q-btn size="sm" icon="edit" color="primary" :title="t('edit')" @click="onEditToken"></q-btn>
+    <q-btn size="sm" icon="delete" color="negative" outline :title="t('delete')" @click="onClearToken"></q-btn>
 
     <span v-if="config.token" class="on-right">
       <code>{{ config.token }}</code>
@@ -18,7 +18,7 @@
         dense
         size="sm"
         icon="content_copy"
-        :title="$t('clipboard.copy')"
+        :title="t('clipboard.copy')"
         @click="onCopyToClipboard"
         aria-label="Copy to clipboard"
         class="on-right"
@@ -26,11 +26,11 @@
     </span>
   </div>
 
-  <div class="text-h6 q-mt-lg">{{ $t('discovery') }}</div>
+  <div class="text-h6 q-mt-lg">{{ t('discovery') }}</div>
   <html-anchor-hint
     class="text-help"
     trKey="apps.discovery_info"
-    :text="$t('apps.apps_admin')"
+    :text="t('apps.apps_admin')"
     url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
   />
 
@@ -46,7 +46,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn size="sm" icon="add" color="primary" :title="$t('add')" @click="onAdd"></q-btn>
+      <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
     </template>
     <template v-slot:body-cell-host="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -58,7 +58,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('edit')"
+            :title="t('edit')"
             :icon="toolsVisible[props.row.host] ? 'edit' : 'none'"
             class="q-ml-xs"
             @click="onEdit(props.row)"
@@ -69,7 +69,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('remove')"
+            :title="t('remove')"
             :icon="toolsVisible[props.row.host] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
@@ -81,8 +81,8 @@
 
   <confirm-dialog
     v-model="showRemove"
-    :title="$t('remove')"
-    :text="$t('apps.remove_config_confirm', { host: selectedConfig.host })"
+    :title="t('remove')"
+    :text="t('apps.remove_config_confirm', { host: selectedConfig.host })"
     @confirm="doRemove"
   />
 
@@ -97,20 +97,15 @@
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AppsConfig',
-});
-</script>
-
 <script setup lang="ts">
-import { RockAppConfigDto } from 'src/models/Apps';
+import type { RockAppConfigDto } from 'src/models/Apps';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
 import AddRServerDialog from 'src/components/admin/apps/AddRServerDialog.vue';
 import AddAppTokenDialog from 'src/components/admin/apps/AddAppTokenDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { copyToClipboard } from 'quasar';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const appsStore = useAppsStore();
@@ -135,7 +130,7 @@ const columns = computed(() => [
     name: 'host',
     required: true,
     label: t('host'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'host',
     sortable: true,
     style: 'width: 25%',
@@ -192,7 +187,7 @@ function onCopyToClipboard() {
     });
 }
 
-async function onAdd(row: RockAppConfigDto) {
+async function onAdd() {
   showAdd.value = true;
 }
 

@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('vcf_store.export_vcf_file') }}</div>
+        <div class="text-h6">{{ t('vcf_store.export_vcf_file') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,7 +10,7 @@
       <q-card-section style="max-height: 75vh" class="scroll">
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-banner rounded class="bg-primary text-white">{{
-            $t('vcf_store.export_vcf_file_label', { count: vcfs.length })
+            t('vcf_store.export_vcf_file_label', { count: vcfs.length })
           }}</q-banner>
 
           <file-select
@@ -29,8 +29,8 @@
             <q-select
               v-model="selectedTable"
               :options="filterOptions"
-              :label="$t('vcf_store.export_participants_filter_label')"
-              :hint="$t('vcf_store.export_mapping_table_hint')"
+              :label="t('vcf_store.export_participants_filter_label')"
+              :hint="t('vcf_store.export_mapping_table_hint')"
               dense
               map-options
               use-chips
@@ -39,13 +39,13 @@
               @filter="onFilterFn"
             >
               <template v-slot:option="scope">
-                <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
+                <q-item v-show="!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.label">
                   <q-item-section class="q-pa-none">
                     {{ scope.opt.label }}
                   </q-item-section>
                 </q-item>
                 <q-item
-                  v-show="!!scope.opt.value"
+                  v-show="scope.opt.value"
                   dense
                   clickable
                   v-close-popup
@@ -60,45 +60,39 @@
 
             <q-select
               v-model="exportOptions.participantIdentifiersMapping"
-              :disable="!!!selectedTable?.name"
+              :disable="!selectedTable?.name"
               :options="idMappings"
-              :label="$t('vcf_store.export_id_mappings_label')"
-              :hint="$t('vcf_store.export_id_mappings_hint')"
+              :label="t('vcf_store.export_id_mappings_label')"
+              :hint="t('vcf_store.export_id_mappings_hint')"
               dense
               map-options
               use-input
             >
             </q-select>
 
-            <q-checkbox v-model="exportOptions.caseControl" :label="$t('vcf_store.export_case_control_label')" />
+            <q-checkbox v-model="exportOptions.caseControl" :label="t('vcf_store.export_case_control_label')" />
           </template>
         </q-form>
       </q-card-section>
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('export')" type="submit" color="primary" :disable="!canExport" @click="onExport" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('export')" type="submit" color="primary" :disable="!canExport" @click="onExport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExportVcfFileDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto, SubjectProfileDto } from 'src/models/Opal';
-import { TableDto } from 'src/models/Magma';
-import { VCFSummaryDto } from 'src/models/Plugins';
-import { ExportVCFCommandOptionsDto } from 'src/models/Commands';
-import { IdentifiersMappingDto } from 'src/models/Identifiers';
+import type { FileDto, SubjectProfileDto } from 'src/models/Opal';
+import type { TableDto } from 'src/models/Magma';
+import type { VCFSummaryDto } from 'src/models/Plugins';
+import type { ExportVCFCommandOptionsDto } from 'src/models/Commands';
+import type { IdentifiersMappingDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
@@ -110,13 +104,16 @@ interface DialogProps {
 type GroupOption = { label: string; value: TableDto | undefined };
 
 const emit = defineEmits(['update:modelValue']);
+
 const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const identifiersStore = useIdentifiersStore();
 const datasourceStore = useDatasourceStore();
 const profilesStore = useProfilesStore();
 const filesStore = useFilesStore();
+
 const props = defineProps<DialogProps>();
+
 const showDialog = ref(props.modelValue);
 const formRef = ref();
 const exportData = ref({} as FileDto);
@@ -127,13 +124,13 @@ const filterOptions = ref([] as GroupOption[]);
 const exportOptions = ref({} as ExportVCFCommandOptionsDto);
 let participantsOptions = [] as GroupOption[];
 const profile = computed(() => profilesStore.profile || ({} as SubjectProfileDto));
-const canExport = computed(() => !!exportData.value.path);
+const canExport = computed(() => exportData.value.path !== '' && exportData.value.path !== undefined);
 
 function initMappingOptions(tables: TableDto[]) {
   if (tables.length > 0) {
     let lastGroup = '';
     tables.forEach((table) => {
-      if (!!table.datasourceName && table.datasourceName !== lastGroup) {
+      if (table.datasourceName && table.datasourceName !== lastGroup) {
         lastGroup = table.datasourceName;
         participantsOptions.push({ label: lastGroup } as GroupOption);
       }

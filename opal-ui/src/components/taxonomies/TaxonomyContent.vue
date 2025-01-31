@@ -11,7 +11,7 @@
       <fields-list class="col-6" :items="properties" :dbobject="taxonomy" />
     </div>
 
-    <div class="text-h6 q-mb-none q-mt-lg">{{ $t('vocabularies') }}</div>
+    <div class="text-h6 q-mb-none q-mt-lg">{{ t('vocabularies') }}</div>
     <q-table
       flat
       :key="tableKey"
@@ -33,10 +33,10 @@
       </template>
       <template v-slot:top-left>
         <div v-if="taxonomiesStore.canEdit" class="q-gutter-sm">
-          <q-btn no-caps color="primary " icon="add" size="sm" :label="$t('add')" @click="onAddVocabulary" />
+          <q-btn no-caps color="primary " icon="add" size="sm" :label="t('add')" @click="onAddVocabulary" />
           <template v-if="dirty">
-            <q-btn no-caps color="primary" icon="check" size="sm" :label="$t('apply')" @click="onApply" />
-            <q-btn no-caps color="secondary" icon="close" size="sm" :label="$t('reset')" @click="onResetSort" />
+            <q-btn no-caps color="primary" icon="check" size="sm" :label="t('apply')" @click="onApply" />
+            <q-btn no-caps color="secondary" icon="close" size="sm" :label="t('reset')" @click="onResetSort" />
           </template>
         </div>
       </template>
@@ -47,7 +47,7 @@
           debounce="400"
           color="primary"
           v-model="filter"
-          :placeholder="$t('taxonomy.filter_vocabulary')"
+          :placeholder="t('taxonomy.filter_vocabulary')"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -67,7 +67,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('move_up')"
+              :title="t('move_up')"
               :icon="toolsVisible[props.row.name] ? 'arrow_upward' : 'none'"
               class="q-ml-xs"
               @click="onMoveUp(props.value)"
@@ -79,7 +79,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('move_down')"
+              :title="t('move_down')"
               :icon="toolsVisible[props.value] ? 'arrow_downward' : 'none'"
               class="q-ml-xs"
               @click="onMoveDown(props.value)"
@@ -118,14 +118,14 @@
       </template>
     </q-table>
 
-    <div v-if="taxonomiesStore.canEdit" class="text-h6 q-mb-none q-mt-lg">{{ $t('taxonomy.change_history') }}</div>
+    <div v-if="taxonomiesStore.canEdit" class="text-h6 q-mb-none q-mt-lg">{{ t('taxonomy.change_history') }}</div>
     <taxonomy-git-history v-if="taxonomiesStore.canEdit" :taxonomy-name="taxonomyName" @restore="onGitRestored" />
 
     <!-- Dialogs -->
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_taxonomy_confirm', { taxonomy: taxonomy.name })"
+      :title="t('delete')"
+      :text="t('delete_taxonomy_confirm', { taxonomy: taxonomy.name })"
       @confirm="doDelete"
     />
 
@@ -145,22 +145,17 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TaxonomyContent',
-});
-</script>
-
 <script setup lang="ts">
-import { TaxonomyDto, VocabularyDto } from 'src/models/Opal';
+import type { TaxonomyDto, VocabularyDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
 import TaxonomyGitHistory from 'src/components/taxonomies/TaxonomyGitHistory.vue';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   taxonomy: TaxonomyDto;
@@ -196,7 +191,7 @@ const {
   onFilter,
 } = useTaxonomyEntityContent<VocabularyDto>(() => props.taxonomy, 'vocabularies');
 
-const properties: FieldItem<TaxonomyDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'name',
   },
@@ -227,7 +222,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -236,7 +231,7 @@ const columns = computed(() => [
   {
     name: 'title',
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'title',
     headerStyle: 'width: 30%; white-space: normal;',
     style: 'width: 30%; white-space: normal;',
@@ -244,7 +239,7 @@ const columns = computed(() => [
   {
     name: 'description',
     label: t('description'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'description',
     headerStyle: 'width: 50%; white-space: normal;',
     style: 'width: 50%; white-space: normal;',
@@ -252,7 +247,7 @@ const columns = computed(() => [
   {
     name: 'terms',
     label: t('terms'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: VocabularyDto) => (row.terms || []).length,
   },
 ]);
@@ -314,7 +309,7 @@ function onVocabularyAdded() {
 watch(
   () => props.taxonomy,
   (newValue) => {
-    if (!!newValue.name) {
+    if (newValue.name) {
       tableKey.value += 1;
       sortedName.value = [];
       canSort.value = true;

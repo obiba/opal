@@ -3,14 +3,14 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
-        <q-breadcrumbs-el :label="$t('tables')" />
+        <q-breadcrumbs-el :label="t('tables')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5">
-        {{ $t('tables') }}
+        {{ t('tables') }}
       </div>
       <q-tabs
         v-model="tab"
@@ -20,11 +20,11 @@
         indicator-color="primary"
         align="justify"
       >
-        <q-tab name="dictionary" :label="$t('dictionary')" />
-        <q-tab name="sql" :label="$t('sql')" />
+        <q-tab name="dictionary" :label="t('dictionary')" />
+        <q-tab name="sql" :label="t('sql')" />
         <q-tab
           name="permissions"
-          :label="$t('permissions')"
+          :label="t('permissions')"
           v-if="datasourceStore.perms.datasourcePermissions?.canRead()"
         />
       </q-tabs>
@@ -56,6 +56,7 @@ import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
 import SqlPanel from 'src/components/datasource/SqlPanel.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();

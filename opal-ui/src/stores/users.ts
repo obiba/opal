@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { PasswordDto, SubjectCredentialsDto } from 'src/models/Opal';
+import type { PasswordDto, SubjectCredentialsDto } from 'src/models/Opal';
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref([] as SubjectCredentialsDto[]);

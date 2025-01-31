@@ -2,10 +2,10 @@
   <div>
     <div v-if="hasDatabase">
       <div class="row">
-        <q-btn :label="$t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
+        <q-btn :label="t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
         <q-btn
           outline
-          :label="$t('test')"
+          :label="t('test')"
           icon="settings_ethernet"
           color="secondary"
           size="sm"
@@ -33,17 +33,17 @@
       </div>
     </div>
     <div v-else>
-      <q-btn-dropdown color="primary" :label="$t('register')" icon="add" size="sm">
+      <q-btn-dropdown color="primary" :label="t('register')" icon="add" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click.prevent="onShowAddSQLDB">
             <q-item-section>
-              <q-item-label>{{ $t('db.register_sqldb') }}</q-item-label>
+              <q-item-label>{{ t('db.register_sqldb') }}</q-item-label>
             </q-item-section>
           </q-item>
 
           <q-item clickable v-close-popup @click.prevent="onShowAddMondoDB">
             <q-item-section>
-              <q-item-label>{{ $t('db.register_mongodb') }}</q-item-label>
+              <q-item-label>{{ t('db.register_mongodb') }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -52,21 +52,16 @@
 
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('unregister')"
-      :text="$t('db.unregister_confirm', { name: database?.name })"
+      :title="t('unregister')"
+      :text="t('db.unregister_confirm', { name: database?.name })"
       @confirm="onDelete"
     />
     <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatabasesList',
-});
-</script>
 <script setup lang="ts">
-import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
@@ -91,7 +86,7 @@ function refresh() {
     .then((data) => {
       database.value = data;
     })
-    .catch((error) => {
+    .catch(() => {
       database.value = {} as DatabaseDto;
     });
 }

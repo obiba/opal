@@ -7,17 +7,17 @@
       <q-separator />
       <q-card-section>
         <div class="text-help q-mb-md">
-          {{ $t('datashield.settings_init_help') }}
+          {{ t('datashield.settings_init_help') }}
         </div>
         <q-spinner-dots v-if="loading" />
         <q-option-group v-model="selected" :options="options" type="checkbox" />
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('initialize')"
+          :label="t('initialize')"
           :disable="loading || selected.length === 0"
           color="primary"
           @click="onInitSettings"
@@ -28,13 +28,10 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldProfileInitDialog',
-});
-</script>
 <script setup lang="ts">
-import { RPackageDto } from 'src/models/OpalR';
+import type { RPackageDto } from 'src/models/OpalR';
+
+const { t } = useI18n();
 
 interface DialogProps {
   modelValue: boolean;
@@ -45,7 +42,7 @@ const showDialog = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue', 'beforeInit', 'afterInit']);
 
 const selected = ref<string[]>([]);
-const options = ref<{ label: string; value: string }[]>();
+const options = ref<{ label: string; value: string }[]>([]);
 const loading = ref(false);
 
 const datashieldStore = useDatashieldStore();

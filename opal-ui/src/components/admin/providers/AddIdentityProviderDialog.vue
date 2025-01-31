@@ -13,8 +13,8 @@
             v-model="newProvider.name"
             dense
             type="text"
-            :label="$t('name') + '*'"
-            :hint="$t('identity_provider.name_hint')"
+            :label="t('name') + '*'"
+            :hint="t('identity_provider.name_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('validation.name_required')]"
@@ -25,8 +25,8 @@
             v-model="newProvider.clientId"
             dense
             type="text"
-            :label="$t('identity_provider.client_id') + '*'"
-            :hint="$t('identity_provider.client_id_hint')"
+            :label="t('identity_provider.client_id') + '*'"
+            :hint="t('identity_provider.client_id_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('validation.identity_provider.client_id_required')]"
@@ -36,8 +36,8 @@
             v-model="newProvider.secret"
             dense
             type="text"
-            :label="$t('identity_provider.secret') + '*'"
-            :hint="$t('identity_provider.secret_hint')"
+            :label="t('identity_provider.secret') + '*'"
+            :hint="t('identity_provider.secret_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('validation.identity_provider.secret_required')]"
@@ -47,7 +47,7 @@
             v-model="newProvider.discoveryURI"
             dense
             type="text"
-            :label="$t('identity_provider.discovery_uri') + '*'"
+            :label="t('identity_provider.discovery_uri') + '*'"
             class="q-mb-md"
             lazy-rules
             :rules="[
@@ -58,7 +58,7 @@
             <template v-slot:hint>
               <html-anchor-hint
                 :tr-key="'identity_provider.discovery_uri_hint'"
-                :text="$t('identity_provider.discovery_uri_definition')"
+                :text="t('identity_provider.discovery_uri_definition')"
                 :url="`https://openid.net/specs/openid-connect-discovery-1_0.html`"
               />
             </template>
@@ -67,8 +67,8 @@
             v-model="newProvider.label"
             dense
             type="text"
-            :label="$t('label')"
-            :hint="$t('identity_provider.label_hint')"
+            :label="t('label')"
+            :hint="t('identity_provider.label_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -77,8 +77,8 @@
             v-model="newProvider.providerUrl"
             dense
             type="text"
-            :label="$t('identity_provider.provider_url')"
-            :hint="$t('identity_provider.provider_url_hint')"
+            :label="t('identity_provider.provider_url')"
+            :hint="t('identity_provider.provider_url_hint')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateUri('validation.identity_provider.provider_url_format', false)]"
@@ -88,8 +88,8 @@
             v-model="newProvider.groups"
             dense
             type="text"
-            :label="$t('groups')"
-            :hint="$t('identity_provider.groups_hint')"
+            :label="t('groups')"
+            :hint="t('identity_provider.groups_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -98,22 +98,22 @@
             v-model="newProvider.scope"
             dense
             type="text"
-            :label="$t('identity_provider.scope')"
+            :label="t('identity_provider.scope')"
             class="q-mb-md"
             lazy-rules
             :rules="[validateRequiredField('validation.identity_provider.scope_required')]"
           >
             <!-- NOTE: to render hint in a with HTML the fields needs rules -->
             <template v-slot:hint>
-              <div v-html="$t('identity_provider.scope_hint', { openid: '<code>openid</code>' })"></div>
+              <div v-html="t('identity_provider.scope_hint', { openid: '<code>openid</code>' })"></div>
             </template>
           </q-input>
           <q-input
             v-model="newProvider.usernameClaim"
             dense
             type="text"
-            :label="$t('identity_provider.username_claim')"
-            :hint="$t('identity_provider.username_claim_hint')"
+            :label="t('identity_provider.username_claim')"
+            :hint="t('identity_provider.username_claim_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -122,7 +122,7 @@
             v-model="groupsMapping"
             :options="groupsMappingOptions"
             dense
-            :label="$t('identity_provider.groups_mapping')"
+            :label="t('identity_provider.groups_mapping')"
             class="q-mb-md q-pt-md"
             emit-value
             map-options
@@ -132,8 +132,8 @@
             v-model="newProvider.groupsClaim"
             dense
             type="text"
-            :placeholder="$t('groups')"
-            :hint="$t('identity_provider.groups_claim_hint')"
+            :placeholder="t('groups')"
+            :hint="t('identity_provider.groups_claim_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -145,7 +145,7 @@
             rows="6"
             type="textarea"
             :placeholder="groupsJavascriptPlaceholder"
-            :hint="$t('identity_provider.groups_javascript_hint')"
+            :hint="t('identity_provider.groups_javascript_hint')"
             class="q-mb-md"
             lazy-rules
           >
@@ -157,13 +157,13 @@
                 dense
                 switch-toggle-side
                 header-class="text-primary text-caption q-pl-none"
-                :label="$t('advanced_options')"
+                :label="t('advanced_options')"
               >
                 <q-checkbox dense v-model="newProvider.useNonce" class="q-my-md">
                   <template v-slot:default>
                     <span
                       class="text-secondary"
-                      v-html="$t('identity_provider.use_nonce', { url: useNonceDefinition })"
+                      v-html="t('identity_provider.use_nonce', { url: useNonceDefinition })"
                       @click.stop="openWindow('https://openid.net/specs/openid-connect-core-1_0.html#IDToken')"
                     ></span>
                   </template>
@@ -172,7 +172,7 @@
                   <template v-slot:default>
                     <span
                       class="text-secondary"
-                      v-html="$t('identity_provider.use_logout', { url: useLogoutDefinition })"
+                      v-html="t('identity_provider.use_logout', { url: useLogoutDefinition })"
                       @click.stop="openWindow('https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout')"
                     ></span>
                   </template>
@@ -181,8 +181,8 @@
                   v-model.number="newProvider.connectTimeout"
                   dense
                   type="number"
-                  :label="$t('identity_provider.connect_timeout')"
-                  :hint="$t('identity_provider.connect_timeout_hint')"
+                  :label="t('identity_provider.connect_timeout')"
+                  :hint="t('identity_provider.connect_timeout_hint')"
                   class="q-mb-md"
                   lazy-rules
                 >
@@ -191,8 +191,8 @@
                   v-model.number="newProvider.readTimeout"
                   dense
                   type="number"
-                  :label="$t('identity_provider.read_timeout')"
-                  :hint="$t('identity_provider.read_timeout_hint')"
+                  :label="t('identity_provider.read_timeout')"
+                  :hint="t('identity_provider.read_timeout_hint')"
                   class="q-mb-md"
                   lazy-rules
                 >
@@ -201,8 +201,8 @@
                   v-model="newProvider.callbackURL"
                   dense
                   type="text"
-                  :label="$t('identity_provider.callback_url')"
-                  :hint="$t('identity_provider.callback_url_hint')"
+                  :label="t('identity_provider.callback_url')"
+                  :hint="t('identity_provider.callback_url_hint')"
                   class="q-mb-md"
                   lazy-rules
                   :rules="[validateUri('validation.identity_provider.callback_url_format', false)]"
@@ -217,20 +217,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddProvider" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddIdentityProviderDialog',
-});
-</script>
 <script setup lang="ts">
-import { IDProviderDto } from 'src/models/Opal';
+import type { IDProviderDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
 
@@ -265,7 +260,7 @@ const groupsMappingOptions = [
 ];
 const groupsMapping: Ref<string | null> = ref(null);
 const newProvider = ref<IDProviderDto>({ ...emptyProvider });
-const editMode = computed(() => !!props.provider && !!props.provider.name);
+const editMode = computed(() => props.provider?.name !== undefined);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('identity_provider_edit') : t('identity_provider_add')));
 const groupsJavascriptPlaceholder = computed(() => {
@@ -306,7 +301,7 @@ watch(
     if (value) {
       if (props.provider) {
         newProvider.value = { ...props.provider };
-        if (!!newProvider.value.groupsClaim || !!newProvider.value.groupsScript) {
+        if (newProvider.value.groupsClaim || newProvider.value.groupsScript) {
           groupsMapping.value = newProvider.value.groupsClaim ? 'groupsClaim' : 'groupsScript';
         }
       } else {

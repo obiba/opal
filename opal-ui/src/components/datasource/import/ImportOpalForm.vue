@@ -2,7 +2,7 @@
   <div>
     <q-input
       v-model="url"
-      :label="$t('opal_url')"
+      :label="t('opal_url')"
       placeholder="https://"
       dense
       class="q-mb-md"
@@ -12,7 +12,7 @@
     <q-select
       v-model="authMethod"
       :options="authOptions"
-      :label="$t('auth_method')"
+      :label="t('auth_method')"
       dense
       class="q-mb-md"
       @update:model-value="onAuthSelection"
@@ -20,7 +20,7 @@
     <q-input
       v-if="!isCredentials"
       v-model="token"
-      :label="$t('personal_access_token')"
+      :label="t('personal_access_token')"
       dense
       class="q-mb-md"
       :debounce="500"
@@ -29,7 +29,7 @@
     <q-input
       v-if="isCredentials"
       v-model="username"
-      :label="$t('username')"
+      :label="t('username')"
       dense
       class="q-mb-md"
       :debounce="500"
@@ -38,7 +38,7 @@
     <q-input
       v-if="isCredentials"
       v-model="password"
-      :label="$t('password')"
+      :label="t('password')"
       type="password"
       dense
       class="q-mb-md"
@@ -47,7 +47,7 @@
     />
     <q-input
       v-model="remoteDatasource"
-      :label="$t('project')"
+      :label="t('project')"
       dense
       class="q-mb-md"
       :debounce="500"
@@ -56,13 +56,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportOpalForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
+import type { DatasourceFactory } from 'src/components/models';
 
 interface ImportOpalFormProps {
   modelValue: DatasourceFactory | undefined;
@@ -90,7 +85,7 @@ const authMethod = ref(
 );
 
 function onAuthSelection() {
-  if (authMethod.value.value === 'token') {
+  if (authMethod.value?.value === 'token') {
     username.value = '';
     password.value = '';
   } else {
@@ -99,12 +94,12 @@ function onAuthSelection() {
   onUpdate();
 }
 
-const isCredentials = computed(() => authMethod.value.value === 'credentials');
+const isCredentials = computed(() => authMethod.value?.value === 'credentials');
 
 function isValid() {
   return (
-    (!!url.value && !!remoteDatasource.value && (!isCredentials.value || (!!username.value && !!password.value))) ||
-    !!token.value
+    (url.value && remoteDatasource.value && (!isCredentials.value || (username.value && password.value))) ||
+    (token.value !== '' && token.value !== undefined)
   );
 }
 

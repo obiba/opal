@@ -19,12 +19,12 @@
               v-if="datasourceStore.perms.variables?.canCreate()"
               color="primary"
               icon="add"
-              :title="$t('add_variable')"
+              :title="t('add_variable')"
               size="sm"
               @click="onShowAddVariable"
             />
-            <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="onRefresh" />
-            <q-btn color="secondary" icon="search" :title="$t('search')" outline size="sm" @click="onSearch" />
+            <q-btn color="secondary" icon="refresh" :title="t('refresh')" outline size="sm" @click="onRefresh" />
+            <q-btn color="secondary" icon="search" :title="t('search')" outline size="sm" @click="onSearch" />
             <q-btn
               v-if="datasourceStore.perms.table?.canUpdate()"
               outline
@@ -35,11 +35,11 @@
             />
             <div v-if="selected.length === 0" class="text-hint q-pt-xs">
               <q-icon name="info" />
-              <span class="q-ml-xs">{{ $t('variables_hint') }}</span>
+              <span class="q-ml-xs">{{ t('variables_hint') }}</span>
             </div>
             <q-btn
               v-if="selected.length > 0"
-              :label="$t('add_to_view')"
+              :label="t('add_to_view')"
               icon="add_circle"
               no-caps
               dense
@@ -51,7 +51,7 @@
             <q-btn-dropdown
               v-if="datasourceStore.perms.table?.canUpdate()"
               v-show="selected.length > 0"
-              :label="$t('annotate')"
+              :label="t('annotate')"
               icon="label"
               no-caps
               dense
@@ -61,19 +61,19 @@
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onShowApplyAnnotation">
                   <q-item-section>
-                    <q-item-label>{{ $t('apply_annotation') }}</q-item-label>
+                    <q-item-label>{{ t('apply_annotation') }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 <q-item clickable v-close-popup @click.prevent="onShowDeleteAnnotation">
                   <q-item-section>
-                    <q-item-label>{{ $t('delete_annotation') }}</q-item-label>
+                    <q-item-label>{{ t('delete_annotation') }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
             </q-btn-dropdown>
             <q-btn
               v-if="selected.length > 0"
-              :label="$t('add_to_cart')"
+              :label="t('add_to_cart')"
               icon="add_shopping_cart"
               no-caps
               dense
@@ -103,7 +103,7 @@
       </template>
       <template v-slot:body-cell-label="props">
         <q-td :props="props">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+          <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
             <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
@@ -138,20 +138,15 @@
     <edit-variable-dialog v-model="showEditVariable" :variable="selectedSingle" />
     <confirm-dialog
       v-model="showDeleteVariables"
-      :title="$t('delete')"
-      :text="$t('delete_variables_confirm', { count: selected.length || rows.length })"
+      :title="t('delete')"
+      :text="t('delete_variables_confirm', { count: selected.length || rows.length })"
       @confirm="onDeleteVariables"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableVariables',
-});
-</script>
 <script setup lang="ts">
-import { CategoryDto, VariableDto } from 'src/models/Magma';
+import type { CategoryDto, VariableDto } from 'src/models/Magma';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
@@ -159,6 +154,7 @@ import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
 import AnnotationPanel from 'src/components/datasource/AnnotationPanel.vue';
 import { notifyError } from 'src/utils/notify';
 import { getLabels } from 'src/utils/attributes';
+import { DefaultAlignment } from 'src/components/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -190,7 +186,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -199,14 +195,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'valueType',
     required: true,
     label: t('value_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueType',
     format: (val: string) => t(val),
     sortable: true,
@@ -215,14 +211,14 @@ const columns = computed(() => [
     name: 'categories',
     required: true,
     label: t('categories'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'categories',
   },
   {
     name: 'annotations',
     required: true,
     label: t('annotations'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'attributes',
   },
 ]);

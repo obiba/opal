@@ -19,7 +19,7 @@
             <q-btn
               v-if="cluster.servers.length"
               color="primary"
-              :label="$t('download_logs')"
+              :label="t('download_logs')"
               icon="download"
               size="sm"
               @click="onClusterLogsDownload"
@@ -37,7 +37,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('start')"
+                  :title="t('start')"
                   icon="start"
                   class="q-ml-xs"
                   @click="onRServerStart(props.row)"
@@ -49,7 +49,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('stop')"
+                  :title="t('stop')"
                   icon="highlight_off"
                   class="q-ml-xs"
                   @click="onRServerStop(props.row)"
@@ -60,7 +60,7 @@
                   flat
                   size="sm"
                   color="secondary"
-                  :title="$t('download_logs')"
+                  :title="t('download_logs')"
                   icon="download"
                   class="q-ml-xs"
                   @click="onRServerLogsDownload(props.row)"
@@ -92,16 +92,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RCluster',
-});
-</script>
 <script setup lang="ts">
 import { baseUrl } from 'src/boot/api';
-import { RServerClusterDto, RServerDto } from 'src/models/OpalR';
+import type { RServerClusterDto, RServerDto } from 'src/models/OpalR';
 import { getSizeLabel } from 'src/utils/files';
 import RPackages from 'src/components/admin/r/RPackages.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   cluster: RServerClusterDto;
@@ -119,14 +115,14 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
   },
   {
     name: 'version',
     required: true,
     label: t('r.version'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'version',
     classes: 'text-caption',
   },
@@ -134,28 +130,28 @@ const columns = computed(() => [
     name: 'sessionCount',
     required: true,
     label: t('r.sessions'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: RServerDto) => t('r.sessions_counts', { count: row.sessionCount, active: row.busySessionCount }),
   },
   {
     name: 'system',
     required: true,
     label: t('system'),
-    align: 'left',
+    align: DefaultAlignment,
     field: (row: RServerDto) => t('r.system', { cores: row.cores, memory: getSizeLabel(row.freeMemory * 1000) }),
   },
   {
     name: 'url',
     required: true,
     label: 'URL',
-    align: 'left',
+    align: DefaultAlignment,
     field: 'app',
   },
   {
     name: 'running',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'running',
   },
 ]);

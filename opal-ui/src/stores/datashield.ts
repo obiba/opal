@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { RPackageDto } from 'src/models/OpalR';
-import { DataShieldProfileDto, DataShieldMethodDto, DataShieldROptionDto } from 'src/models/DataShield';
+import type { RPackageDto } from 'src/models/OpalR';
+import type { DataShieldProfileDto, DataShieldMethodDto, DataShieldROptionDto } from 'src/models/DataShield';
 
 export const useDatashieldStore = defineStore('datashield', () => {
   const profiles = ref<DataShieldProfileDto[]>([]);
@@ -135,8 +135,8 @@ export const useDatashieldStore = defineStore('datashield', () => {
     return access
       ? api.put(`/datashield/profile/${profile.value.name}/_access`).then(() => (profile.value.restrictedAccess = true))
       : api
-          .delete(`/datashield/profile/${profile.value.name}/_access`)
-          .then(() => (profile.value.restrictedAccess = false));
+        .delete(`/datashield/profile/${profile.value.name}/_access`)
+        .then(() => (profile.value.restrictedAccess = false));
   }
 
   return {

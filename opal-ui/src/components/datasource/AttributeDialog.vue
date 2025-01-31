@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('attributes') }}</div>
+        <div class="text-h6">{{ t('attributes') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,14 +10,14 @@
       <q-card-section>
         <q-input
           v-model="namespace"
-          :label="$t('namespace')"
-          :hint="$t('attribute_namespace_hint')"
+          :label="t('namespace')"
+          :hint="t('attribute_namespace_hint')"
           dense
           class="q-mb-md"
         />
-        <q-input v-model="name" :label="$t('name')" :hint="$t('attribute_name_hint')" dense class="q-mb-md" />
+        <q-input v-model="name" :label="t('name')" :hint="t('attribute_name_hint')" dense class="q-mb-md" />
         <div>
-          <div>{{ $t('value') }}</div>
+          <div>{{ t('value') }}</div>
           <q-tabs
             v-model="tab"
             dense
@@ -36,7 +36,7 @@
                 <q-input
                   v-if="!previews[loc]"
                   v-model="texts[loc]"
-                  :label="$t('text')"
+                  :label="t('text')"
                   type="textarea"
                   auto-grow
                   dense
@@ -52,7 +52,7 @@
                     flat
                     no-caps
                     size="sm"
-                    :label="$t('preview')"
+                    :label="t('preview')"
                     color="secondary"
                     class="q-pl-none q-pr-none"
                     @click="previews[loc] = true"
@@ -62,7 +62,7 @@
                     flat
                     no-caps
                     size="sm"
-                    :label="$t('edit')"
+                    :label="t('edit')"
                     color="secondary"
                     class="q-pl-none q-pr-none"
                     @click="previews[loc] = false"
@@ -72,7 +72,7 @@
                     no-caps
                     size="sm"
                     icon="help_outline"
-                    :label="$t('markdown_guide')"
+                    :label="t('markdown_guide')"
                     color="secondary"
                     class="float-right q-pl-none q-pr-none"
                     @click="onMarkdownGuide"
@@ -82,7 +82,7 @@
             </template>
           </q-tab-panels>
           <div class="text-hint">
-            {{ $t('annotation_texts_hint') }}
+            {{ t('annotation_texts_hint') }}
           </div>
         </div>
       </q-card-section>
@@ -90,27 +90,22 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('apply')" color="primary" @click="onApply" :disable="name === ''" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('apply')" color="primary" @click="onApply" :disable="name === ''" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AttribueDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, VariableDto, AttributeDto } from 'src/models/Magma';
-import { AttributesBundle } from 'src/components/models';
+import type { TableDto, VariableDto, AttributeDto } from 'src/models/Magma';
+import type { AttributesBundle } from 'src/components/models';
 
 interface DialogProps {
   modelValue: boolean;
   table: TableDto;
   variable: VariableDto;
-  bundle?: AttributesBundle;
+  bundle?: AttributesBundle | undefined;
 }
 
 const props = defineProps<DialogProps>();
@@ -118,6 +113,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const NO_LOCALE = 'default';
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 const systemStore = useSystemStore();
 
@@ -146,8 +142,8 @@ watch(
   (value) => {
     if (value) {
       if (props.bundle && props.bundle.attributes.length > 0) {
-        namespace.value = props.bundle.attributes[0].namespace || '';
-        name.value = props.bundle.attributes[0].name;
+        namespace.value = props.bundle.attributes[0]?.namespace || '';
+        name.value = props.bundle.attributes[0]?.name || '';
         texts.value = {};
         previews.value = {};
         props.bundle.attributes.forEach((attr) => {
@@ -170,11 +166,11 @@ function onHide() {
 }
 
 async function onApply() {
-  if (props.bundle && props.bundle.attributes.length > 0) {
+  if (props.bundle && props.bundle.attributes.length > 0 && props.bundle.attributes[0]?.name) {
     // provided are to be modified
     await datasourceStore.deleteAttributes(
       props.variable,
-      props.bundle.attributes[0].namespace,
+      props.bundle.attributes[0]?.namespace,
       props.bundle.attributes[0].name
     );
   }

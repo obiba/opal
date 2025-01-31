@@ -2,7 +2,7 @@
   <div>
     <file-select
       v-model="dataFile"
-      :label="$t('data_file')"
+      :label="t('data_file')"
       :folder="filesStore.current"
       selection="single"
       :extensions="fileExtensions"
@@ -12,14 +12,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportFsForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
-import { FileDto } from 'src/models/Opal';
+import type { DatasourceFactory } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ImportFsFormProps {
@@ -29,6 +24,7 @@ interface ImportFsFormProps {
 const props = defineProps<ImportFsFormProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 
 const fileExtensions = ['.zip'];

@@ -1,4 +1,4 @@
-import { VariableDto } from 'src/models/Magma';
+import type { VariableDto } from 'src/models/Magma';
 
 export const ValueTypes = [
   'text',

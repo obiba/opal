@@ -3,7 +3,7 @@
     <q-card :class="maximizedToggle ? '' : 'dialog-lg'">
       <q-card-section>
         <div class="row">
-          <div class="text-h6">{{ $t('edit_script') }}</div>
+          <div class="text-h6">{{ t('edit_script') }}</div>
           <q-space />
           <q-btn dense flat icon="close_fullscreen" @click="maximizedToggle = false" v-if="maximizedToggle" />
           <q-btn dense flat icon="open_in_full" @click="maximizedToggle = true" v-if="!maximizedToggle" />
@@ -14,12 +14,12 @@
 
       <q-card-section>
         <div class="row q-gutter-md q-mb-md">
-          <q-select v-model="valueType" :options="ValueTypes" :label="$t('value_type')" dense style="width: 200px" />
-          <q-checkbox v-model="isRepeatable" :label="$t('repeatable')" dense />
+          <q-select v-model="valueType" :options="ValueTypes" :label="t('value_type')" dense style="width: 200px" />
+          <q-checkbox v-model="isRepeatable" :label="t('repeatable')" dense />
           <q-input
             v-if="isRepeatable"
             v-model="occurrenceGroup"
-            :label="$t('occurrence_group')"
+            :label="t('occurrence_group')"
             dense
             style="width: 300px"
           />
@@ -36,30 +36,25 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-input v-model="comment" :label="$t('comment')" dense />
+        <q-input v-model="comment" :label="t('comment')" dense />
         <q-space />
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <!-- <q-btn
             flat
-            :label="$t('test')"
+            :label="t('test')"
             color="positive"
             @click="onTest"
           /> -->
-        <q-btn flat :label="$t('save')" color="primary" @click="onSave" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" @click="onSave" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableScriptDialog',
-});
-</script>
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
 import { ValueTypes } from 'src/utils/magma';
-import { VariableDto, AttributeDto } from 'src/models/Magma';
+import type { VariableDto, AttributeDto } from 'src/models/Magma';
 
 interface DialogProps {
   modelValue: boolean;
@@ -68,6 +63,8 @@ interface DialogProps {
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'save']);
+
+const { t } = useI18n();
 
 const scriptEdit = ref();
 const valueType = ref();

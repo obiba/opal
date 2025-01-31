@@ -1,20 +1,20 @@
 <template>
   <div>
     <div class="text-help q-mb-md">
-      <q-markdown :src="$t('sql_info')" no-heading-anchor-links />
+      <q-markdown :src="t('sql_info')" no-heading-anchor-links />
     </div>
     <div>
       <q-chip
         clickable
         :color="tab === 'query' ? 'primary' : 'grey-6'"
-        :label="$t('query')"
+        :label="t('query')"
         class="text-white"
         @click="tab = 'query'"
       />
       <q-chip
         clickable
         :color="tab === 'history' ? 'primary' : 'grey-6'"
-        :label="$t('history')"
+        :label="t('history')"
         class="text-white"
         @click="tab = 'history'"
       />
@@ -23,7 +23,7 @@
       <q-tab-panel name="query">
         <div class="text-hint q-mb-md">
           <q-icon name="info" />
-          <span class="q-ml-xs">{{ $t('sql_query_hint') }}</span>
+          <span class="q-ml-xs">{{ t('sql_query_hint') }}</span>
         </div>
         <q-input
           v-model="sql"
@@ -31,11 +31,11 @@
           placeholder="SELECT * FROM ..."
           autogrow
           @keydown="onKeydown"
-          type="text-area"
+          type="textarea"
           class="q-mb-md"
         />
         <q-btn
-          :label="$t('execute')"
+          :label="t('execute')"
           color="primary"
           size="sm"
           icon="play_arrow"
@@ -47,7 +47,7 @@
           outline
           color="secondary"
           icon="cleaning_services"
-          :title="$t('clear')"
+          :title="t('clear')"
           size="sm"
           @click="onClear"
           class="on-right"
@@ -56,7 +56,7 @@
           v-if="rows"
           color="secondary"
           icon="file_download"
-          :label="$t('download')"
+          :label="t('download')"
           size="sm"
           @click="onDownload"
           class="on-right"
@@ -79,7 +79,7 @@
         <div v-if="historyRows.length">
           <div class="text-hint">
             <q-icon name="info" />
-            <span class="q-ml-xs">{{ $t('sql_history_hint') }}</span>
+            <span class="q-ml-xs">{{ t('sql_history_hint') }}</span>
           </div>
           <q-table
             :rows="historyRows"
@@ -99,22 +99,19 @@
           </q-table>
         </div>
         <div v-else class="text-help">
-          {{ $t('no_sql_history') }}
+          {{ t('no_sql_history') }}
         </div>
       </q-tab-panel>
     </q-tab-panels>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'SqlPanel',
-});
-</script>
 <script setup lang="ts">
-import { SqlCommand, SqlResults } from 'src/components/models';
+import type { SqlCommand, SqlResults } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
 import Papa from 'papaparse';
+import { DefaultAlignment } from 'src/components/models';
+
 const sql = ref('');
 
 const sqlStore = useSqlStore();
@@ -135,7 +132,8 @@ const rows = computed(() => {
     const columns = results.value?.columns;
     return columns
       ? row.reduce((acc, val, i) => {
-          acc[columns[i]] = val;
+          if (columns[i])  
+            acc[columns[i]] = val;
           return acc;
         }, rowObj)
       : rowObj;
@@ -149,8 +147,8 @@ const historyRows = computed(() => {
 });
 
 const historyColumns = [
-  { name: 'query', label: t('query'), align: 'left', field: 'query', sortable: true },
-  { name: 'delay', label: t('delay'), align: 'left', field: 'delay', sortable: true },
+  { name: 'query', label: t('query'), align: DefaultAlignment, field: 'query', sortable: true },
+  { name: 'delay', label: t('delay'), align: DefaultAlignment, field: 'delay', sortable: true },
 ];
 
 function onHistoryClick(evt: unknown, row: SqlCommand) {

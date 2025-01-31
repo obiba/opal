@@ -8,7 +8,7 @@
         icon="arrow_back"
         to="/" />
       <span class="q-ml-md">
-        {{ $t('files') }}
+        {{ t('files') }}
       </span>
     </h6>
     <q-list>
@@ -17,18 +17,18 @@
           <q-icon name="person" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('user') }}</q-item-label>
+          <q-item-label>{{ t('user') }}</q-item-label>
         </q-item-section>
       </q-item>
 
-      <q-item-label header class="text-weight-bolder">{{ $t('content') }}</q-item-label>
+      <q-item-label header class="text-weight-bolder">{{ t('content') }}</q-item-label>
 
       <q-item to="/files/home">
         <q-item-section avatar>
           <q-icon name="group" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('users') }}</q-item-label>
+          <q-item-label>{{ t('users') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -37,7 +37,7 @@
           <q-icon name="table_chart" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('projects') }}</q-item-label>
+          <q-item-label>{{ t('projects') }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -46,19 +46,15 @@
           <q-icon name="dns" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('file_system') }}</q-item-label>
+          <q-item-label>{{ t('file_system') }}</q-item-label>
         </q-item-section>
       </q-item>
     </q-list>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FilesDrawer',
-});
-</script>
 <script setup lang="ts">
+const { t } = useI18n();
 const route = useRoute();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
@@ -68,7 +64,7 @@ const username = computed(() => (authStore.profile.principal ? authStore.profile
 watch(
   () => route.params.path,
   () => {
-    const path = [...route.params.path].join('/');
+    const path = Array.isArray(route.params.path) ? route.params.path.join('/') : route.params.path;
     filesStore.loadFiles(`/${path}`);
   }
 );

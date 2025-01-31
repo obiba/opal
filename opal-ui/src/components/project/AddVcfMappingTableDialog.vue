@@ -10,7 +10,7 @@
 
         <q-card-section v-if="tables.length < 1">
           <q-banner inline-actions rounded class="bg-orange text-white">{{
-            $t('vcf_store.no_mapping_tables')
+            t('vcf_store.no_mapping_tables')
           }}</q-banner>
         </q-card-section>
 
@@ -18,8 +18,8 @@
           <q-select
             v-model="selectedTable"
             :options="filterOptions"
-            :label="$t('table')"
-            :hint="$t('vcf_store.mapping_table_hint')"
+            :label="t('table')"
+            :hint="t('vcf_store.mapping_table_hint')"
             class="q-mb-md"
             dense
             emit-value
@@ -32,12 +32,12 @@
             @filter="onFilterFn"
           >
             <template v-slot:option="scope">
-              <q-item v-show="!!!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.group">
+              <q-item v-show="!scope.opt.value" class="text-help" dense clickable disable :label="scope.opt.group">
                 <q-item-section class="q-pa-none">
                   {{ scope.opt.label }}
                 </q-item-section>
               </q-item>
-              <q-item v-show="!!scope.opt.value" dense clickable v-close-popup @click="onSelectTable(scope.opt.value)">
+              <q-item v-show="scope.opt.value" dense clickable v-close-popup @click="onSelectTable(scope.opt.value)">
                 <q-item-section class="q-pl-md">
                   {{ scope.opt.label }}
                 </q-item-section>
@@ -49,8 +49,8 @@
             v-model="selectedParticipantIdVariable"
             dense
             class="q-mb-md"
-            :label="$t('vcf_store.participant_id')"
-            :hint="$t('vcf_store.participant_id_hint')"
+            :label="t('vcf_store.participant_id')"
+            :hint="t('vcf_store.participant_id_hint')"
             :options="participantIdOptions"
             emit-value
             map-options
@@ -61,8 +61,8 @@
             v-model="selectedRoleVariable"
             dense
             class="q-mb-md"
-            :label="$t('vcf_store.participant_id')"
-            :hint="$t('vcf_store.participant_id_hint')"
+            :label="t('vcf_store.participant_id')"
+            :hint="t('vcf_store.participant_id_hint')"
             :options="roleOptions"
             emit-value
             map-options
@@ -73,7 +73,7 @@
         <q-separator />
 
         <q-card-actions align="right" class="bg-grey-3">
-          <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+          <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
           <q-btn flat :label="submitCaption" color="primary" :disable="!canAdd" @click="onAdd" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -81,15 +81,9 @@
   </template>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddVcfMappingTableDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { VCFSamplesMappingDto } from 'src/models/Plugins';
-import { TableDto, VariableDto, CategoryDto } from 'src/models/Magma';
+import type { VCFSamplesMappingDto } from 'src/models/Plugins';
+import type { TableDto, VariableDto, CategoryDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -102,10 +96,12 @@ type SelectOption = { label: string; value: TableDto | undefined };
 
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
+
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 const tables = ref([] as TableDto[]);
 const { t } = useI18n();
+
 const showDialog = ref(props.modelValue);
 const newMapping = ref({} as VCFSamplesMappingDto);
 const selectedTable = ref<TableDto | null>(null);
@@ -115,11 +111,11 @@ let mappingOptions = [] as SelectOption[];
 const filterOptions = ref([] as SelectOption[]);
 const participantIdOptions = ref([] as { label: string; value: VariableDto }[]);
 const roleOptions = ref([] as { label: string; value: VariableDto }[]);
-const editMode = computed(() => !!props.mapping && !!props.mapping.projectName);
+const editMode = computed(() => props.mapping && props.mapping.projectName);
 const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('vcf_store.edit_mapping') : t('vcf_store.add_mapping')));
 const canAdd = computed(
-  () => !!selectedTable.value && !!selectedParticipantIdVariable.value && !!selectedRoleVariable.value
+  () => selectedTable.value && selectedParticipantIdVariable.value && selectedRoleVariable.value
 );
 
 function initMappingOptions() {
@@ -127,11 +123,11 @@ function initMappingOptions() {
     let lastGroup = '';
     tables.value.forEach((table) => {
       const tableRef = `${table.datasourceName}.${table.name}`;
-      if (!!!selectedTable.value && newMapping.value.tableReference === tableRef) {
+      if (!selectedTable.value && newMapping.value.tableReference === tableRef) {
         selectedTable.value = table;
       }
 
-      if (!!table.datasourceName && table.datasourceName !== lastGroup) {
+      if (table.datasourceName && table.datasourceName !== lastGroup) {
         lastGroup = table.datasourceName;
         mappingOptions.push({ label: lastGroup } as SelectOption);
       }
@@ -139,15 +135,15 @@ function initMappingOptions() {
     });
     filterOptions.value = [...mappingOptions];
 
-    if (!!selectedTable.value) {
+    if (selectedTable.value) {
       getVariables();
     }
   }
 }
 
 function initializeVariableOptions(variables: VariableDto[]) {
-  let roleVariableSuggestion: VariableDto | undefined = undefined;
-  let participantIdVariableSuggestion: VariableDto | undefined = undefined;
+  let roleVariableSuggestion: VariableDto | undefined;
+  let participantIdVariableSuggestion: VariableDto | undefined;
   roleOptions.value = [];
   participantIdOptions.value = [];
 
@@ -156,7 +152,7 @@ function initializeVariableOptions(variables: VariableDto[]) {
     let roleCategory = null;
     const categories: CategoryDto[] = variable.categories || [];
 
-    if (!!!roleVariableSuggestion) {
+    if (!roleVariableSuggestion) {
       if (categories.length > 0) {
         roleCategory = categories.find((category: CategoryDto) => {
           const categoryName = category.name.toLowerCase();
@@ -164,17 +160,17 @@ function initializeVariableOptions(variables: VariableDto[]) {
         });
       }
 
-      if (!!newMapping.value.sampleRoleVariable) {
+      if (newMapping.value.sampleRoleVariable) {
         if (variableName === newMapping.value.sampleRoleVariable) {
           roleVariableSuggestion = variable;
         }
-      } else if (!!roleCategory || variableName.match(/role/i) != null) {
+      } else if (roleCategory || variableName.match(/role/i) != null) {
         roleVariableSuggestion = variable;
       }
     }
 
-    if (!!!participantIdVariableSuggestion) {
-      if (!!newMapping.value.participantIdVariable) {
+    if (!participantIdVariableSuggestion) {
+      if (newMapping.value.participantIdVariable) {
         if (variableName === newMapping.value.participantIdVariable) {
           participantIdVariableSuggestion = variable;
         }
@@ -187,12 +183,12 @@ function initializeVariableOptions(variables: VariableDto[]) {
     participantIdOptions.value.push({ label: variableName, value: variable });
   });
 
-  if (!!participantIdVariableSuggestion) {
+  if (participantIdVariableSuggestion) {
     selectedParticipantIdVariable.value = participantIdVariableSuggestion;
     newMapping.value.participantIdVariable = participantIdVariableSuggestion.name;
   }
 
-  if (!!roleVariableSuggestion) {
+  if (roleVariableSuggestion) {
     selectedRoleVariable.value = roleVariableSuggestion;
     newMapping.value.sampleRoleVariable = roleVariableSuggestion.name;
   }
@@ -247,7 +243,7 @@ watch(
 
 function onSelectTable(table: TableDto | null) {
   selectedTable.value = table;
-  if (!!table) {
+  if (table) {
     newMapping.value.tableReference = `${table.datasourceName}.${table.name}`;
     getVariables();
   } else {

@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: Commands.proto
 
-/* eslint-disable */
 import { type IdentifiersMappingConfigDto } from './Identifiers';
 
 export const protobufPackage = 'Opal';

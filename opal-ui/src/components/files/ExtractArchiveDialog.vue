@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('extract') }}</div>
+        <div class="text-h6">{{ t('extract') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,18 +10,17 @@
       <q-card-section>
         <file-select
           v-model="destinationFolder"
-          :label="$t('destination_folder')"
+          :label="t('destination_folder')"
           :folder="filesStore.current"
           selection="single"
-          @select="onUpdate"
           type="folder"
           class="q-mb-md"
         />
         <form autocomplete="off">
           <q-input
             v-model="password"
-            :label="$t('password')"
-            :hint="$t('extract_archive_password_hint')"
+            :label="t('password')"
+            :hint="t('extract_archive_password_hint')"
             type="password"
             autocomplete="new-password"
             dense
@@ -33,10 +32,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('submit')"
+          :label="t('submit')"
           color="primary"
           :disable="!destinationFolder"
           @click="onSubmit"
@@ -47,14 +46,9 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExtractArchiveDialog',
-});
-</script>
 <script setup lang="ts">
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
@@ -64,6 +58,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 
 const showDialog = ref(props.modelValue);

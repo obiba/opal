@@ -3,21 +3,21 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('search')" to="/search" />
-        <q-breadcrumbs-el :label="$t('variables')" />
+        <q-breadcrumbs-el :label="t('search')" to="/search" />
+        <q-breadcrumbs-el :label="t('variables')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h6">{{ $t('variables_search') }}</div>
+      <div class="text-h6">{{ t('variables_search') }}</div>
       <div class="text-help q-mb-md">
-        <q-markdown :src="$t('variables_search_info')" no-heading-anchor-links />
+        <q-markdown :src="t('variables_search_info')" no-heading-anchor-links />
       </div>
       <q-card flat class="bg-grey-2 q-mb-md">
         <q-card-section>
           <div class="row q-gutter-md">
             <q-input
               v-model="searchStore.variablesQuery.query"
-              :label="$t('query')"
+              :label="t('query')"
               flat
               dense
               style="min-width: 400px"
@@ -25,7 +25,7 @@
             />
             <div class="q-gutter-x-md q-mt-lg">
               <q-btn
-                :label="$t('search')"
+                :label="t('search')"
                 icon="search"
                 color="primary"
                 size="sm"
@@ -38,7 +38,7 @@
                 outline
                 color="secondary"
                 icon="search_off"
-                :label="$t('clear')"
+                :label="t('clear')"
                 size="sm"
                 style="height: 2.5em"
                 @click="onClearAndReset"
@@ -75,7 +75,7 @@
                 </template>
               </q-select>
             </template>
-            <q-btn-dropdown color="secondary" :label="$t('filters')" size="sm" class="q-mt-lg" style="height: 2.5em">
+            <q-btn-dropdown color="secondary" :label="t('filters')" size="sm" class="q-mt-lg" style="height: 2.5em">
               <q-list>
                 <template v-for="field in fieldsToAdd" :key="field">
                   <q-item clickable v-close-popup @click="onToggleField(field)">
@@ -104,7 +104,7 @@
         <q-spinner-dots size="lg" />
       </div>
       <div v-else-if="itemResults.length">
-        <div class="text-bold q-mb-md">{{ $t('results') }} ({{ itemResults.length }}/{{ totalHits }})</div>
+        <div class="text-bold q-mb-md">{{ t('results') }} ({{ itemResults.length }}/{{ totalHits }})</div>
         <q-list separator>
           <q-item
             clickable
@@ -122,7 +122,7 @@
               </div>
             </q-item-section>
             <q-item-section top>
-              <div v-for="attr in searchStore.getLabels(item)" :key="attr.locale" class="text-hint">
+              <div v-for="(attr, idx) in searchStore.getLabels(item)" :key="idx" class="text-hint">
                 <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
                 <span>{{ attr.value }}</span>
               </div>
@@ -132,21 +132,21 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <div v-if="!!results && itemResults.length < results.totalHits" class="q-mt-md">
-          <q-btn no-caps icon="add_circle" :label="$t('more_results')" color="primary" size="sm" @click="addLimit" />
+        <div v-if="results && itemResults.length < results.totalHits" class="q-mt-md">
+          <q-btn no-caps icon="add_circle" :label="t('more_results')" color="primary" size="sm" @click="addLimit" />
         </div>
       </div>
       <div v-else class="text-hint">
-        {{ $t('no_results') }}
+        {{ t('no_results') }}
       </div>
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
-import { QueryResultDto } from 'src/models/Search';
-import { ItemFieldsResultDto } from 'src/stores/search';
+import type { TableDto } from 'src/models/Magma';
+import type { QueryResultDto } from 'src/models/Search';
+import type { ItemFieldsResultDto } from 'src/stores/search';
 import { VariableNatures, ValueTypes } from 'src/utils/magma';
 
 const route = useRoute();
@@ -166,7 +166,7 @@ const totalHits = ref<number>(0);
 const queryParam = computed(() => (route.query.q as string) || '');
 const isValid = computed(
   () =>
-    !!searchStore.variablesQuery.query?.trim() ||
+    searchStore.variablesQuery.query?.trim() ||
     Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0)
 );
 const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]) || []);
@@ -246,7 +246,7 @@ function onSubmit() {
         showResults.value = totalHits.value > 0;
         lastDoc.value = res.lastDoc;
 
-        if (totalHits.value > 0 && !!results.value && !!lastDoc.value) {
+        if (totalHits.value > 0 && results.value && lastDoc.value) {
           results.value.totalHits = totalHits.value;
           results.value.hits.push(...res.hits);
         } else {

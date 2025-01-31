@@ -2,7 +2,7 @@
   <div>
     <file-select
       v-model="destinationFolder"
-      :label="$t('destination_folder')"
+      :label="t('destination_folder')"
       :folder="filesStore.current"
       selection="single"
       @select="onUpdate"
@@ -11,14 +11,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExportHavenForm',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
+import type { TableDto } from 'src/models/Magma';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ExportHavenFormProps {
@@ -30,6 +25,7 @@ interface ExportHavenFormProps {
 const props = defineProps<ExportHavenFormProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();
 
@@ -49,7 +45,7 @@ const currentTime = computed(
   () =>
     new Date()
       .toISOString()
-      .replace(/[:T\-]/g, '')
+      .replace(/[:T-]/g, '')
       .split('.')[0]
 );
 
@@ -75,8 +71,8 @@ function onUpdate() {
   }
   const prefix =
     props.tables.length === 1
-      ? `${props.tables[0].datasourceName}-${props.tables[0].name}`
-      : props.tables[0].datasourceName;
+      ? `${props.tables[0]?.datasourceName}-${props.tables[0]?.name}`
+      : props.tables[0]?.datasourceName;
   const out = `${destinationFolder.value.path}/${prefix}-${currentTime.value}${extensions[props.type] || ''}`;
   emit('update:modelValue', out);
 }

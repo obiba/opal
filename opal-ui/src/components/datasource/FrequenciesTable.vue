@@ -2,15 +2,15 @@
   <q-markup-table flat bordered>
     <thead>
       <tr class="bg-blue-grey-1">
-        <th class="text-left">{{ $t('value') }}</th>
-        <th class="text-left">{{ $t('frequency') }}</th>
-        <th class="text-left">{{ $t('percentage') }}</th>
+        <th class="text-left">{{ t('value') }}</th>
+        <th class="text-left">{{ t('frequency') }}</th>
+        <th class="text-left">{{ t('percentage') }}</th>
       </tr>
     </thead>
     <tbody>
       <template v-if="nonMissingTotalFreq > 0">
         <tr class="bg-grey-2 text-bold">
-          <td colspan="3">{{ $t('non_missings') }}</td>
+          <td colspan="3">{{ t('non_missings') }}</td>
         </tr>
         <tr v-for="f in nonMissingFreq" :key="f.value">
           <td>
@@ -24,7 +24,7 @@
           </td>
         </tr>
         <tr class="text-italic" v-if="nonMissingFreq.length > 1">
-          <td>{{ $t('sub_total') }}</td>
+          <td>{{ t('sub_total') }}</td>
           <td>{{ nonMissingTotalFreq }}</td>
           <td class="text-grey-6">{{ (nonMissingTotalPct * 100).toFixed(2) }}% (100%)</td>
         </tr>
@@ -32,7 +32,7 @@
 
       <template v-if="missingTotalFreq > 0">
         <tr class="bg-grey-2 text-bold">
-          <td colspan="3">{{ $t('missings') }}</td>
+          <td colspan="3">{{ t('missings') }}</td>
         </tr>
         <tr v-for="f in missingFreq" :key="f.value">
           <td>
@@ -46,14 +46,14 @@
           </td>
         </tr>
         <tr class="text-italic" v-if="missingFreq.length > 1">
-          <td>{{ $t('sub_total') }}</td>
+          <td>{{ t('sub_total') }}</td>
           <td>{{ missingTotalFreq }}</td>
           <td class="text-grey-6">{{ (missingTotalPct * 100).toFixed(2) }}% (100%)</td>
         </tr>
       </template>
 
       <tr class="bg-grey-2 text-bold">
-        <td>{{ $t('total') }}</td>
+        <td>{{ t('total') }}</td>
         <td>{{ totalFreq }}</td>
         <td class="text-grey-6">{{ (totalPct * 100).toFixed(0) }}%</td>
       </tr>
@@ -61,14 +61,9 @@
   </q-markup-table>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'FrequenciesTable',
-});
-</script>
 <script setup lang="ts">
-import { VariableDto } from 'src/models/Magma';
-import { FrequencyDto } from 'src/models/Math';
+import type { VariableDto } from 'src/models/Magma';
+import type { FrequencyDto } from 'src/models/Math';
 import { getLabelsString } from 'src/utils/attributes';
 
 const { t } = useI18n();
