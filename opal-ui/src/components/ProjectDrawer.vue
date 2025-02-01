@@ -23,7 +23,7 @@
 
       <q-item-label header class="text-weight-bolder">{{ t('content') }}</q-item-label>
 
-      <q-item :to="`/project/${projectsStore.project.name}/tables`">
+      <q-item v-if="projectsStore.perms.summary?.canRead()" :to="`/project/${projectsStore.project.name}/tables`">
         <q-item-section avatar>
           <q-icon name="table_chart" />
         </q-item-section>
