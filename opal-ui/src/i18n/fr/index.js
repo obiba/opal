@@ -417,7 +417,7 @@ export default {
     db_reload_confirm: 'Êtes-vous sûr de vouloir recharger la base de données du projet?',
     backup_restore: 'Sauvegarder / Restaurer',
     backup_project: 'Sauvegarder le projet',
-    backup_hint: "La tâche de sauvegarde du projet a une portée limitée : tables (dictionnaire et exportation de données), vues (soit en tant que table logique, soit en tant que table exportée), ressources et fichiers. D'autres éléments du projet ne font pas partie de la sauvegarde : les autorisations des utilisateurs et des groupes, l'historique des modifications des vues, l'analyse des tables etc.",
+    backup_hint: "La tâche de sauvegarde du projet couvre les tables (dictionnaire et exportation de données), les vues (sous forme de table logique ou exportée), les ressources et les fichiers. Elle exclut les permissions des utilisateurs/groupes, l'historique des modifications des vues, l'analyse des tables, les données liées aux plugins et d'autres éléments du projet.",
     backup_success: 'La tâche de sauvegarde du projet a été lancée. Vous pouvez suivre sa progression dans la liste des tâches.',
     backup_folder: 'Dossier de sauvegarde',
     restore_project: 'Restaurer le projet',
