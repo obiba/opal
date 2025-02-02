@@ -21,11 +21,22 @@
           </div>
 
           <div class="q-mb-md">
-            <export-csv-form v-if="exportType === FileExportType.CSV" v-model="out" :tables="props.tables" />
-            <export-fs-form v-else-if="exportType === FileExportType.OPAL" v-model="out" :tables="props.tables" />
+            <export-csv-form
+              v-if="exportType === FileExportType.CSV"
+              v-model="out"
+              :folder="folder"
+              :tables="props.tables"
+            />
+            <export-fs-form
+              v-else-if="exportType === FileExportType.OPAL"
+              v-model="out"
+              :folder="folder"
+              :tables="props.tables"
+            />
             <export-haven-form
               v-else-if="exportType === FileExportType.HAVEN"
               v-model="out"
+              :folder="folder"
               :tables="props.tables"
               :type="fileExporter.value"
             />
@@ -108,6 +119,7 @@ enum FileExportType {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const authStore = useAuthStore();
 const systemStore = useSystemStore();
 const pluginsStore = usePluginsStore();
 const projectsStore = useProjectsStore();
@@ -132,6 +144,7 @@ const builtinFileExporters: ExporterOption[] = [
 ];
 
 const showDialog = ref(props.modelValue);
+const folder = ref<string>();
 const out = ref<string>(); // output parameters
 const outPlugin = ref<string>(); // output parameters for plugin
 const entityIdNames = ref('');
@@ -173,13 +186,18 @@ watch(
   (value) => {
     showDialog.value = value;
     if (value) {
+      out.value = undefined;
+      folder.value = undefined;
       if (projectsStore.project.exportFolder) {
-        if (isFile.value) {
-          out.value = projectsStore.project.exportFolder;
-          outPlugin.value = JSON.stringify({ file: out.value });
-        }
-        filesStore.refreshFiles(projectsStore.project.exportFolder);
+        folder.value = projectsStore.project.exportFolder;
+      } else {
+        folder.value = `/home/${authStore.profile.principal}/export`;
       }
+      if (isFile.value) {
+        // assume the plugin's data schema uses the 'file' key
+        outPlugin.value = JSON.stringify({ file: folder.value });
+      }
+      filesStore.refreshFiles(folder.value);
     }
   },
 );

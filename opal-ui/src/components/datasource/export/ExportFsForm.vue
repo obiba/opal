@@ -18,6 +18,7 @@ import FileSelect from 'src/components/files/FileSelect.vue';
 
 interface ExportFsFormProps {
   modelValue: string | undefined;
+  folder?: string | undefined;
   tables: TableDto[];
 }
 
@@ -40,18 +41,21 @@ const currentTime = computed(
 
 const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : ''));
 
-onMounted(() => {
-  if (props.modelValue) {
-    destinationFolder.value = {
+onMounted(onInit);
+
+watch(() => props.modelValue, onInit, { immediate: true });
+
+function onInit() {
+  destinationFolder.value = {
       name: 'export',
-      path: `/home/${username.value}/export`,
+      path: props.folder || `/home/${username.value}/export`,
       type: FileDto_FileType.FOLDER,
       readable: true,
       writable: true,
       children: [],
     };
-  }
-});
+  onUpdate();
+}
 
 function onUpdate() {
   if (!destinationFolder.value) {
