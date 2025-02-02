@@ -14,7 +14,6 @@
             {{ exportTablesText }}
           </span>
         </div>
-
         <div v-if="isFile">
           <q-select v-model="fileExporter" :options="fileExporters" :label="t('data_format')" dense class="q-mb-md" />
           <div class="text-hint q-mb-md">
@@ -22,15 +21,15 @@
           </div>
 
           <div class="q-mb-md">
-            <export-csv-form v-if="fileExporter.value === 'csv'" v-model="out" :tables="props.tables" />
-            <export-fs-form v-else-if="fileExporter.value === 'opal'" v-model="out" :tables="props.tables" />
+            <export-csv-form v-if="exportType === FileExportType.CSV" v-model="out" :tables="props.tables" />
+            <export-fs-form v-else-if="exportType === FileExportType.OPAL" v-model="out" :tables="props.tables" />
             <export-haven-form
-              v-else-if="fileExporter.value.startsWith('haven_')"
+              v-else-if="exportType === FileExportType.HAVEN"
               v-model="out"
               :tables="props.tables"
               :type="fileExporter.value"
             />
-            <export-plugin-form v-else v-model="out" :tables="props.tables" :type="fileExporter.value" />
+            <export-plugin-form v-else v-model="outPlugin" :tables="props.tables" :type="fileExporter.value" />
           </div>
 
           <q-list class="q-mt-lg">
@@ -65,7 +64,6 @@
       </q-card-section>
 
       <q-separator />
-
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
@@ -99,6 +97,14 @@ interface DialogProps {
   type: 'file' | 'server' | 'database';
 }
 
+enum FileExportType {
+  NA = 'na',
+  CSV = 'csv',
+  OPAL = 'opal',
+  HAVEN = 'haven',
+  PLUGIN = 'plugin',
+}
+
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -127,6 +133,7 @@ const builtinFileExporters: ExporterOption[] = [
 
 const showDialog = ref(props.modelValue);
 const out = ref<string>(); // output parameters
+const outPlugin = ref<string>(); // output parameters for plugin
 const entityIdNames = ref('');
 const fileExporters = ref([...builtinFileExporters]);
 const fileExporter = ref();
@@ -149,6 +156,17 @@ const fileExporterHint = computed(() => {
 
 const isFile = computed(() => props.type === 'file');
 const isDatabase = computed(() => props.type === 'database');
+const exportType = computed(() => {
+  if (isFile) {
+    if (fileExporter.value) {
+      if (fileExporter.value.value === 'csv') return FileExportType.CSV;
+      if (fileExporter.value.value === 'opal') return FileExportType.OPAL;
+      if (fileExporter.value.value.startsWith('haven_')) return FileExportType.HAVEN;
+      return FileExportType.PLUGIN;
+    }
+  }
+  return FileExportType.NA;
+});
 
 watch(
   () => props.modelValue,
@@ -156,10 +174,14 @@ watch(
     showDialog.value = value;
     if (value) {
       if (projectsStore.project.exportFolder) {
+        if (isFile.value) {
+          out.value = projectsStore.project.exportFolder;
+          outPlugin.value = JSON.stringify({ file: out.value });
+        }
         filesStore.refreshFiles(projectsStore.project.exportFolder);
       }
     }
-  }
+  },
 );
 
 function onShow() {
@@ -222,10 +244,11 @@ function exportFile() {
     notifyError(t('destination_folder_required'));
     return;
   }
+
   const options = {
     format: fileExporter.value.value,
     tables: props.tables.map((t) => `${t.datasourceName}.${t.name}`),
-    out: out.value,
+    out: isFile && exportType.value === FileExportType.PLUGIN ? outPlugin.value : out.value,
     entityIdNames: entityIdNames.value ? entityIdNames.value : undefined,
     copyNullValues: true,
     noVariables: false,

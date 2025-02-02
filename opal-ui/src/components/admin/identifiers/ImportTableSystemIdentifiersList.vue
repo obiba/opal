@@ -28,8 +28,8 @@
                 <q-item
                   clickable
                   v-close-popup
-                  v-for="sugg in filterOptions"
-                  :key="sugg.name"
+                  v-for="(sugg, index) in filterOptions"
+                  :key="index"
                   @click="onTableSuggestionSelected(sugg)"
                 >
                   <q-item-section>{{ `${sugg.datasourceName}.${sugg.name}` }}</q-item-section>
