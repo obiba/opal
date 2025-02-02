@@ -14,6 +14,7 @@
       </div>
 
       <q-tabs
+        v-if="projectsStore.perms.permissions_vcfstore?.canRead()"
         v-model="tab"
         dense
         class="text-grey q-mt-md"

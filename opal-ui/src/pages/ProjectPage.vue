@@ -21,7 +21,7 @@
         <q-badge v-for="tag in tags" :key="tag" class="on-right">{{ tag }}</q-badge>
       </div>
       <div class="row q-gutter-md">
-        <q-card flat bordered class="on-left q-mb-md o-card-md">
+        <q-card v-if="canViewSummary" flat bordered class="on-left q-mb-md o-card-md">
           <q-card-section class="text-h4 text-center bg-grey-2">
             <div>
               {{ projectsStore.summary.tableCount }}
@@ -81,12 +81,14 @@ const projectsStore = useProjectsStore();
 
 const name = computed(() => route.params.id as string);
 const tags = computed(() => (projectsStore.project.tags ? projectsStore.project.tags : []));
+const canViewSummary = ref(false);
 
 onMounted(() => {
   projectsStore
     .initProject(name.value)
     .then(() => {
-      projectsStore.loadSummary();
+      canViewSummary.value = projectsStore.perms.summary ? projectsStore.perms.summary.canRead() : false;
+      if (canViewSummary.value) projectsStore.loadSummary();
     })
     .catch((error) => {
       notifyError(error);
