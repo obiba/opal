@@ -209,7 +209,7 @@ const usageOptions = [
 
 const validateRequiredPassword = (value: string) => {
   if (database.value.sqlSettings) {
-    return (database.value.sqlSettings.username && value) || t('validation.password_required');
+    return (Boolean(database.value.sqlSettings.username) && Boolean(value)) || t('validation.password_required');
   }
 
   return true;
@@ -241,7 +241,7 @@ watch(
       database.value = { ...props.database };
       hasDatasource.value = database.value.hasDatasource || false;
       delete database.value.hasDatasource;
-      editMode.value = props.database.name !== undefined;
+      editMode.value = (props.database.name||'') !== '';
       if (database.value.usedForIdentifiers) {
         database.value.name = '_identifiers';
       }
