@@ -417,7 +417,7 @@ export default {
     db_reload_confirm: 'Are you sure you want to reload the project database?',
     backup_restore: 'Backup / Restore',
     backup_project: 'Backup Project',
-    backup_hint: 'The project backup task has a limited scope: tables (dictionary and data export), views (either as a logical table or as an exported table), resources and files. Other project elements that are not part of the backup: user and group permissions, view change history, table analysis etc.',
+    backup_hint: 'The project backup task covers tables (dictionary and data export), views (as logical or exported table), resources, and files. It excludes user/group permissions, view change history, table analysis, plugin-related data, and other project elements.',
     backup_success: 'Project backup task has been launched. You can follow its progress in the task list.',
     backup_folder: 'Backup Folder',
     restore_project: 'Restore Project',
