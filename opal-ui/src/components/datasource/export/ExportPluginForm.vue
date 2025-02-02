@@ -23,15 +23,12 @@ const pluginsStore = usePluginsStore();
 const schema = ref<SchemaFormObject>();
 const parameters = ref<FormObject>();
 
-onMounted(() => {
-  onInit();
-});
+onMounted(onInit);
 
 watch(
   () => props.type,
-  () => {
-    onInit();
-  }
+  onInit,
+  { immediate: true }
 );
 
 function onInit() {
