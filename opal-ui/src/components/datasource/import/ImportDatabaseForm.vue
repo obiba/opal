@@ -1,22 +1,19 @@
 <template>
   <div>
-    <span class="text-help">{{ $t('no_datasource_configuration') }}</span>
+    <span class="text-help">{{ t('no_datasource_configuration') }}</span>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportDatabaseForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
-import { DatabaseDto } from 'src/models/Database';
+import type { DatasourceFactory } from 'src/components/models';
+import type { DatabaseDto } from 'src/models/Database';
 
 interface Props {
   modelValue: DatasourceFactory | undefined;
   database: DatabaseDto;
 }
+
+const { t } = useI18n();
 
 const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);

@@ -3,66 +3,65 @@ import { TableStatusDto } from 'src/models/Magma';
 import { ProjectDatasourceStatusDto, AnalysisStatusDto } from 'src/models/Projects';
 
 export function projectStatusColor(status: string | ProjectDatasourceStatusDto) {
-  const statusEnum = typeof status === 'string' ? ProjectDatasourceStatusDto[status] : status;
-  switch (statusEnum) {
-    case ProjectDatasourceStatusDto.READY:
-      return 'positive';
-    case ProjectDatasourceStatusDto.ERRORS:
-      return 'negative';
-    case ProjectDatasourceStatusDto.LOADING:
-      return 'secondary';
-    case ProjectDatasourceStatusDto.BUSY:
-      return 'warning';
-    case ProjectDatasourceStatusDto.NONE:
-      return 'black';
-    default:
-      return 'white';
+  if (status === 'READY' || status === ProjectDatasourceStatusDto.READY) {
+    return 'positive';
   }
+  if (status === 'ERRORS' || status === ProjectDatasourceStatusDto.ERRORS) {
+    return 'negative';
+  }
+  if (status === 'LOADING' || status === ProjectDatasourceStatusDto.LOADING) {
+    return 'secondary';
+  }
+  if (status === 'BUSY' || status === ProjectDatasourceStatusDto.BUSY) {
+    return 'warning';
+  }
+  if (status === 'NONE' || status === ProjectDatasourceStatusDto.NONE) {
+    return 'black';
+  }
+  return 'white';
 }
 
-export function tableStatusColor(status: string | TableStatusDto) {
-  const statusEnum = typeof status === 'string' ? TableStatusDto[status] : status;
-  switch (statusEnum) {
-    case TableStatusDto.READY:
-      return 'positive';
-    case TableStatusDto.ERROR:
-      return 'negative';
-    case TableStatusDto.LOADING:
-      return 'secondary';
-    case TableStatusDto.CLOSED:
-      return 'black';
-    default:
-      return 'white';
+export function tableStatusColor(status: string | TableStatusDto | undefined) {
+  if (status === 'READY' || status === TableStatusDto.READY) {
+    return 'positive';
   }
+  if (status === 'ERROR' || status === TableStatusDto.ERROR) {
+    return 'negative';
+  }
+  if (status === 'LOADING' || status === TableStatusDto.LOADING) {
+    return 'secondary';
+  }
+  if (status === 'CLOSED' || status === TableStatusDto.CLOSED) {
+    return 'black';
+  }
+  return 'white';
 }
 
 export function commandStatusColor(status: string | CommandStateDto_Status) {
-  const statusEnum = typeof status === 'string' ? CommandStateDto_Status[status] : status;
-  switch (statusEnum) {
-    case CommandStateDto_Status.NOT_STARTED:
-      return 'black';
-    case CommandStateDto_Status.IN_PROGRESS:
-      return 'primary';
-    case CommandStateDto_Status.SUCCEEDED:
-      return 'positive';
-    case CommandStateDto_Status.FAILED:
-      return 'negative';
-    case CommandStateDto_Status.CANCEL_PENDING:
-      return 'secondary';
-    case CommandStateDto_Status.CANCELED:
-      return 'warning';
-    default:
-      return 'white';
+  if (status === 'NOT_STARTED' || status === CommandStateDto_Status.NOT_STARTED) {
+    return 'black';
   }
+  if (status === 'IN_PROGRESS' || status === CommandStateDto_Status.IN_PROGRESS) {
+    return 'primary';
+  }
+  if (status === 'SUCCEEDED' || status === CommandStateDto_Status.SUCCEEDED) {
+    return 'positive';
+  }
+  if (status === 'FAILED' || status === CommandStateDto_Status.FAILED) {
+    return 'negative';
+  }
+  if (status === 'CANCEL_PENDING' || status === CommandStateDto_Status.CANCEL_PENDING) {
+    return 'secondary';
+  }
+  if (status === 'CANCELED' || status === CommandStateDto_Status.CANCELED) {
+    return 'warning';
+  }
+  return 'white';
 }
 
 export function analysisColor(status: string | AnalysisStatusDto) {
-    const statusEnum = typeof status === 'string' ? AnalysisStatusDto[status] : status;
-    switch (statusEnum) {
-      case AnalysisStatusDto.PASSED:
-        return 'positive';
-      default:
-        return 'negative';
-
-    }
+  if (status === 'PASSED' || status === AnalysisStatusDto.PASSED) {
+    return 'positive';
+  }
+  return 'negative';
 }

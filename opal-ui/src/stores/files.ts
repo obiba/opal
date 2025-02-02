@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import { FileDto, FileDto_FileType } from 'src/models/Opal';
-import { FileObject } from 'src/components/models';
+import { type FileDto, FileDto_FileType } from 'src/models/Opal';
+import type { FileObject } from 'src/components/models';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);
@@ -71,8 +71,12 @@ export const useFilesStore = defineStore('files', () => {
     } else {
       let uri = `${baseUrl}/files${path}`;
       if (files && files.length > 0) {
-        uri += '?';
-        files.forEach((f) => (uri += `&file=${f.name}`));
+        if (files.length > 1) {
+          uri += '?';
+          files.forEach((f) => (uri += `&file=${f.name}`));
+        } else if (files[0]) {
+          uri += `/${files[0].name}`;
+        }
       }
       window.open(uri, '_self');
     }

@@ -9,7 +9,7 @@
           <q-icon name="person" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('my_profile') }}</q-item-label>
+          <q-item-label>{{ t('my_profile') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item clickable @click="onSignout" v-if="authStore.isAuthenticated">
@@ -17,7 +17,7 @@
           <q-icon name="logout" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('auth.signout') }}</q-item-label>
+          <q-item-label>{{ t('auth.signout') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-separator v-if="authStore.isAuthenticated" />
@@ -26,7 +26,7 @@
           <q-icon name="table_chart" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('projects') }}</q-item-label>
+          <q-item-label>{{ t('projects') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item to="/files">
@@ -34,7 +34,7 @@
           <q-icon name="folder" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('files') }}</q-item-label>
+          <q-item-label>{{ t('files') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item :to="`/tasks`">
@@ -42,7 +42,7 @@
           <q-icon name="splitscreen" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('tasks') }}</q-item-label>
+          <q-item-label>{{ t('tasks') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item :to="`/taxonomies`">
@@ -50,7 +50,15 @@
           <q-icon name="sell" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('taxonomies') }}</q-item-label>
+          <q-item-label>{{ t('taxonomies') }}</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item :to="`/search`">
+        <q-item-section avatar>
+          <q-icon name="search" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ t('search') }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item v-if="authStore.isAdministrator" to="/admin">
@@ -58,14 +66,14 @@
           <q-icon name="admin_panel_settings" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ $t('administration') }}</q-item-label>
+          <q-item-label>{{ t('administration') }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item-label header>{{ $t('other_links') }}</q-item-label>
+      <q-item-label header>{{ t('other_links') }}</q-item-label>
       <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
       <q-item class="fixed-bottom text-caption">
         <div>
-          {{ $t('main.powered_by') }}
+          {{ t('main.powered_by') }}
           <a class="text-weight-bold" href="https://www.obiba.org/pages/products/opal" target="_blank">OBiBa Opal</a>
           <span class="q-ml-xs" style="font-size: smaller">{{ authStore.version }}</span>
         </div>
@@ -74,14 +82,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'MainDrawer',
-});
-</script>
 <script setup lang="ts">
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
-import { t } from 'src/boot/i18n';
+import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+const { t } = useI18n();
 
 const router = useRouter();
 const authStore = useAuthStore();

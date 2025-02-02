@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings.import_identifiers_table') }}</div>
+        <div class="text-h6">{{ t('id_mappings.import_identifiers_table') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,13 +10,13 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-banner v-if="!hasTables" rounded class="bg-negative text-white">
-            {{ $t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
+            {{ t('id_mappings.entity_type_no_tables', { entityType: identifier.entityType }) }}
           </q-banner>
           <q-input
             v-model="tableName"
             dense
-            :label="$t('table')"
-            :hint="$t('table_identifiers_import_hint')"
+            :label="t('table')"
+            :hint="t('table_identifiers_import_hint')"
             class="q-mb-md"
             debounce="300"
             lazy-rules
@@ -28,8 +28,8 @@
                 <q-item
                   clickable
                   v-close-popup
-                  v-for="sugg in filterOptions"
-                  :key="sugg.name"
+                  v-for="(sugg, index) in filterOptions"
+                  :key="index"
                   @click="onTableSuggestionSelected(sugg)"
                 >
                   <q-item-section>{{ `${sugg.datasourceName}.${sugg.name}` }}</q-item-section>
@@ -43,20 +43,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" :disable="!!!selectedTable" @click="onImport" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" :disable="!selectedTable" @click="onImport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportTableSystemIdentifiersList',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import type { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -113,16 +108,16 @@ watch(
   }
 );
 
-function onSearchTable(val: string | null) {
+function onSearchTable(val: string | number | null) {
   filterOptions.value = [];
   selectedTable.value = null;
 
-  if (!val || (val || '').trim().length < 3) {
+  if (!val || (val + '').trim().length < 3) {
     showSuggestions.value = false;
     return;
   }
 
-  const needle = val.toLowerCase();
+  const needle = (val + '').toLowerCase();
   filterOptions.value = [...identifiersOptions.filter((v) => v.name.toLowerCase().indexOf(needle) > -1)];
 
   showSuggestions.value = filterOptions.value.length > 0;

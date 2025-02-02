@@ -2,7 +2,7 @@
   <div>
     <file-select
       v-model="dataFile"
-      :label="$t('data_file')"
+      :label="t('data_file')"
       :folder="filesStore.current"
       selection="single"
       :extensions="fileExtensions"
@@ -11,7 +11,7 @@
     />
     <q-input
       v-model="name"
-      :label="$t('table_name')"
+      :label="t('table_name')"
       dense
       class="q-mb-md"
       :debounce="500"
@@ -22,7 +22,7 @@
       <div class="col">
         <q-input
           v-model="entityType"
-          :label="$t('entity_type')"
+          :label="t('entity_type')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -33,7 +33,7 @@
         <q-select
           v-model="defaultValueType"
           :options="ValueTypes"
-          :label="$t('default_value_type')"
+          :label="t('default_value_type')"
           @update:model-value="onUpdate"
           dense
         />
@@ -43,7 +43,7 @@
       <div class="col">
         <q-input
           v-model="fieldSeparator"
-          :label="$t('field_separator')"
+          :label="t('field_separator')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -53,7 +53,7 @@
       <div class="col">
         <q-input
           v-model="quotationMark"
-          :label="$t('quotation_mark')"
+          :label="t('quotation_mark')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -67,7 +67,7 @@
           v-model="fromRow"
           type="number"
           min="1"
-          :label="$t('from_row')"
+          :label="t('from_row')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -77,7 +77,7 @@
       <div class="col">
         <q-input
           v-model="charSet"
-          :label="$t('char_set')"
+          :label="t('char_set')"
           dense
           class="q-mb-md"
           :debounce="500"
@@ -88,14 +88,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportCsvForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory } from 'src/components/models';
-import { FileDto } from 'src/models/Opal';
+import type { DatasourceFactory } from 'src/components/models';
+import type { FileDto } from 'src/models/Opal';
 import { ValueTypes } from 'src/utils/magma';
 import FileSelect from 'src/components/files/FileSelect.vue';
 
@@ -106,6 +101,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const projectsStore = useProjectsStore();
 const filesStore = useFilesStore();
 
@@ -124,16 +120,17 @@ onMounted(() => {
   if (props.modelValue) {
     const params = props.modelValue['Magma.CsvDatasourceFactoryDto.params'];
     if (params) {
-      name.value = params.tables[0].name;
-      entityType.value = params.tables[0].entityType || 'Participant';
+      name.value = params.tables[0]?.name || '';
+      entityType.value = params.tables[0]?.entityType || 'Participant';
       defaultValueType.value = params.defaultValueType || 'text';
       fieldSeparator.value = params.separator || ',';
       quotationMark.value = params.quote || '"';
       fromRow.value = params.firstRow || 1;
       charSet.value = params.characterSet || 'ISO-8859-1';
-      filesStore.getFile(params.tables[0].data).then((file) => {
-        dataFile.value = file;
-      });
+      if (params.tables[0]?.data)
+        filesStore.getFile(params.tables[0].data).then((file) => {
+          dataFile.value = file;
+        });
     }
   }
 });

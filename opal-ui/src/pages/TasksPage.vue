@@ -3,12 +3,12 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('tasks')" />
+        <q-breadcrumbs-el :label="t('tasks')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('tasks') }}
+        {{ t('tasks') }}
       </div>
       <command-states
         :commands="commandsStore.commandStates"
@@ -19,15 +19,15 @@
     </q-page>
     <confirm-dialog
       v-model="showConfirmClear"
-      :title="$t('clear')"
-      :text="$t('clear_tasks_confirm', { count: selectedToClear.length })"
+      :title="t('clear')"
+      :text="t('clear_tasks_confirm', { count: selectedToClear.length })"
       @confirm="onClearConfirmed"
       @cancel="onClearCancel"
     />
     <confirm-dialog
       v-model="showConfirmCancel"
-      :title="$t('cancel')"
-      :text="$t('cancel_task_confirm')"
+      :title="t('cancel')"
+      :text="t('cancel_task_confirm')"
       @confirm="onCancelConfirmed"
       @cancel="onCancelCancel"
     />
@@ -37,8 +37,9 @@
 <script setup lang="ts">
 import CommandStates from 'src/components/CommandStates.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { CommandStateDto } from 'src/models/Commands';
+import type { CommandStateDto } from 'src/models/Commands';
 
+const { t } = useI18n();
 const commandsStore = useCommandsStore();
 
 const showConfirmClear = ref(false);

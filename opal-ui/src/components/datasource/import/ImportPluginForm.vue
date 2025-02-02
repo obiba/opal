@@ -1,16 +1,11 @@
 <template>
   <div>
-    <schema-form v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
+    <schema-form v-if="schema" v-model="parameters" :schema="schema" @update:model-value="onUpdate" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportPluginForm',
-});
-</script>
 <script setup lang="ts">
-import { DatasourceFactory, FormObject, SchemaFormObject } from 'src/components/models';
+import type { DatasourceFactory, FormObject, SchemaFormObject } from 'src/components/models';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface ImportPluginFormProps {

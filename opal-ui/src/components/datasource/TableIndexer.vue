@@ -1,12 +1,12 @@
 <template>
   <div :class="statusClass">
     <div>
-      <span>{{ $t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
+      <span>{{ t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
       <q-btn
         v-if="statusActionIcon"
         :color="statusActionColor"
         :icon="statusActionIcon"
-        :title="$t(statusActionLabel)"
+        :title="t(statusActionLabel)"
         rounded
         dense
         outline
@@ -18,7 +18,7 @@
         v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
         :color="statusActionColor"
         icon="cleaning_services"
-        :title="$t('clear')"
+        :title="t('clear')"
         dense
         flat
         size="sm"
@@ -29,7 +29,7 @@
         v-if="statusActionIcon"
         :color="statusActionColor"
         icon="event"
-        :title="$t('schedule')"
+        :title="t('schedule')"
         flat
         dense
         size="sm"
@@ -48,15 +48,11 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TableIndexer',
-});
-</script>
 <script setup lang="ts">
 import { TableIndexationStatus } from 'src/models/Opal';
 import TableIndexerDialog from 'src/components/datasource/TableIndexerDialog.vue';
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(false);

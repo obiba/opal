@@ -23,7 +23,7 @@
             options-dense
             size="sm"
             display-value=""
-            :label="$t('select_columns')"
+            :label="t('select_columns')"
             emit-value
             map-options
             :options="selectableColumns"
@@ -74,16 +74,13 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ValuesList',
-});
-</script>
 <script setup lang="ts">
-import { QTableColumn } from 'quasar';
-import { TableDto, ValueSetsDto, VariableDto } from 'src/models/Magma';
+import type { QTableColumn } from 'quasar';
+import type { TableDto, ValueSetsDto, VariableDto } from 'src/models/Magma';
 import ValueCell from 'src/components/datasource/ValueCell.vue';
-import { t } from 'src/boot/i18n';
+import { DefaultAlignment } from 'src/components/models';
+
+const { t } = useI18n();
 
 interface ValuesListProps {
   table: TableDto;
@@ -105,7 +102,8 @@ const pagination = ref({
 });
 const COLUMNS_COUNT = 20;
 
-const rows = ref([]);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rows = ref<{ [key: string]: any }[]>([]);
 const columns = ref<QTableColumn[]>([]);
 const visibleColumns = ref<string[]>([]);
 const varFilter = ref<string>('');
@@ -125,7 +123,7 @@ function init() {
   columns.value = props.variables.map((v) => ({
     name: v.name,
     label: v.name,
-    align: 'left',
+    align: DefaultAlignment,
     field: v.name,
     required: false,
     variable: v,
@@ -135,7 +133,7 @@ function init() {
     name: '_id',
     required: true,
     label: t('id'),
-    align: 'left',
+    align: DefaultAlignment,
     field: '_id',
     format: (val: string) => val,
     sortable: false,
@@ -143,13 +141,15 @@ function init() {
   tableRef.value.requestServerInteraction();
 }
 
-function onFilter(val: string, update, abort) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onFilter(val: string, update: any) {
   update(() => {
     varFilter.value = val.toLowerCase();
   });
 }
 
-function onRequest(props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onRequest(props: any) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   const offset = (page - 1) * rowsPerPage;
@@ -161,7 +161,9 @@ function onRequest(props) {
       rows.value = res.valueSets.map((vs) => {
         const row = { _id: vs.identifier };
         vs.values.forEach((val, idx: number) => {
-          row[res.variables[idx]] = val;
+          if (res.variables[idx])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (row as any)[res.variables[idx]] = val;
         });
         return row;
       });
@@ -182,6 +184,6 @@ function onVariableSelection() {
 }
 
 function getVariable(name: string) {
-  return props.variables.find((v) => v.name === name);
+  return props.variables.find((v) => v.name === name) || {name} as VariableDto;
 }
 </script>

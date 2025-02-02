@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{ $t('add_folder') }}</div>
+        <div class="text-h6">{{ t('add_folder') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -14,7 +14,7 @@
             dense
             autofocus
             type="text"
-            :label="$t('name')"
+            :label="t('name')"
             style="width: 300px"
             class="q-mb-md"
             lazy-rules
@@ -27,20 +27,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" color="primary" :disable="newFolder === ''" @click="onAddFolder" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" color="primary" :disable="newFolder === ''" @click="onAddFolder" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AddFolderDialog',
-});
-</script>
 <script setup lang="ts">
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -61,7 +56,7 @@ const formRef = ref();
 
 // Validators
 const validateFolderName = (value: string) => {
-  if (!!value) {
+  if (value) {
     if (INVALID_CHARS.some((char) => value.includes(char))) {
       return t('validation.folder.invalid_chars', { chars: INVALID_CHARS.join(', ') });
     } else if (['.', '..'].indexOf(value) !== -1) {

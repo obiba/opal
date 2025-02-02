@@ -11,7 +11,7 @@
       v-model:selected="selected"
     >
       <template v-slot:top-left>
-        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRWorkspaces" />
+        <q-btn outline color="secondary" icon="refresh" :title="t('refresh')" size="sm" @click="updateRWorkspaces" />
         <q-btn
           outline
           color="red"
@@ -35,23 +35,19 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_r_workspaces_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('delete_r_workspaces_confirm', { count: selected.length })"
       @confirm="onDeleteWorkspaces"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RWorkspaces',
-});
-</script>
 <script setup lang="ts">
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
-import { RWorkspaceDto } from 'src/models/OpalR';
+import type { RWorkspaceDto } from 'src/models/OpalR';
 import { getDateLabel } from 'src/utils/dates';
 import { getSizeLabel } from 'src/utils/files';
+import { DefaultAlignment } from 'src/components/models';
 
 const rStore = useRStore();
 const { t } = useI18n();
@@ -65,18 +61,18 @@ const initialPagination = ref({
 });
 
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'name', sortable: true },
-  { name: 'context', label: t('context'), align: 'left', field: 'context', sortable: true, classes: 'text-caption' },
-  { name: 'user', label: t('user'), align: 'left', field: 'user', sortable: true },
+  { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name', sortable: true },
+  { name: 'context', label: t('context'), align: DefaultAlignment, field: 'context', sortable: true, classes: 'text-caption' },
+  { name: 'user', label: t('user'), align: DefaultAlignment, field: 'user', sortable: true },
   {
     name: 'lastAccessDate',
     label: t('last_access'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'lastAccessDate',
     sortable: true,
     format: getDateLabel,
   },
-  { name: 'size', label: t('size'), align: 'left', field: 'size', sortable: true, format: getSizeLabel },
+  { name: 'size', label: t('size'), align: DefaultAlignment, field: 'size', sortable: true, format: getSizeLabel },
 ]);
 
 function updateRWorkspaces() {

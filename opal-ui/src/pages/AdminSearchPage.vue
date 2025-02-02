@@ -3,27 +3,27 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('search')" />
+        <q-breadcrumbs-el :label="t('administration')" to="/admin" />
+        <q-breadcrumbs-el :label="t('search')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div class="text-h5 q-mb-md">{{ $t('variables_index') }}</div>
-      <div class="text-help q-mb-md">{{ $t('variables_index_info') }}</div>
+      <div class="text-h5 q-mb-md">{{ t('variables_index') }}</div>
+      <div class="text-help q-mb-md">{{ t('variables_index_info') }}</div>
       <q-btn
         color="secondary"
         icon="cleaning_services"
-        :label="$t('clear')"
+        :label="t('clear')"
         size="sm"
         @click="onVariablesClear"
         class="q-mb-sm"
       />
-      <div class="text-h5 q-mb-md q-mt-md">{{ $t('values_index') }}</div>
-      <div class="text-help q-mb-md">{{ $t('values_index_info') }}</div>
+      <div class="text-h5 q-mb-md q-mt-md">{{ t('values_index') }}</div>
+      <div class="text-help q-mb-md">{{ t('values_index_info') }}</div>
       <q-btn
         color="secondary"
         icon="cleaning_services"
-        :label="$t('clear')"
+        :label="t('clear')"
         size="sm"
         @click="onValuesClear"
         class="q-mb-sm"

@@ -402,7 +402,7 @@ export default {
   },
   git: {
     diff_viewer: {
-      titre: 'Détails de la validation',
+      title: 'Détails de la validation',
     },
   },
   key_type: {
@@ -417,7 +417,7 @@ export default {
     db_reload_confirm: 'Êtes-vous sûr de vouloir recharger la base de données du projet?',
     backup_restore: 'Sauvegarder / Restaurer',
     backup_project: 'Sauvegarder le projet',
-    backup_hint: "La tâche de sauvegarde du projet a une portée limitée : tables (dictionnaire et exportation de données), vues (soit en tant que table logique, soit en tant que table exportée), ressources et fichiers. D'autres éléments du projet ne font pas partie de la sauvegarde : les autorisations des utilisateurs et des groupes, l'historique des modifications des vues, l'analyse des tables etc.",
+    backup_hint: "La tâche de sauvegarde du projet couvre les tables (dictionnaire et exportation de données), les vues (sous forme de table logique ou exportée), les ressources et les fichiers. Elle exclut les permissions des utilisateurs/groupes, l'historique des modifications des vues, l'analyse des tables, les données liées aux plugins et d'autres éléments du projet.",
     backup_success: 'La tâche de sauvegarde du projet a été lancée. Vous pouvez suivre sa progression dans la liste des tâches.',
     backup_folder: 'Dossier de sauvegarde',
     restore_project: 'Restaurer le projet',
@@ -560,9 +560,9 @@ export default {
       host_required: "L'hôte est requis",
       host_uri_format: 'L\'hôte doit commencer par "https://" ou "http://"',
     },
-  },
-  analysis: {
-    name_exists: 'Le nom de l\'analyse doit être unique',
+    analysis: {
+      name_exists: 'Le nom de l\'analyse doit être unique',
+    }
   },
   main: {
     brand: 'Opal',
@@ -601,7 +601,7 @@ export default {
   r: {
     cluster: 'Cluster',
     clusters_count: 'Aucun cluster de serveurs R | 1 cluster de serveurs R | {count} clusters de serveurs R',
-    paquets_warn: "Cette opération peut paraître pratique mais elle n'est pas recommandée dans un environnement de production. Il est préférable de déployer le serveur R à partir d'une image Docker validée pour garantir la reproductibilité de l'environnement d'analyse R.",
+    packages_warn: "Cette opération peut paraître pratique mais elle n'est pas recommandée dans un environnement de production. Il est préférable de déployer le serveur R à partir d'une image Docker validée pour garantir la reproductibilité de l'environnement d'analyse R.",
     servers_info: "Les serveurs R sont regroupés par clusters. Dans chaque cluster, tous les serveurs R sont considérés comme interchangeables, c'est-à-dire que la charge d'activité sera répartie sur l'un ou l'autre serveur lors de la création d'une session R.",
     servers: 'Serveurs R',
     sessions_counts: '{count} ({active} active)',
@@ -640,7 +640,7 @@ export default {
     title: 'Taxonomie',
     name_hint: 'Une taxonomie doit avoir un nom unique.',
     author_hint: "L'auteur de la taxonomie peut être spécifié (pour le droit d'auteur).",
-    licence_hint: "Type de licence qui s'applique à cette taxonomie. Voir l'{url} suggérée.",
+    license_hint: "Type de licence qui s'applique à cette taxonomie. Voir l'{url} suggérée.",
     creative_commons_licenses: 'Licences Creative Commons',
     description_hint: 'Description facultative de la taxonomie.',
     add: 'Ajouter une taxonomie',
@@ -671,16 +671,16 @@ export default {
       edit: 'Modifier le terme',
       keywords_hint: 'Liste facultative de mots-clés du terme. Peut être utile lors de la création de requêtes de recherche de variables.',
     },
-    import_mlstr: {
+    import_mr: {
       label: 'Taxonomies de Maelstrom Research',
       title: 'Importer les taxonomies de Maelstrom Research',
       info: "Les taxonomies de classification des variables {mlstr_url} permettent d'annoter des études et des variables harmonisées pour faciliter la navigation dans les métadonnées et améliorer la découverte des données sur le portail Web de données {mica_url}.",
       versions: 'Versions publiées',
       versions_hint: "Ces taxonomies sont disponibles sous l'{url}",
       versions_hint_url: 'Licence publique internationale Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.',
-      licence_agreement: "J'ai lu et accepté les termes de la licence.",
+      license_agreement: "J'ai lu et accepté les termes de la licence.",
     },
-    import_github: {
+    import_gh: {
       label: 'À partir de GitHub',
       title: 'Importer le référentiel GitHub',
       org_hint: 'Exemple : maelstrom-research',
@@ -690,7 +690,7 @@ export default {
       file_hint: 'Nom du fichier YAML de taxonomie (par exemple taxonomy.yml ou scales/taxonomy.yml). Laissez ce champ vide pour importer tous les fichiers de taxonomie.',
       override: 'Remplacer les taxonomies existantes',
     },
-    import_file: {
+    import: {
       label: 'À partir du fichier YAML',
       title: 'Importer un fichier YAML',
     },
@@ -811,7 +811,6 @@ export default {
   annotate: 'Annoter',
   annotation_texts_hint: 'Annotez avec du texte libre. Pour une lisibilité humaine, vous pouvez fournir un texte différent dans chaque langue. Pour un traitement automatique ou un texte sans localisation, choisissez la langue "default". Le texte vide sera ignoré. Le format de texte Markdown est pris en charge.',
   annotations: 'Annotations',
-  annotations: 'Annotations',
   apply_annotation: 'Appliquer une annotation',
   apply: 'Appliquer',
   at: 'à',
@@ -883,15 +882,15 @@ export default {
   databases: 'Base de données',
   datashield_profile: 'Profil DataSHIELD',
   datashield_service: 'Service DataSHIELD',
-  date: 'Date',
   day: 'Jour',
   default_charset: 'Jeu de caractères par défaut',
   default_storage: 'Stockage par défaut',
   default_value_type: 'Type de valeur par défaut',
+  default: 'Défaut',
   delay: 'Délai',
   delete_annotation_confirm: 'Êtes-vous sûr de vouloir supprimer cette annotation ?',
   delete_annotation: 'Supprimer une annotation',
-  delete_attributs_confirm: 'Êtes-vous sûr de vouloir supprimer cet attribut (toutes langues) ?',
+  delete_attributes_confirm: 'Êtes-vous sûr de vouloir supprimer cet attribut (toutes langues) ?',
   delete_categories_confirm: '- | Êtes-vous sûr de vouloir supprimer cette catégorie ? | Êtes-vous sûr de vouloir supprimer ces {count} catégories ?',
   delete_files_confirm: '- | Êtes-vous sûr de vouloir supprimer ce fichier ? | Êtes-vous sûr de vouloir supprimer ces {count} fichiers ?',
   delete_group_confirm: "Êtes-vous sûr de vouloir supprimer le groupe '{groupe}'?",
@@ -918,7 +917,6 @@ export default {
   derivation_script: 'Script de dérivation',
   derived_variables_hint: "Le nom et le type de la variable dérivée peuvent être différents de celui de la variable d'origine.",
   derived_variables: 'Variables dérivées',
-  description: 'Description',
   description: 'Description',
   descriptive_statistics: 'Statistiques descriptives',
   destination_folder: 'Dossier de destination',
@@ -1139,7 +1137,7 @@ export default {
   plugins: 'Plugins',
   preview_import_source: 'Prévisualiser les données',
   preview: 'Prévisualiser',
-  profile_groups_acls_info: "Liste des permissions accordées à l'utilisateur par l'intermédiaire de groupes auxquels il appartient. Notez que supprimer une permission d\'un groupe affecte les permissions accordées aux membres de ce groupe.",
+  profile_groups_acls_info: "Liste des permissions accordées à l'utilisateur par l'intermédiaire de groupes auxquels il appartient. Notez que supprimer une permission d'un groupe affecte les permissions accordées aux membres de ce groupe.",
   profile_groups_acls: 'Permissions de ses groupes',
   profile_otp_disable: "Désactiver l'authentification à deux facteurs pour l'utilisateur '{user}'",
   profile_otp_disabled: "L'authentification à deux facteurs peut être activée par l'utilisateur '{user}'",

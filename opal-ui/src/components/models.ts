@@ -1,5 +1,7 @@
-import { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
-import {
+export const DefaultAlignment: 'left' | 'right' | 'center' = 'left';
+
+import type { PluginPackageDto, DatasourcePluginPackageDto } from 'src/models/Plugins';
+import type {
   ViewDto,
   VariableListViewDto,
   DatasourceFactoryDto,
@@ -13,7 +15,7 @@ import {
   AttributeDto,
   JdbcDatasourceFactoryDto,
 } from 'src/models/Magma';
-import { TaxonomyDto, VocabularyDto, TermDto } from 'src/models/Opal';
+import type { TaxonomyDto, VocabularyDto, TermDto } from 'src/models/Opal';
 
 export interface StringMap {
   [key: string]: string | string[] | undefined;

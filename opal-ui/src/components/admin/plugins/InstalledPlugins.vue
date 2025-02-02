@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="text-help q-mb-md">
-      {{ $t('plugin.installed_plugins_info') }}
+      {{ t('plugin.installed_plugins_info') }}
     </div>
     <q-select
       v-model="type"
       :options="typeOptions"
-      :label="$t('type')"
+      :label="t('type')"
       clearable
       dense
       class="q-mb-md"
@@ -43,14 +43,14 @@
           </q-item-section>
           <q-item-section side>
             <div v-if="!pkg.uninstalled" class="row">
-              <q-btn round flat size="sm" icon="refresh" :title="$t('plugin.restart')" @click="onRestart(pkg)" />
-              <q-btn round flat size="sm" icon="edit" :title="$t('plugin.configure')" @click="onConfigure(pkg)" />
+              <q-btn round flat size="sm" icon="refresh" :title="t('plugin.restart')" @click="onRestart(pkg)" />
+              <q-btn round flat size="sm" icon="edit" :title="t('plugin.configure')" @click="onConfigure(pkg)" />
               <q-btn
                 round
                 flat
                 size="sm"
                 icon="delete"
-                :title="$t('delete')"
+                :title="t('delete')"
                 @click="pluginsStore.uninstallPlugin(pkg.name)"
               />
             </div>
@@ -60,7 +60,7 @@
                 flat
                 size="sm"
                 icon="undo"
-                :title="$t('cancel')"
+                :title="t('cancel')"
                 @click="pluginsStore.cancelUninstallPlugin(pkg.name)"
               />
             </div>
@@ -72,14 +72,9 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'InstalledPlugins',
-});
-</script>
 <script setup lang="ts">
 import PluginConfigurationDialog from 'src/components/admin/plugins/PluginConfigurationDialog.vue';
-import { PluginPackageDto } from 'src/models/Plugins';
+import type { PluginPackageDto } from 'src/models/Plugins';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const pluginsStore = usePluginsStore();

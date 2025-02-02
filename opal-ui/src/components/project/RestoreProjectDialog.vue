@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('project_admin.restore_project') }}</div>
+        <div class="text-h6">{{ t('project_admin.restore_project') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -10,7 +10,7 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <file-select
             v-model="backupFolder"
-            :label="$t('project_admin.restore_folder')"
+            :label="t('project_admin.restore_folder')"
             :folder="filesStore.current"
             selection="single"
             @select="onUpdateFolder"
@@ -25,37 +25,31 @@
           <q-input
             autocomplete="off"
             type="password"
-            :label="$t('password')"
+            :label="t('password')"
             v-model="restoreOptions.password"
             color="grey-10"
             lazy-rules
           >
           </q-input>
-          <q-checkbox v-model="restoreOptions.override" :label="$t('project_admin.restore_override')" />
+          <q-checkbox v-model="restoreOptions.override" :label="t('project_admin.restore_override')" />
         </q-form>
       </q-card-section>
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('backup')" type="submit" color="primary" @click="onRestore" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('restore')" type="submit" color="primary" @click="onRestore" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'UpdatePasswordDialog',
-});
-</script>
-
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
+import type { ProjectDto } from 'src/models/Projects';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto, FileDto_FileType, SubjectProfileDto } from 'src/models/Opal';
-import { RestoreCommandOptionsDto } from 'src/models/Commands';
+import { type FileDto, type SubjectProfileDto, FileDto_FileType } from 'src/models/Opal';
+import type { RestoreCommandOptionsDto } from 'src/models/Commands';
 
 interface DialogProps {
   modelValue: boolean;

@@ -18,7 +18,7 @@ export function flattenObjectToString(object: any, icase = true): string {
       value.forEach((item) => recurse(item));
     } else if (value && typeof value === 'object') {
       for (const key in value) {
-        if (value.hasOwnProperty(key)) {
+        if (value[key]) {
           recurse(value[key]);
         }
       }

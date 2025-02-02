@@ -8,7 +8,7 @@
         icon="arrow_back"
         to="/" />
       <span class="q-ml-md">
-        {{ $t('taxonomies') }}
+        {{ t('taxonomies') }}
       </span>
     </h6>
     <q-list>
@@ -29,30 +29,30 @@
         <q-btn-dropdown
           no-caps
           color="primary"
-          :label="$t('taxonomy.add')"
-          :title="$t('user_profile.add_token')"
+          :label="t('taxonomy.add')"
+          :title="t('user_profile.add_token')"
           icon="add"
           size="sm"
         >
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onAddTaxonomy">
               <q-item-section>
-                <q-item-label>{{ $t('taxonomy.new_taxonomy') }}</q-item-label>
+                <q-item-label>{{ t('taxonomy.new_taxonomy') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportMlstrTaxonomies">
               <q-item-section>
-                <q-item-label>{{ $t('taxonomy.import_mlstr.label') }}</q-item-label>
+                <q-item-label>{{ t('taxonomy.import_mr.label') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportGithubTaxonomies">
               <q-item-section>
-                <q-item-label>{{ $t('taxonomy.import_github.label') }}</q-item-label>
+                <q-item-label>{{ t('taxonomy.import_gh.label') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click.prevent="onImportFileTaxonomy">
               <q-item-section>
-                <q-item-label>{{ $t('taxonomy.import_file.label') }}</q-item-label>
+                <q-item-label>{{ t('taxonomy.import.label') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -82,20 +82,15 @@
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'TaxonomiesDrawer',
-});
-</script>
-
 <script setup lang="ts">
-import { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto, TaxonomyDto } from 'src/models/Opal';
+import type { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto, TaxonomyDto } from 'src/models/Opal';
 import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
 import ImportMlstrTaxonomiesDialog from 'src/components/taxonomies/ImportMlstrTaxonomiesDialog.vue';
 import ImportGithubTaxonomiesDialog from 'src/components/taxonomies/ImportGithubTaxonomiesDialog.vue';
 import ImportTaxonomyFileDialog from 'src/components/taxonomies/ImportTaxonomyFileDialog.vue';
 import { notifyError } from 'src/utils/notify';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const taxonomiesStore = useTaxonomiesStore();

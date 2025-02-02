@@ -2,7 +2,7 @@
   <div>
     <div v-if="!systemStore.generalConf.allowRPackageManagement" class="box-info q-mt-sm">
       <q-icon name="info" />
-      {{ $t('r_packages_management_forbidden') }}
+      {{ t('r_packages_management_forbidden') }}
     </div>
     <q-table
       flat
@@ -15,16 +15,16 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" icon="add" :label="$t('install')" size="sm" class="on-left" :disable="!systemStore.generalConf.allowRPackageManagement">
+        <q-btn-dropdown color="primary" icon="add" :label="t('install')" size="sm" class="on-left" :disable="!systemStore.generalConf.allowRPackageManagement">
           <q-list>
             <q-item clickable v-close-popup @click="onShowInstallPackages">
               <q-item-section>
-                <q-item-label>{{ $t('install_r_package') }}</q-item-label>
+                <q-item-label>{{ t('install_r_package') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn outline color="secondary" icon="refresh" :title="$t('refresh')" size="sm" @click="updateRPackages" />
+        <q-btn outline color="secondary" icon="refresh" :title="t('refresh')" size="sm" @click="updateRPackages" />
       </template>
       <template v-slot:top-right>
         <q-input dense debounce="500" v-model="filter">
@@ -55,7 +55,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onShowDeletePackage(props.row)"
@@ -83,26 +83,22 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_r_package_confirm', { name: pkg?.name })"
+      :title="t('delete')"
+      :text="t('delete_r_package_confirm', { name: pkg?.name })"
       @confirm="onDeletePackage"
     />
     <install-r-package-dialog v-model="showInstall" :cluster="cluster" :managers="['cran', 'gh']" />
-    <view-r-package-dialog v-model="showView" :pkg="pkg" />
+    <view-r-package-dialog v-if="pkg" v-model="showView" :pkg="pkg" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldPackages',
-});
-</script>
 <script setup lang="ts">
-import { RServerDto, RServerClusterDto, RPackageDto } from 'src/models/OpalR';
+import type { RServerDto, RServerClusterDto, RPackageDto } from 'src/models/OpalR';
 import InstallRPackageDialog from 'src/components/admin/r/InstallRPackageDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ViewRPackageDialog from 'src/components/admin/r/ViewRPackageDialog.vue';
 import { getDescriptionValue, getPackageKey } from 'src/utils/r';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   cluster: RServerClusterDto;
@@ -133,7 +129,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -141,38 +137,42 @@ const columns = computed(() => [
     name: 'title',
     required: true,
     label: t('title'),
-    align: 'left',
+    align: DefaultAlignment,
+    field: 'title',
     sortable: true,
   },
   {
     name: 'version',
     required: true,
     label: t('version'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'version',
     sortable: true,
   },
   {
     name: 'built',
     required: true,
     label: t('built'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'built',
     sortable: true,
   },
   {
     name: 'libpath',
     required: true,
     label: t('libpath'),
-    align: 'left',
+    align: DefaultAlignment,
     classes: 'text-caption',
+    field: 'libpath',
     sortable: true,
   },
   {
     name: 'rserver',
     required: true,
     label: t('server'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'rserver',
     sortable: true,
   },
@@ -182,7 +182,7 @@ function onFilter() {
   if (filter.value.length === 0) {
     return packages.value;
   }
-  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  const query = filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
   return packages.value.filter((pkg) => {
     const description = ['Title', 'Version', 'Built', 'LibPath'].map((key) => getDescriptionValue(pkg, key)).join(' ');
     return `${pkg.name} ${pkg.rserver} ${description}`.toLowerCase().includes(query);

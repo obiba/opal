@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="text-h6">
-      {{ $t('plugin.archive_installation') }}
+      {{ t('plugin.archive_installation') }}
     </div>
     <div class="text-help q-mb-md">
-      {{ $t('plugin.archive_info') }}
+      {{ t('plugin.archive_info') }}
     </div>
     <file-select
       v-model="file"
-      :label="$t('plugin.archive_file')"
+      :label="t('plugin.archive_file')"
       :folder="filesStore.current"
       selection="single"
       :extensions="['-dist.zip']"
@@ -17,30 +17,25 @@
     />
     <q-spinner-dots v-if="loading" class="q-mb-md" />
     <div class="text-h6">
-      {{ $t('plugin.update_site') }}
+      {{ t('plugin.update_site') }}
     </div>
     <div class="text-help q-mb-md">
-      {{ $t('plugin.update_site_info') }}
+      {{ t('plugin.update_site_info') }}
     </div>
     <div v-if="pluginsStore.plugins.site">
       <q-markdown :src="siteLinkMd" no-heading-anchor-links />
     </div>
     <div v-if="pluginsStore.plugins.updated">
       <span class="text-hint" :title="getDateLabel(pluginsStore.plugins.updated)">{{
-        $t('plugin.last_update', { ago: getDateDistanceLabel(pluginsStore.plugins.updated) })
+        t('plugin.last_update', { ago: getDateDistanceLabel(pluginsStore.plugins.updated) })
       }}</span>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AdvancedPlugins',
-});
-</script>
 <script setup lang="ts">
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
 

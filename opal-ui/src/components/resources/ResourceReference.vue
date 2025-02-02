@@ -2,7 +2,7 @@
   <div>
     <div class="row q-col-gutter-md q-mb-md">
       <div class="col-12 col-md-6">
-        <div class="text-h6 q-mb-md">{{ $t('properties') }}</div>
+        <div class="text-h6 q-mb-md">{{ t('properties') }}</div>
         <fields-list :items="itemsReference" :dbobject="reference" />
         <fields-list :items="itemsFactory" :dbobject="factory" />
         <div v-if="factory">
@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="col-12 col-md-6">
-        <div class="text-h6 q-mb-md">{{ $t('resource_ref.provider') }}</div>
+        <div class="text-h6 q-mb-md">{{ t('resource_ref.provider') }}</div>
         <div class="q-mb-md">
           <q-badge :label="reference?.provider" :color="provider ? 'positive' : 'negative'" />
         </div>
@@ -18,14 +18,14 @@
           <div class="text-bold q-mb-sm">{{ provider.title }}</div>
           <q-markdown :src="provider.description" no-heading-anchor-links />
           <a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md"
-            >{{ $t('Website') }} <q-icon name="open_in_new"
+            >{{ t('Website') }} <q-icon name="open_in_new"
           /></a>
         </div>
         <div v-else>
           <div class="q-mb-md box-warning">
             <q-icon name="error" size="1.2rem" />
             <span class="on-right">
-              {{ $t('resource_ref.provider_not_found', { provider: reference?.provider }) }}
+              {{ t('resource_ref.provider_not_found', { provider: reference?.provider }) }}
             </span>
           </div>
         </div>
@@ -33,7 +33,7 @@
     </div>
     <div v-if="reference && factory" class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
-        <div class="text-h6 q-mb-md">{{ $t('parameters') }}</div>
+        <div class="text-h6 q-mb-md">{{ t('parameters') }}</div>
         <schema-form
           v-model="refParameters"
           :schema="parametersSchemaForm"
@@ -42,7 +42,7 @@
         />
       </div>
       <div class="col-12 col-md-6">
-        <div class="text-h6 q-mb-md">{{ $t('credentials') }}</div>
+        <div class="text-h6 q-mb-md">{{ t('credentials') }}</div>
         <schema-form
           v-model="refCredentials"
           :schema="credentialsSchemaForm"
@@ -54,19 +54,13 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ResourceReference',
-});
-</script>
 <script setup lang="ts">
-import { ResourceReferenceDto } from 'src/models/Projects';
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
-import { ResourceFactoryDto } from 'src/models/Resources';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 const route = useRoute();
 const resourcesStore = useResourcesStore();
+const { t } = useI18n();
 
 const loading = ref(false);
 
@@ -94,7 +88,7 @@ function init() {
   });
 }
 
-const itemsReference: FieldItem<ResourceReferenceDto>[] = [
+const itemsReference: FieldItem[] = [
   { field: 'name' },
   { field: 'description' },
   {
@@ -112,7 +106,7 @@ const itemsReference: FieldItem<ResourceReferenceDto>[] = [
   },
 ];
 
-const itemsFactory: FieldItem<ResourceFactoryDto>[] = [{ field: 'title', label: 'type' }];
+const itemsFactory: FieldItem[] = [{ field: 'title', label: 'type' }];
 
 function onParametersUpdate() {
   console.log('onParametersUpdate');

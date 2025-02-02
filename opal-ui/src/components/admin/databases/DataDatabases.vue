@@ -2,17 +2,17 @@
   <div>
     <q-table :rows="databases" flat row-key="name" :columns="columns" :pagination="initialPagination">
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :label="$t('register')" icon="add" size="sm">
+        <q-btn-dropdown color="primary" :label="t('register')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onShowAddSQLDB">
               <q-item-section>
-                <q-item-label>{{ $t('db.register_sqldb') }}</q-item-label>
+                <q-item-label>{{ t('db.register_sqldb') }}</q-item-label>
               </q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click.prevent="onShowAddMondoDB">
               <q-item-section>
-                <q-item-label>{{ $t('db.register_mongodb') }}</q-item-label>
+                <q-item-label>{{ t('db.register_mongodb') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -27,7 +27,7 @@
               name="check"
               size="sm"
               class="on-right"
-              :title="$t('default_storage')"
+              :title="t('default_storage')"
             />
             <div class="float-right">
               <q-btn
@@ -37,7 +37,7 @@
                 size="sm"
                 color="secondary"
                 :icon="toolsVisible[props.row.name] ? 'settings_ethernet' : 'none'"
-                :title="$t('test')"
+                :title="t('test')"
                 class="q-ml-xs"
                 @click="onTest(props.row)"
               />
@@ -48,7 +48,7 @@
                 size="sm"
                 color="secondary"
                 :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
-                :title="$t('edit')"
+                :title="t('edit')"
                 class="q-ml-xs"
                 @click="onShowEdit(props.row)"
               />
@@ -59,7 +59,7 @@
                 flat
                 size="sm"
                 color="secondary"
-                :title="$t('delete')"
+                :title="t('delete')"
                 :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
                 class="q-ml-xs"
                 @click="onShowDelete(props.row)"
@@ -77,31 +77,27 @@
             <span v-if="props.row.mongoDbSettings">{{ props.row.mongoDbSettings.url }}</span>
           </q-td>
           <q-td key="usage" :props="props" class="text-caption">
-            {{ $t(props.row.usage.toLowerCase()) }}
+            {{ t(props.row.usage.toLowerCase()) }}
           </q-td>
         </q-tr>
       </template>
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('unregister')"
-      :text="$t('db.unregister_confirm', { name: selected?.name })"
+      :title="t('unregister')"
+      :text="t('db.unregister_confirm', { name: selected?.name })"
       @confirm="onDelete"
     />
     <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DataDatabases',
-});
-</script>
 <script setup lang="ts">
-import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
 import EditDatabaseDialog from 'src/components/admin/databases/EditDatabaseDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const systemStore = useSystemStore();
 const { t } = useI18n();
@@ -118,10 +114,10 @@ const showDelete = ref(false);
 const selected = ref();
 
 const columns = computed(() => [
-  { name: 'name', label: t('name'), align: 'left', field: 'name' },
-  { name: 'hasDatasource', label: t('db.in_use'), align: 'left' },
-  { name: 'url', label: 'URL', align: 'left' },
-  { name: 'usage', label: t('usage'), align: 'left', field: 'usage' },
+  { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },
+  { name: 'hasDatasource', label: t('db.in_use'), align: DefaultAlignment, field: 'hasDatasource' },
+  { name: 'url', label: 'URL', align: DefaultAlignment, field: 'url' },
+  { name: 'usage', label: t('usage'), align: DefaultAlignment, field: 'usage' },
 ]);
 
 onMounted(() => {

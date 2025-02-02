@@ -1,13 +1,13 @@
 <template>
   <div>
     <div v-if="datasourceStore.perms.table?.canUpdate()" class="row q-gutter-sm q-mb-md">
-      <q-btn outline size="sm" color="secondary" icon="edit" :title="$t('edit')" @click="onShowEdit" />
+      <q-btn outline size="sm" color="secondary" icon="edit" :title="t('edit')" @click="onShowEdit" />
       <q-btn
         outline
         size="sm"
         color="red"
         icon="delete"
-        :title="$t('delete')"
+        :title="t('delete')"
         :disable="view.where === undefined"
         @click="onDelete"
       />
@@ -21,21 +21,16 @@
       style="height: 80px"
     />
     <div v-else class="text-help">
-      {{ $t('no_entity_filter') }}
+      {{ t('no_entity_filter') }}
     </div>
     <script-dialog v-model="showEdit" :script="view.where" @save="onSave" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ViewWhereScript',
-});
-</script>
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
 import ScriptDialog from 'src/components/datasource/ScriptDialog.vue';
-import { ViewDto } from 'src/models/Magma';
+import type { ViewDto } from 'src/models/Magma';
 
 interface VariableScriptProps {
   view: ViewDto;
@@ -43,6 +38,7 @@ interface VariableScriptProps {
 
 const props = defineProps<VariableScriptProps>();
 
+const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showEdit = ref(false);

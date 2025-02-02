@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('id_mappings.import_identifiers_mapping') }}</div>
+        <div class="text-h6">{{ t('id_mappings.import_identifiers_mapping') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -14,8 +14,8 @@
             use-input
             use-chips
             input-debounce="0"
-            :label="$t('name') + ' *'"
-            :hint="$t('id_mappings.mapping_name_hint')"
+            :label="t('name') + ' *'"
+            :hint="t('id_mappings.mapping_name_hint')"
             :options="filterOptions"
             @new-value="addName"
             @filter="filterFn"
@@ -32,7 +32,7 @@
                     dense
                     rows="10"
                     type="textarea"
-                    :label="$t('id_mappings.system_identifiers') + ' *'"
+                    :label="t('id_mappings.system_identifiers') + ' *'"
                     class="q-mb-md"
                     lazy-rules
                     :rules="[validateRequiredField('identifiers')]"
@@ -48,7 +48,7 @@
                     dense
                     rows="10"
                     type="textarea"
-                    :label="$t('id_mappings.mapped_identifiers') + ' *'"
+                    :label="t('id_mappings.mapped_identifiers') + ' *'"
                     class="q-mb-md"
                     lazy-rules
                     :rules="[validateRequiredField('identifiers')]"
@@ -64,20 +64,15 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('add')" type="submit" color="primary" @click="onImport" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('add')" type="submit" color="primary" @click="onImport" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportMappedIdentifiers',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, VariableDto } from 'src/models/Magma';
+import type { TableDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {

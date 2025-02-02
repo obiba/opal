@@ -18,43 +18,43 @@
             v-if="datasourceStore.perms.tables?.canCreate()"
             color="primary"
             icon="add"
-            :title="$t('add')"
+            :title="t('add')"
             size="sm"
           >
             <q-list>
               <q-item v-if="projectsStore.isReady" clickable v-close-popup @click="onShowAddTable">
                 <q-item-section>
-                  <q-item-label>{{ $t('add_table') }}</q-item-label>
+                  <q-item-label>{{ t('add_table') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onShowAddTables">
                 <q-item-section>
-                  <q-item-label>{{ $t('add_tables') }}</q-item-label>
+                  <q-item-label>{{ t('add_tables') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onShowAddView">
                 <q-item-section>
-                  <q-item-label>{{ $t('add_a_view') }}</q-item-label>
+                  <q-item-label>{{ t('add_a_view') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onRestoreViews">
                 <q-item-section>
-                  <q-item-label>{{ $t('restore_views') }}</q-item-label>
+                  <q-item-label>{{ t('restore_views') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn color="secondary" icon="refresh" :title="$t('refresh')" outline size="sm" @click="init" />
-          <q-btn-dropdown outline color="primary" icon="download" size="sm" :title="$t('download')">
+          <q-btn color="secondary" icon="refresh" :title="t('refresh')" outline size="sm" @click="init" />
+          <q-btn-dropdown outline color="primary" icon="download" size="sm" :title="t('download')">
             <q-list>
               <q-item clickable v-close-popup @click="onDownloadDictionary">
                 <q-item-section>
-                  <q-item-label>{{ $t('download_dictionaries') }}</q-item-label>
+                  <q-item-label>{{ t('download_dictionaries') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item v-if="hasViews" clickable v-close-popup @click="onDownloadViews">
                 <q-item-section>
-                  <q-item-label>{{ $t('download_views_backup') }}</q-item-label>
+                  <q-item-label>{{ t('download_views_backup') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -64,22 +64,22 @@
             color="secondary"
             icon="input"
             size="sm"
-            :label="$t('import')"
+            :label="t('import')"
           >
             <q-list>
               <q-item clickable v-close-popup @click="onShowImportFile">
                 <q-item-section>
-                  <q-item-label>{{ $t('import_file') }}</q-item-label>
+                  <q-item-label>{{ t('import_file') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onShowImportServer">
                 <q-item-section>
-                  <q-item-label>{{ $t('import_server') }}</q-item-label>
+                  <q-item-label>{{ t('import_server') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onShowImportDatabase">
                 <q-item-section>
-                  <q-item-label>{{ $t('import_database') }}</q-item-label>
+                  <q-item-label>{{ t('import_database') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -89,17 +89,17 @@
             color="secondary"
             icon="output"
             size="sm"
-            :label="$t('export')"
+            :label="t('export')"
           >
             <q-list>
               <q-item clickable v-close-popup @click="onShowExportFile">
                 <q-item-section>
-                  <q-item-label>{{ $t('export_file') }}</q-item-label>
+                  <q-item-label>{{ t('export_file') }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="onShowExportDatabase">
                 <q-item-section>
-                  <q-item-label>{{ $t('export_database') }}</q-item-label>
+                  <q-item-label>{{ t('export_database') }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -108,7 +108,7 @@
             v-if="datasourceStore.tables.length && projectsStore.perms.copy?.canCreate()"
             color="secondary"
             icon="content_copy"
-            :title="$t('copy')"
+            :title="t('copy')"
             size="sm"
             @click="onShowCopy"
           ></q-btn>
@@ -117,7 +117,7 @@
             color="secondary"
             outline
             icon="search"
-            :title="$t('variables_search')"
+            :title="t('variables_search')"
             size="sm"
             @click="onSearch"
           ></q-btn>
@@ -127,7 +127,7 @@
             outline
             color="red"
             icon="delete"
-            :title="$t('delete')"
+            :title="t('delete')"
             size="sm"
             @click="onShowDeleteTables"
           ></q-btn>
@@ -169,20 +169,15 @@
 
     <confirm-dialog
       v-model="showDeleteTables"
-      :title="$t('delete')"
-      :text="$t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })"
+      :title="t('delete')"
+      :text="t('delete_tables_confirm', { count: removableTables.length || datasourceStore.tables.length })"
       @confirm="onDeleteTables"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatasourceTables',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import type { TableDto } from 'src/models/Magma';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddViewDialog from 'src/components/datasource/AddViewDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
@@ -193,6 +188,7 @@ import RestoreViewsDialog from 'src/components/datasource/RestoreViewsDialog.vue
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -228,7 +224,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -236,7 +232,7 @@ const columns = computed(() => [
     name: 'entityType',
     required: true,
     label: t('entity_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'entityType',
     sortable: true,
   },
@@ -244,7 +240,7 @@ const columns = computed(() => [
     name: 'variableCount',
     required: true,
     label: t('variables'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'variableCount',
     sortable: true,
   },
@@ -252,7 +248,7 @@ const columns = computed(() => [
     name: 'valueSetCount',
     required: true,
     label: t('entities'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'valueSetCount',
     sortable: true,
   },
@@ -260,7 +256,7 @@ const columns = computed(() => [
     name: 'lastUpdate',
     required: true,
     label: t('last_update'),
-    align: 'left',
+    align: DefaultAlignment,
     sortable: true,
     field: (row: TableDto) => (row.timestamps || {}).lastUpdate,
     format: (val: string) => getDateLabel(val),
@@ -269,7 +265,7 @@ const columns = computed(() => [
     name: 'status',
     required: true,
     label: t('status'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'status',
   },
 ]);

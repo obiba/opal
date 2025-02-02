@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t(editMode ? 'edit' : 'add') }}</div>
+        <div class="text-h6">{{ t(editMode ? 'edit' : 'add') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -16,22 +16,22 @@
             :href="provider.web"
             target="_blank"
             class="q-mt-md"
-            >{{ $t('Website') }} <q-icon name="open_in_new"
+            >{{ t('Website') }} <q-icon name="open_in_new"
           /></a>
         </div>
 
         <q-input
           v-model="name"
-          :label="$t('name')"
-          :hint="$t('resource_ref.name_hint')"
+          :label="t('name')"
+          :hint="t('resource_ref.name_hint')"
           :disable="editMode"
           dense
           class="q-mb-md"
         />
         <q-input
           v-model="description"
-          :label="$t('description')"
-          :hint="$t('resource_ref.description_hint')"
+          :label="t('description')"
+          :hint="t('resource_ref.description_hint')"
           dense
           type="textarea"
           class="q-mb-md"
@@ -40,7 +40,7 @@
         <q-select
           v-model="category"
           :options="categories"
-          :label="$t('resource_ref.category')"
+          :label="t('resource_ref.category')"
           dense
           @update:model-value="onCategoryUpdated"
           class="q-mb-sm"
@@ -58,13 +58,13 @@
         </q-select>
         <div class="text-hint q-mb-md">
           <q-markdown v-if="category?.description" :src="category.description" />
-          <span v-else>{{ $t('resource_ref.category_hint') }}</span>
+          <span v-else>{{ t('resource_ref.category_hint') }}</span>
         </div>
 
         <q-select
           v-model="factory"
           :options="factories"
-          :label="$t('resource_ref.factory')"
+          :label="t('resource_ref.factory')"
           :disable="!category"
           dense
           class="q-mb-sm"
@@ -82,17 +82,17 @@
         </q-select>
         <div class="text-hint q-mb-md">
           <q-markdown v-if="factory?.description" :src="factory.description" />
-          <span v-else>{{ $t('resource_ref.factory_hint') }}</span>
+          <span v-else>{{ t('resource_ref.factory_hint') }}</span>
         </div>
 
         <div v-if="factory">
           <div class="row q-col-gutter-md">
             <div class="col-6">
-              <div class="text-bold q-mb-sm">{{ $t('parameters') }}</div>
+              <div class="text-bold q-mb-sm">{{ t('parameters') }}</div>
               <schema-form ref="sfParameters" v-model="refParameters" :schema="parametersSchemaForm" />
             </div>
             <div class="col-6">
-              <div class="text-bold q-mb-sm">{{ $t('credentials') }}</div>
+              <div class="text-bold q-mb-sm">{{ t('credentials') }}</div>
               <schema-form ref="sfCredentials"  v-model="refCredentials" :schema="credentialsSchemaForm" />
             </div>
           </div>
@@ -102,26 +102,21 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('save')" color="primary" :disable="!factory" @click="onSave" />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('save')" color="primary" :disable="!factory" @click="onSave" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ResourceReferenceDialog',
-});
-</script>
 <script setup lang="ts">
-import { ResourceProviderDto } from 'src/models/Resources';
-import { ResourceReferenceDto } from 'src/models/Projects';
+import type { ResourceProviderDto } from 'src/models/Resources';
+import type { ResourceReferenceDto } from 'src/models/Projects';
 import SchemaForm from 'src/components/SchemaForm.vue';
 
 interface DialogProps {
   modelValue: boolean;
-  provider?: ResourceProviderDto;
+  provider?: ResourceProviderDto | undefined;
   resource?: ResourceReferenceDto;
 }
 
@@ -130,6 +125,7 @@ const emit = defineEmits(['update:modelValue', 'saved']);
 
 const resourcesStore = useResourcesStore();
 const projectStore = useProjectsStore();
+const { t } = useI18n();
 
 const editMode = ref<boolean>(false);
 const showDialog = ref(props.modelValue);
@@ -190,11 +186,13 @@ watch(
         try {
           refParameters.value = props.resource.parameters ? JSON.parse(props.resource.parameters) : {};
         } catch (e) {
+          console.error(e);
           refParameters.value = {};
         }
         try {
           refCredentials.value = props.resource.credentials ? JSON.parse(props.resource.credentials) : {};
         } catch (e) {
+          console.error(e);
           refCredentials.value = {};
         }
       } else {

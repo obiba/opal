@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ editMode ? $t('edit_view') : $t('add_view') }}</div>
+        <div class="text-h6">{{ editMode ? t('edit_view') : t('add_view') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -12,7 +12,7 @@
           v-show="!editMode"
           v-model="projectDestination"
           :options="projectNames"
-          :label="$t('project_destination')"
+          :label="t('project_destination')"
           dense
           class="q-mb-md"
         />
@@ -20,8 +20,8 @@
           v-model="name"
           dense
           type="text"
-          :label="$t('view_name')"
-          :hint="$t('resource_ref.view_destination_hint')"
+          :label="t('view_name')"
+          :hint="t('resource_ref.view_destination_hint')"
           class="q-mb-md"
         />
         <q-input
@@ -29,35 +29,35 @@
           v-model="resourceFullName"
           dense
           type="text"
-          :label="$t('resource')"
-          :hint="$t('resource_ref.from_hint')"
+          :label="t('resource')"
+          :hint="t('resource_ref.from_hint')"
           class="q-mb-md"
         />
         <q-input
           v-model="id"
           dense
           type="text"
-          :label="$t('resource_ref.id_column')"
-          :hint="$t('resource_ref.id_column_hint')"
+          :label="t('resource_ref.id_column')"
+          :hint="t('resource_ref.id_column_hint')"
           class="q-mb-md"
         />
         <q-input
           v-model="entityType"
           dense
           type="text"
-          :label="$t('entity_type')"
-          :hint="$t('resource_ref.entity_type_hint')"
+          :label="t('entity_type')"
+          :hint="t('resource_ref.entity_type_hint')"
           class="q-mb-md"
         />
-        <q-checkbox dense v-model="allColumns" :label="$t('resource_ref.all_columns')" />
-        <div class="text-hint q-mt-sm q-mb-md">{{ $t('resource_ref.all_columns_hint') }}</div>
+        <q-checkbox dense v-model="allColumns" :label="t('resource_ref.all_columns')" />
+        <div class="text-hint q-mt-sm q-mb-md">{{ t('resource_ref.all_columns_hint') }}</div>
 
         <q-input
           v-model="profile"
           dense
           type="text"
-          :label="$t('resource_ref.r_server_profile')"
-          :hint="$t('resource_ref.r_server_profile_hint')"
+          :label="t('resource_ref.r_server_profile')"
+          :hint="t('resource_ref.r_server_profile_hint')"
           class="q-mb-md"
         />
       </q-card-section>
@@ -66,10 +66,10 @@
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-spinner-dots v-if="processing" class="on-left" />
-        <q-btn flat :label="$t('cancel')" color="secondary" :disable="processing" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" :disable="processing" v-close-popup />
         <q-btn
           flat
-          :label="$t('save')"
+          :label="t('save')"
           color="primary"
           @click="onSaveView"
           :disable="!projectDestination || !name || processing"
@@ -79,14 +79,9 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ResourceViewDialog',
-});
-</script>
 <script setup lang="ts">
-import { ResourceReferenceDto } from 'src/models/Projects';
-import { ViewDto, ResourceViewDto } from 'src/models/Magma';
+import type { ResourceReferenceDto } from 'src/models/Projects';
+import type { ViewDto, ResourceViewDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -98,6 +93,7 @@ interface DialogProps {
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
+const { t } = useI18n();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
@@ -130,8 +126,9 @@ watch(
       }
       if (props.view) {
         name.value = props.view.name || '';
-        resourceFullName.value = props.view.from[0];
-        const resView = props.view['Magma.ResourceViewDto.view'] as ResourceViewDto;
+        resourceFullName.value = props.view.from[0] || '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resView = (props.view as any)['Magma.ResourceViewDto.view'] as ResourceViewDto;
         id.value = resView.idColumn || '';
         entityType.value = resView.entityType || 'Participant';
         allColumns.value = resView.allColumns || true;
@@ -169,10 +166,11 @@ function onSaveView() {
 
   if (editMode.value) {
     // update existing
-    const currentView = { ...props.view };
+    const currentView = { ...props.view } as ViewDto;
     currentView.name = name.value;
     currentView.from = [resourceFullName.value];
-    currentView['Magma.ResourceViewDto.view'] = resView;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (currentView as any)['Magma.ResourceViewDto.view'] = resView;
     datasourceStore
       .updateView(projectDestination.value, props.view?.name || name.value, currentView, 'Updated from resource view')
       .then(() => {
@@ -188,7 +186,8 @@ function onSaveView() {
       .getView(projectDestination.value, name.value)
       .then((view: ViewDto) => {
         view.from = [resourceFullName.value];
-        view['Magma.ResourceViewDto.view'] = resView;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (view as any)['Magma.ResourceViewDto.view'] = resView;
         datasourceStore
           .updateView(projectDestination.value, name.value, view, 'Updated from resource')
           .then(() => {

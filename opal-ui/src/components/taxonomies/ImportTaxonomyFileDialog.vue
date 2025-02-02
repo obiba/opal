@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('taxonomy.import_file.title') }}</div>
+        <div class="text-h6">{{ t('taxonomy.import.title') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,7 +11,7 @@
         <q-form class="q-gutter-md" persistent>
           <file-select
             v-model="destinationFolder"
-            :label="$t('destination_folder')"
+            :label="t('destination_folder')"
             :folder="filesStore.current"
             selection="single"
             @select="onUpdate"
@@ -19,17 +19,17 @@
             :extensions="['.yml']"
           />
 
-          <q-checkbox class="q-ml-sm" v-model="override" :label="$t('taxonomy.import_github.override')" />
+          <q-checkbox class="q-ml-sm" v-model="override" :label="t('taxonomy.import_gh.override')" />
         </q-form>
       </q-card-section>
 
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3"
-        ><q-btn flat :label="$t('cancel')" color="secondary" v-close-popup @click="onHide" />
+        ><q-btn flat :label="t('cancel')" color="secondary" v-close-popup @click="onHide" />
         <q-btn
           flat
-          :label="$t('import')"
+          :label="t('import')"
           type="submit"
           color="primary"
           :disable="!canImport"
@@ -40,21 +40,17 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ImportTaxonomyFileDialog',
-});
-</script>
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
 import FileSelect from 'src/components/files/FileSelect.vue';
-import { FileDto } from 'src/models/Opal';
+import type { FileDto } from 'src/models/Opal';
 import { FileDto_FileType } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
 }
 
+const { t } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
 const filesStore = useFilesStore();
 const authStore = useAuthStore();

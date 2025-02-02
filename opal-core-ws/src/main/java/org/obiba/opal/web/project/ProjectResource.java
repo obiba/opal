@@ -94,6 +94,12 @@ public class ProjectResource implements BaseResource {
     return Dtos.asSummaryDto(project, projectService);
   }
 
+  @OPTIONS
+  @Path("/summary")
+  public Response getSummaryOptions() {
+    return Response.ok().build();
+  }
+
   @PUT
   public Response update(Projects.ProjectDto projectDto, @PathParam("name") String name) {
     // will throw a no such project exception

@@ -4,7 +4,6 @@
 //   protoc               v3.12.4
 // source: OpalR.proto
 
-/* eslint-disable */
 import { type AppDto } from './Apps';
 import { type EntryDto } from './Opal';
 
@@ -80,8 +79,6 @@ export interface RWorkspaceDto {
   context: string;
   size: number;
 }
-
-export interface RRuntimeErrorDto {}
 
 export interface RSessionActivityDto {
   user: string;

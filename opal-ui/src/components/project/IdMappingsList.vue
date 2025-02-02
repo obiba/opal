@@ -15,7 +15,7 @@
       <q-btn
         :disable="!canAddMappings"
         color="primary"
-        :label="$t('add')"
+        :label="t('add')"
         icon="add"
         size="sm"
         @click.prevent="onAdd"
@@ -31,7 +31,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('delete')"
+            :title="t('delete')"
             :icon="toolsVisible[props.row.entityType + props.row.mapping] ? 'delete' : 'none'"
             class="q-ml-xs"
             @click="onDelete(props.row)"
@@ -49,17 +49,12 @@
   <add-project-id-mappings-dialog v-model="showAddDialog" :project="project" @update="$emit('update')" />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'IdMappingsList',
-});
-</script>
-
 <script setup lang="ts">
-import { t } from 'src/boot/i18n';
-import { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
+const { t } = useI18n();
+import type { ProjectDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { notifyError } from 'src/utils/notify';
 import AddProjectIdMappingsDialog from 'src/components/project/AddProjectIdMappingsDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   project: ProjectDto;
@@ -86,7 +81,7 @@ const columns = computed(() => [
     name: 'type',
     required: true,
     label: t('entity_type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'entityType',
     headerStyle: 'width: 30%; white-space: normal;',
     style: 'width: 30%; white-space: normal;',
@@ -94,12 +89,12 @@ const columns = computed(() => [
   {
     name: 'mapping',
     label: t('project_admin.id_mapping'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'mapping',
   },
 ]);
 const canAddMappings = computed(
-  () => (identifiersStore.identifiers || []).filter((id) => !!id.variableCount && id.variableCount > 0).length > 0
+  () => (identifiersStore.identifiers || []).filter((id) => id.variableCount && id.variableCount > 0).length > 0
 );
 
 // Handlers

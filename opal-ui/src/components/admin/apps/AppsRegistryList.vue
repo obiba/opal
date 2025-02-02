@@ -1,5 +1,5 @@
 <template>
-  <div class="text-h6">{{ $t('apps.registry_list') }}</div>
+  <div class="text-h6">{{ t('apps.registry_list') }}</div>
   <q-table
     flat
     :rows="apps"
@@ -10,7 +10,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn size="sm" outline color="secondary" icon="refresh" :title="$t('refresh')" @click="onRefresh"></q-btn>
+      <q-btn size="sm" outline color="secondary" icon="refresh" :title="t('refresh')" @click="onRefresh"></q-btn>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -24,7 +24,7 @@
             flat
             size="sm"
             color="secondary"
-            :title="$t('unregister')"
+            :title="t('unregister')"
             :icon="toolsVisible[props.row.name] ? 'close' : 'none'"
             class="q-ml-xs"
             @click="onUnregister(props.row)"
@@ -58,22 +58,17 @@
 
   <confirm-dialog
     v-model="showDelete"
-    :title="$t('unregister')"
-    :text="$t('apps.unregister_confirm', { app: selectedApp.name })"
+    :title="t('unregister')"
+    :text="t('apps.unregister_confirm', { app: selectedApp.name })"
     @confirm="doUnregister"
   />
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AppsRegistryList',
-});
-</script>
-
 <script setup lang="ts">
-import { AppDto } from 'src/models/Apps';
+import type { AppDto } from 'src/models/Apps';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 const appsStore = useAppsStore();
@@ -95,7 +90,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
     style: 'width: 30%',
@@ -103,25 +98,25 @@ const columns = computed(() => [
   {
     name: 'type',
     label: t('type'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'type',
   },
   {
     name: 'cluster',
     label: t('cluster'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'cluster',
   },
   {
     name: 'host',
     label: t('host'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'server',
   },
   {
     name: 'tags',
     label: t('tags'),
-    align: 'left  ',
+    align: DefaultAlignment,
     field: 'tags',
   },
 ]);

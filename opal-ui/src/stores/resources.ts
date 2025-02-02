@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { ResourceProvidersDto } from 'src/models/Resources';
-import { ResourceReferenceDto } from 'src/models/Projects';
+import type { ResourceProvidersDto } from 'src/models/Resources';
+import type { ResourceReferenceDto } from 'src/models/Projects';
 import { Perms } from 'src/utils/authz';
 
 interface ResourcePerms {
@@ -40,8 +40,8 @@ export const useResourcesStore = defineStore('resources', () => {
 
   async function loadResourceReferences(pName: string) {
     project.value = pName;
-    delete perms.value.resources;
-    delete perms.value.resourcesPermissions;
+    perms.value.resources = undefined;
+    perms.value.resourcesPermissions = undefined;
     return Promise.all([
       api.get(`/project/${project.value}/resources`).then((response) => {
         perms.value.resources = new Perms(response);
@@ -53,7 +53,6 @@ export const useResourcesStore = defineStore('resources', () => {
         return response;
       }),
     ]);
-    return;
   }
 
   function getResourceReference(name: string) {
@@ -96,8 +95,8 @@ export const useResourcesStore = defineStore('resources', () => {
   }
 
   async function loadResourcePerms(pName: string, name: string) {
-    delete perms.value.resource;
-    delete perms.value.resourcePermissions;
+    perms.value.resource = undefined;
+    perms.value.resourcePermissions = undefined;
     return Promise.all([
       api.options(`/project/${pName}/resource/${name}`).then((response) => {
         perms.value.resource = new Perms(response);

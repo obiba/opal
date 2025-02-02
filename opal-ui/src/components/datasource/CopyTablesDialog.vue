@@ -18,7 +18,7 @@
         <q-select
           v-model="projectDestination"
           :options="projectNames"
-          :label="$t('project_destination')"
+          :label="t('project_destination')"
           dense
           style="min-width: 300px"
           class="q-mb-md"
@@ -28,7 +28,7 @@
           v-model="newTableName"
           dense
           type="text"
-          :label="$t('new_name')"
+          :label="t('new_name')"
           style="min-width: 300px"
           class="q-mb-md"
         >
@@ -38,15 +38,15 @@
             switch-toggle-side
             dense
             header-class="text-primary text-caption"
-            :label="$t('advanced_options')"
+            :label="t('advanced_options')"
           >
             <div class="q-mt-md">
-              <q-checkbox v-model="incremental" :label="$t('copy_incremental')" />
-              <div class="text-help q-pl-sm q-pr-sm">{{ $t('copy_incremental_hint') }}</div>
+              <q-checkbox v-model="incremental" :label="t('copy_incremental')" />
+              <div class="text-help q-pl-sm q-pr-sm">{{ t('copy_incremental_hint') }}</div>
             </div>
             <div class="q-mt-md">
-              <q-checkbox v-model="nulls" :label="$t('copy_nulls')" />
-              <div class="text-help q-pl-sm q-pr-sm">{{ $t('copy_nulls_hint') }}</div>
+              <q-checkbox v-model="nulls" :label="t('copy_nulls')" />
+              <div class="text-help q-pl-sm q-pr-sm">{{ t('copy_nulls_hint') }}</div>
             </div>
           </q-expansion-item>
         </q-list>
@@ -55,21 +55,16 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="$t('copy')" color="primary" @click="onCopyTables" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('copy')" color="primary" @click="onCopyTables" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'CopyTablesDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
-import { CopyCommandOptionsDto } from 'src/models/Commands';
+import type { TableDto } from 'src/models/Magma';
+import type { CopyCommandOptionsDto } from 'src/models/Commands';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 interface DialogProps {
@@ -99,13 +94,13 @@ watch(
   (value) => {
     if (value) {
       projectDestination.value =
-        props.tables.length === 1 ? props.tables[0].datasourceName : projectsStore.projects[0].name;
+        (props.tables.length === 1 ? props.tables[0]?.datasourceName : projectsStore.projects[0]?.name) || '';
       newTableName.value = '';
       if (props.tables.length === 1) {
         const tableNames = datasourceStore.tables.map((t) => t.name);
         let idx = 1;
         while (newTableName.value === '') {
-          const name = `${props.tables[0].name}_${idx}`;
+          const name = `${props.tables[0]?.name}_${idx}`;
           if (!tableNames.includes(name)) {
             newTableName.value = name;
           }

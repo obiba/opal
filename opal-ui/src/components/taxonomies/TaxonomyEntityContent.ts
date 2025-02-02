@@ -1,4 +1,4 @@
-import { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
+import type { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
 import { locales } from 'boot/i18n';
 import { flattenObjectToString } from 'src/utils/strings';
 /**
@@ -29,10 +29,10 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
 
   // Functions
 
-  function customSort(rows: TYPE[], sortBy: string, descending: string) {
+  function customSort(rows: readonly TYPE[], sortBy: string, descending: boolean) {
     if (!canSort.value || !sortBy) return rows;
 
-    const data = rows;
+    const data = [...rows];
     dirty.value = true;
 
     data.sort((a: TYPE, b: TYPE): number => (descending ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)));
@@ -85,12 +85,12 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     canSort.value = true;
   }
 
-  function onFilter(tableRows: TYPE[], filter: string) {
-    if (filter.length === 0) {
-      return tableRows;
+  function onFilter() {
+    if (filter.value.length === 0) {
+      return rows.value;
     }
-    const query = !!filter && filter.length > 0 ? filter.toLowerCase() : '';
-    const result = tableRows.filter((row) => {
+    const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+    const result = rows.value.filter((row) => {
       const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
         row.description || {}
       )}`;

@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t(isDeleteOperation ? 'delete_annotation' : 'apply_annotation') }}</div>
+        <div class="text-h6">{{ t(isDeleteOperation ? 'delete_annotation' : 'apply_annotation') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -11,14 +11,14 @@
         <div class="q-mb-md box-info">
           <q-icon name="info" size="1.2rem" />
           <span class="on-right">
-            {{ $t('annotate_info', { count: props.variables.length }) }}
+            {{ t('annotate_info', { count: props.variables.length }) }}
           </span>
         </div>
 
         <q-select
           v-model="taxonomyName"
           :options="taxonomiesOptions"
-          :label="$t('taxonomy.title')"
+          :label="t('taxonomy.title')"
           dense
           emit-value
           map-options
@@ -30,7 +30,7 @@
         <q-select
           v-model="vocabularyName"
           :options="vocabulariesOptions"
-          :label="$t('vocabulary')"
+          :label="t('vocabulary')"
           dense
           emit-value
           map-options
@@ -44,7 +44,7 @@
             <q-select
               v-model="termName"
               :options="termsOptions"
-              :label="$t('term')"
+              :label="t('term')"
               dense
               emit-value
               map-options
@@ -71,7 +71,7 @@
                   <q-input
                     v-if="!previews[loc]"
                     v-model="texts[loc]"
-                    :label="$t('text')"
+                    :label="t('text')"
                     type="textarea"
                     auto-grow
                     dense
@@ -87,7 +87,7 @@
                       flat
                       no-caps
                       size="sm"
-                      :label="$t('preview')"
+                      :label="t('preview')"
                       color="secondary"
                       class="q-pl-none q-pr-none"
                       @click="previews[loc] = true"
@@ -97,7 +97,7 @@
                       flat
                       no-caps
                       size="sm"
-                      :label="$t('edit')"
+                      :label="t('edit')"
                       color="secondary"
                       class="q-pl-none q-pr-none"
                       @click="previews[loc] = false"
@@ -107,7 +107,7 @@
                       no-caps
                       size="sm"
                       icon="help_outline"
-                      :label="$t('markdown_guide')"
+                      :label="t('markdown_guide')"
                       color="secondary"
                       class="float-right q-pl-none q-pr-none"
                       @click="onMarkdownGuide"
@@ -117,7 +117,7 @@
               </template>
             </q-tab-panels>
             <div class="text-hint">
-              {{ $t('annotation_texts_hint') }}
+              {{ t('annotation_texts_hint') }}
             </div>
           </div>
         </div>
@@ -126,10 +126,10 @@
       <q-separator />
 
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t(isDeleteOperation ? 'delete' : 'apply')"
+          :label="t(isDeleteOperation ? 'delete' : 'apply')"
           color="primary"
           @click="onSubmit"
           v-close-popup
@@ -139,21 +139,16 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AnnotateDialog',
-});
-</script>
 <script setup lang="ts">
-import { TableDto, VariableDto } from 'src/models/Magma';
-import { Annotation } from 'src/components/models';
-import { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
+import type { TableDto, VariableDto } from 'src/models/Magma';
+import type { Annotation } from 'src/components/models';
+import type { TaxonomyDto, TermDto, VocabularyDto } from 'src/models/Opal';
 
 interface DialogProps {
   modelValue: boolean;
   table?: TableDto;
   variables: VariableDto[];
-  annotation?: Annotation;
+  annotation?: Annotation | undefined;
   operation?: string;
 }
 
@@ -165,7 +160,7 @@ const NO_LOCALE = 'default';
 const taxonomiesStore = useTaxonomiesStore();
 const datasourceStore = useDatasourceStore();
 const systemStore = useSystemStore();
-const { locale } = useI18n({ useScope: 'global' });
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const taxonomyName = ref<string>('');
 const vocabularyName = ref<string>('');
@@ -236,7 +231,7 @@ const termsOptions = computed(() => {
     return [];
   }
   return vocabulary.value.terms
-    ? vocabulary.value.terms.map((item: VocabularyDto) => {
+    ? vocabulary.value.terms.map((item: TermDto) => {
         return {
           label: item.title ? taxonomiesStore.getLabel(item.title, locale.value) : item.name,
           value: item.name,
@@ -278,7 +273,7 @@ watch(
             });
           }
         } else {
-          taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0].name : '';
+          taxonomyName.value = taxonomiesStore.taxonomies ? taxonomiesStore.taxonomies[0]?.name || '' : '';
           onTaxonomyChange();
         }
         tab.value = NO_LOCALE;
@@ -290,7 +285,7 @@ watch(
 
 function onTaxonomyChange() {
   if (taxonomy.value) {
-    vocabularyName.value = taxonomy.value.vocabularies ? taxonomy.value.vocabularies[0].name : '';
+    vocabularyName.value = taxonomy.value.vocabularies ? taxonomy.value.vocabularies[0]?.name || '' : '';
   } else {
     vocabularyName.value = '';
   }
@@ -299,7 +294,7 @@ function onTaxonomyChange() {
 
 function onVocabularyChange() {
   if (vocabulary.value) {
-    termName.value = vocabulary.value.terms ? vocabulary.value.terms[0].name : '';
+    termName.value = vocabulary.value.terms ? vocabulary.value.terms[0]?.name || '' : '';
   } else {
     termName.value = '';
   }

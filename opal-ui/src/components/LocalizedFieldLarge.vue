@@ -2,7 +2,7 @@
   <div>
     <slot name="header"></slot>
     <span
-      v-if="!$slots.header && !!title"
+      v-if="!$slots.header && title"
       class="text-body2"
       :class="{ 'text-primary': dirty, 'text-secondary': !dirty }"
       >{{ title }}</span
@@ -36,22 +36,16 @@
         size="sm"
         color="primary"
         icon="add"
-        :label="labels.length ? '' : $t('add')"
+        :label="labels.length ? '' : t('add')"
         @click="onAddLocale"
       />
     </q-card>
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'LocalizedField',
-});
-</script>
-
 <script setup lang="ts">
-import { LocaleTextDto } from 'src/models/Opal';
-import { t } from 'src/boot/i18n';
+import type { LocaleTextDto } from 'src/models/Opal';
+const { t } = useI18n();
 
 interface Props {
   modelValue: LocaleTextDto[] | undefined;
@@ -86,7 +80,7 @@ function onAddLocale() {
   const missingLocales = getMissingLocales();
 
   if (missingLocales.length > 0) {
-    labels.value = labels.value.concat({ locale: missingLocales[0], text: '' });
+    labels.value = labels.value.concat({ locale: missingLocales[0] || 'en', text: '' });
     tab.value = missingLocales[0];
   }
 }

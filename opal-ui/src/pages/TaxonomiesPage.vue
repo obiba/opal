@@ -3,15 +3,15 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('taxonomies')" />
+        <q-breadcrumbs-el :label="t('taxonomies')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('taxonomies') }}
+        {{ t('taxonomies') }}
       </div>
       <div class="text-help q-mb-md">
-        {{ $t('taxonomies_info') }}
+        {{ t('taxonomies_info') }}
       </div>
       <div class="row" v-if="summaries.length">
         <template v-for="summary in summaries" :key="summary.name">
@@ -28,17 +28,17 @@
         </template>
       </div>
       <div v-else class="text-hint">
-        {{ $t('no_taxonomies') }}
+        {{ t('no_taxonomies') }}
       </div>
     </q-page>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TaxonomiesDto_TaxonomySummaryDto } from 'src/models/Opal';
+import type { TaxonomiesDto_TaxonomySummaryDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const taxonomiesStore = useTaxonomiesStore();
 const summaries = computed(() => taxonomiesStore.summaries || []);
 

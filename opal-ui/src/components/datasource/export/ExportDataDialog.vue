@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" persistent @hide="onHide" @before-show="onShow">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ $t('export_data') }}</div>
+        <div class="text-h6">{{ t('export_data') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -14,23 +14,22 @@
             {{ exportTablesText }}
           </span>
         </div>
-
         <div v-if="isFile">
-          <q-select v-model="fileExporter" :options="fileExporters" :label="$t('data_format')" dense class="q-mb-md" />
+          <q-select v-model="fileExporter" :options="fileExporters" :label="t('data_format')" dense class="q-mb-md" />
           <div class="text-hint q-mb-md">
             {{ fileExporterHint }}
           </div>
 
           <div class="q-mb-md">
-            <export-csv-form v-if="fileExporter.value === 'csv'" v-model="out" :tables="props.tables" />
-            <export-fs-form v-else-if="fileExporter.value === 'opal'" v-model="out" :tables="props.tables" />
+            <export-csv-form v-if="exportType === FileExportType.CSV" v-model="out" :tables="props.tables" />
+            <export-fs-form v-else-if="exportType === FileExportType.OPAL" v-model="out" :tables="props.tables" />
             <export-haven-form
-              v-else-if="fileExporter.value.startsWith('haven_')"
+              v-else-if="exportType === FileExportType.HAVEN"
               v-model="out"
               :tables="props.tables"
               :type="fileExporter.value"
             />
-            <export-plugin-form v-else v-model="out" :tables="props.tables" :type="fileExporter.value" />
+            <export-plugin-form v-else v-model="outPlugin" :tables="props.tables" :type="fileExporter.value" />
           </div>
 
           <q-list class="q-mt-lg">
@@ -38,12 +37,12 @@
               switch-toggle-side
               dense
               header-class="text-primary text-caption"
-              :label="$t('advanced_options')"
+              :label="t('advanced_options')"
             >
               <q-input
                 v-model="entityIdNames"
-                :label="$t('id_column_name')"
-                :hint="$t('id_column_name_hint')"
+                :label="t('id_column_name')"
+                :hint="t('id_column_name_hint')"
                 dense
                 class="q-mb-md"
                 :debounce="500"
@@ -55,7 +54,7 @@
           <q-select
             v-model="databaseExporter"
             :options="databaseExporters"
-            :label="$t('database')"
+            :label="t('database')"
             dense
             emit-value
             map-options
@@ -65,12 +64,11 @@
       </q-card-section>
 
       <q-separator />
-
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('cancel')" color="secondary" v-close-popup />
+        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
         <q-btn
           flat
-          :label="$t('export')"
+          :label="t('export')"
           color="primary"
           @click="onExportData"
           :disable="isFile ? out === undefined : databaseExporter === undefined"
@@ -81,27 +79,30 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ExportDataDialog',
-});
-</script>
 <script setup lang="ts">
-import { ExportCommandOptionsDto } from 'src/models/Commands';
-import { TableDto } from 'src/models/Magma';
+import type { ExportCommandOptionsDto } from 'src/models/Commands';
+import type { TableDto } from 'src/models/Magma';
 import ExportCsvForm from 'src/components/datasource/export/ExportCsvForm.vue';
 import ExportFsForm from 'src/components/datasource/export/ExportFsForm.vue';
 import ExportHavenForm from 'src/components/datasource/export/ExportHavenForm.vue';
 import ExportPluginForm from 'src/components/datasource/export/ExportPluginForm.vue';
 import IdentifiersMappingSelect from 'src/components/datasource/IdentifiersMappingSelect.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
-import { DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
-import { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
+import { type DatabaseDto, DatabaseDto_Usage } from 'src/models/Database';
+import type { IdentifiersMappingConfigDto } from 'src/models/Identifiers';
 
 interface DialogProps {
   modelValue: boolean;
   tables: TableDto[];
   type: 'file' | 'server' | 'database';
+}
+
+enum FileExportType {
+  NA = 'na',
+  CSV = 'csv',
+  OPAL = 'opal',
+  HAVEN = 'haven',
+  PLUGIN = 'plugin',
 }
 
 const props = defineProps<DialogProps>();
@@ -132,6 +133,7 @@ const builtinFileExporters: ExporterOption[] = [
 
 const showDialog = ref(props.modelValue);
 const out = ref<string>(); // output parameters
+const outPlugin = ref<string>(); // output parameters for plugin
 const entityIdNames = ref('');
 const fileExporters = ref([...builtinFileExporters]);
 const fileExporter = ref();
@@ -154,6 +156,17 @@ const fileExporterHint = computed(() => {
 
 const isFile = computed(() => props.type === 'file');
 const isDatabase = computed(() => props.type === 'database');
+const exportType = computed(() => {
+  if (isFile) {
+    if (fileExporter.value) {
+      if (fileExporter.value.value === 'csv') return FileExportType.CSV;
+      if (fileExporter.value.value === 'opal') return FileExportType.OPAL;
+      if (fileExporter.value.value.startsWith('haven_')) return FileExportType.HAVEN;
+      return FileExportType.PLUGIN;
+    }
+  }
+  return FileExportType.NA;
+});
 
 watch(
   () => props.modelValue,
@@ -161,10 +174,14 @@ watch(
     showDialog.value = value;
     if (value) {
       if (projectsStore.project.exportFolder) {
+        if (isFile.value) {
+          out.value = projectsStore.project.exportFolder;
+          outPlugin.value = JSON.stringify({ file: out.value });
+        }
         filesStore.refreshFiles(projectsStore.project.exportFolder);
       }
     }
-  }
+  },
 );
 
 function onShow() {
@@ -183,7 +200,7 @@ function onShow() {
       .getDatabases(DatabaseDto_Usage.EXPORT)
       .then((response) => {
         databases.value = response?.filter((db) => db.usedForIdentifiers !== true) || [];
-        if (databaseExporters.value.length > 0) databaseExporter.value = databaseExporters.value[0].value;
+        if (databaseExporters.value.length > 0) databaseExporter.value = databaseExporters.value[0]?.value;
       })
       .catch((err) => {
         notifyError(err);
@@ -207,7 +224,7 @@ function onExportData() {
     return;
   }
 
-  if (idConfig.value && !!idConfig.value.name) {
+  if (idConfig.value && idConfig.value.name) {
     options.idConfig = idConfig.value;
   }
 
@@ -227,10 +244,11 @@ function exportFile() {
     notifyError(t('destination_folder_required'));
     return;
   }
+
   const options = {
     format: fileExporter.value.value,
     tables: props.tables.map((t) => `${t.datasourceName}.${t.name}`),
-    out: out.value,
+    out: isFile && exportType.value === FileExportType.PLUGIN ? outPlugin.value : out.value,
     entityIdNames: entityIdNames.value ? entityIdNames.value : undefined,
     copyNullValues: true,
     noVariables: false,

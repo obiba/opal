@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
-import { SubjectProfileDto } from 'src/models/Opal';
+import type { SubjectProfileDto } from 'src/models/Opal';
 
 export const useProfilesStore = defineStore('profiles', () => {
   const profiles = ref([] as SubjectProfileDto[]);

@@ -3,37 +3,37 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('administration')" to="/admin" />
-        <q-breadcrumbs-el :label="$t('id_mappings.title')" />
+        <q-breadcrumbs-el :label="t('administration')" to="/admin" />
+        <q-breadcrumbs-el :label="t('id_mappings.title')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="q-gutter-md">
         <div class="text-h5">
-          {{ $t('id_mappings.title') }}
+          {{ t('id_mappings.title') }}
         </div>
         <div class="text-help q-mb-md">
-          {{ $t('id_mappings.info') }}
+          {{ t('id_mappings.info') }}
         </div>
       </div>
 
       <q-banner v-if="!hasIdsDatabase" inline-actions rounded class="bg-warning">
-        {{ $t('id_mappings.no_database_warning') }}
+        {{ t('id_mappings.no_database_warning') }}
 
         <template v-slot:action>
-          <q-btn flat :label="$t('configure')" to="/admin/databases" />
+          <q-btn flat :label="t('configure')" to="/admin/databases" />
         </template>
       </q-banner>
       <div v-else class="row q-gutter-md">
         <div class="col">
           <div class="text-h6 q-mb-md row q-gutter-sm items-center">
-            <span>{{ $t('id_mappings.ids_list_title') }}</span>
+            <span>{{ t('id_mappings.ids_list_title') }}</span>
             <q-btn
               size="sm"
               icon="add"
               color="primary"
               outline
-              :title="$t('add')"
+              :title="t('add')"
               @click="onAddIdentifierTable"
             ></q-btn>
             <q-btn
@@ -42,7 +42,7 @@
               icon="delete"
               color="negative"
               outline
-              :title="$t('delete')"
+              :title="t('delete')"
               @click="onDeleteIdentifierTable"
             ></q-btn>
           </div>
@@ -63,24 +63,24 @@
         <div v-if="hasIdentifiersTables" class="col-9">
           <div class="text-h6">
             {{ selectedIdentifierTable?.entityType }}
-            <q-btn :label="$t('export')" color="secondary" icon="output" @click="onExportIdentifiers" size="sm" />
-            <q-btn-dropdown class="q-ml-sm" color="secondary" :label="$t('import')" icon="input" size="sm">
+            <q-btn :label="t('export')" color="secondary" icon="output" @click="onExportIdentifiers" size="sm" />
+            <q-btn-dropdown class="q-ml-sm" color="secondary" :label="t('import')" icon="input" size="sm">
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onImportSystemIdentifiersList">
                   <q-item-section>
-                    <q-item-label>{{ $t('id_mappings.import_identifiers_list') }}</q-item-label>
+                    <q-item-label>{{ t('id_mappings.import_identifiers_list') }}</q-item-label>
                   </q-item-section>
                 </q-item>
 
                 <q-item clickable v-close-popup @click.prevent="onImportTableSystemIdentifiersList">
                   <q-item-section>
-                    <q-item-label>{{ $t('id_mappings.import_identifiers_table') }}</q-item-label>
+                    <q-item-label>{{ t('id_mappings.import_identifiers_table') }}</q-item-label>
                   </q-item-section>
                 </q-item>
 
                 <q-item clickable v-close-popup @click.prevent="onImportMappedIdentifiers">
                   <q-item-section>
-                    <q-item-label>{{ $t('id_mappings.import_identifiers_mapping') }}</q-item-label>
+                    <q-item-label>{{ t('id_mappings.import_identifiers_mapping') }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -97,8 +97,8 @@
             indicator-color="primary"
             align="justify"
           >
-            <q-tab name="mappings" :label="$t('mappings')" />
-            <q-tab name="identifiers" :label="$t('identifiers')" />
+            <q-tab name="mappings" :label="t('mappings')" />
+            <q-tab name="identifiers" :label="t('identifiers')" />
           </q-tabs>
 
           <q-separator />
@@ -143,9 +143,9 @@
 </template>
 
 <script setup lang="ts">
-import { TableDto } from 'src/models/Magma';
+import type { TableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList from 'src/components/FieldsList.vue';
 import { getDateLabel } from 'src/utils/dates';
 import AddIdentifierTableDialog from 'src/components/admin/identifiers/AddIdentifierTableDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -173,7 +173,7 @@ const showImportMapped = ref(false);
 const identifiersTables = ref([] as TableDto[]);
 const hasIdentifiersTables = computed(() => identifiersTables.value.length > 0);
 const mappings = computed(() => identifiersStore.mappings || []);
-const properties: FieldItem<TableDto>[] = computed(() => {
+const properties = computed(() => {
   return [
     {
       field: 'timestamps',

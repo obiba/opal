@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-help">
-      {{ $t(`datashield.${env}_methods_info`) }}
+      {{ t(`datashield.${env}_methods_info`) }}
     </div>
     <q-table
       flat
@@ -20,7 +20,7 @@
           color="primary"
           text-color="white"
           icon="add"
-          :title="$t('add_method')"
+          :title="t('add_method')"
           size="sm"
           @click="onShowEdit(null)"
         />
@@ -28,7 +28,7 @@
           outline
           color="secondary"
           icon="refresh"
-          :title="$t('refresh')"
+          :title="t('refresh')"
           size="sm"
           class="on-right"
           @click="updateMethods"
@@ -71,7 +71,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onShowDeleteSingle(props.row)"
@@ -81,7 +81,7 @@
       </template>
       <template v-slot:body-cell-type="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span class="text-caption">{{ $t(getType(props.row)) }}</span>
+          <span class="text-caption">{{ t(getType(props.row)) }}</span>
         </q-td>
       </template>
       <template v-slot:body-cell-code="props">
@@ -102,23 +102,19 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('datashield.delete_methods_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('datashield.delete_methods_confirm', { count: selected.length })"
       @confirm="onDeleteMethods"
     />
     <edit-datashield-method-dialog v-model="showEdit" :env="env" :method="method" />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'DatashieldMethods',
-});
-</script>
 <script setup lang="ts">
-import { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
+import type { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldMethodDialog from 'src/components/admin/datashield/EditDatashieldMethodDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   env: string;
@@ -142,15 +138,15 @@ const showEdit = ref(false);
 const method = ref<DataShieldMethodDto | null>(null);
 
 const methods = computed(() => {
-  return datashieldStore.methods[props.env];
+  return datashieldStore.methods[props.env] || [];
 });
 
 function onFilter() {
   if (filter.value.length === 0) {
     return methods.value;
   }
-  const query = !!filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
-  return methods.value.filter((m) => {
+  const query = filter.value && filter.value.length > 0 ? filter.value.toLowerCase() : '';
+  return methods.value?.filter((m) => {
     const desc = `${m.name} ${getCode(m)} ${getPackageName(m)}`.toLowerCase();
     return desc.includes(query);
   });
@@ -161,7 +157,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     sortable: true,
   },
@@ -169,25 +165,29 @@ const columns = computed(() => [
     name: 'type',
     required: true,
     label: t('type'),
-    align: 'left',
+    field: 'type',
+    align: DefaultAlignment,
   },
   {
     name: 'code',
     required: true,
     label: t('code'),
-    align: 'left',
+    field: 'code',
+    align: DefaultAlignment,
   },
   {
     name: 'package',
     required: true,
     label: t('package'),
-    align: 'left',
+    field: 'package',
+    align: DefaultAlignment,
   },
   {
     name: 'version',
     required: true,
     label: t('version'),
-    align: 'left',
+    field: 'version',
+    align: DefaultAlignment,
   },
 ]);
 

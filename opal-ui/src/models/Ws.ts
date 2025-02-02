@@ -4,8 +4,6 @@
 //   protoc               v3.12.4
 // source: Ws.proto
 
-/* eslint-disable */
-
 export const protobufPackage = 'Ws';
 
 export interface ClientErrorDto {

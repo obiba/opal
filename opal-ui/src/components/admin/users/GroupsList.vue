@@ -19,7 +19,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onDeleteGroup(props.row)"
@@ -39,22 +39,18 @@
     <confirm-dialog
       v-if="selectedGroup"
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_group_confirm', { group: selectedGroup.name })"
+      :title="t('delete')"
+      :text="t('delete_group_confirm', { group: selectedGroup.name })"
       @confirm="doDeleteGroup"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'GroupsList',
-});
-</script>
 <script setup lang="ts">
-import { GroupDto } from 'src/models/Opal';
+import type { GroupDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError } from 'src/utils/notify';
+import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
 
@@ -70,7 +66,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -79,9 +75,9 @@ const columns = computed(() => [
   {
     name: 'users',
     label: t('users'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'subjectCredentials',
-    format: (val: string[]) => (val || []).filter((val) => !!val && val.length > 0),
+    format: (val: string[]) => (val || []).filter((val) => val && val.length > 0),
   },
 ]);
 

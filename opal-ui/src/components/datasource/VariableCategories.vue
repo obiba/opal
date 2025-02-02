@@ -12,16 +12,16 @@
       v-model:selected="selected"
     >
       <template v-slot:top>
-        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :title="$t('add')" size="sm">
+        <q-btn-dropdown v-if="canUpdate" color="primary" icon="add" :title="t('add')" size="sm">
           <q-list>
             <q-item clickable @click="onShowAddSingle">
               <q-item-section>
-                <q-item-label>{{ $t('add_category') }}</q-item-label>
+                <q-item-label>{{ t('add_category') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item clickable @click="onShowAddRange">
               <q-item-section>
-                <q-item-label>{{ $t('add_categories_range') }}</q-item-label>
+                <q-item-label>{{ t('add_categories_range') }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -31,7 +31,7 @@
           color="secondary"
           icon="arrow_upward"
           size="sm"
-          :title="$t('move_up')"
+          :title="t('move_up')"
           @click="onUp"
           :disable="selected.length === 0 || !moveEnabled"
           class="on-right"
@@ -41,7 +41,7 @@
           color="secondary"
           icon="arrow_downward"
           size="sm"
-          :title="$t('move_down')"
+          :title="t('move_down')"
           @click="onDown"
           :disable="selected.length === 0 || !moveEnabled"
           class="on-right"
@@ -67,7 +67,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('edit')"
+              :title="t('edit')"
               :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
               class="q-ml-xs"
               @click="onShowEdit(props.row)"
@@ -78,7 +78,7 @@
               flat
               size="sm"
               color="secondary"
-              :title="$t('delete')"
+              :title="t('delete')"
               :icon="toolsVisible[props.row.name] ? 'delete' : 'none'"
               class="q-ml-xs"
               @click="onShowDeleteSingle(props.row)"
@@ -93,7 +93,7 @@
       </template>
       <template v-slot:body-cell-label="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <div v-for="attr in getLabels(props.value)" :key="attr.locale">
+          <div v-for="(attr, idx) in getLabels(props.value)" :key="idx">
             <q-badge v-if="attr.locale" color="grey-6" :label="attr.locale" class="on-left" />
             <span>{{ attr.value }}</span>
           </div>
@@ -103,8 +103,8 @@
 
     <confirm-dialog
       v-model="showDelete"
-      :title="$t('delete')"
-      :text="$t('delete_categories_confirm', { count: selected.length })"
+      :title="t('delete')"
+      :text="t('delete_categories_confirm', { count: selected.length })"
       @confirm="onDelete"
     />
 
@@ -119,17 +119,14 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'VariableCategories',
-});
-</script>
 <script setup lang="ts">
 import { getLabels } from 'src/utils/attributes';
-import { CategoryDto } from 'src/models/Magma';
+import type { CategoryDto } from 'src/models/Magma';
 import CategoryDialog from 'src/components/datasource/CategoryDialog.vue';
 import CategoriesRangeDialog from 'src/components/datasource/CategoriesRangeDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import { DefaultAlignment } from 'src/components/models';
+
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
@@ -153,7 +150,7 @@ const columns = computed(() => [
     name: 'name',
     required: true,
     label: t('name'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'name',
     format: (val: string) => val,
     sortable: true,
@@ -162,14 +159,14 @@ const columns = computed(() => [
     name: 'label',
     required: true,
     label: t('label'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'attributes',
   },
   {
     name: 'missing',
     required: true,
     label: t('is_missing'),
-    align: 'left' as const,
+    align: DefaultAlignment,
     field: 'isMissing',
     sortable: true,
   },
@@ -230,12 +227,13 @@ function onUp() {
   const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort();
   for (let i = 0; i < indices.length; i++) {
     const idx = indices[i];
-    if (idx === 0) {
+    if (idx === 0 || idx === undefined) {
       continue;
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    categories.splice(idx - 1, 0, c);
+    if (c)
+      categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore
@@ -251,12 +249,13 @@ function onDown() {
   const indices = selected.value.map((c) => categories.findIndex((cc) => cc.name === c.name)).sort((a, b) => b - a);
   for (let i = 0; i < indices.length; i++) {
     const idx = indices[i];
-    if (idx === categories.length - 1) {
+    if (idx === categories.length - 1 || idx === undefined) {
       continue;
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    categories.splice(idx + 1, 0, c);
+    if (c)
+      categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore

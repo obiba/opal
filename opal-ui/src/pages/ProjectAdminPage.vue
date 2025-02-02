@@ -3,14 +3,14 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
-        <q-breadcrumbs-el :label="$t('administration')" />
+        <q-breadcrumbs-el :label="t('administration')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5">
-        <span>{{ $t('administration') }} </span>
+        <span>{{ t('administration') }} </span>
         <q-btn
           v-if="hasAdminPermission"
           outline
@@ -31,29 +31,29 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section v-if="hasDatabase" class="q-px-none">
-            <span class="text-help">{{ $t('project_admin.db_hint') }}</span>
+            <span class="text-help">{{ t('project_admin.db_hint') }}</span>
             <fields-list class="col-6" :items="dsProperties" :dbobject="project || {}" />
           </q-card-section>
           <q-card-section v-else class="q-px-none">
             <q-banner inline-actions rounded class="bg-orange text-white">
-              {{ $t('project_admin.no_database_warning') }}
+              {{ t('project_admin.no_database_warning') }}
 
               <template v-slot:action>
-                <q-btn no-caps flat :label="$t('project_admin.edit')" @click="onEdit" />
+                <q-btn no-caps flat :label="t('project_admin.edit')" @click="onEdit" />
               </template>
             </q-banner>
           </q-card-section>
         </q-card>
 
         <q-card flat>
-          <q-card-section v-if="hasVcfStores && !!project.vcfStoreService" class="q-px-none">
-            <span class="text-help">{{ $t('project_admin.vcf_store_hint') }}</span>
+          <q-card-section v-if="hasVcfStores && project.vcfStoreService" class="q-px-none">
+            <span class="text-help">{{ t('project_admin.vcf_store_hint') }}</span>
             <fields-list class="col-6" :items="vcfProperties" :dbobject="project || {}" />
           </q-card-section>
         </q-card>
-        <q-card-section v-if="hasVcfStores && !!!project.vcfStoreService" class="q-px-none">
+        <q-card-section v-if="hasVcfStores && !project.vcfStoreService" class="q-px-none">
           <div class="box-warning">
-            {{ $t('project_admin.no_vcf_store_warning') }}
+            {{ t('project_admin.no_vcf_store_warning') }}
           </div>
         </q-card-section>
       </template>
@@ -61,8 +61,8 @@
       <template v-if="hasKeystorePermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-h6">{{ $t('project_admin.encryption_keys') }}</div>
-            <div class="text-help q-mb-sm">{{ $t('project_admin.encryption_keys_info') }}</div>
+            <div class="text-h6">{{ t('project_admin.encryption_keys') }}</div>
+            <div class="text-help q-mb-sm">{{ t('project_admin.encryption_keys_info') }}</div>
             <KeyPairsList :project="project" @update="onProjectUpdate" />
           </q-card-section>
         </q-card>
@@ -71,8 +71,8 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <div class="text-h6">{{ $t('id_mappings.title') }}</div>
-            <div class="text-help q-mb-sm">{{ $t('project_admin.id_mappings_info') }}</div>
+            <div class="text-h6">{{ t('id_mappings.title') }}</div>
+            <div class="text-help q-mb-sm">{{ t('project_admin.id_mappings_info') }}</div>
             <id-mappings-list :project="project" @update="onProjectUpdate" />
           </q-card-section>
         </q-card>
@@ -82,7 +82,7 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none">
-            <span class="text-h6 q-mb-md">{{ $t('permissions') }}</span>
+            <span class="text-h6 q-mb-md">{{ t('permissions') }}</span>
             <access-control-list
               :resource="`/project/${name}/permissions/project`"
               :options="[AclAction.PROJECT_ALL]"
@@ -95,9 +95,9 @@
         <q-card flat>
           <q-card-section class="q-px-none">
             <span class="text-h6"
-              >{{ $t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
+              >{{ t('database') }} <q-icon name="circle" size="sm" :color="tableStatusColor(state)"
             /></span>
-            <div class="text-help">{{ $t('project_admin.db_reload_hint') }}</div>
+            <div class="text-help">{{ t('project_admin.db_reload_hint') }}</div>
           </q-card-section>
           <q-card-section class="q-px-none q-pt-none q-gutter-sm">
             <q-btn
@@ -105,10 +105,10 @@
               icon="cached"
               color="warning"
               text-color="black"
-              :label="$t('reload')"
+              :label="t('reload')"
               @click="onReloadDatabase"
             ></q-btn>
-            <q-btn size="sm" icon="cached" color="primary" :label="$t('state')" @click="getState"></q-btn>
+            <q-btn size="sm" icon="cached" color="primary" :label="t('state')" @click="getState"></q-btn>
           </q-card-section>
         </q-card>
       </template>
@@ -116,28 +116,28 @@
       <template v-if="hasAdminPermission">
         <q-card flat>
           <q-card-section class="q-px-none q-pb-none">
-            <span class="text-h6">{{ $t('project_admin.backup_restore') }}</span>
+            <span class="text-h6">{{ t('project_admin.backup_restore') }}</span>
           </q-card-section>
 
           <q-card-section class="q-pa-none">
-            <div class="text-help">{{ $t('project_admin.backup_hint') }}</div>
+            <div class="text-help">{{ t('project_admin.backup_hint') }}</div>
             <q-btn
               size="sm"
               class="q-mt-xs"
               icon="download"
               color="primary"
-              :label="$t('backup')"
+              :label="t('backup')"
               @click="onBackup"
             ></q-btn>
 
             <q-card-section class="q-px-none">
-              <div class="text-help">{{ $t('project_admin.restore_hint') }}</div>
+              <div class="text-help">{{ t('project_admin.restore_hint') }}</div>
               <q-btn
                 size="sm"
                 class="q-mt-xs"
                 icon="upload"
                 color="primary"
-                :label="$t('restore')"
+                :label="t('restore')"
                 @click="onRestore"
               ></q-btn>
             </q-card-section>
@@ -147,28 +147,28 @@
         <div class="q-my-md">
           <q-card flat class="q-mt-md o-border-negative rounded-borders">
             <q-card-section>
-              <span class="text-h6">{{ $t('project_admin.danger_zone') }} </span>
+              <span class="text-h6">{{ t('project_admin.danger_zone') }} </span>
             </q-card-section>
             <q-separator />
             <q-card-section>
-              <div class="text-help">{{ $t('project_admin.danger_zone_info') }}</div>
+              <div class="text-help">{{ t('project_admin.danger_zone_info') }}</div>
               <q-btn
                 size="sm"
                 class="q-mt-xs"
                 icon="archive"
                 color="negative"
-                :label="$t('project_admin.archive')"
+                :label="t('project_admin.archive')"
                 @click="onArchive"
               ></q-btn>
             </q-card-section>
             <q-card-section>
-              <div class="text-help">{{ $t('project_admin.remove_info') }}</div>
+              <div class="text-help">{{ t('project_admin.remove_info') }}</div>
               <q-btn
                 size="sm"
                 class="q-mt-xs"
                 icon="delete"
                 color="negative"
-                :label="$t('project_admin.remove')"
+                :label="t('project_admin.remove')"
                 @click="onDelete"
               ></q-btn>
             </q-card-section>
@@ -178,7 +178,7 @@
 
       <!-- Dialogs -->
 
-      <confirm-dialog v-model="showConfirm" :title="$t('delete')" :text="confirmText" @confirm="onConfirmed" />
+      <confirm-dialog v-model="showConfirm" :title="t('delete')" :text="confirmText" @confirm="onConfirmed" />
 
       <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
 
@@ -190,8 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { ProjectDto } from 'src/models/Projects';
-import FieldsList, { FieldItem } from 'src/components/FieldsList.vue';
+import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { AclAction } from 'src/models/Opal';
@@ -226,10 +225,10 @@ const hasAdminPermission = computed(
 );
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);
-const hasDatabase = computed(() => !!project.value.database);
+const hasDatabase = computed(() => project.value.database !== undefined);
 const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
-const properties: FieldItem<ProjectDto>[] = [
+const properties: FieldItem[] = [
   {
     field: 'name',
   },
@@ -252,7 +251,7 @@ const properties: FieldItem<ProjectDto>[] = [
   },
 ];
 
-const dsProperties: FieldItem<ProjectDto>[] = [
+const dsProperties: FieldItem[] = [
   {
     field: 'database',
     label: 'database',
@@ -261,13 +260,13 @@ const dsProperties: FieldItem<ProjectDto>[] = [
     field: 'datasource.type',
     label: 'type',
     html: (val) => {
-      if (val.datasource && !!val.datasource.type) return t(`${val.datasource.type}`);
+      if (val.datasource && val.datasource.type) return t(`${val.datasource.type}`);
       return t('none_value');
     },
   },
 ];
 
-const vcfProperties: FieldItem<ProjectDto>[] = [
+const vcfProperties: FieldItem[] = [
   {
     field: 'vcfStoreService',
     label: 'vcf_store.label',

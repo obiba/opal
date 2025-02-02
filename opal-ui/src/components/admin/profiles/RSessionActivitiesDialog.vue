@@ -2,20 +2,20 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-md">
       <q-card-section>
-        <div class="text-h6">{{ $t('r_sessions_activity') }}</div>
+        <div class="text-h6">{{ t('r_sessions_activity') }}</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
         <div class="q-mb-sm">
-          <span class="text-help">{{ $t('profile') }}:</span>
+          <span class="text-help">{{ t('profile') }}:</span>
           <span class="text-caption q-ml-xs">{{ props.profile }}</span>
-          <span class="text-help on-right">{{ $t('context') }}:</span>
+          <span class="text-help on-right">{{ t('context') }}:</span>
           <span class="text-caption q-ml-xs">{{ props.context }}</span>
         </div>
         <div class="q-mb-md">
-          <span class="text-hint">{{ $t('total_duration') }}:</span>
+          <span class="text-hint">{{ t('total_duration') }}:</span>
           <span class="text-caption q-ml-xs">{{ getMillisLabel(totalDuration) }}</span>
-          <span class="text-hint on-right">{{ $t('total_execution_time') }}:</span>
+          <span class="text-hint on-right">{{ t('total_execution_time') }}:</span>
           <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
         </div>
         <q-table
@@ -27,20 +27,16 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="$t('close')" color="primary" v-close-popup />
+        <q-btn flat :label="t('close')" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'RSessionActivitiesDialog',
-});
-</script>
 <script setup lang="ts">
-import { RSessionActivityDto } from 'src/models/OpalR';
+import type { RSessionActivityDto } from 'src/models/OpalR';
 import { getDate, getDateLabel, getMillisLabel } from 'src/utils/dates';
+import { DefaultAlignment } from 'src/components/models';
 
 interface DialogProps {
   modelValue: boolean;
@@ -67,7 +63,7 @@ const columns = computed(() => {
       name: 'createdDate',
       required: true,
       label: t('start_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'createdDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -76,7 +72,7 @@ const columns = computed(() => {
       name: 'updatedDate',
       required: true,
       label: t('end_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'updatedDate',
       format: (val: string) => getDateLabel(val),
       sortable: true,
@@ -85,7 +81,7 @@ const columns = computed(() => {
       name: 'duration',
       required: true,
       label: t('duration'),
-      align: 'left',
+      align: DefaultAlignment,
       field: (row: RSessionActivityDto) => getMillisLabel(Math.ceil(Math.max(getDuration(row), row.executionTimeMillis)/1000)*1000),
       sortable: true,
     },
@@ -93,7 +89,7 @@ const columns = computed(() => {
       name: 'executionTimeMillis',
       required: true,
       label: t('r_execution_time'),
-      align: 'left',
+      align: DefaultAlignment,
       field: 'executionTimeMillis',
       format: (val: number) => getMillisLabel(val),
       sortable: true,

@@ -3,17 +3,17 @@
     <q-toolbar class="bg-grey-3">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
-        <q-breadcrumbs-el :label="$t('projects')" to="/projects" />
+        <q-breadcrumbs-el :label="t('projects')" to="/projects" />
         <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
-        <q-breadcrumbs-el :label="$t('files')" />
+        <q-breadcrumbs-el :label="t('files')" />
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        {{ $t('files') }}
+        {{ t('files') }}
       </div>
       <div class="text-help">
-        {{ $t('project_files_info') }}
+        {{ t('project_files_info') }}
       </div>
 
       <div class="row q-gutter-md">
@@ -26,7 +26,7 @@
                 icon="person"
                 color="primary"
                 size="12px"
-                :label="$t('user')"
+                :label="t('user')"
                 align="left"
                 class="full-width"
                 @click="onFolderSelection(`/home/${username}`)"
@@ -39,7 +39,7 @@
                 icon="table_chart"
                 color="primary"
                 size="12px"
-                :label="$t('project')"
+                :label="t('project')"
                 align="left"
                 class="full-width"
                 @click="onFolderSelection(`/projects/${name}`)"
@@ -53,7 +53,7 @@
                 icon="group"
                 color="primary"
                 size="12px"
-                :label="$t('users')"
+                :label="t('users')"
                 align="left"
                 class="full-width"
                 @click="onFolderSelection('/home')"
@@ -66,7 +66,7 @@
                 icon="table_chart"
                 color="primary"
                 size="12px"
-                :label="$t('projects')"
+                :label="t('projects')"
                 align="left"
                 class="full-width"
                 @click="onFolderSelection('/projects')"
@@ -79,7 +79,7 @@
                 icon="dns"
                 color="primary"
                 size="12px"
-                :label="$t('file_system')"
+                :label="t('file_system')"
                 align="left"
                 class="full-width"
                 @click="onFolderSelection('/')"
@@ -98,6 +98,7 @@
 <script setup lang="ts">
 import FileView from 'src/components/files/FileView.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const projectsStore = useProjectsStore();
 const filesStore = useFilesStore();

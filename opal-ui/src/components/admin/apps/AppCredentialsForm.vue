@@ -4,8 +4,8 @@
       v-model="name"
       dense
       type="text"
-      :label="$t('name') + ' *'"
-      :hint="$t('apps.name_hint', { type: type })"
+      :label="t('name') + ' *'"
+      :hint="t('apps.name_hint', { type: type })"
       class="q-mb-md"
       lazy-rules
       :rules="[validateRequiredField('name')]"
@@ -15,8 +15,8 @@
     <q-input
       autocomplete="off"
       type="password"
-      :label="$t('password') + ' *'"
-      :hint="$t('apps.name_hint', { type: type })"
+      :label="t('password') + ' *'"
+      :hint="t('apps.name_hint', { type: type })"
       v-model="password"
       color="grey-10"
       lazy-rules
@@ -25,14 +25,8 @@
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AppCredentialsForm',
-});
-</script>
-
 <script setup lang="ts">
-import { AppCredentialsDto } from 'src/models/Apps';
+import type { AppCredentialsDto } from 'src/models/Apps';
 
 interface Props {
   modelValue: AppCredentialsDto | undefined;

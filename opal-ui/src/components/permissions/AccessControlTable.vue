@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="rows.length === 0">
-      <div class="text-hint q-mt-md">{{ $t('no_permissions') }}</div>
+      <div class="text-hint q-mt-md">{{ t('no_permissions') }}</div>
     </div>
     <q-table
       v-else
@@ -50,20 +50,15 @@
   
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'AccessControlTable',
-});
-</script>
-
 <script setup lang="ts">
-import { Acl, Subject_SubjectType } from 'src/models/Opal';
+import type { Acl, Subject_SubjectType } from 'src/models/Opal';
+import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   modelValue: Acl[];
   acls: Acl[];
   principal?: string;
-  type: Subject_SubjectType;
+  type?: Subject_SubjectType;
   loading: boolean;
   hideDelete?: boolean;
   onDeleteAcls: () => void;
@@ -97,7 +92,7 @@ const columns = computed(() => [
     name: 'resource',
     required: true,
     label: t('name'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'resource',
     sortable: true,
     style: 'width: 25%',
@@ -105,7 +100,7 @@ const columns = computed(() => [
   {
     name: 'permissions',
     label: t('permissions'),
-    align: 'left',
+    align: DefaultAlignment,
     field: 'action',
     format: (val: string) => t(`acls.${val}.label`),
     tooltip: (val: string) => t(`acls.${val}.description`),
@@ -114,9 +109,9 @@ const columns = computed(() => [
 
 const cases = [
   { regex: /\/files\/(.*)$/, type: 'folder_file' },
-  { regex: /\/datasource\/([^\/]+)\/table\/([^\/]+)\/variable\/(.*)$/, type: 'variable' },
-  { regex: /\/datasource\/([^\/]+)\/table\/(.*)$/, type: 'table' },
-  { regex: /\/datasource\/([^\/]+)\/view\/(.*)$/, type: 'view' },
+  { regex: /\/datasource\/([^/]+)\/table\/([^/]+)\/variable\/(.*)$/, type: 'variable' },
+  { regex: /\/datasource\/([^/]+)\/table\/(.*)$/, type: 'table' },
+  { regex: /\/datasource\/([^/]+)\/view\/(.*)$/, type: 'view' },
   { regex: /\/datasource\/(.*)$/, type: 'project' },
   { regex: /\/project\/(.*)\/resources$/, type: 'resources' },
   { regex: /\/project\/(.*)\/resource\/(.*)$/, type: 'resource' },
@@ -187,9 +182,13 @@ const rows = computed(() => {
             break;
           case 'project|system':
             result.url = item.url || '';
-            const isSystem = acl.actions.includes('SYSTEM_ALL');
-            result.title = isSystem ? t('system_settings') : t('project_settings');
-            result.caption = isSystem ? t('system') : t('project');
+            if (acl.actions.includes('SYSTEM_ALL')) {
+              result.title = t('system_settings');
+              result.caption = t('system');
+            } else {
+              result.title = t('project_settings');
+              result.caption = t('project');
+            }
             break;
         }
         return true;

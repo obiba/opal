@@ -12,24 +12,20 @@
 
     <confirm-dialog
       v-model="showDeletes"
-      :title="$t('delete')"
-      :text="$t('delete_profile_acl_confirm', { count: selectedAcls.length })"
+      :title="t('delete')"
+      :text="t('delete_profile_acl_confirm', { count: selectedAcls.length })"
       @confirm="doRemoveAcls"
     />
   </div>
 </template>
 
-<script lang="ts">
-export default defineComponent({
-  name: 'ProfileAclsList',
-});
-</script>
-
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import { Acl, Subject_SubjectType } from 'src/models/Opal';
+import { type Acl, Subject_SubjectType } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
+
+const { t } = useI18n();
 
 interface Props {
   principal: string;

@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import {
+import type {
   ProjectDto,
   ProjectSummaryDto,
-  ProjectDatasourceStatusDto,
   ProjectDto_IdentifiersMappingDto,
 } from 'src/models/Projects';
-import { Acl } from 'src/models/Opal';
-import { Subject, KeyForm } from 'src/models/Opal';
-import {
+import { ProjectDatasourceStatusDto } from 'src/models/Projects';
+import type { Acl } from 'src/models/Opal';
+import type { Subject, KeyForm } from 'src/models/Opal';
+import type {
   CommandStateDto,
-  CommandStateDto_Status,
   ImportCommandOptionsDto,
   ExportCommandOptionsDto,
   CopyCommandOptionsDto,
@@ -20,10 +19,12 @@ import {
   ExportVCFCommandOptionsDto,
   AnalyseCommandOptionsDto,
 } from 'src/models/Commands';
+import { CommandStateDto_Status } from 'src/models/Commands';
 import { Perms } from 'src/utils/authz';
-import { VCFSamplesMappingDto } from 'src/models/Plugins';
+import type { VCFSamplesMappingDto } from 'src/models/Plugins';
 
 interface ProjectPerms {
+  summary: Perms | undefined;
   export: Perms | undefined;
   copy: Perms | undefined;
   import: Perms | undefined;
@@ -35,6 +36,7 @@ interface ProjectPerms {
   vcfstore: Perms | undefined;
   samples: Perms | undefined;
   vcfs: Perms | undefined;
+  permissions_vcfstore: Perms | undefined;
   import_vcf: Perms | undefined;
   export_vcf: Perms | undefined;
 
@@ -99,6 +101,11 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.project = new Perms(response);
           return response;
         }),
+        api.options(`/project/${project.value.name}/summary`).then((response) => {
+          console.log('summary', response);
+          perms.value.summary = new Perms(response);
+          return response;
+        }),
         api.options(`/project/${project.value.name}/commands/_export`).then((response) => {
           perms.value.export = new Perms(response);
           return response;
@@ -146,11 +153,13 @@ export const useProjectsStore = defineStore('projects', () => {
     return Promise.all([
       api.options(`/project/${name}/vcf-store/samples`),
       api.options(`/project/${name}/vcf-store/vcfs`),
+      api.options(`/project/${name}/permissions/vcf-store`),
       api.options(`/project/${name}/commands/_import_vcf`),
       api.options(`/project/${name}/commands/_export_vcf`),
-    ]).then(([samples, vcfs, import_vcf, export_vcf]) => {
+    ]).then(([samples, vcfs, permissions_vcfstore, import_vcf, export_vcf]) => {
       perms.value.samples = new Perms(samples);
       perms.value.vcfs = new Perms(vcfs);
+      perms.value.permissions_vcfstore = new Perms(permissions_vcfstore);
       perms.value.import_vcf = new Perms(import_vcf);
       perms.value.export_vcf = new Perms(export_vcf);
     });
@@ -268,7 +277,7 @@ export const useProjectsStore = defineStore('projects', () => {
     const resource = acl.resource
       .replace(/^\//, '')
       .replace(/^project.*/, 'project')
-      .replace(/^datasource\/[^\/]+$/, 'datasource')
+      .replace(/^datasource\/[^/]+$/, 'datasource')
       .replace(/.*(table|view)/, 'table');
 
     const params = { principal: subject.principal, type: subject.type };
