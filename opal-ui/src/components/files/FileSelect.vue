@@ -9,7 +9,7 @@
     </div>
     <slot name="error"></slot>
     <div v-if="hint" class="text-hint q-mb-sm q-mt-xs">
-      {{ hint }}
+      <q-markdown :src="hint" no-heading-anchor-links />
     </div>
     <q-dialog v-model="showDialog">
       <q-card class="dialog-lg">
