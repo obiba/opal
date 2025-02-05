@@ -6,7 +6,7 @@
       </q-breadcrumbs>
     </q-toolbar>
     <q-page class="q-pa-md">
-      <div v-if="!authStore.profile.otpEnabled" class="box-warning">
+      <div v-if="authStore.otpMessage" class="box-warning">
         <span>{{ t('main.two_fa_info') }}</span>
         <q-btn
           flat

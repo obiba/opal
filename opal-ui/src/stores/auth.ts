@@ -9,6 +9,8 @@ export const useAuthStore = defineStore('auth', () => {
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
 
+  const otpMessage = computed(() => (profile.value && profile.value.realm?.startsWith('opal-') && !profile.value.otpEnabled));
+
   function reset() {
     sid.value = '';
     version.value = '';
@@ -100,6 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     bookmarks,
     isAdministrator,
+    otpMessage,
     signin,
     signout,
     userProfile,
