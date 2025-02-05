@@ -20,7 +20,6 @@ import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.eclipse.jetty.http.MimeTypes;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response.Status;
-import org.springframework.util.MimeType;
 
 import java.io.*;
 import java.net.FileNameMap;
@@ -211,6 +209,7 @@ public class FilesResource {
     for (String sourcePath : sourcesPath) {
       if (!sourcePath.equals(destinationPath)) {
         FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+        checkSourceIsNotParent(sourceFile, destinationFolder);
         FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
         sourceFile.moveTo(destinationFile);
       }
@@ -268,6 +267,16 @@ public class FilesResource {
     return null;
   }
 
+  private void checkSourceIsNotParent(FileObject source, FileObject destination) throws IOException {
+    if (destination.compareTo(source) == 0) throw new IllegalArgumentException("The destination file cannot be the source file");
+    if (!source.isFolder()) return;
+    FileObject parent = destination.getParent();
+    while (parent != null) {
+      if (parent.compareTo(source) == 0) throw new IllegalArgumentException("The destination file cannot be a child of the source file");
+      parent = parent.getParent();
+    }
+  }
+
   private Response copyFrom(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
@@ -282,6 +291,7 @@ public class FilesResource {
       if (!sourceFile.isReadable()) {
         return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
       }
+      checkSourceIsNotParent(sourceFile, destinationFolder);
     }
 
     // do action
