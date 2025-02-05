@@ -42,8 +42,12 @@ class SecuredFileObject extends DecoratedFileObject {
     List<FileObject> securedSelected = Lists.newArrayList();
     for (FileObject file : selected) {
       SecuredFileObject secured = new SecuredFileObject(authorizer, file);
-      if (secured.getParent() == null || secured.getParent().isReadable())
-        securedSelected.add(secured);
+      if (secured.getParent() == null || secured.getParent().isReadable()) {
+        String parentPath = secured.getParent() == null ? null : secured.getParent().getName().getPath();
+        if (!"/home".equals(parentPath) || secured.isReadable()) {
+          securedSelected.add(secured);
+        }
+      }
     }
     selected.clear();
     selected.addAll(securedSelected);
