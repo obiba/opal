@@ -14,6 +14,8 @@ package org.obiba.opal.web.project.resource;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
+import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Projects;
@@ -29,7 +31,6 @@ import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 @Path("/project/{name}/resources")
@@ -39,13 +40,17 @@ public class ProjectResourceReferencesResource implements BaseResource {
 
   private final ResourceReferenceService resourceReferenceService;
 
+  private final ProjectService projectService;
+
   @Autowired
-  public ProjectResourceReferencesResource(ResourceReferenceService resourceReferenceService) {
+  public ProjectResourceReferencesResource(ResourceReferenceService resourceReferenceService, ProjectService projectService) {
     this.resourceReferenceService = resourceReferenceService;
+    this.projectService = projectService;
   }
 
   @GET
   public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name, @QueryParam("safe") @DefaultValue("true") Boolean safe) {
+    checkProject(name);
     return resourceReferenceService.getResourceReferences(name).stream()
         .sorted(Comparator.comparing(ResourceReference::getName))
         .map(ref -> Dtos.asDto(ref, resourceReferenceService.createResource(ref), !safe && isEditable(name, ref.getName())))
@@ -56,6 +61,7 @@ public class ProjectResourceReferencesResource implements BaseResource {
   public Response createResourceReference(@Context UriInfo uriInfo, @PathParam("name") String name, Projects.ResourceReferenceDto referenceDto) {
     if (!name.equals(referenceDto.getProject()))
       throw new IllegalArgumentException("Expected project name: " + name);
+    checkProject(referenceDto.getProject());
 
     ResourceReference reference = Dtos.fromDto(referenceDto);
     resourceReferenceService.save(reference);
@@ -65,6 +71,7 @@ public class ProjectResourceReferencesResource implements BaseResource {
 
   @DELETE
   public Response deleteAll(@PathParam("name") String name, @QueryParam("names") List<String> names) {
+    checkProject(name);
     if (names != null && !names.isEmpty())
       names.forEach(n -> resourceReferenceService.delete(name, n));
     else
@@ -74,5 +81,18 @@ public class ProjectResourceReferencesResource implements BaseResource {
 
   private boolean isEditable(String project, String name) {
     return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":PUT");
+  }
+
+  private boolean isReadable(String project) {
+    return authorizer.isPermitted("rest:/project/" + project + ":GET");
+  }
+
+  /**
+   * Ensure project exists and is readable.
+   *
+   * @param name
+   */
+  private void checkProject(String name) {
+    if (!projectService.hasProject(name) || !isReadable(name)) throw new NoSuchProjectException(name);
   }
 }

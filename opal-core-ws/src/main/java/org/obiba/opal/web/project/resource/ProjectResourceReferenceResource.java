@@ -14,6 +14,8 @@ package org.obiba.opal.web.project.resource;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
+import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.RServerException;
@@ -37,14 +39,18 @@ public class ProjectResourceReferenceResource implements BaseResource {
 
   private final RServerManagerService rServerManagerService;
 
+  private final ProjectService projectService;
+
   @Autowired
-  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, RServerManagerService rServerManagerService) {
+  public ProjectResourceReferenceResource(ResourceReferenceService resourceReferenceService, RServerManagerService rServerManagerService, ProjectService projectService) {
     this.resourceReferenceService = resourceReferenceService;
     this.rServerManagerService = rServerManagerService;
+    this.projectService = projectService;
   }
 
   @GET
   public Projects.ResourceReferenceDto get(@PathParam("project") String project, @PathParam("name") String name) {
+    checkProject(project);
     ResourceReference reference = resourceReferenceService.getResourceReference(project, name);
     return Dtos.asDto(reference, resourceReferenceService.createResource(reference), isEditable(project, name));
   }
@@ -54,6 +60,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
     // check same project
     if (!project.equals(referenceDto.getProject()))
       throw new IllegalArgumentException("Expecting a resource of project: " + project);
+    checkProject(project);
     // check it is not a creation
     ResourceReference originalReference = resourceReferenceService.getResourceReference(project, name);
     ResourceReference updatedReference = Dtos.fromDto(referenceDto);
@@ -70,6 +77,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
   @PUT
   @Path("_test")
   public Response test(@PathParam("project") String project, @PathParam("name") String name) throws RServerException {
+    checkProject(project);
     ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
     // test in the R server where the resource provider is defined
     rServerManagerService.getRServerWithPackages(rop.getRequiredPackages()).execute(rop);
@@ -78,6 +86,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
 
   @DELETE
   public Response delete(@PathParam("project") String project, @PathParam("name") String name) {
+    checkProject(project);
     resourceReferenceService.delete(project, name);
     return Response.noContent().build();
   }
@@ -86,4 +95,16 @@ public class ProjectResourceReferenceResource implements BaseResource {
     return authorizer.isPermitted("rest:/project/" + project + "/resource/" + name + ":PUT");
   }
 
+  private boolean isReadable(String project) {
+    return authorizer.isPermitted("rest:/project/" + project + ":GET");
+  }
+
+  /**
+   * Ensure project exists and is readable.
+   *
+   * @param name
+   */
+  private void checkProject(String name) {
+    if (!projectService.hasProject(name) || !isReadable(name)) throw new NoSuchProjectException(name);
+  }
 }
