@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.15",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "date-fns": "^4.1.0",
     "diff2html": "^3.4.51",
     "papaparse": "^5.5.1",
