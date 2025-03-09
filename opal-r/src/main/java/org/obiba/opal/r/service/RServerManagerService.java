@@ -23,7 +23,6 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.rock.RockService;
-import org.obiba.opal.r.rserve.RserveService;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.r.service.event.RServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
@@ -55,9 +54,6 @@ public class RServerManagerService implements Service {
 
   private final RCacheHelper rCacheHelper;
 
-  // legacy
-  private final RserveService rserveService;
-
   private boolean rserveServiceInDefaultCluster;
 
   private final Map<String, RServerCluster> rClusters = Maps.newConcurrentMap();
@@ -65,10 +61,9 @@ public class RServerManagerService implements Service {
   private boolean running;
 
   @Autowired
-  public RServerManagerService(ApplicationContext applicationContext, EventBus eventBus, RserveService rserveService, RCacheHelper rCacheHelper) {
+  public RServerManagerService(ApplicationContext applicationContext, EventBus eventBus, RCacheHelper rCacheHelper) {
     this.applicationContext = applicationContext;
     this.eventBus = eventBus;
-    this.rserveService = rserveService;
     this.rCacheHelper = rCacheHelper;
   }
 
@@ -223,12 +218,6 @@ public class RServerManagerService implements Service {
 
   @Override
   public void start() {
-    if (!rserveServiceInDefaultCluster && rserveService.isServiceAvailable()) {
-      if (!rClusters.containsKey(getDefaultClusterName()))
-        rClusters.put(getDefaultClusterName(), new RServerCluster(getDefaultClusterName(), eventBus));
-      rClusters.get(getDefaultClusterName()).addRServerService(rserveService);
-      rserveServiceInDefaultCluster = true;
-    }
     rClusters.values().forEach(RServerCluster::start);
     running = true;
     eventBus.post(new RServiceStartedEvent(getName()));
