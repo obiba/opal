@@ -45,7 +45,7 @@
     <commons-lang.version>3.14.0</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <commons-vfs.version>2.9.0</commons-vfs.version>
+    <commons-vfs.version>2.10.0</commons-vfs.version>
     <dbunit.version>2.5.1</dbunit.version>
     <ds4j.version>2.1.0</ds4j.version>
     <easymock.version>3.4</easymock.version>
