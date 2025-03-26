@@ -48,6 +48,8 @@ public class RServerManagerService implements Service {
 
   private static final String ROCK_APP_TYPE = "rock";
 
+  private static final String ROCK_SPAWNER_APP_TYPE = "rock-spawner";
+
   private final ApplicationContext applicationContext;
 
   private final EventBus eventBus;
@@ -116,7 +118,7 @@ public class RServerManagerService implements Service {
             .map(OpalR.RPackageDto::getName)
             .filter(requiredPackages::contains)
             .distinct()
-            .collect(Collectors.toList());
+            .toList();
         if (packageNames.size() == requiredPackages.size())
           return rServerServiceOpt.get();
       }
@@ -181,6 +183,8 @@ public class RServerManagerService implements Service {
         eventBus.post(new AppRejectedEvent(event.getApp()));
       }
       notifyInitialized();
+    } else if (ROCK_SPAWNER_APP_TYPE.equals(event.getApp().getType())) {
+      // TODO
     }
   }
 
@@ -193,6 +197,8 @@ public class RServerManagerService implements Service {
         if (entry.getValue().isEmpty())
           rClusters.remove(entry.getKey());
       }
+    } else if (ROCK_SPAWNER_APP_TYPE.equals(event.getApp().getType())) {
+
     }
   }
 
