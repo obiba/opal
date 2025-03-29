@@ -15,7 +15,7 @@ import org.obiba.opal.spi.r.RMatrix;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class RockStringMatrix implements RMatrix<String> {
+public class RockStringMatrix implements RMatrix<String> {
 
   private List<String> rowNames;
 
