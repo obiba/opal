@@ -16,6 +16,7 @@ message AppDto {
 message AppsConfigDto {
   required string token = 1;
   repeated RockAppConfigDto rockConfigs = 2;
+  repeated RockSpawnerAppConfigDto rockSpawnerConfigs = 3;
 }
 
 message RockAppConfigDto {
@@ -28,4 +29,9 @@ message RockAppConfigDto {
 message AppCredentialsDto {
   required string name = 1;
   required string password = 2;
+}
+
+message RockSpawnerAppConfigDto {
+  required string host = 1;
+  optional string token = 2;
 }

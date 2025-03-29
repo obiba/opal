@@ -141,4 +141,5 @@ public interface RServerService {
    * @return
    */
   String[] getLog(Integer nbLines);
+
 }

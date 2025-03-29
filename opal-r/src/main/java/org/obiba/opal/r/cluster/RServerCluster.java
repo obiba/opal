@@ -50,10 +50,12 @@ public class RServerCluster implements RServerClusterService {
     return name;
   }
 
+  @Override
   public void addRServerService(RServerService service) {
     rServerServices.add(service);
   }
 
+  @Override
   public void removeRServerService(App app) {
     try {
       Optional<RServerService> service = rServerServices.stream()
@@ -64,10 +66,12 @@ public class RServerCluster implements RServerClusterService {
     }
   }
 
+  @Override
   public List<RServerService> getRServerServices() {
     return rServerServices;
   }
 
+  @Override
   public RServerService getRServerService(String sname) {
     Optional<RServerService> service = rServerServices.stream().filter(s -> s.getName().equals(sname)).findFirst();
     if (service.isPresent()) return service.get();
