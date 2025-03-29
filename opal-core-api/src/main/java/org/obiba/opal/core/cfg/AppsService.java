@@ -12,6 +12,7 @@ package org.obiba.opal.core.cfg;
 
 import org.obiba.opal.core.domain.AppsConfig;
 import org.obiba.opal.core.domain.RockAppConfig;
+import org.obiba.opal.core.domain.RockSpawnerAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.service.SystemService;
 
@@ -104,4 +105,10 @@ public interface AppsService extends SystemService {
    */
   RockAppConfig getRockAppConfig(App app);
 
+  /**
+   * Get the configuration corresponding to the Rock spawner app.
+   * @param app
+   * @return
+   */
+  RockSpawnerAppConfig getRockSpawnerAppConfig(App app);
 }

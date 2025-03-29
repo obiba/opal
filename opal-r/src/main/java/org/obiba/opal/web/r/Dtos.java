@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.r.cluster.RServerCluster;
+import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
@@ -37,7 +38,7 @@ public class Dtos {
   private Dtos() {
   }
 
-  public static OpalR.RProfileDto asProfileDto(RServerCluster cluster) {
+  public static OpalR.RProfileDto asProfileDto(RServerClusterService cluster) {
     return OpalR.RProfileDto.newBuilder()
         .setName(cluster.getName())
         .setEnabled(true)
@@ -46,7 +47,7 @@ public class Dtos {
   }
 
 
-  public static OpalR.RServerClusterDto asDto(RServerCluster cluster) {
+  public static OpalR.RServerClusterDto asDto(RServerClusterService cluster) {
     return OpalR.RServerClusterDto.newBuilder()
         .setName(cluster.getName())
         .addAllServers(cluster.getRServerServices().stream().map(Dtos::asDto).collect(Collectors.toList()))

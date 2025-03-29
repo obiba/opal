@@ -26,6 +26,7 @@ import org.obiba.opal.r.rock.RockService;
 import org.obiba.opal.r.service.event.RServiceInitializedEvent;
 import org.obiba.opal.r.service.event.RServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
+import org.obiba.opal.r.spawner.RockSpawnerService;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Management of the R servers available.
@@ -56,9 +56,7 @@ public class RServerManagerService implements Service {
 
   private final RCacheHelper rCacheHelper;
 
-  private boolean rserveServiceInDefaultCluster;
-
-  private final Map<String, RServerCluster> rClusters = Maps.newConcurrentMap();
+  private final Map<String, RServerClusterService> rClusters = Maps.newConcurrentMap();
 
   private boolean running;
 
@@ -111,7 +109,7 @@ public class RServerManagerService implements Service {
   }
 
   public RServerService getRServerWithPackages(List<String> requiredPackages) {
-    for (RServerCluster cluster : getRServerClusters()) {
+    for (RServerClusterService cluster : getRServerClusters()) {
       Optional<RServerService> rServerServiceOpt = cluster.getRServerServices().stream().findFirst();
       if (rServerServiceOpt.isPresent()) {
         List<String> packageNames = rServerServiceOpt.get().getInstalledPackagesDtos().stream()
@@ -131,7 +129,7 @@ public class RServerManagerService implements Service {
    *
    * @return
    */
-  public Collection<RServerCluster> getRServerClusters() {
+  public Collection<RServerClusterService> getRServerClusters() {
     return rClusters.values();
   }
 
@@ -141,7 +139,7 @@ public class RServerManagerService implements Service {
    * @param name
    * @return
    */
-  public RServerCluster getRServerCluster(String name) {
+  public RServerClusterService getRServerCluster(String name) {
     if (Strings.isNullOrEmpty(name) && rClusters.containsKey(getDefaultClusterName()))
       return rClusters.get(getDefaultClusterName());
     if (rClusters.containsKey(name))
@@ -184,21 +182,38 @@ public class RServerManagerService implements Service {
       }
       notifyInitialized();
     } else if (ROCK_SPAWNER_APP_TYPE.equals(event.getApp().getType())) {
-      // TODO
+      log.info("Register R server spawner: {}", event.getApp().toString());
+      RockSpawnerService rServerSpawnerService = applicationContext.getBean("rockSpawnerRService", RockSpawnerService.class);
+      rServerSpawnerService.setApp(event.getApp());
+      try {
+        // R server can only be in one cluster
+        String clusterName = rServerSpawnerService.getState().getCluster();
+        if (rClusters.containsKey(clusterName))
+          // ensure a service built on same app is not already registered in the cluster
+          rClusters.get(clusterName).removeRServerService(event.getApp());
+        else
+          rClusters.put(clusterName, new RServerCluster(clusterName, eventBus));
+        rClusters.get(clusterName).addRServerService(rServerSpawnerService);
+        rServerSpawnerService.setRServerClusterName(clusterName);
+        if (running)
+          rServerSpawnerService.start();
+        log.info("R server spawner '{}' added to cluster: {}", rServerSpawnerService.getName(), clusterName);
+      } catch (Exception e) {
+        log.error("Rock R server spawner registration failed: {}", event.getApp().getName(), e);
+        eventBus.post(new AppRejectedEvent(event.getApp()));
+      }
     }
   }
 
   @Subscribe
   public synchronized void onAppUnregistered(AppUnregisteredEvent event) {
-    if (ROCK_APP_TYPE.equals(event.getApp().getType())) {
+    if (ROCK_APP_TYPE.equals(event.getApp().getType()) || ROCK_SPAWNER_APP_TYPE.equals(event.getApp().getType())) {
       log.info("Unregister R server: {}", event.getApp().toString());
       rClusters.values().forEach(cluster -> cluster.removeRServerService(event.getApp()));
-      for (Map.Entry<String, RServerCluster> entry : rClusters.entrySet()) {
+      for (Map.Entry<String, RServerClusterService> entry : rClusters.entrySet()) {
         if (entry.getValue().isEmpty())
           rClusters.remove(entry.getKey());
       }
-    } else if (ROCK_SPAWNER_APP_TYPE.equals(event.getApp().getType())) {
-
     }
   }
 
@@ -224,7 +239,7 @@ public class RServerManagerService implements Service {
 
   @Override
   public void start() {
-    rClusters.values().forEach(RServerCluster::start);
+    rClusters.values().forEach(RServerClusterService::start);
     running = true;
     eventBus.post(new RServiceStartedEvent(getName()));
     notifyInitialized();
@@ -233,7 +248,7 @@ public class RServerManagerService implements Service {
   @Override
   public void stop() {
     try {
-      rClusters.values().forEach(RServerCluster::stop);
+      rClusters.values().forEach(RServerClusterService::stop);
     } catch (Exception e) {
       // ignore
       log.debug("Failure when stopping R servers", e);

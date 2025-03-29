@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.rock;
+package org.obiba.opal.r.spawner;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Scan specified hosts periodically to discover Rock R server instances or to check
+ * Scan specified hosts periodically to discover Rock spawner server instances or to check
  * whether they are still alive.
  */
 @Component
-public class RockServerDiscoveryService {
+public class RockSpawnerServerDiscoveryService {
 
-  private static final Logger log = LoggerFactory.getLogger(RockServerDiscoveryService.class);
+  private static final Logger log = LoggerFactory.getLogger(RockSpawnerServerDiscoveryService.class);
 
   @Autowired
   private AppsService appsService;
@@ -47,7 +47,7 @@ public class RockServerDiscoveryService {
 
   @Scheduled(fixedDelayString = "${apps.discovery.interval:10000}")
   public void scanHosts() {
-    List<String> hosts = appsService.getAppsConfig().getRockAppConfigs().stream()
+    List<String> hosts = appsService.getAppsConfig().getRockSpawnerAppConfigs().stream()
         .map(AppConfig::getHost).toList();
     for (String host : hosts)
       discoverOrCheckHost(host);
@@ -55,7 +55,7 @@ public class RockServerDiscoveryService {
 
   @Subscribe
   public synchronized void onAppUnregistered(AppUnregisteredEvent event) {
-    if ("rock".equals(event.getApp().getType())) {
+    if ("rock-spawner".equals(event.getApp().getType())) {
       hostsToCheck.remove(event.getApp().getServer());
     }
   }
@@ -75,18 +75,18 @@ public class RockServerDiscoveryService {
       ResponseEntity<String> response = restTemplate.getForEntity(url + "/_info", String.class);
       if (response.getStatusCode().is2xxSuccessful()) {
         JSONObject jsonApp = new JSONObject(response.getBody());
-        if (!"rock".equals(jsonApp.getString("type"))) {
-          log.debug("Not a Rock R server: {}", jsonApp.toString(2));
+        if (!"rock-spawner".equals(jsonApp.getString("type"))) {
+          log.debug("Not a Rock spawner server: {}", jsonApp.toString(2));
           return false;
         }
         if (!jsonApp.has("id")) {
-          log.debug("Not a valid Rock R server: {}", jsonApp.toString(2));
+          log.debug("Not a valid Rock spawner server: {}", jsonApp.toString(2));
           return false;
         }
         App app = new App();
         app.setName(jsonApp.getString("id"));
         app.setCluster(jsonApp.getString("cluster"));
-        app.setType("rock");
+        app.setType("rock-spawner");
         JSONArray tags = jsonApp.has("tags") ? jsonApp.getJSONArray("tags") : null;
         if (tags != null && tags.length() > 0) {
           List<String> tagList = Lists.newArrayList();
@@ -98,7 +98,7 @@ public class RockServerDiscoveryService {
           app.setServer(url);
         else
           app.setServer(jsonApp.getString("server"));
-        log.debug("Discovered Rock R server: {}", app);
+        log.debug("Discovered Rock spawner server: {}", app);
         appsService.registerApp(app);
         hostsToCheck.put(url, app);
         return true;
@@ -126,14 +126,14 @@ public class RockServerDiscoveryService {
         log.debug(">> OK!");
         return true;
       } else {
-        log.warn("Critical Rock R server: {}", app);
+        log.warn("Critical Rock spawner server: {}", app);
         return false;
       }
     } catch (HttpServerErrorException e) {
-      log.warn("Critical Rock R server: {}", app);
+      log.warn("Critical Rock spawner server: {}", app);
       return false;
     } catch (Exception e) {
-      log.debug("Failing Rock R server: {}", app);
+      log.debug("Failing Rock spawner server: {}", app);
       hostsToCheck.remove(url);
       appsService.unregisterApp(app);
       return false;

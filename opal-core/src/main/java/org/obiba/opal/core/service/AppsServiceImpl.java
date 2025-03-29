@@ -18,6 +18,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.domain.AppsConfig;
 import org.obiba.opal.core.domain.RockAppConfig;
+import org.obiba.opal.core.domain.RockSpawnerAppConfig;
 import org.obiba.opal.core.event.AppRegisteredEvent;
 import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
@@ -54,6 +55,9 @@ public class AppsServiceImpl implements AppsService {
 
   @Value("${apps.discovery.rock.hosts}")
   private String[] defaultRockHosts;
+
+  @Value("${apps.discovery.rock-spawner.hosts}")
+  private String[] defaultRockSpawnerHosts;
 
   private final Lock registryLock = new ReentrantLock();
 
@@ -199,6 +203,17 @@ public class AppsServiceImpl implements AppsService {
   }
 
   @Override
+  public RockSpawnerAppConfig getRockSpawnerAppConfig(App app) {
+    AppsConfig config = getAppsConfig();
+    for (RockSpawnerAppConfig rockSpawnerConfig : config.getRockSpawnerAppConfigs()) {
+      if (app.getServer().equals(rockSpawnerConfig.getHost())) {
+        return rockSpawnerConfig;
+      }
+    }
+    return new RockSpawnerAppConfig(app.getServer());
+  }
+
+  @Override
   public void start() {
     orientDbService.createUniqueIndex(AppsConfig.class);
     orientDbService.createUniqueIndex(App.class);
@@ -235,6 +250,9 @@ public class AppsServiceImpl implements AppsService {
     config.setToken(defaultToken);
     for (String host : defaultRockHosts) {
       config.addRockAppConfig(new RockAppConfig(host));
+    }
+    for (String host : defaultRockSpawnerHosts) {
+      config.addRockSpawnerAppConfig(new RockSpawnerAppConfig(host));
     }
     return config;
   }

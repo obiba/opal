@@ -26,6 +26,7 @@ import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;
+import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.spi.r.RServerResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,7 +186,7 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
       ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       try {
         // scan all R server clusters
-        for (RServerCluster rServerCluster : rServerManagerService.getRServerClusters()) {
+        for (RServerClusterService rServerCluster : rServerManagerService.getRServerClusters()) {
           try {
             rServerCluster.execute(rop);
             RServerResult result = rop.getResult();
@@ -232,7 +233,13 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void finalizeServiceStart() {
     if (!ensureResourcerDone) {
       try {
-        rServerManagerService.getRServerClusters().forEach(cluster -> cluster.ensureCRANPackage("resourcer"));
+        rServerManagerService.getRServerClusters().forEach(cluster -> {
+          try {
+            cluster.ensureCRANPackage("resourcer");
+          } catch (RServerException e) {
+            log.warn("Package installation failed for R server cluster: {}", cluster.getName(), e);
+          }
+        });
         ensureResourcerDone = true;
       } catch (Exception e) {
         log.error("Cannot ensure resourcer R package is installed", e);
