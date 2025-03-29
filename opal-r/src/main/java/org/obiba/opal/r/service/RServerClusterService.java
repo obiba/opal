@@ -11,6 +11,7 @@
 package org.obiba.opal.r.service;
 
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.r.rock.RockService;
 
 import java.util.List;
 
@@ -64,5 +65,13 @@ public interface RServerClusterService extends RServerService {
   default boolean isEmpty() {
     return getApps().isEmpty();
   }
+
+  List<RServerService> getRServerServices();
+
+  RServerService getRServerService(String sname);
+
+  void removeRServerService(App app);
+
+  void addRServerService(RServerService rServerService);
 
 }
