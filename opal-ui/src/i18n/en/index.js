@@ -516,6 +516,7 @@ export default {
   locale: 'Locale',
   validation: {
     name_required: 'Name is required',
+    name_invalid_chars: 'Name contains invalid characters',
     password_required: 'Password is required',
     entity_type_required: 'Entity Type is required',
     range: 'Value must be between {min} and {max} inclusively',

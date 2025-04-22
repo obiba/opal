@@ -145,7 +145,7 @@ const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
-const validateName = (val: string) => val.match(/^[\w _-]*$/) !== null || t('validation.invalid_chars');
+const validateName = (val: string) => val.match(/^[\w _-]*$/) !== null || t('validation.name_invalid_chars');
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addTag(val: string, done: any) {

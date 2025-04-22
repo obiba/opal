@@ -124,7 +124,7 @@ const hasValues = computed(() => datasourceStore.table.valueSetCount !== undefin
 const canEditTypeFields = computed(() => isView.value || !editMode.value || !hasValues.value);
 const isValid = computed(
   () =>
-    selected.value.name &&
+    selected.value.name.trim() &&
     (editMode.value ||
       datasourceStore.table.variableCount === 0 ||
       !datasourceStore.variables.some((v) => v.name === selected.value.name))
