@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseExtractor;
@@ -39,7 +40,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.UUID;
 
-class RockSession extends AbstractRServerSession implements RServerSession, RServerConnection {
+public class RockSession extends AbstractRServerSession implements RServerSession, RServerConnection {
 
   private static final Logger log = LoggerFactory.getLogger(RockSession.class);
 
@@ -50,10 +51,14 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   private String rockSessionId;
 
   protected RockSession(String serverName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, UUID.randomUUID().toString(), user, transactionalThreadFactory, eventBus);
+    this(serverName, UUID.randomUUID().toString(), app, credentials, user, transactionalThreadFactory, eventBus);
+    openSession();
+  }
+
+  protected RockSession(String serverName, String id, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, user, transactionalThreadFactory, eventBus);
     this.app = app;
     this.credentials = credentials;
-    openSession();
   }
 
   //
@@ -67,7 +72,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = createHeaders();
     headers.setContentType(MediaType.valueOf("application/x-rdata"));
-    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+    UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serverUrl)
         .queryParam("s", symbol);
 
     try {
@@ -85,7 +90,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = createHeaders();
     headers.setContentType(MediaType.valueOf("application/x-rscript"));
-    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+    UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serverUrl)
         .queryParam("s", symbol);
 
     try {
@@ -143,7 +148,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
       String serverUrl = getRSessionResourceUrl("/_upload");
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serverUrl)
           .queryParam("path", fileName)
           .queryParam("overwrite", true);
 
@@ -169,7 +174,7 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
       headers.setAccept(Collections.singletonList(MediaType.ALL));
 
       String serverUrl = getRSessionResourceUrl("/_download");
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl)
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serverUrl)
           .queryParam("path", fileName);
 
       RestTemplate restTemplate = new RestTemplate();
@@ -233,6 +238,10 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
   // Private methods
   //
 
+  protected String getRockSessionId() {
+    return rockSessionId;
+  }
+
   private long calculateDuration(long start) {
     long elapsed = System.currentTimeMillis() - start;
     String durationStr = MDC.get("r_duration");
@@ -245,10 +254,13 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     return elapsed;
   }
 
-  private void openSession() throws RServerException {
+  protected void openSession() throws RServerException {
     long start = System.currentTimeMillis();
     try {
-      RestTemplate restTemplate = new RestTemplate();
+      HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+      factory.setConnectTimeout(30000);
+      factory.setReadTimeout(30000);
+      RestTemplate restTemplate = new RestTemplate(factory);
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionsResourceUrl(), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       RockSessionInfo info = response.getBody();
       this.rockSessionId = info.getId();
@@ -286,11 +298,11 @@ class RockSession extends AbstractRServerSession implements RServerSession, RSer
     }
   }
 
-  private String getRSessionsResourceUrl() {
+  protected String getRSessionsResourceUrl() {
     return String.format("%s/r/sessions", app.getServer());
   }
 
-  private String getRSessionResourceUrl(String path) {
+  protected String getRSessionResourceUrl(String path) {
     return String.format("%s/r/session/%s%s", app.getServer(), rockSessionId, path);
   }
 
