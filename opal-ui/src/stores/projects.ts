@@ -102,7 +102,6 @@ export const useProjectsStore = defineStore('projects', () => {
           return response;
         }),
         api.options(`/project/${project.value.name}/summary`).then((response) => {
-          console.log('summary', response);
           perms.value.summary = new Perms(response);
           return response;
         }),

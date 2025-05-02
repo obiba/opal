@@ -1,13 +1,7 @@
 <template>
   <div>
-    <file-select
-      v-model="destinationFolder"
-      :label="t('destination_folder')"
-      :folder="filesStore.current"
-      selection="single"
-      @select="onUpdate"
-      type="folder"
-    />
+    <file-select v-model="destinationFolder" :label="t('destination_folder')" :folder="filesStore.current"
+      selection="single" @select="onUpdate" type="folder" />
   </div>
 </template>
 
@@ -15,6 +9,7 @@
 import type { TableDto } from 'src/models/Magma';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import FileSelect from 'src/components/files/FileSelect.vue';
+import { makeOutputPath } from 'src/components/datasource/export/exportUtils';
 
 interface ExportCsvFormProps {
   modelValue: string | undefined;
@@ -31,42 +26,23 @@ const authStore = useAuthStore();
 
 const destinationFolder = ref<FileDto>();
 
-const currentTime = computed(
-  () =>
-    new Date()
-      .toISOString()
-      .replace(/[:T-]/g, '')
-      .split('.')[0]
-);
-
 const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : ''));
 
 onMounted(onInit);
 
-watch(() => props.modelValue, onInit, { immediate: true });
-
 function onInit() {
   destinationFolder.value = {
-      name: 'export',
-      path: props.folder || `/home/${username.value}/export`,
-      type: FileDto_FileType.FOLDER,
-      readable: true,
-      writable: true,
-      children: [],
-    };
+    name: 'export',
+    path: props.folder || `/home/${username.value}/export`,
+    type: FileDto_FileType.FOLDER,
+    readable: true,
+    writable: true,
+    children: [],
+  };
   onUpdate();
 }
 
 function onUpdate() {
-  if (!destinationFolder.value) {
-    emit('update:modelValue', undefined);
-    return;
-  }
-  const prefix =
-    props.tables.length === 1
-      ? `${props.tables[0]?.datasourceName}-${props.tables[0]?.name}`
-      : props.tables[0]?.datasourceName;
-  const out = `${destinationFolder.value.path}/${prefix}-${currentTime.value}`;
-  emit('update:modelValue', out);
+  emit('update:modelValue', makeOutputPath(destinationFolder.value, props.tables[0]?.datasourceName, props.tables[0]?.name, undefined));
 }
 </script>
