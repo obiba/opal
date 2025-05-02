@@ -230,7 +230,7 @@ public class RockService implements RServerService {
       ResponseEntity<String> response =
           restTemplate.exchange(getRServerResourceUrl("/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       String jsonSource = response.getBody();
-      if (response.getStatusCode().is2xxSuccessful()) {
+      if (response.getStatusCode().is2xxSuccessful() && jsonSource != null && !jsonSource.isEmpty()) {
         RNamedList<RServerResult> results = new RockResult(new JSONObject(jsonSource)).asNamedList();
         for (String name : results.getNames()) {
           dsPackages.put(name, getDataShieldPackagePropertiesDtos(results.get(name).asNamedList()));
@@ -305,7 +305,7 @@ public class RockService implements RServerService {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Lists.newArrayList(MediaType.TEXT_PLAIN));
       RestTemplate restTemplate = new RestTemplate();
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getRServerResourceUrl("/rserver/_log"))
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl("/rserver/_log"))
           .queryParam("limit", nbLines);
       ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       return response.getBody().split("\n");
@@ -364,7 +364,7 @@ public class RockService implements RServerService {
       HttpHeaders headers = createHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getRServerResourceUrl("/rserver/packages"));
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl("/rserver/packages"));
       params.forEach(builder::queryParam);
 
       RestTemplate restTemplate = new RestTemplate();
