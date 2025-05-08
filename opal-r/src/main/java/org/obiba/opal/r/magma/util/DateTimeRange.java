@@ -1,49 +1,55 @@
 package org.obiba.opal.r.magma.util;
 
+import com.google.common.collect.Lists;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class DateTimeRange implements Range {
   private static final SimpleDateFormat NO_TIMEZONE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-  private final List<String> missingCats;
-
-  private final List<Value> naValues;
+  private List<String> naValues;
+  private List<Value> naRange;
 
   public DateTimeRange(List<String> missingCats) {
-    this.missingCats = missingCats;
-    this.naValues = missingCats.stream().map(this::makeDate).filter(Objects::nonNull).filter(val -> !val.isNull()).sorted().toList();
+    this.naValues = Lists.newArrayList();
+    this.naRange = Lists.newArrayList();
+    missingCats.forEach((name) -> {
+      Value val = makeDate(name);
+      if (val != null && !val.isNull()) {
+        naValues.add(name);
+        naRange.add(val);
+      }
+    });
+    naValues = naValues.stream().sorted().toList();
+    naRange = naRange.stream().sorted().toList();
   }
 
   @Override
   public boolean hasRange() {
-    return !naValues.isEmpty();
+    return !naRange.isEmpty();
   }
 
   @Override
   public String getRangeMin() {
-    return NO_TIMEZONE.format(naValues.getFirst().getValue());
+    return String.format("'%s'", NO_TIMEZONE.format(naRange.getFirst().getValue()));
   }
 
   @Override
   public String getRangeMax() {
-    return NO_TIMEZONE.format(naValues.getLast().getValue());
+    return String.format("'%s'", NO_TIMEZONE.format(naRange.getLast().getValue()));
   }
 
   @Override
   public List<String> getMissingCats() {
-    return missingCats;
+    return naValues;
   }
-
 
   @Override
   public String toString() {
-    return "na_values=" + naValues.stream().map(val -> NO_TIMEZONE.format(val.getValue())).toList();
+    return "na_values=" + naValues;
   }
 
   private Value makeDate(String valStr) {

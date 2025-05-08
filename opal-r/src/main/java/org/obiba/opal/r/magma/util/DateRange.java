@@ -1,39 +1,48 @@
 package org.obiba.opal.r.magma.util;
 
+import com.google.common.collect.Lists;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateType;
 
 import java.util.List;
-import java.util.Objects;
 
 public class DateRange implements Range {
-  private final List<String> missingCats;
 
-  private final List<Value> naValues;
+  private List<String> naValues;
+  private List<Value> naRange;
 
   public DateRange(List<String> missingCats) {
-    this.missingCats = missingCats;
-    this.naValues = missingCats.stream().map(this::makeDate).filter(Objects::nonNull).filter(val -> !val.isNull()).sorted().toList();
+    this.naValues = Lists.newArrayList();
+    this.naRange = Lists.newArrayList();
+    missingCats.forEach((name) -> {
+      Value val = makeDate(name);
+      if (val != null && !val.isNull()) {
+        naValues.add(name);
+        naRange.add(val);
+      }
+    });
+    naValues = naValues.stream().sorted().toList();
+    naRange = naRange.stream().sorted().toList();
   }
 
   @Override
   public boolean hasRange() {
-    return !naValues.isEmpty();
+    return !naRange.isEmpty();
   }
 
   @Override
   public String getRangeMin() {
-    return naValues.getFirst().toString();
+    return String.format("'%s'", naRange.getFirst().toString());
   }
 
   @Override
   public String getRangeMax() {
-    return naValues.getLast().toString();
+    return String.format("'%s'", naRange.getLast().toString());
   }
 
   @Override
   public List<String> getMissingCats() {
-    return missingCats;
+    return naValues;
   }
 
   @Override

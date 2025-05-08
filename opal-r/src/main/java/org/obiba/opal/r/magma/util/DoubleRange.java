@@ -19,11 +19,11 @@ public class DoubleRange extends NumberRange {
   }
 
   public double getMin() {
-    return naRange.get(0).doubleValue();
+    return naRange.getFirst().doubleValue();
   }
 
   public double getMax() {
-    return naRange.get(naRange.size() - 1).doubleValue();
+    return naRange.getLast().doubleValue();
   }
 
   @Override

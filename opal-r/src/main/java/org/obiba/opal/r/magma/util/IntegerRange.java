@@ -19,11 +19,11 @@ public class IntegerRange extends NumberRange {
   }
 
   public int getMin() {
-    return naRange.get(0).intValue();
+    return naRange.getFirst().intValue();
   }
 
   public int getMax() {
-    return naRange.get(naRange.size() - 1).intValue();
+    return naRange.getLast().intValue();
   }
 
   @Override

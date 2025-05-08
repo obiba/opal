@@ -310,9 +310,9 @@ public class RAssignDatasource extends CsvDatasource {
         type = "double";
       else if (variable.getValueType().equals(BooleanType.get()))
         type = "logical";
-      else if (variable.getValueType().equals(DateType.get()) && !variable.hasCategories())
+      else if (variable.getValueType().equals(DateType.get()))
         type = "date";
-      else if (variable.getValueType().equals(DateTimeType.get()) && !variable.hasCategories())
+      else if (variable.getValueType().equals(DateTimeType.get()))
         type = "datetime";
       else
         type = "character";
@@ -346,7 +346,7 @@ public class RAssignDatasource extends CsvDatasource {
           }
         }
         if (!missingCats.isEmpty()) {
-          Range naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).toList());
+          Range naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).collect(Collectors.toList()));
           if (naRange != null && naRange.hasRange()) {
             attributesList.add(String.format("na_range = c(%s)",
                 Joiner.on(", ").join(naRange.getRangeMin(), naRange.getRangeMax())));
@@ -360,11 +360,15 @@ public class RAssignDatasource extends CsvDatasource {
             attributesList.add(String.format("na_values = c(%s)",
                 Joiner.on(", ").join(getLabelledCategories(variable, missingCats))));
           }
-          // obiba/opal#3829 enforce haven to read spss missings properly
-          attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
-            getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
+          if (!variable.getValueType().isDateTime()) {
+            // obiba/opal#3829 enforce haven to read spss missings properly
+            attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
+                getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
+          }
         }
-        labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
+        if (!variable.getValueType().isDateTime()) {
+          labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
+        }
       }
       // apply labelled first (as it overrides attributes)
       if (!Strings.isNullOrEmpty(labels)) {
