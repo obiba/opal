@@ -20,9 +20,7 @@ import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.*;
-import org.obiba.opal.r.magma.util.DoubleRange;
-import org.obiba.opal.r.magma.util.IntegerRange;
-import org.obiba.opal.r.magma.util.NumberRange;
+import org.obiba.opal.r.magma.util.*;
 import org.obiba.opal.spi.r.AbstractROperation;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerConnection;
@@ -312,9 +310,9 @@ public class RAssignDatasource extends CsvDatasource {
         type = "double";
       else if (variable.getValueType().equals(BooleanType.get()))
         type = "logical";
-      else if (variable.getValueType().equals(DateType.get()) && !variable.hasCategories())
+      else if (variable.getValueType().equals(DateType.get()))
         type = "date";
-      else if (variable.getValueType().equals(DateTimeType.get()) && !variable.hasCategories())
+      else if (variable.getValueType().equals(DateTimeType.get()))
         type = "datetime";
       else
         type = "character";
@@ -348,11 +346,11 @@ public class RAssignDatasource extends CsvDatasource {
           }
         }
         if (!missingCats.isEmpty()) {
-          NumberRange naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).collect(Collectors.toList()));
+          Range naRange = getCategoriesMissingNumberRange(variable, missingCats.stream().map(Category::getName).collect(Collectors.toList()));
           if (naRange != null && naRange.hasRange()) {
             attributesList.add(String.format("na_range = c(%s)",
-                Joiner.on(", ").join(naRange.getRangeMin().toString(), naRange.getRangeMax().toString())));
-            missingCats = missingCats.stream().filter(cat -> naRange.getMissingCats().contains(cat.getName())).collect(Collectors.toList());
+                Joiner.on(", ").join(naRange.getRangeMin(), naRange.getRangeMax())));
+            missingCats = missingCats.stream().filter(cat -> naRange.getMissingCats().contains(cat.getName())).toList();
           }
           // add discrete missing values after na_range as the missingCats may have been modified
           if (!missingCats.isEmpty()) {
@@ -362,11 +360,15 @@ public class RAssignDatasource extends CsvDatasource {
             attributesList.add(String.format("na_values = c(%s)",
                 Joiner.on(", ").join(getLabelledCategories(variable, missingCats))));
           }
-          // obiba/opal#3829 enforce haven to read spss missings properly
-          attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
-            getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
+          if (!variable.getValueType().isDateTime()) {
+            // obiba/opal#3829 enforce haven to read spss missings properly
+            attributesWriter.println(String.format("class(`%s`[['%s']]) <- c('haven_labelled_spss', class(`%s`[['%s']]))",
+                getSymbol(tableName), variable.getName(), getSymbol(tableName), variable.getName()));
+          }
         }
-        labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
+        if (!variable.getValueType().isDateTime()) {
+          labels = String.format("c(%s)", Joiner.on(", ").join(getLabelledCategories(variable, variable.getCategories())));
+        }
       }
       // apply labelled first (as it overrides attributes)
       if (!Strings.isNullOrEmpty(labels)) {
@@ -478,16 +480,19 @@ public class RAssignDatasource extends CsvDatasource {
     }
 
 
-    private NumberRange getCategoriesMissingNumberRange(Variable variable, List<String> missingCats) {
-      if (!variable.getValueType().isNumeric()) return null;
+    private Range getCategoriesMissingNumberRange(Variable variable, List<String> missingCats) {
+      if (!variable.getValueType().isNumeric() && !variable.getValueType().isDateTime()) return null;
       if (missingCats.size() <= 3) return null; // spss allows a max of 3 discrete missings
 
+      List<String> cats = variable.getCategories().stream().map(Category::getName).toList();
       if (IntegerType.get().equals(variable.getValueType()))
-        return new IntegerRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
-
-      return new DoubleRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
+        return new IntegerRange(cats, missingCats);
+      else if (DecimalType.get().equals(variable.getValueType()))
+        return new DoubleRange(cats, missingCats);
+      else if (DateType.get().equals(variable.getValueType()))
+        return new DateRange(missingCats);
+      return new DateTimeRange(missingCats);
     }
-
   }
 
 }

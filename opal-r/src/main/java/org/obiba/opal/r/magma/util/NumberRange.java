@@ -16,21 +16,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class NumberRange {
-  private final List<String> cats;
+public abstract class NumberRange implements Range {
   private final List<String> missingCats;
 
   protected List<Number> naValues;
   protected List<Number> naRange;
 
   public NumberRange(List<String> cats, List<String> missingCats) {
-    this.cats = cats;
     this.missingCats = missingCats;
     this.naValues = missingCats.stream().map(this::makeNumber).filter(Objects::nonNull).sorted().collect(Collectors.toList());
     this.naRange = Lists.newArrayList();
 
-    // find longuest range
-    List<Number> nums = cats.stream().map(this::makeNumber).filter(Objects::nonNull).sorted().collect(Collectors.toList());
+    // find longest range
+    List<Number> nums = cats.stream().map(this::makeNumber).filter(Objects::nonNull).sorted().toList();
     List<Number> tmpRange = Lists.newArrayList();
 
     for (Number value : nums) {
@@ -58,18 +56,22 @@ public abstract class NumberRange {
     missingCats.removeAll(toRemove);
   }
 
+  @Override
   public boolean hasRange() {
     return !naRange.isEmpty();
   }
 
-  public Number getRangeMin() {
-    return hasRange() ? naRange.get(0) : null;
+  @Override
+  public String getRangeMin() {
+    return hasRange() ? naRange.getFirst().toString() : null;
   }
 
-  public Number getRangeMax() {
-    return hasRange() ? naRange.get(naRange.size() - 1) : null;
+  @Override
+  public String getRangeMax() {
+    return hasRange() ? naRange.getLast().toString() : null;
   }
 
+  @Override
   public List<String> getMissingCats() {
     return missingCats;
   }

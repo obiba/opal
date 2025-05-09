@@ -3,9 +3,7 @@ package org.obiba.opal.r.magma;
 import org.fest.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
-import org.obiba.opal.r.magma.util.DoubleRange;
-import org.obiba.opal.r.magma.util.IntegerRange;
-import org.obiba.opal.r.magma.util.NumberRange;
+import org.obiba.opal.r.magma.util.*;
 
 public class VectorTypeTest {
 
@@ -39,4 +37,27 @@ public class VectorTypeTest {
     Assert.assertEquals("na_range=[2000] na_values=[]", res.toString());
   }
 
+  @Test
+  public void findDateRangeTest() {
+    Range res = new DateRange(Lists.newArrayList("1871-01-29", "1918-11-11", "1945-05-08"));
+    Assert.assertEquals("na_values=[1871-01-29, 1918-11-11, 1945-05-08]", res.toString());
+
+    res = new DateRange(Lists.newArrayList("1945-05-08", "1871-01-29", "1918-11-11"));
+    Assert.assertEquals("na_values=[1871-01-29, 1918-11-11, 1945-05-08]", res.toString());
+
+    res = new DateRange(Lists.newArrayList("1918 11 11", "1871/01/29", "08.05.1945"));
+    Assert.assertEquals("na_values=[08.05.1945, 1871/01/29, 1918 11 11]", res.toString());
+  }
+
+  @Test
+  public void findDateTimeRangeTest() {
+    Range res = new DateTimeRange(Lists.newArrayList("1871-01-29 10:11:12", "1918-11-11 11:11:11", "1945-05-08 22:12:24"));
+    Assert.assertEquals("na_values=[1871-01-29 10:11:12, 1918-11-11 11:11:11, 1945-05-08 22:12:24]", res.toString());
+
+    res = new DateTimeRange(Lists.newArrayList("1945-05-08", "1871-01-29 10:11:12", "1918-11-11"));
+    Assert.assertEquals("na_values=[1871-01-29 10:11:12, 1918-11-11, 1945-05-08]", res.toString());
+
+    res = new DateTimeRange(Lists.newArrayList("1918 11 11", "1871/01/29 10:11:12", "08.05.1945"));
+    Assert.assertEquals("na_values=[1871/01/29 10:11:12, 1918 11 11]", res.toString());
+  }
 }
