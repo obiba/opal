@@ -22,7 +22,6 @@ import org.obiba.opal.core.service.NoSuchResourceProviderException;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
-import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.event.*;
 import org.obiba.opal.spi.r.AbstractROperationWithResult;
 import org.obiba.opal.spi.r.RNamedList;

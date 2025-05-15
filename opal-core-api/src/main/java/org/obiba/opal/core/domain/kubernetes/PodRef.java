@@ -1,19 +1,25 @@
-package org.obiba.opal.r.spawner;
+package org.obiba.opal.core.domain.kubernetes;
 
 /**
- * Description of Kubernetes pod created by the Rock spawner.
+ * Description of Kubernetes pod created by the pod spawner.
  */
-public class RockPod {
+public class PodRef {
 
   private String name;
   private String image;
   private String status = "Pending";
   private String ip;
   private int port = -1;
-  private String service_ip;
-  private int service_port = -1;
 
-  public RockPod() {}
+  public PodRef() {}
+
+  public PodRef(String podName, String image, String status, String ip, int port) {
+    this.name = podName;
+    this.image = image;
+    this.status = status;
+    this.ip = ip;
+    this.port = port;
+  }
 
   public String getName() {
     return name;
@@ -53,21 +59,5 @@ public class RockPod {
 
   public void setPort(int port) {
     this.port = port;
-  }
-
-  public String getService_ip() {
-    return service_ip;
-  }
-
-  public void setService_ip(String service_ip) {
-    this.service_ip = service_ip;
-  }
-
-  public int getService_port() {
-    return service_port;
-  }
-
-  public void setService_port(int service_port) {
-    this.service_port = service_port;
   }
 }
