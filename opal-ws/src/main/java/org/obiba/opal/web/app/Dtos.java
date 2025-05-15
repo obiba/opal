@@ -42,9 +42,6 @@ public class Dtos {
         .addAllRockConfigs(config.getRockAppConfigs().stream()
             .map(Dtos::asDto)
             .toList())
-        .addAllRockSpawnerConfigs(config.getRockSpawnerAppConfigs().stream()
-            .map(Dtos::asDto)
-            .toList())
         .build();
   }
 
@@ -56,13 +53,6 @@ public class Dtos {
       builder.setManagerCredentials(asDto(config.getManagerCredentials()));
     if (config.hasUserCredentials())
       builder.setUserCredentials(asDto(config.getUserCredentials()));
-    return builder.build();
-  }
-
-  public static Apps.RockSpawnerAppConfigDto asDto(RockSpawnerAppConfig config) {
-    Apps.RockSpawnerAppConfigDto.Builder builder = Apps.RockSpawnerAppConfigDto.newBuilder().setHost(config.getHost());
-    if (config.hasToken())
-      builder.setToken(config.getToken());
     return builder.build();
   }
 
@@ -90,9 +80,6 @@ public class Dtos {
     config.setRockAppConfigs(dto.getRockConfigsList().stream()
         .map(Dtos::fromDto)
         .toList());
-    config.setRockSpawnerAppConfigs(dto.getRockSpawnerConfigsList().stream()
-        .map(Dtos::fromDto)
-        .toList());
     return config;
   }
 
@@ -104,13 +91,6 @@ public class Dtos {
       config.setManagerCredentials(fromDto(dto.getManagerCredentials()));
     if (dto.hasUserCredentials())
       config.setUserCredentials(fromDto(dto.getUserCredentials()));
-    return config;
-  }
-
-  public static RockSpawnerAppConfig fromDto(Apps.RockSpawnerAppConfigDto dto) {
-    RockSpawnerAppConfig config = new RockSpawnerAppConfig(dto.getHost());
-    if (dto.hasToken())
-      config.setToken(dto.getToken());
     return config;
   }
 

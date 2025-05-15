@@ -31,13 +31,16 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+/**
+ * R server instances grouped in a cluster.
+ */
 public class RServerCluster implements RServerClusterService {
 
   private static final Logger log = LoggerFactory.getLogger(RServerCluster.class);
 
   private final String name;
 
-  private final List<RServerService> rServerServices = Collections.synchronizedList(Lists.newArrayList());
+  protected final List<RServerService> rServerServices = Collections.synchronizedList(Lists.newArrayList());
 
   private final EventBus eventBus;
 
@@ -53,17 +56,6 @@ public class RServerCluster implements RServerClusterService {
   @Override
   public void addRServerService(RServerService service) {
     rServerServices.add(service);
-  }
-
-  @Override
-  public void removeRServerService(App app) {
-    try {
-      Optional<RServerService> service = rServerServices.stream()
-          .filter(s -> s.isFor(app)).findFirst();
-      service.ifPresent(rServerServices::remove);
-    } catch (Exception e) {
-      // ignored
-    }
   }
 
   @Override
@@ -365,40 +357,8 @@ public class RServerCluster implements RServerClusterService {
   //
 
   @Override
-  public List<App> getApps() {
-    return rServerServices.stream().map(RServerService::getApp).collect(Collectors.toList());
-  }
-
-  @Override
-  public void start(App app) {
-    rServerServices.stream().filter(s -> s.isFor(app)).findFirst().ifPresent(RServerService::start);
-  }
-
-  @Override
-  public void stop(App app) {
-    rServerServices.stream().filter(s -> s.isFor(app)).findFirst().ifPresent(RServerService::stop);
-  }
-
-  @Override
-  public boolean isRunning(App app) {
-    return rServerServices.stream().filter(s -> s.isFor(app)).findFirst()
-        .map(RServerService::isRunning).orElse(false);
-  }
-
-  @Override
-  public RServerState getState(App app) {
-    return rServerServices.stream()
-        .filter(s -> s.isFor(app))
-        .map(s -> {
-          try {
-            return s.getState();
-          } catch (RServerException e) {
-            return null;
-          }
-        })
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElse(null);
+  public boolean isEmpty() {
+    return rServerServices.isEmpty();
   }
 
   //

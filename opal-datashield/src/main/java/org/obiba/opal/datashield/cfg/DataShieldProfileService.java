@@ -22,7 +22,6 @@ import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.datashield.CustomRScriptMethod;
 import org.obiba.opal.datashield.RFunctionDataShieldMethod;
-import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.slf4j.Logger;

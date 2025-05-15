@@ -1,13 +1,12 @@
-package org.obiba.opal.r.spawner;
+package org.obiba.opal.r.kubernetes;
 
-import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-
 import org.obiba.opal.core.domain.AppCredentials;
+import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.rock.RockSession;
-import org.obiba.opal.spi.r.*;
+import org.obiba.opal.spi.r.RServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClientException;
@@ -17,9 +16,9 @@ public class RockPodSession extends RockSession {
 
   private static final Logger log = LoggerFactory.getLogger(RockPodSession.class);
 
-  private final RockPod pod;
+  private final PodRef pod;
 
-  protected RockPodSession(String serverName, RockPod pod, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+  protected RockPodSession(String serverName, PodRef pod, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
     super(serverName, pod.getName(), app, credentials, user, transactionalThreadFactory, eventBus);
     this.pod = pod;
     openSession();
@@ -49,10 +48,7 @@ public class RockPodSession extends RockSession {
   }
 
   private String getServerUrl() {
-    if (Strings.isNullOrEmpty(pod.getService_ip())) {
-      return String.format("http://%s:%s", pod.getIp(), pod.getPort());
-    }
-    return String.format("http://%s:%s", pod.getService_ip(), pod.getService_port());
+    return String.format("http://%s:%s", pod.getName(), pod.getPort());
   }
 
   private String getAppResourceUrl(String path) {

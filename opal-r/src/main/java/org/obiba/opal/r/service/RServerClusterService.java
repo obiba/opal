@@ -21,56 +21,15 @@ import java.util.List;
 public interface RServerClusterService extends RServerService {
 
   /**
-   * Get the Apps associated to the cluster items.
-   *
-   * @return
-   */
-  List<App> getApps();
-
-  /**
-   * Start the R server associated to the App.
-   *
-   * @param app
-   */
-  void start(App app);
-
-  /**
-   * Stop the R server associated to the App.
-   *
-   * @param app
-   */
-  void stop(App app);
-
-  /**
-   * Check that the R server associated to the App is running.
-   *
-   * @param app
-   * @return
-   */
-  boolean isRunning(App app);
-
-  /**
-   * Get the state of the R server associated to the App.
-   *
-   * @param app
-   * @return
-   */
-  RServerState getState(App app);
-
-  /**
    * Check for an empty cluster of R servers.
    *
    * @return
    */
-  default boolean isEmpty() {
-    return getApps().isEmpty();
-  }
+  boolean isEmpty();
 
   List<RServerService> getRServerServices();
 
   RServerService getRServerService(String sname);
-
-  void removeRServerService(App app);
 
   void addRServerService(RServerService rServerService);
 
