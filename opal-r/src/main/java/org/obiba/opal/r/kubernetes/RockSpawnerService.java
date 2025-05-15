@@ -1,4 +1,4 @@
-package org.obiba.opal.r.spawner;
+package org.obiba.opal.r.kubernetes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.core.domain.AppCredentials;
-import org.obiba.opal.core.domain.RockSpawnerAppConfig;
+import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.rock.RockServerException;
@@ -116,9 +116,9 @@ public class RockSpawnerService implements RServerService {
       factory.setConnectTimeout(30000);
       factory.setReadTimeout(30000);
       RestTemplate restTemplate = new RestTemplate(factory);
-      ResponseEntity<RockPod> response =
-          restTemplate.exchange(getRServerResourceUrl("/pod/"), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockPod.class);
-      RockPod pod = response.getBody();
+      ResponseEntity<PodRef> response =
+          restTemplate.exchange(getRServerResourceUrl("/pod/"), HttpMethod.POST, new HttpEntity<>(createHeaders()), PodRef.class);
+      PodRef pod = response.getBody();
       if (pod == null) {
         throw new RuntimeException("Unable to create Rock pod session: null response from Rock spawner");
       }
@@ -265,12 +265,6 @@ public class RockSpawnerService implements RServerService {
   }
 
   private HttpHeaders createHeaders() {
-    RockSpawnerAppConfig config = appsService.getRockSpawnerAppConfig(app);
-    if (config.hasToken()) {
-      return new HttpHeaders() {{
-        add("X-API-KEY", config.getToken());
-      }};
-    }
     return new HttpHeaders();
   }
 }

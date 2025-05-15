@@ -13,7 +13,6 @@ import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.runtime.App;
-import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
