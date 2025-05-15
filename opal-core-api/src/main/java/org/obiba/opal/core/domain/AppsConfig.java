@@ -22,8 +22,6 @@ public class AppsConfig  implements HasUniqueProperties {
 
   private List<RockAppConfig> rockAppConfigs = Lists.newArrayList();
 
-  private List<RockSpawnerAppConfig> rockSpawnerAppConfigs = Lists.newArrayList();
-
   public String getId() {
     return id;
   }
@@ -50,20 +48,6 @@ public class AppsConfig  implements HasUniqueProperties {
 
   public void addRockAppConfig(RockAppConfig rockAppConfig) {
     rockAppConfigs.add(rockAppConfig);
-  }
-
-  // Rock spawner apps
-
-  public List<RockSpawnerAppConfig> getRockSpawnerAppConfigs() {
-    return rockSpawnerAppConfigs;
-  }
-
-  public void setRockSpawnerAppConfigs(List<RockSpawnerAppConfig> rockSpawnerAppConfigs) {
-    this.rockSpawnerAppConfigs = rockSpawnerAppConfigs;
-  }
-
-  public void addRockSpawnerAppConfig(RockSpawnerAppConfig appConfig) {
-    rockSpawnerAppConfigs.add(appConfig);
   }
 
   // DB methods
