@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package k8s.v1;
+
+option java_package = "org.obiba.opal.web.model";
+
+// Resources
+
+message ResourceListDto {
+  string cpu    = 1;       // optional
+  string memory = 2;       // optional
+}
+
+message ResourceRequirementsDto {
+  ResourceListDto requests = 1; // min guaranteed
+  ResourceListDto limits   = 2; // hard ceiling
+}
+
+// Pod specifications with Container
+
+message ContainerDto {
+  string name = 1;
+  string image = 2;
+  int32 port = 3;
+  map<string, string> env = 4;
+  ResourceRequirementsDto resources = 5;
+}
+
+message PodSpecDto {
+  string id = 1;
+  string type = 2;
+  string description = 3;
+  string namespace = 4;
+  ContainerDto container = 5;
+}

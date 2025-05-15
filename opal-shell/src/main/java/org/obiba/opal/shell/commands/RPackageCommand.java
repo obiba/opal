@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.shell.commands;
 
-import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.shell.commands.options.RPackageCommandOptions;
