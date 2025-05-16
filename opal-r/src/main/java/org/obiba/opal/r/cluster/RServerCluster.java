@@ -124,7 +124,7 @@ public class RServerCluster implements RServerClusterService {
         .forEach(s -> {
           state.setVersion(s.getVersion());
           if (!state.isRunning())
-            state.setRunning(state.isRunning());
+            state.setRunning(s.isRunning());
           state.addTags(s.getTags());
           state.addRSessionsCount(s.getRSessionsCount());
           state.addBusyRSessionsCount(s.getBusyRSessionsCount());

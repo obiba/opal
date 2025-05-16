@@ -21,9 +21,11 @@ message ResourceRequirementsDto {
 message ContainerDto {
   string name = 1;
   string image = 2;
-  int32 port = 3;
-  map<string, string> env = 4;
-  ResourceRequirementsDto resources = 5;
+  string imagePullPolicy = 3;
+  string imagePullSecret = 4;
+  int32 port = 5;
+  map<string, string> env = 6;
+  ResourceRequirementsDto resources = 7;
 }
 
 message PodSpecDto {

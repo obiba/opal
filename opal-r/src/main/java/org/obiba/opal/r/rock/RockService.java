@@ -317,7 +317,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    RServerSession session = new RockSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    RServerSession session = new RockAppSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     session.setProfile(new RServerProfile() {
       @Override
       public String getName() {

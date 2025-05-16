@@ -50,24 +50,24 @@ public class PodsServiceImpl implements PodsService {
   @Override
   public void deleteSpec(String id) {
     try {
-      PodSpec podSpec = getSpec(id);
+      PodSpec spec = getSpec(id);
       orientDbService.delete(new PodSpec(id));
-      eventBus.post(new PodSpecUnregisteredEvent(podSpec));
+      eventBus.post(new PodSpecUnregisteredEvent(spec));
     } catch (Exception e) {
-      log.warn("Unable to delete pod specification with ID: " + id, e);
+      log.warn("Unable to delete pod specification with ID: {}", id, e);
     }
   }
 
   @Override
-  public void saveSpec(PodSpec podSpec) {
+  public void saveSpec(PodSpec spec) {
     try {
-      if (Strings.isNullOrEmpty(podSpec.getId())) {
-        podSpec.setId(podSpec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
+      if (Strings.isNullOrEmpty(spec.getId())) {
+        spec.setId(spec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
       }
-      orientDbService.save(podSpec, podSpec);
-      eventBus.post(new PodSpecRegisteredEvent(podSpec));
+      orientDbService.save(spec, spec);
+      eventBus.post(new PodSpecRegisteredEvent(spec));
     } catch (Exception e) {
-      log.warn("Unable to save pod specification: " + podSpec, e);
+      log.warn("Unable to save pod specification: {}", spec, e);
     }
   }
 
@@ -84,7 +84,7 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public PodRef createPod(PodSpec spec) {
-    String podName = spec.getContainer().getName() + "-" + UUID.randomUUID().toString().replace("-", "");
+    String podName = spec.getContainer().getName() + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     List<EnvVar> env = spec.getContainer().getEnv().entrySet().stream().map(e -> new EnvVar(e.getKey(), e.getValue(), null)).toList();
     ResourceRequirements res = new ResourceRequirements();
     res.setRequests(Map.of("memory", new Quantity(spec.getContainer().getResources().getRequests().getMemory()), "cpu", new Quantity(spec.getContainer().getResources().getRequests().getCpu())));
@@ -100,10 +100,12 @@ public class PodsServiceImpl implements PodsService {
           .addNewContainer()
             .withName(podName)
             .withImage(spec.getContainer().getImage())
+            .withImagePullPolicy(spec.getContainer().getImagePullPolicy())
             .addNewPort().withContainerPort(spec.getContainer().getPort()).endPort()
-        .withEnv(env)
-        .withResources(res)
-        .endContainer()
+            .withEnv(env)
+            .withResources(res)
+          .endContainer()
+          .withImagePullSecrets(spec.getContainer().hasImagePullSecret() ? new LocalObjectReferenceBuilder().withName(spec.getContainer().getImagePullSecret()).build() : null)
         .endSpec()
         .build();
 
@@ -117,7 +119,7 @@ public class PodsServiceImpl implements PodsService {
         .withPort(spec.getContainer().getPort())
         //.withTargetPort(new IntOrString(spec.getContainer().getPort()))
         .endPort()
-        .withType("NodePort")
+        .withType("ClusterIP")
         .endSpec()
         .build();
 
@@ -130,20 +132,17 @@ public class PodsServiceImpl implements PodsService {
   public PodRef getPod(PodSpec spec, String podName) {
     Pod pod = client.pods().inNamespace(spec.getNamespace()).withName(podName).get();
     if (pod == null) return null;
-
-    String ip = pod.getStatus().getPodIP();
-    String status = pod.getStatus().getPhase();
-    String image = pod.getSpec().getContainers().getFirst().getImage();
-
-    if (!image.equals(spec.getContainer().getImage())) return null;
-
-    return new PodRef(podName, image, status, ip, spec.getContainer().getPort());
+    return getPodRef(spec, pod);
   }
 
   @Override
-  public void deletePod(PodSpec spec, String podName) {
-    client.pods().inNamespace(spec.getNamespace()).withName(podName).delete();
-    client.services().inNamespace(spec.getNamespace()).withName(podName).delete();
+  public void deletePod(PodRef pod) {
+    try {
+      client.pods().inNamespace(pod.getPodSpec().getNamespace()).withName(pod.getName()).delete();
+      client.services().inNamespace(pod.getPodSpec().getNamespace()).withName(pod.getName()).delete();
+    } catch (Exception e) {
+      log.warn("Unable to delete pod: {}", pod, e);
+    }
   }
 
   @Override
@@ -151,14 +150,21 @@ public class PodsServiceImpl implements PodsService {
     List<PodRef> podRefs = Lists.newArrayList();
     var pods = client.pods().inNamespace(spec.getNamespace()).list().getItems();
     for (Pod pod : pods) {
-      if (pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage())) {
-        PodRef ref = getPod(spec, pod.getMetadata().getName());
+      if (pod.getMetadata().getName().startsWith(spec.getContainer().getName())
+          && pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage())) {
+        PodRef ref = getPodRef(spec, pod);
         if (ref != null) {
           podRefs.add(ref);
         }
       }
     }
     return podRefs;
+  }
+
+  @Override
+  public void deletePods(PodSpec spec) {
+    List<PodRef> podRefs = getPods(spec);
+    podRefs.forEach(this::deletePod);
   }
 
   @Override
@@ -188,6 +194,22 @@ public class PodsServiceImpl implements PodsService {
     }
   }
 
+  //
+  // Private methods
+  //
+
+  private PodRef getPodRef(PodSpec spec, Pod pod) {
+    String podName = pod.getMetadata().getName();
+    Service service = client.services().inNamespace(spec.getNamespace()).withName(podName).get();
+    if (service == null)
+      log.warn("Unable to find service for pod: {}", podName);
+    String ip = service != null ? service.getSpec().getClusterIP() : null;
+    String status = pod.getStatus().getPhase();
+    String image = pod.getSpec().getContainers().getFirst().getImage();
+    if (!image.equals(spec.getContainer().getImage())) return null;
+    return new PodRef(podName, spec, status, ip, spec.getContainer().getPort());
+  }
+
   private KubernetesClient getClient() {
     if (client == null) {
       try {
@@ -202,9 +224,9 @@ public class PodsServiceImpl implements PodsService {
   private PodRef ensureRunningPod(PodSpec spec, String podName) {
     int retries = 0;
     while (retries < 10) {
-      PodRef ref = getPod(spec, podName);
-      if (ref != null && "Running".equals(ref.getStatus())) {
-        return ref;
+      PodRef pod = getPod(spec, podName);
+      if (pod != null && "Running".equals(pod.getStatus())) {
+        return pod;
       }
       try {
         Thread.sleep(1000);

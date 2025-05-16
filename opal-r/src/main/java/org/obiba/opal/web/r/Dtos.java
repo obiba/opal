@@ -10,6 +10,8 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.runtime.App;
@@ -23,8 +25,6 @@ import org.obiba.opal.web.model.Apps;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.model.Ws;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -61,13 +61,13 @@ public class Dtos {
     try {
       RServerState state = server.getState();
       builder.setCluster(state.getCluster())
-          .setVersion(state.getVersion())
+          .setVersion(Strings.isNullOrEmpty(state.getVersion()) ? "?" : state.getVersion())
           .addAllTags(state.getTags())
           .setSessionCount(state.getRSessionsCount())
           .setBusySessionCount(state.getBusyRSessionsCount())
           .setCores(state.getSystemCores())
           .setFreeMemory(state.getSystemFreeMemory());
-    } catch (RServerException e) {
+    } catch (Exception e) {
       builder.setVersion("?")
           .setCluster("?")
           .setSessionCount(0)

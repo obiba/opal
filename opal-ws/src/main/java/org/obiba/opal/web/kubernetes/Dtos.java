@@ -20,6 +20,8 @@ public class Dtos {
     return K8S.ContainerDto.newBuilder()
         .setName(container.getName())
         .setImage(container.getImage())
+        .setImagePullPolicy(container.getImagePullPolicy())
+        .setImagePullSecret(container.getImagePullSecret())
         .setPort(container.getPort())
         .putAllEnv(container.getEnv())
         .setResources(asDto(container.getResources()))
@@ -53,6 +55,8 @@ public class Dtos {
     return new Container()
         .setName(dto.getName())
         .setImage(dto.getImage())
+        .setImagePullPolicy(dto.getImagePullPolicy())
+        .setImagePullSecret(dto.getImagePullSecret())
         .setPort(dto.getPort())
         .setEnv(dto.getEnvMap())
         .setResources(fromDto(dto.getResources()));

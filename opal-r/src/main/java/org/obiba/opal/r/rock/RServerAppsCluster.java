@@ -8,10 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.cluster;
+package org.obiba.opal.r.rock;
 
 import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.r.cluster.RServerCluster;
 import org.obiba.opal.r.service.RServerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
