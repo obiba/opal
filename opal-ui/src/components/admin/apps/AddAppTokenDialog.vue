@@ -67,7 +67,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onGenerateToken() {

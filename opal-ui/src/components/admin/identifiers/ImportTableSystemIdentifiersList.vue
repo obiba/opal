@@ -105,7 +105,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onSearchTable(val: string | number | null) {

@@ -102,7 +102,7 @@ watch(
     if (props.identifierTable) {
       getIdentifiers(0, 10);
     }
-  }
+  },
 );
 
 onMounted(() => {

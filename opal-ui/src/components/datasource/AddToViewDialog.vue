@@ -128,7 +128,7 @@ watch(
       derivedVariables.value = makeDerivedVariables();
     }
     showDialog.value = value;
-  }
+  },
 );
 
 onMounted(() => {
@@ -154,7 +154,7 @@ function onSaveView() {
       view.from = merged.filter((f, idx) => merged.indexOf(f) === idx);
       view['Magma.VariableListViewDto.view'].variables = mergeVariables(
         view['Magma.VariableListViewDto.view'].variables,
-        validDerivedVariables.value
+        validDerivedVariables.value,
       );
       datasourceStore
         .updateView(projectDestination.value, newTableName.value, view, `Added variables from ${from} to view`)

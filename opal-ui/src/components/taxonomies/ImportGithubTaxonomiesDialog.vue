@@ -105,6 +105,6 @@ watch(
     if (value) {
       showDialog.value = value;
     }
-  }
+  },
 );
 </script>

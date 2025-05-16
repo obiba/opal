@@ -13,14 +13,14 @@
         class="on-right"
       />
     </div>
-    <q-separator class="q-mb-sm"/>
+    <q-separator class="q-mb-sm" />
     <div v-if="missingCluster" class="box-warning q-mb-md">
       <q-icon name="warning" />
       {{ t('datashield.profile_missing_cluster') }}
     </div>
     <div class="row q-col-gutter-md q-mb-md">
       <div class="col-md-6 col-xs-12">
-        <div class="text-bold q-mb-md" style="font-size: larger;">{{ t('status') }}</div>
+        <div class="text-bold q-mb-md" style="font-size: larger">{{ t('status') }}</div>
         <div class="q-mb-md">
           <q-toggle
             v-model="enabled"
@@ -32,7 +32,7 @@
         <fields-list :items="items" :dbobject="profile" />
       </div>
       <div class="col-md-6 col-xs-12">
-        <div class="text-bold q-mb-md" style="font-size: larger;">{{ t('permissions') }}</div>
+        <div class="text-bold q-mb-md" style="font-size: larger">{{ t('permissions') }}</div>
         <q-toggle
           v-model="restricted"
           :label="t('datashield.profile_access_toggle')"
@@ -55,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="text-bold q-mt-lg" style="font-size: larger;">{{ t('settings') }}</div>
+    <div class="text-bold q-mt-lg" style="font-size: larger">{{ t('settings') }}</div>
     <div class="text-help q-mb-md">
       {{ t('datashield.profile_settings_help') }}
     </div>
@@ -133,7 +133,7 @@ const showInitSettings = ref(false);
 const loading = ref(false);
 
 const missingCluster = computed(
-  () => props.profile === undefined || (rStore.clusters.length > 0 && getCluster(props.profile) === undefined)
+  () => props.profile === undefined || (rStore.clusters.length > 0 && getCluster(props.profile) === undefined),
 );
 const builtinProfile = computed(() => props.profile?.name === props.profile?.cluster);
 

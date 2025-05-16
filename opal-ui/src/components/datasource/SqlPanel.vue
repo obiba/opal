@@ -65,8 +65,7 @@
           <q-spinner-dots size="md" class="q-mt-md" />
         </div>
         <div v-else class="q-mt-md">
-          <q-table v-if="rows" :rows="rows" row-key="_id" flat
-          table-header-style="background-color: #efefef">
+          <q-table v-if="rows" :rows="rows" row-key="_id" flat table-header-style="background-color: #efefef">
             <template v-slot:header-cell="props">
               <q-th :props="props">
                 {{ props.col.name }}
@@ -132,8 +131,7 @@ const rows = computed(() => {
     const columns = results.value?.columns;
     return columns
       ? row.reduce((acc, val, i) => {
-          if (columns[i])  
-            acc[columns[i]] = val;
+          if (columns[i]) acc[columns[i]] = val;
           return acc;
         }, rowObj)
       : rowObj;

@@ -31,11 +31,11 @@ p:last-of-type {
 
 .fields-list {
   .q-item:nth-child(even) {
-   background-color: $grey-2;
- }
- .q-item:nth-child(odd) {
-   background-color: white;
- }
+    background-color: $grey-2;
+  }
+  .q-item:nth-child(odd) {
+    background-color: white;
+  }
 }
 
 code {

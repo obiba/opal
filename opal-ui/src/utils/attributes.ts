@@ -7,7 +7,7 @@ export function getLabels(attributes: AttributeDto[] | undefined) {
 export function getLabelsString(attributes: AttributeDto[] | undefined) {
   const labels = getLabels(attributes);
   if (labels.length > 0) {
-    return labels.map(attr => attr.locale ? `(${attr.locale}) ${attr.value}` : attr.value).join(' | ');
+    return labels.map((attr) => (attr.locale ? `(${attr.locale}) ${attr.value}` : attr.value)).join(' | ');
   }
   return '';
 }

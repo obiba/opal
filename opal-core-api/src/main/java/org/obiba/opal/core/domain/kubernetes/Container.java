@@ -1,6 +1,8 @@
 package org.obiba.opal.core.domain.kubernetes;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
@@ -8,6 +10,8 @@ public class Container {
 
   private String name;
   private String image;
+  private String imagePullPolicy = "IfNotPresent";
+  private String imagePullSecret;
   private int port;
   private Map<String, String> env;
   private ResourceRequirements resources;
@@ -30,6 +34,28 @@ public class Container {
     return this;
   }
 
+  public String getImagePullPolicy() {
+    return imagePullPolicy;
+  }
+
+  public Container setImagePullPolicy(String imagePullPolicy) {
+    this.imagePullPolicy = Strings.isNullOrEmpty(imagePullPolicy) ? "IfNotPresent" : imagePullPolicy.trim();
+    return this;
+  }
+
+  public boolean hasImagePullSecret() {
+    return !Strings.isNullOrEmpty(imagePullSecret);
+  }
+
+  public String getImagePullSecret() {
+    return imagePullSecret;
+  }
+
+  public Container setImagePullSecret(String imagePullSecret) {
+    this.imagePullSecret = imagePullSecret;
+    return this;
+  }
+
   public int getPort() {
     return port;
   }
@@ -40,7 +66,7 @@ public class Container {
   }
 
   public Map<String, String> getEnv() {
-    return env;
+    return env == null ? env = Maps.newHashMap() : env;
   }
 
   public Container setEnv(Map<String, String> env) {

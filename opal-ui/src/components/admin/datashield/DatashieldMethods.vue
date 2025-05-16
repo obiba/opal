@@ -111,7 +111,11 @@
 </template>
 
 <script setup lang="ts">
-import type { DataShieldMethodDto, RFunctionDataShieldMethodDto, RScriptDataShieldMethodDto } from 'src/models/DataShield';
+import type {
+  DataShieldMethodDto,
+  RFunctionDataShieldMethodDto,
+  RScriptDataShieldMethodDto,
+} from 'src/models/DataShield';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldMethodDialog from 'src/components/admin/datashield/EditDatashieldMethodDialog.vue';
 import { DefaultAlignment } from 'src/components/models';
@@ -253,7 +257,7 @@ function onDeleteMethods() {
   datashieldStore
     .deleteMethods(
       props.env,
-      selected.value.map((m) => m.name)
+      selected.value.map((m) => m.name),
     )
     .then(() => {
       selected.value = [];

@@ -67,7 +67,7 @@ watch(
     }
     transientDatasourceStore.reset();
     showDialog.value = value;
-  }
+  },
 );
 
 onMounted(() => {

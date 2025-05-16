@@ -44,13 +44,7 @@
                     {{ scope.opt.label }}
                   </q-item-section>
                 </q-item>
-                <q-item
-                  v-show="scope.opt.value"
-                  dense
-                  clickable
-                  v-close-popup
-                  @click="selectedTable = scope.opt.value"
-                >
+                <q-item v-show="scope.opt.value" dense clickable v-close-popup @click="selectedTable = scope.opt.value">
                   <q-item-section class="q-pl-md">
                     {{ scope.opt.label }}
                   </q-item-section>
@@ -161,7 +155,7 @@ watch(
       }
       showDialog.value = value;
     }
-  }
+  },
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,7 +203,7 @@ onMounted(() =>
   profilesStore.initProfile().then(() =>
     filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
       exportData.value = filesStore.current;
-    })
-  )
+    }),
+  ),
 );
 </script>

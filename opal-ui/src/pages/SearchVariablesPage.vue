@@ -167,7 +167,7 @@ const queryParam = computed(() => (route.query.q as string) || '');
 const isValid = computed(
   () =>
     searchStore.variablesQuery.query?.trim() ||
-    Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0)
+    Object.values(searchStore.variablesQuery.criteria).some((criteria) => criteria.length > 0),
 );
 const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]) || []);
 

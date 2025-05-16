@@ -205,25 +205,30 @@ const tName = computed(() => route.params.tid as string);
 const allVarCatOptions = computed(() =>
   datasourceStore.variables
     .filter((v) => getVariableNature(v) === VariableNatures.CATEGORICAL)
-    .map((v) => ({ label: v.name, value: v.name, variable: v }))
+    .map((v) => ({ label: v.name, value: v.name, variable: v })),
 );
 const allVarAltOptions = computed(() =>
   datasourceStore.variables
     .filter(
-      (v) => getVariableNature(v) === VariableNatures.CATEGORICAL || getVariableNature(v) === VariableNatures.CONTINUOUS
+      (v) =>
+        getVariableNature(v) === VariableNatures.CATEGORICAL || getVariableNature(v) === VariableNatures.CONTINUOUS,
     )
-    .map((v) => ({ label: v.name, value: v.name, variable: v }))
+    .map((v) => ({ label: v.name, value: v.name, variable: v })),
 );
 
 const variableCat = computed(() => varCat.value?.variable);
 const variableCatCategories = computed(
-  () => (variableCat.value?.valueType === 'boolean' ? booleanCategories : variableCat.value?.categories) || []
+  () => (variableCat.value?.valueType === 'boolean' ? booleanCategories : variableCat.value?.categories) || [],
 );
 const variableAlt = computed(() => varAlt.value?.variable);
 const variableAltCategories = computed(
-  () => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || []
+  () => (variableAlt.value?.valueType === 'boolean' ? booleanCategories : variableAlt.value?.categories) || [],
 );
-const withFrequencies = computed(() => varAlt.value ? getVariableNature(varAlt.value.variable) === VariableNatures.CATEGORICAL : contingency.value?.facets.some((f) => f.frequencies !== undefined));
+const withFrequencies = computed(() =>
+  varAlt.value
+    ? getVariableNature(varAlt.value.variable) === VariableNatures.CATEGORICAL
+    : contingency.value?.facets.some((f) => f.frequencies !== undefined),
+);
 const withStatistics = computed(() => contingency.value?.facets.some((f) => f.statistics !== undefined));
 
 watch([dsName, tName], () => {

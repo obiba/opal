@@ -209,7 +209,7 @@ watch(
       tagsFilters.value = [...tagsFilterOptions];
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onUpdateFolder() {
@@ -224,10 +224,8 @@ async function onAddProject() {
         newProject.value.title = newProject.value.name;
       }
 
-      if (editMode.value)
-        await projectsStore.updateProject(newProject.value as ProjectDto);
-      else
-        await projectsStore.addProject(newProject.value as ProjectDto);
+      if (editMode.value) await projectsStore.updateProject(newProject.value as ProjectDto);
+      else await projectsStore.addProject(newProject.value as ProjectDto);
       emit('update', newProject.value);
       onHide();
     } catch (err) {

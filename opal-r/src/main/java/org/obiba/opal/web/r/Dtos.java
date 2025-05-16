@@ -10,21 +10,23 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
+import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.r.kubernetes.RServerPodService;
+import org.obiba.opal.r.rock.RServerAppService;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerException;
-import org.obiba.opal.web.model.Apps;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.model.Ws;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -61,13 +63,13 @@ public class Dtos {
     try {
       RServerState state = server.getState();
       builder.setCluster(state.getCluster())
-          .setVersion(state.getVersion())
+          .setVersion(Strings.isNullOrEmpty(state.getVersion()) ? "?" : state.getVersion())
           .addAllTags(state.getTags())
           .setSessionCount(state.getRSessionsCount())
           .setBusySessionCount(state.getBusyRSessionsCount())
           .setCores(state.getSystemCores())
           .setFreeMemory(state.getSystemFreeMemory());
-    } catch (RServerException e) {
+    } catch (Exception e) {
       builder.setVersion("?")
           .setCluster("?")
           .setSessionCount(0)
@@ -76,14 +78,18 @@ public class Dtos {
           .setFreeMemory(0);
     }
 
-    App app = server.getApp();
-    if (app != null) {
-      builder.setApp(Apps.AppDto.newBuilder()
-          .setId(app.getId())
-          .setName(app.getName())
-          .setType(app.getType())
-          .setServer(app.getServer())
-          .build());
+    if (server instanceof RServerAppService) {
+      App app = ((RServerAppService) server).getApp();
+      if (app != null) {
+        builder.setApp(org.obiba.opal.web.app.Dtos.asDto(app));
+      }
+    }
+
+    if (server instanceof RServerPodService) {
+      PodSpec podSpec = ((RServerPodService) server).getPodSpec();
+      if (podSpec != null) {
+        builder.setPod(org.obiba.opal.web.kubernetes.Dtos.asDto(podSpec));
+      }
     }
 
     return builder.build();

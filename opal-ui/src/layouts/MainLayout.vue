@@ -11,19 +11,33 @@
           <q-btn icon="shopping_cart" size="sm" to="/cart" class="q-mr-sm">
             <q-badge v-if="cartStore.variables?.length" color="orange" floating>{{
               cartStore.variables.length
-              }}</q-badge>
+            }}</q-badge>
           </q-btn>
-          <q-input v-model="query" dense filled :placeholder="t('search') + '...'" bg-color="grey-2" debounce="300"
-            @update:model-value="onSearch" style="width: 200px">
+          <q-input
+            v-model="query"
+            dense
+            filled
+            :placeholder="t('search') + '...'"
+            bg-color="grey-2"
+            debounce="300"
+            @update:model-value="onSearch"
+            style="width: 200px"
+          >
             <q-menu v-model="showResults" no-parent-event no-focus auto-close>
               <q-list style="min-width: 100px">
-                <q-item clickable v-close-popup v-for="item in itemResults" :key="item.identifier"
-                  @click="goToVariable(item)">
+                <q-item
+                  clickable
+                  v-close-popup
+                  v-for="item in itemResults"
+                  :key="item.identifier"
+                  @click="goToVariable(item)"
+                >
                   <q-item-section class="text-caption">
                     <span>{{ searchStore.getField(item, 'name') }}</span>
                     <div>
-                      <span class="text-hint text-primary">{{ searchStore.getField(item, 'project') }}.{{
-                        searchStore.getField(item, 'table') }}</span>
+                      <span class="text-hint text-primary"
+                        >{{ searchStore.getField(item, 'project') }}.{{ searchStore.getField(item, 'table') }}</span
+                      >
                     </div>
                     <div v-for="(attr, idx) in searchStore.getLabels(item)" :key="idx" class="text-hint">
                       <q-badge v-if="attr.locale" color="grey-3" :label="attr.locale" class="q-mr-xs text-grey-6" />
@@ -43,8 +57,13 @@
           </q-input>
           <q-btn-dropdown flat :label="locale">
             <q-list>
-              <q-item clickable v-close-popup @click="onLocaleSelection(localeOpt)" v-for="localeOpt in localeOptions"
-                :key="localeOpt.value">
+              <q-item
+                clickable
+                v-close-popup
+                @click="onLocaleSelection(localeOpt)"
+                v-for="localeOpt in localeOptions"
+                :key="localeOpt.value"
+              >
                 <q-item-section>
                   <q-item-label>{{ localeOpt.label }}</q-item-label>
                 </q-item-section>

@@ -122,7 +122,7 @@ watch(
       taxonomiesStore
         .getMlstrTaxonomies()
         .then((response: VcsTagsInfoDto) => {
-          versions.value = (response.names || []).map((v) => ({ label: v, value: v } as VersionOptions));
+          versions.value = (response.names || []).map((v) => ({ label: v, value: v }) as VersionOptions);
           if (versions.value.length > 0 && versions.value[0]) {
             versions.value[0].label = `${versions.value[0].label} (${t('latest').toLowerCase()})`;
             version.value = versions.value[0].value;
@@ -132,6 +132,6 @@ watch(
         })
         .catch(notifyError);
     }
-  }
+  },
 );
 </script>

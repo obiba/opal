@@ -43,18 +43,21 @@ const dbobject = computed(() => {
 
 const fields = computed(() => {
   if (!props.pkg) return [];
-  return props.pkg.description.map((d) => ({
-    field: d.key,
-    label: d.key,
-    format: (obj: StringMap) => obj[d.key],
-  } as FieldItem));
+  return props.pkg.description.map(
+    (d) =>
+      ({
+        field: d.key,
+        label: d.key,
+        format: (obj: StringMap) => obj[d.key],
+      }) as FieldItem,
+  );
 });
 
 watch(
   () => props.modelValue,
   (value) => {
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

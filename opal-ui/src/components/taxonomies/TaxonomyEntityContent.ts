@@ -10,7 +10,7 @@ import { flattenObjectToString } from 'src/utils/strings';
 export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | TermDto>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getProps: any,
-  collectionName: string
+  collectionName: string,
 ) {
   const canSort = ref(true);
   const dirty = ref(false);
@@ -54,7 +54,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
               <div class="col-auto"><span class="q-badge bg-grey-6 flex inline items-center no-wrap" >${locale}</span></div>
               <div class="col q-ml-sm">${taxonomiesStore.getLabel(val, locale)}</div>
             </div>
-            `
+            `,
         )
         .join('');
       return rows;
@@ -92,7 +92,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
     const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
     const result = rows.value.filter((row) => {
       const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
-        row.description || {}
+        row.description || {},
       )}`;
       return rowString.includes(query);
     });

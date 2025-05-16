@@ -20,14 +20,7 @@
             :disable="editMode"
           >
           </q-input>
-          <q-input
-            v-model="description"
-            dense
-            type="text"
-            :label="t('description')"
-            class="q-mb-md"
-            lazy-rules
-          >
+          <q-input v-model="description" dense type="text" :label="t('description')" class="q-mb-md" lazy-rules>
           </q-input>
         </q-form>
       </q-card-section>
@@ -90,7 +83,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {

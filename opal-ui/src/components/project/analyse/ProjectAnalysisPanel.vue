@@ -121,7 +121,14 @@ const analysisOptions = ref({} as AnalyseCommandOptionsDto_AnalyseDto);
 const pluginSchemaFormData = {} as { [key: string]: { schema: SchemaFormObject; model: FormObject } };
 const sfModel = ref<FormObject>({});
 const sfSchema = ref<SchemaFormObject>();
-const editMode = computed(() => props.analysis && props.analysis.name !== undefined && props.analysis.name !== '' && props.analysis.name !== null || false);
+const editMode = computed(
+  () =>
+    (props.analysis &&
+      props.analysis.name !== undefined &&
+      props.analysis.name !== '' &&
+      props.analysis.name !== null) ||
+    false,
+);
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -145,7 +152,7 @@ function initPluginData() {
           label: t(`plugins.${plugin.name}.${template.name}.title`),
           value: { pluginName: plugin.name, templateName: template.name },
         });
-      }
+      },
     );
   });
 }
@@ -206,10 +213,13 @@ function onRemoveVariable(value: string) {
 
 function getSearchHitFieldMap(fields: EntryDto[], keys: string[]): { [key: string]: string } {
   const result: EntryDto[] = fields.filter((field) => keys.includes(field.key)) || ([] as EntryDto[]);
-  return result.reduce((acc, f: EntryDto) => {
-    acc[f.key] = f.value ?? '';
-    return acc;
-  }, {} as { [key: string]: string });
+  return result.reduce(
+    (acc, f: EntryDto) => {
+      acc[f.key] = f.value ?? '';
+      return acc;
+    },
+    {} as { [key: string]: string },
+  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,7 +328,7 @@ onMounted(() => {
         }
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 });
 

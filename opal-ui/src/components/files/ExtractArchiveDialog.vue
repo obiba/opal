@@ -74,7 +74,7 @@ watch(
       init();
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function init() {

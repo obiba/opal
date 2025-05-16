@@ -74,7 +74,7 @@ watch(
       newFolder.value = '';
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

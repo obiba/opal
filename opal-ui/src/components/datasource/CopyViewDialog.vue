@@ -78,7 +78,7 @@ watch(
       }
     }
     showDialog.value = value;
-  }
+  },
 );
 
 onMounted(() => {

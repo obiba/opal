@@ -67,7 +67,7 @@ watch(
       optName.value = props.option ? props.option.name : '';
       optValue.value = props.option ? props.option.value : '';
     }
-  }
+  },
 );
 
 function onHide() {

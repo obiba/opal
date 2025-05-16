@@ -58,7 +58,7 @@ watch(
   () => props.variables,
   (value) => {
     rows.value = value ? value : [];
-  }
+  },
 );
 
 const columns = computed(() => [

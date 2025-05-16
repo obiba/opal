@@ -62,7 +62,7 @@ watch(
         loading.value = false;
       });
     }
-  }
+  },
 );
 
 function onHide() {

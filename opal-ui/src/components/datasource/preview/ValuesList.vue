@@ -110,8 +110,8 @@ const varFilter = ref<string>('');
 
 const selectableColumns = computed(() =>
   columns.value.filter(
-    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)
-  )
+    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1),
+  ),
 );
 
 onMounted(() => {
@@ -184,6 +184,6 @@ function onVariableSelection() {
 }
 
 function getVariable(name: string) {
-  return props.variables.find((v) => v.name === name) || {name} as VariableDto;
+  return props.variables.find((v) => v.name === name) || ({ name } as VariableDto);
 }
 </script>

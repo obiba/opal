@@ -9,7 +9,9 @@ export const useAuthStore = defineStore('auth', () => {
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
 
-  const otpMessage = computed(() => (profile.value && profile.value.realm?.startsWith('opal-') && !profile.value.otpEnabled));
+  const otpMessage = computed(
+    () => profile.value && profile.value.realm?.startsWith('opal-') && !profile.value.otpEnabled,
+  );
 
   function reset() {
     sid.value = '';
@@ -22,9 +24,10 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   async function checkIsAdministrator() {
-    return api.options('/system/subject-credentials')
-      .then((response) => isAdministrator.value = response.headers['allow'].includes('POST'))
-      .catch(() => isAdministrator.value = false);
+    return api
+      .options('/system/subject-credentials')
+      .then((response) => (isAdministrator.value = response.headers['allow'].includes('POST')))
+      .catch(() => (isAdministrator.value = false));
   }
 
   async function signin(username: string, password: string, authMethod: string, token: string) {

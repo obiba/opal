@@ -16,8 +16,13 @@
         <q-card-section>
           <q-breadcrumbs>
             <q-breadcrumbs-el icon="dns" @click="onFolderSelection('/')" class="cursor-pointer" />
-            <q-breadcrumbs-el v-for="crumb in crumbs" :key="crumb.to" :label="crumb.label"
-              :class="crumb.to !== props.folder.path ? 'cursor-pointer' : ''" @click="onFolderSelection(crumb.to)" />
+            <q-breadcrumbs-el
+              v-for="crumb in crumbs"
+              :key="crumb.to"
+              :label="crumb.label"
+              :class="crumb.to !== props.folder.path ? 'cursor-pointer' : ''"
+              @click="onFolderSelection(crumb.to)"
+            />
           </q-breadcrumbs>
         </q-card-section>
 
@@ -30,37 +35,100 @@
                 <td style="width: 150px; vertical-align: top">
                   <div class="text-grey-8">
                     <div>
-                      <q-btn flat no-caps icon="person" color="primary" size="12px" :label="t('user')" align="left"
-                        class="full-width" @click="onFolderSelection(`/home/${username}`)"></q-btn>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="person"
+                        color="primary"
+                        size="12px"
+                        :label="t('user')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection(`/home/${username}`)"
+                      ></q-btn>
                     </div>
                     <div v-if="projectName">
-                      <q-btn flat no-caps icon="table_chart" color="primary" size="12px" :label="t('project')"
-                        align="left" class="full-width" @click="onFolderSelection(`/projects/${projectName}`)"></q-btn>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="table_chart"
+                        color="primary"
+                        size="12px"
+                        :label="t('project')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection(`/projects/${projectName}`)"
+                      ></q-btn>
                     </div>
                     <q-separator class="q-mt-md q-mb-md" />
                     <div>
-                      <q-btn flat no-caps icon="group" color="primary" size="12px" :label="t('users')" align="left"
-                        class="full-width" @click="onFolderSelection('/home')"></q-btn>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="group"
+                        color="primary"
+                        size="12px"
+                        :label="t('users')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/home')"
+                      ></q-btn>
                     </div>
                     <div>
-                      <q-btn flat no-caps icon="table_chart" color="primary" size="12px" :label="t('projects')"
-                        align="left" class="full-width" @click="onFolderSelection('/projects')"></q-btn>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="table_chart"
+                        color="primary"
+                        size="12px"
+                        :label="t('projects')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/projects')"
+                      ></q-btn>
                     </div>
                     <div>
-                      <q-btn flat no-caps icon="dns" color="primary" size="12px" :label="t('file_system')" align="left"
-                        class="full-width" @click="onFolderSelection('/')"></q-btn>
+                      <q-btn
+                        flat
+                        no-caps
+                        icon="dns"
+                        color="primary"
+                        size="12px"
+                        :label="t('file_system')"
+                        align="left"
+                        class="full-width"
+                        @click="onFolderSelection('/')"
+                      ></q-btn>
                     </div>
                   </div>
                 </td>
                 <td style="vertical-align: top">
                   <div>
-                    <q-table ref="tableRef" flat dense :rows="rows" :columns="columns" row-key="name"
-                      :pagination="initialPagination" :loading="loading" @row-dblclick="onRowDblClick"
-                      @row-click="onRowClick" :selection="props.selection ? props.selection : 'single'"
-                      v-model:selected="selected" @update:selected="onFileSelection" :filter="filter">
+                    <q-table
+                      ref="tableRef"
+                      flat
+                      dense
+                      :rows="rows"
+                      :columns="columns"
+                      row-key="name"
+                      :pagination="initialPagination"
+                      :loading="loading"
+                      @row-dblclick="onRowDblClick"
+                      @row-click="onRowClick"
+                      :selection="props.selection ? props.selection : 'single'"
+                      v-model:selected="selected"
+                      @update:selected="onFileSelection"
+                      :filter="filter"
+                    >
                       <template v-slot:top-right>
-                        <q-input dense clearable debounce="400" color="primary" v-model="filter"
-                          :placeholder="t('file_folder_search')">
+                        <q-input
+                          dense
+                          clearable
+                          debounce="400"
+                          color="primary"
+                          v-model="filter"
+                          :placeholder="t('file_folder_search')"
+                        >
                           <template v-slot:append>
                             <q-icon name="search" />
                           </template>
@@ -68,8 +136,12 @@
                       </template>
                       <template v-slot:body-cell-name="props">
                         <q-td :props="props">
-                          <q-icon :name="getIconName(props.row)"
-                            :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'" size="sm" class="q-mr-sm" />
+                          <q-icon
+                            :name="getIconName(props.row)"
+                            :color="props.row.type === 'FOLDER' ? 'primary' : 'secondary'"
+                            size="sm"
+                            class="q-mr-sm"
+                          />
                           <span>{{ props.value }}</span>
                         </q-td>
                       </template>
@@ -106,8 +178,14 @@
           <q-space />
           <div>
             <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
-            <q-btn flat :label="t('select')" color="primary" :disable="selected.length === 0" @click="onSubmitSelection"
-              v-close-popup />
+            <q-btn
+              flat
+              :label="t('select')"
+              color="primary"
+              :disable="selected.length === 0"
+              @click="onSubmitSelection"
+              v-close-popup
+            />
           </div>
         </q-card-actions>
       </q-card>

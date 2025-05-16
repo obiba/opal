@@ -68,7 +68,7 @@ watch(
       } as TableDto;
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {

@@ -22,7 +22,15 @@
             <q-separator />
             <q-card-section class="text-hint">
               {{ getTitle(summary) }}
-              <q-btn flat rounded dense icon="arrow_forward" size="xs" color="primary" :to="`/taxonomy/${summary.name}`" />
+              <q-btn
+                flat
+                rounded
+                dense
+                icon="arrow_forward"
+                size="xs"
+                color="primary"
+                :to="`/taxonomy/${summary.name}`"
+              />
             </q-card-section>
           </q-card>
         </template>
@@ -43,9 +51,7 @@ const taxonomiesStore = useTaxonomiesStore();
 const summaries = computed(() => taxonomiesStore.summaries || []);
 
 onMounted(() => {
-  taxonomiesStore
-    .initSummaries()
-    .catch(notifyError);
+  taxonomiesStore.initSummaries().catch(notifyError);
 });
 
 function getTitle(summary: TaxonomiesDto_TaxonomySummaryDto) {

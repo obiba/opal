@@ -13,14 +13,7 @@
   >
     <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn
-          no-caps
-          color="primary"
-          icon="add"
-          size="sm"
-          :label="t('analyse_validate.add')"
-          @click="onAddAnalysis"
-        />
+        <q-btn no-caps color="primary" icon="add" size="sm" :label="t('analyse_validate.add')" @click="onAddAnalysis" />
         <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="t('refresh')" @click="onRefresh" />
       </div>
     </template>
@@ -229,10 +222,11 @@ function onFilter() {
     return analyses.value;
   }
   const query = filter.value?.length > 0 ? filter.value.toLowerCase() : '';
-  const result = analyses.value.filter((row) => {
-    const rowString = `${row.name.toLowerCase()}`;
-    return rowString.includes(query);
-  }) || [];
+  const result =
+    analyses.value.filter((row) => {
+      const rowString = `${row.name.toLowerCase()}`;
+      return rowString.includes(query);
+    }) || [];
 
   return result;
 }
@@ -269,7 +263,7 @@ function onViewAnalysis(row: OpalAnalysisDto) {
 
 function onDuplicateAnalysis(row: OpalAnalysisDto) {
   selectedAnalysis.value = JSON.parse(JSON.stringify(row));
-  (selectedAnalysis.value ?? {} as OpalAnalysisDto).name = '';
+  (selectedAnalysis.value ?? ({} as OpalAnalysisDto)).name = '';
   showAnalysisDialog.value = true;
 }
 

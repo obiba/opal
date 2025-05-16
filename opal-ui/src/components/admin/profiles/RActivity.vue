@@ -10,7 +10,7 @@
         :rows="profileActivityStore.summaries"
         :columns="columns"
         :row-key="(row) => `${row.context}:${row.profile}`"
-        >
+      >
         <template v-slot:body-cell-profile="props">
           <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
             <q-chip :label="props.value" class="q-ma-none" />
@@ -44,7 +44,8 @@
       v-model:model-value="showDialog"
       :principal="props.principal"
       :profile="selectedProfile"
-      :context="selectedContext" />
+      :context="selectedContext"
+    />
   </div>
 </template>
 
@@ -68,7 +69,9 @@ const selectedProfile = ref<string>('');
 const selectedContext = ref<string>('');
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 
-const totalExecutionTime = computed(() => profileActivityStore.summaries.map((sum) => sum.executionTimeMillis).reduce((acc, val) => acc + val, 0));
+const totalExecutionTime = computed(() =>
+  profileActivityStore.summaries.map((sum) => sum.executionTimeMillis).reduce((acc, val) => acc + val, 0),
+);
 
 const columns = computed(() => {
   return [

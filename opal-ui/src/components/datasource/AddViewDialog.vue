@@ -66,7 +66,7 @@ watch(
         .then(() => (fromTables.value = allTables.value));
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {
