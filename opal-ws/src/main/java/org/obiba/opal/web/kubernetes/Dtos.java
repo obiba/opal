@@ -12,18 +12,24 @@ public class Dtos {
         .setType(spec.getType())
         .setDescription(spec.getDescription())
         .setNamespace(spec.getNamespace())
+        .setEnabled(spec.isEnabled())
         .setContainer(asDto(spec.getContainer()))
         .build();
   }
 
   private static K8S.ContainerDto asDto(Container container) {
-    return K8S.ContainerDto.newBuilder()
+    K8S.ContainerDto.Builder builder = K8S.ContainerDto.newBuilder()
         .setName(container.getName())
         .setImage(container.getImage())
+        .setImagePullPolicy(container.getImagePullPolicy())
         .setPort(container.getPort())
         .putAllEnv(container.getEnv())
-        .setResources(asDto(container.getResources()))
-        .build();
+        .setResources(asDto(container.getResources()));
+
+    if (container.hasImagePullSecret())
+        builder.setImagePullSecret(container.getImagePullSecret());
+
+    return builder.build();
   }
 
   private static K8S.ResourceRequirementsDto asDto(Container.ResourceRequirements req) {
@@ -46,6 +52,7 @@ public class Dtos {
         .setType(dto.getType())
         .setNamespace(dto.getNamespace())
         .setDescription(dto.getDescription())
+        .setEnabled(dto.getEnabled())
         .setContainer(fromDto(dto.getContainer()));
   }
 
@@ -53,6 +60,8 @@ public class Dtos {
     return new Container()
         .setName(dto.getName())
         .setImage(dto.getImage())
+        .setImagePullPolicy(dto.getImagePullPolicy())
+        .setImagePullSecret(dto.getImagePullSecret())
         .setPort(dto.getPort())
         .setEnv(dto.getEnvMap())
         .setResources(fromDto(dto.getResources()));

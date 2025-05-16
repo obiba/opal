@@ -85,7 +85,7 @@ watch(
       comment.value = 'Udpate ' + props.variable.name;
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

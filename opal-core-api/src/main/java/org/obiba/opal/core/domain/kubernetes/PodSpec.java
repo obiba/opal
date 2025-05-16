@@ -18,6 +18,8 @@ public class PodSpec implements HasUniqueProperties {
 
   private Container container;
 
+  private boolean enabled = false;
+
   public PodSpec() {}
 
   public PodSpec(String id) {
@@ -66,6 +68,15 @@ public class PodSpec implements HasUniqueProperties {
 
   public PodSpec setContainer(Container container) {
     this.container = container;
+    return this;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public PodSpec setEnabled(boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 

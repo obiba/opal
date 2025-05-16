@@ -82,7 +82,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   }
 
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
-    const params: { offset: number, limit: number, select: string | undefined } = { offset, limit, select: undefined };
+    const params: { offset: number; limit: number; select: string | undefined } = { offset, limit, select: undefined };
     if (select && select.length > 0) {
       params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }

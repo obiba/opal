@@ -121,7 +121,7 @@ export const useFilesStore = defineStore('files', () => {
     return Promise.all(
       files.map((f) => {
         return api.delete(`/files${f.path}`);
-      })
+      }),
     );
   }
 
@@ -151,7 +151,7 @@ export const useFilesStore = defineStore('files', () => {
           paramsSerializer: {
             indexes: null, // no brackets at all
           },
-        }
+        },
       )
       .then((response) => {
         copySelection.value = [];
@@ -164,7 +164,7 @@ export const useFilesStore = defineStore('files', () => {
     // selections not in own parent folder or in itself when is a folder
     function canPaste(files: FileDto[]) {
       return files.every(
-        (f) => path !== getParentFolder(f.path) && (f.type === FileDto_FileType.FILE || !path.startsWith(f.path))
+        (f) => path !== getParentFolder(f.path) && (f.type === FileDto_FileType.FILE || !path.startsWith(f.path)),
       );
     }
     return (
@@ -189,7 +189,7 @@ export const useFilesStore = defineStore('files', () => {
           file: path,
         };
         return api.put(`/files${newPath}`, {}, { params });
-      }
+      },
     );
   }
 

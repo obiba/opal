@@ -158,7 +158,7 @@ watch(
       tab.value = NO_LOCALE;
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {
@@ -171,14 +171,14 @@ async function onApply() {
     await datasourceStore.deleteAttributes(
       props.variable,
       props.bundle.attributes[0]?.namespace,
-      props.bundle.attributes[0].name
+      props.bundle.attributes[0].name,
     );
   }
   // any existing is to be updated
   await datasourceStore.deleteAttributes(
     props.variable,
     namespace.value === '' ? undefined : namespace.value,
-    name.value
+    name.value,
   );
   const attributes: AttributeDto[] = [];
   for (const [locale, value] of Object.entries(texts.value)) {

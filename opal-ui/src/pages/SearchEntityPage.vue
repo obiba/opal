@@ -110,7 +110,7 @@ const typeParam = computed(() => route.query.type as string);
 
 const isValid = computed(() => type.value && identifier.value);
 const tableOptions = computed(
-  () => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || []
+  () => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || [],
 );
 const table = computed(() => tables.value?.find((t) => asTableId(t) === tableId.value));
 
@@ -233,6 +233,6 @@ function getEntityValueSets(table: TableDto, identifier: string) {
 }
 
 function getVariable(name: string) {
-  return variables.value?.find((v) => v.name === name) || { name: name } as VariableDto;
+  return variables.value?.find((v) => v.name === name) || ({ name: name } as VariableDto);
 }
 </script>

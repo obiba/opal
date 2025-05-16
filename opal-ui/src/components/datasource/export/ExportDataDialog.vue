@@ -21,26 +21,55 @@
           </div>
 
           <div class="q-mb-md">
-            <export-csv-form v-if="exportType === FileExportType.CSV" v-model="out" :folder="folder"
-              :tables="props.tables" />
-            <export-fs-form v-else-if="exportType === FileExportType.OPAL" v-model="out" :folder="folder"
-              :tables="props.tables" />
-            <export-haven-form v-else-if="exportType === FileExportType.HAVEN" v-model="out" :folder="folder"
-              :tables="props.tables" :type="fileExporter.value" />
+            <export-csv-form
+              v-if="exportType === FileExportType.CSV"
+              v-model="out"
+              :folder="folder"
+              :tables="props.tables"
+            />
+            <export-fs-form
+              v-else-if="exportType === FileExportType.OPAL"
+              v-model="out"
+              :folder="folder"
+              :tables="props.tables"
+            />
+            <export-haven-form
+              v-else-if="exportType === FileExportType.HAVEN"
+              v-model="out"
+              :folder="folder"
+              :tables="props.tables"
+              :type="fileExporter.value"
+            />
             <export-plugin-form v-else v-model="outPlugin" :tables="props.tables" :type="fileExporter.value" />
           </div>
 
           <q-list class="q-mt-lg">
-            <q-expansion-item switch-toggle-side dense header-class="text-primary text-caption"
-              :label="t('advanced_options')">
-              <q-input v-model="entityIdNames" :label="t('id_column_name')" :hint="t('id_column_name_hint')" dense
-                class="q-mb-md" :debounce="500" />
+            <q-expansion-item
+              switch-toggle-side
+              dense
+              header-class="text-primary text-caption"
+              :label="t('advanced_options')"
+            >
+              <q-input
+                v-model="entityIdNames"
+                :label="t('id_column_name')"
+                :hint="t('id_column_name_hint')"
+                dense
+                class="q-mb-md"
+                :debounce="500"
+              />
             </q-expansion-item>
           </q-list>
         </div>
         <div v-else-if="isDatabase">
-          <q-select v-model="databaseExporter" :options="databaseExporters" :label="t('database')" dense emit-value
-            map-options />
+          <q-select
+            v-model="databaseExporter"
+            :options="databaseExporters"
+            :label="t('database')"
+            dense
+            emit-value
+            map-options
+          />
         </div>
         <identifiers-mapping-select v-model="idConfig" :for-import="false" />
       </q-card-section>
@@ -48,8 +77,14 @@
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="t('export')" color="primary" @click="onExportData"
-          :disable="isFile ? out === undefined : databaseExporter === undefined" v-close-popup />
+        <q-btn
+          flat
+          :label="t('export')"
+          color="primary"
+          @click="onExportData"
+          :disable="isFile ? out === undefined : databaseExporter === undefined"
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

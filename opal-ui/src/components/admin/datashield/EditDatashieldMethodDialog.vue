@@ -56,7 +56,11 @@
 </template>
 
 <script setup lang="ts">
-import type { DataShieldMethodDto, RScriptDataShieldMethodDto, RFunctionDataShieldMethodDto } from 'src/models/DataShield';
+import type {
+  DataShieldMethodDto,
+  RScriptDataShieldMethodDto,
+  RFunctionDataShieldMethodDto,
+} from 'src/models/DataShield';
 
 interface DialogProps {
   modelValue: boolean;
@@ -78,12 +82,12 @@ interface MethodTypeOption {
 
 const RFuncOption: MethodTypeOption = {
   label: t('r_func'),
-  value: 'r_func'
-}
+  value: 'r_func',
+};
 const RScriptOption: MethodTypeOption = {
   label: t('r_script'),
-  value: 'r_script'
-}
+  value: 'r_script',
+};
 const typeOptions: MethodTypeOption[] = [RFuncOption, RScriptOption];
 
 const name = ref('');
@@ -103,7 +107,7 @@ watch(
       func.value = props.method && type.value.value === 'r_func' ? getCode(props.method) : '';
       script.value = props.method && type.value.value === 'r_script' ? getCode(props.method) : '';
     }
-  }
+  },
 );
 
 function onHide() {
@@ -134,7 +138,7 @@ function onSubmit() {
   const payload = {
     name: name.value,
   };
-  if (type.value.value === 'r_func') {  
+  if (type.value.value === 'r_func') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (payload as any)['DataShield.RFunctionDataShieldMethodDto.method'] = {
       func: func.value,

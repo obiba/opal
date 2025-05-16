@@ -33,8 +33,14 @@
                     <div v-if="authProviders.length > 0">
                       <q-separator class="q-mb-md" />
                       <div v-for="provider in authProviders" :key="provider.name">
-                        <q-btn no-caps :label="t('signin_with', { provider: provider.name })"
-                          @click="onSigninProvider(provider)" color="primary" class="full-width" stretch />
+                        <q-btn
+                          no-caps
+                          :label="t('signin_with', { provider: provider.name })"
+                          @click="onSigninProvider(provider)"
+                          color="primary"
+                          class="full-width"
+                          stretch
+                        />
                       </div>
                     </div>
                   </q-form>
@@ -49,8 +55,14 @@
                 </q-card-section>
                 <q-card-section v-if="withToken">
                   <q-form @submit="onSubmit" class="q-gutter-md">
-                    <q-input autofocus type="number" color="grey-10" v-model="token" :label="t('auth.code')"
-                      :hint="t('auth.code_hint')">
+                    <q-input
+                      autofocus
+                      type="number"
+                      color="grey-10"
+                      v-model="token"
+                      :label="t('auth.code')"
+                      :hint="t('auth.code_hint')"
+                    >
                       <template v-slot:prepend>
                         <q-icon name="fas fa-mobile" size="xs" />
                       </template>
@@ -65,8 +77,13 @@
               <q-card-section class="q-pt-none">
                 <q-btn-dropdown flat :label="t(locale)">
                   <q-list>
-                    <q-item clickable v-close-popup @click="onLocaleSelection(localeOpt)"
-                      v-for="localeOpt in localeOptions" :key="localeOpt.value">
+                    <q-item
+                      clickable
+                      v-close-popup
+                      @click="onLocaleSelection(localeOpt)"
+                      v-for="localeOpt in localeOptions"
+                      :key="localeOpt.value"
+                    >
                       <q-item-section>
                         <q-item-label>{{ localeOpt.label }}</q-item-label>
                       </q-item-section>

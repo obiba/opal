@@ -29,11 +29,7 @@
             :hint="t('taxonomy.vocabulary.description_hint')"
           />
 
-          <q-checkbox
-            v-model="newVocabulary.repeatable"
-            class="q-ml-sm"
-            :label="t('taxonomy.vocabulary.repeatable')"
-          />
+          <q-checkbox v-model="newVocabulary.repeatable" class="q-ml-sm" :label="t('taxonomy.vocabulary.repeatable')" />
           <div class="text-hint q-mb-md q-mt-none">
             {{ t('taxonomy.vocabulary.repeatable_hint') }}
           </div>
@@ -98,7 +94,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 // Handlers

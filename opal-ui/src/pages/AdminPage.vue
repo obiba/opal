@@ -141,6 +141,14 @@
                 <q-item-label caption lines="2">{{ t('apps.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label
+                  ><router-link to="/admin/kubernetes">{{ t('kubernetes.title') }}</router-link></q-item-label
+                >
+                <q-item-label caption lines="2">{{ t('kubernetes.caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
             <!-- <q-item>
               <q-item-section>
                 <q-item-label><router-link to="/admin/jvm">{{ t('jvm') }}</router-link></q-item-label>

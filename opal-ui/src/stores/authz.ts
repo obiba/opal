@@ -34,7 +34,7 @@ export const useAuthzStore = defineStore('authz', () => {
             principal: acl.subject?.principal,
             permission: acl.actions.join(','),
           },
-        }
+        },
       )
       .then(() => {
         return initAcls(path);

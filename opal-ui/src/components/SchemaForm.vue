@@ -4,12 +4,7 @@
       <div v-if="schema.title" class="text-help">{{ schema.title }}</div>
       <div v-if="schema.description" class="text-hint q-mb-sm">{{ schema.description }}</div>
       <div v-for="item in schema.items" :key="item.key">
-        <schema-form-item
-          v-model="data[item.key]"
-          :field="item"
-          :disable="disable"
-          @update:model-value="onUpdate"
-        />
+        <schema-form-item v-model="data[item.key]" :field="item" :disable="disable" @update:model-value="onUpdate" />
       </div>
     </form>
   </div>
@@ -53,7 +48,6 @@ function initDefaults() {
     }
   });
 }
-
 
 // TODO needs a better validation handling, this is just a basic one
 function validate() {

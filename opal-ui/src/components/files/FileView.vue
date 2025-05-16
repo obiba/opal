@@ -312,7 +312,7 @@ watch(
   () => props.file,
   () => {
     selected.value = [];
-  }
+  },
 );
 
 const columns = computed(() => [
@@ -363,7 +363,7 @@ const crumbs = computed(() => {
 });
 
 const rows = computed(() => {
-  const result:FileDto[] = [];
+  const result: FileDto[] = [];
 
   if (props.file.children === undefined) {
     return result;
@@ -440,7 +440,7 @@ async function onDownload() {
     filesStore.downloadFiles(
       props.file.path,
       readables.value,
-      encryptContent.value ? encryptPassword.value : undefined
+      encryptContent.value ? encryptPassword.value : undefined,
     );
     showDownload.value = false;
   }

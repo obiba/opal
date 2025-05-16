@@ -4,45 +4,42 @@
 //   protoc               v3.21.12
 // source: K8s.proto
 
-export const protobufPackage = "k8s.v1";
+export const protobufPackage = 'K8s';
 
-/** “100m”, “512Mi”, … */
-export interface Quantity {
-  value: string;
+export interface ResourceListDto {
+  /** optional */
+  cpu: string;
+  /** optional */
+  memory: string;
 }
 
-export interface ResourceList {
-  /** optional */
-  cpu:
-    | Quantity
-    | undefined;
-  /** optional */
-  memory: Quantity | undefined;
-}
-
-export interface ResourceRequirements {
+export interface ResourceRequirementsDto {
   /** min guaranteed */
-  requests:
-    | ResourceList
-    | undefined;
+  requests: ResourceListDto | undefined;
   /** hard ceiling */
-  limits: ResourceList | undefined;
+  limits: ResourceListDto | undefined;
 }
 
-export interface EnvVar {
-  name: string;
-  value: string;
-}
-
-export interface Container {
+export interface ContainerDto {
   name: string;
   image: string;
+  imagePullPolicy: string;
+  imagePullSecret: string;
   port: number;
-  env: EnvVar[];
-  resources: ResourceRequirements | undefined;
+  env: ContainerDto_EnvEntry[];
+  resources: ResourceRequirementsDto | undefined;
 }
 
-export interface PodSpec {
+export interface ContainerDto_EnvEntry {
+  key: string;
+  value: string;
+}
+
+export interface PodSpecDto {
+  id: string;
+  type: string;
+  description: string;
   namespace: string;
-  container: Container | undefined;
+  container: ContainerDto | undefined;
+  enabled: boolean;
 }

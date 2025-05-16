@@ -91,11 +91,10 @@ watch(
     if (value) {
       idOptions.value = identifiersStore.identifiers.map((id) => ({ label: id.entityType, value: id }));
       selectedId.value = idOptions.value[0]?.value || null;
-      if (selectedId.value)
-        initMapping(selectedId.value.name);
+      if (selectedId.value) initMapping(selectedId.value.name);
       showDialog.value = value;
     }
-  }
+  },
 );
 
 async function onAddMapping() {

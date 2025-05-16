@@ -111,7 +111,7 @@ watch(
       }
     }
     showDialog.value = value;
-  }
+  },
 );
 
 const isValid = computed(
@@ -120,7 +120,7 @@ const isValid = computed(
     (props.variable.categories === undefined ||
       props.variable.categories
         .filter((c) => c.name !== props.category.name)
-        .find((c) => c.name === newCategory.value.name) === undefined)
+        .find((c) => c.name === newCategory.value.name) === undefined),
 );
 
 function onHide() {

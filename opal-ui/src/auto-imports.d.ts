@@ -12,7 +12,7 @@ declare global {
   const $ref: typeof import('vue/macros')['$ref']
   const $shallowRef: typeof import('vue/macros')['$shallowRef']
   const $toRef: typeof import('vue/macros')['$toRef']
-  const AnalysisPluginPackages: typeof import('./stores/plugins')['AnalysisPluginPackages']
+  const AnalysisPluginPackages: (typeof import('./stores/plugins'))['AnalysisPluginPackages']
   const EffectScope: typeof import('vue')['EffectScope']
   const TOKEN_TYPES: typeof import('./stores/tokens')['TOKEN_TYPES']
   const computed: typeof import('vue')['computed']
@@ -68,7 +68,7 @@ declare global {
   const useAuthzStore: typeof import('./stores/authz')['useAuthzStore']
   const useCartStore: typeof import('./stores/cart')['useCartStore']
   const useCommandsStore: typeof import('./stores/commands')['useCommandsStore']
-  const useCounterStore: typeof import('./stores/auth')['useCounterStore']
+  const useCounterStore: (typeof import('./stores/auth'))['useCounterStore']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useDatashieldStore: typeof import('./stores/datashield')['useDatashieldStore']
@@ -82,6 +82,7 @@ declare global {
   const useLink: typeof import('vue-router')['useLink']
   const useModel: typeof import('vue')['useModel']
   const usePluginsStore: typeof import('./stores/plugins')['usePluginsStore']
+  const usePodsStore: typeof import('./stores/pods')['usePodsStore']
   const useProfileAclsStore: typeof import('./stores/profile-acls')['useProfileAclsStore']
   const useProfileActivityStore: typeof import('./stores/profile-activity')['useProfileActivityStore']
   const useProfilesStore: typeof import('./stores/profiles')['useProfilesStore']
@@ -98,7 +99,7 @@ declare global {
   const useTemplateRef: typeof import('vue')['useTemplateRef']
   const useTokensStore: typeof import('./stores/tokens')['useTokensStore']
   const useTransientDatasourceStore: typeof import('./stores/transient-datasource')['useTransientDatasourceStore']
-  const useUsersGroupsStore: typeof import('./stores/users-groups')['useUsersGroupsStore']
+  const useUsersGroupsStore: (typeof import('./stores/users-groups'))['useUsersGroupsStore']
   const useUsersStore: typeof import('./stores/users')['useUsersStore']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
@@ -194,6 +195,7 @@ declare module 'vue' {
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
     readonly usePluginsStore: UnwrapRef<typeof import('./stores/plugins')['usePluginsStore']>
+    readonly usePodsStore: UnwrapRef<typeof import('./stores/pods')['usePodsStore']>
     readonly useProfileAclsStore: UnwrapRef<typeof import('./stores/profile-acls')['useProfileAclsStore']>
     readonly useProfileActivityStore: UnwrapRef<typeof import('./stores/profile-activity')['useProfileActivityStore']>
     readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>

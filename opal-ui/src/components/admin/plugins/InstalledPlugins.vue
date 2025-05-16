@@ -87,7 +87,7 @@ const type = ref<string | undefined>();
 const typeOptions = ['opal-analysis-r', 'opal-datasource', 'vcf-store'];
 
 const packages = computed(() =>
-  pluginsStore.plugins.packages?.filter((pkg) => (type.value ? pkg.type === type.value : true))
+  pluginsStore.plugins.packages?.filter((pkg) => (type.value ? pkg.type === type.value : true)),
 );
 
 onMounted(() => {

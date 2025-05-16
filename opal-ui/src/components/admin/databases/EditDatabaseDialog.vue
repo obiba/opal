@@ -184,7 +184,7 @@ interface DialogProps {
 }
 
 const props = withDefaults(defineProps<DialogProps>(), {
-  database: () => ({} as DatabaseDto),
+  database: () => ({}) as DatabaseDto,
 });
 
 const emit = defineEmits(['update:modelValue', 'save']);
@@ -241,7 +241,7 @@ watch(
       database.value = { ...props.database };
       hasDatasource.value = database.value.hasDatasource || false;
       delete database.value.hasDatasource;
-      editMode.value = (props.database.name||'') !== '';
+      editMode.value = (props.database.name || '') !== '';
       if (database.value.usedForIdentifiers) {
         database.value.name = '_identifiers';
       }
@@ -273,7 +273,7 @@ watch(
         }
       }
     }
-  }
+  },
 );
 
 function onHide() {

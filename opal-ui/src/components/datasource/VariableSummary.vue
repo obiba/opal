@@ -71,13 +71,13 @@ const route = useRoute();
 const datasourceStore = useDatasourceStore();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const categoricalData = computed(() => (summary.value as any)['Math.CategoricalSummaryDto.categorical'])
+const categoricalData = computed(() => (summary.value as any)['Math.CategoricalSummaryDto.categorical']);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const textData = computed(() => (summary.value as any)['Math.TextSummaryDto.textSummary'])
+const textData = computed(() => (summary.value as any)['Math.TextSummaryDto.textSummary']);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const continuousData = computed(() => (summary.value as any)['Math.ContinuousSummaryDto.continuous'])
+const continuousData = computed(() => (summary.value as any)['Math.ContinuousSummaryDto.continuous']);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const defaultData = computed(() => (summary.value as any)['Math.DefaultSummaryDto.defaultSummary'])
+const defaultData = computed(() => (summary.value as any)['Math.DefaultSummaryDto.defaultSummary']);
 
 interface VariableSummaryProps {
   variable: VariableDto;
@@ -112,7 +112,11 @@ function init() {
   }
   loading.value = true;
   datasourceStore
-    .loadVariableSummary(props.variable, fullIfCached, (limit.value && limit.value > props.total) ? props.total : limit.value)
+    .loadVariableSummary(
+      props.variable,
+      fullIfCached,
+      limit.value && limit.value > props.total ? props.total : limit.value,
+    )
     .then((data) => {
       summary.value = data;
     })

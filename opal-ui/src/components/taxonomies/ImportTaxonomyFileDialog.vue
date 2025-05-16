@@ -102,7 +102,7 @@ watch(
       showDialog.value = value;
       destinationFolder.value.path = `/home/${username.value}`;
     }
-  }
+  },
 );
 
 onMounted(() => filesStore.initFiles('/home/administrator'));

@@ -1,10 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import type {
-  ProjectDto,
-  ProjectSummaryDto,
-  ProjectDto_IdentifiersMappingDto,
-} from 'src/models/Projects';
+import type { ProjectDto, ProjectSummaryDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { ProjectDatasourceStatusDto } from 'src/models/Projects';
 import type { Acl } from 'src/models/Opal';
 import type { Subject, KeyForm } from 'src/models/Opal';
@@ -343,7 +339,7 @@ export const useProjectsStore = defineStore('projects', () => {
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
     if (!project.idMappings) project.idMappings = [];
     const index: number = project.idMappings.findIndex(
-      (m) => m.name === mapping.name && m.entityType === mapping.entityType && m.mapping === mapping.mapping
+      (m) => m.name === mapping.name && m.entityType === mapping.entityType && m.mapping === mapping.mapping,
     );
 
     if (index === -1) {
@@ -357,7 +353,7 @@ export const useProjectsStore = defineStore('projects', () => {
   async function deleteIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
     if (!project.idMappings) return Promise.resolve();
     project.idMappings = project.idMappings.filter(
-      (m) => m.entityType !== mapping.entityType || m.name !== mapping.name
+      (m) => m.entityType !== mapping.entityType || m.name !== mapping.name,
     );
     return updateProject(project);
   }

@@ -2,9 +2,33 @@
   <div v-if="taxonomyName">
     <div class="text-h5">
       <span>{{ taxonomy.name }}</span>
-      <q-btn v-if="taxonomiesStore.canEdit" outline color="primary" icon="download" size="sm" @click="onDownload" class="on-right"></q-btn>
-      <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" size="sm" @click="onEditTaxonomy" class="on-right"></q-btn>
-      <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" size="sm" @click="onDelete" class="on-right"></q-btn>
+      <q-btn
+        v-if="taxonomiesStore.canEdit"
+        outline
+        color="primary"
+        icon="download"
+        size="sm"
+        @click="onDownload"
+        class="on-right"
+      ></q-btn>
+      <q-btn
+        v-if="taxonomiesStore.canEdit"
+        outline
+        color="secondary"
+        icon="edit"
+        size="sm"
+        @click="onEditTaxonomy"
+        class="on-right"
+      ></q-btn>
+      <q-btn
+        v-if="taxonomiesStore.canEdit"
+        outline
+        color="red"
+        icon="delete"
+        size="sm"
+        @click="onDelete"
+        class="on-right"
+      ></q-btn>
     </div>
 
     <div class="q-gutter-md q-mt-md q-mb-md">
@@ -316,6 +340,6 @@ watch(
       dirty.value = false;
       rows.value = props.taxonomy.vocabularies || [];
     }
-  }
+  },
 );
 </script>

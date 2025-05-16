@@ -19,6 +19,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/admin/idproviders', component: () => import('pages/AdminIdentityProvidersPage.vue') },
       { path: '/admin/plugins', component: () => import('pages/AdminPluginsPage.vue') },
       { path: '/admin/apps', component: () => import('pages/AdminAppsPage.vue') },
+      { path: '/admin/kubernetes', component: () => import('pages/AdminKubernetesPage.vue') },
       { path: '/admin/identifiers', component: () => import('pages/AdminIdentifiersPage.vue') },
       { path: '/profile', component: () => import('pages/ProfilePage.vue') },
       { path: '/projects', component: () => import('pages/ProjectsPage.vue') },

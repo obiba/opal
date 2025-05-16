@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
 import org.obiba.opal.core.domain.AppCredentials;
-import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
 import org.obiba.opal.spi.r.*;
@@ -37,26 +36,17 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.UUID;
 
-public class RockSession extends AbstractRServerSession implements RServerConnection {
+public abstract class RockSession extends AbstractRServerSession implements RServerConnection {
 
   private static final Logger log = LoggerFactory.getLogger(RockSession.class);
 
-  private final App app;
-
   private final AppCredentials credentials;
 
-  private String rockSessionId;
+  protected String rockSessionId;
 
-  protected RockSession(String serverName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    this(serverName, UUID.randomUUID().toString(), app, credentials, user, transactionalThreadFactory, eventBus);
-    openSession();
-  }
-
-  protected RockSession(String serverName, String id, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+  protected RockSession(String serverName, String id, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
     super(serverName, id, user, transactionalThreadFactory, eventBus);
-    this.app = app;
     this.credentials = credentials;
   }
 
@@ -237,10 +227,6 @@ public class RockSession extends AbstractRServerSession implements RServerConnec
   // Private methods
   //
 
-  protected App getApp() {
-    return app;
-  }
-
   protected String getRockSessionId() {
     return rockSessionId;
   }
@@ -301,13 +287,9 @@ public class RockSession extends AbstractRServerSession implements RServerConnec
     }
   }
 
-  protected String getRSessionsResourceUrl() {
-    return String.format("%s/r/sessions", app.getServer());
-  }
+  protected abstract String getRSessionsResourceUrl();
 
-  protected String getRSessionResourceUrl(String path) {
-    return String.format("%s/r/session/%s%s", app.getServer(), rockSessionId, path);
-  }
+  protected abstract String getRSessionResourceUrl(String path);
 
   private HttpHeaders createHeaders() {
     return new HttpHeaders() {{

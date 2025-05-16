@@ -73,8 +73,8 @@ const missings = computed(() =>
   nonMissingsSelection.value === null
     ? t('all_categories')
     : nonMissingsSelection.value
-    ? t('non_missings')
-    : t('missings')
+      ? t('non_missings')
+      : t('missings'),
 );
 
 const layout = computed(() => {
@@ -123,7 +123,7 @@ const frequencies = computed(() => {
     (f: FrequencyDto) =>
       nonMissingsSelection.value === null ||
       (!nonMissingsSelection.value && f.missing) ||
-      (nonMissingsSelection.value && !f.missing)
+      (nonMissingsSelection.value && !f.missing),
   );
 
   if (props.data.otherFrequency && props.data.otherFrequency > 0 && nonMissingsSelection.value !== false) {

@@ -50,13 +50,6 @@ public interface RServerService {
   void execute(ROperation rop) throws RServerException;
 
   /**
-   * Get the inner App from which the R server was built.
-   *
-   * @return
-   */
-  App getApp();
-
-  /**
    * Check whether the App object is associated to the R server service, order to avoid name conflicts
    * (same app name but from different server or with different type).
    *

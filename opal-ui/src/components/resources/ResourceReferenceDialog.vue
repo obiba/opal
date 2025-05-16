@@ -93,7 +93,7 @@
             </div>
             <div class="col-6">
               <div class="text-bold q-mb-sm">{{ t('credentials') }}</div>
-              <schema-form ref="sfCredentials"  v-model="refCredentials" :schema="credentialsSchemaForm" />
+              <schema-form ref="sfCredentials" v-model="refCredentials" :schema="credentialsSchemaForm" />
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@ const categories = computed(() =>
         ...p,
       };
     })
-    .sort(compareTitles)
+    .sort(compareTitles),
 );
 const factories = computed(() =>
   category.value
@@ -161,7 +161,7 @@ const factories = computed(() =>
           };
         })
         .sort(compareTitles)
-    : []
+    : [],
 );
 const parametersSchemaForm = computed(() => (factory.value ? JSON.parse(factory.value.parametersSchemaForm) : {}));
 const credentialsSchemaForm = computed(() => (factory.value ? JSON.parse(factory.value.credentialsSchemaForm) : {}));
@@ -206,7 +206,7 @@ watch(
       }
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

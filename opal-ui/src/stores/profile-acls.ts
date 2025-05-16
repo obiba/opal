@@ -34,12 +34,11 @@ export const useProfileAclsStore = defineStore('profileAcls', () => {
   }
 
   async function deleteAcls(acls: Acl[]) {
-    const requests = acls
-      .map((acl) =>
-        api.delete(`/authz/${acl.resource.replace(/^\//, '')}`, {
-          params: { subject: acl.subject?.principal, perm: acl.actions.pop() || '', type: acl.subject?.type },
-        })
-      );
+    const requests = acls.map((acl) =>
+      api.delete(`/authz/${acl.resource.replace(/^\//, '')}`, {
+        params: { subject: acl.subject?.principal, perm: acl.actions.pop() || '', type: acl.subject?.type },
+      }),
+    );
     return Promise.all(requests);
   }
 

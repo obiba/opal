@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
-import type { TaxonomyDto, TaxonomiesDto_TaxonomySummaryDto, LocaleTextDto, VocabularyDto, TermDto } from 'src/models/Opal';
+import type {
+  TaxonomyDto,
+  TaxonomiesDto_TaxonomySummaryDto,
+  LocaleTextDto,
+  VocabularyDto,
+  TermDto,
+} from 'src/models/Opal';
 import type { AttributeDto } from 'src/models/Magma';
 import type { Annotation } from 'src/components/models';
 
@@ -52,7 +58,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function loadTaxonomiesPermissions() {
     return api.options('/system/conf/taxonomies').then((response) => {
-      canAdd.value = response.headers['allow'].split(',').map((m: string) => m.trim()).includes('POST');
+      canAdd.value = response.headers['allow']
+        .split(',')
+        .map((m: string) => m.trim())
+        .includes('POST');
       return response;
     });
   }
@@ -76,7 +85,10 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     vocabulary.value = {} as VocabularyDto;
     canEdit.value = false;
     return api.get(`/system/conf/taxonomy/${name}`).then((response) => {
-      canEdit.value = response.headers['allow'].split(',').map((m: string) => m.trim()).includes('DELETE');
+      canEdit.value = response.headers['allow']
+        .split(',')
+        .map((m: string) => m.trim())
+        .includes('DELETE');
       taxonomy.value = response.data;
       return response;
     });
@@ -129,7 +141,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     return api
       .put(
         `/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
-        term
+        term,
       )
       .then((response) => response.data);
   }
@@ -228,8 +240,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
           annotations[i]?.taxonomy === annotations[j]?.taxonomy &&
           annotations[i]?.vocabulary === annotations[j]?.vocabulary
         ) {
-          if (annotations[j]?.attributes)
-            annotations[i]?.attributes.push(...annotations[j]?.attributes || []);
+          if (annotations[j]?.attributes) annotations[i]?.attributes.push(...(annotations[j]?.attributes || []));
           annotations.splice(j, 1);
           j--;
         }

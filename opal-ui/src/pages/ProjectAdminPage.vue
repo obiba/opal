@@ -221,7 +221,7 @@ const hasAdminPermission = computed(
   () =>
     projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||
-    projectsStore.perms.project?.canDelete()
+    projectsStore.perms.project?.canDelete(),
 );
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);

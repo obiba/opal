@@ -40,12 +40,7 @@
       </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-icon
-            name="circle"
-            size="sm"
-            :title="t(props.value.toLowerCase())"
-            :color="getSessionColor(props.value)"
-          />
+          <q-icon name="circle" size="sm" :title="t(props.value.toLowerCase())" :color="getSessionColor(props.value)" />
         </q-td>
       </template>
     </q-table>
@@ -77,10 +72,31 @@ const initialPagination = ref({
 
 const columns = computed(() => [
   { name: 'id', label: 'ID', align: DefaultAlignment, field: 'id', sortable: true },
-  { name: 'profile', label: t('profile'), align: DefaultAlignment, field: 'profile', sortable: true, classes: 'text-caption' },
-  { name: 'cluster', label: t('r.cluster'), align: DefaultAlignment, field: 'cluster', sortable: true, classes: 'text-caption' },
+  {
+    name: 'profile',
+    label: t('profile'),
+    align: DefaultAlignment,
+    field: 'profile',
+    sortable: true,
+    classes: 'text-caption',
+  },
+  {
+    name: 'cluster',
+    label: t('r.cluster'),
+    align: DefaultAlignment,
+    field: 'cluster',
+    sortable: true,
+    classes: 'text-caption',
+  },
   { name: 'server', label: t('server'), align: DefaultAlignment, field: 'server', sortable: true },
-  { name: 'context', label: t('context'), align: DefaultAlignment, field: 'context', sortable: true, classes: 'text-caption' },
+  {
+    name: 'context',
+    label: t('context'),
+    align: DefaultAlignment,
+    field: 'context',
+    sortable: true,
+    classes: 'text-caption',
+  },
   { name: 'user', label: t('user'), align: DefaultAlignment, field: 'user', sortable: true },
   {
     name: 'creationDate',

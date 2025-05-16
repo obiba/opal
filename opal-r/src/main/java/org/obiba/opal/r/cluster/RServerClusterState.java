@@ -17,7 +17,7 @@ import org.obiba.opal.r.service.RServerState;
 import java.util.List;
 import java.util.Set;
 
-class RServerClusterState implements RServerState {
+public class RServerClusterState implements RServerState {
 
   private final String name;
 
@@ -110,5 +110,13 @@ class RServerClusterState implements RServerState {
   @Override
   public int getSystemFreeMemory() {
     return systemFreeMemory;
+  }
+
+  public void setSystemCores(int systemCores) {
+    this.systemCores = systemCores;
+  }
+
+  public void setSystemFreeMemory(int systemFreeMemory) {
+    this.systemFreeMemory = systemFreeMemory;
   }
 }

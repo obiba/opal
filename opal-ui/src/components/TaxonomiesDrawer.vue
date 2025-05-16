@@ -1,12 +1,7 @@
 <template>
   <div>
     <h6 class="q-mt-none q-mb-none q-pa-md">
-      <q-btn
-        flat
-        round
-        dense
-        icon="arrow_back"
-        to="/" />
+      <q-btn flat round dense icon="arrow_back" to="/" />
       <span class="q-ml-md">
         {{ t('taxonomies') }}
       </span>
