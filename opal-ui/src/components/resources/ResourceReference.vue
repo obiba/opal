@@ -17,8 +17,9 @@
         <div v-if="provider">
           <div class="text-bold q-mb-sm">{{ provider.title }}</div>
           <q-markdown :src="provider.description" no-heading-anchor-links />
-          <a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md">{{ t('Website') }} <q-icon
-              name="open_in_new" /></a>
+          <a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md"
+            >{{ t('Website') }} <q-icon name="open_in_new"
+          /></a>
         </div>
         <div v-else>
           <div class="q-mb-md box-warning">
@@ -33,13 +34,21 @@
     <div v-if="reference && factory" class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
         <div class="text-h6 q-mb-md">{{ t('parameters') }}</div>
-        <schema-form v-model="refParameters" :schema="parametersSchemaForm" @update:model-value="onParametersUpdate"
-          disable />
+        <schema-form
+          v-model="refParameters"
+          :schema="parametersSchemaForm"
+          @update:model-value="onParametersUpdate"
+          disable
+        />
       </div>
       <div class="col-12 col-md-6">
         <div class="text-h6 q-mb-md">{{ t('credentials') }}</div>
-        <schema-form v-model="refCredentials" :schema="credentialsSchemaForm" @update:model-value="onParametersUpdate"
-          disable />
+        <schema-form
+          v-model="refCredentials"
+          :schema="credentialsSchemaForm"
+          @update:model-value="onParametersUpdate"
+          disable
+        />
       </div>
     </div>
   </div>

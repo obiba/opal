@@ -65,7 +65,7 @@ watch(
       scriptEdit.value = props.script || '';
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

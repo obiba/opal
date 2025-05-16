@@ -28,14 +28,7 @@
         <div class="col">
           <div class="text-h6 q-mb-md row q-gutter-sm items-center">
             <span>{{ t('id_mappings.ids_list_title') }}</span>
-            <q-btn
-              size="sm"
-              icon="add"
-              color="primary"
-              outline
-              :title="t('add')"
-              @click="onAddIdentifierTable"
-            ></q-btn>
+            <q-btn size="sm" icon="add" color="primary" outline :title="t('add')" @click="onAddIdentifierTable"></q-btn>
             <q-btn
               v-if="hasIdentifiersTables"
               size="sm"

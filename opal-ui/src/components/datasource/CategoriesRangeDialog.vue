@@ -55,7 +55,7 @@ watch(
       rangeStr.value = '';
     }
     showDialog.value = value;
-  }
+  },
 );
 
 const isValid = computed(() => rangeStr.value !== '');

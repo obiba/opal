@@ -4,9 +4,36 @@
       <q-icon name="arrow_back_ios_new" />
     </router-link>
     <span>{{ vocabulary.name }}</span>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="edit" :title="t('edit')" size="sm" @click="onEditVocabulary" class="on-right"></q-btn>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="red" icon="delete" :title="t('delete')" size="sm" @click="onDelete" class="on-right"></q-btn>
-    <q-btn v-if="taxonomiesStore.canEdit" outline color="secondary" icon="search" :title="t('search')" size="sm" @click="onSearchVocabulary" class="on-right"></q-btn>
+    <q-btn
+      v-if="taxonomiesStore.canEdit"
+      outline
+      color="secondary"
+      icon="edit"
+      :title="t('edit')"
+      size="sm"
+      @click="onEditVocabulary"
+      class="on-right"
+    ></q-btn>
+    <q-btn
+      v-if="taxonomiesStore.canEdit"
+      outline
+      color="red"
+      icon="delete"
+      :title="t('delete')"
+      size="sm"
+      @click="onDelete"
+      class="on-right"
+    ></q-btn>
+    <q-btn
+      v-if="taxonomiesStore.canEdit"
+      outline
+      color="secondary"
+      icon="search"
+      :title="t('search')"
+      size="sm"
+      @click="onSearchVocabulary"
+      class="on-right"
+    ></q-btn>
   </div>
   <div class="q-gutter-md q-mt-md q-mb-md">
     <fields-list class="col-6" :items="properties" :dbobject="vocabulary" />
@@ -342,13 +369,14 @@ function onEditVocabulary() {
 
 function onSearchVocabulary() {
   searchStore.reset();
-  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] = props.vocabulary.terms?.map((term) => term.name) || [];
+  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] =
+    props.vocabulary.terms?.map((term) => term.name) || [];
   router.push('/search/variables');
 }
 
 function onSearchTerm(term: TermDto) {
   searchStore.reset();
-  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] = [ term.name ];
+  searchStore.variablesQuery.criteria[`${props.taxonomy}-${props.vocabulary.name}`] = [term.name];
   router.push('/search/variables');
 }
 
@@ -397,6 +425,6 @@ watch(
       dirty.value = false;
       rows.value = props.vocabulary.terms || [];
     }
-  }
+  },
 );
 </script>

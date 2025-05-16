@@ -48,7 +48,7 @@ watch(
   () => {
     showDialog.value = props.modelValue;
     if (props.modelValue) init();
-  }
+  },
 );
 
 onMounted(init);

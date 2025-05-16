@@ -4,7 +4,7 @@
       <div class="q-mb-md">
         <q-btn :title="t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
       </div>
-      <fields-list :items="items" :dbobject="systemStore.generalConf" max-width="400"/>
+      <fields-list :items="items" :dbobject="systemStore.generalConf" max-width="400" />
     </div>
 
     <q-dialog v-model="showEdit">
@@ -56,7 +56,12 @@
           <div class="text-hint q-mb-md">
             {{ t('app_configuration.enforced_2fa_hint') }}
           </div>
-          <q-toggle v-model="config.allowRPackageManagement" dense :label="t('app_configuration.allow_r_packages_management')" class="q-mb-sm" />
+          <q-toggle
+            v-model="config.allowRPackageManagement"
+            dense
+            :label="t('app_configuration.allow_r_packages_management')"
+            class="q-mb-sm"
+          />
           <div class="text-hint">
             {{ t('app_configuration.allow_r_packages_management_hint') }}
           </div>
@@ -77,10 +82,7 @@ import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 const { t } = useI18n();
 
 const items: FieldItem[] = [
-  { field: 'name',
-    label: 'name',
-    hint: 'app_configuration.name_hint'
-  },
+  { field: 'name', label: 'name', hint: 'app_configuration.name_hint' },
   {
     field: 'publicURL',
     label: 'public_url',
@@ -108,13 +110,13 @@ const items: FieldItem[] = [
     field: 'enforced2FA',
     label: 'enforced_2fa',
     hint: 'app_configuration.enforced_2fa_hint',
-    icon: (val) => (val.enforced2FA ? 'check' : 'close')
+    icon: (val) => (val.enforced2FA ? 'check' : 'close'),
   },
   {
     field: 'allowRPackageManagement',
     label: 'app_configuration.allow_r_packages_management',
     hint: 'app_configuration.allow_r_packages_management_hint',
-    icon: (val) => (val.allowRPackageManagement ? 'check' : 'close')
+    icon: (val) => (val.allowRPackageManagement ? 'check' : 'close'),
   },
 ];
 

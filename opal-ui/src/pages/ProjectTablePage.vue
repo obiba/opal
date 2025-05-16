@@ -231,10 +231,7 @@
           </q-tab-panel>
 
           <q-tab-panel name="analyses" v-if="canAnalyseValidate">
-            <project-anaylse-validate
-              :project-name="dsName"
-              :table-name="tName"
-            />
+            <project-anaylse-validate :project-name="dsName" :table-name="tName" />
           </q-tab-panel>
 
           <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">

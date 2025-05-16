@@ -1,7 +1,13 @@
 <template>
   <div>
-    <file-select v-model="destinationFolder" :label="t('destination_folder')" :folder="filesStore.current"
-      selection="single" @select="onUpdate" type="folder" />
+    <file-select
+      v-model="destinationFolder"
+      :label="t('destination_folder')"
+      :folder="filesStore.current"
+      selection="single"
+      @select="onUpdate"
+      type="folder"
+    />
   </div>
 </template>
 
@@ -54,6 +60,14 @@ function onInit() {
 }
 
 function onUpdate() {
-  emit('update:modelValue', makeOutputPath(destinationFolder.value, props.tables[0]?.datasourceName, props.tables[0]?.name, extensions[props.type]));
+  emit(
+    'update:modelValue',
+    makeOutputPath(
+      destinationFolder.value,
+      props.tables[0]?.datasourceName,
+      props.tables[0]?.name,
+      extensions[props.type],
+    ),
+  );
 }
 </script>

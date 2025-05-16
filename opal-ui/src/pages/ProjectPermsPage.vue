@@ -108,12 +108,15 @@ async function doDeleteAcls() {
 }
 
 function initializeSubjectTypes() {
-  subjectTypes.value = projectsStore.subjects.reduce((acc: Record<string, Subject[]>, subject: Subject) => {
-    acc[subject.type] = acc[subject.type] || [];
-    acc[subject.type]?.push(subject);
-    acc[subject.type]?.sort((a, b) => a.principal.localeCompare(b.principal));
-    return acc;
-  }, {} as Record<string, Subject[]>);
+  subjectTypes.value = projectsStore.subjects.reduce(
+    (acc: Record<string, Subject[]>, subject: Subject) => {
+      acc[subject.type] = acc[subject.type] || [];
+      acc[subject.type]?.push(subject);
+      acc[subject.type]?.sort((a, b) => a.principal.localeCompare(b.principal));
+      return acc;
+    },
+    {} as Record<string, Subject[]>,
+  );
 }
 
 function findCandidateSubject() {

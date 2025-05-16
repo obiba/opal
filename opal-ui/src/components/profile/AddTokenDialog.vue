@@ -132,7 +132,7 @@ watch(
       initializeAdminGroupOptions();
       initializeServicesGroupOptions();
     }
-  }
+  },
 );
 
 // Validations
@@ -146,7 +146,7 @@ const servicesGroupOptions: { label: string; value: string }[] = [];
 function initializeTaskGroupOptions() {
   taskGroupOptions.push(
     { label: t('command_types.import'), value: 'import' },
-    { label: t('command_types.export'), value: 'export' }
+    { label: t('command_types.export'), value: 'export' },
   );
 
   if (props.type === TOKEN_TYPES.CUSTOM) {
@@ -156,7 +156,7 @@ function initializeTaskGroupOptions() {
       { label: t('command_types.import_vcf'), value: 'import_vcf' },
       { label: t('command_types.export_vcf'), value: 'export_vcf' },
       { label: t('command_types.backup'), value: 'backup' },
-      { label: t('command_types.restore'), value: 'restore' }
+      { label: t('command_types.restore'), value: 'restore' },
     );
   }
 }
@@ -165,7 +165,7 @@ function initializeAdminGroupOptions() {
   adminGroupOptions.push(
     { label: t('token_administration.createProject'), value: 'createProject' },
     { label: t('token_administration.updateProject'), value: 'updateProject' },
-    { label: t('token_administration.deleteProject'), value: 'deleteProject' }
+    { label: t('token_administration.deleteProject'), value: 'deleteProject' },
   );
 }
 
@@ -174,7 +174,7 @@ function initializeServicesGroupOptions() {
     { label: t('token_services.useR'), value: 'useR' },
     { label: t('token_services.useDatashield'), value: 'useDatashield' },
     { label: t('token_services.useSQL'), value: 'useSQL' },
-    { label: t('token_services.sysAdmin'), value: 'sysAdmin' }
+    { label: t('token_services.sysAdmin'), value: 'sysAdmin' },
   );
 }
 

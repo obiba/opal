@@ -290,7 +290,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
-    const params: { offset: number, limit: number, select: string | undefined } = { offset, limit, select: undefined };
+    const params: { offset: number; limit: number; select: string | undefined } = { offset, limit, select: undefined };
     if (select && select.length > 0) {
       params.select = `name().matches(/^${select.join('$|^')}$/)`;
     }
@@ -306,7 +306,11 @@ export const useDatasourceStore = defineStore('datasource', () => {
     const link = localVar
       ? `${localVar.parentLink?.link}/variable/${localVar.name}`
       : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
-    const params: { fullIfCached: boolean, limit: number | undefined, resetCache: boolean | undefined } = { fullIfCached, limit, resetCache: undefined };
+    const params: { fullIfCached: boolean; limit: number | undefined; resetCache: boolean | undefined } = {
+      fullIfCached,
+      limit,
+      resetCache: undefined,
+    };
     if (limit) {
       params.limit = limit;
     } else {
@@ -347,7 +351,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api
       .put(
         `/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`,
-        localVar
+        localVar,
       )
       .then(() => {
         return loadTableVariables();
@@ -377,7 +381,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     variables: VariableDto[],
     taxonomy: string,
     vocabulary: string,
-    termOrTexts: string | { [key: string]: string | undefined }
+    termOrTexts: string | { [key: string]: string | undefined },
   ) {
     const grouped = groupVariablesByTableLink(variables);
 
@@ -402,7 +406,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
           }
         });
         return api.post(`${tableLink}/variables`, variables);
-      })
+      }),
     );
   }
 
@@ -417,7 +421,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
           }
         });
         return api.post(`${tableLink}/variables`, variables);
-      })
+      }),
     );
   }
 

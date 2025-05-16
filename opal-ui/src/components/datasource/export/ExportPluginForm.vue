@@ -25,11 +25,7 @@ const parameters = ref<FormObject>();
 
 onMounted(onInit);
 
-watch(
-  () => props.type,
-  onInit,
-  { immediate: true }
-);
+watch(() => props.type, onInit, { immediate: true });
 
 function onInit() {
   pluginsStore.getDatasourcePluginForm(props.type, 'export').then((form) => {

@@ -27,11 +27,13 @@
           </template>
           <template v-slot:body-cell-name="props">
             <q-td :props="props">
-              <span class="text-primary">{{ props.row.app.name }}</span>
-              <code class="on-right" :title="props.value">{{ props.row.app.id.split('-')[0] }}</code>
+              <span class="text-primary">{{ props.row.app?.name || props.row.pod?.id }}</span>
+              <code v-if="props.row.app" class="on-right" :title="props.value">{{
+                props.row.app.id.split('-')[0]
+              }}</code>
               <div class="float-right">
                 <q-btn
-                  v-if="!props.row.running"
+                  v-if="props.row.app && !props.row.running"
                   rounded
                   dense
                   flat
@@ -43,7 +45,7 @@
                   @click="onRServerStart(props.row)"
                 />
                 <q-btn
-                  v-if="props.row.running"
+                  v-if="props.row.app && props.row.running"
                   rounded
                   dense
                   flat
@@ -75,7 +77,7 @@
           </template>
           <template v-slot:body-cell-url="props">
             <q-td :props="props">
-              <a :href="props.row.app.server" target="_blank">{{ props.row.app.server }}</a>
+              <a v-if="props.row.app" :href="props.row.app.server" target="_blank">{{ props.row.app.server }}</a>
             </q-td>
           </template>
           <template v-slot:body-cell-running="props">

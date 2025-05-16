@@ -47,7 +47,6 @@
       </template>
     </q-table>
   </div>
-  
 </template>
 
 <script setup lang="ts">

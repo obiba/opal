@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  */
 @Component("rockRService")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class RockService implements RServerService {
+public class RockService implements RServerAppService {
 
   private static final Logger log = LoggerFactory.getLogger(RockService.class);
 
@@ -317,7 +317,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    RServerSession session = new RockSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    RServerSession session = new RockAppSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     session.setProfile(new RServerProfile() {
       @Override
       public String getName() {

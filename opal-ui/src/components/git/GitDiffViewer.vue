@@ -18,7 +18,7 @@ interface Props {
 const props = defineProps<Props>();
 const diffHtml = ref('');
 const diffEntry = computed(() =>
-  props.commitInfo && props.commitInfo.diffEntries ? props.commitInfo.diffEntries[0] : ''
+  props.commitInfo && props.commitInfo.diffEntries ? props.commitInfo.diffEntries[0] : '',
 );
 
 function refresh() {
@@ -37,7 +37,7 @@ watch(
     if (newValue) {
       refresh();
     }
-  }
+  },
 );
 
 onMounted(() => refresh());

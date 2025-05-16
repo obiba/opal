@@ -134,10 +134,10 @@ const showDelete = ref(false);
 const showAddProfile = ref(false);
 // NOTE: Using interpolation mute i18n warnings for using html fragments in messages
 const idProviderDefinition = computed(
-  () => `<a href="https://en.wikipedia.org/wiki/Identity_provider" target="_blank">${t('identity_provider.title')}</a>`
+  () => `<a href="https://en.wikipedia.org/wiki/Identity_provider" target="_blank">${t('identity_provider.title')}</a>`,
 );
 const openIdDefinition = computed(
-  () => `<a href="https://en.wikipedia.org/wiki/OpenID_Connect" target="_blank">${t('openid_connect')}</a>`
+  () => `<a href="https://en.wikipedia.org/wiki/OpenID_Connect" target="_blank">${t('openid_connect')}</a>`,
 );
 
 const columns = computed(() => [

@@ -105,7 +105,7 @@ const credentialOptions = [
 ];
 const credentialType = ref(credentialOptions[0]?.value);
 const credentialTypeHint = computed(() =>
-  credentialType.value ? t(`apps.credential_hints.${credentialType.value}`) : t('apps.credential_hints.default')
+  credentialType.value ? t(`apps.credential_hints.${credentialType.value}`) : t('apps.credential_hints.default'),
 );
 const adminCredentials = computed(() => credentialType.value === 'administrator');
 const managerCredentials = computed(() => credentialType.value === 'manager_user');
@@ -151,7 +151,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onUpdateCredentialType(value: string) {

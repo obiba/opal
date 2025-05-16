@@ -194,7 +194,7 @@ watch(
     if (newValue) {
       getCommits();
     }
-  }
+  },
 );
 
 onMounted(() => {
