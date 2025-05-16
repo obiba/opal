@@ -15,7 +15,14 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" icon="add" :label="t('install')" size="sm" class="on-left" :disable="!systemStore.generalConf.allowRPackageManagement">
+        <q-btn-dropdown
+          color="primary"
+          icon="add"
+          :label="t('install')"
+          size="sm"
+          class="on-left"
+          :disable="!systemStore.generalConf.allowRPackageManagement"
+        >
           <q-list>
             <q-item clickable v-close-popup @click="onShowInstallPackages">
               <q-item-section>
@@ -197,7 +204,7 @@ watch(
   () => props.cluster,
   () => {
     updateRPackages();
-  }
+  },
 );
 
 function updateRPackages() {

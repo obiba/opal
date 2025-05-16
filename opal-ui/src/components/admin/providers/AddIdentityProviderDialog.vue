@@ -275,14 +275,14 @@ userInfo.some.property.map(x => x.split(':')[0])
 const useNonceDefinition = computed(
   () =>
     `<a href="https://openid.net/specs/openid-connect-core-1_0.html#IDToken" target="_blank" tabindex="-1">${t(
-      'identity_provider.use_nonce_definition'
-    )}</a>`
+      'identity_provider.use_nonce_definition',
+    )}</a>`,
 );
 const useLogoutDefinition = computed(
   () =>
     `<a href="https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout" target="_blank" tabindex="-1">${t(
-      'identity_provider.use_logout_definition'
-    )}</a>`
+      'identity_provider.use_logout_definition',
+    )}</a>`,
 );
 
 // Validation rules
@@ -310,7 +310,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function openWindow(url: string) {

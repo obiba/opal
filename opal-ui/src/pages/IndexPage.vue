@@ -74,7 +74,9 @@
               </q-card-section>
             </q-card>
             <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
-              <q-card-section class="q-pa-sm text-h6 text-center text-white bg-secondary"> R/DataSHIELD </q-card-section>
+              <q-card-section class="q-pa-sm text-h6 text-center text-white bg-secondary">
+                R/DataSHIELD
+              </q-card-section>
               <q-separator />
               <q-card-section class="text-hint">
                 <q-markdown :src="t('main.r_api')" />

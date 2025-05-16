@@ -5,17 +5,16 @@ package org.obiba.opal.core.domain.kubernetes;
  */
 public class PodRef {
 
-  private String name;
-  private String image;
+  private final String name;
+  private final PodSpec podSpec;
   private String status = "Pending";
-  private String ip;
-  private int port = -1;
+  private final String ip;
+  private final int port;
 
-  public PodRef() {}
 
-  public PodRef(String podName, String image, String status, String ip, int port) {
+  public PodRef(String podName, PodSpec podSpec, String status, String ip, int port) {
     this.name = podName;
-    this.image = image;
+    this.podSpec = podSpec;
     this.status = status;
     this.ip = ip;
     this.port = port;
@@ -25,16 +24,8 @@ public class PodRef {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getImage() {
-    return image;
-  }
-
-  public void setImage(String image) {
-    this.image = image;
+  public PodSpec getPodSpec() {
+    return podSpec;
   }
 
   public String getStatus() {
@@ -49,15 +40,12 @@ public class PodRef {
     return ip;
   }
 
-  public void setIp(String ip) {
-    this.ip = ip;
-  }
-
   public int getPort() {
     return port;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  @Override
+  public String toString() {
+    return podSpec.getNamespace() + ":" + name + " (" + status + ")";
   }
 }

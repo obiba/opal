@@ -15,12 +15,7 @@ declare module 'plotly.js-dist' {
     // Add more as needed
   }
 
-  export function newPlot(
-    div: string | HTMLDivElement,
-    data: Data[],
-    layout?: Layout,
-    config?: object
-  ): Promise<void>;
+  export function newPlot(div: string | HTMLDivElement, data: Data[], layout?: Layout, config?: object): Promise<void>;
 
   // Add other methods you're using
 }

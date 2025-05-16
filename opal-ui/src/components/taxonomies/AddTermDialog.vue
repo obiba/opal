@@ -99,7 +99,7 @@ watch(
 
       showDialog.value = value;
     }
-  }
+  },
 );
 
 // Handlers

@@ -85,7 +85,7 @@ const intervalFrequencies = computed(() => {
 });
 
 const hasIntervalFrequencies = computed(
-  () => intervalFrequencies.value.filter((f: IntervalFrequencyDto) => f.freq > 0).length > 0
+  () => intervalFrequencies.value.filter((f: IntervalFrequencyDto) => f.freq > 0).length > 0,
 );
 
 const histoLayout = computed(() => {
@@ -113,7 +113,7 @@ const histoLayout = computed(() => {
 const histoChartData = computed(() => {
   if (!props.data) return [];
   const labels = intervalFrequencies.value.map(
-    (f: IntervalFrequencyDto) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`
+    (f: IntervalFrequencyDto) => `${f.lower.toFixed(2)} - ${f.upper.toFixed(2)}`,
   );
   const values = intervalFrequencies.value.map((f: IntervalFrequencyDto) => (isFreq.value ? f.freq : f.density * 100));
 

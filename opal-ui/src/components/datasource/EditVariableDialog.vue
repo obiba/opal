@@ -112,7 +112,7 @@ watch(
       editMode.value = selected.value.name !== '' && selected.value.name !== undefined;
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {
@@ -120,14 +120,16 @@ function onHide() {
 }
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
-const hasValues = computed(() => datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0);
+const hasValues = computed(
+  () => datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0,
+);
 const canEditTypeFields = computed(() => isView.value || !editMode.value || !hasValues.value);
 const isValid = computed(
   () =>
     selected.value.name.trim() &&
     (editMode.value ||
       datasourceStore.table.variableCount === 0 ||
-      !datasourceStore.variables.some((v) => v.name === selected.value.name))
+      !datasourceStore.variables.some((v) => v.name === selected.value.name)),
 );
 
 function onSave() {

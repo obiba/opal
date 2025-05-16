@@ -2,6 +2,7 @@ package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import com.google.common.eventbus.EventBus;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class PodsServiceImpl implements PodsService {
@@ -28,6 +30,16 @@ public class PodsServiceImpl implements PodsService {
   private final EventBus eventBus;
 
   private KubernetesClient client;
+
+  private Boolean isInCluster = null;
+
+  @Override
+  public boolean isInsideKubernetes() {
+    if (isInCluster != null) return isInCluster;
+    isInCluster = System.getenv("KUBERNETES_SERVICE_HOST") != null;
+    log.info("Inside Kubernetes cluster: {}", isInCluster);
+    return isInCluster;
+  }
 
   @Autowired
   public PodsServiceImpl(OrientDbService orientDbService, EventBus eventBus) {
@@ -50,24 +62,24 @@ public class PodsServiceImpl implements PodsService {
   @Override
   public void deleteSpec(String id) {
     try {
-      PodSpec podSpec = getSpec(id);
+      PodSpec spec = getSpec(id);
       orientDbService.delete(new PodSpec(id));
-      eventBus.post(new PodSpecUnregisteredEvent(podSpec));
+      new Thread(() -> eventBus.post(new PodSpecUnregisteredEvent(spec))).start();
     } catch (Exception e) {
-      log.warn("Unable to delete pod specification with ID: " + id, e);
+      log.warn("Unable to delete pod specification with ID: {}", id, e);
     }
   }
 
   @Override
-  public void saveSpec(PodSpec podSpec) {
+  public void saveSpec(PodSpec spec) {
     try {
-      if (Strings.isNullOrEmpty(podSpec.getId())) {
-        podSpec.setId(podSpec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
+      if (Strings.isNullOrEmpty(spec.getId())) {
+        spec.setId(spec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
       }
-      orientDbService.save(podSpec, podSpec);
-      eventBus.post(new PodSpecRegisteredEvent(podSpec));
+      orientDbService.save(spec, spec);
+      new Thread(() -> eventBus.post(spec.isEnabled() ? new PodSpecRegisteredEvent(spec) : new PodSpecUnregisteredEvent(spec))).start();
     } catch (Exception e) {
-      log.warn("Unable to save pod specification: " + podSpec, e);
+      log.warn("Unable to save pod specification: {}", spec, e);
     }
   }
 
@@ -76,16 +88,25 @@ public class PodsServiceImpl implements PodsService {
     try {
       List<PodSpec> specs = getSpecs();
       orientDbService.deleteAll(PodSpec.class);
-      specs.forEach(spec -> eventBus.post(new PodSpecUnregisteredEvent(spec)));
+      new Thread(() -> specs.forEach(spec -> eventBus.post(new PodSpecUnregisteredEvent(spec)))).start();
     } catch (Exception e) {
       log.warn("Unable to delete all pod specifications", e);
     }
   }
 
   @Override
-  public PodRef createPod(PodSpec spec) {
-    String podName = spec.getContainer().getName() + "-" + UUID.randomUUID().toString().replace("-", "");
-    List<EnvVar> env = spec.getContainer().getEnv().entrySet().stream().map(e -> new EnvVar(e.getKey(), e.getValue(), null)).toList();
+  public PodRef createPod(PodSpec spec, Map<String, String> env) {
+    String podName = spec.getContainer().getName() + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    // user provided env vars
+    List<EnvVar> envVars = spec.getContainer().getEnv().entrySet().stream()
+        .filter(e -> env == null || !env.containsKey(e.getKey()))
+        .map(e -> new EnvVar(e.getKey(), e.getValue(), null)).collect(Collectors.toList());
+    // system provided env vars
+    if (env != null) {
+      env.entrySet().stream()
+          .map(e -> new EnvVar(e.getKey(), e.getValue(), null))
+          .forEach(envVars::add);
+    }
     ResourceRequirements res = new ResourceRequirements();
     res.setRequests(Map.of("memory", new Quantity(spec.getContainer().getResources().getRequests().getMemory()), "cpu", new Quantity(spec.getContainer().getResources().getRequests().getCpu())));
     res.setLimits(Map.of("memory", new Quantity(spec.getContainer().getResources().getLimits().getMemory()), "cpu", new Quantity(spec.getContainer().getResources().getLimits().getCpu())));
@@ -100,14 +121,16 @@ public class PodsServiceImpl implements PodsService {
           .addNewContainer()
             .withName(podName)
             .withImage(spec.getContainer().getImage())
+            .withImagePullPolicy(spec.getContainer().getImagePullPolicy())
             .addNewPort().withContainerPort(spec.getContainer().getPort()).endPort()
-        .withEnv(env)
-        .withResources(res)
-        .endContainer()
+            .withEnv(envVars)
+            .withResources(res)
+          .endContainer()
+          .withImagePullSecrets(spec.getContainer().hasImagePullSecret() ? new LocalObjectReferenceBuilder().withName(spec.getContainer().getImagePullSecret()).build() : null)
         .endSpec()
         .build();
 
-    client.pods().inNamespace(spec.getNamespace()).resource(pod).create();
+    client.pods().inNamespace(getNamespace(spec)).resource(pod).create();
 
     Service service = new ServiceBuilder()
         .withNewMetadata().withName(podName).endMetadata()
@@ -117,42 +140,41 @@ public class PodsServiceImpl implements PodsService {
         .withPort(spec.getContainer().getPort())
         //.withTargetPort(new IntOrString(spec.getContainer().getPort()))
         .endPort()
-        .withType("NodePort")
+        .withType("ClusterIP")
         .endSpec()
         .build();
 
-    client.services().inNamespace(spec.getNamespace()).resource(service).create();
+    client.services().inNamespace(getNamespace(spec)).resource(service).create();
 
     return ensureRunningPod(spec, podName);
   }
 
   @Override
   public PodRef getPod(PodSpec spec, String podName) {
-    Pod pod = client.pods().inNamespace(spec.getNamespace()).withName(podName).get();
+    Pod pod = client.pods().inNamespace(getNamespace(spec)).withName(podName).get();
     if (pod == null) return null;
-
-    String ip = pod.getStatus().getPodIP();
-    String status = pod.getStatus().getPhase();
-    String image = pod.getSpec().getContainers().getFirst().getImage();
-
-    if (!image.equals(spec.getContainer().getImage())) return null;
-
-    return new PodRef(podName, image, status, ip, spec.getContainer().getPort());
+    return getPodRef(spec, pod);
   }
 
   @Override
-  public void deletePod(PodSpec spec, String podName) {
-    client.pods().inNamespace(spec.getNamespace()).withName(podName).delete();
-    client.services().inNamespace(spec.getNamespace()).withName(podName).delete();
+  public void deletePod(PodRef pod) {
+    try {
+      PodSpec spec = pod.getPodSpec();
+      client.pods().inNamespace(getNamespace(spec)).withName(pod.getName()).delete();
+      client.services().inNamespace(getNamespace(spec)).withName(pod.getName()).delete();
+    } catch (Exception e) {
+      log.warn("Unable to delete pod: {}", pod, e);
+    }
   }
 
   @Override
   public List<PodRef> getPods(PodSpec spec) {
     List<PodRef> podRefs = Lists.newArrayList();
-    var pods = client.pods().inNamespace(spec.getNamespace()).list().getItems();
+    var pods = client.pods().inNamespace(getNamespace(spec)).list().getItems();
     for (Pod pod : pods) {
-      if (pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage())) {
-        PodRef ref = getPod(spec, pod.getMetadata().getName());
+      if (pod.getMetadata().getName().startsWith(spec.getContainer().getName())
+          && pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage())) {
+        PodRef ref = getPodRef(spec, pod);
         if (ref != null) {
           podRefs.add(ref);
         }
@@ -162,15 +184,22 @@ public class PodsServiceImpl implements PodsService {
   }
 
   @Override
-  public void start() {
-    getClient();
+  public void deletePods(PodSpec spec) {
+    List<PodRef> podRefs = getPods(spec);
+    podRefs.forEach(this::deletePod);
+  }
 
+  @Override
+  public void start() {
+    initClient();
     orientDbService.createUniqueIndex(PodSpec.class);
 
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
-        orientDbService.list(PodSpec.class).forEach(spec -> eventBus.post(new PodSpecRegisteredEvent(spec)));
+        Streams.stream(orientDbService.list(PodSpec.class))
+            .filter(PodSpec::isEnabled)
+            .forEach(spec -> eventBus.post(new PodSpecRegisteredEvent(spec)));
       }
     }, 5000);
   }
@@ -188,23 +217,43 @@ public class PodsServiceImpl implements PodsService {
     }
   }
 
-  private KubernetesClient getClient() {
+  //
+  // Private methods
+  //
+
+  private String getNamespace(PodSpec spec) {
+    return Strings.isNullOrEmpty(spec.getNamespace()) ? client.getNamespace() : spec.getNamespace();
+  }
+
+  private PodRef getPodRef(PodSpec spec, Pod pod) {
+    String podName = pod.getMetadata().getName();
+    Service service = client.services().inNamespace(getNamespace(spec)).withName(podName).get();
+    if (service == null)
+      log.warn("Unable to find service for pod: {}", podName);
+    String ip = service != null ? service.getSpec().getClusterIP() : null;
+    String status = pod.getStatus().getPhase();
+    String image = pod.getSpec().getContainers().getFirst().getImage();
+    if (!image.equals(spec.getContainer().getImage())) return null;
+    return new PodRef(podName, spec, status, ip, spec.getContainer().getPort());
+  }
+
+  private void initClient() {
     if (client == null) {
       try {
         client = new KubernetesClientBuilder().build();
+        isInsideKubernetes();
       } catch (Exception e) {
         log.error("Error opening Kubernetes client", e);
       }
     }
-    return client;
   }
 
   private PodRef ensureRunningPod(PodSpec spec, String podName) {
     int retries = 0;
     while (retries < 10) {
-      PodRef ref = getPod(spec, podName);
-      if (ref != null && "Running".equals(ref.getStatus())) {
-        return ref;
+      PodRef pod = getPod(spec, podName);
+      if (pod != null && "Running".equals(pod.getStatus())) {
+        return pod;
       }
       try {
         Thread.sleep(1000);

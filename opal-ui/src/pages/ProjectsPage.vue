@@ -200,7 +200,7 @@ function onFilter() {
   const query = filter && filter.value.length > 0 ? filter.value.toLowerCase() : '';
   const result = projects.value.filter((row) => {
     const rowString = `${row.name.toLowerCase()} ${flattenObjectToString(row.title || {})} ${flattenObjectToString(
-      row.description || {}
+      row.description || {},
     )}`;
     return rowString.includes(query);
   });

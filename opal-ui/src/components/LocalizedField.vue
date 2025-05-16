@@ -91,6 +91,6 @@ watch(
   () => {
     dirty.value = labels.value.some((l) => l.text || l.locale);
   },
-  { deep: true }
+  { deep: true },
 );
 </script>

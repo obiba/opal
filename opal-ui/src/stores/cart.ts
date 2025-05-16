@@ -25,8 +25,8 @@ export const useCartStore = defineStore(
             .catch(() => {
               // remove the variable from the cart if it no longer exists
               variables.value[i] = {} as VariableDto;
-            })
-        )
+            }),
+        ),
       );
       variables.value = variables.value.filter((v) => v.parentLink !== undefined);
     }
@@ -54,5 +54,5 @@ export const useCartStore = defineStore(
       isInCart,
     };
   },
-  { persist: true }
+  { persist: true },
 );

@@ -263,7 +263,7 @@ watch(
     // reset, not delete, otherwise a transient datasource in a previous import task would be deleted
     transientDatasourceStore.reset();
     showDialog.value = value;
-  }
+  },
 );
 
 const canNext = computed(() => {

@@ -62,7 +62,14 @@ const initialPagination = ref({
 
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name', sortable: true },
-  { name: 'context', label: t('context'), align: DefaultAlignment, field: 'context', sortable: true, classes: 'text-caption' },
+  {
+    name: 'context',
+    label: t('context'),
+    align: DefaultAlignment,
+    field: 'context',
+    sortable: true,
+    classes: 'text-caption',
+  },
   { name: 'user', label: t('user'), align: DefaultAlignment, field: 'user', sortable: true },
   {
     name: 'lastAccessDate',

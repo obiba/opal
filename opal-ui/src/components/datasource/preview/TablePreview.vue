@@ -43,6 +43,6 @@ watch(
     if (value) {
       tableTab.value = 'variables';
     }
-  }
+  },
 );
 </script>

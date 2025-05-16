@@ -1,100 +1,102 @@
 <template>
-  <div class="text-h6">{{ t('apps.self_register') }}</div>
-  <html-anchor-hint
-    class="text-help"
-    trKey="apps.self_register_info"
-    :text="t('apps.apps_admin')"
-    url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-  />
+  <div>
+    <div class="text-h6">{{ t('apps.self_register') }}</div>
+    <html-anchor-hint
+      class="text-help"
+      trKey="apps.self_register_info"
+      :text="t('apps.apps_admin')"
+      url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+    />
 
-  <div class="q-mt-sm q-gutter-sm row items-center">
-    <q-btn size="sm" icon="edit" color="primary" :title="t('edit')" @click="onEditToken"></q-btn>
-    <q-btn size="sm" icon="delete" color="negative" outline :title="t('delete')" @click="onClearToken"></q-btn>
+    <div class="q-mt-sm q-gutter-sm row items-center">
+      <q-btn size="sm" icon="edit" color="primary" :title="t('edit')" @click="onEditToken"></q-btn>
+      <q-btn size="sm" icon="delete" color="negative" outline :title="t('delete')" @click="onClearToken"></q-btn>
 
-    <span v-if="config.token" class="on-right">
-      <code>{{ config.token }}</code>
-      <q-btn
-        flat
-        dense
-        size="sm"
-        icon="content_copy"
-        :title="t('clipboard.copy')"
-        @click="onCopyToClipboard"
-        aria-label="Copy to clipboard"
-        class="on-right"
-      />
-    </span>
+      <span v-if="config.token" class="on-right">
+        <code>{{ config.token }}</code>
+        <q-btn
+          flat
+          dense
+          size="sm"
+          icon="content_copy"
+          :title="t('clipboard.copy')"
+          @click="onCopyToClipboard"
+          aria-label="Copy to clipboard"
+          class="on-right"
+        />
+      </span>
+    </div>
+
+    <div class="text-h6 q-mt-lg">{{ t('discovery') }}</div>
+    <html-anchor-hint
+      class="text-help"
+      trKey="apps.discovery_info"
+      :text="t('apps.apps_admin')"
+      url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+    />
+
+    <div class="text-bold q-mt-md">Rock</div>
+    <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
+    <q-table
+      flat
+      :rows="rockConfigs"
+      :columns="columns"
+      row-key="host"
+      :pagination="initialPagination"
+      :hide-pagination="rockConfigs.length <= initialPagination.rowsPerPage"
+      :loading="loading"
+    >
+      <template v-slot:top-left>
+        <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
+      </template>
+      <template v-slot:body-cell-host="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <a :href="props.value" target="_blank" class="text-primary">{{ props.value }}</a>
+          <div class="float-right">
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="t('edit')"
+              :icon="toolsVisible[props.row.host] ? 'edit' : 'none'"
+              class="q-ml-xs"
+              @click="onEdit(props.row)"
+            />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="t('remove')"
+              :icon="toolsVisible[props.row.host] ? 'delete' : 'none'"
+              class="q-ml-xs"
+              @click="onDelete(props.row)"
+            />
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+
+    <confirm-dialog
+      v-model="showRemove"
+      :title="t('remove')"
+      :text="t('apps.remove_config_confirm', { host: selectedConfig.host })"
+      @confirm="doRemove"
+    />
+
+    <add-app-token-dialog v-model="showEditToken" :token="config.token || ''" @update="onTokenEdited" />
+
+    <add-r-server-dialog
+      v-model="showAdd"
+      :config="config"
+      :rock-app-config="selectedConfig"
+      @update:model-value="onClose"
+      @update="onUpdated"
+    />
   </div>
-
-  <div class="text-h6 q-mt-lg">{{ t('discovery') }}</div>
-  <html-anchor-hint
-    class="text-help"
-    trKey="apps.discovery_info"
-    :text="t('apps.apps_admin')"
-    url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-  />
-
-  <div class="text-bold q-mt-md">Rock</div>
-  <html-anchor-hint class="text-help" trKey="apps.rock_info" text="OBiBa/Rock" url="https://rockdoc.obiba.org/" />
-  <q-table
-    flat
-    :rows="rockConfigs"
-    :columns="columns"
-    row-key="host"
-    :pagination="initialPagination"
-    :hide-pagination="rockConfigs.length <= initialPagination.rowsPerPage"
-    :loading="loading"
-  >
-    <template v-slot:top-left>
-      <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
-    </template>
-    <template v-slot:body-cell-host="props">
-      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-        <a :href="props.value" target="_blank" class="text-primary">{{ props.value }}</a>
-        <div class="float-right">
-          <q-btn
-            rounded
-            dense
-            flat
-            size="sm"
-            color="secondary"
-            :title="t('edit')"
-            :icon="toolsVisible[props.row.host] ? 'edit' : 'none'"
-            class="q-ml-xs"
-            @click="onEdit(props.row)"
-          />
-          <q-btn
-            rounded
-            dense
-            flat
-            size="sm"
-            color="secondary"
-            :title="t('remove')"
-            :icon="toolsVisible[props.row.host] ? 'delete' : 'none'"
-            class="q-ml-xs"
-            @click="onDelete(props.row)"
-          />
-        </div>
-      </q-td>
-    </template>
-  </q-table>
-
-  <confirm-dialog
-    v-model="showRemove"
-    :title="t('remove')"
-    :text="t('apps.remove_config_confirm', { host: selectedConfig.host })"
-    @confirm="doRemove"
-  />
-
-  <add-app-token-dialog v-model="showEditToken" :token="config.token || ''" @update="onTokenEdited" />
-
-  <add-r-server-dialog
-    v-model="showAdd"
-    :config="config"
-    :rock-app-config="selectedConfig"
-    @update:model-value="onClose"
-    @update="onUpdated"
-  />
 </template>
 
 <script setup lang="ts">

@@ -77,7 +77,7 @@ watch(
     if (value) {
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {
@@ -115,7 +115,7 @@ onMounted(() =>
   profilesStore.initProfile().then(() =>
     filesStore.initFiles(`/home/${profile.value.principal}`).then(() => {
       backupFolder.value = filesStore.current;
-    })
-  )
+    }),
+  ),
 );
 </script>

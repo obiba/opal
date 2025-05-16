@@ -59,7 +59,7 @@ watch(
     if (value) {
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {

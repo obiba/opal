@@ -141,7 +141,7 @@ watch(
       });
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {
