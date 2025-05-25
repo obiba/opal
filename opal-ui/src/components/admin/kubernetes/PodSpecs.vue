@@ -4,8 +4,12 @@
     <div class="text-help">{{ t('kubernetes.pod_specs.info') }}</div>
 
     <div class="text-bold q-mt-md">Rock</div>
-    <html-anchor-hint class="text-help" trKey="kubernetes.rock_info" text="OBiBa/Rock"
-      url="https://rockdoc.obiba.org/" />
+    <html-anchor-hint
+      class="text-help"
+      trKey="kubernetes.rock_info"
+      text="OBiBa/Rock"
+      url="https://rockdoc.obiba.org/"
+    />
     <q-table flat :rows="rockPodSpecs" :columns="columns" row-key="id" :pagination="initialPagination">
       <template v-slot:top-left>
         <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
@@ -14,10 +18,28 @@
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <code :title="props.row.id">{{ props.value }}</code>
           <div class="float-right">
-            <q-btn rounded dense flat size="sm" color="secondary" :title="t('edit')"
-              :icon="toolsVisible[props.row.id] ? 'edit' : 'none'" class="q-ml-xs" @click="onEdit(props.row)" />
-            <q-btn rounded dense flat size="sm" color="secondary" :title="t('delete')"
-              :icon="toolsVisible[props.row.id] ? 'delete' : 'none'" class="q-ml-xs" @click="onRemove(props.row)" />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="t('edit')"
+              :icon="toolsVisible[props.row.id] ? 'edit' : 'none'"
+              class="q-ml-xs"
+              @click="onEdit(props.row)"
+            />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="t('delete')"
+              :icon="toolsVisible[props.row.id] ? 'delete' : 'none'"
+              class="q-ml-xs"
+              @click="onRemove(props.row)"
+            />
           </div>
         </q-td>
       </template>
@@ -159,5 +181,4 @@ function onEdit(row: PodSpecDto) {
 function onRemove(row: PodSpecDto) {
   console.log('Remove', row);
 }
-
 </script>

@@ -8,11 +8,26 @@
       <q-icon name="info" />
       {{ t('r_packages_management_forbidden') }}
     </div>
-    <q-table flat :rows="packages" :columns="columns" :row-key="getPackageKey" wrap-cells
-      :pagination="initialPagination" :filter="filter" :filter-method="onFilter">
+    <q-table
+      flat
+      :rows="packages"
+      :columns="columns"
+      :row-key="getPackageKey"
+      wrap-cells
+      :pagination="initialPagination"
+      :filter="filter"
+      :filter-method="onFilter"
+    >
       <template v-slot:top-left>
-        <q-btn-dropdown v-if="!hasPods" color="primary" icon="add" :label="t('install')" size="sm" class="on-left"
-          :disable="!systemStore.generalConf.allowRPackageManagement">
+        <q-btn-dropdown
+          v-if="!hasPods"
+          color="primary"
+          icon="add"
+          :label="t('install')"
+          size="sm"
+          class="on-left"
+          :disable="!systemStore.generalConf.allowRPackageManagement"
+        >
           <q-list>
             <q-item clickable v-close-popup @click="onShowInstallPackages">
               <q-item-section>
@@ -35,13 +50,28 @@
           <q-td key="name" :props="props">
             <span class="text-primary">{{ props.row.name }}</span>
             <div class="float-right">
-              <q-btn rounded dense flat size="sm" color="secondary"
-                :icon="toolsVisible[getPackageKey(props.row)] ? 'visibility' : 'none'" class="q-ml-xs"
-                @click="onShowViewPackage(props.row)" />
-              <q-btn v-if="systemStore.generalConf.allowRPackageManagement" rounded dense flat size="sm"
-                color="secondary" :title="t('delete')"
-                :icon="toolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'" class="q-ml-xs"
-                @click="onShowDeletePackage(props.row)" />
+              <q-btn
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :icon="toolsVisible[getPackageKey(props.row)] ? 'visibility' : 'none'"
+                class="q-ml-xs"
+                @click="onShowViewPackage(props.row)"
+              />
+              <q-btn
+                v-if="systemStore.generalConf.allowRPackageManagement"
+                rounded
+                dense
+                flat
+                size="sm"
+                color="secondary"
+                :title="t('delete')"
+                :icon="toolsVisible[getPackageKey(props.row)] ? 'delete' : 'none'"
+                class="q-ml-xs"
+                @click="onShowDeletePackage(props.row)"
+              />
             </div>
           </q-td>
           <q-td key="title" :props="props">
@@ -59,16 +89,21 @@
           <q-td key="rserver" :props="props">
             <div v-if="props.row.rserver">
               <span>{{ props.row.rserver.split('~')[0] }}</span>
-              <code v-if="props.row.rserver?.includes('~')"
-                class="on-right">{{ props.row.rserver.split('~')[1].split('-')[0] }}</code>
+              <code v-if="props.row.rserver?.includes('~')" class="on-right">{{
+                props.row.rserver.split('~')[1].split('-')[0]
+              }}</code>
             </div>
             <span v-else>?</span>
           </q-td>
         </q-tr>
       </template>
     </q-table>
-    <confirm-dialog v-model="showDelete" :title="t('delete')" :text="t('delete_r_package_confirm', { name: pkg?.name })"
-      @confirm="onDeletePackage" />
+    <confirm-dialog
+      v-model="showDelete"
+      :title="t('delete')"
+      :text="t('delete_r_package_confirm', { name: pkg?.name })"
+      @confirm="onDeletePackage"
+    />
     <install-r-package-dialog v-model="showInstall" :cluster="cluster" :managers="['cran', 'gh']" />
     <view-r-package-dialog v-if="pkg" v-model="showView" :pkg="pkg" />
   </div>
