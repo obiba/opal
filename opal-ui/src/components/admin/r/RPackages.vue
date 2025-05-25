@@ -87,8 +87,11 @@
             {{ getDescriptionValue(props.row, 'LibPath') }}
           </q-td>
           <q-td key="rserver" :props="props">
-            <span>{{ props.row.rserver.split('~')[0] }}</span>
-            <code class="on-right">{{ props.row.rserver.split('~')[1].split('-')[0] }}</code>
+            <div v-if="props.row.rserver">
+              <span>{{ props.row.rserver.split('~')[0] }}</span>
+              <code v-if="props.row.rserver?.includes('~')" class="on-right">{{ props.row.rserver.split('~')[1].split('-')[0] }}</code>
+            </div>
+            <span v-else>?</span>
           </q-td>
         </q-tr>
       </template>

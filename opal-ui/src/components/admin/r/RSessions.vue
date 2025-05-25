@@ -29,13 +29,16 @@
       </template>
       <template v-slot:body-cell-server="props">
         <q-td :props="props">
-          <span>{{ props.value.split('~')[0] }}</span>
-          <code class="on-right">{{ props.value.split('~')[1].split('-')[0] }}</code>
+          <div v-if="props.value">
+            <span>{{ props.value.split('~')[0] }}</span>
+            <code v-if="props.value?.includes('~')" class="on-right">{{ props.value.split('~')[1].split('-')[0] }}</code>
+          </div>
+          <span v-else>?</span>
         </q-td>
       </template>
       <template v-slot:body-cell-user="props">
         <q-td :props="props">
-          <q-chip>{{ props.value }}</q-chip>
+          <q-chip class="q-ml-none">{{ props.value }}</q-chip>
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
