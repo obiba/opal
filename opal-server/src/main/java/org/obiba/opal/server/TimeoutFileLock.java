@@ -22,6 +22,12 @@ public class TimeoutFileLock {
   public static boolean setupLock() {
     log.info("Setting up lock file at {}", LOCK_PATH);
     lockFile = new File(LOCK_PATH);
+    if (!lockFile.getParentFile().exists()) {
+      if (!lockFile.getParentFile().mkdirs()) {
+        log.error("Unable to create work directory {}", lockFile.getParentFile().getAbsolutePath());
+        return false;
+      }
+    }
 
     try {
       RandomAccessFile raf = new RandomAccessFile(lockFile, "rw");
