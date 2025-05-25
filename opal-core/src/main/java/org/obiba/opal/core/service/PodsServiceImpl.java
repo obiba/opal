@@ -96,7 +96,7 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public PodRef createPod(PodSpec spec, Map<String, String> env) {
-    String podName = spec.getContainer().getName() + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    String podName = spec.getContainer().getName() + "--" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     // user provided env vars
     List<EnvVar> envVars = spec.getContainer().getEnv().entrySet().stream()
         .filter(e -> env == null || !env.containsKey(e.getKey()))
@@ -172,8 +172,12 @@ public class PodsServiceImpl implements PodsService {
     List<PodRef> podRefs = Lists.newArrayList();
     var pods = client.pods().inNamespace(getNamespace(spec)).list().getItems();
     for (Pod pod : pods) {
-      if (pod.getMetadata().getName().startsWith(spec.getContainer().getName())
-          && pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage())) {
+      // check image
+      boolean sameImage = pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage());
+      if (!sameImage) continue;
+      // check name prefix
+      String[] parts = pod.getMetadata().getName().split("--");
+      if (parts.length == 2 && parts[1].equals(spec.getContainer().getName())) {
         PodRef ref = getPodRef(spec, pod);
         if (ref != null) {
           podRefs.add(ref);
