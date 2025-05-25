@@ -24,14 +24,17 @@
       </template>
       <template v-slot:body-cell-id="props">
         <q-td :props="props">
-          <code :title="props.value">{{ props.value.split('-')[0] }}</code>
+          <code v-if="props.value.includes('--')" :title="props.value">{{ props.value.split('--')[0] }}</code>
+          <code v-else :title="props.value">{{ props.value.split('-')[0] }}</code>
         </q-td>
       </template>
       <template v-slot:body-cell-server="props">
         <q-td :props="props">
           <div v-if="props.value">
             <span>{{ props.value.split('~')[0] }}</span>
-            <code v-if="props.value?.includes('~')" class="on-right">{{ props.value.split('~')[1].split('-')[0] }}</code>
+            <code v-if="props.value?.includes('~')" class="on-right">{{
+              props.value.split('~')[1].split('-')[0]
+            }}</code>
           </div>
           <span v-else>?</span>
         </q-td>
