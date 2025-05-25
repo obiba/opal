@@ -35,6 +35,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -107,7 +108,6 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public void stop() {
-    if (sessions.isEmpty()) return;
     // clean up associated pods
     podsService.deletePods(podSpec);
   }
@@ -121,10 +121,12 @@ public class RockSpawnerService implements RServerPodService {
   public RServerState getState() throws RServerException {
     RServerClusterState state = new RServerClusterState(getName());
     state.setRunning(isRunning());
-    if (sessions.isEmpty()) {
+    List<RockPodSession> openedSessions = Lists.newArrayList(this.sessions.values()).stream()
+        .filter(session -> !session.isClosed()).toList();
+    if (openedSessions.isEmpty()) {
         return defaultRServerState != null ? defaultRServerState : state;
     } else {
-      for (RockPodSession session : sessions.values()) {
+      for (RockPodSession session : openedSessions) {
         try {
           RServerState podState = getState(session.getPodRef());
           state.setVersion(podState.getVersion());
@@ -253,7 +255,27 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public String[] getLog(Integer nbLines) {
-    throw new NotSupportedException("Rock spawner does not have access to spawned R server logs");
+    if (sessions.isEmpty()) return new String[0];
+    String[] logs = new String[0];
+    // concat all running pods logs
+    for (RockPodSession session : sessions.values()) {
+      if (session.isClosed()) continue;
+      String nameLine = String.format("### %s", session.getPod().getName());
+      String[] podLogs = getLog(session.getPodRef(), nbLines);
+      if (logs.length == 0) {
+        // add line with pod name
+        logs = new String[podLogs.length + 1];
+        logs[0] = nameLine;
+        System.arraycopy(podLogs, 0, logs, 1, podLogs.length);
+      } else {
+        String[] newLogs = new String[logs.length + podLogs.length + 1];
+        System.arraycopy(logs, 0, newLogs, 0, logs.length);
+        newLogs[logs.length] = nameLine;
+        System.arraycopy(podLogs, 0, newLogs, logs.length + 1, podLogs.length);
+        logs = newLogs;
+      }
+    }
+    return logs;
   }
 
   public void setRServerClusterName(String clusterName) {
@@ -272,6 +294,21 @@ public class RockSpawnerService implements RServerPodService {
   //
   // Private methods
   //
+
+  private String[] getLog(PodRef pod, Integer nbLines) {
+    try {
+      HttpHeaders headers = createHeaders();
+      headers.setAccept(Lists.newArrayList(MediaType.TEXT_PLAIN));
+      RestTemplate restTemplate = new RestTemplate();
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl(pod,"/rserver/_log"))
+          .queryParam("limit", nbLines);
+      ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+      return response.getBody().split("\n");
+    } catch (RestClientException e) {
+      log.warn("Error while getting R server log", e);
+      return new String[0];
+    }
+  }
 
   private RServerState getState(PodRef pod) {
     RestTemplate restTemplate = new RestTemplate();
