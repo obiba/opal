@@ -14,7 +14,6 @@ import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.AppsConfig;
 import org.obiba.opal.core.domain.RockAppConfig;
-import org.obiba.opal.core.domain.RockSpawnerAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.web.model.Apps;
 
