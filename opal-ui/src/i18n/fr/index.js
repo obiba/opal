@@ -1206,6 +1206,7 @@ export default {
   r_execution_time: "Temps d'exécution R",
   r_func: 'Fonction',
   r_packages_management_forbidden: "La gestion des paquets R (installation, mise à jour, suppression) n'est pas autorisée : il est recommandé d'utiliser des images Docker validées des serveurs R, pour garantir la reproductibilité de l'environnement d'analyse R. En tant que développeur de paquets R, vous pouvez modifier les paramètres système pour activer cette fonctionnalité.",
+  r_packages_readonly: 'Les paquets R sont en lecture seule, vous ne pouvez pas les installer, les mettre à jour ou les supprimer.',
   r_script: 'Script',
   r_service: 'Service R',
   r_sessions_activity: 'Activité des sessions R',

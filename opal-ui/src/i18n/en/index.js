@@ -1206,6 +1206,7 @@ export default {
   r_execution_time: 'R execution time',
   r_func: 'Function',
   r_packages_management_forbidden: 'R packages management (installation, update, removal) is not allowed: it is recommended to use validated Docker images of R servers, to ensure reproducibility of the R analysis environment. As a R package developer, you may modify the system settings to enable this feature.',
+  r_packages_readonly: 'R packages management is read-only: you can only view the installed R packages, but not install, update or remove them.',
   r_script: 'Script',
   r_service: 'R service',
   r_sessions_activity: 'R sessions activity',
