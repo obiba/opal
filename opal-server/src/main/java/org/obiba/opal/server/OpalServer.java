@@ -154,10 +154,10 @@ public class OpalServer {
   public static void main(String... args) throws Exception {
     try {
       checkSystemProperty("OPAL_HOME", "OPAL_DIST");
+      TimeoutFileLock.setupLock();
 
       if (args.length>0) {
         if ("--upgrade".equals(args[0])) {
-
           new OpalServer(true);
           System.exit(0);
         } else {
