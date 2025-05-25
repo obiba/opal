@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import jakarta.ws.rs.NotSupportedException;
+import org.apache.shiro.SecurityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.cfg.PodsService;
@@ -44,13 +45,15 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * R server service built over a Rock spawner application that got registered.
+ * R server service that spawns Rock server pods.
  */
 @Component("rockSpawnerRService")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RockSpawnerService implements RServerPodService {
 
   private static final Logger log = LoggerFactory.getLogger(RockSpawnerService.class);
+
+  private static final AppCredentials DEFAULT_CREDENTIALS = new AppCredentials("administrator", "password");
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
@@ -68,7 +71,7 @@ public class RockSpawnerService implements RServerPodService {
 
   private final Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
 
-  private static final AppCredentials DEFAULT_CREDENTIALS = new AppCredentials("administrator", "password");
+  private RServerState defaultRServerState;
 
   @Autowired
   public RockSpawnerService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, PodsService podsService) {
@@ -91,6 +94,7 @@ public class RockSpawnerService implements RServerPodService {
         pod = createRockPod();
         initInstalledPackagesDtos(pod);
         initDataShieldPackagesProperties(pod);
+        defaultRServerState = getState(pod);
       } catch (Exception e) {
         log.error("Error when reading installed packages and DataSHIELD properties", e);
       } finally {
@@ -117,17 +121,21 @@ public class RockSpawnerService implements RServerPodService {
   public RServerState getState() throws RServerException {
     RServerClusterState state = new RServerClusterState(getName());
     state.setRunning(isRunning());
-    for (RockPodSession session : sessions.values()) {
-      try {
-        RServerState podState = getState(session.getPodRef());
-        state.setVersion(podState.getVersion());
-        state.addTags(podState.getTags());
-        state.addRSessionsCount(podState.getRSessionsCount());
-        state.addBusyRSessionsCount(podState.getBusyRSessionsCount());
-        state.setSystemCores(podState.getSystemCores());
-        state.setSystemFreeMemory(podState.getSystemFreeMemory());
-      } catch (RestClientException e) {
-        log.error("Error when reading R server state", e);
+    if (sessions.isEmpty()) {
+        return defaultRServerState != null ? defaultRServerState : state;
+    } else {
+      for (RockPodSession session : sessions.values()) {
+        try {
+          RServerState podState = getState(session.getPodRef());
+          state.setVersion(podState.getVersion());
+          state.addTags(podState.getTags());
+          state.addRSessionsCount(podState.getRSessionsCount());
+          state.addBusyRSessionsCount(podState.getBusyRSessionsCount());
+          state.setSystemCores(podState.getSystemCores());
+          state.setSystemFreeMemory(podState.getSystemFreeMemory());
+        } catch (RestClientException e) {
+          log.error("Error when reading R server state", e);
+        }
       }
     }
     return state;
@@ -159,7 +167,13 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public void execute(ROperation rop) throws RServerException {
-    throw new NotSupportedException("Rock spawner is readonly");
+    Object principal = SecurityUtils.getSubject().getPrincipal();
+    RServerSession rSession = newRServerSession(principal == null ? "opal/system" : principal.toString());
+    try {
+      rSession.execute(rop);
+    } finally {
+      rSession.close();
+    }
   }
 
   @Override
@@ -188,7 +202,7 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   @Override
-  public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
+  public synchronized Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
     if (!dsPackages.isEmpty()) return dsPackages;
     PodRef pod = null;
     try {
@@ -266,7 +280,7 @@ public class RockSpawnerService implements RServerPodService {
     return new RockState(response.getBody(), getName());
   }
 
-  private synchronized void initInstalledPackagesDtos(PodRef pod) {
+  private void initInstalledPackagesDtos(PodRef pod) {
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<RockStringMatrix> response =
         restTemplate.exchange(getRServerResourceUrl(pod,"/rserver/packages"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockStringMatrix.class);
@@ -277,7 +291,7 @@ public class RockSpawnerService implements RServerPodService {
         .toList());
   }
 
-  private synchronized void initDataShieldPackagesProperties(PodRef pod) {
+  private void initDataShieldPackagesProperties(PodRef pod) {
     HttpHeaders headers = createHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     RestTemplate restTemplate = new RestTemplate();
