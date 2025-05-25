@@ -154,7 +154,11 @@ public class OpalServer {
   public static void main(String... args) throws Exception {
     try {
       checkSystemProperty("OPAL_HOME", "OPAL_DIST");
-      TimeoutFileLock.setupLock();
+      boolean locked = TimeoutFileLock.setupLock();
+      if (!locked) {
+        System.out.println("Could not acquire lock, exiting");
+        System.exit(1);
+      }
 
       if (args.length>0) {
         if ("--upgrade".equals(args[0])) {
