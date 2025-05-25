@@ -33,6 +33,10 @@ public class RockPodSession extends RockSession {
     podsService.deletePod(pod);
   }
 
+  public PodRef getPod() {
+    return pod;
+  }
+
   public PodRef getPodRef() {
     return pod;
   }
