@@ -62,9 +62,11 @@ public class RockSpawnerService implements RServerPodService {
 
   private final PodsService podsService;
 
-  private String clusterName;
+  private final Map<String, RockPodSession> sessions = Maps.newHashMap();
 
-  private Map<String, RockPodSession> sessions = Maps.newHashMap();
+  private boolean running = false;
+
+  private String clusterName;
 
   private PodSpec podSpec;
 
@@ -100,6 +102,7 @@ public class RockSpawnerService implements RServerPodService {
         log.error("Error when reading installed packages and DataSHIELD properties", e);
       } finally {
         if (pod != null) podsService.deletePod(pod);
+        running = true;
       }
     };
     Thread thread = new Thread(task);
@@ -108,13 +111,21 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public void stop() {
-    // clean up associated pods
-    podsService.deletePods(podSpec);
+    try {
+      // clean up associated pods
+      podsService.deletePods(podSpec);
+    } finally {
+      running = false;
+      sessions.clear();
+      packages.clear();
+      dsPackages.clear();
+      defaultRServerState = null;
+    }
   }
 
   @Override
   public boolean isRunning() {
-    return true;
+    return running;
   }
 
   @Override
@@ -125,7 +136,7 @@ public class RockSpawnerService implements RServerPodService {
         .filter(session -> !session.isClosed()).toList();
     if (openedSessions.isEmpty()) {
         return defaultRServerState != null ? defaultRServerState : state;
-    } else {
+    } else if (isRunning()) {
       for (RockPodSession session : openedSessions) {
         try {
           RServerState podState = getState(session.getPodRef());
@@ -185,7 +196,7 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public synchronized List<OpalR.RPackageDto> getInstalledPackagesDtos() {
-    if (!packages.isEmpty()) return packages;
+    if (!packages.isEmpty() || !isRunning()) return packages;
     PodRef pod = null;
     try {
       pod = createRockPod();
@@ -205,7 +216,7 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public synchronized Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
-    if (!dsPackages.isEmpty()) return dsPackages;
+    if (!dsPackages.isEmpty() || !isRunning()) return dsPackages;
     PodRef pod = null;
     try {
       pod = createRockPod();
@@ -255,7 +266,7 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public String[] getLog(Integer nbLines) {
-    if (sessions.isEmpty()) return new String[0];
+    if (sessions.isEmpty() || !isRunning()) return new String[0];
     String[] logs = new String[0];
     // concat all running pods logs
     for (RockPodSession session : sessions.values()) {
