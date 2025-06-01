@@ -16,20 +16,25 @@
             <q-item-label header class="text-uppercase">{{ t('data_access') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/users">{{ t('users_and_groups') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/users">{{ t('users_and_groups') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('users_and_groups_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/profiles">{{ t('user_profiles') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/profiles">{{ t('user_profiles') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('user_profiles_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/idproviders">{{ t('identity_providers')
-                }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/idproviders">{{ t('identity_providers') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('identity_providers_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -40,7 +45,9 @@
             <q-item-label header class="text-uppercase">{{ t('data_analysis') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/rservers">{{ t('rservers') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/rservers">{{ t('rservers') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('rservers_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -52,7 +59,9 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/search">{{ t('search') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/search">{{ t('search') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('search_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -65,20 +74,25 @@
             <q-item-label header class="text-uppercase">{{ t('data_management') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/files">{{ t('files') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/files">{{ t('files') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('files_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/tasks">{{ t('tasks') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/tasks">{{ t('tasks') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('tasks_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/identifiers">{{ t('id_mappings.title')
-                }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/identifiers">{{ t('id_mappings.title') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('id_mappings.manage_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -89,38 +103,50 @@
             <q-item-label header class="text-uppercase">{{ t('system') }}</q-item-label>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/settings">{{ t('general_settings') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/settings">{{ t('general_settings') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('general_settings_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/taxonomies">{{ t('taxonomies') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/taxonomies">{{ t('taxonomies') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('taxonomies_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/databases">{{ t('databases') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/databases">{{ t('databases') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('databases_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/plugins">{{ t('plugins') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/plugins">{{ t('plugins') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('plugins_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/apps">{{ t('apps.title') }}</router-link></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/apps">{{ t('apps.title') }}</router-link></q-item-label
+                >
                 <q-item-label caption lines="2">{{ t('apps.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label><router-link to="/admin/kubernetes">{{ t('kubernetes.title') }}</router-link><q-badge
-                    color="warning" text-color="black" label="beta" class="on-right" /></q-item-label>
+                <q-item-label
+                  ><router-link to="/admin/kubernetes">{{ t('kubernetes.title') }}</router-link
+                  ><q-badge color="warning" text-color="black" label="beta" class="on-right"
+                /></q-item-label>
                 <q-item-label caption lines="2">{{ t('kubernetes.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
