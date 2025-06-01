@@ -65,6 +65,7 @@
     <jetty.version>12.0.12</jetty.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>7.2.1.202505142326-r</jgit.version>
+    <jib.version>0.27.3</jib.version>
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.8.2</joda-time.version>
     <jpa.version>1.0.2</jpa.version>
@@ -1271,6 +1272,17 @@
         <groupId>io.fabric8</groupId>
         <artifactId>kubernetes-client</artifactId>
         <version>${kubernetes.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-core</artifactId>
+        <version>${jib.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
