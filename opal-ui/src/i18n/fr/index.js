@@ -182,6 +182,8 @@ export default {
     resources_limits_hint: 'Les limites de ressources du pod. Ces ressources sont la quantité maximale de ressources que le pod peut utiliser.',
     cpu_hint: "Le nombre d'unités de CPU.",
     memory_hint: "La quantité d'unités de mémoire.",
+    invalid_pod_name: 'Le nom du pod doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, des chiffres et des tirets.',
+    invalid_docker_image_name: "Le nom de l'image Docker doit être un nom d'image valide, par exemple 'mon-registre/mon-image:tag'.",
   },
   identity_provider: {
     title: "Fournisseur d'identité",

@@ -182,6 +182,8 @@ export default {
     resources_limits_hint: 'The maximum resources allowed for the pod.',
     cpu_hint: 'The number of CPU units.',
     memory_hint: 'The amount of memory units.',
+    invalid_pod_name: 'Invalid pod name: alphanumeric lowercase characters and dashes only. Must start and end with an alphanumeric character.',
+    invalid_docker_image_name: 'Invalid Docker image name.',
   },
   identity_provider: {
     title: 'Identity Provider',

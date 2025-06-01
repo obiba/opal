@@ -54,7 +54,7 @@
           >
             <q-tab name="container" :label="t('kubernetes.container')" />
             <q-tab name="resources" :label="t('kubernetes.resources')" />
-            <q-tab name="environment" :label="t('kubernetes.environment')" />
+            <!-- q-tab name="environment" :label="t('kubernetes.environment')" /-->
           </q-tabs>
 
           <q-tab-panels v-model="tab">
@@ -66,9 +66,11 @@
                 :hint="t('kubernetes.name_prefix_hint')"
                 class="q-mb-md"
                 lazy-rules
-                :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
-              >
-              </q-input>
+                :rules="[
+                  (val) => (val && val.trim().length > 0) || t('required'),
+                  (val) => isValidPodName(val) || t('kubernetes.invalid_pod_name'),
+                ]"
+              ></q-input>
               <q-input
                 v-model="container.image"
                 dense
@@ -76,7 +78,10 @@
                 :hint="t('kubernetes.image_hint')"
                 class="q-mb-md"
                 lazy-rules
-                :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
+                :rules="[
+                  (val) => (val && val.trim().length > 0) || t('required'),
+                  (val) => isValidDockerImageName(val) || t('kubernetes.invalid_docker_image_name'),
+                ]"
               >
               </q-input>
               <q-select
@@ -271,6 +276,28 @@ watch(
     }
   },
 );
+
+function isValidPodName(name: string): boolean {
+  const maxLength = 253 - 10; // need to leave space for the pod name suffix
+  const regex = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+
+  return name.length > 0 && name.length <= maxLength && regex.test(name);
+}
+
+function isValidDockerImageName(name: string): boolean {
+  // Regex pattern for a full Docker image name (tag OR digest allowed)
+  const dockerImageRegex = new RegExp(
+    // optional registry: host[:port]/
+    '^(?:(?:[a-zA-Z0-9.-]+(?::[0-9]+)?)/)?' +
+      // repository path (may include namespace)
+      '(?:[a-z0-9]+(?:[._-][a-z0-9]+)*(?:/[a-z0-9]+(?:[._-][a-z0-9]+)*)*)' +
+      // optional tag
+      '(?::[\\w][\\w.-]{0,127})?' +
+      // optional digest
+      '(?:@sha256:[a-fA-F0-9]{64})?$',
+  );
+  return dockerImageRegex.test(name);
+}
 
 function onRemoveEnv(index: number) {
   env.value.splice(index, 1);
