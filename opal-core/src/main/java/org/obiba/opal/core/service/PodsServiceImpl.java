@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service;
 
+import com.google.cloud.tools.jib.api.ImageReference;
+import com.google.cloud.tools.jib.api.InvalidImageReferenceException;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
@@ -15,6 +17,7 @@ import org.obiba.opal.core.event.PodSpecUnregisteredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -24,6 +27,11 @@ import java.util.stream.Collectors;
 public class PodsServiceImpl implements PodsService {
 
   private static final Logger log = LoggerFactory.getLogger(PodsServiceImpl.class);
+
+  @Value("${pods.images.rock}")
+  private String[] allowedPodImagesRock;
+
+  private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
   private final OrientDbService orientDbService;
 
@@ -73,6 +81,7 @@ public class PodsServiceImpl implements PodsService {
   @Override
   public void saveSpec(PodSpec spec) {
     try {
+      checkImage(spec);
       if (Strings.isNullOrEmpty(spec.getId())) {
         spec.setId(spec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
       }
@@ -81,6 +90,27 @@ public class PodsServiceImpl implements PodsService {
     } catch (Exception e) {
       log.warn("Unable to save pod specification: {}", spec, e);
     }
+  }
+
+  private void checkImage(PodSpec spec) {
+    String imageStr = spec.getContainer().getImage();
+    try {
+      ImageReference imageReference = ImageReference.parse(imageStr);
+      checkRockImage(spec, imageReference);
+    } catch (InvalidImageReferenceException e) {
+      throw new IllegalArgumentException("Pod image " + imageStr + " is not valid", e);
+    }
+
+  }
+
+  private void checkRockImage(PodSpec spec, ImageReference imageReference) {
+    if (!"rock".equals(spec.getType())) return;
+    String imageStr = spec.getContainer().getImage();
+    // check if it matches any allowed image refs
+    if (allowedPodImageRefsRock.isEmpty()) return;
+    boolean hasMatch = allowedPodImageRefsRock.stream().anyMatch((allowedRef) -> imageReference.getRegistry().equals(allowedRef.getRegistry()) && imageReference.getRepository().equals(allowedRef.getRepository()));
+    if (hasMatch) return;
+    throw new IllegalArgumentException("Pod 'rock' image " + imageStr + " is not allowed (allowed images: " + Arrays.toString(allowedPodImagesRock) + ")");
   }
 
   @Override
@@ -197,6 +227,17 @@ public class PodsServiceImpl implements PodsService {
   public void start() {
     initClient();
     orientDbService.createUniqueIndex(PodSpec.class);
+
+    if (allowedPodImagesRock != null) {
+      allowedPodImageRefsRock.clear();
+      for (String allowedPodImage : allowedPodImagesRock) {
+        try {
+          allowedPodImageRefsRock.add(ImageReference.parse(allowedPodImage));
+        } catch (Exception e) {
+          log.error("Unable to parse allowed docker image {}", allowedPodImage, e);
+        }
+      }
+    }
 
     new Timer().schedule(new TimerTask() {
       @Override
