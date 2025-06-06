@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [21]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm devscripts fakeroot debhelper
+
+      - name: Cache Maven and general cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2
+            ~/.cache
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .settings.xml ~/.m2/settings.xml
+
+      - name: Deploy Snapshot
+        if: github.ref == 'refs/heads/snapshot' && github.event_name == 'push'
+        run: mvn -U deploy
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
+
+      - name: Deploy Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: mvn -Prelease deploy
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
+
+      - name: Maven Install (non-snapshot, non-tag)
+        if: github.ref != 'refs/heads/snapshot' && !startsWith(github.ref, 'refs/tags/')
+        run: mvn -U install
