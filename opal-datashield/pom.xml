@@ -54,10 +54,6 @@
       <groupId>org.obiba.datashield</groupId>
       <artifactId>ds4j-r</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core-ws</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
