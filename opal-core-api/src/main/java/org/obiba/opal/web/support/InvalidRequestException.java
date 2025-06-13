@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.support;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +50,6 @@ public class InvalidRequestException extends RuntimeException {
   //
 
   public List<String> getMessageArgs() {
-    return Collections.unmodifiableList(messageArgs);
+    return Lists.newArrayList(messageArgs);
   }
 }

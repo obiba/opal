@@ -9,21 +9,20 @@
  */
 package org.obiba.opal.shell;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
-import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Contains a command and the state of its execution.
@@ -241,7 +240,7 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   public List<Message> getMessages() {
-    return Collections.unmodifiableList(messages);
+    return Lists.newArrayList(messages);
   }
 
   public String getMessageProgress() {
