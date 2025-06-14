@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '**'
+    tags:
+      - '*'
   pull_request:
 
 jobs:
@@ -27,7 +29,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm devscripts fakeroot debhelper
+          sudo apt-get install -y rpm devscripts fakeroot debhelper build-essential
 
       - name: Cache Maven and general cache
         uses: actions/cache@v4
