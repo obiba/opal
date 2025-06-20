@@ -21,6 +21,11 @@ import java.util.List;
 public interface ResourceProvidersService extends SystemService {
 
   /**
+   * Force inspection of R servers for resource providers.
+   */
+  void initResourceProviders();
+
+  /**
    * Get all resource providers.
    *
    * @return

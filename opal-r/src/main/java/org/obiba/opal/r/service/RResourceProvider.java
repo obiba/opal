@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-class RResourceProvider implements ResourceProvidersService.ResourceProvider {
+public class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   private static final Logger log = LoggerFactory.getLogger(RResourceProvider.class);
 
@@ -33,7 +33,7 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   private JSONObject settings;
 
-  RResourceProvider(String profile, String name, String script) {
+  public RResourceProvider(String profile, String name, String script) {
     this.profile = profile;
     this.name = name;
     this.script = script;
@@ -113,5 +113,9 @@ class RResourceProvider implements ResourceProvidersService.ResourceProvider {
 
   public JSONObject getSettings() {
     return settings;
+  }
+
+  public static ResourceProvidersService.ResourceProvider copyResourceProvider(String profile, RResourceProvider resourceProvider) {
+    return new RResourceProvider(profile, resourceProvider.name, resourceProvider.script);
   }
 }

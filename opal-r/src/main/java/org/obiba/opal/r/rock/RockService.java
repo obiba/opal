@@ -23,12 +23,10 @@ import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.InstallLocalPackageOperation;
-import org.obiba.opal.r.service.RServerProfile;
-import org.obiba.opal.r.service.RServerService;
-import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
@@ -218,6 +216,29 @@ public class RockService implements RServerAppService {
       log.error("Error when reading installed package: " + name, e);
     }
     throw new NoSuchRPackageException(name);
+  }
+
+  @Override
+  public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
+    Map<String, List<ResourceProvidersService.ResourceProvider>> resourceProviders = Maps.newHashMap();
+    ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
+    try {
+      this.execute(rop);
+      RServerResult result = rop.getResult();
+      if (result.isNamedList()) {
+        RNamedList<RServerResult> pkgList = result.asNamedList();
+        for (String name : pkgList.keySet()) {
+          RServerResult res = pkgList.get(name);
+          if (!resourceProviders.containsKey(name)) {
+            resourceProviders.put(name, Lists.newArrayList());
+          }
+          resourceProviders.get(name).add(new RResourceProvider(this.getName(), name, res.asStrings()[0]));
+        }
+      }
+    } catch (Exception e) {
+      log.error("Error when reading R server resource providers", e);
+    }
+    return resourceProviders;
   }
 
   @Override

@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RPackageInstalledEvent;
 import org.obiba.opal.r.service.event.RPackageRemovedEvent;
@@ -200,6 +201,17 @@ public class RServerCluster implements RServerClusterService {
       log.error("Cannot retrieve all R packages", e);
     }
     return allPackages;
+  }
+
+  @Override
+  public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
+    Map<String, List<ResourceProvidersService.ResourceProvider>> resourceProviders = Maps.newHashMap();
+    rServerServices.getFirst().getResourceProviders().forEach((name, list) -> {
+      resourceProviders.put(name, list.stream()
+          .map((provider) -> RResourceProvider.copyResourceProvider(getName(), ((RResourceProvider) provider)))
+          .toList());
+    });
+    return resourceProviders;
   }
 
   @Override

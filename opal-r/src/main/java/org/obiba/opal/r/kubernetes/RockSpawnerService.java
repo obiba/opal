@@ -12,17 +12,18 @@ import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.cluster.RServerClusterState;
 import org.obiba.opal.r.rock.RockServerException;
 import org.obiba.opal.r.rock.RockServerStatus;
 import org.obiba.opal.r.rock.RockState;
 import org.obiba.opal.r.rock.RockStringMatrix;
-import org.obiba.opal.r.service.RServerProfile;
-import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.*;
+import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.RPackageResourceHelper;
@@ -72,6 +73,8 @@ public class RockSpawnerService implements RServerPodService {
 
   private final List<OpalR.RPackageDto> packages = Lists.newArrayList();
 
+  private final Map<String, List<ResourceProvidersService.ResourceProvider>> resourceProviders = Maps.newHashMap();
+
   private final Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
 
   private RServerState defaultRServerState;
@@ -96,6 +99,7 @@ public class RockSpawnerService implements RServerPodService {
       try {
         pod = createRockPod();
         initInstalledPackagesDtos(pod);
+        initResourceProviders(pod);
         initDataShieldPackagesProperties(pod);
         defaultRServerState = getState(pod);
       } catch (Exception e) {
@@ -156,26 +160,8 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    try {
-      PodRef pod = createRockPod();
-      RockPodSession session = new RockPodSession(getName(), pod, DEFAULT_CREDENTIALS, user, podsService, transactionalThreadFactory, eventBus);
-      session.setProfile(new RServerProfile() {
-        @Override
-        public String getName() {
-          return podSpec.getId();
-        }
-
-        @Override
-        public String getCluster() {
-          return podSpec.getId();
-        }
-      });
-      sessions.put(pod.getName(), session);
-      return session;
-    } catch (RestClientException e) {
-      log.error("Error when creating Rock pod session", e);
-      throw new RockServerException("Rock pod session creation failed", e);
-    }
+    PodRef pod = createRockPod();
+    return newRServerSession(pod, user);
   }
 
   @Override
@@ -215,6 +201,21 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   @Override
+  public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
+    if (!resourceProviders.isEmpty() ||  !isRunning()) return resourceProviders;
+    PodRef pod = null;
+    try {
+      pod = createRockPod();
+      initResourceProviders(pod);
+    } catch (Exception e) {
+      log.error("Error when reading installed resource packages", e);
+    } finally {
+      if (pod != null) podsService.deletePod(pod);
+    }
+    return resourceProviders;
+  }
+
+  @Override
   public synchronized Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
     if (!dsPackages.isEmpty() || !isRunning()) return dsPackages;
     PodRef pod = null;
@@ -222,7 +223,7 @@ public class RockSpawnerService implements RServerPodService {
       pod = createRockPod();
       initDataShieldPackagesProperties(pod);
     } catch (Exception e) {
-      log.error("Error when reading installed packages", e);
+      log.error("Error when reading installed DataSHIELD packages", e);
     } finally {
       if (pod != null) podsService.deletePod(pod);
     }
@@ -306,6 +307,40 @@ public class RockSpawnerService implements RServerPodService {
   // Private methods
   //
 
+  private RServerSession newRServerSession(PodRef pod, String user) throws RServerException {
+    try {
+      RockPodSession session = new RockPodSession(getName(), pod, DEFAULT_CREDENTIALS, user, podsService, transactionalThreadFactory, eventBus);
+      session.setProfile(new RServerProfile() {
+        @Override
+        public String getName() {
+          return podSpec.getId();
+        }
+
+        @Override
+        public String getCluster() {
+          return podSpec.getId();
+        }
+      });
+      sessions.put(pod.getName(), session);
+      return session;
+    } catch (RestClientException e) {
+      log.error("Error when creating Rock pod session", e);
+      throw new RockServerException("Rock pod session creation failed", e);
+    }
+  }
+
+  private void execute(PodRef pod, ROperation rop) throws RServerException {
+    Object principal = SecurityUtils.getSubject().getPrincipal();
+    RServerSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString());
+    // close session but not the pod that is managed externally
+    ((RockPodSession) rSession).setTerminatePod(false);
+    try {
+      rSession.execute(rop);
+    } finally {
+      rSession.close();
+    }
+  }
+
   private String[] getLog(PodRef pod, Integer nbLines) {
     try {
       HttpHeaders headers = createHeaders();
@@ -337,6 +372,27 @@ public class RockSpawnerService implements RServerPodService {
     packages.addAll(matrix.iterateRows().stream()
         .map(new RPackageResourceHelper.StringsToRPackageDto(clusterName, getName(), matrix))
         .toList());
+  }
+
+  private void initResourceProviders(PodRef pod) {
+    resourceProviders.clear();
+    ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
+    try {
+      this.execute(pod, rop);
+      RServerResult result = rop.getResult();
+      if (result.isNamedList()) {
+        RNamedList<RServerResult> pkgList = result.asNamedList();
+        for (String name : pkgList.keySet()) {
+          RServerResult res = pkgList.get(name);
+          if (!resourceProviders.containsKey(name)) {
+            resourceProviders.put(name, Lists.newArrayList());
+          }
+          resourceProviders.get(name).add(new RResourceProvider(this.getName(), name, res.asStrings()[0]));
+        }
+      }
+    } catch (Exception e) {
+      log.error("Resource packages discovery failed for R server pod: {}", this.getName(), e);
+    }
   }
 
   private void initDataShieldPackagesProperties(PodRef pod) {

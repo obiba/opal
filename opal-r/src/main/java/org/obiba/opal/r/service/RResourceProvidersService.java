@@ -23,10 +23,7 @@ import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.core.service.event.ResourceProvidersServiceStartedEvent;
 import org.obiba.opal.r.service.event.*;
-import org.obiba.opal.spi.r.AbstractROperationWithResult;
-import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.RServerException;
-import org.obiba.opal.spi.r.RServerResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +38,6 @@ import java.util.stream.Collectors;
 public class RResourceProvidersService implements Service, ResourceProvidersService {
 
   private static final Logger log = LoggerFactory.getLogger(RResourceProvidersService.class);
-
-  private static final String RESOURCE_JS_FILE = "resources/resource.js";
 
   private final RServerManagerService rServerManagerService;
 
@@ -98,8 +93,18 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   // ResourceProvidersService methods
   //
 
+
+  @Override
+  public void initResourceProviders() {
+    synchronized (resourceProvidersTask) {
+      resourceProviders.clear();
+      loadResourceProviders();
+    }
+  }
+
   @Override
   public List<ResourceProvider> getResourceProviders() {
+    ensureResourceProvidersInitialized();
     return Lists.newArrayList(getResourceProvidersMap().values());
   }
 
@@ -182,23 +187,17 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
   private void loadResourceProviders() {
     synchronized (resourceProvidersTask) {
       resourceProviders.clear();
-      ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
       try {
         // scan all R server clusters
         for (RServerClusterService rServerCluster : rServerManagerService.getRServerClusters()) {
           try {
-            rServerCluster.execute(rop);
-            RServerResult result = rop.getResult();
-            if (result.isNamedList()) {
-              RNamedList<RServerResult> pkgList = result.asNamedList();
-              for (String name : pkgList.keySet()) {
-                RServerResult res = pkgList.get(name);
-                if (!resourceProviders.containsKey(name)) {
-                  resourceProviders.put(name, Lists.newArrayList());
-                }
-                resourceProviders.get(name).add(new RResourceProvider(rServerCluster.getName(), name, res.asStrings()[0]));
+            rServerCluster.getResourceProviders().forEach((name, list) -> {
+              if (resourceProviders.containsKey(name)) {
+                resourceProviders.get(name).addAll(list);
+              } else {
+                resourceProviders.put(name, Lists.newArrayList(list));
               }
-            }
+            });
           } catch (Exception e) {
             log.error("Resource packages discovery failed for R servers cluster: {}", rServerCluster.getName(), e);
           }
@@ -218,11 +217,20 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
    * @return
    */
   public synchronized Map<String, ResourceProvider> getResourceProvidersMap() {
+    ensureResourceProvidersInitialized();
     synchronized (resourceProvidersTask) {
       // get first provider even if it appears in multiple profiles
       return resourceProviders.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey,
-              e -> e.getValue().get(0)));
+              e -> e.getValue().getFirst()));
+    }
+  }
+
+  private void ensureResourceProvidersInitialized() {
+    synchronized (resourceProvidersTask) {
+      if (resourceProviders.isEmpty()) {
+        loadResourceProviders();
+      }
     }
   }
 
@@ -243,20 +251,6 @@ public class RResourceProvidersService implements Service, ResourceProvidersServ
       } catch (Exception e) {
         log.error("Cannot ensure resourcer R package is installed", e);
       }
-    }
-  }
-
-  /**
-   * Fetch resource R package names and their location folder.
-   */
-  private static class ResourcePackageScriptsROperation extends AbstractROperationWithResult {
-
-    @Override
-    protected void doWithConnection() {
-      setResult(null);
-
-      eval(String.format("is.null(assign('x', lapply(installed.packages()[,1], function(p) { system.file('%s', package=p) })))", RESOURCE_JS_FILE), false);
-      setResult(eval("lapply(x[lapply(x, nchar)>0], function(p) { readChar(p, file.info(p)$size) })", false));
     }
   }
 
