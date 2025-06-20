@@ -49,7 +49,7 @@ watch(
       name.value = '';
       cluster.value = rStore.clusters.length && rStore.clusters[0] ? rStore.clusters[0].name : '';
     }
-  }
+  },
 );
 
 function onHide() {

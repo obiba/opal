@@ -10,14 +10,14 @@
     </q-toolbar>
     <q-page class="q-pa-md">
       <div class="text-h5 q-mb-md">
-        <q-icon name="person" class="q-mb-xs on-left"/>
+        <q-icon name="person" class="q-mb-xs on-left" />
         <span>{{ principal }}</span>
       </div>
       <div class="text-h6 q-mb-md">
         {{ t('permissions') }}
       </div>
-      <profile-acls :principal="principal"/>
-      
+      <profile-acls :principal="principal" />
+
       <div class="text-h6 q-mt-md q-mb-md">
         {{ t('r_activity') }}
       </div>
@@ -37,5 +37,4 @@ const { t } = useI18n();
 const route = useRoute();
 
 const principal = computed(() => route.params.principal as string);
-
 </script>

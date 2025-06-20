@@ -3,6 +3,7 @@ syntax = "proto2";
 import "Ws.proto";
 import "Opal.proto";
 import "Apps.proto";
+import "K8s.proto";
 
 package OpalR;
 
@@ -30,6 +31,7 @@ message RServerDto {
   required int32 cores = 8;
   required int32 freeMemory = 9;
   optional Apps.AppDto app = 10;
+  optional K8s.PodSpecDto pod = 11;
 }
 
 enum RSessionStatus {

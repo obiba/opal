@@ -198,7 +198,7 @@ watch(
       groupFilters.value = [...groupFilterOptions];
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {

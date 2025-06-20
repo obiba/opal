@@ -28,7 +28,7 @@ public class RockServerException extends RServerException {
     this.clientError = false;
   }
 
-  RockServerException(String message, RestClientException e) {
+  public RockServerException(String message, RestClientException e) {
     super(message);
     if (e instanceof RestClientResponseException) {
       RestClientResponseException re = (RestClientResponseException) e;

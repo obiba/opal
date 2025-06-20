@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-if="!systemStore.generalConf.allowRPackageManagement" class="box-info">
+    <div v-if="hasPods" class="box-info">
+      <q-icon name="info" />
+      {{ t('r_packages_readonly') }}
+    </div>
+    <div v-else-if="!systemStore.generalConf.allowRPackageManagement" class="box-info">
       <q-icon name="info" />
       {{ t('r_packages_management_forbidden') }}
     </div>
@@ -15,7 +19,15 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" icon="add" :label="t('install')" size="sm" class="on-left" :disable="!systemStore.generalConf.allowRPackageManagement">
+        <q-btn-dropdown
+          v-if="!hasPods"
+          color="primary"
+          icon="add"
+          :label="t('install')"
+          size="sm"
+          class="on-left"
+          :disable="!systemStore.generalConf.allowRPackageManagement"
+        >
           <q-list>
             <q-item clickable v-close-popup @click="onShowInstallPackages">
               <q-item-section>
@@ -80,8 +92,13 @@
             {{ getDescriptionValue(props.row, 'LibPath') }}
           </q-td>
           <q-td key="rserver" :props="props">
-            <span>{{ props.row.rserver.split('~')[0] }}</span>
-            <code class="on-right">{{ props.row.rserver.split('~')[1].split('-')[0] }}</code>
+            <div v-if="props.row.rserver">
+              <span>{{ props.row.rserver.split('~')[0] }}</span>
+              <code v-if="props.row.rserver?.includes('~')" class="on-right">{{
+                props.row.rserver.split('~')[1].split('-')[0]
+              }}</code>
+            </div>
+            <span v-else>?</span>
           </q-td>
         </q-tr>
       </template>
@@ -131,6 +148,9 @@ const showUpdate = ref(false);
 const showDelete = ref(false);
 const showView = ref(false);
 
+const hasPods = computed(() => {
+  return props.cluster.servers.some((server: RServerDto) => server.running && server.pod);
+});
 const columns = computed(() => [
   {
     name: 'name',
@@ -204,7 +224,7 @@ watch(
   () => props.cluster,
   () => {
     updateRPackages();
-  }
+  },
 );
 
 function updateRPackages() {

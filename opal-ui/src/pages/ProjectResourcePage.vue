@@ -43,15 +43,7 @@
           :disable="!resourceProvider"
           class="on-right"
         />
-        <q-btn
-          color="positive"
-          size="sm"
-          outline
-          icon="terminal"
-          :label="t('test')"
-          @click="onTest"
-          class="on-right"
-        />
+        <q-btn color="positive" size="sm" outline icon="terminal" :label="t('test')" @click="onTest" class="on-right" />
         <q-btn
           color="secondary"
           size="sm"
@@ -155,7 +147,7 @@ const selected = ref({} as ResourceReferenceDto);
 
 const resourceReference = computed(() => resourcesStore.getResourceReference(rName.value));
 const resourceProvider = computed(() =>
-  resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined
+  resourceReference.value ? resourcesStore.getResourceProvider(resourceReference.value) : undefined,
 );
 
 const previousReference = computed(() => {

@@ -1,9 +1,9 @@
 <template>
   <div class="row q-mt-lg">
     <div>
-      <div class="text-subtitle1" :class="{ 'text-primary': group.length > 0, 'text-secondary': group.length < 1 }">{{
-        t(title)
-      }}</div>
+      <div class="text-subtitle1" :class="{ 'text-primary': group.length > 0, 'text-secondary': group.length < 1 }">
+        {{ t(title) }}
+      </div>
       <div class="text-hint">{{ t(hint) }}</div>
       <q-option-group size="sm" :options="groupOptions" type="checkbox" v-model="group" />
     </div>

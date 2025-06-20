@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row q-gutter-md">
-      <div class="col" style="max-width: 200px;">
+      <div class="col" style="max-width: 200px">
         <div v-for="profile in datashieldStore.profiles" :key="profile.name">
           <q-btn
             flat
@@ -12,7 +12,7 @@
             :label="getProfileLabel(profile)"
             align="left"
             class="full-width"
-            :class="`${ tab === profile.name ? 'bg-grey-2' : '' }`"
+            :class="`${tab === profile.name ? 'bg-grey-2' : ''}`"
             @click="tab = profile.name"
           ></q-btn>
         </div>
@@ -53,7 +53,9 @@ const { t } = useI18n();
 
 const datashieldStore = useDatashieldStore();
 
-const tab = ref<string>(datashieldStore.profiles.length && datashieldStore.profiles[0] ? datashieldStore.profiles[0].name : '');
+const tab = ref<string>(
+  datashieldStore.profiles.length && datashieldStore.profiles[0] ? datashieldStore.profiles[0].name : '',
+);
 const showAdd = ref(false);
 
 watch(
@@ -63,7 +65,7 @@ watch(
       if (tab.value === '' || !datashieldStore.profiles.find((profile) => profile.name === tab.value))
         tab.value = datashieldStore.profiles[0]?.name || '';
     }
-  }
+  },
 );
 
 function getProfileIcon(profile: DataShieldProfileDto) {

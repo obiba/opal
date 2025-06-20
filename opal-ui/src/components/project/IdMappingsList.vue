@@ -12,14 +12,7 @@
     :loading="loading"
   >
     <template v-slot:top-left>
-      <q-btn
-        :disable="!canAddMappings"
-        color="primary"
-        :label="t('add')"
-        icon="add"
-        size="sm"
-        @click.prevent="onAdd"
-      />
+      <q-btn :disable="!canAddMappings" color="primary" :label="t('add')" icon="add" size="sm" @click.prevent="onAdd" />
     </template>
     <template v-slot:body-cell-type="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
@@ -94,7 +87,7 @@ const columns = computed(() => [
   },
 ]);
 const canAddMappings = computed(
-  () => (identifiersStore.identifiers || []).filter((id) => id.variableCount && id.variableCount > 0).length > 0
+  () => (identifiersStore.identifiers || []).filter((id) => id.variableCount && id.variableCount > 0).length > 0,
 );
 
 // Handlers

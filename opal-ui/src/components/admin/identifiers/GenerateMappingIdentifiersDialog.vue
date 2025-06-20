@@ -21,9 +21,7 @@
             dense
             type="text"
             :label="t('id_mappings.identifier_size')"
-            :hint="
-              t('id_mappings.identifier_size_hint', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE }) + ' *'
-            "
+            :hint="t('id_mappings.identifier_size_hint', { min: MIN_IDENTIFIER_SIZE, max: MAX_IDENTIFIER_SIZE }) + ' *'"
             :disable="!hasSystemIdentifiers"
             class="q-mb-md"
             lazy-rules
@@ -125,7 +123,7 @@ function updateSampleIdentifier() {
     options.value.size,
     options.value.zeros,
     options.value.checksum,
-    options.value.prefix
+    options.value.prefix,
   );
 }
 
@@ -147,7 +145,7 @@ watch(
       updateSampleIdentifier();
       showDialog.value = value;
     }
-  }
+  },
 );
 
 watch(
@@ -155,7 +153,7 @@ watch(
   () => {
     updateSampleIdentifier();
   },
-  { deep: true }
+  { deep: true },
 );
 
 function onHide() {

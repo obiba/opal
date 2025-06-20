@@ -26,6 +26,8 @@ public class AppsConfig  implements HasUniqueProperties {
     return id;
   }
 
+  // Self registration
+
   public void setToken(String token) {
     this.token = token;
   }
@@ -34,6 +36,8 @@ public class AppsConfig  implements HasUniqueProperties {
     return token;
   }
 
+  // Rock apps
+
   public List<RockAppConfig> getRockAppConfigs() {
     return rockAppConfigs;
   }
@@ -41,6 +45,12 @@ public class AppsConfig  implements HasUniqueProperties {
   public void setRockAppConfigs(List<RockAppConfig> rockAppConfigs) {
     this.rockAppConfigs = rockAppConfigs;
   }
+
+  public void addRockAppConfig(RockAppConfig rockAppConfig) {
+    rockAppConfigs.add(rockAppConfig);
+  }
+
+  // DB methods
 
   @Override
   public List<String> getUniqueProperties() {
@@ -52,7 +62,4 @@ public class AppsConfig  implements HasUniqueProperties {
     return Lists.newArrayList(id);
   }
 
-  public void addRockAppConfig(RockAppConfig rockAppConfig) {
-    rockAppConfigs.add(rockAppConfig);
-  }
 }

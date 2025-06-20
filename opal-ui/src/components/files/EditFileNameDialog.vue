@@ -47,7 +47,7 @@ watch(
       newName.value = props.file.name;
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

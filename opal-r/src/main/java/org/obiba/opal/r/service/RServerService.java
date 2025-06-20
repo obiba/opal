@@ -11,6 +11,7 @@
 package org.obiba.opal.r.service;
 
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.Opal;
@@ -50,13 +51,6 @@ public interface RServerService {
   void execute(ROperation rop) throws RServerException;
 
   /**
-   * Get the inner App from which the R server was built.
-   *
-   * @return
-   */
-  App getApp();
-
-  /**
    * Check whether the App object is associated to the R server service, order to avoid name conflicts
    * (same app name but from different server or with different type).
    *
@@ -86,6 +80,13 @@ public interface RServerService {
    * @param name
    */
   void removePackage(String name) throws RServerException;
+
+  /**
+   * Get the resource providers installed.
+   *
+   * @return
+   */
+  Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders();
 
   /**
    * Extract DataSHIELD settings from installed packages.
@@ -141,4 +142,5 @@ public interface RServerService {
    * @return
    */
   String[] getLog(Integer nbLines);
+
 }

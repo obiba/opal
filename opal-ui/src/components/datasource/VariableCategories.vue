@@ -211,7 +211,7 @@ function onDelete() {
   const newVariable = {
     ...datasourceStore.variable,
     categories: datasourceStore.variable.categories.filter(
-      (c) => !selected.value.map((cs) => cs.name).includes(c.name)
+      (c) => !selected.value.map((cs) => cs.name).includes(c.name),
     ),
   };
   datasourceStore
@@ -232,8 +232,7 @@ function onUp() {
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    if (c)
-      categories.splice(idx - 1, 0, c);
+    if (c) categories.splice(idx - 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore
@@ -254,8 +253,7 @@ function onDown() {
     }
     const c = categories[idx];
     categories.splice(idx, 1);
-    if (c)
-      categories.splice(idx + 1, 0, c);
+    if (c) categories.splice(idx + 1, 0, c);
   }
   moveEnabled.value = false;
   datasourceStore

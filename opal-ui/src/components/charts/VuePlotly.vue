@@ -7,7 +7,6 @@ import { ref, onMounted, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import Plotly from 'plotly.js-dist';
 
-
 const props = defineProps({
   data: {
     type: Array,

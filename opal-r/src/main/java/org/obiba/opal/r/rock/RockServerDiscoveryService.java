@@ -30,10 +30,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Scan specified hosts periodically to discore Rock R server instances or to check
+ * Scan specified hosts periodically to discover Rock R server instances or to check
  * whether they are still alive.
  */
 @Component
@@ -49,7 +48,7 @@ public class RockServerDiscoveryService {
   @Scheduled(fixedDelayString = "${apps.discovery.interval:10000}")
   public void scanHosts() {
     List<String> hosts = appsService.getAppsConfig().getRockAppConfigs().stream()
-        .map(AppConfig::getHost).collect(Collectors.toList());
+        .map(AppConfig::getHost).toList();
     for (String host : hosts)
       discoverOrCheckHost(host);
   }

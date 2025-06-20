@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.runtime.App;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RPackageInstalledEvent;
 import org.obiba.opal.r.service.event.RPackageRemovedEvent;
@@ -31,13 +32,16 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+/**
+ * R server instances grouped in a cluster.
+ */
 public class RServerCluster implements RServerClusterService {
 
   private static final Logger log = LoggerFactory.getLogger(RServerCluster.class);
 
   private final String name;
 
-  private final List<RServerService> rServerServices = Collections.synchronizedList(Lists.newArrayList());
+  protected final List<RServerService> rServerServices = Collections.synchronizedList(Lists.newArrayList());
 
   private final EventBus eventBus;
 
@@ -50,24 +54,17 @@ public class RServerCluster implements RServerClusterService {
     return name;
   }
 
+  @Override
   public void addRServerService(RServerService service) {
     rServerServices.add(service);
   }
 
-  public void removeRServerService(App app) {
-    try {
-      Optional<RServerService> service = rServerServices.stream()
-          .filter(s -> s.isFor(app)).findFirst();
-      service.ifPresent(rServerServices::remove);
-    } catch (Exception e) {
-      // ignored
-    }
-  }
-
+  @Override
   public List<RServerService> getRServerServices() {
     return rServerServices;
   }
 
+  @Override
   public RServerService getRServerService(String sname) {
     Optional<RServerService> service = rServerServices.stream().filter(s -> s.getName().equals(sname)).findFirst();
     if (service.isPresent()) return service.get();
@@ -128,7 +125,7 @@ public class RServerCluster implements RServerClusterService {
         .forEach(s -> {
           state.setVersion(s.getVersion());
           if (!state.isRunning())
-            state.setRunning(state.isRunning());
+            state.setRunning(s.isRunning());
           state.addTags(s.getTags());
           state.addRSessionsCount(s.getRSessionsCount());
           state.addBusyRSessionsCount(s.getBusyRSessionsCount());
@@ -155,11 +152,6 @@ public class RServerCluster implements RServerClusterService {
     } finally {
       rSession.close();
     }
-  }
-
-  @Override
-  public App getApp() {
-    return null;
   }
 
   @Override
@@ -209,6 +201,17 @@ public class RServerCluster implements RServerClusterService {
       log.error("Cannot retrieve all R packages", e);
     }
     return allPackages;
+  }
+
+  @Override
+  public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
+    Map<String, List<ResourceProvidersService.ResourceProvider>> resourceProviders = Maps.newHashMap();
+    rServerServices.getFirst().getResourceProviders().forEach((name, list) -> {
+      resourceProviders.put(name, list.stream()
+          .map((provider) -> RResourceProvider.copyResourceProvider(getName(), ((RResourceProvider) provider)))
+          .toList());
+    });
+    return resourceProviders;
   }
 
   @Override
@@ -361,40 +364,8 @@ public class RServerCluster implements RServerClusterService {
   //
 
   @Override
-  public List<App> getApps() {
-    return rServerServices.stream().map(RServerService::getApp).collect(Collectors.toList());
-  }
-
-  @Override
-  public void start(App app) {
-    rServerServices.stream().filter(s -> s.isFor(app)).findFirst().ifPresent(RServerService::start);
-  }
-
-  @Override
-  public void stop(App app) {
-    rServerServices.stream().filter(s -> s.isFor(app)).findFirst().ifPresent(RServerService::stop);
-  }
-
-  @Override
-  public boolean isRunning(App app) {
-    return rServerServices.stream().filter(s -> s.isFor(app)).findFirst()
-        .map(RServerService::isRunning).orElse(false);
-  }
-
-  @Override
-  public RServerState getState(App app) {
-    return rServerServices.stream()
-        .filter(s -> s.isFor(app))
-        .map(s -> {
-          try {
-            return s.getState();
-          } catch (RServerException e) {
-            return null;
-          }
-        })
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElse(null);
+  public boolean isEmpty() {
+    return rServerServices.isEmpty();
   }
 
   //

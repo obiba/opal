@@ -63,7 +63,7 @@ watch(
       newTable.value = { name: '', entityType: 'Participant' } as TableDto;
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

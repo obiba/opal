@@ -173,7 +173,7 @@ function onDeleteResources() {
   resourcesStore
     .deleteResources(
       pName.value,
-      selected.value.map((r) => r.name)
+      selected.value.map((r) => r.name),
     )
     .then(() => {
       return resourcesStore.loadResourceReferences(pName.value);

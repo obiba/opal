@@ -126,7 +126,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
           paramsSerializer: {
             indexes: null, // no brackets at all
           },
-        }
+        },
       )
       .then(() => loadProfileSettings());
   }
@@ -135,8 +135,8 @@ export const useDatashieldStore = defineStore('datashield', () => {
     return access
       ? api.put(`/datashield/profile/${profile.value.name}/_access`).then(() => (profile.value.restrictedAccess = true))
       : api
-        .delete(`/datashield/profile/${profile.value.name}/_access`)
-        .then(() => (profile.value.restrictedAccess = false));
+          .delete(`/datashield/profile/${profile.value.name}/_access`)
+          .then(() => (profile.value.restrictedAccess = false));
   }
 
   return {

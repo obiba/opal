@@ -37,7 +37,7 @@ const items = computed(() =>
     caption: bookmark.type.toLowerCase(),
     link: getLink(bookmark),
     resource: bookmark.resource,
-  }))
+  })),
 );
 
 function getTitle(bookmark: BookmarkDto) {
@@ -46,8 +46,7 @@ function getTitle(bookmark: BookmarkDto) {
   if (title && bookmark.type === BookmarkDto_ResourceType.TABLE) {
     linkObj = bookmark.links.find((link) => link.rel !== bookmark.resource);
     const dsName = linkObj?.link;
-    if (dsName)
-      return `${dsName}.${title}`;
+    if (dsName) return `${dsName}.${title}`;
   }
   return title;
 }

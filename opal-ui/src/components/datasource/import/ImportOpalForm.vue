@@ -73,7 +73,7 @@ const username = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.
 const password = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.password ?? '');
 const token = ref<string>(props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.token ?? '');
 const remoteDatasource = ref<string>(
-  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.remoteDatasource ?? ''
+  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.remoteDatasource ?? '',
 );
 
 const authOptions = [
@@ -81,7 +81,7 @@ const authOptions = [
   { label: t('credentials'), value: 'credentials' },
 ];
 const authMethod = ref(
-  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ? authOptions[1] : authOptions[0]
+  props.modelValue?.['Magma.RestDatasourceFactoryDto.params']?.username ? authOptions[1] : authOptions[0],
 );
 
 function onAuthSelection() {

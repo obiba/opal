@@ -23,12 +23,10 @@ import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
+import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.InstallLocalPackageOperation;
-import org.obiba.opal.r.service.RServerProfile;
-import org.obiba.opal.r.service.RServerService;
-import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.*;
@@ -59,7 +57,7 @@ import java.util.stream.Collectors;
  */
 @Component("rockRService")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class RockService implements RServerService {
+public class RockService implements RServerAppService {
 
   private static final Logger log = LoggerFactory.getLogger(RockService.class);
 
@@ -221,6 +219,29 @@ public class RockService implements RServerService {
   }
 
   @Override
+  public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
+    Map<String, List<ResourceProvidersService.ResourceProvider>> resourceProviders = Maps.newHashMap();
+    ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
+    try {
+      this.execute(rop);
+      RServerResult result = rop.getResult();
+      if (result.isNamedList()) {
+        RNamedList<RServerResult> pkgList = result.asNamedList();
+        for (String name : pkgList.keySet()) {
+          RServerResult res = pkgList.get(name);
+          if (!resourceProviders.containsKey(name)) {
+            resourceProviders.put(name, Lists.newArrayList());
+          }
+          resourceProviders.get(name).add(new RResourceProvider(this.getName(), name, res.asStrings()[0]));
+        }
+      }
+    } catch (Exception e) {
+      log.error("Error when reading R server resource providers", e);
+    }
+    return resourceProviders;
+  }
+
+  @Override
   public Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
     Map<String, List<Opal.EntryDto>> dsPackages = Maps.newHashMap();
     try {
@@ -230,7 +251,7 @@ public class RockService implements RServerService {
       ResponseEntity<String> response =
           restTemplate.exchange(getRServerResourceUrl("/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       String jsonSource = response.getBody();
-      if (response.getStatusCode().is2xxSuccessful()) {
+      if (response.getStatusCode().is2xxSuccessful() && jsonSource != null && !jsonSource.isEmpty()) {
         RNamedList<RServerResult> results = new RockResult(new JSONObject(jsonSource)).asNamedList();
         for (String name : results.getNames()) {
           dsPackages.put(name, getDataShieldPackagePropertiesDtos(results.get(name).asNamedList()));
@@ -305,7 +326,7 @@ public class RockService implements RServerService {
       HttpHeaders headers = createHeaders();
       headers.setAccept(Lists.newArrayList(MediaType.TEXT_PLAIN));
       RestTemplate restTemplate = new RestTemplate();
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getRServerResourceUrl("/rserver/_log"))
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl("/rserver/_log"))
           .queryParam("limit", nbLines);
       ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       return response.getBody().split("\n");
@@ -317,7 +338,7 @@ public class RockService implements RServerService {
 
   @Override
   public RServerSession newRServerSession(String user) throws RServerException {
-    RServerSession session = new RockSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+    RServerSession session = new RockAppSession(getName(), app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     session.setProfile(new RServerProfile() {
       @Override
       public String getName() {
@@ -364,7 +385,7 @@ public class RockService implements RServerService {
       HttpHeaders headers = createHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getRServerResourceUrl("/rserver/packages"));
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl("/rserver/packages"));
       params.forEach(builder::queryParam);
 
       RestTemplate restTemplate = new RestTemplate();

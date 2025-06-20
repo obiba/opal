@@ -14,3 +14,8 @@ proto:
     rm -f ${DESTINATION}/$${base_name%.*}.ts; \
     protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=onlyTypes=true --ts_proto_opt=outputJsonMethods=false --ts_proto_opt=outputEncodeMethods=false --ts_proto_opt=stringEnums=true --ts_proto_opt=outputExtensions=true --ts_proto_out=${DESTINATION} --proto_path=${PROTO_DIR} $$base_name; \
 	done
+
+proto-file:
+	mkdir -p ${DESTINATION}
+	rm -f ${DESTINATION}/${name}.ts; \
+	protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_opt=onlyTypes=true --ts_proto_opt=outputJsonMethods=false --ts_proto_opt=outputEncodeMethods=false --ts_proto_opt=stringEnums=true --ts_proto_opt=outputExtensions=true --ts_proto_out=${DESTINATION} --proto_path=${PROTO_DIR} ${name}.proto

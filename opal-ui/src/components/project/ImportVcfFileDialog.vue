@@ -72,7 +72,7 @@ watch(
     if (value) {
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {
@@ -106,7 +106,7 @@ onMounted(() =>
   profilesStore.initProfile().then(() =>
     filesStore.refreshFiles(`/home/${profile.value.principal}`).then(() => {
       importData.value = filesStore.current;
-    })
-  )
+    }),
+  ),
 );
 </script>

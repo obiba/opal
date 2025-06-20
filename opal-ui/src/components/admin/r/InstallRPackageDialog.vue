@@ -58,7 +58,7 @@ watch(
     organization.value = '';
     reference.value = '';
     showDialog.value = value;
-  }
+  },
 );
 
 const managersOptions = computed(() => {

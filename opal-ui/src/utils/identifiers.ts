@@ -22,7 +22,7 @@ export function generateLuhnCheckDigit(input: number): number {
   }
 
   for (let i = ints.length - 2; i >= 0; i = i - 2) {
-    let j: number = ints[i] as number * 2;
+    let j: number = (ints[i] as number) * 2;
     if (j > 9) {
       j = (j % 10) + 1;
     }

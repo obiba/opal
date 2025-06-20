@@ -11,14 +11,11 @@
 package org.obiba.opal.web.app;
 
 import com.google.common.base.Strings;
-import org.obiba.opal.core.domain.AppConfig;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.AppsConfig;
 import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.web.model.Apps;
-
-import java.util.stream.Collectors;
 
 public class Dtos {
 
@@ -43,7 +40,7 @@ public class Dtos {
         .setToken(config.getToken())
         .addAllRockConfigs(config.getRockAppConfigs().stream()
             .map(Dtos::asDto)
-            .collect(Collectors.toList()))
+            .toList())
         .build();
   }
 
@@ -81,7 +78,7 @@ public class Dtos {
     config.setToken(dto.getToken());
     config.setRockAppConfigs(dto.getRockConfigsList().stream()
         .map(Dtos::fromDto)
-        .collect(Collectors.toList()));
+        .toList());
     return config;
   }
 

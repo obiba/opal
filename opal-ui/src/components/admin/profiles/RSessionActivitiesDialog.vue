@@ -18,12 +18,7 @@
           <span class="text-hint on-right">{{ t('total_execution_time') }}:</span>
           <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
         </div>
-        <q-table
-          flat
-          :rows="activities"
-          :columns="columns"
-          >
-        </q-table>
+        <q-table flat :rows="activities" :columns="columns"> </q-table>
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
@@ -54,8 +49,12 @@ const { t } = useI18n();
 
 const activities = ref<RSessionActivityDto[]>([]);
 
-const totalDuration = computed(() => activities.value.map((act) => getDuration(act)).reduce((acc, val) => acc + val, 0));
-const totalExecutionTime = computed(() => activities.value.map((act) => act.executionTimeMillis).reduce((acc, val) => acc + val, 0));
+const totalDuration = computed(() =>
+  activities.value.map((act) => getDuration(act)).reduce((acc, val) => acc + val, 0),
+);
+const totalExecutionTime = computed(() =>
+  activities.value.map((act) => act.executionTimeMillis).reduce((acc, val) => acc + val, 0),
+);
 
 const columns = computed(() => {
   return [
@@ -82,7 +81,8 @@ const columns = computed(() => {
       required: true,
       label: t('duration'),
       align: DefaultAlignment,
-      field: (row: RSessionActivityDto) => getMillisLabel(Math.ceil(Math.max(getDuration(row), row.executionTimeMillis)/1000)*1000),
+      field: (row: RSessionActivityDto) =>
+        getMillisLabel(Math.ceil(Math.max(getDuration(row), row.executionTimeMillis) / 1000) * 1000),
       sortable: true,
     },
     {
@@ -102,16 +102,18 @@ watch(
   () => {
     showDialog.value = props.modelValue;
     init();
-  }
+  },
 );
 
 onMounted(init);
 
 function init() {
   if (props.modelValue) {
-    profileActivityStore.getRSessionActivities(props.principal, props.context, props.profile).then((data: RSessionActivityDto[]) => {
-      activities.value = data;
-    });
+    profileActivityStore
+      .getRSessionActivities(props.principal, props.context, props.profile)
+      .then((data: RSessionActivityDto[]) => {
+        activities.value = data;
+      });
   }
 }
 

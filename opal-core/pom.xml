@@ -63,6 +63,10 @@
       <artifactId>opal-fs</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-spi-r</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
     </dependency>
@@ -290,9 +294,14 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Kubernetes -->
     <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-spi-r</artifactId>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud.tools</groupId>
+      <artifactId>jib-core</artifactId>
     </dependency>
 
   </dependencies>

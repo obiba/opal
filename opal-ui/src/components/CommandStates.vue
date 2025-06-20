@@ -251,7 +251,7 @@ watch(
   () => props.commands,
   () => {
     loading.value = false;
-  }
+  },
 );
 
 function isDeletable(row: CommandStateDto) {

@@ -87,7 +87,8 @@ const password = ref<PasswordDto>({
   oldPassword: '',
 });
 
-const validateRequiredOldPassword = (val: string) => (val && val.length > 0) || t('validation.update_password.old_password');
+const validateRequiredOldPassword = (val: string) =>
+  (val && val.length > 0) || t('validation.update_password.old_password');
 const validateRequiredNewPassword = (val: string) =>
   (val && val.length >= 8) || t('validation.update_password.new_password');
 const validateMatchingPasswords = () =>
@@ -101,7 +102,7 @@ watch(
     if (value) {
       showDialog.value = value;
     }
-  }
+  },
 );
 
 function onHide() {

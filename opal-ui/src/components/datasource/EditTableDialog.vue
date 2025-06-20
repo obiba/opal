@@ -28,7 +28,13 @@
             <q-item v-for="tbl in from" :key="tbl">
               <q-item-section>
                 <q-item-label class="text-caption text-bold">{{ tbl }}</q-item-label>
-                <q-checkbox v-model="innerFrom[tbl]" dense size="sm" :label="t('inner_join')" class="q-mt-sm text-caption" />
+                <q-checkbox
+                  v-model="innerFrom[tbl]"
+                  dense
+                  size="sm"
+                  :label="t('inner_join')"
+                  class="q-mt-sm text-caption"
+                />
               </q-item-section>
               <q-item-section side>
                 <table>
@@ -91,7 +97,7 @@ const datasourceStore = useDatasourceStore();
 const showDialog = ref(props.modelValue);
 const name = ref(props.table.name);
 const from = ref<string[]>(props.view?.from || []);
-const innerFrom = ref<{[key: string]: boolean}>({});
+const innerFrom = ref<{ [key: string]: boolean }>({});
 const fromSelection = ref<string>();
 const fromAllTables = ref<string[]>([]);
 const allTables = ref<string[]>([]);
@@ -112,13 +118,13 @@ watch(
             (tables) =>
               (allTables.value = tables
                 .map((table) => `${table.datasourceName}.${table.name}`)
-                .filter((tbl) => tbl !== `${props.table.datasourceName}.${props.table.name}`))
+                .filter((tbl) => tbl !== `${props.table.datasourceName}.${props.table.name}`)),
           )
           .then(() => (fromAllTables.value = allTables.value));
       }
     }
     showDialog.value = value;
-  }
+  },
 );
 
 const fromTables = computed(() => fromAllTables.value.filter((tbl) => !from.value.includes(tbl)));
@@ -128,7 +134,7 @@ function onHide() {
 }
 
 const isTableNameValid = computed(
-  () => datasourceStore.isNewTableNameValid(name.value) || props.table.name === name.value
+  () => datasourceStore.isNewTableNameValid(name.value) || props.table.name === name.value,
 );
 
 const isView = computed(() => props.view && props.view.name);
@@ -150,14 +156,16 @@ function filterFn(val: string, update: any) {
 
 function onSaveTable() {
   if (props.view && isView.value) {
-    const newInner = Object.entries(innerFrom.value).filter(([, value]) => value).map(([key]) => key);
+    const newInner = Object.entries(innerFrom.value)
+      .filter(([, value]) => value)
+      .map(([key]) => key);
     const updatedView = { ...props.view, name: name.value, from: from.value as string[], innerFrom: newInner };
     datasourceStore
       .updateView(
         datasourceStore.datasource.name,
         props.view.name || name.value,
         updatedView,
-        `Editing ${props.view.name}`
+        `Editing ${props.view.name}`,
       )
       .then(() => emit('update:view', updatedView))
       .catch((err) => {

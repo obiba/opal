@@ -280,7 +280,7 @@ watch(
       });
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onTaxonomyChange() {
@@ -311,7 +311,7 @@ async function onSubmit() {
     await datasourceStore.deleteAnnotation(
       props.variables,
       props.annotation.taxonomy.name,
-      props.annotation.vocabulary.name
+      props.annotation.vocabulary.name,
     );
   }
   if (isDeleteOperation.value) {
@@ -321,7 +321,7 @@ async function onSubmit() {
       props.variables,
       taxonomyName.value,
       vocabularyName.value,
-      termsOptions.value.length ? termName.value : texts.value
+      termsOptions.value.length ? termName.value : texts.value,
     );
   }
   if (props.table) datasourceStore.loadTableVariables();

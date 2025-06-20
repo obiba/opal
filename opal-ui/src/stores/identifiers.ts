@@ -100,7 +100,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     entityType: string,
     mappingName: string,
     content: string,
-    separator?: string
+    separator?: string,
   ) {
     return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
       params: separator ? { type: entityType, separator } : { type: entityType },

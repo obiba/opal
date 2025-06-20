@@ -90,12 +90,7 @@ export const useRStore = defineStore('r', () => {
     });
   }
 
-  async function installRPackage(
-    clusterId: string,
-    manager: string,
-    packageName: string,
-    ref?: string
-  ) {
+  async function installRPackage(clusterId: string, manager: string, packageName: string, ref?: string) {
     if (!['cran', 'gh', 'bioc'].includes(manager)) {
       throw new Error(`Invalid package manager: ${manager}`);
     }
@@ -107,7 +102,7 @@ export const useRStore = defineStore('r', () => {
         name: packageName,
         ref: ref,
       },
-      { params: { name: packageName } }
+      { params: { name: packageName } },
     );
   }
 

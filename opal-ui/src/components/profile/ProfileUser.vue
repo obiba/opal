@@ -224,18 +224,17 @@
             <div class="row">
               <div class="text-white text-bold">{{ tokenAdded?.token }}</div>
               <q-btn
-              flat
-              dense
-              size="sm"
-              icon="content_copy"
-              color="white"
-              :title="t('clipboard.copy')"
-              @click="onCopyToClipboard"
-              aria-label="Copy to clipboard"
-              class="q-ml-sm"
-            />
+                flat
+                dense
+                size="sm"
+                icon="content_copy"
+                color="white"
+                :title="t('clipboard.copy')"
+                @click="onCopyToClipboard"
+                aria-label="Copy to clipboard"
+                class="q-ml-sm"
+              />
             </div>
-            
           </q-card-section>
         </q-card>
       </q-dialog>
@@ -347,21 +346,21 @@ const otpIcon = computed(() => (profile.value?.otpEnabled ? 'lock_open' : 'lock'
 const realms = computed(() => profile.value?.realm?.split(',') || []);
 const isOpalUserRealm = computed(() => realms.value?.includes('opal-user-realm'));
 const isAnOpalRealm = computed(
-  () => profile.value && (realms.value?.includes('opal-user-realm') || realms.value?.includes('opal-ini-realm'))
+  () => profile.value && (realms.value?.includes('opal-user-realm') || realms.value?.includes('opal-ini-realm')),
 );
 const androidOtpUrl = computed(() => {
   return `<a href="https://play.google.com/store/apps/details?id=com.azure.authenticator" target="_blank">${t(
-    'user_profile.android_otp'
+    'user_profile.android_otp',
   )}</a>`;
 });
 const androidOnlyOtpUrl = computed(() => {
   return `<a href="https://play.google.com/store/apps/details?id=org.liberty.android.freeotpplus" target="_blank">${t(
-    'user_profile.android_only_otp'
+    'user_profile.android_only_otp',
   )}</a>`;
 });
 const iosOtpUrl = computed(() => {
   return `<a href="https://apps.apple.com/us/app/microsoft-authenticator/id983156458" target="_blank">${t(
-    'user_profile.ios_otp'
+    'user_profile.ios_otp',
   )}</a>`;
 });
 
@@ -501,5 +500,4 @@ function onTokenAddedHide() {
   showTokenAdded.value = false;
   tokenAdded.value = null;
 }
-
 </script>

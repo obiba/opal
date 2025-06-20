@@ -113,8 +113,8 @@ const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 const selectableColumns = computed(() =>
   columns.value.filter(
-    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1)
-  )
+    (c) => c.name !== 'ID' && (varFilter.value === '' || c.name.toLowerCase().indexOf(varFilter.value) > -1),
+  ),
 );
 
 onMounted(() => {
@@ -208,6 +208,6 @@ function onVariableSelection() {
 }
 
 function getVariable(name: string) {
-  return datasourceStore.variables.find((v) => v.name === name) || {name} as VariableDto;
+  return datasourceStore.variables.find((v) => v.name === name) || ({ name } as VariableDto);
 }
 </script>

@@ -96,13 +96,13 @@ const showDialog = ref(props.modelValue);
 const typeOptions = computed(() =>
   Object.values(ScheduleType)
     .filter((value) => value !== ScheduleType.UNRECOGNIZED)
-    .map((value) => ({ label: t(`schedule_type.${value}`), value }))
+    .map((value) => ({ label: t(`schedule_type.${value}`), value })),
 );
 
 const dayOptions = computed(() =>
   Object.values(Day)
     .filter((value) => value !== Day.UNRECOGNIZED)
-    .map((value) => ({ label: t(`weekdays.${value}`), value }))
+    .map((value) => ({ label: t(`weekdays.${value}`), value })),
 );
 
 const minutesOptions = computed(() => {
@@ -141,7 +141,7 @@ watch(
         : { type: ScheduleType.NOT_SCHEDULED };
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {

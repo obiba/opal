@@ -79,7 +79,7 @@ watch(
       newFiles.value = [];
     }
     showDialog.value = value;
-  }
+  },
 );
 
 function onHide() {
@@ -96,7 +96,6 @@ function onUpload() {
 function onLocalFilesChange() {
   if (newFiles.value.length > 0) {
     // check files do not already exist
-    
   }
 }
 </script>

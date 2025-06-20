@@ -10,6 +10,10 @@
 
 package org.obiba.opal.web.resources;
 
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.Resources;
@@ -17,8 +21,6 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,6 +42,12 @@ public class ResourceProvidersResource {
     builder.addAllCategories(resourceProvidersService.getAllCategories().stream()
         .map(Dtos::asDto).collect(Collectors.toList()));
     return builder.build();
+  }
+
+  @DELETE
+  public Response init() {
+    resourceProvidersService.initResourceProviders();
+    return Response.noContent().build();
   }
 
   @GET

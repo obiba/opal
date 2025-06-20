@@ -148,9 +148,9 @@ const properties = computed<FieldItem[]>(() => [
     label: 'status',
     html: (val) =>
       `<span><i class="q-icon text-h5 text-${analysisColor(
-        val.status
+        val.status,
       )} material-icons" aria-hidden="true" role="presentation">circle</i> ${t(
-        'analysis_status.' + val.status
+        'analysis_status.' + val.status,
       )}</span>`,
   },
   {
@@ -175,7 +175,7 @@ const properties = computed<FieldItem[]>(() => [
         props.projectName,
         props.tableName,
         props.analysisName,
-        val.id
+        val.id,
       )}" target="_blank" >${t('view')}</a>`,
   },
 ]);

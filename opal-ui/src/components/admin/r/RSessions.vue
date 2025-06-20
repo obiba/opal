@@ -24,28 +24,29 @@
       </template>
       <template v-slot:body-cell-id="props">
         <q-td :props="props">
-          <code :title="props.value">{{ props.value.split('-')[0] }}</code>
+          <code v-if="props.value.includes('--')" :title="props.value">{{ props.value.split('--')[0] }}</code>
+          <code v-else :title="props.value">{{ props.value.split('-')[0] }}</code>
         </q-td>
       </template>
       <template v-slot:body-cell-server="props">
         <q-td :props="props">
-          <span>{{ props.value.split('~')[0] }}</span>
-          <code class="on-right">{{ props.value.split('~')[1].split('-')[0] }}</code>
+          <div v-if="props.value">
+            <span>{{ props.value.split('~')[0] }}</span>
+            <code v-if="props.value?.includes('~')" class="on-right">{{
+              props.value.split('~')[1].split('-')[0]
+            }}</code>
+          </div>
+          <span v-else>?</span>
         </q-td>
       </template>
       <template v-slot:body-cell-user="props">
         <q-td :props="props">
-          <q-chip>{{ props.value }}</q-chip>
+          <q-chip class="q-ml-none">{{ props.value }}</q-chip>
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-icon
-            name="circle"
-            size="sm"
-            :title="t(props.value.toLowerCase())"
-            :color="getSessionColor(props.value)"
-          />
+          <q-icon name="circle" size="sm" :title="t(props.value.toLowerCase())" :color="getSessionColor(props.value)" />
         </q-td>
       </template>
     </q-table>
@@ -77,10 +78,31 @@ const initialPagination = ref({
 
 const columns = computed(() => [
   { name: 'id', label: 'ID', align: DefaultAlignment, field: 'id', sortable: true },
-  { name: 'profile', label: t('profile'), align: DefaultAlignment, field: 'profile', sortable: true, classes: 'text-caption' },
-  { name: 'cluster', label: t('r.cluster'), align: DefaultAlignment, field: 'cluster', sortable: true, classes: 'text-caption' },
+  {
+    name: 'profile',
+    label: t('profile'),
+    align: DefaultAlignment,
+    field: 'profile',
+    sortable: true,
+    classes: 'text-caption',
+  },
+  {
+    name: 'cluster',
+    label: t('r.cluster'),
+    align: DefaultAlignment,
+    field: 'cluster',
+    sortable: true,
+    classes: 'text-caption',
+  },
   { name: 'server', label: t('server'), align: DefaultAlignment, field: 'server', sortable: true },
-  { name: 'context', label: t('context'), align: DefaultAlignment, field: 'context', sortable: true, classes: 'text-caption' },
+  {
+    name: 'context',
+    label: t('context'),
+    align: DefaultAlignment,
+    field: 'context',
+    sortable: true,
+    classes: 'text-caption',
+  },
   { name: 'user', label: t('user'), align: DefaultAlignment, field: 'user', sortable: true },
   {
     name: 'creationDate',

@@ -1,7 +1,7 @@
 <template>
   <div v-if="rStore.clusters.length">
     <div class="row q-gutter-md">
-      <div class="col" style="max-width: 200px;">
+      <div class="col" style="max-width: 200px">
         <div v-for="cluster in rStore.clusters" :key="cluster.name">
           <q-btn
             flat
@@ -12,15 +12,19 @@
             :label="cluster.name"
             align="left"
             class="full-width"
-            :class="`${ tab === cluster.name ? 'bg-grey-2' : '' }`"
+            :class="`${tab === cluster.name ? 'bg-grey-2' : ''}`"
             @click="tab = cluster.name"
           ></q-btn>
         </div>
       </div>
       <div class="col">
         <q-tab-panels v-model="tab">
-          <q-tab-panel v-for="cluster in rStore.clusters" :key="cluster.name" :name="cluster.name"
-            style="padding-top: 0">
+          <q-tab-panel
+            v-for="cluster in rStore.clusters"
+            :key="cluster.name"
+            :name="cluster.name"
+            style="padding-top: 0"
+          >
             <div class="text-h6 q-mb-sm">
               {{ cluster.name }}
             </div>
@@ -48,6 +52,6 @@ watch(
       if (tab.value === '' || !rStore.clusters.find((cluster: RServerClusterDto) => cluster.name === tab.value))
         tab.value = rStore.clusters[0]?.name || '';
     }
-  }
+  },
 );
 </script>

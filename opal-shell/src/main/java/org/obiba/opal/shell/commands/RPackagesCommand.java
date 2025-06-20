@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.shell.commands;
 
-import org.obiba.opal.r.cluster.RServerCluster;
+import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.shell.commands.options.RPackagesCommandOptions;
 import org.obiba.opal.web.r.RPackageResourceHelper;
@@ -36,7 +36,7 @@ public class RPackagesCommand extends AbstractOpalRuntimeDependentCommand<RPacka
     // Get the R cluster name
     String clusterName = getOptions().getRCluster();
     getShell().progress(String.format("[%s] Preparing R cluster", clusterName), 0, 2, 0);
-    RServerCluster cluster;
+    RServerClusterService cluster;
     try {
       cluster = rServerManagerService.getRServerCluster(clusterName);
     } catch (NoSuchElementException e) {
