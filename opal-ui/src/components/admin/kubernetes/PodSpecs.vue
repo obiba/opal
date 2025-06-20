@@ -179,6 +179,6 @@ function onEdit(row: PodSpecDto) {
 }
 
 function onRemove(row: PodSpecDto) {
-  console.log('Remove', row);
+  podsStore.removePodSpec(row.id).then(init);
 }
 </script>
