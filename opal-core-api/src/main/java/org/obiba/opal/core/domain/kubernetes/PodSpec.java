@@ -1,10 +1,13 @@
 package org.obiba.opal.core.domain.kubernetes;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import java.util.List;
+import java.util.Map;
 
 public class PodSpec implements HasUniqueProperties {
 
@@ -16,7 +19,15 @@ public class PodSpec implements HasUniqueProperties {
 
   private String namespace;
 
+  private Map<String, String> labels;
+
   private Container container;
+
+  private String nodeName;
+
+  private Map<String, String> nodeSelector;
+
+  private List<Toleration> tolerations;
 
   private boolean enabled = false;
 
@@ -62,12 +73,52 @@ public class PodSpec implements HasUniqueProperties {
     return namespace;
   }
 
+  public Map<String, String> getLabels() {
+    return labels == null ? labels = Maps.newHashMap() : labels;
+  }
+
+  public PodSpec setLabels(Map<String, String> labels) {
+    this.labels = labels;
+    return this;
+  }
+
   public Container getContainer() {
     return container;
   }
 
   public PodSpec setContainer(Container container) {
     this.container = container;
+    return this;
+  }
+
+  public boolean hasNodeName() {
+    return !Strings.isNullOrEmpty(nodeName);
+  }
+
+  public String getNodeName() {
+    return nodeName;
+  }
+
+  public PodSpec setNodeName(String nodeName) {
+    this.nodeName = nodeName;
+    return this;
+  }
+
+  public Map<String, String> getNodeSelector() {
+    return nodeSelector == null ? nodeSelector = Maps.newHashMap() : nodeSelector;
+  }
+
+  public PodSpec setNodeSelector(Map<String, String> nodeSelector) {
+    this.nodeSelector = nodeSelector;
+    return this;
+  }
+
+  public List<Toleration> getTolerations() {
+    return tolerations == null ? tolerations = Lists.newArrayList() : tolerations;
+  }
+
+  public PodSpec setTolerations(List<Toleration> tolerations) {
+    this.tolerations = tolerations;
     return this;
   }
 

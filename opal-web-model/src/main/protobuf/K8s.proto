@@ -28,11 +28,25 @@ message ContainerDto {
   ResourceRequirementsDto resources = 7;
 }
 
+// Toleration
+
+message TolerationDto {
+  string key = 1;
+  string operator = 2;
+  string value = 3;
+  string effect = 4;
+  int64 tolerationSeconds = 5;
+}
+
 message PodSpecDto {
   string id = 1;
   string type = 2;
   string description = 3;
   string namespace = 4;
-  ContainerDto container = 5;
-  bool enabled = 6;
+  map<string, string> labels = 5;
+  ContainerDto container = 6;
+  string nodeName = 7;
+  map<string, string> nodeSelector = 8;
+  repeated TolerationDto tolerations = 9;
+  bool enabled = 10;
 }

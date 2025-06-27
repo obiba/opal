@@ -4,7 +4,7 @@
 //   protoc               v3.21.12
 // source: K8s.proto
 
-export const protobufPackage = 'K8s';
+export const protobufPackage = "K8s";
 
 export interface ResourceListDto {
   /** optional */
@@ -15,7 +15,9 @@ export interface ResourceListDto {
 
 export interface ResourceRequirementsDto {
   /** min guaranteed */
-  requests: ResourceListDto | undefined;
+  requests:
+    | ResourceListDto
+    | undefined;
   /** hard ceiling */
   limits: ResourceListDto | undefined;
 }
@@ -35,11 +37,33 @@ export interface ContainerDto_EnvEntry {
   value: string;
 }
 
+export interface TolerationDto {
+  key: string;
+  operator: string;
+  value: string;
+  effect: string;
+  tolerationSeconds: number;
+}
+
 export interface PodSpecDto {
   id: string;
   type: string;
   description: string;
   namespace: string;
+  labels: PodSpecDto_LabelsEntry[];
   container: ContainerDto | undefined;
+  nodeName: string;
+  nodeSelector: PodSpecDto_NodeSelectorEntry[];
+  tolerations: TolerationDto[];
   enabled: boolean;
+}
+
+export interface PodSpecDto_LabelsEntry {
+  key: string;
+  value: string;
+}
+
+export interface PodSpecDto_NodeSelectorEntry {
+  key: string;
+  value: string;
 }
