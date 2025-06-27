@@ -27,6 +27,8 @@ public class PodSpec implements HasUniqueProperties {
 
   private Map<String, String> nodeSelector;
 
+  private List<Toleration> tolerations;
+
   private boolean enabled = false;
 
   public PodSpec() {}
@@ -108,6 +110,15 @@ public class PodSpec implements HasUniqueProperties {
 
   public PodSpec setNodeSelector(Map<String, String> nodeSelector) {
     this.nodeSelector = nodeSelector;
+    return this;
+  }
+
+  public List<Toleration> getTolerations() {
+    return tolerations == null ? tolerations = Lists.newArrayList() : tolerations;
+  }
+
+  public PodSpec setTolerations(List<Toleration> tolerations) {
+    this.tolerations = tolerations;
     return this;
   }
 

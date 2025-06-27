@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" @hide="onHide" persistent>
-    <q-card class="dialog-md">
+    <q-card class="dialog-lg">
       <q-card-section>
         <div class="text-h6">{{ dialogTitle }}</div>
       </q-card-section>
@@ -149,6 +149,7 @@
                 </div>
               </div>
             </q-tab-panel>
+
             <q-tab-panel name="environment">
               <div class="text-hint">{{ t('kubernetes.environment_hint') }}</div>
               <q-list v-if="env.length" separator bordered class="q-mt-md">
@@ -169,7 +170,7 @@
                   </q-item-section>
                 </q-item>
               </q-list>
-              <div class="row q-mt-md">
+              <div class="row q-mt-md q-pa-md bg-grey-2">
                 <q-input v-model="envKey" dense :label="t('key')"> </q-input>
                 <q-input v-model="envValue" dense :label="t('value')" class="on-right"> </q-input>
                 <q-btn
@@ -182,6 +183,41 @@
                 />
               </div>
             </q-tab-panel>
+            
+            <q-tab-panel name="labels">
+              <div class="text-hint">{{ t('kubernetes.labels_hint') }}</div>
+                <q-list v-if="labels.length" separator bordered class="q-mt-md">
+                  <q-item v-for="(pair, index) in labels" :key="index">
+                    <q-item-section>
+                      <q-input
+                        v-model="pair.value"
+                        dense
+                        :label="pair.key"
+                        hide-bottom-space
+                        lazy-rules
+                        :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
+                      >
+                      </q-input>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn flat dense round icon="delete" @click="onRemoveLabel(index)" size="sm" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+                <div class="row q-mt-md q-pa-md bg-grey-2">
+                  <q-input v-model="labelKey" dense :label="t('key')"> </q-input>
+                  <q-input v-model="labelValue" dense :label="t('value')" class="on-right"> </q-input>
+                  <q-btn
+                    color="primary"
+                    icon="add"
+                    :disable="!canAddLabel"
+                    @click="onAddLabel"
+                    size="sm"
+                    class="on-right q-mt-md"
+                  />
+                </div>
+            </q-tab-panel>
+
             <q-tab-panel name="node">
               <div class="text-hint q-mb-md">{{ t('kubernetes.node_hint') }}</div>
               <q-input
@@ -212,7 +248,7 @@
                   </q-item-section>
                 </q-item>
               </q-list>
-              <div class="row q-mt-md">
+              <div class="row q-mt-md q-mb-md q-pa-md bg-grey-2">
                 <q-input v-model="nodeSelectorKey" dense :label="t('key')"> </q-input>
                 <q-input v-model="nodeSelectorValue" dense :label="t('value')" class="on-right"> </q-input>
                 <q-btn
@@ -224,41 +260,82 @@
                   class="on-right q-mt-md"
                 />
               </div>
-            </q-tab-panel>
-            
-          <q-tab-panel name="labels">
-            <div class="text-hint">{{ t('kubernetes.labels_hint') }}</div>
-              <q-list v-if="labels.length" separator bordered class="q-mt-md">
-                <q-item v-for="(pair, index) in labels" :key="index">
+              <div class="text-bold">{{ t('kubernetes.tolerations') }}</div>
+              <div class="text-hint">{{ t('kubernetes.tolerations_hint') }}</div>
+              <q-list v-if="tolerations.length" separator bordered class="q-mt-md">
+                <q-item v-for="(pair, index) in tolerations" :key="index">
                   <q-item-section>
-                    <q-input
-                      v-model="pair.value"
-                      dense
-                      :label="pair.key"
-                      hide-bottom-space
-                      lazy-rules
-                      :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
-                    >
-                    </q-input>
+                    <div class="row q-col-gutter-md">
+                      <q-input
+                        v-model="pair.key"
+                        dense
+                        :label="t('kubernetes.toleration_key')"
+                      />
+                      <q-select
+                        v-model="pair.operator"
+                        :options="operatorOptions"
+                        dense
+                        :label="t('kubernetes.toleration_operator')"
+                        style="min-width: 90px;"
+                      />
+                      <q-select
+                        v-model="pair.effect"
+                        :options="effectOptions"
+                        dense
+                        :label="t('kubernetes.toleration_effect')"
+                      />
+                      <q-input
+                        v-model="pair.value"
+                        dense
+                        :label="t('kubernetes.toleration_value')"
+                      />
+                      <q-input
+                        v-model.number="pair.tolerationSeconds"
+                        dense
+                        type="number"
+                        :label="t('kubernetes.toleration_seconds')"
+                      />
+                    </div>
                   </q-item-section>
                   <q-item-section side>
-                    <q-btn flat dense round icon="delete" @click="onRemoveLabel(index)" size="sm" />
+                    <q-btn flat dense round icon="delete" @click="onRemoveToleration(index)" size="sm" />
                   </q-item-section>
                 </q-item>
               </q-list>
-              <div class="row q-mt-md">
-                <q-input v-model="labelKey" dense :label="t('key')"> </q-input>
-                <q-input v-model="labelValue" dense :label="t('value')" class="on-right"> </q-input>
+              <div class="row q-mt-md q-pa-md bg-grey-2">
+                <q-input v-model="tolerationKey" dense :label="t('kubernetes.toleration_key')" />
+                <q-select
+                  v-model="tolerationOperator"
+                  :options="operatorOptions"
+                  dense
+                  :label="t('kubernetes.toleration_operator')"
+                  class="on-right"
+                  style="min-width: 80px;"
+                />
+                <q-select
+                  v-model="tolerationEffect"
+                  :options="effectOptions"
+                  dense
+                  :label="t('kubernetes.toleration_effect')"
+                  class="on-right"
+                />
+                <q-input v-model="tolerationValue" dense :label="t('kubernetes.toleration_value')" class="on-right" />
+                <q-input
+                  v-model.number="tolerationTolerationSeconds"
+                  dense
+                  type="number"
+                  :label="t('kubernetes.toleration_seconds')"
+                  class="on-right"
+                />
                 <q-btn
                   color="primary"
                   icon="add"
-                  :disable="!canAddLabel"
-                  @click="onAddLabel"
+                  @click="onAddToleration"
                   size="sm"
                   class="on-right q-mt-md"
                 />
               </div>
-          </q-tab-panel>
+            </q-tab-panel>
           </q-tab-panels>
         </q-form>
       </q-card-section>
@@ -275,7 +352,7 @@
 
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import type { PodSpecDto, ContainerDto, ContainerDto_EnvEntry, PodSpecDto_LabelsEntry, PodSpecDto_NodeSelectorEntry } from 'src/models/K8s';
+import type { PodSpecDto, ContainerDto, ContainerDto_EnvEntry, PodSpecDto_LabelsEntry, PodSpecDto_NodeSelectorEntry, TolerationDto } from 'src/models/K8s';
 
 interface DialogProps {
   modelValue: boolean;
@@ -299,6 +376,10 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue', 'update']);
 const podsStore = usePodsStore();
 const { t } = useI18n();
+
+const operatorOptions = ['Equal', 'Exists'];
+const effectOptions = ['NoSchedule', 'PreferNoSchedule', 'NoExecute'];
+
 const formRef = ref();
 const showDialog = ref(props.modelValue);
 const spec = ref<PodSpecDto>(emptyPodSpec);
@@ -314,6 +395,12 @@ const labelValue = ref('');
 const nodeSelector = ref<PodSpecDto_NodeSelectorEntry[]>([]);
 const nodeSelectorKey = ref('');
 const nodeSelectorValue = ref('');
+const tolerations = ref<TolerationDto[]>([]); // Not used in the dialog, but can be added later if needed
+const tolerationKey = ref('');
+const tolerationValue = ref('');
+const tolerationEffect = ref('NoSchedule');
+const tolerationOperator = ref('Equal');
+const tolerationTolerationSeconds = ref();
 const env = ref<ContainerDto_EnvEntry[]>([]);
 const envKey = ref('');
 const envValue = ref('');
@@ -366,6 +453,12 @@ watch(
       nodeSelector.value = spec.value.nodeSelector || [];
       nodeSelectorKey.value = '';
       nodeSelectorValue.value = '';
+      tolerations.value = spec.value.tolerations || [];
+      tolerationKey.value = '';
+      tolerationValue.value = '';
+      tolerationEffect.value = 'NoSchedule';
+      tolerationOperator.value = 'Equal';
+      tolerationTolerationSeconds.value = undefined;
       env.value = container.value.env || [];
       envKey.value = '';
       envValue.value = '';
@@ -433,6 +526,24 @@ function onAddNodeSelector() {
   }
 }
 
+function onRemoveToleration(index: number) {
+  tolerations.value.splice(index, 1);
+}
+function onAddToleration() {
+  tolerations.value.push({
+    key: tolerationKey.value,
+    value: tolerationValue.value,
+    effect: tolerationEffect.value,
+    operator: tolerationOperator.value,
+    tolerationSeconds: tolerationTolerationSeconds.value,
+  });
+  tolerationKey.value = '';
+  tolerationValue.value = '';
+  tolerationEffect.value = 'NoSchedule';
+  tolerationOperator.value = 'Equal';
+  tolerationTolerationSeconds.value = undefined;
+}
+
 function onRemoveEnv(index: number) {
   env.value.splice(index, 1);
 }
@@ -469,6 +580,7 @@ async function onSubmit() {
       spec.value.container.env = env.value;
       spec.value.labels = labels.value;
       spec.value.nodeSelector = nodeSelector.value;
+      spec.value.tolerations = tolerations.value;
       // ensure it is a rock-based image
       spec.value.type = 'rock';
       spec.value.container.port = 8085;

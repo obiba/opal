@@ -192,6 +192,13 @@ export default {
     node_selector_hint: 'The Kubernetes node selector to be used for scheduling the pod. This is a set of key-value pairs that must match the labels of the node.',
     labels: 'Labels',
     labels_hint: 'The Kubernetes labels to be applied to the pod. Labels are key-value pairs that can be used to organize and select resources.',
+    tolerations: 'Tolerations',
+    tolerations_hint: 'The Kubernetes tolerations to be applied to the pod. Tolerations allow the pod to be scheduled on nodes with specific taints.',
+    toleration_operator: 'Operator',
+    toleration_effect: 'Effect',
+    toleration_key: 'Key',
+    toleration_value: 'Value',
+    toleration_seconds: 'Seconds',
   },
   identity_provider: {
     title: 'Identity Provider',

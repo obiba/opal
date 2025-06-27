@@ -2,7 +2,10 @@ package org.obiba.opal.web.kubernetes;
 
 import org.obiba.opal.core.domain.kubernetes.Container;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
+import org.obiba.opal.core.domain.kubernetes.Toleration;
 import org.obiba.opal.web.model.K8S;
+
+import java.util.stream.Collectors;
 
 public class Dtos {
 
@@ -14,10 +17,23 @@ public class Dtos {
         .setNamespace(spec.getNamespace())
         .putAllLabels(spec.getLabels())
         .putAllNodeSelector(spec.getNodeSelector())
+        .addAllTolerations(spec.getTolerations().stream().map(Dtos::asDto).toList())
         .setEnabled(spec.isEnabled())
         .setContainer(asDto(spec.getContainer()));
 
     if (spec.hasNodeName()) builder.setNodeName(spec.getNodeName());
+
+    return builder.build();
+  }
+
+  private static K8S.TolerationDto asDto(Toleration tol) {
+    K8S.TolerationDto.Builder builder = K8S.TolerationDto.newBuilder()
+        .setOperator(tol.getOperator().name())
+        .setEffect(tol.getEffect().name());
+
+    if (tol.hasKey()) builder.setKey(tol.getKey());
+    if (tol.hasValue()) builder.setValue(tol.getValue());
+    if (tol.hasTolerationSeconds()) builder.setTolerationSeconds(tol.getTolerationSeconds());
 
     return builder.build();
   }
@@ -61,7 +77,17 @@ public class Dtos {
         .setNodeSelector(dto.getNodeSelectorMap())
         .setDescription(dto.getDescription())
         .setEnabled(dto.getEnabled())
+        .setTolerations(dto.getTolerationsList().stream().map(Dtos::fromDto).collect(Collectors.toList()))
         .setContainer(fromDto(dto.getContainer()));
+  }
+
+  private static Toleration fromDto(K8S.TolerationDto dto) {
+    return new Toleration()
+        .setKey(dto.getKey())
+        .setOperator(dto.getOperator())
+        .setEffect(dto.getEffect())
+        .setValue(dto.getValue())
+        .setTolerationSeconds(dto.getTolerationSeconds());
   }
 
   private static Container fromDto(K8S.ContainerDto dto) {

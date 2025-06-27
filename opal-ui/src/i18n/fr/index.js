@@ -192,6 +192,13 @@ export default {
     node_selector_hint: "Un sélecteur de nœud pour restreindre le pod à un ensemble spécifique de nœuds. Par exemple, 'kubernetes.io/hostname: mon-nœud'.",
     labels: 'Étiquettes',
     labels_hint: "Les étiquettes à appliquer au pod. Les étiquettes sont des paires clé-valeur utilisées pour organiser et sélectionner les pods.",
+    tolerations: 'Tolérances',
+    tolerations_hint: "Les tolérances à appliquer au pod. Les tolérances permettent au pod de s'exécuter sur des nœuds avec des taints spécifiques.",
+    toleration_operator: 'Opérateur',
+    toleration_effect: 'Effet',
+    toleration_key: 'Clé',
+    toleration_value: 'Valeur',
+    toleration_seconds: 'Secondes',
   },
   identity_provider: {
     title: "Fournisseur d'identité",
