@@ -15,7 +15,9 @@ export interface ResourceListDto {
 
 export interface ResourceRequirementsDto {
   /** min guaranteed */
-  requests: ResourceListDto | undefined;
+  requests:
+    | ResourceListDto
+    | undefined;
   /** hard ceiling */
   limits: ResourceListDto | undefined;
 }
@@ -40,6 +42,19 @@ export interface PodSpecDto {
   type: string;
   description: string;
   namespace: string;
+  labels: PodSpecDto_LabelsEntry[];
   container: ContainerDto | undefined;
+  nodeName: string;
+  nodeSelector: PodSpecDto_NodeSelectorEntry[];
   enabled: boolean;
+}
+
+export interface PodSpecDto_LabelsEntry {
+  key: string;
+  value: string;
+}
+
+export interface PodSpecDto_NodeSelectorEntry {
+  key: string;
+  value: string;
 }

@@ -146,6 +146,7 @@ public class PodsServiceImpl implements PodsService {
         .withNewMetadata()
           .withName(podName)
           .addToLabels("app", podName)
+          .addToLabels(spec.getLabels())
           .endMetadata()
         .withNewSpec()
           .addNewContainer()
@@ -157,6 +158,8 @@ public class PodsServiceImpl implements PodsService {
             .withResources(res)
           .endContainer()
           .withImagePullSecrets(spec.getContainer().hasImagePullSecret() ? new LocalObjectReferenceBuilder().withName(spec.getContainer().getImagePullSecret()).build() : null)
+          .withNodeName(spec.getNodeName())
+          .withNodeSelector(spec.getNodeSelector())
         .endSpec()
         .build();
 

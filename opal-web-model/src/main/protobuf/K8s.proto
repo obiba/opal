@@ -33,6 +33,9 @@ message PodSpecDto {
   string type = 2;
   string description = 3;
   string namespace = 4;
-  ContainerDto container = 5;
-  bool enabled = 6;
+  map<string, string> labels = 5;
+  ContainerDto container = 6;
+  string nodeName = 7;
+  map<string, string> nodeSelector = 8;
+  bool enabled = 9;
 }

@@ -7,14 +7,19 @@ import org.obiba.opal.web.model.K8S;
 public class Dtos {
 
   public static K8S.PodSpecDto asDto(PodSpec spec) {
-    return K8S.PodSpecDto.newBuilder()
+    K8S.PodSpecDto.Builder builder = K8S.PodSpecDto.newBuilder()
         .setId(spec.getId())
         .setType(spec.getType())
         .setDescription(spec.getDescription())
         .setNamespace(spec.getNamespace())
+        .putAllLabels(spec.getLabels())
+        .putAllNodeSelector(spec.getNodeSelector())
         .setEnabled(spec.isEnabled())
-        .setContainer(asDto(spec.getContainer()))
-        .build();
+        .setContainer(asDto(spec.getContainer()));
+
+    if (spec.hasNodeName()) builder.setNodeName(spec.getNodeName());
+
+    return builder.build();
   }
 
   private static K8S.ContainerDto asDto(Container container) {
@@ -51,6 +56,9 @@ public class Dtos {
         .setId(dto.getId())
         .setType(dto.getType())
         .setNamespace(dto.getNamespace())
+        .setLabels(dto.getLabelsMap())
+        .setNodeName(dto.getNodeName())
+        .setNodeSelector(dto.getNodeSelectorMap())
         .setDescription(dto.getDescription())
         .setEnabled(dto.getEnabled())
         .setContainer(fromDto(dto.getContainer()));

@@ -44,6 +44,7 @@
           >
           </q-input>
 
+
           <q-tabs
             v-model="tab"
             dense
@@ -55,8 +56,10 @@
             <q-tab name="container" :label="t('kubernetes.container')" />
             <q-tab name="resources" :label="t('kubernetes.resources')" />
             <!-- q-tab name="environment" :label="t('kubernetes.environment')" /-->
+            <q-tab name="labels" :label="t('kubernetes.labels')" />
+            <q-tab name="node" :label="t('kubernetes.node')" />
           </q-tabs>
-
+          <q-separator />
           <q-tab-panels v-model="tab">
             <q-tab-panel name="container">
               <q-input
@@ -179,6 +182,83 @@
                 />
               </div>
             </q-tab-panel>
+            <q-tab-panel name="node">
+              <div class="text-hint q-mb-md">{{ t('kubernetes.node_hint') }}</div>
+              <q-input
+                v-model="spec.nodeName"
+                dense
+                :label="t('kubernetes.node_name')"
+                :hint="t('kubernetes.node_name_hint')"
+                class="q-mb-md"
+              >
+              </q-input>
+              <div class="text-bold">{{ t('kubernetes.node_selector') }}</div>
+              <div class="text-hint">{{ t('kubernetes.node_selector_hint') }}</div>
+              <q-list v-if="nodeSelector.length" separator bordered class="q-mt-md">
+                <q-item v-for="(pair, index) in nodeSelector" :key="index">
+                  <q-item-section>
+                    <q-input
+                      v-model="pair.value"
+                      dense
+                      :label="pair.key"
+                      hide-bottom-space
+                      lazy-rules
+                      :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
+                    >
+                    </q-input>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn flat dense round icon="delete" @click="onRemoveNodeSelector(index)" size="sm" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <div class="row q-mt-md">
+                <q-input v-model="nodeSelectorKey" dense :label="t('key')"> </q-input>
+                <q-input v-model="nodeSelectorValue" dense :label="t('value')" class="on-right"> </q-input>
+                <q-btn
+                  color="primary"
+                  icon="add"
+                  :disable="!canAddNodeSelector"
+                  @click="onAddNodeSelector"
+                  size="sm"
+                  class="on-right q-mt-md"
+                />
+              </div>
+            </q-tab-panel>
+            
+          <q-tab-panel name="labels">
+            <div class="text-hint">{{ t('kubernetes.labels_hint') }}</div>
+              <q-list v-if="labels.length" separator bordered class="q-mt-md">
+                <q-item v-for="(pair, index) in labels" :key="index">
+                  <q-item-section>
+                    <q-input
+                      v-model="pair.value"
+                      dense
+                      :label="pair.key"
+                      hide-bottom-space
+                      lazy-rules
+                      :rules="[(val) => (val && val.trim().length > 0) || t('required')]"
+                    >
+                    </q-input>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn flat dense round icon="delete" @click="onRemoveLabel(index)" size="sm" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <div class="row q-mt-md">
+                <q-input v-model="labelKey" dense :label="t('key')"> </q-input>
+                <q-input v-model="labelValue" dense :label="t('value')" class="on-right"> </q-input>
+                <q-btn
+                  color="primary"
+                  icon="add"
+                  :disable="!canAddLabel"
+                  @click="onAddLabel"
+                  size="sm"
+                  class="on-right q-mt-md"
+                />
+              </div>
+          </q-tab-panel>
           </q-tab-panels>
         </q-form>
       </q-card-section>
@@ -195,7 +275,7 @@
 
 <script setup lang="ts">
 import { notifyError } from 'src/utils/notify';
-import type { PodSpecDto, ContainerDto, ContainerDto_EnvEntry } from 'src/models/K8s';
+import type { PodSpecDto, ContainerDto, ContainerDto_EnvEntry, PodSpecDto_LabelsEntry, PodSpecDto_NodeSelectorEntry } from 'src/models/K8s';
 
 interface DialogProps {
   modelValue: boolean;
@@ -228,6 +308,12 @@ const requests_cpu = ref();
 const requests_memory = ref();
 const limits_cpu = ref();
 const limits_memory = ref();
+const labels = ref<PodSpecDto_LabelsEntry[]>([]);
+const labelKey = ref('');
+const labelValue = ref('');
+const nodeSelector = ref<PodSpecDto_NodeSelectorEntry[]>([]);
+const nodeSelectorKey = ref('');
+const nodeSelectorValue = ref('');
 const env = ref<ContainerDto_EnvEntry[]>([]);
 const envKey = ref('');
 const envValue = ref('');
@@ -238,6 +324,12 @@ const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('kubernetes.edit_pod_spec') : t('kubernetes.add_pod_spec')));
 const canAddEnv = computed(() => {
   return envKey.value.trim() !== '' && envValue.value.trim() !== '';
+});
+const canAddLabel = computed(() => {
+  return labelKey.value.trim() !== '' && labelValue.value.trim() !== '';
+});
+const canAddNodeSelector = computed(() => {
+  return nodeSelectorKey.value.trim() !== '' && nodeSelectorValue.value.trim() !== '';
 });
 
 // Handlers
@@ -255,19 +347,25 @@ watch(
         spec.value = JSON.parse(JSON.stringify(props.podSpec));
         container.value = JSON.parse(JSON.stringify(props.podSpec.container || emptyContainer));
         container.value.imagePullPolicy = container.value.imagePullPolicy || 'IfNotPresent';
-        requests_cpu.value = spec.value.container?.resources?.requests?.cpu || '100m';
+        requests_cpu.value = spec.value.container?.resources?.requests?.cpu || '1000m';
         requests_memory.value = spec.value.container?.resources?.requests?.memory || '500Mi';
         limits_cpu.value = spec.value.container?.resources?.limits?.cpu || '1000m';
         limits_memory.value = spec.value.container?.resources?.limits?.memory || '1Gi';
       } else {
         spec.value = JSON.parse(JSON.stringify(emptyPodSpec));
         container.value = JSON.parse(JSON.stringify(emptyContainer));
-        requests_cpu.value = '100m';
+        requests_cpu.value = '1000m';
         requests_memory.value = '500Mi';
         limits_cpu.value = '1000m';
         limits_memory.value = '1Gi';
       }
       spec.value.enabled = spec.value.enabled || false;
+      labels.value = spec.value.labels || [];
+      labelKey.value = '';
+      labelValue.value = '';
+      nodeSelector.value = spec.value.nodeSelector || [];
+      nodeSelectorKey.value = '';
+      nodeSelectorValue.value = '';
       env.value = container.value.env || [];
       envKey.value = '';
       envValue.value = '';
@@ -297,6 +395,42 @@ function isValidDockerImageName(name: string): boolean {
       '(?:@sha256:[a-fA-F0-9]{64})?$',
   );
   return dockerImageRegex.test(name);
+}
+
+function onRemoveLabel(index: number) {
+  labels.value.splice(index, 1);
+}
+
+function onAddLabel() {
+  if (canAddLabel.value) {
+    // find if the key already exists
+    const existingLabel = labels.value.find((e) => e.key === labelKey.value);
+    if (existingLabel) {
+      existingLabel.value = labelValue.value;
+    } else {
+      labels.value.push({ key: labelKey.value, value: labelValue.value });
+    }
+    labelKey.value = '';
+    labelValue.value = '';
+  }
+}
+
+function onRemoveNodeSelector(index: number) {
+  nodeSelector.value.splice(index, 1);
+}
+
+function onAddNodeSelector() {
+  if (canAddNodeSelector.value) {
+    // find if the key already exists
+    const existingSelector = nodeSelector.value.find((e) => e.key === nodeSelectorKey.value);
+    if (existingSelector) {
+      existingSelector.value = nodeSelectorValue.value;
+    } else {
+      nodeSelector.value.push({ key: nodeSelectorKey.value, value: nodeSelectorValue.value });
+    }
+    nodeSelectorKey.value = '';
+    nodeSelectorValue.value = '';
+  }
 }
 
 function onRemoveEnv(index: number) {
@@ -333,6 +467,8 @@ async function onSubmit() {
         },
       };
       spec.value.container.env = env.value;
+      spec.value.labels = labels.value;
+      spec.value.nodeSelector = nodeSelector.value;
       // ensure it is a rock-based image
       spec.value.type = 'rock';
       spec.value.container.port = 8085;
