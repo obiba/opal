@@ -42,7 +42,7 @@
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
     <commons-httpclient.version>3.1</commons-httpclient.version>
     <commons-io.version>2.16.1</commons-io.version>
-    <commons-lang.version>3.14.0</commons-lang.version>
+    <commons-lang.version>3.18.0</commons-lang.version>
     <commons-math.version>3.5</commons-math.version>
     <commons-text.version>1.10.0</commons-text.version>
     <commons-vfs.version>2.10.0</commons-vfs.version>
