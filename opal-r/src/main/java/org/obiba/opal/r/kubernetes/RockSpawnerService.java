@@ -20,6 +20,8 @@ import org.obiba.opal.r.rock.RockServerStatus;
 import org.obiba.opal.r.rock.RockState;
 import org.obiba.opal.r.rock.RockStringMatrix;
 import org.obiba.opal.r.service.*;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
@@ -104,6 +106,7 @@ public class RockSpawnerService implements RServerPodService {
         initResourceProviders(pod);
         initDataShieldPackagesProperties(pod);
         defaultRServerState = getState(pod);
+        eventBus.post(new RServerServiceStartedEvent(clusterName));
       } catch (Exception e) {
         log.error("Error when reading installed packages and DataSHIELD properties", e);
       } finally {
@@ -120,6 +123,7 @@ public class RockSpawnerService implements RServerPodService {
     try {
       // clean up associated pods
       podsService.deletePods(podSpec);
+      eventBus.post(new RServerServiceStoppedEvent(clusterName));
     } finally {
       running = false;
       sessions.clear();

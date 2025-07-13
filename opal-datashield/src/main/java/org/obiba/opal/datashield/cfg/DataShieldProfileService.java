@@ -12,6 +12,7 @@ package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
@@ -24,6 +25,10 @@ import org.obiba.opal.datashield.CustomRScriptMethod;
 import org.obiba.opal.datashield.RFunctionDataShieldMethod;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.r.service.event.RServiceInitializedEvent;
+import org.obiba.opal.spi.r.RServerException;
+import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +59,8 @@ public class DataShieldProfileService implements SystemService {
 
   private final Lock lock = new ReentrantLock();
 
+  //private final DataShieldPackageMethodHelper dsPackageMethodeHelper;
+
   private final DatashieldConfigurationSupplier datashieldConfigurationSupplier;
 
   @Autowired
@@ -61,6 +68,7 @@ public class DataShieldProfileService implements SystemService {
     this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
     this.subjectAclService = subjectAclService;
+    //this.dsPackageMethodeHelper = dsPackageMethodeHelper;
     this.datashieldConfigurationSupplier = datashieldConfigurationSupplier;
   }
 
@@ -117,7 +125,7 @@ public class DataShieldProfileService implements SystemService {
     try {
       String pName = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
       Optional<DataShieldProfile> profileOpt = getProfiles().stream().filter(p -> p.getName().equals(pName)).findFirst();
-      if (!profileOpt.isPresent()) {
+      if (profileOpt.isEmpty()) {
         DataShieldProfile profile = new DataShieldProfile(pName);
         profile.setEnabled(false);
         return profile;
@@ -190,6 +198,25 @@ public class DataShieldProfileService implements SystemService {
   @Override
   public void stop() {
 
+  }
+
+
+  @Subscribe
+  public void onRServiceStarted(RServerServiceStartedEvent event) {
+    if (!event.hasName()) { // only when a cluster is started
+      try {
+        rServerManagerService.getRServerClusters().forEach(cluster -> {
+          if (!hasProfile(cluster.getName())) {
+            //DataShieldProfile profile = new DataShieldProfile(cluster.getName());
+            //cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profile, name));
+            //profile.setEnabled(true);
+            //saveProfile(profile);
+          }
+        });
+      } catch (Exception e) {
+        log.error("Cannot read R/DataSHIELD packages to initialize profile", e);
+      }
+    }
   }
 
   //
