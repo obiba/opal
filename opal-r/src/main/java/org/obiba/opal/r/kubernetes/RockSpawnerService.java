@@ -57,6 +57,8 @@ public class RockSpawnerService implements RServerPodService {
 
   private static final AppCredentials DEFAULT_CREDENTIALS = new AppCredentials("administrator", "password");
 
+  private static final int ROCK_POD_CONNECTION_MAX_ATTEMPTS = 60;
+
   private final TransactionalThreadFactory transactionalThreadFactory;
 
   private final EventBus eventBus;
@@ -434,14 +436,18 @@ public class RockSpawnerService implements RServerPodService {
       PodRef pod =  podsService.createPod(podSpec, env);
       boolean ready = false;
       int attempts = 0;
-      while (!ready && attempts < 20) {
+      while (!ready && attempts < ROCK_POD_CONNECTION_MAX_ATTEMPTS) {
         RestTemplate restTemplate = new RestTemplate();
         try {
           ResponseEntity<String> response =
               restTemplate.exchange(getRServerResourceUrl(pod, "/_check"), HttpMethod.GET, new HttpEntity<>(createHeaders()), String.class);
           ready = response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
-          log.error("Error when checking R server pod {} status", pod.getName(), e);
+          if (log.isDebugEnabled()) {
+            log.error("Error when checking R server pod {} status", pod.getName(), e);
+          } else {
+            log.error("Error when checking R server pod {} status", pod.getName());
+          }
         }
         if (!ready) {
           log.info("Waiting for R server pod {} to be ready (attempt {})", pod.getName(), attempts);
