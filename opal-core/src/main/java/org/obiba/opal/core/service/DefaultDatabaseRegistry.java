@@ -122,6 +122,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return !Iterables.isEmpty(list(usage));
   }
 
+  @Override
+  public boolean hasDatabase(@org.jetbrains.annotations.Nullable String name) {
+    Database database = orientDbService.findUnique(Database.Builder.create().name(name).build());
+    return database != null;
+  }
+
   @NotNull
   @Override
   public Database getDatabase(@NotNull String name) throws NoSuchDatabaseException {

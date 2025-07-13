@@ -31,6 +31,8 @@ public interface DatabaseRegistry extends SystemService {
 
   boolean hasDatabases(@Nullable Database.Usage usage);
 
+  boolean hasDatabase(@Nullable String name);
+
   @NotNull
   Database getDatabase(@NotNull String name) throws NoSuchDatabaseException;
 
