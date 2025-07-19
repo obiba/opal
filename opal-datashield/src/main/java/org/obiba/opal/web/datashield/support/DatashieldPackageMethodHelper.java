@@ -12,11 +12,6 @@ package org.obiba.opal.web.datashield.support;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.datashield.core.DSMethod;
-import org.obiba.datashield.core.DSMethodType;
-import org.obiba.datashield.core.NoSuchDSMethodException;
-import org.obiba.datashield.core.impl.PackagedFunctionDSMethod;
-import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.datashield.cfg.DatashieldPackagesHandler;
@@ -32,12 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
-public class DataShieldPackageMethodHelper {
+public class DatashieldPackageMethodHelper {
 
-  private static final Logger log = LoggerFactory.getLogger(DataShieldPackageMethodHelper.class);
+  private static final Logger log = LoggerFactory.getLogger(DatashieldPackageMethodHelper.class);
 
   @Autowired
   private DataShieldProfileService datashieldProfileService;

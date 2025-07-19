@@ -12,7 +12,7 @@ package org.obiba.opal.web.datashield;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
-import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
+import org.obiba.opal.web.datashield.support.DatashieldPackageMethodHelper;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class DataShieldPackageResource {
   private DataShieldProfileService datashieldProfileService;
 
   @Autowired
-  private DataShieldPackageMethodHelper dsPackageMethodeHelper;
+  private DatashieldPackageMethodHelper dsPackageMethodeHelper;
 
   @Autowired
   private OpalGeneralConfigService opalGeneralConfigService;

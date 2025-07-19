@@ -86,8 +86,7 @@ public class DatashieldPackagesHandler {
         .map(DSMethod::getName)
         .collect(Collectors.toList()));
     // cannot identify the R options by the package where they are defined
-    if (packages != null)
-      removeOptions(config, getPackageROptions(packages.getFirst()));
+    removeOptions(config, getPackageROptions(packages.getFirst()));
   }
 
   public void deletePackage(DataShieldProfile profile) {
