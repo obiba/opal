@@ -28,8 +28,17 @@ public class PodsServiceImpl implements PodsService {
 
   private static final Logger log = LoggerFactory.getLogger(PodsServiceImpl.class);
 
-  @Value("${pods.images.rock}")
-  private String[] allowedPodImagesRock;
+  @Value("${pods.rock.images.allowed}")
+  private String[] allowedRockPodImages;
+
+  @Value("${pods.rock.default.image}")
+  private String defaultRockPodImage;
+
+  @Value("${pods.rock.default.resources.cpu}")
+  private String defaultRockPodCpu;
+
+  @Value("${pods.rock.default.resources.memory}")
+  private String defaultRockPodMemory;
 
   private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
@@ -110,7 +119,7 @@ public class PodsServiceImpl implements PodsService {
     if (allowedPodImageRefsRock.isEmpty()) return;
     boolean hasMatch = allowedPodImageRefsRock.stream().anyMatch((allowedRef) -> imageReference.getRegistry().equals(allowedRef.getRegistry()) && imageReference.getRepository().equals(allowedRef.getRepository()));
     if (hasMatch) return;
-    throw new IllegalArgumentException("Pod 'rock' image " + imageStr + " is not allowed (allowed images: " + Arrays.toString(allowedPodImagesRock) + ")");
+    throw new IllegalArgumentException("Pod 'rock' image " + imageStr + " is not allowed (allowed images: " + Arrays.toString(allowedRockPodImages) + ")");
   }
 
   @Override
@@ -234,9 +243,9 @@ public class PodsServiceImpl implements PodsService {
     initClient();
     orientDbService.createUniqueIndex(PodSpec.class);
 
-    if (allowedPodImagesRock != null) {
+    if (allowedRockPodImages != null) {
       allowedPodImageRefsRock.clear();
-      for (String allowedPodImage : allowedPodImagesRock) {
+      for (String allowedPodImage : allowedRockPodImages) {
         try {
           allowedPodImageRefsRock.add(ImageReference.parse(allowedPodImage));
         } catch (Exception e) {
@@ -251,6 +260,14 @@ public class PodsServiceImpl implements PodsService {
         Streams.stream(orientDbService.list(PodSpec.class))
             .filter(PodSpec::isEnabled)
             .forEach(spec -> eventBus.post(new PodSpecRegisteredEvent(spec)));
+        if (!Strings.isNullOrEmpty(defaultRockPodImage)) {
+          PodSpec found = orientDbService.findUnique(new PodSpec("default").setType("rock"));
+          if (found == null) {
+            saveSpec(RockPodSpecFactory
+                .makeRockPodSpec("default", defaultRockPodImage, defaultRockPodCpu, defaultRockPodMemory)
+                .setEnabled(true));
+          }
+        }
       }
     }, 5000);
   }

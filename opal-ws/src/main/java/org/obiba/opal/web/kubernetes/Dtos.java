@@ -1,5 +1,6 @@
 package org.obiba.opal.web.kubernetes;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.kubernetes.Container;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.domain.kubernetes.Toleration;
@@ -14,7 +15,7 @@ public class Dtos {
         .setId(spec.getId())
         .setType(spec.getType())
         .setDescription(spec.getDescription())
-        .setNamespace(spec.getNamespace())
+        .setNamespace(Strings.isNullOrEmpty(spec.getNamespace()) ? "" :  spec.getNamespace())
         .putAllLabels(spec.getLabels())
         .putAllNodeSelector(spec.getNodeSelector())
         .addAllTolerations(spec.getTolerations().stream().map(Dtos::asDto).toList())
