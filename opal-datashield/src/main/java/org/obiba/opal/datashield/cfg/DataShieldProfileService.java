@@ -22,23 +22,23 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.datashield.CustomRScriptMethod;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RFunctionDataShieldMethod;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerProfile;
+import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
-import org.obiba.opal.r.service.event.RServiceInitializedEvent;
-import org.obiba.opal.spi.r.RServerException;
-import org.obiba.opal.web.datashield.support.DataShieldPackageMethodHelper;
+import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -59,8 +59,6 @@ public class DataShieldProfileService implements SystemService {
 
   private final Lock lock = new ReentrantLock();
 
-  //private final DataShieldPackageMethodHelper dsPackageMethodeHelper;
-
   private final DatashieldConfigurationSupplier datashieldConfigurationSupplier;
 
   @Autowired
@@ -68,7 +66,6 @@ public class DataShieldProfileService implements SystemService {
     this.rServerManagerService = rServerManagerService;
     this.orientDbService = orientDbService;
     this.subjectAclService = subjectAclService;
-    //this.dsPackageMethodeHelper = dsPackageMethodeHelper;
     this.datashieldConfigurationSupplier = datashieldConfigurationSupplier;
   }
 
@@ -207,10 +204,10 @@ public class DataShieldProfileService implements SystemService {
       try {
         rServerManagerService.getRServerClusters().forEach(cluster -> {
           if (!hasProfile(cluster.getName())) {
-            //DataShieldProfile profile = new DataShieldProfile(cluster.getName());
-            //cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> dsPackageMethodeHelper.publish(profile, name));
-            //profile.setEnabled(true);
-            //saveProfile(profile);
+            DataShieldProfile profile = new DataShieldProfile(cluster.getName());
+            cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> publish(profile, name));
+            profile.setEnabled(true);
+            saveProfile(profile);
           }
         });
       } catch (Exception e) {
@@ -219,6 +216,77 @@ public class DataShieldProfileService implements SystemService {
     }
   }
 
+  //
+  // Publication
+  //
+
+  /**
+   * Get the package settings and push them to the profile's config.
+   *
+   * @param profile R server profile
+   * @param name    Package name
+   */
+  public void publish(RServerProfile profile, String name) {
+    List<OpalR.RPackageDto> packages = getDatashieldPackage(profile, name);
+    publish(profile, packages);
+  }
+
+  public void publish(RServerProfile profile, List<OpalR.RPackageDto> packages) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(packages);
+    DataShieldProfile config = (DataShieldProfile) profile;
+    handler.publish(config);
+    saveProfile(config);
+    String name = packages.getFirst().getName();
+    DataShieldLog.adminLog("Package '{}' config added.", handler.getName());
+  }
+
+  public void unpublish(RServerProfile profile, List<OpalR.RPackageDto> packages) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(packages);
+    DataShieldProfile config = (DataShieldProfile) profile;
+    handler.unpublish(config);
+    saveProfile(config);
+    DataShieldLog.adminLog("Package '{}' config removed.", handler.getName());
+  }
+
+  public void deletePackage(DataShieldProfile config, OpalR.RPackageDto pkg) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(Lists.newArrayList(pkg));
+    handler.deletePackage(config);
+    saveProfile(config);
+    DataShieldLog.adminLog("Package '{}' removed.", handler.getName());
+  }
+
+  public List<OpalR.RPackageDto> getDatashieldPackage(RServerProfile profile, final String name) {
+    List<OpalR.RPackageDto> pkgs = getInstalledPackagesDtos(profile).stream()
+        .filter(dto -> name.equals(dto.getName()))
+        .collect(Collectors.toList());
+    if (pkgs.isEmpty()) throw new NoSuchRPackageException(name);
+    return pkgs;
+  }
+
+  public List<OpalR.RPackageDto> getInstalledPackagesDtos(RServerProfile profile) {
+    RServerService server = rServerManagerService.getRServer(profile.getCluster());
+    Map<String, List<Opal.EntryDto>> dsPackages = server.getDataShieldPackagesProperties();
+    Set<String> dsNames = dsPackages.keySet();
+    return server.getInstalledPackagesDtos().stream()
+        .filter(dto -> dsNames.contains(dto.getName()))
+        .map(dto -> {
+          OpalR.RPackageDto.Builder builder = dto.toBuilder();
+          for (Opal.EntryDto dsEntry : dsPackages.get(dto.getName())) {
+            boolean found = false;
+            for (Opal.EntryDto entry : builder.getDescriptionList()) {
+              if (entry.getKey().equals(dsEntry.getKey())) {
+                found = true;
+                break;
+              }
+            }
+            if (!found)
+              builder.addDescription(dsEntry);
+          }
+          return builder.build();
+        })
+        .collect(Collectors.toList());
+  }
+  
   //
   // Private methods
   //
