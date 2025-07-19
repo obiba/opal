@@ -12,6 +12,7 @@ package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
@@ -21,19 +22,23 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.datashield.CustomRScriptMethod;
+import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RFunctionDataShieldMethod;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerManagerService;
+import org.obiba.opal.r.service.RServerProfile;
+import org.obiba.opal.r.service.RServerService;
+import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
+import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.r.NoSuchRPackageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -117,7 +122,7 @@ public class DataShieldProfileService implements SystemService {
     try {
       String pName = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultRServerProfile().getName() : name;
       Optional<DataShieldProfile> profileOpt = getProfiles().stream().filter(p -> p.getName().equals(pName)).findFirst();
-      if (!profileOpt.isPresent()) {
+      if (profileOpt.isEmpty()) {
         DataShieldProfile profile = new DataShieldProfile(pName);
         profile.setEnabled(false);
         return profile;
@@ -136,6 +141,14 @@ public class DataShieldProfileService implements SystemService {
    */
   public boolean hasProfile(String name) {
     return findProfile(name) != null;
+  }
+
+  public boolean hasEmptyProfile(String name) {
+    DataShieldProfile profile = findProfile(name);
+    if (profile == null) return true;
+    return Lists.newArrayList(profile.getOptions()).isEmpty()
+        && profile.getEnvironment(DSMethodType.AGGREGATE).getMethods().isEmpty()
+        && profile.getEnvironment(DSMethodType.ASSIGN).getMethods().isEmpty();
   }
 
   /**
@@ -192,6 +205,98 @@ public class DataShieldProfileService implements SystemService {
 
   }
 
+
+  @Subscribe
+  public void onRServiceStarted(RServerServiceStartedEvent event) {
+    if (!event.hasName()) { // only when a cluster is started
+      try {
+        rServerManagerService.getRServerClusters().forEach(cluster -> {
+          log.info("Checking R cluster Datashield profile {}: running={} hasEmptyProfile={}", cluster.getName(), cluster.isRunning(), hasEmptyProfile(cluster.getName()));
+          if (cluster.isRunning() && hasEmptyProfile(cluster.getName())) {
+            log.info("Initializing datashield profile {}", cluster.getName());
+            DataShieldProfile profile = hasProfile(cluster.getName()) ? findProfile(cluster.getName()) : new DataShieldProfile(cluster.getName());
+            cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> publish(profile, name));
+            profile.setEnabled(true);
+            saveProfile(profile);
+          }
+        });
+      } catch (Exception e) {
+        log.error("Cannot read R/DataSHIELD packages to initialize profile", e);
+      }
+    }
+  }
+
+  //
+  // Publication
+  //
+
+  /**
+   * Get the package settings and push them to the profile's config.
+   *
+   * @param profile R server profile
+   * @param name    Package name
+   */
+  public void publish(RServerProfile profile, String name) {
+    List<OpalR.RPackageDto> packages = getDatashieldPackage(profile, name);
+    publish(profile, packages);
+  }
+
+  public void publish(RServerProfile profile, List<OpalR.RPackageDto> packages) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(packages);
+    DataShieldProfile config = (DataShieldProfile) profile;
+    handler.publish(config);
+    saveProfile(config);
+    String name = packages.getFirst().getName();
+    DataShieldLog.adminLog("Package '{}' config added.", handler.getName());
+  }
+
+  public void unpublish(RServerProfile profile, List<OpalR.RPackageDto> packages) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(packages);
+    DataShieldProfile config = (DataShieldProfile) profile;
+    handler.unpublish(config);
+    saveProfile(config);
+    DataShieldLog.adminLog("Package '{}' config removed.", handler.getName());
+  }
+
+  public void deletePackage(DataShieldProfile config, OpalR.RPackageDto pkg) {
+    DatashieldPackagesHandler handler = new DatashieldPackagesHandler(Lists.newArrayList(pkg));
+    handler.deletePackage(config);
+    saveProfile(config);
+    DataShieldLog.adminLog("Package '{}' removed.", handler.getName());
+  }
+
+  public List<OpalR.RPackageDto> getDatashieldPackage(RServerProfile profile, final String name) {
+    List<OpalR.RPackageDto> pkgs = getInstalledPackagesDtos(profile).stream()
+        .filter(dto -> name.equals(dto.getName()))
+        .collect(Collectors.toList());
+    if (pkgs.isEmpty()) throw new NoSuchRPackageException(name);
+    return pkgs;
+  }
+
+  public List<OpalR.RPackageDto> getInstalledPackagesDtos(RServerProfile profile) {
+    RServerService server = rServerManagerService.getRServer(profile.getCluster());
+    Map<String, List<Opal.EntryDto>> dsPackages = server.getDataShieldPackagesProperties();
+    Set<String> dsNames = dsPackages.keySet();
+    return server.getInstalledPackagesDtos().stream()
+        .filter(dto -> dsNames.contains(dto.getName()))
+        .map(dto -> {
+          OpalR.RPackageDto.Builder builder = dto.toBuilder();
+          for (Opal.EntryDto dsEntry : dsPackages.get(dto.getName())) {
+            boolean found = false;
+            for (Opal.EntryDto entry : builder.getDescriptionList()) {
+              if (entry.getKey().equals(dsEntry.getKey())) {
+                found = true;
+                break;
+              }
+            }
+            if (!found)
+              builder.addDescription(dsEntry);
+          }
+          return builder.build();
+        })
+        .collect(Collectors.toList());
+  }
+
   //
   // Private methods
   //
@@ -218,16 +323,13 @@ public class DataShieldProfileService implements SystemService {
         datashieldConfiguration.getOptions().forEach(opt -> profile.addOrUpdateOption(opt.getName(), opt.getValue()));
         profile.setEnabled(true);
         saveProfile(profile);
-        datashieldConfigurationSupplier.modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-          @Override
-          public void doWithConfig(DatashieldConfiguration config) {
-            // empty legacy config
-            final DSEnvironment aggs = config.getEnvironment(DSMethodType.AGGREGATE);
-            Lists.newArrayList(aggs.getMethods()).forEach(m -> aggs.removeMethod(m.getName()));
-            final DSEnvironment asss = config.getEnvironment(DSMethodType.ASSIGN);
-            Lists.newArrayList(asss.getMethods()).forEach(m -> asss.removeMethod(m.getName()));
-            config.getOptions().forEach(opt -> config.removeOption(opt.getName()));
-          }
+        datashieldConfigurationSupplier.modify(config -> {
+          // empty legacy config
+          final DSEnvironment aggs = config.getEnvironment(DSMethodType.AGGREGATE);
+          Lists.newArrayList(aggs.getMethods()).forEach(m -> aggs.removeMethod(m.getName()));
+          final DSEnvironment asss = config.getEnvironment(DSMethodType.ASSIGN);
+          Lists.newArrayList(asss.getMethods()).forEach(m -> asss.removeMethod(m.getName()));
+          config.getOptions().forEach(opt -> config.removeOption(opt.getName()));
         });
       } catch (Exception e) {
         log.warn("DataSHIELD configuration upgrade failed", e);

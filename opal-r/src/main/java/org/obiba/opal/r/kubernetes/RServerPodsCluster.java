@@ -28,6 +28,19 @@ public class RServerPodsCluster extends RServerCluster {
   }
 
   @Override
+  public void start() {
+    rServerServices.forEach(RServerService::start);
+    // do not try to install any package
+    // do not send cluster started event
+  }
+
+  @Override
+  public void stop() {
+    rServerServices.forEach(RServerService::stop);
+    // do not send cluster stopped event
+  }
+
+  @Override
   public void addRServerService(RServerService service) {
     if (!rServerServices.isEmpty()) rServerServices.removeFirst();
     super.addRServerService(service);
