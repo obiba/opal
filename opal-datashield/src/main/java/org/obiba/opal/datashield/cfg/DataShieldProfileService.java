@@ -143,6 +143,14 @@ public class DataShieldProfileService implements SystemService {
     return findProfile(name) != null;
   }
 
+  public boolean hasEmptyProfile(String name) {
+    DataShieldProfile profile = findProfile(name);
+    if (profile == null) return true;
+    return Lists.newArrayList(profile.getOptions()).isEmpty()
+        && profile.getEnvironment(DSMethodType.AGGREGATE).getMethods().isEmpty()
+        && profile.getEnvironment(DSMethodType.ASSIGN).getMethods().isEmpty();
+  }
+
   /**
    * Find profile by name.
    *
@@ -203,8 +211,10 @@ public class DataShieldProfileService implements SystemService {
     if (!event.hasName()) { // only when a cluster is started
       try {
         rServerManagerService.getRServerClusters().forEach(cluster -> {
-          if (!hasProfile(cluster.getName())) {
-            DataShieldProfile profile = new DataShieldProfile(cluster.getName());
+          log.info("Checking R cluster Datashield profile {}: running={} hasEmptyProfile={}", cluster.getName(), cluster.isRunning(), hasEmptyProfile(cluster.getName()));
+          if (cluster.isRunning() && hasEmptyProfile(cluster.getName())) {
+            log.info("Initializing datashield profile {}", cluster.getName());
+            DataShieldProfile profile = hasProfile(cluster.getName()) ? findProfile(cluster.getName()) : new DataShieldProfile(cluster.getName());
             cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> publish(profile, name));
             profile.setEnabled(true);
             saveProfile(profile);
@@ -286,7 +296,7 @@ public class DataShieldProfileService implements SystemService {
         })
         .collect(Collectors.toList());
   }
-  
+
   //
   // Private methods
   //
@@ -313,16 +323,13 @@ public class DataShieldProfileService implements SystemService {
         datashieldConfiguration.getOptions().forEach(opt -> profile.addOrUpdateOption(opt.getName(), opt.getValue()));
         profile.setEnabled(true);
         saveProfile(profile);
-        datashieldConfigurationSupplier.modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
-          @Override
-          public void doWithConfig(DatashieldConfiguration config) {
-            // empty legacy config
-            final DSEnvironment aggs = config.getEnvironment(DSMethodType.AGGREGATE);
-            Lists.newArrayList(aggs.getMethods()).forEach(m -> aggs.removeMethod(m.getName()));
-            final DSEnvironment asss = config.getEnvironment(DSMethodType.ASSIGN);
-            Lists.newArrayList(asss.getMethods()).forEach(m -> asss.removeMethod(m.getName()));
-            config.getOptions().forEach(opt -> config.removeOption(opt.getName()));
-          }
+        datashieldConfigurationSupplier.modify(config -> {
+          // empty legacy config
+          final DSEnvironment aggs = config.getEnvironment(DSMethodType.AGGREGATE);
+          Lists.newArrayList(aggs.getMethods()).forEach(m -> aggs.removeMethod(m.getName()));
+          final DSEnvironment asss = config.getEnvironment(DSMethodType.ASSIGN);
+          Lists.newArrayList(asss.getMethods()).forEach(m -> asss.removeMethod(m.getName()));
+          config.getOptions().forEach(opt -> config.removeOption(opt.getName()));
         });
       } catch (Exception e) {
         log.warn("DataSHIELD configuration upgrade failed", e);

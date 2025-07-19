@@ -45,6 +45,10 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -83,6 +87,10 @@ public class RockSpawnerService implements RServerPodService {
 
   private RServerState defaultRServerState;
 
+  private Future<?> initFuture;
+
+  private final ReentrantLock initLock = new ReentrantLock();
+
   @Autowired
   public RockSpawnerService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, PodsService podsService) {
     this.transactionalThreadFactory = transactionalThreadFactory;
@@ -97,30 +105,35 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public void start() {
-    // init as background task
-    Runnable task = () -> {
-      PodRef pod = null;
-      try {
-        pod = createRockPod();
-        initInstalledPackagesDtos(pod);
-        initResourceProviders(pod);
-        initDataShieldPackagesProperties(pod);
-        defaultRServerState = getState(pod);
-        eventBus.post(new RServerServiceStartedEvent(clusterName));
-      } catch (Exception e) {
-        log.error("Error when reading installed packages and DataSHIELD properties", e);
-      } finally {
-        if (pod != null) podsService.deletePod(pod);
-        running = true;
-      }
-    };
-    Thread thread = new Thread(task);
-    thread.start();
+    try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+      initFuture = executor.submit(() -> {
+        log.info("Starting init");
+        initLock.lock();
+        PodRef pod = null;
+        try {
+          pod = createRockPod();
+          initInstalledPackagesDtos(pod);
+          initResourceProviders(pod);
+          initDataShieldPackagesProperties(pod);
+          defaultRServerState = getState(pod);
+        } catch (Exception e) {
+          log.error("Error when reading installed packages and DataSHIELD properties", e);
+        } finally {
+          running = true;
+          initLock.unlock();
+          eventBus.post(new RServerServiceStartedEvent(clusterName));
+          if (pod != null) podsService.deletePod(pod);
+        }
+      });
+    }
   }
 
   @Override
   public void stop() {
     try {
+      if (initFuture != null) {
+        initFuture.cancel(true);
+      }
       // clean up associated pods
       podsService.deletePods(podSpec);
       eventBus.post(new RServerServiceStoppedEvent(clusterName));
@@ -130,6 +143,7 @@ public class RockSpawnerService implements RServerPodService {
       packages.clear();
       dsPackages.clear();
       defaultRServerState = null;
+      initFuture = null;
     }
   }
 
@@ -189,6 +203,7 @@ public class RockSpawnerService implements RServerPodService {
   @Override
   public synchronized List<OpalR.RPackageDto> getInstalledPackagesDtos() {
     if (!packages.isEmpty() || !isRunning()) return packages;
+    initLock.lock();
     PodRef pod = null;
     try {
       pod = createRockPod();
@@ -197,6 +212,7 @@ public class RockSpawnerService implements RServerPodService {
       log.error("Error when reading installed packages", e);
     } finally {
       if (pod != null) podsService.deletePod(pod);
+      initLock.unlock();
     }
     return packages;
   }
@@ -209,6 +225,7 @@ public class RockSpawnerService implements RServerPodService {
   @Override
   public Map<String, List<ResourceProvidersService.ResourceProvider>> getResourceProviders() {
     if (!resourceProviders.isEmpty() ||  !isRunning()) return resourceProviders;
+    initLock.lock();
     PodRef pod = null;
     try {
       pod = createRockPod();
@@ -217,6 +234,7 @@ public class RockSpawnerService implements RServerPodService {
       log.error("Error when reading installed resource packages", e);
     } finally {
       if (pod != null) podsService.deletePod(pod);
+      initLock.unlock();
     }
     return resourceProviders;
   }
@@ -224,6 +242,7 @@ public class RockSpawnerService implements RServerPodService {
   @Override
   public synchronized Map<String, List<Opal.EntryDto>> getDataShieldPackagesProperties() {
     if (!dsPackages.isEmpty() || !isRunning()) return dsPackages;
+    initLock.lock();
     PodRef pod = null;
     try {
       pod = createRockPod();
@@ -232,6 +251,7 @@ public class RockSpawnerService implements RServerPodService {
       log.error("Error when reading installed DataSHIELD packages", e);
     } finally {
       if (pod != null) podsService.deletePod(pod);
+      initLock.unlock();
     }
     return dsPackages;
   }
@@ -370,6 +390,7 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   private void initInstalledPackagesDtos(PodRef pod) {
+    log.info("Init installed packages for pod {}", pod);
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<RockStringMatrix> response =
         restTemplate.exchange(getRServerResourceUrl(pod,"/rserver/packages"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockStringMatrix.class);
@@ -381,6 +402,7 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   private void initResourceProviders(PodRef pod) {
+    log.info("Init resource providers for pod {}", pod);
     resourceProviders.clear();
     ResourcePackageScriptsROperation rop = new ResourcePackageScriptsROperation();
     try {
@@ -402,6 +424,7 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   private void initDataShieldPackagesProperties(PodRef pod) {
+    log.info("Init datashield packages for pod {}", pod);
     HttpHeaders headers = createHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     RestTemplate restTemplate = new RestTemplate();
