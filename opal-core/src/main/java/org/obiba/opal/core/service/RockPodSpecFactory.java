@@ -1,24 +1,41 @@
 package org.obiba.opal.core.service;
 
-import com.google.common.base.Strings;
-import org.obiba.opal.core.domain.kubernetes.Container;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.protobuf.util.JsonFormat;
+import org.apache.commons.compress.utils.Lists;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
+import org.obiba.opal.web.kubernetes.Dtos;
+import org.obiba.opal.web.model.K8S;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RockPodSpecFactory {
 
-  public static PodSpec makeRockPodSpec(String name, String image,  String cpu, String memory) {
-    return new PodSpec(name)
-        .setType("rock")
-        .setContainer(new Container()
-            .setName("default")
-            .setImage(image)
-            .setPort(8085)
-            .setResources(new Container.ResourceRequirements()
-                .setRequests(new Container.ResourceList()
-                    .setCpu(Strings.isNullOrEmpty(cpu) ? "1000m" : cpu)
-                    .setMemory(Strings.isNullOrEmpty(memory) ? "500Mi" : memory))
-                .setLimits(new Container.ResourceList()
-                    .setCpu(Strings.isNullOrEmpty(cpu) ? "1000m" : cpu)
-                    .setMemory(Strings.isNullOrEmpty(memory) ? "1Gi" : memory))));
+  private static final Logger log = LoggerFactory.getLogger(RockPodSpecFactory.class);
+
+  public static List<PodSpec> makeRockPodSpecs(String jsonArray) {
+    log.info("Parsing pod specifications: {}", jsonArray);
+    try {
+      JsonArray array = JsonParser.parseString(jsonArray).getAsJsonArray();
+      List<PodSpec> podSpecs = Lists.newArrayList();
+      for (JsonElement element : array) {
+        K8S.PodSpecDto.Builder builder = K8S.PodSpecDto.newBuilder();
+        JsonFormat.parser().merge(element.toString(), builder);
+        podSpecs.add(Dtos.fromDto(builder.build()));
+      }
+      return podSpecs.stream()
+          .filter(Objects::nonNull)
+          .filter(p -> p.getType().equals("rock"))
+          .collect(Collectors.toList());
+    }  catch (Exception e) {
+      log.error("Cannot parse pod specifications: {}", jsonArray, e);
+      return Lists.newArrayList();
+    }
   }
 }

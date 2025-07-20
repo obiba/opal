@@ -16,6 +16,8 @@ public class Container {
   private Map<String, String> env;
   private ResourceRequirements resources;
 
+  public Container() {}
+
   public String getName() {
     return name;
   }
@@ -104,6 +106,8 @@ public class Container {
     String cpu;
     String memory;
 
+    public ResourceList() {}
+
     public ResourceList setCpu(String cpu) {
       this.cpu = cpu;
       return this;
@@ -126,6 +130,8 @@ public class Container {
   public static class ResourceRequirements {
     ResourceList limits;
     ResourceList requests;
+
+    public ResourceRequirements() {}
 
     public ResourceRequirements setLimits(ResourceList limits) {
       this.limits = limits;

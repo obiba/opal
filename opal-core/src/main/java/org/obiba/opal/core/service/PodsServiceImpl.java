@@ -31,14 +31,8 @@ public class PodsServiceImpl implements PodsService {
   @Value("${pods.rock.images.allowed}")
   private String[] allowedRockPodImages;
 
-  @Value("${pods.rock.default.image}")
-  private String defaultRockPodImage;
-
-  @Value("${pods.rock.default.resources.cpu}")
-  private String defaultRockPodCpu;
-
-  @Value("${pods.rock.default.resources.memory}")
-  private String defaultRockPodMemory;
+  @Value("${pods.rock.specs}")
+  private String defaultRockPodSpecs;
 
   private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
@@ -260,12 +254,13 @@ public class PodsServiceImpl implements PodsService {
         Streams.stream(orientDbService.list(PodSpec.class))
             .filter(PodSpec::isEnabled)
             .forEach(spec -> eventBus.post(new PodSpecRegisteredEvent(spec)));
-        if (!Strings.isNullOrEmpty(defaultRockPodImage)) {
-          PodSpec found = orientDbService.findUnique(new PodSpec("default").setType("rock"));
-          if (found == null) {
-            saveSpec(RockPodSpecFactory
-                .makeRockPodSpec("default", defaultRockPodImage, defaultRockPodCpu, defaultRockPodMemory)
-                .setEnabled(true));
+        if (!Strings.isNullOrEmpty(defaultRockPodSpecs)) {
+          List<PodSpec> podSpecs = RockPodSpecFactory.makeRockPodSpecs(defaultRockPodSpecs);
+          for (PodSpec podSpec : podSpecs) {
+            PodSpec found = orientDbService.findUnique(new PodSpec(podSpec.getId()).setType("rock"));
+            if (found == null) {
+              saveSpec(podSpec);
+            }
           }
         }
       }

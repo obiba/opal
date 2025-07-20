@@ -87,6 +87,8 @@ public class RockSpawnerService implements RServerPodService {
 
   private RServerState defaultRServerState;
 
+  private ExecutorService executor;
+
   private Future<?> initFuture;
 
   private final ReentrantLock initLock = new ReentrantLock();
@@ -105,27 +107,28 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public void start() {
-    try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-      initFuture = executor.submit(() -> {
-        log.info("Starting init");
-        initLock.lock();
-        PodRef pod = null;
-        try {
-          pod = createRockPod();
-          initInstalledPackagesDtos(pod);
-          initResourceProviders(pod);
-          initDataShieldPackagesProperties(pod);
-          defaultRServerState = getState(pod);
-        } catch (Exception e) {
-          log.error("Error when reading installed packages and DataSHIELD properties", e);
-        } finally {
-          running = true;
-          initLock.unlock();
-          eventBus.post(new RServerServiceStartedEvent(clusterName));
-          if (pod != null) podsService.deletePod(pod);
-        }
-      });
+    if (this.executor == null) {
+      this.executor = Executors.newSingleThreadExecutor();
     }
+    initFuture = executor.submit(() -> {
+      log.info("Starting init");
+      initLock.lock();
+      PodRef pod = null;
+      try {
+        pod = createRockPod();
+        initInstalledPackagesDtos(pod);
+        initResourceProviders(pod);
+        initDataShieldPackagesProperties(pod);
+        defaultRServerState = getState(pod);
+      } catch (Exception e) {
+        log.error("Error when reading installed packages and DataSHIELD properties", e);
+      } finally {
+        running = true;
+        initLock.unlock();
+        eventBus.post(new RServerServiceStartedEvent(clusterName));
+        if (pod != null) podsService.deletePod(pod);
+      }
+    });
   }
 
   @Override
@@ -133,6 +136,7 @@ public class RockSpawnerService implements RServerPodService {
     try {
       if (initFuture != null) {
         initFuture.cancel(true);
+        executor.shutdownNow();
       }
       // clean up associated pods
       podsService.deletePods(podSpec);
@@ -144,6 +148,7 @@ public class RockSpawnerService implements RServerPodService {
       dsPackages.clear();
       defaultRServerState = null;
       initFuture = null;
+      executor = null;
     }
   }
 
