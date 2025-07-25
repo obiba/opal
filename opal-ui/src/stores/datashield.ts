@@ -37,7 +37,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
   }
 
   async function deleteProfile(name: string) {
-    return api.delete(`/datashield/profile/${name}`).then(() => initProfiles());
+    return api.delete(`/datashield/profile/${name}?force=true`).then(() => initProfiles());
   }
 
   async function getPackages(cluster: string | undefined = undefined): Promise<RPackageDto[]> {

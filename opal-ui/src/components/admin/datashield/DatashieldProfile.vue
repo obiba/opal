@@ -3,7 +3,7 @@
     <div class="text-h6 q-mb-sm">
       {{ profile.name }}
       <q-btn
-        v-if="!builtinProfile"
+        v-if="missingCluster || !builtinProfile"
         outline
         color="red"
         icon="delete"

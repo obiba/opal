@@ -204,25 +204,24 @@ public class DataShieldProfileService implements SystemService {
   public void stop() {
 
   }
-
-
+  
   @Subscribe
-  public void onRServiceStarted(RServerServiceStartedEvent event) {
-    if (!event.hasName()) { // only when a cluster is started
-      try {
-        rServerManagerService.getRServerClusters().forEach(cluster -> {
-          log.info("Checking R cluster Datashield profile {}: running={} hasEmptyProfile={}", cluster.getName(), cluster.isRunning(), hasEmptyProfile(cluster.getName()));
-          if (cluster.isRunning() && hasEmptyProfile(cluster.getName())) {
-            log.info("Initializing datashield profile {}", cluster.getName());
-            DataShieldProfile profile = hasProfile(cluster.getName()) ? findProfile(cluster.getName()) : new DataShieldProfile(cluster.getName());
-            cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> publish(profile, name));
-            profile.setEnabled(true);
-            saveProfile(profile);
-          }
-        });
-      } catch (Exception e) {
-        log.error("Cannot read R/DataSHIELD packages to initialize profile", e);
-      }
+  public synchronized void onRServiceStarted(RServerServiceStartedEvent event) {
+    try {
+      rServerManagerService.getRServerClusters().forEach(cluster -> {
+        log.debug("Checking R cluster Datashield profile {}: running={} hasEmptyProfile={}", cluster.getName(), cluster.isRunning(), hasEmptyProfile(cluster.getName()));
+        if (cluster.isRunning() && hasEmptyProfile(cluster.getName())) {
+          log.info("Initializing datashield profile {}", cluster.getName());
+          boolean hasProfile = hasProfile(cluster.getName());
+          DataShieldProfile profile = hasProfile ? findProfile(cluster.getName()) : new DataShieldProfile(cluster.getName());
+          cluster.getDataShieldPackagesProperties().keySet().stream().distinct().forEach(name -> publish(profile, name));
+          // do not change enabled if it is not a new profile
+          if (!hasProfile) profile.setEnabled(true);
+          saveProfile(profile);
+        }
+      });
+    } catch (Exception e) {
+      log.error("Cannot read R/DataSHIELD packages to initialize profile", e);
     }
   }
 
