@@ -503,8 +503,7 @@ public class FilesResource {
 
   private boolean checkFileName(String fileName) {
     try {
-      String safeFileName = URLEncoder.encode(fileName, "UTF-8");
-      if (!safeFileName.equals(fileName)) return false;
+      URLEncoder.encode(fileName, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       return false;
     }

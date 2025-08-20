@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -126,7 +127,9 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
       if(isLocalFile(virtualFile)) {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
-        return new File(nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", ""));
+        String encodedPath = nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", "");
+        String decodedPath = URLDecoder.decode(encodedPath, "UTF-8");
+        return new File(decodedPath);
       }
       return convertVirtualFileToLocal(virtualFile);
     } catch(Exception e) {
