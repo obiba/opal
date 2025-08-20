@@ -32,7 +32,7 @@
 
     <antlr.version>4.7.1</antlr.version>
     <atomikos.version>6.0.0</atomikos.version>
-    <bouncycastle.version>1.78</bouncycastle.version>
+    <bouncycastle.version>1.78.1</bouncycastle.version>
     <buji.version>4.1.0</buji.version>
     <cglib-nodep.version>3.1</cglib-nodep.version>
     <commons-codec.version>1.16.1</commons-codec.version>
