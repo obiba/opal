@@ -152,7 +152,7 @@ export default {
   kubernetes: {
     title: 'Kubernetes',
     caption: 'Manage pods in a Kubernetes cluster',
-    info: 'Kubernetes is a container orchestration system for automating deployment, scaling, and management of containerized applications. Opal can be configured to use Kubernetes to manage its R servers.',
+    info: 'Kubernetes is a container orchestration system for automating deployment, scaling, and management of containerized applications. When running in a Kubernetes environment, Opal can be configured to manage its R servers.',
     pod_specs: {
       title: 'Pod Specifications',
       info: 'Pod specifications are used to define the pods that will be created on-demand in the Kubernetes cluster. These specifications describe the configuration and behavior of each pod.',
@@ -164,7 +164,7 @@ export default {
     namespace: 'Namespace',
     namespace_hint: 'The Kubernetes namespace in which the pods will be created. If not specified, the same namespace as Opal will be used.',
     name_prefix: 'Name prefix',
-    name_prefix_hint: 'The prefix to be used for the pod names.',
+    name_prefix_hint: 'The prefix to be used for the pod names: alphanumeric lowercase characters and dashes only. Must start and end with an alphanumeric character.',
     description_hint: 'A short description of the pod specification.',
     container: 'Container',
     resources: 'Resources',

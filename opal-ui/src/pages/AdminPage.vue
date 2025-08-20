@@ -145,8 +145,7 @@
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/kubernetes">{{ t('kubernetes.title') }}</router-link
-                  ><q-badge color="warning" text-color="black" label="beta" class="on-right"
-                /></q-item-label>
+                  ></q-item-label>
                 <q-item-label caption lines="2">{{ t('kubernetes.caption') }}</q-item-label>
               </q-item-section>
             </q-item>

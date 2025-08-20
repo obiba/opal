@@ -152,7 +152,7 @@ export default {
   kubernetes: {
     title: 'Kubernetes',
     caption: "Gérer les pods d'un cluster Kubernetes",
-    info: "Kubernetes est un système d'orchestration de conteneurs permettant d'automatiser le déploiement, la mise à l'échelle et la gestion des applications conteneurisées. Opal peut être configuré pour utiliser Kubernetes afin de gérer ses serveurs R.",
+    info: "Kubernetes est un système d'orchestration de conteneurs permettant d'automatiser le déploiement, la mise à l'échelle et la gestion des applications conteneurisées. Quand Opal est exécuté dans un environnement Kubernetes, il peut être configuré afin de gérer ses serveurs R.",
     pod_specs: {
       title: 'Spécifications des pods',
       info: 'Ces spécifications servent à définir les pods qui seront créés à la demande dans le cluster Kubernetes. Chaque spécification décrit la configuration et le comportement du pod.',
@@ -164,7 +164,7 @@ export default {
     namespace: 'Espace de noms',
     namespace_hint: "L'espace de noms Kubernetes dans lequel le pod sera créé.",
     name_prefix: 'Préfixe du nom',
-    name_prefix_hint: 'Le préfixe du nom du pod.',
+    name_prefix_hint: 'Le préfixe du nom du pod. Il doit contenir uniquement des caractères alphanumériques minuscules et des tirets, et doit commencer et se terminer par un caractère alphanumérique.',
     description_hint: 'Une description de la spécification du pod.',
     container: 'Conteneur',
     resources: 'Ressources',

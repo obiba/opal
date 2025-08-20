@@ -10,7 +10,6 @@
     <q-page class="q-pa-md">
       <div class="q-mb-md">
         <span class="text-h5">{{ t('kubernetes.title') }}</span>
-        <q-badge color="warning" text-color="black" label="beta" class="on-right" />
       </div>
       <div class="text-help">{{ t('kubernetes.info') }}</div>
       <q-card flat>
