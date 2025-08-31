@@ -158,6 +158,21 @@ public class PodsServiceImpl implements PodsService {
             .withImagePullPolicy(spec.getContainer().getImagePullPolicy())
             .addNewPort().withContainerPort(spec.getContainer().getPort()).endPort()
             .withEnv(envVars)
+            .withLivenessProbe(new ProbeBuilder()
+                .withNewTcpSocket()
+                .withPort(new IntOrString(spec.getContainer().getPort()))
+                .endTcpSocket()
+                .withInitialDelaySeconds(2)   // wait before first probe
+                .withPeriodSeconds(5)          // check every 5s
+                .build())
+            .withReadinessProbe(new ProbeBuilder()
+                .withNewHttpGet()
+                .withPath("/_check")
+                .withPort(new IntOrString(spec.getContainer().getPort()))
+                .endHttpGet()
+                .withInitialDelaySeconds(2)    // start checking after 5s
+                .withPeriodSeconds(5)          // check every 5s
+                .build())
             .withResources(res)
           .endContainer()
           .withImagePullSecrets(spec.getContainer().hasImagePullSecret() ? new LocalObjectReferenceBuilder().withName(spec.getContainer().getImagePullSecret()).build() : null)
@@ -208,15 +223,18 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public List<PodRef> getPods(PodSpec spec) {
+    log.debug("Get pods of {}", spec.getId());
     List<PodRef> podRefs = Lists.newArrayList();
     var pods = client.pods().inNamespace(getNamespace(spec)).list().getItems();
     for (Pod pod : pods) {
+      log.debug("Pod name={} image={}", pod.getMetadata().getName(), pod.getSpec().getContainers().getFirst().getImage());
       // check image
       boolean sameImage = pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage());
       if (!sameImage) continue;
       // check name prefix
       String[] parts = pod.getMetadata().getName().split("--");
-      if (parts.length == 2 && parts[1].equals(spec.getContainer().getName())) {
+      log.debug("... prefix={}", parts[0]);
+      if (parts.length == 2 && parts[0].equals(spec.getContainer().getName())) {
         PodRef ref = getPodRef(spec, pod);
         if (ref != null) {
           podRefs.add(ref);

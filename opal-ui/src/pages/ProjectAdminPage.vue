@@ -178,7 +178,7 @@
 
       <!-- Dialogs -->
 
-      <confirm-dialog v-model="showConfirm" :title="t('delete')" :text="confirmText" @confirm="onConfirmed" />
+      <confirm-dialog v-model="showConfirm" :title="confirmTitle" :text="confirmText" @confirm="onConfirmed" />
 
       <backup-project-dialog v-model="showBackup" :project="project" @update:model-value="onBackedUp" />
 
@@ -212,6 +212,7 @@ const showConfirm = ref(false);
 const showBackup = ref(false);
 const showRestore = ref(false);
 const showEditProject = ref(false);
+const confirmTitle = ref('');
 const confirmText = ref('');
 const onConfirmed = ref(() => ({}));
 const state = ref(ProjectDatasourceStatusDto.NONE);
@@ -276,6 +277,7 @@ const vcfProperties: FieldItem[] = [
 function resetConfirmedData() {
   onConfirmed.value = () => ({});
   confirmText.value = '';
+  confirmTitle.value = '';
 }
 
 async function getState() {
@@ -317,6 +319,7 @@ async function _onDelete() {
 }
 
 function onReloadDatabase() {
+  confirmTitle.value = t('project_admin.db_reload');
   confirmText.value = t('project_admin.db_reload_confirm');
   onConfirmed.value = async () => await _onReloadDatabase();
   showConfirm.value = true;
@@ -362,12 +365,14 @@ async function onProjectEdited() {
 }
 
 function onArchive() {
+  confirmTitle.value = t('project_admin.archive');
   confirmText.value = t('project_admin.archive_confirm');
   onConfirmed.value = async () => await _onArchive();
   showConfirm.value = true;
 }
 
 function onDelete() {
+  confirmTitle.value = t('project_admin.remove');
   confirmText.value = t('project_admin.remove_confirm');
   onConfirmed.value = async () => await _onDelete();
   showConfirm.value = true;

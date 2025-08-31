@@ -199,6 +199,10 @@ export default {
     toleration_key: 'Clé',
     toleration_value: 'Valeur',
     toleration_seconds: 'Secondes',
+    pods: 'Pods',
+    remove_spec_confirm: 'Êtes-vous sûr de vouloir supprimer la spécification du pod "{id}" ?',
+    terminate_pods: 'Terminer les pods',
+    terminate_pods_confirm: 'Êtes-vous sûr de vouloir terminer les pods pour la spécification du pod "{id}" ?',
   },
   identity_provider: {
     title: "Fournisseur d'identité",
@@ -466,6 +470,7 @@ export default {
     db_hint: 'Les tables de projet (dictionnaires et données) sont stockées dans la base de données:',
     db_reload_hint: "Le rechargement d'une base de données de projet rend ses données temporairement inaccessibles (pas de liste de tables, pas d'importation ou d'exportation) pendant que la connexion à la base de données est réinitialisée. Le temps nécessaire à cette opération dépend du type et du schéma de la base de données.",
     db_reload_confirm: 'Êtes-vous sûr de vouloir recharger la base de données du projet?',
+    db_reload: 'Recharger les données',
     backup_restore: 'Sauvegarder / Restaurer',
     backup_project: 'Sauvegarder le projet',
     backup_hint: "La tâche de sauvegarde du projet couvre les tables (dictionnaire et exportation de données), les vues (sous forme de table logique ou exportée), les ressources et les fichiers. Elle exclut les permissions des utilisateurs/groupes, l'historique des modifications des vues, l'analyse des tables, les données liées aux plugins et d'autres éléments du projet.",

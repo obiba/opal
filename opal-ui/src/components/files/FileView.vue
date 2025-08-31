@@ -213,7 +213,7 @@
               />
             </div>
             <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
-              <div class="row q-gutter-md">
+              <div class="row q-col-gutter-md">
                 <div class="col-8">
                   <q-input
                     v-model="encryptPassword"
