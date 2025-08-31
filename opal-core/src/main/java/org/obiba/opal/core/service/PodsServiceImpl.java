@@ -158,6 +158,21 @@ public class PodsServiceImpl implements PodsService {
             .withImagePullPolicy(spec.getContainer().getImagePullPolicy())
             .addNewPort().withContainerPort(spec.getContainer().getPort()).endPort()
             .withEnv(envVars)
+            .withLivenessProbe(new ProbeBuilder()
+                .withNewTcpSocket()
+                .withPort(new IntOrString(spec.getContainer().getPort()))
+                .endTcpSocket()
+                .withInitialDelaySeconds(2)   // wait before first probe
+                .withPeriodSeconds(5)          // check every 5s
+                .build())
+            .withReadinessProbe(new ProbeBuilder()
+                .withNewHttpGet()
+                .withPath("/_check")
+                .withPort(new IntOrString(spec.getContainer().getPort()))
+                .endHttpGet()
+                .withInitialDelaySeconds(2)    // start checking after 5s
+                .withPeriodSeconds(5)          // check every 5s
+                .build())
             .withResources(res)
           .endContainer()
           .withImagePullSecrets(spec.getContainer().hasImagePullSecret() ? new LocalObjectReferenceBuilder().withName(spec.getContainer().getImagePullSecret()).build() : null)
