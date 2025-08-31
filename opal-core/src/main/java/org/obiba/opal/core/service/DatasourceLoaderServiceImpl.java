@@ -113,6 +113,9 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   private class DatasourceLoader extends Thread {
 
+    private static final int MAX_LOAD_ATTEMPTS = 5;
+    private static final int LOAD_ATTEMPT_DELAY = 1000;
+
     @Override
     public void run() {
       log.info("{}: started", getName());
@@ -129,14 +132,34 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
     private void load(Project project) {
       log.info("{}: loading datasource of project {}", getName(), project.getName());
-      try {
+      int attempt = 1;
+      boolean done = false;
+      while (!done && attempt < MAX_LOAD_ATTEMPTS) {
+        try {
+          loadAttempt(project);
+          done = true;
+        } catch (Exception e) {
+          log.error("{}: #{} loading datasource of project {} failed for database: {}", getName(), attempt, project.getName(), project.getDatabase(), e);
+          attempt++;
+          if (attempt >= MAX_LOAD_ATTEMPTS) {
+            databaseRegistry.unregister(project.getDatabase(), project.getName());
+            projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
+          } else {
+            try {
+              Thread.sleep(LOAD_ATTEMPT_DELAY);
+            } catch (InterruptedException ex) {
+              projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
+              done = true;
+            }
+          }
+        }
+      }
+    }
+
+    private void loadAttempt(Project project) {
         reloadDatasource(project);
         projectsState.updateProjectState(project.getName(), ProjectsState.State.READY);
-      } catch (Exception e) {
-        log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
-        databaseRegistry.unregister(project.getDatabase(), project.getName());
-        projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
-      }
+
     }
   }
 
