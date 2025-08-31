@@ -10,7 +10,10 @@ declare module '@vue/runtime-core' {
 }
 
 // context path detection
-const locationContextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 2));
+let locationContextPath = window.location.pathname;
+if (locationContextPath.endsWith('/')) {
+  locationContextPath = locationContextPath.substring(0, locationContextPath.length - 1);
+}
 
 const baseUrl =
   process.env.API && process.env.API.startsWith('/') ? locationContextPath + process.env.API : process.env.API;
