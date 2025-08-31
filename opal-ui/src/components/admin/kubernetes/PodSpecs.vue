@@ -40,12 +40,28 @@
               class="q-ml-xs"
               @click="onRemove(props.row)"
             />
+            <q-btn
+              rounded
+              dense
+              flat
+              size="sm"
+              color="secondary"
+              :title="t('kubernetes.terminate_pods')"
+              :icon="toolsVisible[props.row.id] ? 'cleaning_services' : 'none'"
+              class="q-ml-xs"
+              @click="onRemovePods(props.row)"
+            />
           </div>
         </q-td>
       </template>
       <template v-slot:body-cell-enabled="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-icon v-if="props.value" name="check" size="sm" />
+        </q-td>
+      </template>
+      <template v-slot:body-cell-pods="props">
+        <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+          <q-chip size="12px" color="secondary" class="q-ml-none text-white">{{ props.value }}</q-chip>
         </q-td>
       </template>
       <template v-slot:body-cell-image="props">
@@ -73,12 +89,28 @@
         </q-td>
       </template>
     </q-table>
+
     <pod-spec-dialog v-model="showDialog" :podSpec="selected" @update="init" />
+    <confirm-dialog
+      v-if="selected"
+      v-model="showRemove"
+      :title="t('remove')"
+      :text="t('kubernetes.remove_spec_confirm', { id: selected.id })"
+      @confirm="doRemove"
+    />
+    <confirm-dialog
+      v-if="selected"
+      v-model="showRemovePods"
+      :title="t('kubernetes.terminate_pods')"
+      :text="t('kubernetes.terminate_pods_confirm', { id: selected.id })"
+      @confirm="doRemovePods"
+    />
   </div>
 </template>
 <script setup lang="ts">
 import PodSpecDialog from 'src/components/admin/kubernetes/PodSpecDialog.vue';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { DefaultAlignment } from 'src/components/models';
 import type { PodSpecDto } from 'src/models/K8s';
 
@@ -94,6 +126,8 @@ const initialPagination = ref({
 });
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const showDialog = ref(false);
+const showRemove = ref(false);
+const showRemovePods = ref(false);
 const selected = ref<PodSpecDto>();
 
 const rockPodSpecs = computed(() => podsStore.podSpecs.filter((podSpec) => podSpec.type === 'rock'));
@@ -119,6 +153,12 @@ const columns = computed(() => [
     label: t('enabled'),
     align: DefaultAlignment,
     field: 'enabled',
+  },
+  {
+    name: 'pods',
+    label: t('kubernetes.pods'),
+    align: DefaultAlignment,
+    field: (row: PodSpecDto) => podsStore.podRefs[row.id]?.length || 0,
   },
   {
     name: 'name',
@@ -179,6 +219,22 @@ function onEdit(row: PodSpecDto) {
 }
 
 function onRemove(row: PodSpecDto) {
-  podsStore.removePodSpec(row.id).then(init);
+  selected.value = row;
+  showRemove.value = true;
+}
+
+function doRemove() {
+  if (!selected.value) return;
+  podsStore.removePodSpec(selected.value.id).finally(init);
+}
+
+function onRemovePods(row: PodSpecDto) {
+  selected.value = row;
+  showRemovePods.value = true;
+}
+
+function doRemovePods() {
+  if (!selected.value) return;
+  podsStore.removePods(selected.value.id).finally(init);
 }
 </script>

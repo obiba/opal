@@ -2,6 +2,7 @@ package org.obiba.opal.web.kubernetes;
 
 import com.google.common.base.Strings;
 import org.obiba.opal.core.domain.kubernetes.Container;
+import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.domain.kubernetes.Toleration;
 import org.obiba.opal.web.model.K8S;
@@ -67,6 +68,16 @@ public class Dtos {
         .setMemory(list.getMemory())
         .build();
   }
+
+  public static K8S.PodRefDto asDto(PodRef ref) {
+    return K8S.PodRefDto.newBuilder()
+        .setName(ref.getName())
+        .setId(ref.getPodSpec().getId())
+        .setType(ref.getPodSpec().getType())
+        .setStatus(ref.getStatus())
+        .build();
+  }
+
 
   public static PodSpec fromDto(K8S.PodSpecDto dto) {
     return new PodSpec()

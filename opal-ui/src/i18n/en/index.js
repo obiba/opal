@@ -199,6 +199,10 @@ export default {
     toleration_key: 'Key',
     toleration_value: 'Value',
     toleration_seconds: 'Seconds',
+    pods: 'Pods',
+    remove_spec_confirm: 'Are you sure you want to remove the pod specification "{id}"?',
+    terminate_pods: 'Terminate Pods',
+    terminate_pods_confirm: 'Are you sure you want to terminate the pods for the pod specification "{id}"?',
   },
   identity_provider: {
     title: 'Identity Provider',

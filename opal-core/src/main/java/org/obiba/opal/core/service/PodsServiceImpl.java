@@ -223,15 +223,18 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public List<PodRef> getPods(PodSpec spec) {
+    log.info("Get pods of {}", spec.getId());
     List<PodRef> podRefs = Lists.newArrayList();
     var pods = client.pods().inNamespace(getNamespace(spec)).list().getItems();
     for (Pod pod : pods) {
+      log.info("Pod name={} image={}", pod.getMetadata().getName(), pod.getSpec().getContainers().getFirst().getImage());
       // check image
       boolean sameImage = pod.getSpec().getContainers().getFirst().getImage().equals(spec.getContainer().getImage());
       if (!sameImage) continue;
       // check name prefix
       String[] parts = pod.getMetadata().getName().split("--");
-      if (parts.length == 2 && parts[1].equals(spec.getContainer().getName())) {
+      log.info("... prefix={}", parts[0]);
+      if (parts.length == 2 && parts[0].equals(spec.getContainer().getName())) {
         PodRef ref = getPodRef(spec, pod);
         if (ref != null) {
           podRefs.add(ref);

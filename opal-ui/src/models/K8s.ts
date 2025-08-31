@@ -67,3 +67,10 @@ export interface PodSpecDto_NodeSelectorEntry {
   key: string;
   value: string;
 }
+
+export interface PodRefDto {
+  id: string;
+  type: string;
+  name: string;
+  status: string;
+}
