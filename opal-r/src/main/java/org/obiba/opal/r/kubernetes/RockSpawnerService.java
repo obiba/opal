@@ -32,6 +32,7 @@ import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
@@ -63,7 +64,11 @@ public class RockSpawnerService implements RServerPodService {
 
   private static final AppCredentials DEFAULT_CREDENTIALS = new AppCredentials("administrator", "password");
 
-  private static final int ROCK_POD_CONNECTION_MAX_ATTEMPTS = 60;
+  @Value("${pods.rock.connection.maxAttempts}")
+  private int connectionMaxAttempts;
+
+  @Value("${pods.rock.connection.delay}")
+  private int connectionDelay;
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
@@ -467,8 +472,8 @@ public class RockSpawnerService implements RServerPodService {
       env.put("ROCK_SECURITY_ENABLED", "false");
       PodRef pod =  podsService.createPod(podSpec, env);
       boolean ready = false;
-      int attempts = 0;
-      while (!ready && attempts < ROCK_POD_CONNECTION_MAX_ATTEMPTS) {
+      int attempts = 1;
+      while (!ready && attempts <= connectionMaxAttempts) {
         RestTemplate restTemplate = new RestTemplate();
         try {
           ResponseEntity<String> response =
@@ -476,16 +481,16 @@ public class RockSpawnerService implements RServerPodService {
           ready = response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
           if (log.isDebugEnabled()) {
-            log.error("Error when checking R server pod {} status", pod.getName(), e);
+            log.warn("Error when checking R server pod {} status", pod.getName(), e);
           } else {
-            log.error("Error when checking R server pod {} status", pod.getName());
+            log.warn("Error when checking R server pod {} status", pod.getName());
           }
         }
         if (!ready) {
           log.info("Waiting for R server pod {} to be ready (attempt {})", pod.getName(), attempts);
           attempts++;
           try {
-            Thread.sleep(1000);
+            Thread.sleep(connectionDelay);
           } catch (InterruptedException e) {
             log.error("Interrupted while waiting for R server pod {} to be ready", pod.getName());
             Thread.currentThread().interrupt();
