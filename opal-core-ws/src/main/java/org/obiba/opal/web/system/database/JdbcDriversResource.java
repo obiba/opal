@@ -32,7 +32,6 @@ public class JdbcDriversResource {
         .setDriverClass("com.mysql.jdbc.Driver") //
         .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal") //
-        .addSupportedSchemas("hibernate") //
         .addSupportedSchemas("jdbc") //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
@@ -40,7 +39,6 @@ public class JdbcDriversResource {
         .setDriverClass("org.mariadb.jdbc.Driver") //
         .setJdbcUrlTemplate("jdbc:mariadb://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:mariadb://localhost:3306/opal") //
-        .addSupportedSchemas("hibernate") //
         .addSupportedSchemas("jdbc") //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
@@ -48,6 +46,13 @@ public class JdbcDriversResource {
         .setDriverClass("org.postgresql.Driver") //
         .setJdbcUrlTemplate("jdbc:postgresql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:postgresql://localhost:5432/opal") //
+        .addSupportedSchemas("jdbc") //
+        .build());
+    drivers.add(Database.JdbcDriverDto.newBuilder() //
+        .setDriverName("SQL Server") //
+        .setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver") //
+        .setJdbcUrlTemplate("jdbc:sqlserver://{hostname}:{port};databaseName={databaseName}") //
+        .setJdbcUrlExample("jdbc:sqlserver://localhost:1433;databaseName=opal") //
         .addSupportedSchemas("jdbc") //
         .build());
     return drivers;
