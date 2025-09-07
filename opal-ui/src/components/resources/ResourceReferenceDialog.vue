@@ -73,15 +73,15 @@
             <q-item v-bind="scope.itemProps">
               <q-item-section>
                 <q-item-label>{{ scope.opt.title }}</q-item-label>
-                <q-item-label v-if="scope.opt.description" caption style="max-width: 400px">
-                  {{ scope.opt.description }}
+                <q-item-label v-if="scope.opt.description" caption>
+                  <q-markdown :src="scope.opt.description" no-heading-anchor-links />
                 </q-item-label>
               </q-item-section>
             </q-item>
           </template>
         </q-select>
         <div class="text-hint q-mb-md">
-          <q-markdown v-if="factory?.description" :src="factory.description" />
+          <q-markdown v-if="factory?.description" :src="factory.description" no-heading-anchor-links />
           <span v-else>{{ t('resource_ref.factory_hint') }}</span>
         </div>
 
