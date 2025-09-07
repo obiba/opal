@@ -82,12 +82,13 @@
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.0.4</magma.version>
+    <magma.version>5.1.0</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
     <mongodb-driver.version>5.3.1</mongodb-driver.version>
+    <mssql.version>12.10.1.jre11</mssql.version>
     <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
@@ -673,6 +674,11 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>${mssql.version}</version>
       </dependency>
 
       <dependency>
