@@ -63,7 +63,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     if (datasource.value?.name !== dsName) {
       return loadDatasource(dsName).then(() => loadTables());
     } else {
-      return loadTables();
+      return loadDatasourcePermissions(dsName).then(() => loadTables());
     }
   }
 
@@ -110,20 +110,19 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.get(`/datasource/${name}`).then((response) => {
       perms.value.datasource = new Perms(response);
       datasource.value = response.data;
-      return api.options(`/project/${name}/permissions/datasource`).then((response) => {
-        perms.value.datasourcePermissions = new Perms(response);
-        return response;
-      });
+      return loadDatasourcePermissions(name);
+    });
+  }
+
+  async function loadDatasourcePermissions(name: string) {
+    return api.options(`/project/${name}/permissions/datasource`).then((response) => {
+      perms.value.datasourcePermissions = new Perms(response);
+      return response;
     });
   }
 
   async function loadTables() {
     tables.value = [];
-    // table.value = {} as TableDto;
-    // view.value = {} as ViewDto;
-    // tableIndex.value = {} as TableIndexStatusDto;
-    // variables.value = [];
-    // variable.value = {} as VariableDto;
     perms.value.tables = undefined;
     return api.get(`/datasource/${datasource.value.name}/tables`, { params: { counts: true } }).then((response) => {
       perms.value.tables = new Perms(response);
