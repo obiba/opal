@@ -51,7 +51,7 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn-dropdown
-          v-if="datasourceStore.tables.length && projectsStore.perms.export?.canCreate()"
+          v-if="datasourceStore.tables.length && canExport"
           color="secondary"
           icon="output"
           size="sm"
@@ -72,7 +72,7 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn
-          v-if="!isView && projectsStore.perms.copy?.canCreate()"
+          v-if="!isView && canCopy"
           color="secondary"
           icon="content_copy"
           :title="t('copy')"
@@ -103,7 +103,7 @@
         </q-btn-dropdown>
 
         <q-btn
-          v-if="datasourceStore.perms.table?.canUpdate()"
+          v-if="canUpdate"
           outline
           color="secondary"
           icon="edit"
@@ -112,7 +112,7 @@
           class="on-right"
         ></q-btn>
         <q-btn
-          v-if="datasourceStore.perms.table?.canDelete()"
+          v-if="canDelete"
           outline
           color="red"
           icon="delete"
@@ -121,7 +121,7 @@
           class="on-right"
         ></q-btn>
         <q-btn
-          v-if="isView && datasourceStore.perms.table?.canUpdate()"
+          v-if="isView && canUpdate"
           no-caps
           dense
           flat
@@ -151,14 +151,14 @@
           <q-tab
             name="entity_filter"
             :label="t('entity_filter')"
-            v-if="isTablesView && datasourceStore.perms.tableValueSets?.canRead()"
+            v-if="isTablesView && canReadValues"
           />
-          <q-tab name="values" :label="t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
+          <q-tab name="values" :label="t('values')" v-if="canReadValues" />
           <q-tab name="analyses" :label="t('analyses')" v-if="canAnalyseValidate" />
           <q-tab
             name="permissions"
             :label="t('permissions')"
-            v-if="datasourceStore.perms.tablePermissions?.canRead()"
+            v-if="canReadPermissions"
           />
         </q-tabs>
 
@@ -174,7 +174,7 @@
           </q-tab-panel>
 
           <q-tab-panel name="summary">
-            <div v-if="datasourceStore.perms.tableValueSets?.canRead()" class="q-mb-md">
+            <div v-if="canReadValues" class="q-mb-md">
               <table-indexer />
             </div>
             <div class="row q-gutter-md">
@@ -201,7 +201,7 @@
                 </q-card-section>
               </q-card>
             </div>
-            <div v-if="datasourceStore.perms.tableValueSets?.canRead()">
+            <div v-if="canReadValues">
               <div v-if="datasourceStore.table.valueSetCount === 0">
                 <div class="q-mb-md box-info">
                   <q-icon name="error" size="1.2rem" />
@@ -216,7 +216,7 @@
             </div>
           </q-tab-panel>
 
-          <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">
+          <q-tab-panel name="values" v-if="canReadValues">
             <div v-if="datasourceStore.table.valueSetCount === 0">
               <div class="q-mb-md box-info">
                 <q-icon name="error" size="1.2rem" />
@@ -234,7 +234,7 @@
             <project-anaylse-validate :project-name="dsName" :table-name="tName" />
           </q-tab-panel>
 
-          <q-tab-panel name="permissions" v-if="datasourceStore.perms.tablePermissions?.canRead()">
+          <q-tab-panel name="permissions" v-if="canReadPermissions">
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}`"
               :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
@@ -310,7 +310,13 @@ const exportType = ref<'file' | 'server' | 'database'>('file');
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
 const isResourceView = computed(() => datasourceStore.table.viewType === 'ResourceView');
+const canExport = computed(() => projectsStore.perms.export?.canCreate());
+const canCopy = computed(() => projectsStore.perms.copy?.canCreate());
 const canAnalyseValidate = computed(() => projectsStore.perms.analyses?.canRead());
+const canUpdate = computed(() => datasourceStore.perms.table?.canUpdate());
+const canDelete = computed(() => datasourceStore.perms.table?.canDelete());
+const canReadValues = computed(() => datasourceStore.perms.tableValueSets?.canRead());
+const canReadPermissions = computed(() => datasourceStore.perms.tablePermissions?.canRead());
 
 const previousTable = computed(() => {
   const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);
@@ -377,15 +383,20 @@ const items2 = [
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
 
+onMounted(() => {
+  init();
+});
+
 watch([dsName, tName], () => {
   init();
 });
 
 function init() {
+  projectsStore.initProject(dsName.value);
   datasourceStore
     .initDatasourceTable(dsName.value, tName.value)
     .then(() => {
-      if (!datasourceStore.perms.tableValueSets?.canRead() && ['entity_filter', 'values'].includes(tab.value)) {
+      if (!canReadValues.value && ['entity_filter', 'values'].includes(tab.value)) {
         tab.value = 'dictionary';
       }
       if (!isTablesView.value && tab.value === 'entity_filter') {
