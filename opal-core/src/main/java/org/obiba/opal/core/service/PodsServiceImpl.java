@@ -34,6 +34,12 @@ public class PodsServiceImpl implements PodsService {
   @Value("${pods.rock.specs}")
   private String defaultRockPodSpecs;
 
+  @Value("${pods.rock.running.maxAttempts}")
+  private int runningMaxAttempts;
+
+  @Value("${pods.rock.running.delay}")
+  private int runningDelay;
+
   private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
   private final OrientDbService orientDbService;
@@ -330,14 +336,16 @@ public class PodsServiceImpl implements PodsService {
   }
 
   private PodRef ensureRunningPod(PodSpec spec, String podName) {
+    // When pod is ContainerCreating state (for instance docker image is being downloaded),
+    // it is still not Running, then wait
     int retries = 0;
-    while (retries < 10) {
+    while (retries < runningMaxAttempts) {
       PodRef pod = getPod(spec, podName);
       if (pod != null && "Running".equals(pod.getStatus())) {
         return pod;
       }
       try {
-        Thread.sleep(1000);
+        Thread.sleep(runningDelay);
       } catch (InterruptedException ignored) {
       }
       retries++;
