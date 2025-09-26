@@ -120,7 +120,7 @@ public class DatashieldPackageMethodHelper {
   }
 
   public List<OpalR.RPackageDto> getDatashieldPackage(RServerProfile profile, final String name) {
-    return datashieldProfileService.getInstalledPackagesDtos(profile);
+    return datashieldProfileService.getInstalledPackagesDtos(profile).stream().filter((pkg) -> Strings.isNullOrEmpty(name) || name.equals(pkg.getName())).toList();
   }
 
   public void deletePackage(RServerProfile profile, String name) {
