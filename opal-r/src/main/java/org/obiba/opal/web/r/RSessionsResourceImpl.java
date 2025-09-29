@@ -11,6 +11,7 @@ package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import jakarta.ws.rs.core.MediaType;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerProfile;
@@ -69,17 +70,23 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   @Override
-  public Response newRSession(UriInfo info, String restore, String profile) {
+  public Response newRSession(UriInfo info, String restore, String profile, boolean async) {
     if (!createRSessionEnabled())
       throw new ForbiddenException("Plain R service endpoint is not enabled");
-    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
-    onNewRSession(rSession);
-    if (!Strings.isNullOrEmpty(restore)) {
-      opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+    if (async) {
+      String id = opalRSessionManager.newSubjectRSessionAsync(createProfile(profile));
+      URI location = getLocation(info, String.format("command/%s", id));
+      return Response.created(location).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
+    } else {
+      RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
+      onNewRSession(rSession);
+      if (!Strings.isNullOrEmpty(restore)) {
+        opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+      }
+      URI location = getLocation(info, rSession.getId());
+      return Response.created(location).entity(Dtos.asDto(rSession))
+              .build();
     }
-    URI location = getLocation(info, rSession.getId());
-    return Response.created(location).entity(Dtos.asDto(rSession))
-        .build();
   }
 
   @Override

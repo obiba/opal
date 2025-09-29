@@ -29,7 +29,7 @@ public interface RSessionsResource {
   Response removeRSessions();
 
   @POST
-  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile);
+  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile, @QueryParam("async") @DefaultValue("false") boolean async);
 
   @PUT
   @Path("/_test")
