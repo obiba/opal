@@ -28,8 +28,17 @@ public interface RSessionsResource {
   @DELETE
   Response removeRSessions();
 
+  /**
+   * Create a new R session and wait for it to be operational.
+   *
+   * @param info
+   * @param restore
+   * @param profile
+   * @param wait
+   * @return
+   */
   @POST
-  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile, @QueryParam("async") @DefaultValue("false") boolean async);
+  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore, @QueryParam("profile") String profile, @QueryParam("wait") @DefaultValue("true") boolean wait);
 
   @PUT
   @Path("/_test")

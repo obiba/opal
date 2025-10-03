@@ -133,6 +133,10 @@ public class OpalRSessionManager implements DisposableBean {
     }
   }
 
+  public RSessionTaskManager getRSessionTaskManager() {
+    return rSessionTaskManager;
+  }
+
   /**
    * Get the R sessions.
    *
@@ -246,16 +250,6 @@ public class OpalRSessionManager implements DisposableBean {
    */
   public RServerSession newSubjectRSession(RServerProfile profile) {
     return newSubjectRSession(getSubjectPrincipal(), profile);
-  }
-
-  /**
-   * Creates a task that established a new R connection in the provided profile.
-   *
-   * @param profile
-   * @return R session creation task identifier
-   */
-  public String newSubjectRSessionAsync(RServerProfile profile) {
-    return newSubjectRSessionAsync(getSubjectPrincipal(), profile);
   }
 
   /**
@@ -401,17 +395,6 @@ public class OpalRSessionManager implements DisposableBean {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
       SubjectRSessions rSessions = getRSessions(principal);
       return rSessionTaskManager.makeRSession(principal, safeProfile, rSessions);
-    } catch (Exception e) {
-      throw new RRuntimeException(e);
-    }
-  }
-
-  public String newSubjectRSessionAsync(String principal, RServerProfile profile) {
-    try {
-      RServerProfile safeProfile = asSafeRServerProfile(profile);
-      SubjectRSessions rSessions = getRSessions(principal);
-      RSessionTask task = rSessionTaskManager.makeCreationTask(principal, safeProfile, rSessions);
-      return task.getId();
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }

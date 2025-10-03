@@ -189,9 +189,9 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user) throws RServerException {
+  public RServerSession newRServerSession(String user, String id) throws RServerException {
     PodRef pod = createRockPod();
-    return newRServerSession(pod, user);
+    return newRServerSession(pod, user, id);
   }
 
   @Override
@@ -343,9 +343,9 @@ public class RockSpawnerService implements RServerPodService {
   // Private methods
   //
 
-  private RServerSession newRServerSession(PodRef pod, String user) throws RServerException {
+  private RServerSession newRServerSession(PodRef pod, String user, String id) throws RServerException {
     try {
-      RockPodSession session = new RockPodSession(getName(), pod, DEFAULT_CREDENTIALS, user, podsService, transactionalThreadFactory, eventBus);
+      RockPodSession session = new RockPodSession(getName(), id, pod, DEFAULT_CREDENTIALS, user, podsService, transactionalThreadFactory, eventBus);
       session.setProfile(new RServerProfile() {
         @Override
         public String getName() {
@@ -367,7 +367,7 @@ public class RockSpawnerService implements RServerPodService {
 
   private void execute(PodRef pod, ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RServerSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString());
+    RServerSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null);
     // close session but not the pod that is managed externally
     ((RockPodSession) rSession).setTerminatePod(false);
     try {

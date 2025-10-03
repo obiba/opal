@@ -10,7 +10,7 @@ import java.util.List;
 public class RSessionTask {
 
   public enum Status {
-    PENDING, CREATING, RUNNING, TERMINATING, FAILED
+    PENDING, IN_PROGRESS, COMPLETED, FAILED
   }
 
   private final String id;
@@ -24,8 +24,6 @@ public class RSessionTask {
   private final Date createDate;
 
   private Date startDate;
-
-  private final List<String> events = Lists.newArrayList();
 
   private Date endDate;
 
@@ -63,21 +61,26 @@ public class RSessionTask {
     return createDate;
   }
 
+  public Date getStartDate() {
+    return startDate;
+  }
+
   public Date getEndDate() {
     return endDate;
   }
 
-  public List<String> getEvents() {
-    return events;
-  }
-
-  public void addEvent(String event) {
-    if (Strings.isNullOrEmpty(event)) return;
-    events.add(event);
+  public String getError() {
+    return error;
   }
 
   public void inProgress() {
     this.startDate = new Date();
+    this.status = Status.IN_PROGRESS;
+  }
+
+  public void completed() {
+    this.endDate = new Date();
+    this.status = Status.COMPLETED;
   }
 
   public void failed(String message) {

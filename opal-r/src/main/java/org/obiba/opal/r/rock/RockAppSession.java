@@ -19,8 +19,6 @@ import org.obiba.opal.spi.r.RServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 public class RockAppSession extends RockSession implements RServerConnection {
 
   private static final Logger log = LoggerFactory.getLogger(RockAppSession.class);
@@ -28,7 +26,11 @@ public class RockAppSession extends RockSession implements RServerConnection {
   private final App app;
 
   protected RockAppSession(String serverName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, UUID.randomUUID().toString(), credentials, user, transactionalThreadFactory, eventBus);
+    this(serverName, null, app, credentials, user, transactionalThreadFactory, eventBus);
+  }
+
+  protected RockAppSession(String serverName, String id, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, credentials, user, transactionalThreadFactory, eventBus);
     this.app = app;
     openSession();
   }

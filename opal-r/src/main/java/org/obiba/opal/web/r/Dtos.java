@@ -22,6 +22,8 @@ import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
+import org.obiba.opal.r.service.tasks.RSessionCreationTask;
+import org.obiba.opal.r.service.tasks.RSessionTask;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.OpalR;
@@ -103,6 +105,7 @@ public class Dtos {
         .setCreationDate(DateTimeType.get().valueOf(rSession.getCreated()).toString())
         .setLastAccessDate(DateTimeType.get().valueOf(rSession.getTimestamp()).toString())
         .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING)
+        .setState(rSession.getState().name())
         .setCurrentExecutionTimeMillis(rSession.getCurrentExecutionTimeMillis())
         .setTotalExecutionTimeMillis(rSession.getTotalExecutionTimeMillis())
         .setLink(ub.build(rSession.getId()).toString())
@@ -110,6 +113,7 @@ public class Dtos {
         .setProfile(rSession.getProfile().getName())
         .setCluster(rSession.getProfile().getCluster())
         .setServer(rSession.getRServerServiceName())
+        .addAllEvents(rSession.getEvents())
         .build();
   }
 

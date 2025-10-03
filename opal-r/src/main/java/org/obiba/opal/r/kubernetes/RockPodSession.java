@@ -20,8 +20,8 @@ public class RockPodSession extends RockSession {
 
   private boolean terminatePod = true;
 
-  protected RockPodSession(String serverName, PodRef pod, AppCredentials credentials, String user, PodsService podsService, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, pod.getName(), credentials, user, transactionalThreadFactory, eventBus);
+  protected RockPodSession(String serverName, String id, PodRef pod, AppCredentials credentials, String user, PodsService podsService, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, credentials, user, transactionalThreadFactory, eventBus);
     this.pod = pod;
     this.podsService = podsService;
     openSession();
