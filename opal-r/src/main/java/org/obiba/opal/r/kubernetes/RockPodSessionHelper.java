@@ -83,6 +83,8 @@ public class RockPodSessionHelper {
       try {
         Thread.sleep(runningDelay);
       } catch (InterruptedException ignored) {
+        Thread.currentThread().interrupt();
+        break;
       }
       retries++;
     }
