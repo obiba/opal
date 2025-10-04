@@ -10,6 +10,8 @@
 package org.obiba.opal.web.r;
 
 import org.obiba.opal.spi.r.RServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.core.Response;
@@ -21,8 +23,11 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class RServerExceptionMapper implements ExceptionMapper<RServerException> {
 
+  private static final Logger log = LoggerFactory.getLogger(RServerExceptionMapper.class);
+
   @Override
   public Response toResponse(RServerException exception) {
+    log.error(exception.getMessage(), exception);
     if (exception.isClientError())
       return Response
           .status(Status.BAD_REQUEST)

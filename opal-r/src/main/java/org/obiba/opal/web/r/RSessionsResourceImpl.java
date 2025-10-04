@@ -10,7 +10,10 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.r.service.RServerProfile;
@@ -23,13 +26,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.core.PathSegment;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles the list and the creation of the R sessions of the invoking Opal user.
@@ -59,7 +58,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
   public List<OpalR.RSessionDto> getRSessions() {
     return opalRSessionManager.getSubjectRSessions().stream()
         .map(Dtos::asDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Override
@@ -69,13 +68,18 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   @Override
-  public Response newRSession(UriInfo info, String restore, String profile) {
+  public Response newRSession(UriInfo info, String restore, String profile, boolean wait) {
     if (!createRSessionEnabled())
       throw new ForbiddenException("Plain R service endpoint is not enabled");
     RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
     onNewRSession(rSession);
-    if (!Strings.isNullOrEmpty(restore)) {
-      opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+    if (wait || !Strings.isNullOrEmpty(restore)) {
+      RSessionStateRunnable runnable = new RSessionStateRunnable(rSession, restore);
+      if (wait) {
+        runnable.run();
+      } else {
+        CompletableFuture.runAsync(runnable);
+      }
     }
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))
@@ -119,7 +123,33 @@ public class RSessionsResourceImpl implements RSessionsResource {
     return info.getBaseUriBuilder().path(root.toString()).path(id).build();
   }
 
-  public class DefaultRServerProfile implements RServerProfile {
+  private class RSessionStateRunnable implements Runnable {
+
+    private final RServerSession rSession;
+    private final String restore;
+
+    public RSessionStateRunnable(RServerSession rSession, String restore) {
+      this.rSession = rSession;
+      this.restore = restore;
+    }
+
+    @Override
+    public void run() {
+      while (RServerSession.State.PENDING.equals(rSession.getState())) {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+      }
+      if (RServerSession.State.RUNNING.equals(rSession.getState()) && !Strings.isNullOrEmpty(restore)) {
+        opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+      }
+    }
+  }
+
+  public static class DefaultRServerProfile implements RServerProfile {
 
     private final String name;
 

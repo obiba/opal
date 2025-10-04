@@ -13,18 +13,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
-import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
-import org.obiba.opal.spi.r.FileReadROperation;
-import org.obiba.opal.spi.r.FileWriteROperation;
+import org.obiba.opal.r.service.tasks.SubjectRSessions;
 import org.obiba.opal.spi.r.RRuntimeException;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -33,14 +29,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.ForbiddenException;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Maps R Sessions with its invoking Opal user (through its Opal Session). Current R session of an Opal user is the last
@@ -54,9 +50,6 @@ public class OpalRSessionManager implements DisposableBean {
   public static final String WORKSPACES_FORMAT = System.getenv().get("OPAL_HOME") + File.separatorChar + "data"
       + File.separatorChar + "R" + File.separatorChar + "workspaces" + File.separatorChar + "%s";
 
-  private static final String R_IMAGE_FILE = ".RData";
-
-  private static final String R_IMAGE_FILE_ENC = ".RData.enc";
 
   @Value("${org.obiba.opal.r.sessionTimeout}")
   private Long rSessionTimeout;
@@ -337,7 +330,7 @@ public class OpalRSessionManager implements DisposableBean {
     log.debug("clearRSessions({})", principal);
     SubjectRSessions subjectRSessions = rSessionMap.get(principal);
     for (RServerSession rSession : subjectRSessions) {
-      if (!rSession.isBusy()) {
+      if (rSession.isRunning() && !rSession.isBusy()) {
         Long contextTimeout = getRSessionTimeoutByContext(rSession);
         long timeout = contextTimeout == null ? rSessionTimeout : contextTimeout;
         if (rSession.hasExpired(timeout)) {
@@ -386,12 +379,14 @@ public class OpalRSessionManager implements DisposableBean {
   public RServerSession newSubjectRSession(String principal, RServerProfile profile) {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
-      SubjectRSessions rSessions = getRSessions(principal);
-      RServerSession rSession = rServerManagerService.getRServer(safeProfile.getCluster()).newRServerSession(principal);
+      RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
+      RServerSession rSession = service.newRServerSession(principal);
       rSession.setProfile(safeProfile);
+      SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
+      log.error("New subject R session failed", e);
       throw new RRuntimeException(e);
     }
   }
@@ -408,7 +403,7 @@ public class OpalRSessionManager implements DisposableBean {
   private synchronized SubjectRSessions getRSessions(String principal) {
     SubjectRSessions rSessions = rSessionMap.get(principal);
     if (rSessions == null) {
-      rSessions = new SubjectRSessions();
+      rSessions = new SubjectRSessions(cryptoService);
       rSessionMap.put(principal, rSessions);
     }
     return rSessions;
@@ -419,173 +414,4 @@ public class OpalRSessionManager implements DisposableBean {
     return SecurityUtils.getSubject().getPrincipal().toString();
   }
 
-  //
-  // Nested classes
-  //
-
-  private final class SubjectRSessions implements Iterable<RServerSession> {
-
-    private final List<RServerSession> rSessions = Collections.synchronizedList(new ArrayList<RServerSession>());
-
-    void saveRSession(String rSessionId, String saveId) {
-      RServerSession rSession = getRSession(rSessionId);
-      // make sure the session storage folder is empty
-      File store = rSession.getWorkspace(saveId);
-      Lists.newArrayList(store.listFiles()).forEach(file -> {
-        try {
-          FileUtil.delete(file);
-        } catch (IOException e) {
-          // ignore
-        }
-      });
-      saveRSessionFiles(rSession, saveId);
-      saveRSessionImage(rSession, saveId);
-    }
-
-    void restoreRSession(String rSessionId, String restoreId) {
-      RServerSession rSession = getRSession(rSessionId);
-      restoreSessionImage(rSession, restoreId);
-      restoreSessionFiles(rSession, restoreId);
-    }
-
-    void removeRSession(String rSessionId) {
-      removeRSession(getRSession(rSessionId));
-    }
-
-    void removeRSession(RServerSession rSession) {
-      try {
-        rSession.close();
-        rSessions.remove(rSession);
-      } catch (Exception e) {
-        log.warn("Failed closing R session: {}", rSession.getId(), e);
-      }
-    }
-
-    void removeRSessions(String clusterName, String serverName) {
-      List<RServerSession> sessionsToRemove = rSessions.stream()
-          .filter(s -> clusterName.equals(s.getProfile().getCluster()) && serverName.equals(s.getRServerServiceName()))
-          .collect(Collectors.toList());
-      for (RServerSession rSession : sessionsToRemove) {
-        try {
-          removeRSession(rSession);
-        } catch (Exception e) {
-          log.warn("Failed closing R session: {}", rSession.getId(), e);
-        }
-      }
-    }
-
-    void removeRSessions() {
-      for (RServerSession rSession : rSessions) {
-        try {
-          rSession.close();
-        } catch (Exception e) {
-          log.warn("Failed closing R session: {}", rSession.getId(), e);
-        }
-      }
-      rSessions.clear();
-    }
-
-    void clean() {
-      List<RServerSession> toRemove = Lists.newArrayList();
-      for (RServerSession rSession : rSessions) {
-        if (rSession.isClosed()) {
-          toRemove.add(rSession);
-        }
-      }
-      rSessions.removeAll(toRemove);
-    }
-
-    private void saveRSessionImage(RServerSession rSession, String saveId) {
-      // then save the memory image
-      String rscript = "base::save.image()";
-      RScriptROperation rop = new RScriptROperation(rscript, false);
-      rSession.execute(rop);
-      // clean legacy
-      File destination = new File(rSession.getWorkspace(saveId), R_IMAGE_FILE);
-      if (destination.exists()) destination.delete();
-      destination = new File(rSession.getWorkspace(saveId), R_IMAGE_FILE_ENC);
-      if (destination.exists()) destination.delete();
-      try {
-        FileReadROperation readop = new FileReadROperation(R_IMAGE_FILE, cryptoService.newCipherOutputStream(new FileOutputStream(destination)));
-        rSession.execute(readop);
-      } catch (FileNotFoundException e) {
-        throw new RRuntimeException(e);
-      }
-    }
-
-    private void restoreSessionImage(RServerSession rSession, String restoreId) {
-      File source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE_ENC);
-      if (!source.exists()) {
-        // legacy
-        source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE);
-      }
-      if (!source.exists()) return;
-
-      try {
-        FileWriteROperation writeop = null;
-        if (R_IMAGE_FILE_ENC.equals(source.getName())) {
-          writeop = new FileWriteROperation(R_IMAGE_FILE, cryptoService.newCipherInputStream(new FileInputStream(source)));
-        } else {
-          // legacy
-          writeop = new FileWriteROperation(R_IMAGE_FILE, source);
-        }
-        rSession.execute(writeop);
-        String rscript = String.format("base::load('%s')", R_IMAGE_FILE);
-        RScriptROperation rop = new RScriptROperation(rscript, false);
-        rSession.execute(rop);
-      } catch (FileNotFoundException e) {
-        throw new RRuntimeException(e);
-      }
-    }
-
-    private void saveRSessionFiles(RServerSession rSession, String saveId) {
-      rSession.saveRSessionFiles(saveId);
-    }
-
-    private void restoreSessionFiles(RServerSession rSession, String restoreId) {
-      File source = rSession.getWorkspace(restoreId);
-      FileUtils.listFiles(source, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).forEach(file -> {
-        String destination = file.getAbsolutePath().replace(source.getAbsolutePath(), "");
-        if (destination.startsWith("/")) destination = destination.substring(1);
-        if (!R_IMAGE_FILE_ENC.equals(destination) && !R_IMAGE_FILE.equals(destination)) {
-          if (destination.contains("/")) {
-            // make sure destination directory exists
-            String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
-            RScriptROperation rop = new RScriptROperation(rscript, false);
-            rSession.execute(rop);
-          }
-          FileWriteROperation writeop = new FileWriteROperation(destination, file);
-          rSession.execute(writeop);
-        }
-      });
-    }
-
-    private boolean hasRSession(String rSessionId) {
-      for (RServerSession rs : rSessions) {
-        if (rs.getId().equals(rSessionId)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    private void addRSession(RServerSession rSession) {
-      rSessions.add(rSession);
-    }
-
-    private RServerSession getRSession(String rSessionId) {
-      for (RServerSession rs : rSessions) {
-        if (rs.getId().equals(rSessionId)) {
-          return rs;
-        }
-      }
-      throw new NoSuchRSessionException(rSessionId);
-    }
-
-    @Override
-    public Iterator<RServerSession> iterator() {
-      return rSessions.iterator();
-    }
-
-  }
 }

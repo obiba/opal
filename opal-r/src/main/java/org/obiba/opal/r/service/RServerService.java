@@ -41,7 +41,26 @@ public interface RServerService {
 
   RServerState getState() throws RServerException;
 
-  RServerSession newRServerSession(String user) throws RServerException;
+  /**
+   * Create an R session for user.
+   *
+   * @param user
+   * @return
+   * @throws RServerException
+   */
+  default RServerSession newRServerSession(String user) throws RServerException {
+    return newRServerSession(user, null);
+  }
+
+  /**
+   * Create an R session for user and with optionally provided identifier.
+   *
+   * @param user
+   * @param id Session identifier or null
+   * @return
+   * @throws RServerException
+   */
+  RServerSession newRServerSession(String user, String id) throws RServerException;
 
   /**
    * Shortcut for one shot R code execution.

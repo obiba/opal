@@ -103,6 +103,7 @@ public class Dtos {
         .setCreationDate(DateTimeType.get().valueOf(rSession.getCreated()).toString())
         .setLastAccessDate(DateTimeType.get().valueOf(rSession.getTimestamp()).toString())
         .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING)
+        .setState(rSession.getState().name())
         .setCurrentExecutionTimeMillis(rSession.getCurrentExecutionTimeMillis())
         .setTotalExecutionTimeMillis(rSession.getTotalExecutionTimeMillis())
         .setLink(ub.build(rSession.getId()).toString())
@@ -110,6 +111,7 @@ public class Dtos {
         .setProfile(rSession.getProfile().getName())
         .setCluster(rSession.getProfile().getCluster())
         .setServer(rSession.getRServerServiceName())
+        .addAllEvents(rSession.getEvents())
         .build();
   }
 

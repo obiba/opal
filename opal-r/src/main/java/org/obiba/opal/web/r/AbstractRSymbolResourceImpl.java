@@ -10,6 +10,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.BadRequestException;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ResourceReferenceService;

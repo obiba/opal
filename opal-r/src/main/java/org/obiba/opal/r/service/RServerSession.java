@@ -14,8 +14,13 @@ import org.obiba.opal.spi.r.RASyncOperationTemplate;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 public interface RServerSession extends RASyncOperationTemplate {
+
+  enum State {
+    PENDING, RUNNING, FAILED, TERMINATED
+  }
 
   String DEFAULT_CONTEXT = "default";
 
@@ -30,6 +35,10 @@ public interface RServerSession extends RASyncOperationTemplate {
   Date getTimestamp();
 
   boolean isBusy();
+
+  State getState();
+
+  List<String> getEvents();
 
   /**
    * Cumulated execution time.
@@ -76,4 +85,12 @@ public interface RServerSession extends RASyncOperationTemplate {
   File getWorkspace(String saveId);
 
   void saveRSessionFiles(String saveId);
+
+  default boolean isRunning() {
+    return State.RUNNING.equals(getState());
+  }
+
+  default boolean isPending() {
+    return State.PENDING.equals(getState());
+  }
 }

@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.event.RServerSessionClosedEvent;
@@ -35,7 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Defines the common attributes of what is a R server session.
+ * Defines the common attributes of what is an R server session.
  */
 public abstract class AbstractRServerSession implements RServerSession {
 
@@ -62,6 +63,10 @@ public abstract class AbstractRServerSession implements RServerSession {
   private final String serverName;
 
   private RServerProfile profile;
+
+  private State state;
+
+  private final List<String> events = Lists.newArrayList();
 
   /**
    * R commands to be processed.
@@ -94,6 +99,9 @@ public abstract class AbstractRServerSession implements RServerSession {
     this.created = new Date();
     this.timestamp = created;
     this.serverName = serverName;
+    this.state = State.PENDING;
+    this.busy = false;
+    addEvent("Created");
   }
 
   //
@@ -128,6 +136,16 @@ public abstract class AbstractRServerSession implements RServerSession {
   @Override
   public boolean isBusy() {
     return busy;
+  }
+
+  @Override
+  public State getState() {
+    return state;
+  }
+
+  @Override
+  public List<String> getEvents() {
+    return events;
   }
 
   @Override
@@ -196,6 +214,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   @Override
   public void close() {
+    this.state = State.TERMINATED;
     eventBus.post(new RServerSessionClosedEvent(id, user));
   }
 
@@ -205,6 +224,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   @Override
   public synchronized String executeAsync(ROperation rop) {
+    if (!isRunning()) throw new IllegalStateException("R Session is not opened");
     touch();
     ensureRCommandsConsumer();
     String rCommandId = getId() + "-" + commandId++;
@@ -247,6 +267,20 @@ public abstract class AbstractRServerSession implements RServerSession {
     }
     rCommandList.remove(rCommand);
     return rCommand;
+  }
+
+  public void setRunning() {
+    this.state = State.RUNNING;
+    addEvent("Ready");
+  }
+
+  public void setFailed(String message) {
+    this.state = State.FAILED;
+    addEvent(message);
+  }
+
+  public void addEvent(String message) {
+    events.add(String.format("%s;%s;%s", this.state.name(), DateTimeType.get().valueOf(new Date()).toString(), message));
   }
 
   //

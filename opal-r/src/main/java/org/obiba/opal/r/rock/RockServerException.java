@@ -23,7 +23,7 @@ public class RockServerException extends RServerException {
 
   private String causeMessage;
 
-  RockServerException(String message) {
+  public RockServerException(String message) {
     super(message);
     this.clientError = false;
   }

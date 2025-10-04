@@ -13,6 +13,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -24,18 +29,12 @@ import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RCommand;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RSerialize;
-import org.obiba.opal.spi.r.RServerResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import jakarta.annotation.Nullable;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 /**

@@ -52,6 +52,8 @@ message RSessionDto {
   required string server = 10;
   required int64 currentExecutionTimeMillis = 11;
   required int64 totalExecutionTimeMillis = 12;
+  required string state = 13;
+  repeated string events = 14;
 }
 
 message RPackageDto {

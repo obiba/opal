@@ -17,6 +17,7 @@ import com.google.common.io.ByteStreams;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
+import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.UUID;
 
 public abstract class RockSession extends AbstractRServerSession implements RServerConnection {
 
@@ -46,7 +48,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
   protected String rockSessionId;
 
   protected RockSession(String serverName, String id, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, id, user, transactionalThreadFactory, eventBus);
+    super(serverName, Strings.isNullOrEmpty(id) ? UUID.randomUUID().toString() : id, user, transactionalThreadFactory, eventBus);
     this.credentials = credentials;
   }
 
@@ -210,6 +212,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
 
   @Override
   public synchronized void execute(ROperation rop) {
+    if (!isRunning()) throw new IllegalStateException("R Session is not opened");
     touch();
     lock.lock();
     setBusy(true);
@@ -243,7 +246,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
     return elapsed;
   }
 
-  protected void openSession() throws RServerException {
+  public void openSession() throws RServerException {
     long start = System.currentTimeMillis();
     try {
       HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -252,8 +255,14 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
       RestTemplate restTemplate = new RestTemplate(factory);
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionsResourceUrl(), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
       RockSessionInfo info = response.getBody();
-      this.rockSessionId = info.getId();
+      if (info != null) {
+        this.rockSessionId = info.getId();
+        setRunning();
+      } else {
+        setFailed("No rock session found");
+      }
     } catch (RestClientException e) {
+      setFailed(e.getMessage());
       throw new RockServerException("Failure when opening a Rock R session", e);
     } finally {
       calculateDuration(start);

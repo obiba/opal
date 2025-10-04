@@ -46,7 +46,7 @@
       </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-icon name="circle" size="sm" :title="t(props.value.toLowerCase())" :color="getSessionColor(props.value)" />
+          <q-icon name="circle" size="sm" :title="t(getSessionTitle(props.row))" :color="getSessionColor(props.row)" />
         </q-td>
       </template>
     </q-table>
@@ -123,8 +123,24 @@ const columns = computed(() => [
   { name: 'status', label: 'Status', align: DefaultAlignment, field: 'status', sortable: true },
 ]);
 
-function getSessionColor(status: string) {
-  return status === 'BUSY' ? 'warning' : status === 'WAITING' ? 'positive' : 'grey-6';
+function getSessionTitle(session: RSessionDto) {
+  if (session.state !== 'RUNNING') {
+    return session.state.toLowerCase();
+  }
+  return session.status.toLowerCase();
+}
+
+function getSessionColor(session: RSessionDto) {
+  if (session.state === 'PENDING') {
+    return 'grey-6';
+  }
+  if (session.state === 'FAILED') {
+    return 'negative';
+  }
+  if (session.state === 'TERMINATED') {
+    return 'dark';
+  }
+  return session.status === 'BUSY' ? 'warning' : session.status === 'WAITING' ? 'positive' : 'grey-6';
 }
 
 function updateRSessions() {
