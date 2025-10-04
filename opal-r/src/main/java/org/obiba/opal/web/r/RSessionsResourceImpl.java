@@ -138,7 +138,10 @@ public class RSessionsResourceImpl implements RSessionsResource {
       while (RServerSession.State.PENDING.equals(rSession.getState())) {
         try {
           Thread.sleep(100);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
       }
       if (RServerSession.State.RUNNING.equals(rSession.getState()) && !Strings.isNullOrEmpty(restore)) {
         opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
