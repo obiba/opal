@@ -9,10 +9,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RockPodSession extends RockSession {
 
   private static final Logger log = LoggerFactory.getLogger(RockPodSession.class);
+
+  private static final ExecutorService EXECUTOR =
+      Executors.newFixedThreadPool(4, r -> {
+        Thread t = new Thread(r);
+        t.setName("rserver-ready-task-" + t.threadId());
+        t.setDaemon(true);
+        return t;
+      });
 
   private final RockPodSessionHelper rockPodSessionHelper;
 
@@ -84,7 +94,7 @@ public class RockPodSession extends RockSession {
 
   private void init() {
     // Update pod state in a thread
-    readyFuture = CompletableFuture.runAsync(new RServerReadyTask());
+    readyFuture = CompletableFuture.runAsync(new RServerReadyTask(), EXECUTOR);
   }
 
   private final class RServerReadyTask implements Runnable {
