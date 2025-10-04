@@ -13,21 +13,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
-import org.obiba.opal.r.service.tasks.RSessionCreationTask;
-import org.obiba.opal.r.service.tasks.RSessionTask;
-import org.obiba.opal.r.service.tasks.RSessionTaskManager;
 import org.obiba.opal.r.service.tasks.SubjectRSessions;
-import org.obiba.opal.spi.r.FileReadROperation;
-import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.RRuntimeException;
-import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -36,14 +29,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.ForbiddenException;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Maps R Sessions with its invoking Opal user (through its Opal Session). Current R session of an Opal user is the last
@@ -91,9 +84,6 @@ public class OpalRSessionManager implements DisposableBean {
   @Autowired
   private CryptoService cryptoService;
 
-  @Autowired
-  private RSessionTaskManager rSessionTaskManager;
-
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
   @Override
@@ -131,10 +121,6 @@ public class OpalRSessionManager implements DisposableBean {
     } catch (Exception e) {
       log.warn("Error while stopping R session manager", e);
     }
-  }
-
-  public RSessionTaskManager getRSessionTaskManager() {
-    return rSessionTaskManager;
   }
 
   /**
@@ -393,15 +379,15 @@ public class OpalRSessionManager implements DisposableBean {
   public RServerSession newSubjectRSession(String principal, RServerProfile profile) {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
+      RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
+      RServerSession rSession = service.newRServerSession(principal);
+      rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
-      return rSessionTaskManager.makeRSession(principal, safeProfile, rSessions);
+      rSessions.addRSession(rSession);
+      return rSession;
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }
-  }
-
-  public RSessionTask getRSessionTask(String id) {
-    return rSessionTaskManager.getTask(id);
   }
 
   private RServerProfile asSafeRServerProfile(RServerProfile profile) {

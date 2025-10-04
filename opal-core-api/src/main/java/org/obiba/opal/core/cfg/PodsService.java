@@ -83,4 +83,8 @@ public interface PodsService extends SystemService {
    * @param spec
    */
   void deletePods(PodSpec spec);
+
+  interface PodRefCallback {
+    void onPodRef(PodRef podRef);
+  }
 }

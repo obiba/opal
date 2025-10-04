@@ -212,6 +212,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
 
   @Override
   public synchronized void execute(ROperation rop) {
+    if (!isRunning()) throw new IllegalStateException("R Session is not opened");
     touch();
     lock.lock();
     setBusy(true);
@@ -245,7 +246,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
     return elapsed;
   }
 
-  protected void openSession() throws RServerException {
+  public void openSession() throws RServerException {
     long start = System.currentTimeMillis();
     try {
       HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();

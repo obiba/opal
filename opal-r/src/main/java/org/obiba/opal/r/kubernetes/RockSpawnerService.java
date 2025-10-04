@@ -8,7 +8,6 @@ import org.apache.shiro.SecurityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.core.cfg.PodsService;
-import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.runtime.App;
@@ -32,7 +31,6 @@ import org.obiba.opal.web.r.RPackageResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
@@ -41,8 +39,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,19 +58,13 @@ public class RockSpawnerService implements RServerPodService {
 
   private static final Logger log = LoggerFactory.getLogger(RockSpawnerService.class);
 
-  private static final AppCredentials DEFAULT_CREDENTIALS = new AppCredentials("administrator", "password");
-
-  @Value("${pods.rock.connection.maxAttempts}")
-  private int connectionMaxAttempts;
-
-  @Value("${pods.rock.connection.delay}")
-  private int connectionDelay;
-
   private final TransactionalThreadFactory transactionalThreadFactory;
 
   private final EventBus eventBus;
 
   private final PodsService podsService;
+
+  private final RockPodSessionHelper rockPodSessionHelper;
 
   private final Map<String, RockPodSession> sessions = Maps.newHashMap();
 
@@ -99,10 +89,11 @@ public class RockSpawnerService implements RServerPodService {
   private final ReentrantLock initLock = new ReentrantLock();
 
   @Autowired
-  public RockSpawnerService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, PodsService podsService) {
+  public RockSpawnerService(TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus, PodsService podsService, RockPodSessionHelper rockPodSessionHelper) {
     this.transactionalThreadFactory = transactionalThreadFactory;
     this.eventBus = eventBus;
     this.podsService = podsService;
+    this.rockPodSessionHelper = rockPodSessionHelper;
   }
 
   @Override
@@ -120,7 +111,7 @@ public class RockSpawnerService implements RServerPodService {
       initLock.lock();
       PodRef pod = null;
       try {
-        pod = createRockPod();
+        pod = createRockPod(true);
         initInstalledPackagesDtos(pod);
         initResourceProviders(pod);
         initDataShieldPackagesProperties(pod);
@@ -190,7 +181,7 @@ public class RockSpawnerService implements RServerPodService {
 
   @Override
   public RServerSession newRServerSession(String user, String id) throws RServerException {
-    PodRef pod = createRockPod();
+    PodRef pod = createRockPod(false);
     return newRServerSession(pod, user, id);
   }
 
@@ -216,7 +207,7 @@ public class RockSpawnerService implements RServerPodService {
     initLock.lock();
     PodRef pod = null;
     try {
-      pod = createRockPod();
+      pod = createRockPod(true);
       initInstalledPackagesDtos(pod);
     } catch (Exception e) {
       log.error("Error when reading installed packages", e);
@@ -238,7 +229,7 @@ public class RockSpawnerService implements RServerPodService {
     initLock.lock();
     PodRef pod = null;
     try {
-      pod = createRockPod();
+      pod = createRockPod(true);
       initResourceProviders(pod);
     } catch (Exception e) {
       log.error("Error when reading installed resource packages", e);
@@ -255,7 +246,7 @@ public class RockSpawnerService implements RServerPodService {
     initLock.lock();
     PodRef pod = null;
     try {
-      pod = createRockPod();
+      pod = createRockPod(true);
       initDataShieldPackagesProperties(pod);
     } catch (Exception e) {
       log.error("Error when reading installed DataSHIELD packages", e);
@@ -343,9 +334,9 @@ public class RockSpawnerService implements RServerPodService {
   // Private methods
   //
 
-  private RServerSession newRServerSession(PodRef pod, String user, String id) throws RServerException {
+  private RockPodSession newRServerSession(PodRef pod, String user, String id) throws RServerException {
     try {
-      RockPodSession session = new RockPodSession(getName(), id, pod, DEFAULT_CREDENTIALS, user, podsService, transactionalThreadFactory, eventBus);
+      RockPodSession session = new RockPodSession(getName(), id, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
       session.setProfile(new RServerProfile() {
         @Override
         public String getName() {
@@ -367,9 +358,11 @@ public class RockSpawnerService implements RServerPodService {
 
   private void execute(PodRef pod, ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RServerSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null);
+    RockPodSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null);
     // close session but not the pod that is managed externally
-    ((RockPodSession) rSession).setTerminatePod(false);
+    rSession.setTerminatePod(false);
+    // ensure session is ready
+    rSession.join();
     try {
       rSession.execute(rop);
     } finally {
@@ -379,10 +372,10 @@ public class RockSpawnerService implements RServerPodService {
 
   private String[] getLog(PodRef pod, Integer nbLines) {
     try {
-      HttpHeaders headers = createHeaders();
+      HttpHeaders headers = rockPodSessionHelper.createHeaders();
       headers.setAccept(Lists.newArrayList(MediaType.TEXT_PLAIN));
       RestTemplate restTemplate = new RestTemplate();
-      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(getRServerResourceUrl(pod,"/rserver/_log"))
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(rockPodSessionHelper.getRServerResourceUrl(pod,"/rserver/_log"))
           .queryParam("limit", nbLines);
       ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
       return response.getBody().split("\n");
@@ -395,7 +388,7 @@ public class RockSpawnerService implements RServerPodService {
   private RServerState getState(PodRef pod) {
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<RockServerStatus> response =
-        restTemplate.exchange(getRServerResourceUrl(pod, "/rserver"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockServerStatus.class);
+        restTemplate.exchange(rockPodSessionHelper.getRServerResourceUrl(pod, "/rserver"), HttpMethod.GET, new HttpEntity<>(rockPodSessionHelper.createHeaders()), RockServerStatus.class);
     return new RockState(response.getBody(), getName());
   }
 
@@ -403,7 +396,7 @@ public class RockSpawnerService implements RServerPodService {
     log.info("Init installed packages for pod {}", pod);
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<RockStringMatrix> response =
-        restTemplate.exchange(getRServerResourceUrl(pod,"/rserver/packages"), HttpMethod.GET, new HttpEntity<>(createHeaders()), RockStringMatrix.class);
+        restTemplate.exchange(rockPodSessionHelper.getRServerResourceUrl(pod,"/rserver/packages"), HttpMethod.GET, new HttpEntity<>(rockPodSessionHelper.createHeaders()), RockStringMatrix.class);
     RockStringMatrix matrix = response.getBody();
     if (matrix == null) return;
     packages.addAll(matrix.iterateRows().stream()
@@ -435,11 +428,11 @@ public class RockSpawnerService implements RServerPodService {
 
   private void initDataShieldPackagesProperties(PodRef pod) {
     log.info("Init datashield packages for pod {}", pod);
-    HttpHeaders headers = createHeaders();
+    HttpHeaders headers = rockPodSessionHelper.createHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<String> response =
-        restTemplate.exchange(getRServerResourceUrl(pod,"/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        restTemplate.exchange(rockPodSessionHelper.getRServerResourceUrl(pod,"/rserver/packages/_datashield"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
     String jsonSource = response.getBody();
     if (response.getStatusCode().is2xxSuccessful() && jsonSource != null && !jsonSource.isEmpty()) {
       JSONObject json = new JSONObject(jsonSource);
@@ -464,56 +457,21 @@ public class RockSpawnerService implements RServerPodService {
    * Create a rock pod that is ready to use (check successful).
    * @return
    */
-  private PodRef createRockPod() {
+  private PodRef createRockPod(boolean wait) {
     try {
       Map<String, String> env = Maps.newHashMap();
       env.put("ROCK_CLUSTER", clusterName);
       // TODO make it optional
       env.put("ROCK_SECURITY_ENABLED", "false");
       PodRef pod =  podsService.createPod(podSpec, env);
-      boolean ready = false;
-      int attempts = 1;
-      while (!ready && attempts <= connectionMaxAttempts) {
-        RestTemplate restTemplate = new RestTemplate();
-        try {
-          ResponseEntity<String> response =
-              restTemplate.exchange(getRServerResourceUrl(pod, "/_check"), HttpMethod.GET, new HttpEntity<>(createHeaders()), String.class);
-          ready = response.getStatusCode().is2xxSuccessful();
-        } catch (Exception e) {
-          if (log.isDebugEnabled()) {
-            log.warn("Error when checking R server pod {} status", pod.getName(), e);
-          } else {
-            log.warn("Error when checking R server pod {} status", pod.getName());
-          }
-        }
-        if (!ready) {
-          log.info("Waiting for R server pod {} to be ready (attempt {})", pod.getName(), attempts);
-          attempts++;
-          try {
-            Thread.sleep(connectionDelay);
-          } catch (InterruptedException e) {
-            log.error("Interrupted while waiting for R server pod {} to be ready", pod.getName());
-            Thread.currentThread().interrupt();
-          }
-        }
+      if (wait) {
+        pod = rockPodSessionHelper.ensureRunningPod(pod);
+        rockPodSessionHelper.ensureRServerReady(pod);
       }
       return pod;
     } catch (Exception e) {
       log.error("Error when reading installed packages", e);
       throw new RuntimeException(e);
     }
-  }
-
-  private String getRServerResourceUrl(PodRef pod, String path) {
-    return String.format("http://%s:%s%s", pod.getName(), pod.getPort(), path);
-  }
-
-  private HttpHeaders createHeaders() {
-    return new HttpHeaders() {{
-      String auth = DEFAULT_CREDENTIALS.getUser() + ":" + DEFAULT_CREDENTIALS.getPassword();
-      byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-      String authHeader = "Basic " + new String(encodedAuth);
-      add("Authorization", authHeader);
-    }};
   }
 }

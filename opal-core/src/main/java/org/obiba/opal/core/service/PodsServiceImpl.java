@@ -34,11 +34,11 @@ public class PodsServiceImpl implements PodsService {
   @Value("${pods.rock.specs}")
   private String defaultRockPodSpecs;
 
-  @Value("${pods.rock.running.maxAttempts}")
-  private int runningMaxAttempts;
+  @Value("${pods.maxAttempts}")
+  private int podExistsMaxAttempts;
 
-  @Value("${pods.rock.running.delay}")
-  private int runningDelay;
+  @Value("${pods.delay}")
+  private int podExistsDelay;
 
   private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
@@ -206,7 +206,7 @@ public class PodsServiceImpl implements PodsService {
 
     client.services().inNamespace(getNamespace(spec)).resource(service).create();
 
-    return ensureRunningPod(spec, podName);
+    return ensurePodExists(spec, podName);
   }
 
   @Override
@@ -321,6 +321,19 @@ public class PodsServiceImpl implements PodsService {
     String status = pod.getStatus().getPhase();
     String image = pod.getSpec().getContainers().getFirst().getImage();
     if (!image.equals(spec.getContainer().getImage())) return null;
+
+//    EventList eventList = client.v1().events().inNamespace(getNamespace(spec))
+//        .withField("involvedObject.name", podName)
+//        .withField("involvedObject.kind", "Pod").list();
+//    for (Event event : eventList.getItems()) {
+//      System.out.println(
+//            "Type: " + event.getType() +
+//                " Reason: " + event.getReason() +
+//                " Message: " + event.getMessage() +
+//                " Count: " + event.getCount() +
+//                " LastTimestamp: " + event.getLastTimestamp()
+//        );
+//    }
     return new PodRef(podName, spec, status, ip, spec.getContainer().getPort());
   }
 
@@ -335,22 +348,28 @@ public class PodsServiceImpl implements PodsService {
     }
   }
 
-  private PodRef ensureRunningPod(PodSpec spec, String podName) {
-    // When pod is ContainerCreating state (for instance docker image is being downloaded),
-    // it is still not Running, then wait
+  /**
+   * Wait for pod to be available, may take some time when a k8s node creation is needed.
+   *
+   * @param spec
+   * @param podName
+   * @return
+   */
+  private PodRef ensurePodExists(PodSpec spec, String podName) {
     int retries = 0;
-    while (retries < runningMaxAttempts) {
+    while (retries < podExistsMaxAttempts) {
       PodRef pod = getPod(spec, podName);
-      if (pod != null && "Running".equals(pod.getStatus())) {
+      if (pod != null && !Strings.isNullOrEmpty(pod.getName())) {
         return pod;
       }
+      retries++;
+      log.info("Waiting for pod {} to be ready (attempt {})", podName, retries);
       try {
-        Thread.sleep(runningDelay);
+        Thread.sleep(podExistsDelay);
       } catch (InterruptedException ignored) {
       }
-      retries++;
     }
-    throw new RuntimeException("Pod " + podName + " did not become Running in time");
+    throw new RuntimeException("Pod " + podName + " was not created in time");
   }
 
 }

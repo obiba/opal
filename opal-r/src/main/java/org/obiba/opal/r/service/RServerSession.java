@@ -19,7 +19,7 @@ import java.util.List;
 public interface RServerSession extends RASyncOperationTemplate {
 
   enum State {
-    PENDING, RUNNING, FAILED
+    PENDING, RUNNING, FAILED, TERMINATED
   }
 
   String DEFAULT_CONTEXT = "default";
@@ -85,4 +85,8 @@ public interface RServerSession extends RASyncOperationTemplate {
   File getWorkspace(String saveId);
 
   void saveRSessionFiles(String saveId);
+
+  default boolean isRunning() {
+    return State.RUNNING.equals(getState());
+  }
 }

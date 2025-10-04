@@ -22,8 +22,6 @@ import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.r.service.RServerState;
-import org.obiba.opal.r.service.tasks.RSessionCreationTask;
-import org.obiba.opal.r.service.tasks.RSessionTask;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.model.OpalR;

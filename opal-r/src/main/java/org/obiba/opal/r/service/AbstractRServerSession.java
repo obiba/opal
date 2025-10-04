@@ -36,7 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Defines the common attributes of what is a R server session.
+ * Defines the common attributes of what is an R server session.
  */
 public abstract class AbstractRServerSession implements RServerSession {
 
@@ -214,6 +214,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   @Override
   public void close() {
+    this.state = State.TERMINATED;
     eventBus.post(new RServerSessionClosedEvent(id, user));
   }
 
@@ -223,6 +224,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   @Override
   public synchronized String executeAsync(ROperation rop) {
+    if (!isRunning()) throw new IllegalStateException("R Session is not opened");
     touch();
     ensureRCommandsConsumer();
     String rCommandId = getId() + "-" + commandId++;
@@ -267,23 +269,23 @@ public abstract class AbstractRServerSession implements RServerSession {
     return rCommand;
   }
 
-  //
-  // Protected methods
-  //
-
-  protected void setRunning() {
+  public void setRunning() {
     this.state = State.RUNNING;
     addEvent("Ready");
   }
 
-  protected void setFailed(String message) {
+  public void setFailed(String message) {
     this.state = State.FAILED;
     addEvent(message);
   }
 
-  protected void addEvent(String message) {
+  public void addEvent(String message) {
     events.add(String.format("%s;%s;%s", this.state.name(), DateTimeType.get().valueOf(new Date()).toString(), message));
   }
+
+  //
+  // Protected methods
+  //
 
   protected synchronized void setBusy(boolean busy) {
     this.busy = busy;

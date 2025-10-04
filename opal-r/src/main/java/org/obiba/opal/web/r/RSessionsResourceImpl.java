@@ -78,7 +78,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
       if (wait) {
         runnable.run();
       } else {
-        executeAsync(runnable);
+        CompletableFuture.runAsync(runnable);
       }
     }
     URI location = getLocation(info, rSession.getId());
@@ -144,11 +144,6 @@ public class RSessionsResourceImpl implements RSessionsResource {
         opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
       }
     }
-  }
-
-  // Execute without waiting
-  private static void executeAsync(Runnable task) {
-    CompletableFuture.runAsync(task);
   }
 
   public static class DefaultRServerProfile implements RServerProfile {
