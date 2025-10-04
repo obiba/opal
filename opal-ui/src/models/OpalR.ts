@@ -48,6 +48,7 @@ export interface RSessionDto {
   creationDate: string;
   lastAccessDate: string;
   status: RSessionStatus;
+  state: string;
   link?: string | undefined;
   context: string;
   profile: string;
