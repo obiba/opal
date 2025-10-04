@@ -330,7 +330,7 @@ public class OpalRSessionManager implements DisposableBean {
     log.debug("clearRSessions({})", principal);
     SubjectRSessions subjectRSessions = rSessionMap.get(principal);
     for (RServerSession rSession : subjectRSessions) {
-      if (!rSession.isBusy()) {
+      if (rSession.isRunning() && !rSession.isBusy()) {
         Long contextTimeout = getRSessionTimeoutByContext(rSession);
         long timeout = contextTimeout == null ? rSessionTimeout : contextTimeout;
         if (rSession.hasExpired(timeout)) {
@@ -386,6 +386,7 @@ public class OpalRSessionManager implements DisposableBean {
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
+      log.error("New subject R session failed", e);
       throw new RRuntimeException(e);
     }
   }

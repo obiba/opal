@@ -53,6 +53,10 @@ public class RockPodSessionHelper {
   }
 
   public PodRef ensureRunningPod(PodRef pod) {
+    if (pod == null) {
+      log.error("Pod is null, cannot ensure running pod");
+      return null;
+    }
     return ensureRunningPod(pod.getPodSpec(), pod.getName(), null);
   }
 
@@ -91,6 +95,10 @@ public class RockPodSessionHelper {
    * @param pod
    */
   public void ensureRServerReady(PodRef pod) {
+    if (pod == null) {
+      log.error("Pod is null, cannot ensure R server ready");
+      return;
+    }
     boolean ready = false;
     int attempts = 1;
     while (!ready && attempts <= connectionMaxAttempts) {
@@ -120,6 +128,10 @@ public class RockPodSessionHelper {
   }
 
   public String getRServerResourceUrl(PodRef pod, String path) {
+    if (pod == null) {
+      log.error("Pod is null, cannot get R server resource url");
+      return null;
+    }
     return String.format("http://%s:%s%s", pod.getName(), pod.getPort(), path);
   }
 

@@ -335,6 +335,10 @@ public class RockSpawnerService implements RServerPodService {
   //
 
   private RockPodSession newRServerSession(PodRef pod, String user, String id) throws RServerException {
+    if (pod == null) {
+      log.error("Pod is null, cannot get R server session");
+      throw new RockServerException("Rock session creation failed because pod is null");
+    }
     try {
       RockPodSession session = new RockPodSession(getName(), id, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
       session.setProfile(new RServerProfile() {

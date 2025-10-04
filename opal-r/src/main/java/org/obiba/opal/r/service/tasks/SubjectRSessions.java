@@ -101,7 +101,8 @@ public final class SubjectRSessions implements Iterable<RServerSession> {
   public void clean() {
     List<RServerSession> toRemove = Lists.newArrayList();
     for (RServerSession rSession : rSessions) {
-      if (rSession.isClosed()) {
+      if (!rSession.isPending() && rSession.isClosed()) {
+        log.info("R session {} has been closed, removing it from user R sessions", rSession.getId());
         toRemove.add(rSession);
       }
     }

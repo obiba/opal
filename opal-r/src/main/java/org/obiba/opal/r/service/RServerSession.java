@@ -89,4 +89,8 @@ public interface RServerSession extends RASyncOperationTemplate {
   default boolean isRunning() {
     return State.RUNNING.equals(getState());
   }
+
+  default boolean isPending() {
+    return State.PENDING.equals(getState());
+  }
 }

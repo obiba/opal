@@ -218,6 +218,7 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public void deletePod(PodRef pod) {
+    if (pod == null) return;
     try {
       PodSpec spec = pod.getPodSpec();
       client.pods().inNamespace(getNamespace(spec)).withName(pod.getName()).delete();

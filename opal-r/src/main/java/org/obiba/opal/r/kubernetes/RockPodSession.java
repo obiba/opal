@@ -56,6 +56,10 @@ public class RockPodSession extends RockSession {
 
   public void join() {
     if (readyFuture == null || readyFuture.isDone()) return;
+    if (pod == null) {
+      log.error("Pod is null, cannot join pod init thread");
+      return;
+    }
     try {
       log.info("Joining pod init {}", pod.getName());
       readyFuture.join();
