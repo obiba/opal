@@ -16,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public final class SubjectRSessions implements Iterable<RServerSession> {
 
@@ -43,7 +40,7 @@ public final class SubjectRSessions implements Iterable<RServerSession> {
     File store = rSession.getWorkspace(saveId);
     File[] files = store.listFiles();
     if (files != null) {
-      Lists.newArrayList(files).forEach(file -> {
+      Arrays.stream(files).forEach(file -> {
         try {
           FileUtil.delete(file);
         } catch (IOException e) {
