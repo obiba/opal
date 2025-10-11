@@ -180,9 +180,9 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id) throws RServerException {
+  public RServerSession newRServerSession(String user, String id, RContextInitiator rContextInitiator) throws RServerException {
     PodRef pod = createRockPod(false);
-    return newRServerSession(pod, user, id);
+    return newRServerSession(pod, user, id, rContextInitiator);
   }
 
   @Override
@@ -334,13 +334,13 @@ public class RockSpawnerService implements RServerPodService {
   // Private methods
   //
 
-  private RockPodSession newRServerSession(PodRef pod, String user, String id) throws RServerException {
+  private RockPodSession newRServerSession(PodRef pod, String user, String id, RContextInitiator rContextInitiator) throws RServerException {
     if (pod == null) {
       log.error("Pod is null, cannot get R server session");
       throw new RockServerException("Rock session creation failed because pod is null");
     }
     try {
-      RockPodSession session = new RockPodSession(getName(), id, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
+      RockPodSession session = new RockPodSession(getName(), id, rContextInitiator, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
       session.setProfile(new RServerProfile() {
         @Override
         public String getName() {
@@ -362,7 +362,7 @@ public class RockSpawnerService implements RServerPodService {
 
   private void execute(PodRef pod, ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RockPodSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null);
+    RockPodSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null, null);
     // close session but not the pod that is managed externally
     rSession.setTerminatePod(false);
     // ensure session is ready

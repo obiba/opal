@@ -337,8 +337,8 @@ public class RockService implements RServerAppService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id) throws RServerException {
-    RServerSession session = new RockAppSession(getName(), id, app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
+  public RServerSession newRServerSession(String user, String id, RContextInitiator rContextInitiator) throws RServerException {
+    RServerSession session = new RockAppSession(getName(), id, rContextInitiator, app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     session.setProfile(new RServerProfile() {
       @Override
       public String getName() {

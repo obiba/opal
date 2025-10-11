@@ -49,7 +49,19 @@ public interface RServerService {
    * @throws RServerException
    */
   default RServerSession newRServerSession(String user) throws RServerException {
-    return newRServerSession(user, null);
+    return newRServerSession(user, null, null);
+  }
+
+  /**
+   * Create an R session for user with context initiator.
+   *
+   * @param user
+   * @param rContextInitiator
+   * @return
+   * @throws RServerException
+   */
+  default RServerSession newRServerSession(String user, RContextInitiator rContextInitiator) throws RServerException {
+    return newRServerSession(user, null, rContextInitiator);
   }
 
   /**
@@ -57,10 +69,11 @@ public interface RServerService {
    *
    * @param user
    * @param id Session identifier or null
+   * @param rContextInitiator
    * @return
    * @throws RServerException
    */
-  RServerSession newRServerSession(String user, String id) throws RServerException;
+  RServerSession newRServerSession(String user, String id, RContextInitiator rContextInitiator) throws RServerException;
 
   /**
    * Shortcut for one shot R code execution.

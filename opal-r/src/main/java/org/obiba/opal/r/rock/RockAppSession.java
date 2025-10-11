@@ -14,6 +14,7 @@ import com.google.common.eventbus.EventBus;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.service.RContextInitiator;
 import org.obiba.opal.spi.r.RServerConnection;
 import org.obiba.opal.spi.r.RServerException;
 import org.slf4j.Logger;
@@ -25,12 +26,12 @@ public class RockAppSession extends RockSession implements RServerConnection {
 
   private final App app;
 
-  protected RockAppSession(String serverName, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    this(serverName, null, app, credentials, user, transactionalThreadFactory, eventBus);
+  protected RockAppSession(String serverName, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    this(serverName, null, rContextInitiator, app, credentials, user, transactionalThreadFactory, eventBus);
   }
 
-  protected RockAppSession(String serverName, String id, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, id, credentials, user, transactionalThreadFactory, eventBus);
+  protected RockAppSession(String serverName, String id, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, rContextInitiator, credentials, user, transactionalThreadFactory, eventBus);
     this.app = app;
     openSession();
   }

@@ -17,7 +17,7 @@ import com.google.common.io.ByteStreams;
 import org.obiba.opal.core.domain.AppCredentials;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.service.AbstractRServerSession;
-import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.RContextInitiator;
 import org.obiba.opal.spi.r.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +47,12 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
 
   protected String rockSessionId;
 
-  protected RockSession(String serverName, String id, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+  protected RContextInitiator rContextInitiator;
+
+  protected RockSession(String serverName, String id, RContextInitiator rContextInitiator, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
     super(serverName, Strings.isNullOrEmpty(id) ? UUID.randomUUID().toString() : id, user, transactionalThreadFactory, eventBus);
     this.credentials = credentials;
+    this.rContextInitiator = rContextInitiator;
   }
 
   //
@@ -258,6 +261,9 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
       if (info != null) {
         this.rockSessionId = info.getId();
         setRunning();
+        if (this.rContextInitiator != null) {
+          this.rContextInitiator.initiate(this);
+        }
       } else {
         setFailed("No rock session found");
       }

@@ -14,10 +14,7 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.r.service.RServerManagerService;
-import org.obiba.opal.r.service.RServerProfile;
-import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.*;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +68,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
   public Response newRSession(UriInfo info, String restore, String profile, boolean wait) {
     if (!createRSessionEnabled())
       throw new ForbiddenException("Plain R service endpoint is not enabled");
-    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile));
+    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), withInitiator());
     onNewRSession(rSession);
     if (wait || !Strings.isNullOrEmpty(restore)) {
       RSessionStateRunnable runnable = new RSessionStateRunnable(rSession, restore);
@@ -109,6 +106,10 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(R_CONTEXT);
+  }
+
+  protected RContextInitiator withInitiator() {
+    return null;
   }
 
   URI getLocation(UriInfo info, String id) {

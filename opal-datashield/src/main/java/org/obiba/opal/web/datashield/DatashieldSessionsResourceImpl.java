@@ -15,9 +15,11 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
+import org.obiba.opal.r.service.RContextInitiator;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.RSessionsResourceImpl;
@@ -95,14 +97,20 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   protected void onNewRSession(RServerSession rSession) {
     rSession.setExecutionContext(DS_CONTEXT);
-    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
-    if (profile.hasOptions()) {
-      rSession.execute(
-          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
-    }
-    rSession.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", getSeed())));
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
+  }
+
+  @Override
+  protected RContextInitiator withInitiator() {
+    return session -> {
+      DataShieldProfile profile = (DataShieldProfile) session.getProfile();
+      if (profile.hasOptions()) {
+        session.execute(
+            new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(profile.getOptions()).build()));
+      }
+      session.execute(new RScriptROperation(String.format("options('datashield.seed' = %s)", getSeed())));
+    };
   }
 
   /**

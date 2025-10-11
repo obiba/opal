@@ -235,7 +235,18 @@ public class OpalRSessionManager implements DisposableBean {
    * @return R session
    */
   public RServerSession newSubjectRSession(RServerProfile profile) {
-    return newSubjectRSession(getSubjectPrincipal(), profile);
+    return newSubjectRSession(getSubjectPrincipal(), profile, null);
+  }
+
+  /**
+   * Creates a new R connection in the provided profile and context initiator, stores the corresponding R session.
+   *
+   * @param profile
+   * @param contextInitiator
+   * @return
+   */
+  public RServerSession newSubjectRSession(RServerProfile profile, RContextInitiator contextInitiator) {
+    return newSubjectRSession(getSubjectPrincipal(), profile, contextInitiator);
   }
 
   /**
@@ -376,11 +387,11 @@ public class OpalRSessionManager implements DisposableBean {
     }
   }
 
-  public RServerSession newSubjectRSession(String principal, RServerProfile profile) {
+  public RServerSession newSubjectRSession(String principal, RServerProfile profile, RContextInitiator contextInitiator) {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
       RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
-      RServerSession rSession = service.newRServerSession(principal);
+      RServerSession rSession = service.newRServerSession(principal, contextInitiator);
       rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
