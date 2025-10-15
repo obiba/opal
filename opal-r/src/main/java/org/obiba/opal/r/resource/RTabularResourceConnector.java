@@ -22,6 +22,7 @@ import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
+import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.spi.r.*;
 import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.obiba.opal.spi.r.datasource.magma.RVariableEntity;
@@ -162,6 +163,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
       }
       rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), rServerProfile, null);
       rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
+      RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
+      waiter.run();
       // prepare R env with util functions
       rSession.execute(new SourceROperation(RESOURCE_UTILS_SCRIPT));
       // assign resource

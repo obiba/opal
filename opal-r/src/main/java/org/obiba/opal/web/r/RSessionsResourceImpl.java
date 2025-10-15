@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.obiba.opal.r.service.*;
+import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,11 +72,18 @@ public class RSessionsResourceImpl implements RSessionsResource {
     RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), withInitiator());
     onNewRSession(rSession);
     if (wait || !Strings.isNullOrEmpty(restore)) {
-      RSessionStateRunnable runnable = new RSessionStateRunnable(rSession, restore);
+      RSessionStateWaiter waiter = new RSessionStateWaiter(rSession, restore) {
+        @Override
+        protected void onRunning(RServerSession rSession, String restore) {
+           if (!Strings.isNullOrEmpty(restore)) {
+             opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+           }
+        }
+      };
       if (wait) {
-        runnable.run();
+        waiter.run();
       } else {
-        CompletableFuture.runAsync(runnable);
+        CompletableFuture.runAsync(waiter);
       }
     }
     URI location = getLocation(info, rSession.getId());
@@ -122,32 +130,6 @@ public class RSessionsResourceImpl implements RSessionsResource {
     root.append("/session");
 
     return info.getBaseUriBuilder().path(root.toString()).path(id).build();
-  }
-
-  private class RSessionStateRunnable implements Runnable {
-
-    private final RServerSession rSession;
-    private final String restore;
-
-    public RSessionStateRunnable(RServerSession rSession, String restore) {
-      this.rSession = rSession;
-      this.restore = restore;
-    }
-
-    @Override
-    public void run() {
-      while (RServerSession.State.PENDING.equals(rSession.getState())) {
-        try {
-          Thread.sleep(100);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-      }
-      if (RServerSession.State.RUNNING.equals(rSession.getState()) && !Strings.isNullOrEmpty(restore)) {
-        opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
-      }
-    }
   }
 
   public static class DefaultRServerProfile implements RServerProfile {

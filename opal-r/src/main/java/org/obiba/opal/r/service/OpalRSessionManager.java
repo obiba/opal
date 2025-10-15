@@ -19,6 +19,7 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
+import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.r.service.tasks.SubjectRSessions;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.slf4j.Logger;
@@ -235,7 +236,11 @@ public class OpalRSessionManager implements DisposableBean {
    * @return R session
    */
   public RServerSession newSubjectRSession(RServerProfile profile) {
-    return newSubjectRSession(getSubjectPrincipal(), profile, null);
+    RServerSession rSession = newSubjectRSession(getSubjectPrincipal(), profile, null);
+    // Ensure R session is up and running
+    RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
+    waiter.run();
+    return rSession;
   }
 
   /**
