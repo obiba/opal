@@ -164,14 +164,17 @@ public class RockSpawnerService implements RServerPodService {
     } else if (isRunning()) {
       for (RockPodSession session : openedSessions) {
         try {
-          RServerState podState = getState(session.getPodRef());
-          state.setVersion(podState.getVersion());
-          state.addTags(podState.getTags());
-          state.addRSessionsCount(podState.getRSessionsCount());
-          state.addBusyRSessionsCount(podState.getBusyRSessionsCount());
-          state.setSystemCores(podState.getSystemCores());
-          state.setSystemFreeMemory(podState.getSystemFreeMemory());
-        } catch (RestClientException e) {
+          PodRef pod = session.getPodRef();
+          if (pod != null) {
+            RServerState podState = getState(pod);
+            state.setVersion(podState.getVersion());
+            state.addTags(podState.getTags());
+            state.addRSessionsCount(podState.getRSessionsCount());
+            state.addBusyRSessionsCount(podState.getBusyRSessionsCount());
+            state.setSystemCores(podState.getSystemCores());
+            state.setSystemFreeMemory(podState.getSystemFreeMemory());
+          }
+        } catch (Exception e) {
           log.error("Error when reading R server state", e);
         }
       }
