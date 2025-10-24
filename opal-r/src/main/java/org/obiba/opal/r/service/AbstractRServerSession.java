@@ -91,7 +91,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private long startExecMillis = -1;
 
-  protected AbstractRServerSession(String serverName, String id, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
+  protected AbstractRServerSession(String serverName, String id, String user, RServerProfile profile, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
     this.id = id;
     this.user = user;
     this.transactionalThreadFactory = transactionalThreadFactory;
@@ -101,6 +101,7 @@ public abstract class AbstractRServerSession implements RServerSession {
     this.serverName = serverName;
     this.state = State.PENDING;
     this.busy = false;
+    this.profile = profile;
     addEvent("Created");
   }
 

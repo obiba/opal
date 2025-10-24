@@ -396,8 +396,8 @@ public class OpalRSessionManager implements DisposableBean {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
       RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
-      RServerSession rSession = service.newRServerSession(principal, contextInitiator);
-      rSession.setProfile(safeProfile);
+      RServerSession rSession = service.newRServerSession(principal, safeProfile, contextInitiator);
+      // rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
       return rSession;

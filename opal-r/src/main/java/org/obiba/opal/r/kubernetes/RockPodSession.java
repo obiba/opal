@@ -5,6 +5,7 @@ import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.rock.RockSession;
 import org.obiba.opal.r.service.RContextInitiator;
+import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.spi.r.RServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,8 @@ public class RockPodSession extends RockSession {
 
   private CompletableFuture<Void> readyFuture;
 
-  protected RockPodSession(String serverName, String id, RContextInitiator rContextInitiator, PodRef pod, String user, RockPodSessionHelper rockPodSessionHelper, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, id, rContextInitiator, RockPodSessionHelper.DEFAULT_CREDENTIALS, user, transactionalThreadFactory, eventBus);
+  protected RockPodSession(String serverName, String id, RServerProfile profile, RContextInitiator rContextInitiator, PodRef pod, String user, RockPodSessionHelper rockPodSessionHelper, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, profile, rContextInitiator, RockPodSessionHelper.DEFAULT_CREDENTIALS, user, transactionalThreadFactory, eventBus);
     this.pod = pod;
     this.rockPodSessionHelper = rockPodSessionHelper;
     init();

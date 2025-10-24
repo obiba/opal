@@ -136,17 +136,30 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id, RContextInitiator rContextInitiator) throws RServerException {
-    RServerSession session = getNextRServerService().newRServerSession(user, id, rContextInitiator);
-    session.setProfile(asProfile());
+  public RServerSession newRServerSession(String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
+    RServerSession session = getNextRServerService().newRServerSession(user, id, profile, rContextInitiator);
     return session;
   }
 
-  @Override
+    @Override
+    public RServerProfile newRServerProfile() {
+        return new RServerProfile() {
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public String getCluster() {
+                return name;
+            }
+        };
+    }
+
+    @Override
   public void execute(ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RServerSession rSession = getNextRServerService().newRServerSession(principal == null ? "opal/system" : principal.toString());
-    rSession.setProfile(asProfile());
+    RServerSession rSession = getNextRServerService().newRServerSession(principal == null ? "opal/system" : principal.toString(), newRServerProfile(), null);
     try {
       rSession.execute(rop);
     } finally {
@@ -400,20 +413,6 @@ public class RServerCluster implements RServerClusterService {
     } catch (InterruptedException e) {
       log.error("Error while invoking all R servers", e);
     }
-  }
-
-  private RServerProfile asProfile() {
-    return new RServerProfile() {
-      @Override
-      public String getName() {
-        return name;
-      }
-
-      @Override
-      public String getCluster() {
-        return name;
-      }
-    };
   }
 
 }

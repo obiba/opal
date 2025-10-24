@@ -337,23 +337,27 @@ public class RockService implements RServerAppService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id, RContextInitiator rContextInitiator) throws RServerException {
-    RServerSession session = new RockAppSession(getName(), id, rContextInitiator, app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
-    session.setProfile(new RServerProfile() {
-      @Override
-      public String getName() {
-        return app.getCluster();
-      }
-
-      @Override
-      public String getCluster() {
-        return app.getCluster();
-      }
-    });
+  public RServerSession newRServerSession(String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
+    RServerSession session = new RockAppSession(getName(), id, profile, rContextInitiator, app, getUserCredentials(), user, transactionalThreadFactory, eventBus);
     return session;
   }
 
-  @Override
+    @Override
+    public RServerProfile newRServerProfile() {
+        return new RServerProfile() {
+            @Override
+            public String getName() {
+                return app.getCluster();
+            }
+
+            @Override
+            public String getCluster() {
+                return app.getCluster();
+            }
+        };
+    }
+
+    @Override
   public void execute(ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
     RServerSession rSession = newRServerSession(principal == null ? "opal/system" : principal.toString());
