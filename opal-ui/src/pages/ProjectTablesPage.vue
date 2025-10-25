@@ -55,9 +55,11 @@
 import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
 import SqlPanel from 'src/components/datasource/SqlPanel.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
+import { notifyError } from 'src/utils/notify';
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
@@ -66,6 +68,14 @@ const tab = ref('dictionary');
 const name = computed(() => route.params.id as string);
 
 onMounted(() => {
-  projectsStore.initProject(name.value);
+  projectsStore.initProject(name.value)
+  .then(() => {
+      const canViewSummary = projectsStore.perms.summary ? projectsStore.perms.summary.canRead() : false;
+      if (canViewSummary) projectsStore.loadSummary();
+    })
+    .catch((error) => {
+      notifyError(error);
+      router.replace('/projects');
+    });
 });
 </script>
