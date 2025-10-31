@@ -75,6 +75,7 @@
               <target>
                 <delete dir="node_modules" />
                 <delete dir="dist" />
+                <delete dir="node" />
               </target>
             </configuration>
           </execution>
