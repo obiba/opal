@@ -92,6 +92,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   public List<TableDto> getTables(boolean counts, String entityType, boolean indexedOnly) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     if (datasource == null) return tables;
+    log.info("##### getTables {} with counts {}", datasource.getName(), counts);
     List<ValueTable> filteredTables = datasource.getValueTables().stream()
         .filter(vt -> entityType == null || vt.getEntityType().equals(entityType))
         .filter(vt -> !indexedOnly || hasUpToDateIndex(vt))
@@ -99,7 +100,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     for(ValueTable valueTable : filteredTables) {
       TableDto.Builder builder;
       try {
+        log.info("##### valueTable as DTO {}", valueTable.getName());
         builder = Dtos.asDto(valueTable, counts);
+        log.info("##### \tDONE");
       } catch(Exception e) {
         if (counts) {
           log.warn("Error when evaluating table variables/values counts: " + valueTable.getName(), e);
