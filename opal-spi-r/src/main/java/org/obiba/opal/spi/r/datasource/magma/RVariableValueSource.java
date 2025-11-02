@@ -54,7 +54,11 @@ class RVariableValueSource extends AbstractRVariableValueSource implements Varia
 
   @Override
   public Value getValue(ValueSet valueSet) {
-    Map<Integer, List<Object>> columnValues = ((RValueSet) valueSet).getValuesByPosition();
+    ValueSet vs = valueSet;
+    if (valueSet instanceof ValueSetWrapper) {
+      vs = ((ValueSetWrapper) valueSet).getWrapped();
+    }
+    Map<Integer, List<Object>> columnValues = ((RValueSet) vs).getValuesByPosition();
     if (!columnValues.containsKey(position))
       return variable.isRepeatable() ? getValueType().nullSequence() : getValueType().nullValue();
     return getValue(columnValues.get(position));

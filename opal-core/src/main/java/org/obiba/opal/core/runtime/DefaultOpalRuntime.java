@@ -16,6 +16,8 @@ import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.runtime.cache.CacheDecorator;
+import org.obiba.opal.core.runtime.cache.InMemoryCacheManager;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.plugins.spi.ServicePlugin;
@@ -51,6 +53,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private final ViewManager viewManager;
 
+  private final InMemoryCacheManager cacheManager;
+
   private final ProjectService projectService;
 
   private Integer readDataPointsCount;
@@ -67,6 +71,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     this.viewManager = viewManager;
     this.projectService = projectService;
     this.readDataPointsCount = readDataPointsCount;
+    this.cacheManager = new InMemoryCacheManager();
   }
 
   @Override
@@ -206,6 +211,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
       Runnable magmaEngineInit = () -> {
         // This needs to be added BEFORE otherwise bad things happen. That really sucks.
         MagmaEngine.get().addDecorator(viewManager);
+        MagmaEngine.get().addDecorator(new CacheDecorator(cacheManager));
         MagmaEngineFactory magmaEngineFactory = opalConfigurationService.getOpalConfiguration()
             .getMagmaEngineFactory();
 
