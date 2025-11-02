@@ -82,10 +82,10 @@ const props = withDefaults(defineProps<FrequenciesTableProps>(), {
 });
 
 const categorical = computed(() => props.variable.categories && props.variable.categories.length > 0);
-const nonMissingTotalFreq = computed(() => props.nonMissingFreq.reduce((acc, f) => acc + f.freq, 0));
-const nonMissingTotalPct = computed(() => props.nonMissingFreq.reduce((acc, f) => acc + f.pct, 0));
-const missingTotalFreq = computed(() => props.missingFreq.reduce((acc, f) => acc + f.freq, 0));
-const missingTotalPct = computed(() => props.missingFreq.reduce((acc, f) => acc + f.pct, 0));
+const nonMissingTotalFreq = computed(() => (props.nonMissingFreq || []).reduce((acc, f) => acc + f.freq, 0));
+const nonMissingTotalPct = computed(() => (props.nonMissingFreq || []).reduce((acc, f) => acc + f.pct, 0));
+const missingTotalFreq = computed(() => (props.missingFreq || []).reduce((acc, f) => acc + f.freq, 0));
+const missingTotalPct = computed(() => (props.missingFreq || []).reduce((acc, f) => acc + f.pct, 0));
 
 function getLabels(value: string): string | undefined {
   if (categorical.value) {
