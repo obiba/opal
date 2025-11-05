@@ -95,6 +95,8 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
         return Lists.newArrayList(toRest("/datasource/{0}", "GET:GET/GET", args),
             toRest("/datasource/{0}/_sql", "POST:GET", args),
             toRest("/datasources/_sql", "POST", args),
+            toRest("/identifiers/mappings", "GET"),
+            toRest("/project/{0}/identifiers-mappings", "GET:GET", args),
             toRest("/project/{0}/commands/_analyse", "POST:GET", args),
             toRest("/project/{0}/commands/_export", "POST:GET", args),
             toRest("/project/{0}/commands/_copy", "POST:GET", args),

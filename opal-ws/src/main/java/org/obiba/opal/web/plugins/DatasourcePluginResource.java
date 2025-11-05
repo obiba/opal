@@ -15,6 +15,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -37,12 +38,14 @@ public class DatasourcePluginResource {
   private PluginsService pluginsService;
 
   @GET
+  @NoAuthorization
   public Plugins.PluginDto get() {
     return Dtos.asDto(pluginsService.getInstalledPlugin(name));
   }
 
   @GET
   @Path("form")
+  @NoAuthorization
   public String getSchemaJsonForUsage(@QueryParam("usage") @DefaultValue("import") String usage) {
     if (opalRuntime.hasServicePlugin(name)) {
       ServicePlugin servicePlugin = opalRuntime.getServicePlugin(name);

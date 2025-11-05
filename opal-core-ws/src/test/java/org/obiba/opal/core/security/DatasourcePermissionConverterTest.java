@@ -46,6 +46,8 @@ public class DatasourcePermissionConverterTest
         "rest:/datasource/patate:GET:GET/GET",
         "rest:/datasource/patate/_sql:POST:GET",
         "rest:/datasources/_sql:POST",
+        "rest:/identifiers/mappings:GET",
+        "rest:/project/patate/identifiers-mappings:GET:GET",
         "rest:/project/patate/commands/_analyse:POST:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
