@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.analysis.AnalysisService;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ public class AnalysisPluginResource {
 
   @GET
   @Path("/{plg}")
+  @NoAuthorization
   public Response get(@PathParam("plg") String pluginName) {
     if (opalRuntime.hasServicePlugin(pluginName)) {
       ServicePlugin servicePlugin = opalRuntime.getServicePlugin(pluginName);

@@ -15,6 +15,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class DatasourcePluginsResource {
   private PluginsService pluginsService;
 
   @GET
+  @NoAuthorization
   public Plugins.PluginPackagesDto list(@QueryParam("usage") @DefaultValue("import") String usage) {
     DatasourceUsage dsUsage = DatasourceUsage.valueOf(usage.toUpperCase());
     List<Plugins.PluginPackageDto> dsPackages = pluginsService.getInstalledPlugins().stream()
