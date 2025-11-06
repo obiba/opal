@@ -402,7 +402,11 @@ public class OpalRSessionManager implements DisposableBean {
       rSessions.addRSession(rSession);
       return rSession;
     } catch (Exception e) {
-      log.error("New subject R session failed", e);
+      if (log.isDebugEnabled()) {
+        log.error("New subject R session failed", e);
+      }  else {
+        log.error("New subject R session failed: {}", e.getMessage());
+      }
       throw new RRuntimeException(e);
     }
   }
