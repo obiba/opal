@@ -72,6 +72,9 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   @Autowired
   private RequestAttributesProvider requestAttributeProvider;
 
+  @Autowired
+  private CSRFTokenHelper csrfTokenHelper;
+
   @Override
   public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
     if (OPTIONS.equals(requestContext.getMethod())) {
@@ -119,12 +122,14 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
         }
       }
     }
+
+    responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.createCsrfTokenCookie());
   }
 
   static String asHeader(Iterable<String> values) {
     StringBuilder sb = new StringBuilder();
     for(String s : values) {
-      if(sb.length() > 0) sb.append(", ");
+      if(!sb.isEmpty()) sb.append(", ");
       sb.append(s);
     }
     return sb.toString();

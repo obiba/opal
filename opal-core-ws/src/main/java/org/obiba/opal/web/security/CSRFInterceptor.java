@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -52,17 +51,28 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   private final List<String> csrfAllowedAgents;
 
+  private final CSRFTokenHelper csrfTokenHelper;
+
   @Autowired
   public CSRFInterceptor(@Value("${productionMode}") boolean productionMode,
                          @Value("${csrf.allowed}") String csrfAllowed,
-                         @Value("${csrf.allowed-agents}") String csrfAllowedAgents) {
+                         @Value("${csrf.allowed-agents}") String csrfAllowedAgents,
+                         CSRFTokenHelper csrfTokenHelper) {
     this.productionMode = productionMode;
     this.csrfAllowed = Strings.isNullOrEmpty(csrfAllowed) ? Lists.newArrayList() : Splitter.on(",").splitToList(csrfAllowed.trim());
     this.csrfAllowedAgents = Strings.isNullOrEmpty(csrfAllowedAgents) ? Lists.newArrayList() : Splitter.on(",").splitToList(csrfAllowedAgents.trim());
+    this.csrfTokenHelper = csrfTokenHelper;
   }
 
   @Override
   public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
+    String xsrfCookie = requestContext.getHeaderString(CSRFTokenHelper.CSRF_TOKEN_HEADER);
+    log.debug("{}: {}", CSRFTokenHelper.CSRF_TOKEN_HEADER, xsrfCookie);
+    if (!csrfTokenHelper.validateXsrfToken(xsrfCookie)) {
+      log.warn("XSRF token validation failed. Are you sending the '{}' HTTP header with the XSRF token value?", CSRFTokenHelper.CSRF_TOKEN_HEADER);
+      throw new ForbiddenException("XSRF token validation failed");
+    }
+
     if (!productionMode || csrfAllowed.contains("*")) return;
 
     String host = requestContext.getHeaderString(HOST_HEADER);
