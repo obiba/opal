@@ -101,7 +101,7 @@
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>3.25.5</protobuf.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>6.2.8.Final</resteasy.version>
+    <resteasy.version>6.2.14.Final</resteasy.version>
     <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
     <rhino-js.version>1.7.7.1</rhino-js.version>
     <shiro.version>1.13.0</shiro.version>
@@ -109,7 +109,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
-    <spring.version>6.2.11</spring.version>
+    <spring.version>6.2.13</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
