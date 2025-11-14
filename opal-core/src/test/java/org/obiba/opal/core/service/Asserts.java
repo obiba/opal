@@ -15,7 +15,7 @@ import org.obiba.opal.core.domain.Timestamped;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.apache.commons.lang.time.DateUtils.round;
+import static org.apache.commons.lang3.time.DateUtils.round;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class Asserts {
