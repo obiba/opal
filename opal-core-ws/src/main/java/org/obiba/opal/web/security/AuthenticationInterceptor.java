@@ -15,16 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.NewCookie;
-import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.session.Session;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ServerResponse;
-import org.jboss.resteasy.spi.Failure;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -80,17 +75,32 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
       responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
-          new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), getCookiePath(), null, null, timeout, true, true));
+          new NewCookie.Builder(OPAL_SESSION_ID_COOKIE_NAME)
+              .value(session.getId().toString())
+              .path(getCookiePath())
+              .maxAge(timeout)
+              .secure(true)
+              .httpOnly(true)
+              .sameSite(NewCookie.SameSite.LAX)
+              .build());
       Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
       if(cookieValue != null) {
-        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
+        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, new NewCookie.Builder(cookieValue.toString()).build());
       }
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(resourceMethod == null || isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
         responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
-            new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, getCookiePath(), null, "Opal session deleted", 0, true, true));
+            new NewCookie.Builder(OPAL_SESSION_ID_COOKIE_NAME)
+                .value(null)
+                .path(getCookiePath())
+                .comment("Opal session deleted")
+                .maxAge(0)
+                .secure(true)
+                .httpOnly(true)
+                .sameSite(NewCookie.SameSite.LAX)
+                .build());
       }
     }
   }
